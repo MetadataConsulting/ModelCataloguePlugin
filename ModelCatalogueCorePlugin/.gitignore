@@ -4,14 +4,21 @@
 /web-app/WEB-INF
 
 # IDE support files
-/.classpath
+*.classpath
 /.launch
-/.project
+*.project
 /.settings
 /*.launch
 /*.tmproj
 /ivy*
 /eclipse
+/idea*
+/out*
+*.idea
+
+#bower
+
+grails-app/assets/bower_components/*
 
 # default HSQL database files for production mode
 /prodDb.*
@@ -41,3 +48,6 @@
 
 # other
 *.iws
+
+
+
