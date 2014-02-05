@@ -34,7 +34,6 @@ class DataElementController {
             model=[
                     success: true,
                     instance: element
-
             ]
 
         }

@@ -31,10 +31,10 @@ class EnumeratedTypeSpec extends Specification {
        where:
 
        validates|args
-        false| [ : ]
-        false | [name:'test']
-        false | [name:'test', enumerations: ['male']]
-        true | [name:'test', enumerations: ['male','female','unknown'] ]
+        false   | [ : ]
+        false   | [name:'test']
+        false   | [name:'test', enumerations: ['male']]
+        true    | [name:'test', enumerations: ['male','female','unknown'] ]
 
 
 

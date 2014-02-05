@@ -7,4 +7,8 @@
         {"class": "uk.co.mc.core.DataElement", "id": 3, "definition": "Third data element definition", "description": "Third data element", "extension": {}, "incomingRelationships": null, "name": "Three", "outgoingRelationships": null, "revisionNumber": 1, "status": {"enumType": "uk.co.mc.core.CatalogueElement$Status", "name": "DRAFT"}, "versionNumber": 0}
     ]}
 
+    fixtures.dataElementGet = {
+        instance:{"extension":{}, "id":1, "outgoingRelationships":null, "revisionNumber":1, "definition":"First data element definition", "status":{"name":"DRAFT", "enumType":"uk.co.mc.core.CatalogueElement$Status"}, "description":"First data element", "name":"One", "class":"uk.co.mc.core.DataElement", "versionNumber":0, "incomingRelationships":null}, "success":true}
+
+
 })(window)

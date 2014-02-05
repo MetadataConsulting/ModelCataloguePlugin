@@ -52,10 +52,6 @@ class RelationshipSpec extends Specification{
 
     }
 
-
-
-
-
     RelationshipType createRelationshipType(Class destinationClass=DataElement){
         new RelationshipType(name:'relationship1', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: DataElement,destinationClass: destinationClass )
     }

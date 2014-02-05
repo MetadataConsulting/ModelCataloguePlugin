@@ -9,9 +9,9 @@ class DataElement extends CatalogueElement {
 	String definition
 
     static constraints = {
-		description nullable:true
-		definition nullable: true
-		name blank: false
+		description nullable:true, maxSize:2000
+		definition nullable: true, maxSize:2000
+		name blank: false, size: 2..255
     }
 	
 	static mapping = {

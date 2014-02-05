@@ -5,25 +5,12 @@ class ConceptualDomain extends CatalogueElement  {
 	String name
 	String description
 
-	static auditable = true
-
-	static hasMany = [valueDomains: ValueDomain]
-
 	static constraints = {
-		valueDomains nullable:true
-		name blank: false
-	}
-
-	def prepareForDelete(){
-		if(this.valueDomains.size()!=0){
-			this.valueDomains.each{ p->
-				p.prepareForDelete()
-			}
-		}
-	}
+        name blank: false, size: 2..255
+        description maxSize: 2000
+    }
 
 	static mapping = {
 		description type: 'text'
-		valueDomains cascade: 'save-update'
 	}
 }

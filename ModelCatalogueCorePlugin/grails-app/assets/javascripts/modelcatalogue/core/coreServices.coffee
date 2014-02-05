@@ -10,6 +10,16 @@ angular.module('mc.coreServices', []).service("mcDataElementsService", ["$http",
 
       deferred.promise
 
+    get: (id) ->
+      deferred = $q.defer()
+      $http.get("/dataElement/#{id}").then (response) ->
+        deferred.resolve(response.data)
+      , (errorResponse) ->
+        deferred.reject(errorResponse)
+
+      deferred.promise
+
+
   }
 
 ])

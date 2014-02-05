@@ -105,7 +105,6 @@ class DataElementControllerSpec extends Specification {
         controller.get(1)
         def result = response.json
 
-
         then:
         result.instance
         result.instance.id == 1

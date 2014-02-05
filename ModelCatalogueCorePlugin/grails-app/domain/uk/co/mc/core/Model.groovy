@@ -4,12 +4,10 @@ class Model extends CatalogueElement  {
 	 
 	String name
 	String description
-
-
-	static hasMany = [relations: Relationship]
 	 
     static constraints = {
-		name blank: false
+		name blank: false, size: 2..255
+        description maxSize: 2000
     }
 	
 	static mapping = {
