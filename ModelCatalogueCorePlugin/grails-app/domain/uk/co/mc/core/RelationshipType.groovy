@@ -22,9 +22,6 @@ class RelationshipType {
 	//type is a mandatory data element then the catalogue x must contain a value for the data element y
 	
 	//Rule relationshipTypeRule
-    //FIXME thinking of adding constraints here
-    //but need to have a think about this before
-    //we go down this path
 
     static constraints = {
         def classValidator = {val, obj ->

@@ -1,9 +1,7 @@
 package uk.co.mc.core
 
-class DataType  {
-	
-	String name
-	
+class DataType extends CatalogueElement{
+
     static constraints = {
 		name unique:true, size: 2..255
     }

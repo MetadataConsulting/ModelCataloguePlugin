@@ -130,6 +130,20 @@ class DataElementControllerSpec extends Specification {
 
     }
 
+    void "Update an element"()
+    {
+        expect:
+        DataElement.count()==3
 
+        when:
+        controller.update()
+        def result = response.json
+
+        then:
+        result.instance
+        result.instance.id == 1
+        result.instance.name == "OneUpdated"
+
+    }
 
 }

@@ -8,7 +8,8 @@
     ]}
 
     fixtures.dataElementGet = {
-        instance:{"extension":{}, "id":1, "outgoingRelationships":null, "revisionNumber":1, "definition":"First data element definition", "status":{"name":"DRAFT", "enumType":"uk.co.mc.core.CatalogueElement$Status"}, "description":"First data element", "name":"One", "class":"uk.co.mc.core.DataElement", "versionNumber":0, "incomingRelationships":null}, "success":true}
+        instance:{"extension":{}, "id":1, "outgoingRelationships":null, "revisionNumber":1, "definition":"First data element definition", "status":{"name":"DRAFT", "enumType":"uk.co.mc.core.CatalogueElement$Status"}, "description":"First data element", "name":"One", "class":"uk.co.mc.core.DataElement", "versionNumber":0, "incomingRelationships":null}, "success":true
+    }
 
 
 })(window)
