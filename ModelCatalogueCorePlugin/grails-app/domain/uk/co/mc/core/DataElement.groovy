@@ -7,5 +7,15 @@ package uk.co.mc.core
 * */
 
 class DataElement extends ExtendibleElement {
+
+    //nearly all examples that I have seen have a unique data element code
+    String code
+
+    static constraints = {
+        code nullable:true, unique:true, maxSize: 255
+    }
+
+    static mapping = {
+    }
 	
 }

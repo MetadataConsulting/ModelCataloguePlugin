@@ -28,15 +28,15 @@ class DataElementControllerISpec extends Specification {
                 sourceClass: DataElement,
                 destinationClass: DataElement).save()
 
-        def de1 = new DataElement(name: "One", description: "First data element", definition: "First data element definition").save()
-        def de2 = new DataElement(name: "Two", description: "Second data element", definition: "Second data element definition").save()
+        def de1 = new DataElement(id: 1, name: "One", description: "First data element", definition: "First data element definition").save()
+        def de2 = new DataElement(id: 2, name: "Two", description: "Second data element", definition: "Second data element definition").save()
 
 
         def rel = new Relationship(source: de1,
                 destination: de2,
                 relationshipType: rt).save()
 
-        new DataElement(name: "Three",
+        new DataElement(id:3, name: "Three",
                 description: "Third data element",
                 definition: "Third data element definition",
                 incomingRelationships: rel).save()
@@ -46,10 +46,6 @@ class DataElementControllerISpec extends Specification {
     }
 
     def cleanup() {
-
-        /*DataElement.list().each{ dataElement->
-            dataElement.delete()
-        }*/
 
     }
 
@@ -106,7 +102,7 @@ class DataElementControllerISpec extends Specification {
 
     }
 
-    void "Get an element"()
+    void "Get an element that contains relationships"()
     {
         expect:
          DataElement.count()==3
@@ -114,17 +110,38 @@ class DataElementControllerISpec extends Specification {
 
         when:
 
-        controller.params.id = 13
+
+        controller.params.id = 15
         controller.show()
 
         def result = controller.response.json
 
-        println(result)
-
         then:
         result.instance
-        result.instance.id == 13
-        result.instance.name == "One"
+        result.instance.id == 15
+        result.instance.name == "Three"
+        result.instance.incomingRelationships == [
+                [
+                        destinationPath: "/DataElement/14",
+                        relationshipType: [
+                                sourceClass: "uk.co.mc.core.DataElement",
+                                id: 5,
+                                sourceToDestination: "SynonymousWith",
+                                errors: [
+                                        errors: [
+
+                                        ]
+                                ],
+                                destinationClass: "uk.co.mc.core.DataElement",
+                                name: "Synonym",
+                                destinationToSource: "SynonymousWith",
+                                version: 0
+                        ],
+                        sourceName: "Three",
+                        sourcePath: "/DataElement/15",
+                        destinationName: "Two"
+                ]
+        ]
 
     }
 
@@ -146,20 +163,20 @@ class DataElementControllerISpec extends Specification {
 
     }
 
-    void "Update an element"()
-    {
-        expect:
-        DataElement.count()==3
-
-        when:
-        controller.update()
-        def result = response.json
-
-        then:
-        result.instance
-        result.instance.id == 1
-        result.instance.name == "OneUpdated"
-
-    }
+//    void "Update an element"()
+//    {
+//        expect:
+//        DataElement.count()==3
+//
+//        when:
+//        controller.update()
+//        def result = response.json
+//
+//        then:
+//        result.instance
+//        result.instance.id == 1
+//        result.instance.name == "OneUpdated"
+//
+//    }
 
 }

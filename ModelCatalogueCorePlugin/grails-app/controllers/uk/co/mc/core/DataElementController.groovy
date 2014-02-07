@@ -59,48 +59,48 @@ class DataElementController extends RestfulController<DataElement>{
  * Updates a resource for the given id
  * @param id
  */
-    @Transactional
-    @Override
-    def update() {
-
-        def model
-
-        if(handleReadOnly()) {
-            model = [
-                    errors: [[message: "data element read only"]]
-            ]
-            return model
-        }
-
-        DataElement dataElementInstance = DataElement.get(params.id)
-        if (dataElementInstance == null) {
-            model = [
-                    errors: [[message: "data element no found"]]
-            ]
-            return model
-        }
-
-        dataElementInstance.properties = getParametersToBind()
-
-        if (dataElementInstance.hasErrors()) {
-            model = [
-                    errors: [dataElementInstance.errors]
-            ]
-            return model
-        }
-
-        dataElementInstance.save flush:true
-
-        request.withFormat {
-            '*'{
-                response.addHeader(HttpHeaders.LOCATION,
-                        g.createLink(
-                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
-                                namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond dataElementInstance, [status: OK]
-            }
-        }
-    }
+//    @Transactional
+//    @Override
+//    def update() {
+//
+//        def model
+//
+//        if(handleReadOnly()) {
+//            model = [
+//                    errors: [[message: "data element read only"]]
+//            ]
+//            return model
+//        }
+//
+//        DataElement dataElementInstance = DataElement.get(params.id)
+//        if (dataElementInstance == null) {
+//            model = [
+//                    errors: [[message: "data element no found"]]
+//            ]
+//            return model
+//        }
+//
+//        dataElementInstance.properties = getParametersToBind()
+//
+//        if (dataElementInstance.hasErrors()) {
+//            model = [
+//               errors: [dataElementInstance.errors]
+//            ]
+//            return model
+//        }
+//
+//        dataElementInstance.save flush:true
+//
+//        request.withFormat {
+//            '*'{
+//                response.addHeader(HttpHeaders.LOCATION,
+//                        g.createLink(
+//                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
+//                                namespace: hasProperty('namespace') ? this.namespace : null ))
+//                respond dataElementInstance, [status: OK]
+//            }
+//        }
+//    }
 
 
 }

@@ -35,7 +35,8 @@ class DataElementSpec extends Specification{
         validates |   size    | args
         false     |   0       | [name: "x" * 256, description: "this is the the result description"]
         false     |   0       | [name: "x", description: "x"*2001]
-        true      |   1       | [name: "result1", description: "this is the the result description"]
+        false     |   0       | [name: "result1", description: "this is the the result description", code:"x" * 256]
+        true      |   1       | [name: "result1", description: "this is the the result description", code:"NHIC12341"]
 
     }
 
