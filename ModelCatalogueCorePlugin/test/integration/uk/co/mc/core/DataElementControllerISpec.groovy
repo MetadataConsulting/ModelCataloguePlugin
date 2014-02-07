@@ -10,7 +10,7 @@ import spock.lang.Unroll
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
-@TestFor(DataElementController)
+
 class DataElementControllerISpec extends Specification {
 
     def controller
@@ -122,27 +122,18 @@ class DataElementControllerISpec extends Specification {
         result.instance.name == "Three"
         result.instance.incomingRelationships == [
                 [
-                        destinationPath: "/DataElement/14",
-                        relationshipType: [
-                                sourceClass: "uk.co.mc.core.DataElement",
-                                id: 5,
-                                sourceToDestination: "SynonymousWith",
-                                errors: [
-                                        errors: [
-
-                                        ]
-                                ],
-                                destinationClass: "uk.co.mc.core.DataElement",
-                                name: "Synonym",
-                                destinationToSource: "SynonymousWith",
-                                version: 0
-                        ],
-                        sourceName: "Three",
-                        sourcePath: "/DataElement/15",
-                        destinationName: "Two"
-                ]
-        ]
-
+                        destinationPath:"/DataElement/14",
+                        relationshipType:[
+                                sourceClass:"uk.co.mc.core.DataElement",
+                                id:5,
+                                sourceToDestination:"SynonymousWith",
+                                destinationClass:"uk.co.mc.core.DataElement",
+                                name:"Synonym",
+                                class:"uk.co.mc.core.RelationshipType",
+                                destinationToSource:"SynonymousWith"],
+                        sourceName:"Three",
+                        sourcePath:"/DataElement/15",
+                        destinationName:"Two"]]
     }
 
     void "If element not found "()

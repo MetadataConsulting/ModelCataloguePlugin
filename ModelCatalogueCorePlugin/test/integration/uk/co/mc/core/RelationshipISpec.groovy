@@ -1,10 +1,13 @@
 package uk.co.mc.core
 
+import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 /**
  * Created by adammilward on 04/02/2014.
  */
+
+
 class RelationshipISpec extends Specification{
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()

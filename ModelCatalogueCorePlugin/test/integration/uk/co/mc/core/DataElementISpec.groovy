@@ -52,16 +52,15 @@ class DataElementISpec extends Specification{
 
         when:
 
-        DataElement dataElementInstance1 = new DataElement(name: "result1", description: "this is the the result description", "code": "x123")
-        dataElementInstance1.save()
+        DataElement dataElementInstance1 = new DataElement(name: "result1", description: "this is the the result description", code: "x123")
+        dataElementInstance1.save(flush:true)
 
-        DataElement dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", "code": "x123")
-        dataElementInstance2.save()
+        DataElement dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "x123")
+        dataElementInstance2.validate()
 
         then:
 
         dataElementInstance2.hasErrors()
-        dataElementInstance2.errors.getFieldError("code") =='blah'
 
     }
 
