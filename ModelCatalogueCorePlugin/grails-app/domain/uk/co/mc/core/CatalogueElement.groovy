@@ -19,12 +19,8 @@ abstract class CatalogueElement {
 
 
     static mappedBy = [ outgoingRelationships: 'source', incomingRelationships: 'destination']
-		
-		
 
-		
-		
-		
+
 		/******************************************************************************************************************/
 		/****functions for specifying relationships between catalogue elements using the uk.co.mc.core.Relationship class ************/
 		/******************************************************************************************************************/

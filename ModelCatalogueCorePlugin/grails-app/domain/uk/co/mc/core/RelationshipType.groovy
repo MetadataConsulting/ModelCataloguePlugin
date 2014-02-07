@@ -11,10 +11,10 @@ class RelationshipType {
 	//the both sides of the relationship i.e. for parentChild this would be child (for synonym this is synonym, so the same on both sides)
 	String destinationToSource
 
-    //this is nullable - you can constrain the relationship type
+    //you can constrain the relationship type
     Class sourceClass
 
-    //this is nullable - you can constrain the relationship type
+    // you can constrain the relationship type
     Class destinationClass
 	
 	//this is the rule that describes the relationship in terms of X and Y

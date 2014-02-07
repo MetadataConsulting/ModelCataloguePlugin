@@ -20,3 +20,8 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 }
+
+grails.mime.types = [
+        json:          ['application/json', 'text/json'],
+        xml:           ['text/xml', 'application/xml']
+]
