@@ -16,7 +16,7 @@ class EnumeratedTypeSpec extends Specification {
 
         expect:
 
-        EnumeratedType.list().isEmpty()
+            EnumeratedType.list().isEmpty()
 
        when:
 

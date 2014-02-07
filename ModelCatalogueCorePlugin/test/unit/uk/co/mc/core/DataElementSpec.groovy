@@ -26,16 +26,44 @@ class DataElementSpec extends Specification{
         then:
 
         !dataElementInstance.hasErrors()==validates
+        dataElementInstance.versionNumber == 0.1
         DataElement.list().size() == size
+
 
         where:
 
         validates |   size    | args
-        false     |   0       | [name: "x" * 256, description: "this is the the result description", definition: "this is the result definition"]
-        false     |   0       | [name: "x", description: "x"*2001, definition: "this is the result definition"]
-        false     |   0       | [name: "result1", description: "this is the the result description", definition: "x" * 2001]
-        true      |   1       | [name: "result1", description: "this is the the result description", definition: "this is the result definition"]
+        false     |   0       | [name: "x" * 256, description: "this is the the result description"]
+        false     |   0       | [name: "x", description: "x"*2001]
+        false     |   0       | [name: "result1", description: "this is the the result description", code:"x" * 256]
+        true      |   1       | [name: "result1", description: "this is the the result description", code:"NHIC12341"]
 
     }
+
+    @Unroll
+    def "create a new data element and extend it to include additional metadata"(){
+
+        expect:
+
+        DataElement.list().isEmpty()
+
+        when:
+
+        def dataCollectionQualityExtension = ["oxford": 1, "cambridge": 3]
+
+        DataElement dataElementInstance = new DataElement(name: "result1", description: "this is the the result description")
+
+        dataElementInstance.dataCollectionQuality =  dataCollectionQualityExtension
+
+        dataElementInstance.save()
+
+        then:
+
+        !dataElementInstance.hasErrors()
+        dataElementInstance.dataCollectionQuality == dataCollectionQualityExtension
+
+    }
+
+
 
 }

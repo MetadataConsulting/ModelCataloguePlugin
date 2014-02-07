@@ -7,8 +7,6 @@ import spock.lang.Specification
  */
 class RelationshipISpec extends Specification{
 
-
-
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
 
@@ -35,9 +33,7 @@ class RelationshipISpec extends Specification{
 
         rel.hasErrors()
 
-
     }
-
 
     def "Create Relationship if the catalogue elements have been persisted and add relations to the source and destination"()
     {

@@ -50,5 +50,6 @@ grails.project.dependency.resolution = {
         compile ":less-asset-pipeline:1.5.0"
         compile ":hibernate:3.6.10.3"
         build ":tomcat:7.0.50"
+
     }
 }
