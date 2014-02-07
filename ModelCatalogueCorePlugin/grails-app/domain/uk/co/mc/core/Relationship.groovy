@@ -12,9 +12,9 @@ class Relationship  {
         relationshipType validator: { val,obj ->
 
             if(!val) return true;
-            if(!val.validateSourceDestination(obj.source,obj.destination))
+            if(!val.validateSourceDestination(obj.source,obj.destination)){
                return false;
-
+            }
             return  true;
 
         }

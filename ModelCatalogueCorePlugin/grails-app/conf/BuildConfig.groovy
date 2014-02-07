@@ -48,7 +48,7 @@ grails.project.dependency.resolution = {
         }
         compile ":coffee-asset-pipeline:1.5.0"
         compile ":less-asset-pipeline:1.5.0"
-        compile ":hibernate:3.6.10.3"
+        compile ":hibernate:3.6.10.7"
         build ":tomcat:7.0.50"
 
     }

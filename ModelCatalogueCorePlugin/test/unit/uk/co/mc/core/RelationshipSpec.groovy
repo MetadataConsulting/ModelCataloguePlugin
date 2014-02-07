@@ -8,7 +8,7 @@ import spock.lang.Unroll
  * Created by adammilward on 03/02/2014.
  */
 
-@Mock([Relationship, RelationshipType, DataElement])
+@Mock([Relationship, OntologyType, DataElement])
 class RelationshipSpec extends Specification{
 
     @Unroll
@@ -52,7 +52,7 @@ class RelationshipSpec extends Specification{
 
     }
 
-    RelationshipType createRelationshipType(Class destinationClass=DataElement){
-        new RelationshipType(name:'relationship1', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: DataElement,destinationClass: destinationClass )
+    OntologyType createRelationshipType(Class destinationClass=DataElement){
+        new OntologyType(name:'relationship1', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: DataElement,destinationClass: destinationClass)
     }
 }

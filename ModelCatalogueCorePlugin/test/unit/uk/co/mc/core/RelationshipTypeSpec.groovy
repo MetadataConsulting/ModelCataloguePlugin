@@ -7,16 +7,16 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 03/02/2014.
  */
-@Mock(RelationshipType)
-class RelationshipTypeSpec extends Specification {
+@Mock(OntologyType)
+class OntologyTypeSpec extends Specification {
 
     def "The relationship type get persisted"(){
 
         expect:
-        RelationshipType.list().isEmpty()
+        OntologyType.list().isEmpty()
 
         when:
-        RelationshipType type = new RelationshipType(
+        OntologyType type = new OntologyType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
@@ -28,10 +28,10 @@ class RelationshipTypeSpec extends Specification {
 
         then:
         type.id
-        RelationshipType.list().size() == 1
+        OntologyType.list().size() == 1
 
         when:
-        RelationshipType loaded = RelationshipType.get(type.id)
+        OntologyType loaded = OntologyType.get(type.id)
 
         then:
         loaded.sourceClass == DataElement
@@ -46,7 +46,7 @@ class RelationshipTypeSpec extends Specification {
 
         when:
 
-        RelationshipType type = new RelationshipType(
+        OntologyType type = new OntologyType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
@@ -59,7 +59,7 @@ class RelationshipTypeSpec extends Specification {
         !type.hasErrors()
 
         when:
-        RelationshipType type2 = new RelationshipType(
+        OntologyType type2 = new OntologyType(
                 sourceToDestination: "x" * 256,
                 destinationToSource: "x" * 256,
                 name: "x" * 256,
@@ -81,7 +81,7 @@ class RelationshipTypeSpec extends Specification {
 
     @Unroll
     def "test validate is #validates for uk.co.mc.core.Relationship source #source and destination #target" (){
-        RelationshipType type = new RelationshipType(
+        OntologyType type = new OntologyType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
