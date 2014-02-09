@@ -2,21 +2,31 @@ package uk.co.mc.core
 
 /**
  * Created by adammilward on 07/02/2014.
- * context exists between
+ *
+ * Mappings exist between Enumerated DataTypes
+ * i.e. ["His": "history", "Sci": "science", "Pol": "politics"]
+ *
  */
 class Mapping extends RelationshipType{
 
-    //name of the relationship type i.e. parentChild  or synonym
-    static String name = "mapping"
-    static String sourceToDestination = "maps to"
-    static String destinationToSource = "maps to"
+    public final String name = "mapping"
+    public final String sourceToDestination = "maps to"
+    public final String destinationToSource = "maps from"
+    public final Class sourceClass = DataType
+    public final Class destinationClass = DataType
 
-    //you can constrain the relationship type
-    static Class sourceClass = DataType
+    Map map
 
-    // you can constrain the relationship type
-    static Class destinationClass = DataType
+    //FIXME mapping
 
-    //FIXME this class needs to include a map object that maps the two data types
+    static constraints = {
+        map nullable:true
+    }
+
+    boolean validateSourceDestination(source, destination){
+        if(!DataType.isInstance(source)){ return false }
+        if(!DataType.isInstance(destination)){return false}
+        return true
+    }
 
 }

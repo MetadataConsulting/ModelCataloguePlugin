@@ -1,5 +1,11 @@
 package uk.co.mc.core
 
+/*
+*
+* Data Elements and Models are extendible elements. This allows them to add additional metadata as properties
+*
+* */
+
 abstract class ExtendibleElement extends PublishedElement{
 
     //storage is used with propertyMissing to allow the user to extend any catalogue element properties

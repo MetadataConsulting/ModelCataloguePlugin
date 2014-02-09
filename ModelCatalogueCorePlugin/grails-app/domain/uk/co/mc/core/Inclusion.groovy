@@ -2,19 +2,27 @@ package uk.co.mc.core
 
 /**
  * Created by adammilward on 07/02/2014.
- * context exists between
+ * The Inclusion relationship type allows value domains to be included in conceptual domains
+ *
+ *
  */
 class Inclusion extends RelationshipType{
 
     //name of the relationship type i.e. parentChild  or synonym
-    static String name = "include"
-    static String sourceToDestination = "includes"
-    static String destinationToSource = "included in"
+    public final String name = "include"
+    public final String sourceToDestination = "includes"
+    public final String destinationToSource = "included in"
 
     //you can constrain the relationship type
-    static Class sourceClass = ConceptualDomain
+    public final Class sourceClass = ConceptualDomain
 
     // you can constrain the relationship type
-    static Class destinationClass = ValueDomain
+    public final Class destinationClass = ValueDomain
+
+    boolean validateSourceDestination(source, destination){
+        if(!ConceptualDomain.isInstance(source)){ return false }
+        if(!ValueDomain.isInstance(destination)){return false}
+        return true
+    }
 
 }

@@ -2,8 +2,14 @@ package uk.co.mc.core
 
 /**
  * Created by adammilward on 07/02/2014.
+ *
+ * Ontologolic relationship types can exist between data elements i.e. useFor, broaderTerms, narrowerTerm etc.
+ * This allows the user to create relationships between their data elements building up a knowledge base
+ * FIXME - we probably want to preload certain ontologyrelationships i.e. thesauri, skos
+ *
+ *
  */
-class OntologyType extends RelationshipType{
+class OntologyRelationshipType extends RelationshipType{
 
     //name of the relationship type i.e. parentChild  or synonym
     String name
@@ -42,16 +48,8 @@ class OntologyType extends RelationshipType{
 
 
     boolean validateSourceDestination(source, destination){
-
-        if(!sourceClass.isInstance(source)){
-            return false
-        }
-
-        if(!destinationClass.isInstance(destination)){
-            return false
-        }
-
+        if(!sourceClass.isInstance(source)){ return false }
+        if(!destinationClass.isInstance(destination)){return false}
         return true
-
     }
 }

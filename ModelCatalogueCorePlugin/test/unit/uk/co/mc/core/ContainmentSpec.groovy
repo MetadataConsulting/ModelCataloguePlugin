@@ -35,6 +35,37 @@ class ContainmentSpec extends Specification{
 
     }
 
+    def "The containment object cannot be edited"(){
+
+        expect:
+        Containment.list().isEmpty()
+
+        when:
+        Containment type = new Containment()
+
+        type.save()
+
+        then:
+
+        !type.hasErrors()
+
+        when:
+
+        def errors = false
+
+        try{
+            type.name = "another name"
+        }catch (ReadOnlyPropertyException error){
+            errors = true
+        }
+
+        then:
+
+        errors
+
+
+    }
+
 
 
 }

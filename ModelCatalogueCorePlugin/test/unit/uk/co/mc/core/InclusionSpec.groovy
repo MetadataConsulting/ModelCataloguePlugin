@@ -35,6 +35,37 @@ class InclusionSpec extends Specification{
 
     }
 
+    def "The inclusion object cannot be edited"(){
+
+        expect:
+        Inclusion.list().isEmpty()
+
+        when:
+        Inclusion type = new Inclusion()
+
+        type.save()
+
+        then:
+
+        !type.hasErrors()
+
+        when:
+
+        def errors = false
+
+        try{
+            type.name = "another name"
+        }catch (ReadOnlyPropertyException error){
+            errors = true
+        }
+
+        then:
+
+        errors
+
+
+    }
+
 
 
 }

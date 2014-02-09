@@ -35,6 +35,37 @@ class InstantiationSpec extends Specification{
 
     }
 
+    def "The instantiation object cannot be edited"(){
+
+        expect:
+        Instantiation.list().isEmpty()
+
+        when:
+        Instantiation type = new Instantiation()
+
+        type.save()
+
+        then:
+
+        !type.hasErrors()
+
+        when:
+
+        def errors = false
+
+        try{
+            type.name = "another name"
+        }catch (ReadOnlyPropertyException error){
+            errors = true
+        }
+
+        then:
+
+        errors
+
+
+    }
+
 
 
 }

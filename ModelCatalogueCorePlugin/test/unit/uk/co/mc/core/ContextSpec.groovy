@@ -35,6 +35,37 @@ class ContextSpec extends Specification{
 
     }
 
+    def "The context object cannot be edited"(){
+
+        expect:
+        Context.list().isEmpty()
+
+        when:
+        Context type = new Context()
+
+        type.save()
+
+        then:
+
+        !type.hasErrors()
+
+        when:
+
+        def errors = false
+
+        try{
+            type.name = "another name"
+        }catch (ReadOnlyPropertyException error){
+            errors = true
+        }
+
+        then:
+
+        errors
+
+
+    }
+
 
 
 }

@@ -7,9 +7,9 @@ package uk.co.mc.core
 class Supersession extends RelationshipType{
 
     //name of the relationship type i.e. parentChild  or synonym
-    static String name = "supersession"
-    static String sourceToDestination = "superseded by"
-    static String destinationToSource = "supersedes"
+    public final String name = "supersession"
+    public final String sourceToDestination = "superseded by"
+    public final String destinationToSource = "supersedes"
 
     //you can constrain the relationship type
     Class sourceClass
@@ -39,6 +39,12 @@ class Supersession extends RelationshipType{
             }
         }
 
+    }
+
+    boolean validateSourceDestination(source, destination){
+        if(!PublishedElement.isInstance(source)){ return false }
+        if(!PublishedElement.isInstance(destination)){return false}
+        return true
     }
 
 }

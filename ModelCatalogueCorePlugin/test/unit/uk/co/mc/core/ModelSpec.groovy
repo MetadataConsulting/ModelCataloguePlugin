@@ -6,6 +6,9 @@ import spock.lang.Unroll
 
 /**
  * Created by adammilward on 05/02/2014.
+ *
+ * Models are like xml complex types
+ * They contain data elements
  */
 @Mock(Model)
 class ModelSpec extends Specification{
@@ -61,6 +64,8 @@ class ModelSpec extends Specification{
         modelInstance.address == dataExtension
 
     }
+
+
 
 
 }

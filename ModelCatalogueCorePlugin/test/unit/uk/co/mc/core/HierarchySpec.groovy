@@ -35,6 +35,37 @@ class HierarchySpec extends Specification{
 
     }
 
+    def "The hierarchy object cannot be edited"(){
+
+        expect:
+        Hierarchy.list().isEmpty()
+
+        when:
+        Hierarchy type = new Hierarchy()
+
+        type.save()
+
+        then:
+
+        !type.hasErrors()
+
+        when:
+
+        def errors = false
+
+        try{
+            type.name = "another name"
+        }catch (ReadOnlyPropertyException error){
+            errors = true
+        }
+
+        then:
+
+        errors
+
+
+    }
+
 
 
 }

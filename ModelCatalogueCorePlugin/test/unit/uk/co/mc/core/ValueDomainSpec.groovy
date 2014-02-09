@@ -6,6 +6,9 @@ import spock.lang.Unroll
 
 /**
  * Created by adammilward on 05/02/2014.
+ * A value domain instantiates a data element it includes information regarding the set of values and constraints that
+ * describe the data element within the context of a conceptual domain
+ * value domains are invluded in conceptual domains
  */
 @Mock([ValueDomain, DataElement])
 class ValueDomainSpec extends Specification{

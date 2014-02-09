@@ -6,17 +6,18 @@ import spock.lang.Unroll
 
 /**
  * Created by adammilward on 03/02/2014.
+ *
  */
-@Mock(OntologyType)
-class OntologyTypeSpec extends Specification {
+@Mock(OntologyRelationshipType)
+class OntologyRelationshipTypeSpec extends Specification {
 
     def "The relationship type get persisted"(){
 
         expect:
-        OntologyType.list().isEmpty()
+        OntologyRelationshipType.list().isEmpty()
 
         when:
-        OntologyType type = new OntologyType(
+        OntologyRelationshipType type = new OntologyRelationshipType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
@@ -28,10 +29,10 @@ class OntologyTypeSpec extends Specification {
 
         then:
         type.id
-        OntologyType.list().size() == 1
+        OntologyRelationshipType.list().size() == 1
 
         when:
-        OntologyType loaded = OntologyType.get(type.id)
+        OntologyRelationshipType loaded = OntologyRelationshipType.get(type.id)
 
         then:
         loaded.sourceClass == DataElement
@@ -46,7 +47,7 @@ class OntologyTypeSpec extends Specification {
 
         when:
 
-        OntologyType type = new OntologyType(
+        OntologyRelationshipType type = new OntologyRelationshipType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
@@ -59,7 +60,7 @@ class OntologyTypeSpec extends Specification {
         !type.hasErrors()
 
         when:
-        OntologyType type2 = new OntologyType(
+        OntologyRelationshipType type2 = new OntologyRelationshipType(
                 sourceToDestination: "x" * 256,
                 destinationToSource: "x" * 256,
                 name: "x" * 256,
@@ -81,7 +82,7 @@ class OntologyTypeSpec extends Specification {
 
     @Unroll
     def "test validate is #validates for uk.co.mc.core.Relationship source #source and destination #target" (){
-        OntologyType type = new OntologyType(
+        OntologyRelationshipType type = new OntologyRelationshipType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",

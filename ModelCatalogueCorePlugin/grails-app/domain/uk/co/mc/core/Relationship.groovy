@@ -1,5 +1,29 @@
 package uk.co.mc.core
 
+/*
+* Users can create relationships between all catalogue elements. They include
+* DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
+* Relationshipss have a source element, a destination element and a relationship type.
+* There are a number of different predefined relationship types that describe the ways catalogue
+* elements are related in the model catalogue
+
+        * ----------------- ------------------ ------------- -----------------------  ----------------------
+        | Source           | Relationship     | Destination | Source->Destination    |  Destination<-Source |
+        | ---------------- | -----------------| ----------- | ---------------------- | -------------------- |
+        | ConceptualDomain |  [context]       |  Model      | "provides context for" | "has context of"     |
+        | ConceptualDomain | [inclusion]      | ValueDomain |  "includes"            | "included in"        |
+        | Model            | [containment]    | DataElement |  "contains"            |  "contained in"      |
+        | DataElement      | [instantiation]  | ValueDomain | "instantiated by"      | "instantiates"       |
+        | ValueDomain      | [usance]         | DataType    | "uses"                 | "usedBy"             |
+        | DataType         | [mapping]        | DataType    | "mapsTo"               |  "mapsTo"            |
+        | Model            | [heirachical]    | Model       | "parentOf"             | "ChildOf"            |
+        | DataElement      | [supersession]   | DataElement | "supercedes"           | "supercededBy"       |
+
+*
+* New types can be created using the ontology type class
+*
+*/
+
 class Relationship  {
 	
 	CatalogueElement source
@@ -20,10 +44,6 @@ class Relationship  {
         }
     }
 
-
-
-
-	
 	static link(source, destination, relationshipType){
 
 

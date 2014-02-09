@@ -6,6 +6,10 @@ import spock.lang.Unroll
 
 /**
  * Created by adammilward on 07/02/2014.
+ *
+ * Data Elements can be superseded by new versions of the same data element
+ * Models can be superseded by new versions of the same model
+ *
  */
 @Mock(Supersession)
 class SupersessionSpec extends Specification{
@@ -69,6 +73,41 @@ class SupersessionSpec extends Specification{
         validates | sourceClass | DestinationClass
         false     | ValueDomain | ValueDomain
         false     | DataElement | Model
+        true      | DataElement | DataElement
+        true      | Model       | Model
+
+    }
+
+    def "The supersession object properties cannot be edited"(){
+
+        expect:
+        Supersession.list().isEmpty()
+
+        when:
+        Supersession type = new Supersession()
+        type.destinationClass = DataElement
+        type.sourceClass = DataElement
+
+        type.save()
+
+        then:
+
+        !type.hasErrors()
+
+        when:
+
+        def errors = false
+
+        try{
+            type.name = "another name"
+        }catch (ReadOnlyPropertyException error){
+            errors = true
+        }
+
+        then:
+
+        errors
+
 
     }
 

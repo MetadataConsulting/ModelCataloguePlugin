@@ -1,3 +1,7 @@
+import uk.co.mc.core.DataElement
+
+import uk.co.mc.core.Relationship
+
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
     def version = "0.1"
@@ -50,6 +54,7 @@ Brief summary/description of the plugin.
 
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
+
     }
 
     def onChange = { event ->

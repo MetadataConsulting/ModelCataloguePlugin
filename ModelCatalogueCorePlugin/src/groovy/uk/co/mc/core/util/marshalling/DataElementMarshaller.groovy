@@ -18,8 +18,7 @@ class DataElementMarshaller {
                status: dataElement.status,
                versionNumber: dataElement.versionNumber,
                incomingRelationships: MarshallerUtils.marshallIncomingRelationships(dataElement),
-               outgoingRelationships: MarshallerUtils.marshallOutgoingRelationships(dataElement),
-
+               outgoingRelationships: MarshallerUtils.marshallOutgoingRelationships(dataElement)
 			]
 
 		}
