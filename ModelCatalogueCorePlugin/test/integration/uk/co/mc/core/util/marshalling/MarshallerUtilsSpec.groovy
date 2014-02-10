@@ -2,7 +2,6 @@ package uk.co.mc.core.util.marshalling
 
 import spock.lang.Specification
 import uk.co.mc.core.DataElement
-import uk.co.mc.core.OntologyRelationshipType
 import uk.co.mc.core.Relationship
 import uk.co.mc.core.RelationshipType
 import uk.co.mc.core.util.marshalling.MarshallerUtils
@@ -39,7 +38,7 @@ class MarshallerUtilsSpec extends Specification{
         def de2 = new DataElement(id: 2, name: "Two", description: "Second data element", definition: "Second data element definition").save()
         def de3 = new DataElement(id: 3, name: "Three", description: "Third data element", definition: "Third data element definition").save()
 
-        def rt = new OntologyRelationshipType(name:"Synonym",
+        def rt = new RelationshipType(name:"Synonym",
                 sourceToDestination: "SynonymousWith",
                 destinationToSource: "SynonymousWith",
                 sourceClass: DataElement,
@@ -52,16 +51,16 @@ class MarshallerUtilsSpec extends Specification{
 
         def marshalledOutput = MarshallerUtils.marshallOutgoingRelationships(de1)
 
-        marshalledOutput[1].sourcePath =="/DataElement/5"
-        marshalledOutput[1].destinationPath =="/DataElement/4"
-        marshalledOutput[1].destinationName =="One"
-        marshalledOutput[1].relationshipType.sourceClass =="uk.co.mc.core.OntologyRelationshipType"
-        marshalledOutput[1].sourceName =="Two"
-        marshalledOutput[0].sourcePath =="/DataElement/6"
-        marshalledOutput[0].destinationPath =="/DataElement/4"
-        marshalledOutput[0].destinationName =="One"
-        marshalledOutput[0].relationshipType.sourceClass =="uk.co.mc.core.OntologyRelationshipType"
-        marshalledOutput[0].sourceName =="Three"
+        marshalledOutput[1].sourcePath =="/DataElement/$de2.id"
+        marshalledOutput[1].destinationPath =="/DataElement/$de1.id"
+        marshalledOutput[1].destinationName =="$de1.name"
+        marshalledOutput[1].relationshipType.name =="Synonym"
+        marshalledOutput[1].sourceName =="$de2.name"
+        marshalledOutput[0].sourcePath =="/DataElement/$de3.id"
+        marshalledOutput[0].destinationPath =="/DataElement/$de1.id"
+        marshalledOutput[0].destinationName =="$de1.name"
+        marshalledOutput[0].relationshipType.name =="Synonym"
+        marshalledOutput[0].sourceName =="$de3.name"
 
 
     }
