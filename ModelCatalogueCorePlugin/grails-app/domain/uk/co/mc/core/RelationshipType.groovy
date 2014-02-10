@@ -1,29 +1,138 @@
 package uk.co.mc.core
 
-/*
-* There are a number of different predefined relationship types that describe the ways catalogue
-* elements are related in the model catalogue
-*
-*  -----------------------------------------------------------------------------------------------------------
-*  | Relationship Type |  Source              | Destination | Source->Destination    |  Destination<-Source |
-*  | ----------------- | ---------------------| ----------- | ---------------------- | -------------------- |
-*  |  [context]        |  ConceptualDomain    |  Model      | "provides context for" | "has context of"     |
-*  | [inclusion]       |  ConceptualDomain    | ValueDomain |  "includes"            | "included in"        |
-*  | [containment]     |  Model               | DataElement |  "contains"            |  "contained in"      |
-*  | [instantiation]   |  DataElement         | ValueDomain | "instantiated by"      | "instantiates"       |
-*  | [mapping]         |  DataType            | DataType    | "mapsTo"               |  "mapsTo"            |
-*  | [heirachical]     |  Model               | Model       | "parentOf"             | "ChildOf"            |
-*  | [supersession]    |  DataElement         | DataElement | "supercedes"           | "supercededBy"       |
-*  -----------------------------------------------------------------------------------------------------------------
-*
-* New types can be created using the ontology type class
-*/
+class RelationshipType {
+
+    //name of the relationship type i.e. parentChild  or synonym
+    String name
+
+    //the both sides of the relationship ie. for parentChild this would be parent (for synonym this is synonym, so the same on both sides)
+    String sourceToDestination
+
+    //the both sides of the relationship i.e. for parentChild this would be child (for synonym this is synonym, so the same on both sides)
+    String destinationToSource
+
+    //you can constrain the relationship type
+    Class sourceClass
+
+    // you can constrain the relationship type
+    Class destinationClass
+
+    /**
+     * This is a script which will be evaluated with following binding:
+     * source
+     * destination
+     * type
+     *
+     * Type stands for current type evaluated
+     *
+     * For the beginning there are no constraints for the scripts so use them carefully.
+     *
+     */
+    String rule
+
+    static constraints = {
+        def classValidator = {val, obj ->
+            if (!val) return true
+            if (!CatalogueElement.isAssignableFrom(val)) return "Only uk.co.mc.core.CatalogueElement child classes are allowed"
+            return true
+        }
+        name unique:true, maxSize: 255
+        sourceToDestination maxSize: 255
+        destinationToSource maxSize: 255
+        sourceClass validator: classValidator
+        destinationClass validator: classValidator
+        rule nullable: true, maxSize: 1000
+    }
 
 
-abstract class RelationshipType {
+    static mapping = {
+        // this makes entities immutable
+        cache usage: 'read-only'
+    }
 
-    boolean validateSourceDestination(source, destination){
+    boolean validateSourceDestination(CatalogueElement source, CatalogueElement destination){
+
+        if(!sourceClass.isInstance(source)){
+            return false
+        }
+
+        if(!destinationClass.isInstance(destination)){
+            return false
+        }
+
+        if (rule && rule.trim() && !validateRule(source, destination)) {
+            return false
+        }
+
         return true
     }
 
+    boolean validateRule(CatalogueElement source, CatalogueElement destination) {
+        if (!rule || !rule.trim()) {
+            return true
+        }
+
+        GroovyShell shell = new GroovyShell(new Binding([
+                source: source,
+                destination: destination,
+                type: this
+        ]))
+        shell.evaluate(rule)
+    }
+
+
+    static defaultRelationshipTypesDefinitions = [
+            [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement],
+            [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
+            [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
+            [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
+            [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
+            [name: "mapping", sourceToDestination: "maps to", destinationToSource: "maps from", sourceClass: DataType, destinationClass: DataType],
+            [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class"]
+
+    ]
+
+    static initDefaultRelationshipTypes() {
+        for (definition in defaultRelationshipTypesDefinitions) {
+            RelationshipType existing = findByName(definition.name)
+            if (!existing) {
+                new RelationshipType(definition).save()
+            }
+        }
+    }
+
+    static getContainmentType() {
+        readByName("containment")
+    }
+
+    static getContextType() {
+        readByName("context")
+    }
+
+    static getHierarchyType() {
+        readByName("hierarchy")
+    }
+
+    static getInclusionType() {
+        readByName("inclusion")
+    }
+
+    static getInstantiationType() {
+        readByName("instantiation")
+    }
+
+    static getMappingType() {
+        readByName("mapping")
+    }
+
+    static getSupersessionType() {
+        readByName("supersession")
+    }
+
+    static readByName(String name) {
+        findByName(name, [readOnly: true])
+    }
 }
+
+
+
