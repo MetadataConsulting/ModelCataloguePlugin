@@ -134,9 +134,9 @@ abstract class CatalogueElement {
 //
 //
 //
-//		public void addToRelations(Object relation, RelationshipType relationshipType){
-//           Relationship.link(this, relation, relationshipType)
-//		}
+		public void addToRelations(Object relation, RelationshipType relationshipType){
+           Relationship.link(this, relation, relationshipType)
+		}
 
 
 

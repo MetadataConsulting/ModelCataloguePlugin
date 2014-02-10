@@ -12,7 +12,7 @@ class MarshallerUtils {
 
     static marshallIncomingRelationships(CatalogueElement element){
 
-        def toMarshall = element?.incomingRelationships.collect{ relationship ->
+        List toMarshall = element?.incomingRelationships.collect{ relationship ->
             ["destinationPath": "/" + relationship.destination.class.getSimpleName() + "/" + relationship.destination.id,
              "destinationName":relationship.destination.name,
              "sourcePath": "/" + element.class.getSimpleName() + "/" + element.id,
@@ -21,12 +21,12 @@ class MarshallerUtils {
             ]
         }
 
-        return toMarshall
+        return toMarshall.sort{it.destinationName}
     }
 
     static marshallOutgoingRelationships(CatalogueElement element){
 
-        def toMarshall = element?.incomingRelationships.collect{ relationship ->
+        List toMarshall = element?.outgoingRelationships.collect{ relationship ->
             [       "sourcePath": "/" + relationship.destination.class.getSimpleName() + "/" + relationship.destination.id,
                     "sourceName":relationship.destination.name,
                     "destinationPath": "/" + element.class.getSimpleName() + "/" + element.id,
@@ -35,7 +35,7 @@ class MarshallerUtils {
             ]
         }
 
-        return toMarshall
+        return toMarshall.sort{it.sourceName}
 
     }
 

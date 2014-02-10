@@ -2,6 +2,7 @@ package uk.co.mc.core
 
 import org.codehaus.groovy.grails.web.context.ServletContextHolder as SCH
 import org.springframework.web.context.support.WebApplicationContextUtils
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -12,6 +13,11 @@ import spock.lang.Unroll
 class DataElementControllerISpec extends Specification {
 
     def controller
+    def rt
+    def rel
+    def de1
+    def de2
+    def de3
 
     def setup() {
 
@@ -20,31 +26,38 @@ class DataElementControllerISpec extends Specification {
         //register custom json Marshallers
         springContext.getBean('customObjectMarshallers').register()
 
-        def rt = new OntologyRelationshipType(name:"Synonym",
+        rt = new OntologyRelationshipType(name:"Synonym",
                 sourceToDestination: "SynonymousWith",
                 destinationToSource: "SynonymousWith",
                 sourceClass: DataElement,
                 destinationClass: DataElement).save()
 
-        def de1 = new DataElement(id: 1, name: "One", description: "First data element", definition: "First data element definition").save()
-        def de2 = new DataElement(id: 2, name: "Two", description: "Second data element", definition: "Second data element definition").save()
+        de1 = new DataElement(name: "One", description: "First data element", definition: "First data element definition").save()
+        de2 = new DataElement(name: "Two", description: "Second data element", definition: "Second data element definition").save()
 
 
-        def rel = new Relationship(source: de1,
-                destination: de2,
-                relationshipType: rt).save()
+        rel = Relationship.link(de1, de2, rt)
 
-        new DataElement(id:3, name: "Three",
+        de3 = new DataElement(name: "Three",
                 description: "Third data element",
-                definition: "Third data element definition",
-                incomingRelationships: rel).save()
+                definition: "Third data element definition").save()
 
         controller = new DataElementController()
 
     }
 
-    def cleanup() {
+    def cleanup(){
+        Relationship.list().each{ relationship ->
+            Relationship.unlink(relationship.source, relationship.destination, relationship.relationshipType)
+        }
 
+        DataElement.list().each{ dataElement ->
+            dataElement.delete()
+        }
+
+        RelationshipType.list().each{ relationshipType ->
+            relationshipType.delete()
+        }
     }
 
     void "Get list of data elements as JSON"() {
@@ -65,9 +78,9 @@ class DataElementControllerISpec extends Specification {
         json.total          == 3
         json.list
         json.list.size()    == 3
-        json.list.any { it.id == 1 }
-        json.list.any { it.id == 2 }
-        json.list.any { it.id == 3 }
+        json.list.any { it.id == de1.id }
+        json.list.any { it.id == de2.id }
+        json.list.any { it.id == de3.id }
 
     }
 
@@ -90,46 +103,43 @@ class DataElementControllerISpec extends Specification {
         json.size               == size
         json.total              == 3
         json.list
-        json.list.first().id    == id
-
+        json.list.first().id    == de2.id
 
         where:
-        size    | id  | theParams
-        2       | 5   | [offset: 1, sort: "id", order: "desc"]
-        2       | 9   | [max: 2, sort: "id", order: "desc"]
-        1       | 11  | [offset: 1, max: 1, sort: "id", order: "desc"]
+        size    | theParams
+        2       | [offset: 1, sort: "id", order: "desc"]
+        2       | [max: 2, sort: "id", order: "desc"]
+        1       | [offset: 1, max: 1, sort: "id", order: "desc"]
 
     }
-
     void "Get an element that contains relationships"()
     {
         expect:
          DataElement.count()==3
 
-
         when:
 
         controller.request.contentType = "text/json"
-        controller.params.id = 15
+        controller.params.id = de1.id
         controller.show()
 
         def result = controller.response.json
 
         then:
         result.instance
-        result.instance.id == 15
-        result.instance.name == "Three"
-        result.instance.incomingRelationships.destinationPath== ["/DataElement/14"]
-        result.instance.incomingRelationships.sourceName == ["Three"]
-        result.instance.incomingRelationships.sourcePath == ["/DataElement/15"]
-        result.instance.incomingRelationships.destinationName == ["Two"]
-        result.instance.incomingRelationships.relationshipType.sourceClass == ["uk.co.mc.core.DataElement"]
-        result.instance.incomingRelationships.relationshipType.id == [5]
-        result.instance.incomingRelationships.relationshipType.sourceToDestination == ["SynonymousWith"]
-        result.instance.incomingRelationships.relationshipType.destinationClass == ["uk.co.mc.core.DataElement"]
-        result.instance.incomingRelationships.relationshipType.name == ["Synonym"]
-        result.instance.incomingRelationships.relationshipType.getAt("class") == ["uk.co.mc.core.OntologyRelationshipType"]
-        result.instance.incomingRelationships.relationshipType.destinationToSource == ["SynonymousWith"]
+        result.instance.id == de1.id
+        result.instance.name == "One"
+        result.instance.outgoingRelationships.destinationPath== ["/DataElement/$de2.id"]
+        result.instance.outgoingRelationships.sourceName == ["Two"]
+        result.instance.outgoingRelationships.sourcePath == ["/DataElement/$de1.id"]
+        result.instance.outgoingRelationships.destinationName == ["One"]
+        result.instance.outgoingRelationships.relationshipType.sourceClass == ["uk.co.mc.core.DataElement"]
+        result.instance.outgoingRelationships.relationshipType.id == [5]
+        result.instance.outgoingRelationships.relationshipType.sourceToDestination == ["SynonymousWith"]
+        result.instance.outgoingRelationships.relationshipType.destinationClass == ["uk.co.mc.core.DataElement"]
+        result.instance.outgoingRelationships.relationshipType.name == ["Synonym"]
+        result.instance.outgoingRelationships.relationshipType.getAt("class") == ["uk.co.mc.core.OntologyRelationshipType"]
+        result.instance.outgoingRelationships.relationshipType.destinationToSource == ["SynonymousWith"]
 
     }
 
