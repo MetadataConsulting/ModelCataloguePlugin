@@ -1,5 +1,6 @@
 package uk.co.mc.core
 
+import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -9,6 +10,14 @@ import spock.lang.Unroll
 
 
 class RelationshipISpec extends Specification{
+
+    @Shared
+    def cd1, md1
+
+    def setup(){
+        cd1 =  new ConceptualDomain(name: 'element1').save()
+        md1 = new Model(name:'element2').save()
+    }
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
@@ -172,6 +181,23 @@ class RelationshipISpec extends Specification{
     }
 
 
+    def "single test for context relationship typs"(){
+
+        RelationshipType.initDefaultRelationshipTypes()
+
+        expect:
+        Relationship.list().isEmpty()
+
+        when:
+
+        Relationship rel=new Relationship([source: cd1,destination:md1,relationshipType: RelationshipType.contextType]);
+        rel.save()
+
+        then:
+        !rel.hasErrors() == true
+
+    }
+
     @Unroll
     def "uk.co.mc.core.Relationship creation for #args results #validates"()
     {
@@ -193,7 +219,7 @@ class RelationshipISpec extends Specification{
         false      | [ : ]
         false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2')]
         false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.contextType]
-        true       | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.contextType]
+        true       | [source:cd1,destination:md1,relationshipType: RelationshipType.contextType]
         false      | [source:new DataElement(name: 'elementb1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
         true       | [source:new Model(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
         false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]

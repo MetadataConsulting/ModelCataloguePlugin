@@ -30,9 +30,7 @@ class DataElementControllerISpec extends Specification {
         def de2 = new DataElement(id: 2, name: "Two", description: "Second data element").save()
 
 
-        def rel = new Relationship(source: de1,
-                destination: de2,
-                relationshipType: rt).save()
+        def rel = Relationship.link(de1, de2, rt).save()
 
         new DataElement(id:3, name: "Three",
                 description: "Third data element",
@@ -42,8 +40,7 @@ class DataElementControllerISpec extends Specification {
 
     }
 
-    def cleanup() {
-
+    def cleanup(){
     }
 
     void "Get list of data elements as JSON"() {

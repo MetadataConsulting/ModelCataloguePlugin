@@ -7,7 +7,7 @@ import uk.co.mc.core.Relationship
 class DataElementMarshaller {
 	
 	void register() {
-		JSON.registerObjectMarshaller(DataElement) { DataElement dataElement ->
+        JSON.registerObjectMarshaller(DataElement) { DataElement dataElement ->
 
             //marshall incoming and outgoing relationships
 

@@ -33,6 +33,7 @@ class RelationshipSpec extends Specification{
 
     }
 
+
     RelationshipType createRelationshipType(){
         new RelationshipType(name:'relationship1', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: DataElement,destinationClass: DataElement)
     }
