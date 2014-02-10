@@ -63,4 +63,45 @@ class RelationshipTypeISpec extends Specification {
         element.containedIn.size()  == 1
     }
 
+    def "conceptual domains provide context for model"(){
+        RelationshipType.initDefaultRelationshipTypes()
+
+        Model model = new Model(name: "model")
+        ConceptualDomain conceptualDomain = new ConceptualDomain(name: "conceptualDomain")
+
+        expect:
+        model.save()
+        conceptualDomain.save()
+        !model.hasContextOf
+        !conceptualDomain.isContextFor
+
+        when:
+        model.addToHasContextOf(conceptualDomain)
+
+        then:
+        model.hasContextOf
+        model.hasContextOf.size()       == 1
+        conceptualDomain.isContextFor
+        conceptualDomain.isContextFor.size()  == 1
+
+        when:
+        model.removeFromHasContextOf(conceptualDomain)
+
+        then:
+        !model.hasContextOf
+        !conceptualDomain.isContextFor
+
+        when:
+        conceptualDomain.addToIsContextFor(model)
+
+        then:
+        model.hasContextOf
+        model.hasContextOf.size()       == 1
+        conceptualDomain.isContextFor
+        conceptualDomain.isContextFor.size()  == 1
+    }
+
+
+
+
 }

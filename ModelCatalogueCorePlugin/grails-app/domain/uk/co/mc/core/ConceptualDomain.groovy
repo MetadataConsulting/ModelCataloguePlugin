@@ -17,4 +17,19 @@ package uk.co.mc.core
 
 class ConceptualDomain extends CatalogueElement  {
 
+    static transients = ['isContextFor']
+
+    List/*<Model>*/ getIsContextFor() {
+        getOutgoingRelationsByType(RelationshipType.contextType)
+    }
+
+    Relationship addToIsContextFor(Model model) {
+        createLinkTo(model, RelationshipType.contextType)
+    }
+
+    void removeFromIsContextFor(Model model) {
+        removeLinkTo(model, RelationshipType.contextType)
+    }
+
+
 }

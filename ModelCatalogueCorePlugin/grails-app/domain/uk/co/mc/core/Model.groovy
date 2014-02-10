@@ -16,4 +16,18 @@ class Model extends ExtendibleElement  {
         removeLinkTo(element, RelationshipType.containmentType)
     }
 
+
+    List/*<ConceptualDomain>*/ getHasContextOf() {
+        getIncomingRelationsByType(RelationshipType.contextType)
+    }
+
+    Relationship addToHasContextOf(ConceptualDomain conceptualDomain) {
+        createLinkFrom(conceptualDomain, RelationshipType.contextType)
+    }
+
+    void removeFromHasContextOf(ConceptualDomain conceptualDomain) {
+        removeLinkFrom(conceptualDomain, RelationshipType.contextType)
+    }
+
+
 }
