@@ -49,4 +49,20 @@ class ValueDomain extends CatalogueElement  {
     }
 
 
+    static transients = ['includedIn']
+
+
+    List/*<DataElement>*/ getIncludedIn() {
+        getIncomingRelationsByType(RelationshipType.inclusionType)
+    }
+
+    Relationship addToIncludedIn(ConceptualDomain conceptualDomain) {
+        createLinkFrom(conceptualDomain, RelationshipType.inclusionType)
+    }
+
+    void removeFromIncludedIn(ConceptualDomain conceptualDomain) {
+        removeLinkFrom(conceptualDomain, RelationshipType.inclusionType)
+    }
+
+
 }

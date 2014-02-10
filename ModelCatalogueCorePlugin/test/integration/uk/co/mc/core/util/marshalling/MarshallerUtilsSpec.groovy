@@ -28,9 +28,6 @@ class MarshallerUtilsSpec extends Specification{
 
     def "test json marshalling for outgoing relationships"(){
 
-        expect:
-
-        DataElement.list().isEmpty()
 
         when:
 

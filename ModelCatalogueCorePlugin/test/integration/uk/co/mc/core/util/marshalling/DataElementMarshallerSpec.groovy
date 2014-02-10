@@ -38,10 +38,6 @@ class DataElementMarshallerSpec extends Specification{
 
     def 'test json marshalling for incoming relationships'(){
 
-        expect:
-
-        DataElement.list().isEmpty()
-
         when:
 
         def de1 = new DataElement(id: 1, name: 'One', description: 'First data element', definition: 'First data element definition').save()

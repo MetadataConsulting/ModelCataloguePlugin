@@ -25,7 +25,7 @@ class RelationshipTypeISpec extends Specification {
 
     }
 
-    def "models are contained in data elements"(){
+    def "data elements can be contained in models, models can contain data elements"(){
         RelationshipType.initDefaultRelationshipTypes()
 
         Model model = new Model(name: "model")
@@ -63,7 +63,7 @@ class RelationshipTypeISpec extends Specification {
         element.containedIn.size()  == 1
     }
 
-    def "conceptual domains provide context for model"(){
+    def "conceptual domains can provide context for model, models have context of conceptual domains"(){
         RelationshipType.initDefaultRelationshipTypes()
 
         Model model = new Model(name: "model")
@@ -101,7 +101,7 @@ class RelationshipTypeISpec extends Specification {
         conceptualDomain.isContextFor.size()  == 1
     }
 
-    def "model1 can be a parent of model2, model2 can be child of model1"(){
+    def "model can be a parent of another model, model can be child of another model)"(){
         RelationshipType.initDefaultRelationshipTypes()
 
         Model book = new Model(name: "book")
@@ -137,6 +137,46 @@ class RelationshipTypeISpec extends Specification {
         book.parentOf.size()       == 1
         chapter.childOf
         chapter.childOf.size()  == 1
+    }
+
+
+    def "conceptualDomain can include valueDomain, valueDomains can be included in conceptual domains"(){
+        RelationshipType.initDefaultRelationshipTypes()
+
+        ConceptualDomain university = new ConceptualDomain(name: "university")
+        EnumeratedType enumeratedType = new EnumeratedType(name: "sub1", enumerations:['history', 'politics', 'science']).save()
+        ValueDomain subjects = new ValueDomain(name: "subjects", description: "subject in the university", dataType: enumeratedType)
+
+        expect:
+        university.save()
+        subjects.save()
+        !university.includes
+        !subjects.includedIn
+
+        when:
+        university.addToIncludes(subjects)
+
+        then:
+        university.includes
+        university.includes.size()       == 1
+        subjects.includedIn
+        subjects.includedIn.size()  == 1
+
+        when:
+        university.removeFromIncludes(subjects)
+
+        then:
+        !university.includes
+        !subjects.includedIn
+
+        when:
+        subjects.addToIncludedIn(university)
+
+        then:
+        university.includes
+        university.includes.size()       == 1
+        subjects.includedIn
+        subjects.includedIn.size()  == 1
     }
 
 
