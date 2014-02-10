@@ -49,7 +49,27 @@ grails.project.dependency.resolution = {
         compile ":coffee-asset-pipeline:1.5.0"
         compile ":less-asset-pipeline:1.5.0"
         compile ":hibernate:3.6.10.7"
+
+
+        // codenarc static analysis
+        provided ":codenarc:0.20"
+
+        // test coverage
+        test ":code-coverage:1.2.7"
+
         build ":tomcat:7.0.50"
 
+    }
+}
+
+
+codenarc.reports = {
+    MyXmlReport('xml') {                    // The report name "MyXmlReport" is user-defined; Report type is 'xml'
+        outputFile = 'CodeNarc-Report.xml'  // Set the 'outputFile' property of the (XML) Report
+        title = 'Sample Report'             // Set the 'title' property of the (XML) Report
+    }
+    MyHtmlReport('html') {                  // Report type is 'html'
+        outputFile = 'CodeNarc-Report.html'
+        title = 'Sample Report'
     }
 }

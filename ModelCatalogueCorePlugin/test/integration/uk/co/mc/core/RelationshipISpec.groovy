@@ -1,6 +1,5 @@
 package uk.co.mc.core
 
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -10,17 +9,6 @@ import spock.lang.Unroll
 
 
 class RelationshipISpec extends Specification{
-
-    @Shared
-    def CD1, MD1, CONTEXT
-
-
-    def setup(){
-
-         CD1 = new ConceptualDomain(name: 'element1').save()
-         MD1 = new Model(name:'element2').save()
-         CONTEXT = RelationshipType.contextType
-    }
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
@@ -167,8 +155,6 @@ class RelationshipISpec extends Specification{
 
         when:
         Relationship rel1 =  Relationship.link( DE1, DE2, relType)
-        DE1.outgoingRelationships.contains(rel1)
-        DE2.incomingRelationships.contains(rel1)
 
         then:
         !rel1.hasErrors()
@@ -186,27 +172,8 @@ class RelationshipISpec extends Specification{
     }
 
 
-    def "single test for context relationship typs"(){
-
-        RelationshipType.initDefaultRelationshipTypes()
-
-        expect:
-        Relationship.list().isEmpty()
-
-        when:
-
-        Relationship rel=new Relationship([source:CD1, destination:MD1, relationshipType: RelationshipType.contextType]
-        );
-        rel.save()
-
-        then:
-        !rel.hasErrors() == true
-
-   }
-
-
     @Unroll
-    def "test number #testId uk.co.mc.core.Relationship creation for #args results #validates"()
+    def "uk.co.mc.core.Relationship creation for #args results #validates"()
     {
         RelationshipType.initDefaultRelationshipTypes()
 
@@ -218,29 +185,29 @@ class RelationshipISpec extends Specification{
         rel.save()
 
         then:
-        !rel.hasErrors() || !rel.errors == validates
+        !rel.hasErrors() == validates
 
         where:
 
-        testId | validates  | args
-     //   1      |false      | [ : ]
-     //   2      |false      | [source:new DataElement(name: 'element1').save(),destination:new DataElement(name:'element2').save()]
-     //   3      |false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'), relationshipType: RelationshipType.contextType]
-        4      |true       | [source:CD1, destination:MD1, relationshipType: RelationshipType.contextType]
-//        5      |false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
-//        6      |true       | [source:new Model(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
-//        7      |false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]
-//        8      |true       | [source:new Model(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]
-//        9      |false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType:  RelationshipType.inclusionType]
-//        10     |true       | [source:new ConceptualDomain(name: 'element1'),destination:new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name:"MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")), relationshipType:  RelationshipType.inclusionType]
-//        11     |false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.instantiationType]
-//        12     |true       | [source:new DataElement(name: 'element1'),destination:new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name:"MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")), relationshipType: RelationshipType.instantiationType]
-//        // false       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: new Mapping()]
-//        // true       | [source:new EnumeratedType(name: 'universitySubjects', enumerations: ['history', 'politics', 'science']), destination:new EnumeratedType(name: 'publicSubjects', enumerations: ['HIS', 'POL', 'SCI']),relationshipType: new Mapping(map: ['history':'HIS', 'politics':'POL', 'science':'SCI'])]
-//        13     |false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
-//        14     |true       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
-//        15     |false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.supersessionType]
-//        16     |true       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.supersessionType]
+        validates  | args
+        false      | [ : ]
+        false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2')]
+        false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.contextType]
+        true       | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.contextType]
+        false      | [source:new DataElement(name: 'elementb1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
+        true       | [source:new Model(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
+        false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]
+        true       | [source:new Model(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]
+        false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType:  RelationshipType.inclusionType]
+        true       | [source:new ConceptualDomain(name: 'element1'),destination:new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name:"MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")), relationshipType:  RelationshipType.inclusionType]
+        false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.instantiationType]
+        true       | [source:new DataElement(name: 'element1'),destination:new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name:"MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")), relationshipType: RelationshipType.instantiationType]
+        // false       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: new Mapping()]
+        // true       | [source:new EnumeratedType(name: 'universitySubjects', enumerations: ['history', 'politics', 'science']), destination:new EnumeratedType(name: 'publicSubjects', enumerations: ['HIS', 'POL', 'SCI']),relationshipType: new Mapping(map: ['history':'HIS', 'politics':'POL', 'science':'SCI'])]
+        false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
+        true       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
+        false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.supersessionType]
+        true       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.supersessionType]
 
     }
 

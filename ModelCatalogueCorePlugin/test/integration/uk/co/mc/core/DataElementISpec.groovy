@@ -65,6 +65,55 @@ class DataElementISpec extends Specification{
     }
 
 
+    def "get all relations"() {
+        RelationshipType.initDefaultRelationshipTypes()
+        DataElement one     = new DataElement(name: "one")
+        DataElement two     = new DataElement(name: "two")
+        DataElement three   = new DataElement(name: "three")
+        DataElement four    = new DataElement(name: "four")
+
+        [one, two, three, four]*.save()
+
+        expect:
+
+        !one.hasErrors()    || !one.errors
+        !two.hasErrors()    || !two.errors
+        !three.hasErrors()  || !three.errors
+        !four.hasErrors()   || !four.errors
+
+        one.createLinkTo(two, RelationshipType.supersessionType)
+        three.createLinkFrom(two, RelationshipType.supersessionType)
+
+        one.relations
+        one.relations.size()    == 1
+        two.relations
+        two.relations.size()    == 2
+        three.relations
+        three.relations.size()  == 1
+
+        two     in one.relations
+
+        one     in two.relations
+        three   in two.relations
+
+        two     in three.relations
+
+        two.getRelationsByType(RelationshipType.supersessionType).size() == 2
+        two.getIncomingRelationsByType(RelationshipType.supersessionType).size() == 1
+        two.getOutgoingRelationsByType(RelationshipType.supersessionType).size() == 1
+
+        !two.getRelationsByType(RelationshipType.containmentType)
+        !two.getIncomingRelationsByType(RelationshipType.containmentType)
+        !two.getOutgoingRelationsByType(RelationshipType.containmentType)
+
+        one.removeLinkTo(two, RelationshipType.supersessionType)
+        three.removeLinkFrom(two, RelationshipType.supersessionType)
+
+        !one.relations
+        !two.relations
+        !three.relations
+
+    }
 
 
 }
