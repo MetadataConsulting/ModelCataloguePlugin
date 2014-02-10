@@ -25,4 +25,42 @@ class RelationshipTypeISpec extends Specification {
 
     }
 
+    def "models are contained in data elemenets"(){
+        RelationshipType.initDefaultRelationshipTypes()
+
+        Model model = new Model(name: "model")
+        DataElement element = new DataElement(name: "element")
+
+        expect:
+        model.save()
+        element.save()
+        !model.contains
+        !element.containedIn
+
+        when:
+        model.addToContains(element)
+
+        then:
+        model.contains
+        model.contains.size()       == 1
+        element.containedIn
+        element.containedIn.size()  == 1
+
+        when:
+        model.removeFromContains(element)
+
+        then:
+        !model.contains
+        !element.containedIn
+
+        when:
+        element.addToContainedIn(model)
+
+        then:
+        model.contains
+        model.contains.size()       == 1
+        element.containedIn
+        element.containedIn.size()  == 1
+    }
+
 }

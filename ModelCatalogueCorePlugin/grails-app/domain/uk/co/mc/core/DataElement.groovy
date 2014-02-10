@@ -17,7 +17,20 @@ class DataElement extends ExtendibleElement {
         code nullable:true, unique:true, maxSize: 255
     }
 
-    static mapping = {
+
+    static transients = ['containedIn']
+
+    List/*<DataElement>*/ getContainedIn() {
+        getIncomingRelationsByType(RelationshipType.containmentType)
     }
+
+    Relationship addToContainedIn(Model model) {
+        createLinkFrom(model, RelationshipType.containmentType)
+    }
+
+    void removeFromContainedIn(Model model) {
+        removeLinkFrom(model, RelationshipType.containmentType)
+    }
+
 	
 }
