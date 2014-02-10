@@ -9,7 +9,6 @@ module.exports = function(config) {
         ],
         reporters: ['progress', 'junit', 'coverage'],
         singleRun: true,
-        autoWatch : false,
 
         coverageReporter: {
             type: 'lcovonly',
@@ -45,7 +44,8 @@ module.exports = function(config) {
             'karma-coverage',
             'karma-jasmine',
             'karma-junit-reporter',
-            'karma-coffee-preprocessor'
+            'karma-coffee-preprocessor',
+            'karma-phantomjs-launcher'
         ],
 
         preprocessors: {
