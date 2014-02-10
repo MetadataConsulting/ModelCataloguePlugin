@@ -20,14 +20,14 @@ class DataElementControllerISpec extends Specification {
         //register custom json Marshallers
         springContext.getBean('customObjectMarshallers').register()
 
-        def rt = new OntologyRelationshipType(name:"Synonym",
+        def rt = new RelationshipType(name:"Synonym",
                 sourceToDestination: "SynonymousWith",
                 destinationToSource: "SynonymousWith",
                 sourceClass: DataElement,
                 destinationClass: DataElement).save()
 
-        def de1 = new DataElement(id: 1, name: "One", description: "First data element", definition: "First data element definition").save()
-        def de2 = new DataElement(id: 2, name: "Two", description: "Second data element", definition: "Second data element definition").save()
+        def de1 = new DataElement(id: 1, name: "One", description: "First data element").save()
+        def de2 = new DataElement(id: 2, name: "Two", description: "Second data element").save()
 
 
         def rel = new Relationship(source: de1,
@@ -36,8 +36,7 @@ class DataElementControllerISpec extends Specification {
 
         new DataElement(id:3, name: "Three",
                 description: "Third data element",
-                definition: "Third data element definition",
-                incomingRelationships: rel).save()
+                incomingRelationships: [rel]).save()
 
         controller = new DataElementController()
 
@@ -128,7 +127,7 @@ class DataElementControllerISpec extends Specification {
         result.instance.incomingRelationships.relationshipType.sourceToDestination == ["SynonymousWith"]
         result.instance.incomingRelationships.relationshipType.destinationClass == ["uk.co.mc.core.DataElement"]
         result.instance.incomingRelationships.relationshipType.name == ["Synonym"]
-        result.instance.incomingRelationships.relationshipType.getAt("class") == ["uk.co.mc.core.OntologyRelationshipType"]
+        result.instance.incomingRelationships.relationshipType.getAt("class") == ["uk.co.mc.core.RelationshipType"]
         result.instance.incomingRelationships.relationshipType.destinationToSource == ["SynonymousWith"]
 
     }

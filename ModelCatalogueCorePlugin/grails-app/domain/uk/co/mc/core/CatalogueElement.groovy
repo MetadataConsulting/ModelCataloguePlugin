@@ -27,6 +27,8 @@ abstract class CatalogueElement {
 
     static mappedBy = [ outgoingRelationships: 'source', incomingRelationships: 'destination']
 
+    static transients = ['relations']
+
 
 		/******************************************************************************************************************/
 		/****functions for specifying relationships between catalogue elements using the uk.co.mc.core.Relationship class ************/
@@ -35,6 +37,7 @@ abstract class CatalogueElement {
 		/***********return all the relations************/
 		
 		List getRelations() {
+            return []
 		
 			//array of relations to return to the caller
 			/*def relationsR = []

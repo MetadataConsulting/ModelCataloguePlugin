@@ -1,6 +1,7 @@
 package uk.co.mc.core
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * Created by adammilward on 04/02/2014.
@@ -17,7 +18,7 @@ class RelationshipISpec extends Specification{
 
         when:
 
-        OntologyRelationshipType relType = new OntologyRelationshipType(
+        RelationshipType relType = new RelationshipType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
@@ -45,7 +46,7 @@ class RelationshipISpec extends Specification{
 
         when:
 
-        OntologyRelationshipType relType = new OntologyRelationshipType(
+        RelationshipType relType = new RelationshipType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
@@ -95,7 +96,7 @@ class RelationshipISpec extends Specification{
 
         when:
 
-        OntologyRelationshipType relType = new OntologyRelationshipType(
+        RelationshipType relType = new RelationshipType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
@@ -135,7 +136,7 @@ class RelationshipISpec extends Specification{
 
         when:
 
-        OntologyRelationshipType relType = new OntologyRelationshipType(
+        RelationshipType relType = new RelationshipType(
                 sourceToDestination: "Parent",
                 destinationToSource: "Child",
                 name: "Child Type",
@@ -171,5 +172,43 @@ class RelationshipISpec extends Specification{
     }
 
 
+    @Unroll
+    def "uk.co.mc.core.Relationship creation for #args results #validates"()
+    {
+        RelationshipType.initDefaultRelationshipTypes()
+
+        expect:
+        Relationship.list().isEmpty()
+
+        when:
+        Relationship rel=new Relationship(args);
+        rel.save()
+
+        then:
+        !rel.hasErrors() == validates
+
+        where:
+
+        validates  | args
+        false      | [ : ]
+        false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2')]
+        false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.contextType]
+        true       | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.contextType]
+        false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
+        true       | [source:new Model(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
+        false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]
+        true       | [source:new Model(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]
+        false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType:  RelationshipType.inclusionType]
+        true       | [source:new ConceptualDomain(name: 'element1'),destination:new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name:"MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")), relationshipType:  RelationshipType.inclusionType]
+        false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.instantiationType]
+        true       | [source:new DataElement(name: 'element1'),destination:new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name:"MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")), relationshipType: RelationshipType.instantiationType]
+        // false       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: new Mapping()]
+        // true       | [source:new EnumeratedType(name: 'universitySubjects', enumerations: ['history', 'politics', 'science']), destination:new EnumeratedType(name: 'publicSubjects', enumerations: ['HIS', 'POL', 'SCI']),relationshipType: new Mapping(map: ['history':'HIS', 'politics':'POL', 'science':'SCI'])]
+        false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
+        true       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
+        false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.supersessionType]
+        true       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.supersessionType]
+
+    }
 
 }
