@@ -44,12 +44,12 @@ class Relationship  {
         }
     }
 
-	static link(source, destination, relationshipType){
+	static Relationship link(source, destination, relationshipType){
 
 
         if(source.id && destination.id && relationshipType.id){
 
-             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
+             Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
 
              if(relationshipInstance){
 
@@ -78,12 +78,10 @@ class Relationship  {
 	}
 
 
-	static unlink(source, destination,relationshipType){
-
-
+	static Relationship unlink(source, destination,relationshipType){
         if(source.id && destination.id && relationshipType.id){
 
-            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
+            Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
 
             if(relationshipInstance){
 
@@ -93,7 +91,7 @@ class Relationship  {
             }
 
         }
-
+        return null
 	}
 
 }

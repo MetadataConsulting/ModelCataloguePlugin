@@ -194,7 +194,7 @@ class RelationshipISpec extends Specification{
         false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2')]
         false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.contextType]
         true       | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.contextType]
-        false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
+        false      | [source:new DataElement(name: 'elementb1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
         true       | [source:new Model(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
         false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]
         true       | [source:new Model(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]

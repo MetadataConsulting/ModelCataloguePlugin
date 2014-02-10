@@ -37,110 +37,43 @@ abstract class CatalogueElement {
 		/***********return all the relations************/
 		
 		List getRelations() {
-            return []
-		
-			//array of relations to return to the caller
-			/*def relationsR = []
-
-			
-			relations.each{ relation ->
-				def objectId
-                def relationshipDirection
-                def relationshipType = relation.relationshipType
-				
-				if(relation.destination == this.id){
-					objectId = relation.objectXId
-                    if(relationshipType.sourceToDestination){
-                        relationshipDirection = relationshipType.sourceToDestination
-                    }
-				}else{
-					objectId = relation.destination
-                    if(relationshipType.destinationToSource){
-                        relationshipDirection = relationshipType.destinationToSource
-                    }
-				}
-				
-				def catalogueElement = CatalogueElement.get(objectId)
-				catalogueElement.relationshipType = relationshipType
-                catalogueElement.relationshipDirection = relationshipDirection
-				relationsR.add(catalogueElement)
-			}
-		
-
-			return relationsR*/
-		
+            return [
+                    (outgoingRelationships ?: []).collect { it.destination },
+                    (incomingRelationships ?: []).collect { it.source }
+            ].flatten()
 		}
-		
-		/***********return the relations with the given relationship type name***********/
-//
-//		List getRelations(String relationTypeName) {
-//
-//				//array of relations to return to the caller
-//				def relationsR = []
-//
-//
-//				if(relationTypeName){
-//
-//					def relationshipType = RelationshipType.findByName(relationTypeName)
-//                    def relationshipDirection = relationshipType
-//                    if(relationshipType){
-//
-//                        relations.each{ relation ->
-//                            if(relation.relationshipType.id==relationshipType.id){
-//                                def objectId
-//
-//                                //if the relation y side is this object then return the x side of the relationship otherwise return the y side
-//                                if(relation.destination == this.id){
-//                                    objectId = relation.objectXId
-//
-//                                    //if the relationship type has an sourceToDestination then return this instead of the relationship type name
-//                                    //i.e. if the relationship is parentChild and the object to return is the parent, then return Parent rather
-//                                    //then ParentChild as the relationshipT type
-//
-//                                    if(relationshipType.sourceToDestination){
-//                                        relationshipDirection = relationshipType.sourceToDestination
-//                                    }
-//
-//
-//                                }else{
-//
-//                                    objectId = relation.destination
-//
-//                                    //if the relationship type has an destinationToSource then return this instead of the relationship type name
-//                                    //i.e. if the relationship is parentChild and the object to return is the child, then return Child rather
-//                                    //then ParentChild as the relationship type
-//
-//                                    if(relationshipType.destinationToSource){
-//                                        relationshipDirection = relationshipType.destinationToSource
-//                                    }
-//
-//
-//
-//                                }
-//
-//
-//
-//                                def catalogueElement = CatalogueElement.get(objectId)
-//                                catalogueElement.relationshipType = relationTypeName
-//                                catalogueElement.relationshipDirection = relationshipDirection
-//                                relationsR.add(catalogueElement)
-//                            }
-//
-//                        }
-//                    }
-//
-//				}
-//
-//				return relationsR
-//
-//			}
-//
-//
-//
-//		public void addToRelations(Object relation, RelationshipType relationshipType){
-//           Relationship.link(this, relation, relationshipType)
-//		}
 
 
+        List getIncomingRelationsByType(RelationshipType type) {
+            Relationship.findAllByDestinationAndRelationshipType(this, type).collect {
+                it.source
+            }
+        }
 
+        List getOutgoingRelationsByType(RelationshipType type) {
+            Relationship.findAllBySourceAndRelationshipType(this, type).collect {
+                it.destination
+            }
+        }
+
+        List getRelationsByType(RelationshipType type) {
+            [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
+        }
+
+
+        Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
+            Relationship.link(this, destination, type)
+        }
+
+        Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
+            Relationship.link(source, this, type)
+        }
+
+        void removeLinkTo(CatalogueElement destination, RelationshipType type) {
+            Relationship.unlink(this, destination, type)
+        }
+
+        void removeLinkFrom(CatalogueElement source, RelationshipType type) {
+            Relationship.unlink(source, this, type)
+        }
 }
