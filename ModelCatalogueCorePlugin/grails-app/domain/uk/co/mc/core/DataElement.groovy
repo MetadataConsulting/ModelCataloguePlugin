@@ -18,7 +18,7 @@ class DataElement extends ExtendibleElement {
     }
 
 
-    static transients = ['containedIn', 'hasContextOf']
+    static transients = ['containedIn']
 
     List/*<DataElement>*/ getContainedIn() {
         getIncomingRelationsByType(RelationshipType.containmentType)

@@ -25,7 +25,7 @@ class RelationshipTypeISpec extends Specification {
 
     }
 
-    def "models are contained in data elemenets"(){
+    def "models are contained in data elements"(){
         RelationshipType.initDefaultRelationshipTypes()
 
         Model model = new Model(name: "model")
@@ -101,6 +101,43 @@ class RelationshipTypeISpec extends Specification {
         conceptualDomain.isContextFor.size()  == 1
     }
 
+    def "model1 can be a parent of model2, model2 can be child of model1"(){
+        RelationshipType.initDefaultRelationshipTypes()
+
+        Model book = new Model(name: "book")
+        Model chapter = new Model(name: "chapter1")
+
+        expect:
+        book.save()
+        chapter.save()
+        !book.parentOf
+        !chapter.childOf
+
+        when:
+        book.addToParentOf(chapter)
+
+        then:
+        book.parentOf
+        book.parentOf.size()       == 1
+        chapter.childOf
+        chapter.childOf.size()  == 1
+
+        when:
+        book.removeFromParentOf(chapter)
+
+        then:
+        !book.parentOf
+        !chapter.childOf
+
+        when:
+        chapter.addToChildOf(book)
+
+        then:
+        book.parentOf
+        book.parentOf.size()       == 1
+        chapter.childOf
+        chapter.childOf.size()  == 1
+    }
 
 
 
