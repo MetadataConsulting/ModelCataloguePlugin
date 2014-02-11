@@ -219,5 +219,42 @@ class RelationshipTypeISpec extends Specification {
     }
 
 
+    def "data types can be mapped to other data types and mapped from other data types"(){
+
+        EnumeratedType subjectsA = new EnumeratedType(name: "subA", enumerations:['history', 'politics', 'science']).save()
+        EnumeratedType subjectsB = new EnumeratedType(name: "subB", enumerations:['HIS', 'POL', 'SCI']).save()
+
+        expect:
+        subjectsA.save()
+        subjectsB.save()
+        !subjectsA.mapsTo
+        !subjectsB.mapsFrom
+
+        when:
+        subjectsA.addToMapsTo(subjectsB)
+
+        then:
+        subjectsA.mapsTo
+        subjectsA.mapsTo.size()       == 1
+        subjectsB.mapsFrom
+        subjectsB.mapsFrom.size()  == 1
+
+        when:
+        subjectsA.removeFromMapsTo(subjectsB)
+
+        then:
+        !subjectsA.mapsTo
+        !subjectsB.mapsFrom
+
+        when:
+        subjectsB.addToMapsFrom(subjectsA)
+
+        then:
+        subjectsA.mapsTo
+        subjectsA.mapsTo.size()       == 1
+        subjectsB.mapsFrom
+        subjectsB.mapsFrom.size()  == 1
+    }
+
 
 }
