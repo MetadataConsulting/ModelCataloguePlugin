@@ -1,0 +1,253 @@
+Data item No.,Section,Sub-section,Data Item Name,Data Item Description,Value domain,Link to existing definition,Notes from GD/JCIS,[Optional] Local identifier,A: How is the data item collected,"B. How is the data item stored, within the centre?",C. How would you describe the existing coverage?,D. How would you describe the existing quality?,E. How hard would it be to achieve a score of 1 for Parts A to D? ,F. what  are the circumstances of data collection?  where and when is the data recorded?  who is responsible for data entry?,"G. is there a particular form (or data standard, or proforma) used for the collection of the data?   If so, please supply a copy or reference. ","H. if the data is stored in a local database or data warehouse, what is the name and version of the database application?",E2. Source for column E - how data established?
+NHIC_CAN_1,CORE,PATIENT IDENTITY DETAILS,NHS NUMBER*,"
+*For linkage purposes NHS NUMBER 
+and/or
+ LOCAL PATIENT IDENTIFIER 
+is required.
+
+The NHS NUMBER, the primary identifier of a PERSON, is a unique identifier for aPATIENTwithin the NHS in England and Wales. This will not vary by any ORGANISATION of which a PERSON is a PATIENT.","
+",NHS NUMBER,,CR0010,2,2,3,1,4 - Since 2004 approximetly 2% missing.  If entered then accurate.,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"2% missing -> select count(*) from dbo.CosdCorePatientIdentityDetails / * 439824 */
+select count(NHS_NUMBER) from dbo.CosdCorePatientIdentityDetails /*429580 */
+"
+NHIC_CAN_2,CORE,PATIENT IDENTITY DETAILS,LOCAL PATIENT IDENTIFIER*,"*For linkage purposes NHS NUMBER 
+and/or
+ LOCAL PATIENT IDENTIFIER 
+is required.
+
+This is a number used to identify a PATIENT uniquely within a Health Care Provider. It may be different from the PATIENT's casenote number and may be assigned automatically by the computer system.","
+",LOCAL PATIENT IDENTIFIER,,CR0020,2,2,3,1,4 - Since 2004 approximetly 2.25% missing.  If entered then accurate.,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"2.25% missing-> select count(*) from dbo.CosdCorePatientIdentityDetails /* 439824 */
+select count(LOCAL_PATIENT_IDENTIFIER) from dbo.CosdCorePatientIdentityDetails  /* 429919 */"
+NHIC_CAN_3,CORE,PATIENT IDENTITY DETAILS,NHS NUMBER STATUS INDICATOR CODE,The NHS NUMBER STATUS  INDICATOR CODE indicates the verification status of the NHS number provided.,"01 : Number present and verified 
+02 : Number present but not traced 
+03 : Trace required 
+04 : Trace attempted - No match or multiple match found 
+05 : Trace needs to be resolved - (NHS Number or patient detail conflict) 
+06 : Trace in progress 
+07 : Number not present and trace not required 
+08 : Trace postponed (baby under six weeks old) 
+",NHS NUMBER STATUS INDICATOR CODE,,CR1350,2,2,1,1,1,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"0% missing -> select count(PERSON_BIRTH_DATE) from dbo.CosdCorePatientIdentityDetails /* 439814 */
+select count(NHS_NUMBER_STATUS_INDICATOR_CODE) from dbo.CosdCorePatientIdentityDetails  /*439824 */
+"
+NHIC_CAN_4,CORE,PATIENT IDENTITY DETAILS,PERSON BIRTH DATE,The date on which a PERSON was born or is officially deemed to have been born.,"
+",PERSON BIRTH DATE,,CR0100,2,2,1,1,1,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"0% missing -> select count(*) from dbo.CosdCorePatientIdentityDetails /* 439824 */
+select count(PERSON_BIRTH_DATE) from dbo.CosdCorePatientIdentityDetails /* 439814 */
+"
+NHIC_CAN_5,CORE,PATIENT IDENTITY DETAILS,ORGANISATION CODE (CODE OF PROVIDER),"ORGANISATION CODE (CODE OF PROVIDER) is the ORGANISATION CODE of the ORGANISATION acting as a Health Care Provider.
+(an6 not applicable to COSD)","see ORGANISATION CODE
+",ORGANISATION CODE (CODE OF PROVIDER),,CR0030,2,1,1,1,1,When referral details entered.,JCIS and HISS Referral  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"0% missing -> select count(*) from dbo.CosdCorePatientIdentityDetails /* 439824 */
+select count([ORGANISATION_CODE_(CODE_OF_PROVIDER)]) from dbo.CosdCorePatientIdentityDetails  /*439824 */
+"
+NHIC_CAN_6,CORE,DIAGNOSTIC DETAILS,PRIMARY DIAGNOSIS (ICD),See DIAGNOSTIC CODING for details on coding and PRIMARY DIAGNOSES for the standardised definition of primary diagnosis.,"
+",PRIMARY DIAGNOSIS (ICD),,CR0370,1,1,1,1,1,MDT Meeting,JCIS and HISS Referral  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"0% missing -> select count(diagnosis_pk) from dbo.CosdDiag /* 7062 */
+select count(icd_code) from dbo.CosdDiag /* 7062 */"
+NHIC_CAN_7,CORE,DIAGNOSTIC DETAILS,DATE OF DIAGNOSIS (CLINICALLY AGREED)*,"*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED) 
+or
+ DATE OF RECURRENCE (CLINICALLY AGREED) 
+is required as mandatory.
+
+Record the date  where Cancer was confirmed or diagnosis agreed (This will normally be  the date of the authorised  pathology report which confirms the cancer or if this is not available at the time it will be the date of the Multidisciplinary Team Meeting when the diagnosis was agreed)
+(This is may not be the same as Date of Diagnosis which is used for Cancer Registration.)  ","
+",DATE OF DIAGNOSIS (CANCER CLINICALLY AGREED),"From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded.
+--------------------------------
+If final pre-treatment diagnosis is not correct, definitive diagnosis must be recorded.",CR2030,2,2,1,1,1,"MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded.",JCIS and HISS Referral  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"0% missing - > select count(diagnosis_pk) from dbo.CosdDiag /* 7062 */
+select count(activity_date) from dbo.CosdDiag /* 7062 */"
+NHIC_CAN_8,CORE,DIAGNOSTIC DETAILS,DATE OF RECURRENCE (CLINICALLY AGREED)*,"*For linkage purposes DATE OF DIAGNOSIS ((CLINICALLY AGREED) 
+or
+ DATE OF RECURRENCE (CLINICALLY AGREED) 
+is required as mandatory.
+
+(Recurrences only.)
+Record the date where Cancer recurrence was confirmed or diagnosis of recurrence was agreed (This will normally be the  date of the authorised  pathology report which confirms the recurrence or if this is not available at the time it will be the date of the Multidisciplinary Team Meeting when the diagnosis of recurrence was agreed)
+(This is may not be the same as Date of Recurrence which is used for Cancer Registration.)  ","
+",DATE OF RECURRENCE (CANCER CLINICALLY AGREED),"Notes from immediately above apply for recurrence as well.
+
+Recurrence radio button needs to be selected on MDT meeting / Diagnosis / Diagnosis tab or MDT D&S tab",CR0440,2,2,1,3,2 -Meaning of Date may need checking for historical data,"MDT Meeting - From MDT against which definitive diagnosis recorded, or final pre-treatment diagnosis recorded. Recurrence radio button needs to be selected on MDT meeting / Diagnosis / Diagnosis tab or MDT D&S tab",JCIS and HISS Referral  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"0% Missing - > 
+select count(diagnosis_pk) from dbo.CosdDiag /* 7062 */
+select recurrance_ind from dbo.CosdDiag group by  recurrance_ind /* Y N */
+"
+NHIC_CAN_9,CORE,DEMOGRAPHICS,PERSON FAMILY NAME,"That part of a PERSON's name which is used to describe family, clan, tribal group, or marital association.","
+",PERSON FAMILY NAME,,CR0050,2,2,1,1,1,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_10,CORE,DEMOGRAPHICS,PERSON GIVEN NAME,The forename(s) or given name(s) of a PERSON.,"
+",PERSON GIVEN NAME,,CR0060,2,2,1,1,1,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_11,CORE,DEMOGRAPHICS,PATIENT USUAL ADDRESS (AT DIAGNOSIS),PATIENT USUAL ADDRESS (AT DIAGNOSIS) is the PATIENT USUAL ADDRESS of the PATIENT at the time of PATIENT DIAGNOSIS.,"
+",PATIENT USUAL ADDRESS (AT DIAGNOSIS),NB Address details at time of extract will be used.,CR0070,2,2,1,1,1,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_12,CORE,DEMOGRAPHICS,POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS),POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS) is the POSTCODE OF USUAL ADDRESS of the PATIENT at the time of PATIENT DIAGNOSIS.,"see POSTCODE
+",POSTCODE OF USUAL ADDRESS (AT DIAGNOSIS),NB Address details at time of extract will be used.,CR0080,2,2,3,1,1,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,0% missing -> select count(postcode)  from patient_demographics
+NHIC_CAN_13,CORE,DEMOGRAPHICS,PERSON GENDER CODE (CURRENT),A PERSON's gender currently.,"0 : Not Known
+1 : Male
+2 : Female
+9 : Not Specified 
+",PERSON GENDER CODE CURRENT,,CR0090,1,1,1,1,1,When Patient demographics entered.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,0% missing -> select count(sex_fk)  from patient_demographics
+NHIC_CAN_14,CORE,DEMOGRAPHICS,GENERAL MEDICAL PRACTITIONER (SPECIFIED),"GENERAL MEDICAL PRACTITIONER (SPECIFIED) is the code of the GENERAL MEDICAL PRACTITIONER specified by the PATIENT.
+
+This GENERAL MEDICAL PRACTITIONER works within the General Medical Practitioner Practice with which the PATIENT is registered.","
+",GENERAL MEDICAL PRACTITIONER (SPECIFIED),Name shown. Code available in JCIS tables.,CR0110,2,2,1,1,1,When Patient demographics entered. Name shown. Code available in JCIS tables.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"0% missing -> select practitioner_fk,count(patient_pk) from patient_demographics group by practitioner_fk"
+NHIC_CAN_15,CORE,DEMOGRAPHICS,GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION),"The GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION) is an ORGANISATION CODE. This is the code of the GP Practice that the PATIENT is registered with.
+","
+",GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION),Address shown. Code available in JCIS tables.,CR0120,1,1,1,1,1,When Patient demographics entered. Address shown. Code available in JCIS tables.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"0% missing -> select practice_fk,count(patient_pk) from patient_demographics group by practice_fk"
+NHIC_CAN_16,CORE,DEMOGRAPHICS,PERSON FAMILY NAME (AT BIRTH),The PATIENT's surname at birth. ,"
+",PERSON FAMILY NAME (AT BIRTH),The HISS field is MaidenName (ie not strictly Surname at birth),CR0140,2,2,1,1,1,When Patient demographics entered. The HISS field is MaidenName (ie not strictly Surname at birth).,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_17,CORE,DEMOGRAPHICS,ETHNIC CATEGORY,"The ethnicity of a PERSON, as specified by the PERSON.. The 16+1 ethnic data categories defined in the 2001 census is the national mandatory standard for the collection and analysis of ethnicity.
+(The Office for National Statistics has developed a further breakdown of the group from that given, which may be used locally.)","White
+A  : (White) British
+B  : (White) Irish
+C  : Any other White background
+Mixed
+D : White and Black Caribbean
+E : White and Black African
+F : White and Asian
+G : Any other mixed background
+Asian or Asian British
+H : Indian
+J : Pakistani
+K : Bangladeshi
+L : Any other Asian background
+Black or Black British
+M : Caribbean
+N : African
+P : Any other Black background
+Other Ethnic Group
+R : Chinese
+S : Any other ethnic group
+Z : Not stated
+99 : Not Known
+",ETHNIC CATEGORY,Imported from HISS but not displayed,CR0150,1,1,1,1,1,Imported from HISS but not displayed.,JCIS and HISS Patient Demographics  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_18,CORE,REFERRALS,SOURCE OF REFERRAL FOR OUT-PATIENTS,"This identifies the source of referral of each Consultant Out-Patient Episode.
+(See User Guide for further details)","Initiated by the CONSULTANT responsible for the Consultant Out-Patient Episode
+01 : following an emergency admission 
+02 : following a Domiciliary Consultation  
+10 : following an Accident And Emergency Attendance (including Minor Injuries Units and Walk In Centres)  
+11 : other - initiated by the CONSULTANT responsible for the Consultant Out-Patient Episode 
+Not initiated by the CONSULTANT responsible for the Consultant Out-Patient Episode  
+03 : referral from a GENERAL MEDICAL PRACTITIONER 
+92 : referral from a GENERAL DENTAL PRACTITIONER
+12 : referral from a GENERAL PRACTITIONER with a Special Interest (GPwSI) or dentist with a Special Interest (DwSI)
+04 : referral from an Accident And Emergency Department (including Minor Injuries Units and Walk In Centres) 
+05 : referral from a CONSULTANT, other than in an Accident And Emergency Department  
+06 : self-referral 
+07 : referral from a Prosthetist  
+13 : referral from a Specialist NURSE (Secondary Care) 
+14 : referral from an Allied Health Professional 
+15 : referral from an OPTOMETRIST  
+16 : referral from an Orthoptist  
+17 : referral from a National Screening Programme  
+93 : referral from a Community Dental Service 
+97 : other - not initiated by the CONSULTANT responsible for the Consultant Out-Patient Episode  
+","SOURCE OF REFERRAL FOR OUT-PATIENTS 
+",,CR1600,1,1,1,1,1,When referral details entered.,JCIS and HISS Referral  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,select count(referral_pk) from referral_details 
+NHIC_CAN_19,CORE,REFERRALS,REFERRAL TO TREATMENT PERIOD START DATE,The start date of a REFERRAL TO TREATMENT PERIOD. Date that the initial referral to Secondary care was received for this diagnosis. This may be different from CANCER REFERRAL TO TREATMENT PERIOD START DATE if initial referral was not to the cancer services teams.,"
+",REFERRAL TO TREATMENT PERIOD START DATE,,CR1580,2,2,2,1,2,When referral details entered.,Cancer Waiting Times Dataset item but scope to be extended to apply to additional patients,JCIS - SQL SERVER 2000,
+NHIC_CAN_20,CORE,REFERRALS,DATE FIRST SEEN,This is the date that the PATIENT is first seen in the Trust that receives the first referral.,"
+",DATE FIRST SEEN,,CR0230,2,2,2,1,2,When referral details entered.,Cancer Waiting Times Dataset item but scope to be extended to apply to additional patients,JCIS - SQL SERVER 2000,"0% missing -> select count(referral_pk) from referral_details /* 951519 */
+select  count(date_first_seen) from referral_details /* 20746 */"
+NHIC_CAN_21,CORE,REFERRALS,CONSULTANT CODE,A code uniquely identifying a CONSULTANT. (Referred to CONSULTANT CODE).,"The CONSULTANT CODE is derived from either the GENERAL MEDICAL COUNCIL REFERENCE NUMBER for GENERAL MEDICAL PRACTITIONERS, or the GENERAL DENTAL COUNCIL REGISTRATION NUMBER for GENERAL DENTAL PRACTITIONERS (where the dentist doesn't have a GENERAL MEDICAL COUNCIL REFERENCE NUMBER).
+",CONSULTANT CODE,"Imported activities do not have this field completed, but it can be derived from the Clinic code, which is imported. Check with VT.",CR0210,2,2,4,4,2 - Backlog of consultant codes will need to be entered,"Visit
+eg Initial visit or Radiological visit used as first seen in wait time table.   ",JCIS and HISS Visit  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,"select count(referral_pk) from referral_details /* 951519 */
+select  count(consultant_fk) from referral_details /* 504 */"
+NHIC_CAN_22,CORE,REFERRALS,CARE PROFESSIONAL MAIN SPECIALTY CODE,A unique code identifying each MAIN SPECIALTY designated by Royal Colleges. This is the same as the OCCUPATION CODES describing specialties. (Can be derived from consultant code).,"Main Specialty Code
+",CARE PROFESSIONAL MAIN SPECIALTY CODE,"NOT SHOWN ON JCIS
+(A field is available in Consultants table, but often empty)",CR0220,4,4,4,4,3,"NOT SHOWN ON JCIS
+(A field is available in Consultants table, but often empty)",JCIS and HISS Referral  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_23,CORE,REFERRALS,ORGANISATION SITE CODE (PROVIDER FIRST SEEN),The  ORGANISATION SITE CODE of the Health Care Provider at the first contact with the PATIENT.,"see ORGANISATION SITE CODE
+",SITE CODE (OF PROVIDER FIRST SEEN),Name shown. Code available in JCIS tables.,CR1410,2,2,2,3,2,"Visit
+eg Initial visit or Radiological visit used as first seen in wait time table.   ",JCIS and HISS Visit  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_24,CORE,REFERRALS,DATE FIRST SEEN (CANCER SPECIALIST),This is the date that the PATIENT is first seen by the appropriate specialist for cancer care within a Cancer Care Spell. This is the PERSON or PERSONS who are most able to progress the diagnosis of the primary tumour. ,"
+",DATE FIRST SEEN (CANCER SPECIALIST),How can this be pinned down?,CR1360,2,2,2,3,2,"Visit
+eg Initial visit or Radiological visit used as first seen in wait time table.   ",JCIS and HISS Visit  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_25,CORE,REFERRALS,ORGANISATION SITE CODE (PROVIDER FIRST CANCER SPECIALIST),The  ORGANISATION SITE CODE of the ORGANISATION acting as Health Care Provider where the PATIENT is first seen by an appropriate cancer specialist on the DATE FIRST SEEN (CANCER SPECIALIST).,"see ORGANISATION SITE CODE
+",SITE CODE (OF PROVIDER FIRST CANCER SPECIALIST),Name shown. Code available in JCIS tables.,CR1400,2,2,2,3,2,"Visit
+eg Initial visit or Radiological visit used as first seen in wait time table.   ",JCIS and HISS Visit  - > CANCER REGISTRY,JCIS - SQL SERVER 2000,
+NHIC_CAN_26,CORE,REFERRALS,CANCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS,"CANCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS is recorded to enable tracking of the status of REFERRAL REQUESTS for PATIENTS referred with a suspected cancer, or referred with breast symptoms with cancer not originally suspected.
+For COSD this can be used for all patients regardless of referral route.","14 : Suspected primary cancer
+09 : Under investigation following symptomatic referral, cancer not suspected (breast referrals only) (see note 1)
+03 : No new cancer diagnosis identified by the Healthcare Provider
+10 : Diagnosis of new cancer confirmed - first treatment not yet planned
+11 : Diagnosis of new cancer confirmed - English NHS first treatment planned
+07 : Diagnosis of cancer confirmed - no English NHS treatment planned
+08 : First treatment commenced (English NHS only)
+12 : Diagnosis of new cancer confirmed - subsequent treatment not yet planned
+13 : Diagnosis of new cancer confirmed - subsequent English NHS treatment planned
+21 : Subsequent treatment commenced (English NHS only)
+15 : Suspected recurrent cancer
+16 : Diagnosis of recurrent cancer confirmed - first treatment not yet planned
+17 : Diagnosis of recurrent cancer confirmed - English NHS first treatment planned
+18 : Diagnosis of recurrent cancer confirmed - no English NHS treatment planned
+19 : Diagnosis of recurrent cancer confirmed - subsequent treatment not yet planned
+20 : Diagnosis of recurrent cancer confirmed - subsequent English NHS treatment planned
+",CANCER OR SYMPTOMATIC BREAST REFERRAL PATIENT STATUS,,CR0270,TBA,TBA,TBA,TBA,TBA,When referral details entered.,Cancer Waiting Times Dataset item but scope to be extended to apply to additional patients,JCIS - SQL SERVER 2000,
+NHIC_CAN_27,CORE,REFERRALS,CANCER SYMPTOMS FIRST NOTED DATE,"Record the time when the symptoms were first noted related to this diagnosis as agreed between the consultant and the patient.   Depending on the length of time this should normally include at least month and year. Day should also be included if known. If symptoms have been present for a long time then it may only be possible to record the year. This will normally be recorded by the consultant first seeing the patient in secondary care.
+
+In these circumstances the Format/Length will be:
+DATE (including year, month and day) - CCYY-MM-DD
+    YEAR AND MONTH - YYYY-MM
+    Year only - YYYY.","
+",CANCER SYMPTOMS FIRST NOTED DATE,Calculated from date of visit / duration of symptoms,CR2000,TBA,TBA,TBA,TBA,TBA,Calculated from date of visit / duration of symptoms,Calculated from date of visit / duration of symptoms,JCIS - SQL SERVER 2000,
+NHIC_CAN_28,CORE,IMAGING,SITE CODE (OF IMAGING),This is the ORGANISATION SITE CODE of the Organisation  where the imaging took place.,"see ORGANISATION SITE CODE
+",SITE CODE (OF IMAGING),Name shown. Code available in JCIS tables.,CR0310,1,1,1,2,2,Name shown. Code available in JCIS tables.,JCIS and HISS Radiological visit  - > CANCER REGISTRY.  Name shown. Code available in JCIS tables.,JCIS - SQL SERVER 2000,dbo.CosdCoreImaging
+NHIC_CAN_29,CORE,IMAGING,PROCEDURE DATE (CANCER IMAGING),The DATE the Cancer Imaging was carried out.,"
+",PROCEDURE DATE (CANCER IMAGING),,CR0320,1,2,2,2,2,,JCIS and HISS Radiological visit  - > CANCER REGISTRY.  Name shown. Code available in JCIS tables.,JCIS - SQL SERVER 2000,dbo.CosdCoreImaging
+NHIC_CAN_30,CORE,IMAGING,IMAGING CODE (NICIP)*,"*IMAGING CODE (NICIP) 
+and/or
+ (CANCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING)) 
+is required.
+
+IMAGING CODE (NICIP) is the National Interim Clinical Imaging Procedure Code Set code which is used to identify both the test modality and body site of the test.
+","
+",IMAGING CODE (NICIP),"See also alternative  mandatory item for non-imported radiology activities
+Ie  (CANCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING)) ",CR1610,TBA,TBA,TBA,TBA,TBA,"See also alternative  mandatory item for non-imported radiology activities
+Ie  (CANCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING)) ",This item included for imported radiology as within a JCIS table.  Not displayed.,JCIS - SQL SERVER 2000,dbo.CosdCoreImaging
+NHIC_CAN_31,CORE,IMAGING,CANCER IMAGING MODALITY*,"*IMAGING CODE (NICIP) 
+and/or
+ (CANCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING)) 
+is required.
+
+The type of imaging procedure used during an Imaging or Radiodiagnostic Event for a Cancer Care Spell.
+NB: PET Scan also includes PET-CT Scan. 
+","C01X : Standard Radiography
+C01M : Mammogram
+C02X : CT Scan
+C02C : Virtual colonoscopy
+C03X : MRI Scan
+C04X : PET Scan
+C05X : Ultrasound Scan
+C06X : Nuclear Medicine imaging
+C08A : Angiography
+C08B : Barium
+C08U : Urography (IV and retrograde)
+C09X : Intervention radiography. 
+CXXX : Other
+",CANCER IMAGING MODALITY,"Name shown. 
+
+Is imaging modality code available in look up table?",CR0330,2,2,3,3,2,Radiology - see title of activity,Radiology - see title of activity,JCIS - SQL SERVER 2000,dbo.CosdCoreImaging
+NHIC_CAN_32,CORE,IMAGING,IMAGING ANATOMICAL SITE*,"*IMAGING CODE (NICIP) 
+and/or
+ (CANCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING)) 
+is required.
+
+A classification of the part of the body that is the subject of an Imaging Or Radiodiagnostic Event.","The coding frame used is the OPCS-4 'Z' coding, plus two additional local codes:
+Whole body CZ001
+Multiple sites CZ002
+","IMAGING ANATOMICAL SITE
+","Typically not recorded.  Unless the ATM makes it clear what the site is, the site of imaging is not recorded. Exceptions are mammogram (site recorded as breast);BRT ultrasound - user has to record site.  
+[Usage for UGI CT scan (recorded 4 times on Live patients) - is misleading usage of backend table as front end description is 'Primary tumour location' on CT scan.Findings tab].
+
+(Findings site is recordable).",CR0340,4,4,4,4,2,"Typically not recorded.  Unless the ATM makes it clear what the site is, the site of imaging is not recorded. Exceptions are mammogram (site recorded as breast);BRT ultrasound - user has to record site.  
+[Usage for UGI CT scan (recorded 4 times on Live patients) - is misleading usage of backend table as front end description is 'Primary tumour location' on CT scan.Findings tab].
+
+(Findings site is recordable).",,JCIS - SQL SERVER 2000,
+NHIC_CAN_33,CORE,IMAGING,ANATOMICAL SIDE (IMAGING)*,"*IMAGING CODE (NICIP) 
+and/or
+ (CANCER IMAGING MODALITY and IMAGING ANATOMICAL SITE and ANATOMICAL SIDE (IMAGING)) 
+is required.
+
+The side of the body that is the subject of an Imaging or Radiodiagnostic Event.","L : Left
+R : Right
+M : Midline
+B : Bilateral
+8 : Not applicable
+9 : Not Known
+",ANATOMICAL SIDE (IMAGING),"Not usually recordable. 
+
+For mammograms, value in 'Interpretation - right' &/or 'interpretation - left' will indicate which anatomical side(s) imaged.
+
+(Finding laterality is recorded).",CR3000,MAY BE REMOVED,MAY BE REMOVED,MAY BE REMOVED,MAY BE REMOVED,MAY BE REMOVED,,,JCIS - SQL SERVER 2000,

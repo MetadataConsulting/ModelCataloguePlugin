@@ -34,7 +34,7 @@ class EnumeratedTypeSpec extends Specification {
         false   | [ : ]
         false   | [name:'test']
         false   | [name:'test', enumerations: ['male']]
-        true    | [name:'test', enumerations: ['male','female','unknown'] ]
+        true    | [name:'test', enumerations: ['m':'male','f':'female','u':'unknown'] ]
 
 
 

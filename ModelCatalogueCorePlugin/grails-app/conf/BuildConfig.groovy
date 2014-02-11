@@ -46,8 +46,8 @@ grails.project.dependency.resolution = {
               ":rest-client-builder:1.0.3") {
             export = false
         }
-        compile ":coffee-asset-pipeline:1.5.0"
-        compile ":less-asset-pipeline:1.5.0"
+        //compile ":coffee-asset-pipeline:1.5.0"
+        //compile ":less-asset-pipeline:1.5.0"
         compile ":hibernate:3.6.10.7"
 
 
