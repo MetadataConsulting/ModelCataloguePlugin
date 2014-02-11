@@ -69,9 +69,9 @@ class DataElementControllerISpec extends Specification {
         json.total          == 3
         json.list
         json.list.size()    == 3
-        json.list.any { it.id == 1 }
-        json.list.any { it.id == 2 }
-        json.list.any { it.id == 3 }
+        json.list.any { it.id == de1.id }
+        json.list.any { it.id == de2.id }
+        json.list.any { it.id == de3.id }
 
     }
 
@@ -128,7 +128,7 @@ class DataElementControllerISpec extends Specification {
         result.instance.outgoingRelationships.sourcePath == ["/DataElement/$de2.id"]
         result.instance.outgoingRelationships.destinationName == ["$de1.name"]
         result.instance.outgoingRelationships.relationshipType.sourceClass == ["uk.co.mc.core.DataElement"]
-        result.instance.outgoingRelationships.relationshipType.id == [1]
+        result.instance.outgoingRelationships.relationshipType.id == [rt.id]
         result.instance.outgoingRelationships.relationshipType.sourceToDestination == ["SynonymousWith"]
         result.instance.outgoingRelationships.relationshipType.destinationClass == ["uk.co.mc.core.DataElement"]
         result.instance.outgoingRelationships.relationshipType.name == ["Synonym"]
