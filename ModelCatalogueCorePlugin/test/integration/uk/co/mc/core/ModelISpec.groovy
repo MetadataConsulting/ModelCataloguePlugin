@@ -9,6 +9,14 @@ import spock.lang.Specification
 
 class ModelISpec extends Specification{
 
+    /*def cleanupSpec(){
+        Model.list().each{ model ->
+
+            model.delete()
+
+        }
+    }*/
+
     def "create a new model, finalize it and then try to change it"(){
 
         expect:

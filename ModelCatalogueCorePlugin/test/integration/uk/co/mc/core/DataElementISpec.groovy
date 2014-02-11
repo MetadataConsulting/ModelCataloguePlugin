@@ -8,15 +8,12 @@ import spock.lang.Specification
 
 class DataElementISpec extends Specification{
 
+
     def "create a new data element, finalize it and then try to change it"(){
-
-        expect:
-
-        DataElement.list().isEmpty()
 
         when:
 
-        DataElement dataElementInstance = new DataElement(name: "result1", description: "this is the the result description")
+        def dataElementInstance = new DataElement(name: "result1", description: "this is the the result description")
         dataElementInstance.save()
 
         then:
@@ -42,25 +39,25 @@ class DataElementISpec extends Specification{
         dataElementInstance.hasErrors()
         dataElementInstance.errors.getFieldError("status")?.code =='validator.finalized'
 
+        dataElementInstance.delete()
+
     }
 
     def "create two data elements with the same code dataElement"(){
 
-        expect:
-
-        DataElement.list().isEmpty()
-
         when:
 
-        DataElement dataElementInstance1 = new DataElement(name: "result1", description: "this is the the result description", code: "x123")
+        def dataElementInstance1 = new DataElement(name: "result1", description: "this is the the result description", code: "x123")
         dataElementInstance1.save(flush:true)
 
-        DataElement dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "x123")
+        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "x123")
         dataElementInstance2.validate()
 
         then:
 
         dataElementInstance2.hasErrors()
+        dataElementInstance1.delete()
+        dataElementInstance2.delete()
 
     }
 
@@ -112,6 +109,11 @@ class DataElementISpec extends Specification{
         !one.relations
         !two.relations
         !three.relations
+
+        one.delete()
+        two.delete()
+        three.delete()
+        four.delete()
 
     }
 

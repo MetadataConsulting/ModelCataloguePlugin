@@ -7,8 +7,12 @@ import spock.lang.Specification
  */
 class RelationshipTypeISpec extends Specification {
 
-    def "read by name returns read only instance"() {
+    def setupSpec(){
         RelationshipType.initDefaultRelationshipTypes()
+    }
+
+    def "read by name returns read only instance"() {
+
         RelationshipType containment = RelationshipType.readByName("containment")
 
         expect:
@@ -26,7 +30,6 @@ class RelationshipTypeISpec extends Specification {
     }
 
     def "data elements can be contained in models, models can contain data elements"(){
-        RelationshipType.initDefaultRelationshipTypes()
 
         Model model = new Model(name: "model")
         DataElement element = new DataElement(name: "element")
@@ -64,7 +67,6 @@ class RelationshipTypeISpec extends Specification {
     }
 
     def "conceptual domains can provide context for model, models have context of conceptual domains"(){
-        RelationshipType.initDefaultRelationshipTypes()
 
         Model model = new Model(name: "model")
         ConceptualDomain conceptualDomain = new ConceptualDomain(name: "conceptualDomain")
@@ -102,7 +104,6 @@ class RelationshipTypeISpec extends Specification {
     }
 
     def "model can be a parent of another model, model can be child of another model)"(){
-        RelationshipType.initDefaultRelationshipTypes()
 
         Model book = new Model(name: "book")
         Model chapter = new Model(name: "chapter1")
@@ -141,7 +142,6 @@ class RelationshipTypeISpec extends Specification {
 
 
     def "conceptualDomain can include valueDomain, valueDomains can be included in conceptual domains"(){
-        RelationshipType.initDefaultRelationshipTypes()
 
         ConceptualDomain university = new ConceptualDomain(name: "university")
         EnumeratedType enumeratedType = new EnumeratedType(name: "sub1", enumerations:['history', 'politics', 'science']).save()
@@ -177,6 +177,45 @@ class RelationshipTypeISpec extends Specification {
         university.includes.size()       == 1
         subjects.includedIn
         subjects.includedIn.size()  == 1
+    }
+
+
+    def "data elements can be instantiated by valueDomain, valueDomains can instantiate in data elements"(){
+
+        DataElement course = new DataElement(name: "course name")
+        EnumeratedType enumeratedType = new EnumeratedType(name: "sub1", enumerations:['history', 'politics', 'science']).save()
+        ValueDomain subjects = new ValueDomain(name: "subjects", description: "subject in the course", dataType: enumeratedType)
+
+        expect:
+        course.save()
+        subjects.save()
+        !course.instantiatedBy
+        !subjects.instantiates
+
+        when:
+        course.addToInstantiatedBy(subjects)
+
+        then:
+        course.instantiatedBy
+        course.instantiatedBy.size()       == 1
+        subjects.instantiates
+        subjects.instantiates.size()  == 1
+
+        when:
+        course.removeFromInstantiatedBy(subjects)
+
+        then:
+        !course.instantiatedBy
+        !subjects.instantiates
+
+        when:
+        subjects.addToInstantiates(course)
+
+        then:
+        course.instantiatedBy
+        course.instantiatedBy.size()       == 1
+        subjects.instantiates
+        subjects.instantiates.size()  == 1
     }
 
 

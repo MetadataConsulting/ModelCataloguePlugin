@@ -1,5 +1,6 @@
 package uk.co.mc.core.util.marshalling
 
+import spock.lang.Shared
 import spock.lang.Specification
 import uk.co.mc.core.DataElement
 import uk.co.mc.core.Relationship
@@ -11,55 +12,58 @@ import uk.co.mc.core.util.marshalling.MarshallerUtils
  */
 class MarshallerUtilsSpec extends Specification{
 
-
-    def cleanup(){
-        Relationship.list().each{ relationship ->
-            Relationship.unlink(relationship.source, relationship.destination, relationship.relationshipType)
-        }
-
-        DataElement.list().each{ dataElement ->
-            dataElement.delete()
-        }
-
-        RelationshipType.list().each{ relationshipType ->
-            relationshipType.delete()
-        }
-    }
-
     def "test json marshalling for outgoing relationships"(){
 
 
         when:
 
-        def de1 = new DataElement(id: 1, name: "One", description: "First data element", definition: "First data element definition").save()
-        def de2 = new DataElement(id: 2, name: "Two", description: "Second data element", definition: "Second data element definition").save()
-        def de3 = new DataElement(id: 3, name: "Three", description: "Third data element", definition: "Third data element definition").save()
+        def dataElement1 = new DataElement(name: "TEstOne", description: "First data element", definition: "First data element definition").save()
+        def dataElement2 = new DataElement(name: "TestTwo", description: "Second data element", definition: "Second data element definition").save()
+        def dataElement3 = new DataElement(name: "TestThree", description: "Third data element", definition: "Third data element definition").save()
 
-        def rt = new RelationshipType(name:"Synonym",
-                sourceToDestination: "SynonymousWith",
-                destinationToSource: "SynonymousWith",
+        def rt = new RelationshipType(name:"NarrowerTerm",
+                sourceToDestination: "NarrowerTerm",
+                destinationToSource: "NarrowerTerm",
                 sourceClass: DataElement,
                 destinationClass: DataElement).save()
 
-        def rel = Relationship.link(de1, de2, rt)
-        def rel2 = Relationship.link(de1, de3, rt)
+        then:
+
+        !dataElement1.hasErrors()
+        !dataElement2.hasErrors()
+        !dataElement3.hasErrors()
+        !rt.hasErrors()
+
+        when:
+
+        def rel = Relationship.link(dataElement1, dataElement2, rt)
+        def rel2 = Relationship.link(dataElement1, dataElement3, rt)
 
         then:
 
-        def marshalledOutput = MarshallerUtils.marshallOutgoingRelationships(de1)
+        def marshalledOutput = MarshallerUtils.marshallOutgoingRelationships(dataElement1)
 
-        marshalledOutput[1].sourcePath =="/DataElement/$de2.id"
-        marshalledOutput[1].destinationPath =="/DataElement/$de1.id"
-        marshalledOutput[1].destinationName =="$de1.name"
-        marshalledOutput[1].relationshipType.name =="Synonym"
-        marshalledOutput[1].sourceName =="$de2.name"
-        marshalledOutput[0].sourcePath =="/DataElement/$de3.id"
-        marshalledOutput[0].destinationPath =="/DataElement/$de1.id"
-        marshalledOutput[0].destinationName =="$de1.name"
-        marshalledOutput[0].relationshipType.name =="Synonym"
-        marshalledOutput[0].sourceName =="$de3.name"
+        marshalledOutput[1].sourcePath =="/DataElement/$dataElement2.id"
+        marshalledOutput[1].destinationPath =="/DataElement/$dataElement1.id"
+        marshalledOutput[1].destinationName =="$dataElement1.name"
+        marshalledOutput[1].relationshipType.name =="NarrowerTerm"
+        marshalledOutput[1].sourceName =="$dataElement2.name"
+        marshalledOutput[0].sourcePath =="/DataElement/$dataElement3.id"
+        marshalledOutput[0].destinationPath =="/DataElement/$dataElement1.id"
+        marshalledOutput[0].destinationName =="$dataElement1.name"
+        marshalledOutput[0].relationshipType.name =="NarrowerTerm"
+        marshalledOutput[0].sourceName =="$dataElement3.name"
 
 
     }
+
+    /*def cleanup(){
+        Relationship.unlink(dataElement1, dataElement2, rt)
+        Relationship.unlink(dataElement1, dataElement3, rt)
+        dataElement1.delete()
+        dataElement2.delete()
+        dataElement3.delete()
+        rt.delete()
+    }*/
 
 }
