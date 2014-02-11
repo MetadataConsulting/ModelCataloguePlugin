@@ -102,21 +102,6 @@ class RelationshipTypeSpec extends Specification {
 
     }
 
-    def "The mapping is present withing default relations types"(){
-        when:
-        RelationshipType.initDefaultRelationshipTypes()
-        RelationshipType loaded = RelationshipType.mappingType
-
-        then:
-        loaded
-        loaded.sourceClass == DataType
-        loaded.destinationClass == DataType
-        loaded.sourceToDestination == "maps to"
-        loaded.destinationToSource == "maps from"
-        loaded.name == "mapping"
-
-    }
-
     def "The supersession is present withing default relations types"(){
         when:
         RelationshipType.initDefaultRelationshipTypes()

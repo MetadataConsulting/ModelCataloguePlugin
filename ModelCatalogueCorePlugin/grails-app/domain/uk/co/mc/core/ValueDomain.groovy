@@ -33,7 +33,10 @@ class ValueDomain extends CatalogueElement  {
 	MeasurementUnit unitOfMeasure
 	String regexDef
 	DataType dataType
-	
+
+    static hasMany  = [ outgoingMappings: Mapping,  incomingMappings: Mapping ]
+    static mappedBy = [ outgoingMappings: 'source', incomingMappings: 'destination']
+
     static constraints = {
 		description nullable:true, maxSize: 2000
 		unitOfMeasure nullable:true, maxSize: 255

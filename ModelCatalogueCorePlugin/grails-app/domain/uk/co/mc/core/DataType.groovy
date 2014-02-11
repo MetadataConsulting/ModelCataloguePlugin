@@ -13,33 +13,4 @@ class DataType extends CatalogueElement{
 		name unique:true, size: 2..255
     }
 
-    static transients = ['mapsTo', 'mapsFrom']
-
-    //MAPPINGS
-
-
-    List/*<DataType>*/ getMapsTo() {
-        getOutgoingRelationsByType(RelationshipType.mappingType)
-    }
-
-    Relationship addToMapsTo(DataType dataType) {
-        createLinkTo(dataType, RelationshipType.mappingType)
-    }
-
-    void removeFromMapsTo(DataType dataType) {
-        removeLinkTo(dataType, RelationshipType.mappingType)
-    }
-
-    List/*<DataType>*/ getMapsFrom() {
-        getIncomingRelationsByType(RelationshipType.mappingType)
-    }
-
-    Relationship addToMapsFrom(DataType dataType) {
-        createLinkFrom(dataType, RelationshipType.mappingType)
-    }
-
-    void removeFromMapsFrom(DataType dataType) {
-        removeLinkFrom(dataType, RelationshipType.mappingType)
-    }
-
 }

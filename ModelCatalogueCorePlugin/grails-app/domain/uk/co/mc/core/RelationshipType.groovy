@@ -87,7 +87,6 @@ class RelationshipType {
             [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
             [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
             [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
-            [name: "mapping", sourceToDestination: "maps to", destinationToSource: "maps from", sourceClass: DataType, destinationClass: DataType],
             [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class"]
 
     ]

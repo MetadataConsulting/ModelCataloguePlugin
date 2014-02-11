@@ -33,8 +33,8 @@ class EnumeratedTypeSpec extends Specification {
        validates|args
         false   | [ : ]
         false   | [name:'test']
-        false   | [name:'test', enumerations: ['male']]
-        true    | [name:'test', enumerations: ['male','female','unknown'] ]
+        false   | [name:'test', enumerations: [m:'male']]
+        true    | [name:'test', enumerations: [m:'male',f:'female',u:'unknown'] ]
 
 
 
