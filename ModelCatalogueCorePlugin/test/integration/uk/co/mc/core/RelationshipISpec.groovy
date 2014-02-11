@@ -14,7 +14,7 @@ import spock.lang.Unroll
 class RelationshipISpec extends Specification{
 
     @Shared
-    def cd1, md1, de1, vd1, de2, reltype
+    def cd1, md1, de1, vd1, de2, reltype, dt, ms
 
     def setupSpec(){
 
@@ -24,8 +24,24 @@ class RelationshipISpec extends Specification{
         md1 = new Model(name:'element2').save()
         de1 = new DataElement(name:'data element1').save()
         de2 = new DataElement(name:'element2').save()
+        dt = new DataType(name: "Float").save()
+        ms = new MeasurementUnit(name:"MPH").save()
         reltype = new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for").save()
-        vd1 = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name:"MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")).save()
+        vd1 = new ValueDomain(name: "ground_speed", unitOfMeasure: ms, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: dt).save()
+    }
+
+    def cleanupSpec(){
+
+        Relationship.list().each{ relationship ->
+
+            Relationship.unlink(relationship.source, relationship.destination, relationship.relationshipType)
+        }
+
+        cd1.delete()
+        md1.delete()
+        de1.delete()
+        de2.delete()
+        vd1.delete()
     }
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
@@ -43,10 +59,7 @@ class RelationshipISpec extends Specification{
         )
 
 
-        DataElement DE1 = new DataElement(name:"test2DE")
-        DataElement DE2 = new DataElement(name:"test1DE")
-
-        Relationship rel =  Relationship.link( DE1, DE2, relType)
+        Relationship rel =  Relationship.link( de1, de2, relType)
 
         then:
 
@@ -56,9 +69,6 @@ class RelationshipISpec extends Specification{
 
     def "Create Relationship if the catalogue elements have been persisted and add relations to the source and destination"()
     {
-
-        expect:
-        Relationship.list().isEmpty()
 
         when:
 
@@ -100,15 +110,11 @@ class RelationshipISpec extends Specification{
         !DE2.outgoingRelationships?.contains(rel)
         !DE1.incomingRelationships?.contains(rel)
 
-
     }
 
 
     def "Duplicated relationship test"()
     {
-
-        expect:
-        Relationship.list().isEmpty()
 
         when:
 
@@ -146,9 +152,6 @@ class RelationshipISpec extends Specification{
 
     def "Unlink relationship"()
     {
-
-        expect:
-        Relationship.list().isEmpty()
 
         when:
 
@@ -192,9 +195,6 @@ class RelationshipISpec extends Specification{
     @Unroll
     def "testNumber #testNumber uk.co.mc.core.Relationship creation for #args results #validates"()
     {
-
-        expect:
-        Relationship.list().isEmpty()
 
         when:
         Relationship rel=new Relationship(args);

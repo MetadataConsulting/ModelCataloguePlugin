@@ -18,7 +18,7 @@ class DataElement extends ExtendibleElement {
     }
 
 
-    static transients = ['containedIn']
+    static transients = ['containedIn', 'instantiatedBy']
 
     List/*<DataElement>*/ getContainedIn() {
         getIncomingRelationsByType(RelationshipType.containmentType)
@@ -31,5 +31,20 @@ class DataElement extends ExtendibleElement {
     void removeFromContainedIn(Model model) {
         removeLinkFrom(model, RelationshipType.containmentType)
     }
-	
+
+
+    //INSTANTIATION
+
+    List/*<ValueDomain>*/ getInstantiatedBy() {
+        getOutgoingRelationsByType(RelationshipType.instantiationType)
+    }
+
+    Relationship addToInstantiatedBy(ValueDomain valueDomain) {
+        createLinkTo(valueDomain, RelationshipType.instantiationType)
+    }
+
+    void removeFromInstantiatedBy(ValueDomain valueDomain) {
+        removeLinkTo(valueDomain, RelationshipType.instantiationType)
+    }
+
 }

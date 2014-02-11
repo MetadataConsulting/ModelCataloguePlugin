@@ -44,7 +44,7 @@ class Relationship  {
         }
     }
 
-	static Relationship link(source, destination, relationshipType){
+	static Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType){
 
 
         if(source.id && destination.id && relationshipType.id){
@@ -78,8 +78,8 @@ class Relationship  {
 	}
 
 
-	static Relationship unlink(source, destination,relationshipType){
-        if(source.id && destination.id && relationshipType.id){
+	static Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType){
+        if(source?.id && destination?.id && relationshipType?.id){
 
             Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
 
