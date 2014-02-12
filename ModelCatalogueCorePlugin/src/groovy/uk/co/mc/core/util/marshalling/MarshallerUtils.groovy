@@ -21,7 +21,7 @@ class MarshallerUtils {
             ]
         }
 
-        return toMarshall.sort{it.destinationName}
+        return toMarshall?.sort{it.destinationName} ?: []
     }
 
     static marshallOutgoingRelationships(CatalogueElement element){
@@ -35,7 +35,7 @@ class MarshallerUtils {
             ]
         }
 
-        return toMarshall.sort{it.sourceName}
+        return toMarshall?.sort{it.sourceName} ?: []
 
     }
 
