@@ -32,6 +32,7 @@ class ValueDomain extends CatalogueElement  {
 
 	MeasurementUnit unitOfMeasure
 	String regexDef
+    String namespace
 	DataType dataType
 
     static hasMany  = [ outgoingMappings: Mapping,  incomingMappings: Mapping ]
@@ -40,6 +41,7 @@ class ValueDomain extends CatalogueElement  {
     static constraints = {
 		description nullable:true, maxSize: 2000
 		unitOfMeasure nullable:true, maxSize: 255
+        namespace nullable:true, maxSize: 255
 		regexDef nullable:true, maxSize: 500, validator: { val,obj ->
             if(!val){return true}
             try{
