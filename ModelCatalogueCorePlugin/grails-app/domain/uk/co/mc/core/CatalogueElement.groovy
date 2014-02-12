@@ -16,7 +16,7 @@ abstract class CatalogueElement {
 	static hasMany = [ incomingRelationships: Relationship, outgoingRelationships: Relationship  ]
 		
     static constraints = {
-        name size: 2..255
+        name size: 1..255
         description nullable:true, maxSize:2000
 	}
 

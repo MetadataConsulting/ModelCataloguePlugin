@@ -24,40 +24,46 @@ package uk.co.mc.core
 *
 */
 
-class Relationship  {
-	
-	CatalogueElement source
-    
-	CatalogueElement destination
-	
-	RelationshipType relationshipType
+class Relationship {
+
+    CatalogueElement source
+
+//    TODO: save the cardinality for source and destination somehow
+//    e.g. following
+//
+//    Range sourceCardinality = 0..1
+//    Range destinatinCardinality = 1..Integer.MAX_VALUE
+
+    CatalogueElement destination
+
+    RelationshipType relationshipType
 
     static constraints = {
-        relationshipType validator: { val,obj ->
+        relationshipType validator: { val, obj ->
 
-            if(!val) return true;
-            if(!val.validateSourceDestination(obj.source,obj.destination)){
-               return false;
+            if (!val) return true;
+            if (!val.validateSourceDestination(obj.source, obj.destination)) {
+                return false;
             }
-            return  true;
+            return true;
 
         }
     }
 
-	static Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType){
+    static Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
 
 
-        if(source.id && destination.id && relationshipType.id){
+        if (source.id && destination.id && relationshipType.id) {
 
-             Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
+            Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
 
-             if(relationshipInstance){
+            if (relationshipInstance) {
 
                 return relationshipInstance
 
             }
 
-         }
+        }
 
         Relationship relationshipInstance = new Relationship(
                 source: source.id ? source : null,
@@ -74,25 +80,24 @@ class Relationship  {
         relationshipInstance
 
 
+    }
 
-	}
 
-
-	static Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType){
-        if(source?.id && destination?.id && relationshipType?.id){
+    static Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
+        if (source?.id && destination?.id && relationshipType?.id) {
 
             Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
 
-            if(relationshipInstance){
+            if (relationshipInstance) {
 
-               source.removeFromOutgoingRelationships(relationshipInstance)
-               destination.removeFromIncomingRelationships(relationshipInstance)
-               relationshipInstance.delete()
+                source.removeFromOutgoingRelationships(relationshipInstance)
+                destination.removeFromIncomingRelationships(relationshipInstance)
+                relationshipInstance.delete()
             }
 
         }
         return null
-	}
+    }
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}, type: ${relationshipType?.name}]"

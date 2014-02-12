@@ -32,7 +32,7 @@ class ConceptualDomainSpec extends Specification {
         where:
 
         validates  | args
-        false      | [name:"t", description: "test concept description"]
+        false | [name: "", description: "test concept description"]
         false      | [name:"t"*256, description: "test concept description"]
         false      | [name:"test concept", description: "t"*2001]
         true       | [name:"test concept", description: "test concept description"]

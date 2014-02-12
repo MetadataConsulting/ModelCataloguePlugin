@@ -7,7 +7,9 @@ package uk.co.mc.core
 * i.e. ValueDomain subjects uses EnumeratedType enumerations ['politics', 'history', 'science']
 * */
 
-class EnumeratedType extends DataType{
+class EnumeratedType extends DataType {
+
+    // TODO: save enumerations as string in predefined format
 
     Map<String, String> enumerations
 

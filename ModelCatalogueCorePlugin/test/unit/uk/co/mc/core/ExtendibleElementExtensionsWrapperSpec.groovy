@@ -1,11 +1,9 @@
 package uk.co.mc.core
 
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-@TestFor(ExtensionValue)
-@Mock(DataElement)
+@Mock([DataElement, ExtensionValue, ExtendibleElement])
 class ExtendibleElementExtensionsWrapperSpec extends Specification {
 
 
