@@ -17,7 +17,13 @@ package uk.co.mc.core
 
 class ConceptualDomain extends CatalogueElement {
 
+    String namespace
+
     static transients = ['isContextFor', 'includes']
+
+    static constraints = {
+        namespace nullable:true, maxSize: 255
+    }
 
     //CONTEXT
 
