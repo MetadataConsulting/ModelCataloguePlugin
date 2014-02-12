@@ -98,7 +98,7 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
     }
 
     private Map<String, String> asReadOnlyMap() {
-        Collections.unmodifiableMap(ExtensionValue.findAllByElement(element).collectEntries {
+        Collections.unmodifiableMap(element.extensions.collectEntries {
             [it.name, it.value]
         })
     }
@@ -114,9 +114,9 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
             return old
         }
         ExtensionValue newOne = new ExtensionValue(name: name?.toString(), value: value?.toString(), element: element)
+        element.addToExtensions(newOne)
         newOne.save()
         assert newOne.errors.errorCount == 0
-        element.addToExtensions(newOne)
         return null
 
     }
@@ -124,6 +124,7 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
     private String deleteIfPresent(Object key) {
         ExtensionValue existing = findExtensionValueByName(key?.toString())
         if (!existing) return null
+        element.removeFromExtensions(existing)
         existing.delete()
         existing.value
     }
