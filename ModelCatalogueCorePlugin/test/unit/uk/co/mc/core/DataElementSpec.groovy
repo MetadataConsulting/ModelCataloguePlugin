@@ -27,7 +27,7 @@ import spock.lang.Unroll
  *
  *
  */
-@Mock(DataElement)
+@Mock([DataElement, ExtensionValue])
 class DataElementSpec extends Specification{
 
     @Unroll
@@ -69,18 +69,19 @@ class DataElementSpec extends Specification{
 
         when:
 
-        def dataCollectionQualityExtension = ["oxford": 1, "cambridge": 3]
+        def dataCollectionQualityExtension = ["oxford": "1", "cambridge": "3"]
 
         DataElement dataElementInstance = new DataElement(name: "result1", description: "this is the the result description")
 
-        dataElementInstance.dataCollectionQuality =  dataCollectionQualityExtension
-
         dataElementInstance.save()
+        dataElementInstance.ext.putAll dataCollectionQualityExtension
+
 
         then:
 
         !dataElementInstance.hasErrors()
-        dataElementInstance.dataCollectionQuality == dataCollectionQualityExtension
+        dataElementInstance.ext.oxford == "1"
+        dataElementInstance.ext.cambridge == "3"
 
     }
 

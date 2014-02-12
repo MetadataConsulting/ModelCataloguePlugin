@@ -10,7 +10,7 @@ import spock.lang.Unroll
  * Models are like xml complex types
  * They contain data elements
  */
-@Mock(Model)
+@Mock([Model, ExtensionValue])
 class ModelSpec extends Specification{
 
     @Unroll
@@ -34,7 +34,7 @@ class ModelSpec extends Specification{
         where:
 
         validates | args
-        false      | [name:"t", description: "test model description"]
+        false | [name: "", description: "test model description"]
         false      | [name:"t"*256, description: "test model description"]
         false      | [name:"test model", description: "t"*2001]
         true       | [name:"test model", description: "test model description"]
@@ -54,14 +54,16 @@ class ModelSpec extends Specification{
 
         Model modelInstance = new Model(name: "result1", description: "this is the the result description")
 
-        modelInstance.address =  dataExtension
 
         modelInstance.save()
+        modelInstance.ext.putAll dataExtension
 
         then:
 
         !modelInstance.hasErrors()
-        modelInstance.address == dataExtension
+        modelInstance.ext.ip == "x.xx.xx.xx"
+        modelInstance.ext.owner == "BRC_Informatics"
+
 
     }
 

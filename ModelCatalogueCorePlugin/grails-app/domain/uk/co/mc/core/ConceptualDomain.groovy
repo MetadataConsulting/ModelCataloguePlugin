@@ -1,9 +1,5 @@
 package uk.co.mc.core
 
-import groovy.transform.EqualsAndHashCode
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
 /*
 * Conceptual Domains include value domains
 * i.e. a conceptual domain of a particular library could include a number of different
@@ -19,13 +15,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 *
 * */
 
-
 class ConceptualDomain extends CatalogueElement {
 
     static transients = ['isContextFor', 'includes']
-
-    static constraints = {
-    }
 
     //CONTEXT
 
@@ -59,29 +51,5 @@ class ConceptualDomain extends CatalogueElement {
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ConceptualDomain)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        ConceptualDomain cd = (ConceptualDomain) obj;
-        return new EqualsBuilder()
-                .append(name, cd?.name)
-                .append(incomingRelationships, cd?.incomingRelationships)
-                .append(outgoingRelationships, cd?.outgoingRelationships)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(incomingRelationships)
-                .append(outgoingRelationships)
-                .toHashCode();
-    }
-
 
 }
