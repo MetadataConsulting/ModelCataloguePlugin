@@ -65,4 +65,8 @@ class Mapping {
         new GroovyShell(new Binding(x: value)).evaluate(mapping)
     }
 
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}]"
+    }
+
 }

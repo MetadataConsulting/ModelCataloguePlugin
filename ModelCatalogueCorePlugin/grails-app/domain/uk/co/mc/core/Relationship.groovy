@@ -94,4 +94,8 @@ class Relationship  {
         return null
 	}
 
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}, type: ${relationshipType?.name}]"
+    }
+
 }

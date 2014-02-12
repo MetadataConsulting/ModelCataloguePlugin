@@ -15,10 +15,9 @@ package uk.co.mc.core
 *
 * */
 
-class ConceptualDomain extends CatalogueElement  {
+class ConceptualDomain extends CatalogueElement {
 
     static transients = ['isContextFor', 'includes']
-
 
     //CONTEXT
 
@@ -34,7 +33,6 @@ class ConceptualDomain extends CatalogueElement  {
         removeLinkTo(model, RelationshipType.contextType)
     }
 
-
     //INCLUSION
 
     List/*<ValueDomain>*/ getIncludes() {
@@ -49,5 +47,9 @@ class ConceptualDomain extends CatalogueElement  {
         removeLinkTo(valueDomain, RelationshipType.inclusionType)
     }
 
+
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
 
 }

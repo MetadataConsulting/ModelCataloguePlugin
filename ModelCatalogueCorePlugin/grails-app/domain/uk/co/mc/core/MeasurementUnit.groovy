@@ -6,6 +6,10 @@ package uk.co.mc.core
 *
 * */
 
-class MeasurementUnit extends CatalogueElement{
+class MeasurementUnit extends CatalogueElement {
+
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
 
 }

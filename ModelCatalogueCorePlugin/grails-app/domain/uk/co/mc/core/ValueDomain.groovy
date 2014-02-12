@@ -83,4 +83,8 @@ class ValueDomain extends CatalogueElement  {
     }
 
 
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
 }

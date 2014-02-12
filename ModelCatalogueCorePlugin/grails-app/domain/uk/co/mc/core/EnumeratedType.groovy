@@ -18,4 +18,8 @@ class EnumeratedType extends DataType{
             return true
         }
     }
+
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}, enumerations: ${enumerations}]"
+    }
 }

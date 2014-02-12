@@ -47,4 +47,8 @@ class DataElement extends ExtendibleElement {
         removeLinkTo(valueDomain, RelationshipType.instantiationType)
     }
 
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}, code: ${code}, version: ${version}, status: ${status}]"
+    }
+
 }

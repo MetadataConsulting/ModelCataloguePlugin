@@ -26,4 +26,8 @@ abstract class ExtendibleElement extends PublishedElement{
     def propertyMissing(String name) {
         extension[name]
     }
+
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}, extensions: ${extension}]"
+    }
 }

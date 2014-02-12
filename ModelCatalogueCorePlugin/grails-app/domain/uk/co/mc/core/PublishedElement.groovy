@@ -81,5 +81,9 @@ abstract class PublishedElement extends CatalogueElement{
 */
     }
 
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
+    }
+
 
 }

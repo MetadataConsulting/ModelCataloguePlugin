@@ -61,7 +61,9 @@ class Model extends ExtendibleElement  {
     }
 
 
-
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
+    }
 
 
 }

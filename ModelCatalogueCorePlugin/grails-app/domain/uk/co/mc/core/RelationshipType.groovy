@@ -131,6 +131,10 @@ class RelationshipType {
     static readByName(String name) {
         findByName(name, [readOnly: true])
     }
+
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
 }
 
 

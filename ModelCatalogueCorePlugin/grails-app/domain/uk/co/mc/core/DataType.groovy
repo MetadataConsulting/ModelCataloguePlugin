@@ -7,10 +7,14 @@ package uk.co.mc.core
 * Data Types are used by Value Domains (please see ValueDomain and Usance)
 */
 
-class DataType extends CatalogueElement{
+class DataType extends CatalogueElement {
 
     static constraints = {
-		name unique:true, size: 2..255
+        name unique: true, size: 2..255
+    }
+
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
 }
