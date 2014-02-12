@@ -31,7 +31,7 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         element.extensions.size() == 1
         ExtensionValue.count() == 1
         element.ext.keySet() == ['foo'] as Set
-        element.ext.values() == ['bar']
+        element.ext.values()?.contains('bar')
         element.ext.entrySet() == [foo: 'bar'].entrySet()
         // ExtensionValue.findByElementAndName(element, 'foo')
         element.ext.containsKey('foo')
@@ -39,12 +39,12 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         element.ext.size() == 1
 
         when:
-        String oldVal = element.ext.foo = "barbar"
+
+        String oldVal = element.ext.put('foo', "barbar")
 
         then:
         element.extensions
         element.extensions.size() == 1
-        ExtensionValue.findByElementAndName(element, 'foo')
         element.ext.containsKey('foo')
         element.ext.containsValue('barbar')
         !element.ext.containsValue('bar')
@@ -58,6 +58,34 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         IllegalArgumentException e = thrown()
         e.message == "Invalid key: x. The key must be contain at least two characters"
 
+
+        when:
+        element.ext.putAll(one: "1", two: "2")
+
+        then:
+        element.extensions.size() == 3
+        element.ext.containsKey("one")
+        element.ext.containsKey("two")
+        element.ext.size() == 3
+
+
+        when:
+        element.ext.remove("one")
+
+        then:
+        element.extensions.size() == 2
+        !element.ext.containsKey("one")
+        element.ext.containsKey("two")
+        element.ext.size() == 2
+
+        when:
+        element.ext.clear()
+
+        then:
+        !element.extensions
+        !element.ext.containsKey("one")
+        !element.ext.containsKey("two")
+        !element.ext.size()
 
     }
 

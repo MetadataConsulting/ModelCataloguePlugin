@@ -17,7 +17,7 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
 
     @Override
     int size() {
-        ExtensionValue.countByElement(element)
+        element.extensions?.size() ?: 0
     }
 
     @Override
@@ -27,13 +27,12 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
 
     @Override
     boolean containsKey(Object key) {
-        findExtensionValueByName(key)
+        keySet().contains(key)
     }
 
     @Override
     boolean containsValue(Object value) {
-        if (isEmpty()) return false
-        findExtensionValueByValue(value)
+        values().contains(value)
     }
 
     @Override
@@ -89,12 +88,12 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
 
     private ExtensionValue findExtensionValueByName(key) {
         if (!key) return null
-        ExtensionValue.findByElementAndName(element, key.toString())
+        element.extensions?.find { it.name == key }
     }
 
     private ExtensionValue findExtensionValueByValue(key) {
         if (!key) return null
-        ExtensionValue.findByElementAndValue(element, key.toString())
+        element.extensions?.find { it.value == key }
     }
 
     private Map<String, String> asReadOnlyMap() {
@@ -109,7 +108,6 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
             String old = existing.value
             existing.value = value?.toString()
             existing.save()
-            element.addToExtensions(old)
             assert existing.errors.errorCount == 0
             return old
         }
