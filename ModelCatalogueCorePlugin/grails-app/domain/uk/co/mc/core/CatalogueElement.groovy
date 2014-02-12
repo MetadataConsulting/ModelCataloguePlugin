@@ -30,50 +30,55 @@ abstract class CatalogueElement {
     static transients = ['relations']
 
 
-		/******************************************************************************************************************/
-		/****functions for specifying relationships between catalogue elements using the uk.co.mc.core.Relationship class ************/
-		/******************************************************************************************************************/
-		
-		/***********return all the relations************/
-		
-		List getRelations() {
-            return [
-                    (outgoingRelationships ?: []).collect { it.destination },
-                    (incomingRelationships ?: []).collect { it.source }
-            ].flatten()
-		}
+    /******************************************************************************************************************/
+    /****functions for specifying relationships between catalogue elements using the uk.co.mc.core.Relationship class ************/
+    /******************************************************************************************************************/
+
+    /***********return all the relations************/
+
+    List getRelations() {
+        return [
+                (outgoingRelationships ?: []).collect { it.destination },
+                (incomingRelationships ?: []).collect { it.source }
+        ].flatten()
+    }
 
 
-        List getIncomingRelationsByType(RelationshipType type) {
-            Relationship.findAllByDestinationAndRelationshipType(this, type).collect {
-                it.source
-            }
+    List getIncomingRelationsByType(RelationshipType type) {
+        Relationship.findAllByDestinationAndRelationshipType(this, type).collect {
+            it.source
         }
+    }
 
-        List getOutgoingRelationsByType(RelationshipType type) {
-            Relationship.findAllBySourceAndRelationshipType(this, type).collect {
-                it.destination
-            }
+    List getOutgoingRelationsByType(RelationshipType type) {
+        Relationship.findAllBySourceAndRelationshipType(this, type).collect {
+            it.destination
         }
+    }
 
-        List getRelationsByType(RelationshipType type) {
-            [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
-        }
+    List getRelationsByType(RelationshipType type) {
+        [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
+    }
 
 
-        Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
-            Relationship.link(this, destination, type)
-        }
+    Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
+        Relationship.link(this, destination, type)
+    }
 
-        Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
-            Relationship.link(source, this, type)
-        }
+    Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
+        Relationship.link(source, this, type)
+    }
 
-        void removeLinkTo(CatalogueElement destination, RelationshipType type) {
-            Relationship.unlink(this, destination, type)
-        }
+    void removeLinkTo(CatalogueElement destination, RelationshipType type) {
+        Relationship.unlink(this, destination, type)
+    }
 
-        void removeLinkFrom(CatalogueElement source, RelationshipType type) {
-            Relationship.unlink(source, this, type)
-        }
+    void removeLinkFrom(CatalogueElement source, RelationshipType type) {
+        Relationship.unlink(source, this, type)
+    }
+
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
 }

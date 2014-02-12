@@ -39,9 +39,9 @@ class DataElementMarshallerSpec extends Specification{
 
         when:
 
-        de1 = new DataElement(id: 1, name: 'One', description: 'First data element', definition: 'First data element definition').save()
-        de2 = new DataElement(id: 2, name: 'Two', description: 'Second data element', definition: 'Second data element definition').save()
-        de3 = new DataElement(id: 3, name: 'Three', description: 'Third data element', definition: 'Third data element definition').save()
+        de1 = new DataElement(id: 1, name: 'One', description: 'First data element').save()
+        de2 = new DataElement(id: 2, name: 'Two', description: 'Second data element').save()
+        de3 = new DataElement(id: 3, name: 'Three', description: 'Third data element').save()
 
         rt = new RelationshipType(name:'Antonym',
                 sourceToDestination: 'AntonymousWith',

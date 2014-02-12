@@ -17,9 +17,9 @@ class MarshallerUtilsSpec extends Specification{
 
         when:
 
-        def dataElement1 = new DataElement(name: "TEstOne", description: "First data element", definition: "First data element definition").save()
-        def dataElement2 = new DataElement(name: "TestTwo", description: "Second data element", definition: "Second data element definition").save()
-        def dataElement3 = new DataElement(name: "TestThree", description: "Third data element", definition: "Third data element definition").save()
+        def dataElement1 = new DataElement(name: "TEstOne", description: "First data element") .save()
+        def dataElement2 = new DataElement(name: "TestTwo", description: "Second data element").save()
+        def dataElement3 = new DataElement(name: "TestThree", description: "Third data element").save()
 
         def rt = new RelationshipType(name:"NarrowerTerm",
                 sourceToDestination: "NarrowerTerm",
@@ -36,8 +36,8 @@ class MarshallerUtilsSpec extends Specification{
 
         when:
 
-        def rel = Relationship.link(dataElement1, dataElement2, rt)
-        def rel2 = Relationship.link(dataElement1, dataElement3, rt)
+        Relationship.link(dataElement1, dataElement2, rt)
+        Relationship.link(dataElement1, dataElement3, rt)
 
         then:
 

@@ -9,9 +9,13 @@ package uk.co.mc.core
 
 class EnumeratedType extends DataType{
 
-    Map <String, String> enumerations
+    Map<String, String> enumerations
 
     static constraints = {
-        enumerations minSize: 2, nullable: false
+        enumerations nullable: false, validator: { val, obj ->
+            if (!val) return true
+            if (val.size() < 2) return false
+            return true
+        }
     }
 }
