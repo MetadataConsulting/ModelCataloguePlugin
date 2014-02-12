@@ -38,4 +38,26 @@ class ConceptualDomainSpec extends Specification {
         true       | [name:"test concept", description: "test concept description"]
 
     }
+
+    def "check  EqualsAndHashCode works"(){
+
+        when:
+        def a = new ConceptualDomain(name:"test concept", description: "test concept description").save()
+        def b = new ConceptualDomain(name:"test concept", description: "test concept description").save()
+
+        then:
+        a.equals(b)
+        b.equals(a)
+
+    }
+
+    def "check toString works"(){
+
+        when:
+        def a = new ConceptualDomain(name:"test concept", description: "test concept description").save()
+
+        then:
+        a.toString() == "ConceptualDomain[id: 1, name: test concept]"
+
+    }
 }

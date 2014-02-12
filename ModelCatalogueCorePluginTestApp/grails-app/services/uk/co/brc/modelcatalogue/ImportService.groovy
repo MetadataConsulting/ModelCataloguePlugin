@@ -1,5 +1,6 @@
 package uk.co.brc.modelcatalogue
 
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.web.json.JSONObject
 import uk.co.mc.core.DataElement
 import uk.co.mc.core.EnumeratedType
@@ -49,7 +50,7 @@ class ImportService {
 			//dataElementConcept: models,
 			//extension: ext).save(failOnError: true)
 
-            ext.put("NHIC_Identifier:", tokens[0].take(255));
+            /*ext.put("NHIC_Identifier:", tokens[0].take(255));
             ext.put("Link_to_existing definition:", tokens[6].take(255));
             ext.put("Notes_from_GD_JCIS",tokens[7].take(255));
             ext.put("[Optional]_Local_Identifier", tokens[8].take(255));
@@ -63,7 +64,7 @@ class ImportService {
             ext.put("H", tokens[16]);
             ext.put("E2", tokens[17].take(255))
 
-            de.extension =  ext
+            de.extension =  ext*/
             de.save()
 
             de.addToInstantiatedBy(vd)

@@ -37,10 +37,4 @@ class DataTypeSpec extends Specification{
 
     }
 
-
-
-
-
-
-
 }

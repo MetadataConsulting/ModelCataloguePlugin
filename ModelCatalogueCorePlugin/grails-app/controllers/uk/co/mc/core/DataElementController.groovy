@@ -13,6 +13,7 @@ class DataElementController extends RestfulController<DataElement>{
         super(DataElement)
     }
 
+    /**
     @Override
     def index(Integer max) {
 
@@ -28,6 +29,26 @@ class DataElementController extends RestfulController<DataElement>{
         ]
 
         respond model;
+
+    }
+
+    def tester(){
+
+        def rt = new RelationshipType(name:"Synonym",
+                sourceToDestination: "SynonymousWith",
+                destinationToSource: "SynonymousWith",
+                sourceClass: DataElement,
+                destinationClass: DataElement).save()
+
+        def de1 = new DataElement(id: 1, name: "One", description: "First data element").save()
+        def de2 = new DataElement(id: 2, name: "Two", description: "Second data element").save()
+
+
+        def rel = Relationship.link(de1, de2, rt).save()
+
+        def de3 = new DataElement(id:3, name: "Three",
+                description: "Third data element").save()
+
 
     }
 
@@ -55,7 +76,7 @@ class DataElementController extends RestfulController<DataElement>{
         render model as JSON
     }
 
-/**
+
  * Updates a resource for the given id
  * @param id
  */

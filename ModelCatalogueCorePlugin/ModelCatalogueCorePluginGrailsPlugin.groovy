@@ -1,3 +1,8 @@
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.springframework.web.context.support.WebApplicationContextUtils
+import uk.co.mc.core.util.marshalling.CustomObjectMarshallers
+import uk.co.mc.core.util.marshalling.DataElementMarshaller
+
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
     def version = "0.1"
@@ -40,8 +45,17 @@ Brief summary/description of the plugin.
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
+
+
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
+
+
+            customObjectMarshallers( CustomObjectMarshallers ) {
+                marshallers = [
+                        new DataElementMarshaller()
+                ]
+            }
     }
 
     def doWithDynamicMethods = { ctx ->
@@ -50,6 +64,9 @@ Brief summary/description of the plugin.
 
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
+        //register custom json Marshallers
+
+        ctx.getBean('customObjectMarshallers').register()
 
     }
 

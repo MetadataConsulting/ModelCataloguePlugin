@@ -1,11 +1,14 @@
 package uk.co.mc.core
 
+import groovy.transform.EqualsAndHashCode
+
 /*
 * A Data Type is like a primitive type
 * i.e. integer, string, byte, boolean, time........
 * additional types can be specified (as well as enumerated types (see EnumeratedType))
 * Data Types are used by Value Domains (please see ValueDomain and Usance)
 */
+
 
 class DataType extends CatalogueElement {
 
