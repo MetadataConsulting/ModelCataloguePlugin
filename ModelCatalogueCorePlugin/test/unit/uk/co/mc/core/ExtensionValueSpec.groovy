@@ -19,7 +19,7 @@ class ExtensionValueSpec extends Specification {
     def cleanup() { de.delete() }
 
     @Unroll
-    def "create a mew extension value from #args validates to #validates"() {
+    def "#r: create a mew extension value from #args validates to #validates"() {
 
         expect:
 
@@ -30,6 +30,7 @@ class ExtensionValueSpec extends Specification {
         ExtensionValue type = new ExtensionValue(args)
         type.save()
 
+        println type.errors
 
         then:
 
@@ -37,17 +38,16 @@ class ExtensionValueSpec extends Specification {
         ExtensionValue.list().size() == size
 
         where:
-        validates | size | args
-        false     | 0    | [:]
-        false     | 0    | [name: "x" * 256]
-        false     | 0    | [name: "x" * 256, value: "x"]
-        false     | 0    | [name: "x" * 256, value: "x" * 1001]
-        false     | 0    | [name: "x" * 256, value: "x" * 1001]
-        false     | 0    | [name: "x" * 256, element: de]
-        false     | 0    | [name: "x" * 256, value: "x", element: de]
-        false     | 0    | [name: "x" * 256, value: "x" * 1001, element: de]
-        false     | 0    | [name: "x" * 256, value: "x" * 1001, element: de]
-        true      | 1    | [name: "String", value: "x", element: de]
+        r | validates | size | args
+        1 | false     | 0    | [:]
+        2 | false     | 0    | [name: "x" * 256]
+        3 | false     | 0    | [name: "x" * 256, value: "x"]
+        4 | false     | 0    | [name: "x" * 256, value: "x" * 1001]
+        5 | false     | 0    | [name: "x" * 256, element: de]
+        6 | true      | 1    | [name: "xxx", element: de]
+        7 | false     | 0    | [name: "xxx" * 256, value: "x", element: de]
+        8 | false     | 0    | [name: "xxx" * 256, value: "x" * 1001, element: de]
+        9 | true      | 1    | [name: "xxx", value: "x", element: de]
 
     }
 }

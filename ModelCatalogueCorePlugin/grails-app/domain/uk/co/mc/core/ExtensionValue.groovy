@@ -9,7 +9,7 @@ class ExtensionValue extends CatalogueElement {
     static belongsTo = [element: ExtendibleElement]
 
     static constraints = {
-        value maxSize: 1000
+        value maxSize: 1000, nullable: true
     }
 
 
