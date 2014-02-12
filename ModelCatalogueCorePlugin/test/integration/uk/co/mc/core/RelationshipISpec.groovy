@@ -1,7 +1,5 @@
 package uk.co.mc.core
 
-import org.hibernate.TransientObjectException
-import org.springframework.dao.InvalidDataAccessApiUsageException
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll

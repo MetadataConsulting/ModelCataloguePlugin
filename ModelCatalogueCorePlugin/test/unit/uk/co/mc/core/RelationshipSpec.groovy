@@ -1,9 +1,7 @@
 package uk.co.mc.core
 
 import grails.test.mixin.Mock
-import org.relaxng.datatype.Datatype
 import spock.lang.Specification
-import spock.lang.Unroll
 
 /**
  * Created by adammilward on 03/02/2014.

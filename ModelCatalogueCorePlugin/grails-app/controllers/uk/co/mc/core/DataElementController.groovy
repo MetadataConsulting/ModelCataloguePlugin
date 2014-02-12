@@ -1,7 +1,7 @@
 package uk.co.mc.core
 
 import grails.converters.JSON
-import grails.rest.*
+import grails.rest.RestfulController
 import grails.transaction.Transactional
 
 @Transactional(readOnly = true)

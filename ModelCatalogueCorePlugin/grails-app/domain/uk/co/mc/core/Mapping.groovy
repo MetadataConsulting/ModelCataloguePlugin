@@ -1,8 +1,5 @@
 package uk.co.mc.core
 
-import org.codehaus.groovy.control.CompilationFailedException
-import org.codehaus.groovy.control.MultipleCompilationErrorsException
-
 class Mapping {
 
     ValueDomain source

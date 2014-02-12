@@ -1,11 +1,9 @@
 package uk.co.mc.core.util.marshalling
 
-import spock.lang.Shared
 import spock.lang.Specification
 import uk.co.mc.core.DataElement
 import uk.co.mc.core.Relationship
 import uk.co.mc.core.RelationshipType
-import uk.co.mc.core.util.marshalling.MarshallerUtils
 
 /**
  * Created by adammilward on 10/02/2014.

@@ -1,9 +1,6 @@
 package uk.co.mc.core.util.marshalling
 
-import grails.converters.JSON
-import org.codehaus.groovy.grails.web.json.JSONObject
 import uk.co.mc.core.CatalogueElement
-import uk.co.mc.core.Relationship
 
 /**
  * Created by adammilward on 07/02/2014.

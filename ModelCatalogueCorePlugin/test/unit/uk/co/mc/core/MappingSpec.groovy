@@ -2,7 +2,6 @@ package uk.co.mc.core
 
 import grails.test.mixin.TestFor
 import spock.lang.Specification
-import uk.co.mc.core.Mapping
 
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions

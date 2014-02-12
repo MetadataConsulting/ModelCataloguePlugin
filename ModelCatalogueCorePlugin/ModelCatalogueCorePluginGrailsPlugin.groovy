@@ -1,7 +1,3 @@
-import uk.co.mc.core.DataElement
-
-import uk.co.mc.core.Relationship
-
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
     def version = "0.1"
