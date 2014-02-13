@@ -202,6 +202,9 @@ class RelationshipISpec extends Specification{
         (rel.errors.errorCount == 0) == validates
 
 
+        cleanup:
+        if (rel.id) rel.delete()
+
         where:
         testNumber | validates  | args
         1  | false | [:]
