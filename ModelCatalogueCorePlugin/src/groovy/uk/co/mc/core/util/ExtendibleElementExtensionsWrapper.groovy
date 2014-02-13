@@ -43,7 +43,7 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
 
     @Override
     String put(String key, String value) {
-        if (!key || key.length() < 1) throw new IllegalArgumentException("Invalid key: $key. The key must be contain at least two characters")
+        if (!key || key.length() < 1) throw new IllegalArgumentException("Invalid key: $key. The key must be contain at least one character")
         createOrUpdate(key, value)
     }
 

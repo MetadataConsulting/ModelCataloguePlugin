@@ -50,11 +50,11 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         oldVal == "bar"
 
         when:
-        element.ext.x = "something"
+        element.ext."" = "something"
 
         then:
         IllegalArgumentException e = thrown()
-        e.message == "Invalid key: x. The key must be contain at least two characters"
+        e.message == "Invalid key: . The key must be contain at least one character"
 
 
         when:
