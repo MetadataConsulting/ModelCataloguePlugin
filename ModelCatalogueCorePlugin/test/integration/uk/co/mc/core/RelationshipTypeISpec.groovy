@@ -1,15 +1,38 @@
 package uk.co.mc.core
 
+import grails.test.spock.IntegrationSpec
+import spock.lang.Shared
 import spock.lang.Specification
 
 /**
  * Created by ladin on 10.02.14.
  */
-class RelationshipTypeISpec extends Specification {
+class RelationshipTypeISpec extends IntegrationSpec {
+
+    @Shared
+    def fixtureLoader, md1, de1, cd1, md2, vd
 
     def setupSpec(){
         RelationshipType.initDefaultRelationshipTypes()
+        def fixtures =  fixtureLoader.load("dataElements/DE_author4", "models/M_book","models/M_chapter1", "conceptualDomains/CD_publicLibraries", "valueDomains/VD_uni2Subjects")
+
+        md1 = fixtures.M_book
+        md2 = fixtures.M_chapter1
+        de1 = fixtures.DE_author4
+        cd1 = fixtures.CD_publicLibraries
+        vd = fixtures.VD_uni2Subjects
+
     }
+
+    /*def cleanupSpec(){
+
+        de1.delete()
+        md2.delete()
+        md1.delete()
+        cd1.delete()
+        vd.delete()
+
+    }*/
 
     def "read by name returns read only instance"() {
 
@@ -31,12 +54,10 @@ class RelationshipTypeISpec extends Specification {
 
     def "data elements can be contained in models, models can contain data elements"(){
 
-        Model model = new Model(name: "model")
-        DataElement element = new DataElement(name: "element")
+        def model = Model.get(md1.id)
+        def element =  DataElement.get(de1.id)
 
         expect:
-        model.save()
-        element.save()
         !model.contains
         !element.containedIn
 
@@ -64,12 +85,21 @@ class RelationshipTypeISpec extends Specification {
         model.contains.size()       == 1
         element.containedIn
         element.containedIn.size()  == 1
+
+        when:
+        element.removeFromContainedIn(model)
+
+        then:
+
+        !model.contains
+        !element.containedIn
+
     }
 
     def "conceptual domains can provide context for model, models have context of conceptual domains"(){
 
-        Model model = new Model(name: "model")
-        ConceptualDomain conceptualDomain = new ConceptualDomain(name: "conceptualDomain")
+        def model = md1
+        def conceptualDomain = cd1
 
         expect:
         model.save()
@@ -101,12 +131,21 @@ class RelationshipTypeISpec extends Specification {
         model.hasContextOf.size()       == 1
         conceptualDomain.isContextFor
         conceptualDomain.isContextFor.size()  == 1
+
+        when:
+
+        conceptualDomain.removeFromIsContextFor(model)
+
+        then:
+        !model.hasContextOf
+        !conceptualDomain.isContextFor
+
     }
 
     def "model can be a parent of another model, model can be child of another model)"(){
 
-        Model book = new Model(name: "book")
-        Model chapter = new Model(name: "chapter1")
+        def book = Model.get(md1.id)
+        def chapter = Model.get(md2.id)
 
         expect:
         book.save()
@@ -138,18 +177,24 @@ class RelationshipTypeISpec extends Specification {
         book.parentOf.size()       == 1
         chapter.childOf
         chapter.childOf.size()  == 1
+
+        when:
+        chapter.removeFromChildOf(book)
+
+
+        then:
+        !book.parentOf
+        !chapter.childOf
+
     }
 
 
     def "conceptualDomain can include valueDomain, valueDomains can be included in conceptual domains"(){
 
-        ConceptualDomain university = new ConceptualDomain(name: "university")
-        EnumeratedType enumeratedType = new EnumeratedType(name: "sub1", enumerations:['h':'history', 'p':'politics', 'sci':'science']).save()
-        ValueDomain subjects = new ValueDomain(name: "subjects", description: "subject in the university", dataType: enumeratedType)
+        def university = ConceptualDomain.get(cd1.id)
+        def subjects = ValueDomain.get(vd.id)
 
         expect:
-        university.save()
-        subjects.save()
         !university.includes
         !subjects.includedIn
 
@@ -177,18 +222,25 @@ class RelationshipTypeISpec extends Specification {
         university.includes.size()       == 1
         subjects.includedIn
         subjects.includedIn.size()  == 1
+
+        when:
+        subjects.removeFromIncludedIn(university)
+
+        then:
+        !university.includes
+        !subjects.includedIn
+
     }
 
 
     def "data elements can be instantiated by valueDomain, valueDomains can instantiate in data elements"(){
 
-        DataElement course = new DataElement(name: "course name")
-        EnumeratedType enumeratedType = new EnumeratedType(name: "sub1", enumerations:['h':'history', 'p':'politics', 'sci':'science']).save()
-        ValueDomain subjects = new ValueDomain(name: "subjects", description: "subject in the course", dataType: enumeratedType)
+
+        def course = DataElement.get(de1.id)
+        def subjects = ValueDomain.get(vd.id)
 
         expect:
-        course.save()
-        subjects.save()
+
         !course.instantiatedBy
         !subjects.instantiates
 
@@ -216,6 +268,13 @@ class RelationshipTypeISpec extends Specification {
         course.instantiatedBy.size()       == 1
         subjects.instantiates
         subjects.instantiates.size()  == 1
+
+        when:
+        subjects.removeFromInstantiates(course)
+
+        then:
+        !course.instantiatedBy
+        !subjects.instantiates
     }
 
 

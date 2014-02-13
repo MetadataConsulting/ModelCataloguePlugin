@@ -12,12 +12,12 @@ class ConceptualDomainISpec extends IntegrationSpec {
     def "test fixtures stuff"() {
 
         when:
-        def fixtures =  fixtureLoader.load("conceptualDomains/universityLibraries",
-                                            "conceptualDomains/publicLibraries")
+        def fixtures =  fixtureLoader.load("conceptualDomains/CD_universityLibraries",
+                                            "conceptualDomains/CD_publicLibraries")
 
         then:
-        fixtures.universityLibraries.name == "university libraries"
-        fixtures.publicLibraries.name == "public libraries"
+        fixtures.CD_universityLibraries.name == "university libraries"
+        fixtures.CD_publicLibraries.name == "public libraries"
 
     }
 }

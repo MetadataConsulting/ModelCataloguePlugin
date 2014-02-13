@@ -1,30 +1,36 @@
 package uk.co.mc.core
 
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
+import spock.lang.Shared
 
 /**
  * Created by adammilward on 05/02/2014.
  */
 
-class ModelISpec extends Specification{
+class ModelISpec extends IntegrationSpec{
 
-    /*def cleanupSpec(){
-        Model.list().each{ model ->
+    @Shared
+    def fixtureLoader, book
 
-            model.delete()
+    def setupSpec(){
+        def fixtures =  fixtureLoader.load("models/M_book")
 
-        }
-    }*/
+        book = fixtures.M_book
 
+    }
+/*
+    def cleanupSpec(){
+        book.delete()
+    }
+*/
     def "create a new model, finalize it and then try to change it"(){
 
         expect:
 
-        Model.list().isEmpty()
-
+        Model.list().size()==1
         when:
 
-        Model modelInstance = new Model(name: "result1", description: "this is the the result description")
+        Model modelInstance = Model.get(book.id)
         modelInstance.save()
 
         then:

@@ -1,9 +1,30 @@
 package uk.co.mc.core
 
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
+import spock.lang.Shared
 import spock.lang.Unroll
 
-class MappingISpec extends Specification {
+class MappingISpec extends IntegrationSpec {
+
+    @Shared
+    def fixtureLoader, degreeC, degreeF
+
+    def setupSpec(){
+        def fixtures =  fixtureLoader.load( "valueDomains/VD_degree_C", "valueDomains/VD_degree_F")
+
+        degreeC = fixtures.VD_degree_C
+        degreeF = fixtures.VD_degree_F
+
+    }
+
+    /*
+    def cleanupSpec(){
+
+        degreeC.delete()
+        degreeF.delete()
+
+    }*/
+
 
     @Unroll
     def "create a mew data type from #args validates to #validates" (){
@@ -16,105 +37,86 @@ class MappingISpec extends Specification {
 
         Mapping type = new Mapping(args)
         type.save()
-        println type.errors
+
 
         then:
 
         !type.hasErrors() == validates
         Mapping.list().size() == size
 
+        when:
+
+        type.delete()
+
+        then:
+
+        true
+
         where:
         validates | size | args
         false     | 0    | [:]
         false     | 0    | [name: "x" * 256]
-        false     | 0    | [
-                name: "String",
-                source: new ValueDomain(
-                        unitOfMeasure: new MeasurementUnit(name: "Degrees of C").save(),
-                        name: "value domain source",
-                        dataType: new DataType(name: "degree").save()
-                ).save(),
-                destination: new ValueDomain(
-                        unitOfMeasure: new MeasurementUnit(name: "Degrees of F").save(),
-                        name: "value domain destination",
-                        dataType: new DataType(name: "integer").save()
-                ).save(),
-                mapping: "foo"
-        ]
-        true      | 1    | [
-                name: "String",
-                source: new ValueDomain(
-                        unitOfMeasure: new MeasurementUnit(name: "Degrees of C 2").save(),
-                        name: "value domain source 2",
-                        dataType: new DataType(name: "degree 2").save()
-                ).save(),
-                destination: new ValueDomain(
-                        unitOfMeasure: new MeasurementUnit(name: "Degrees of F 2").save(),
-                        name: "value domain destination 2",
-                        dataType: new DataType(name: "integer 2").save()
-                ).save(),
-                mapping: "x * 2"
-        ]
+        false     | 0    | [ name: "String", source: degreeC, destination: degreeF, mapping: "foo" ]
+        true      | 1    | [ name: "String", source: degreeC, destination: degreeF, mapping: "x * 2" ]
+
+
 
     }
 
     def "create mapping using map "(){
-        MeasurementUnit mu1 = new MeasurementUnit(name: "Degrees of C").save()
-        MeasurementUnit mu2 = new MeasurementUnit(name: "Degrees of F").save()
-
-        DataType floatType  = new DataType(name: "float").save()
-
-        ValueDomain vd1     = new ValueDomain(name: "Patient`s Temperature in C", dataType: floatType, unitOfMeasure: mu1).save()
-        ValueDomain vd2     = new ValueDomain(name: "Patient`s Temperature in F", dataType: floatType, unitOfMeasure: mu2).save()
 
         when:
-        Mapping zero = Mapping.map(vd1, new ValueDomain(name: "none"), "x")
+
+        def dC = ValueDomain.get(degreeC.id)
+        def dF = ValueDomain.get(degreeF.id)
+
+        Mapping zero = Mapping.map(dC, new ValueDomain(name: "none"), "x")
 
         then:
         !zero
 
         when:
-        Mapping first = Mapping.map(vd1, vd2, "x * 9/5 + 32")
+        Mapping first = Mapping.map(dC, dF, "x * 9/5 + 32")
 
         then:
         first
         !first.hasErrors()
-        vd1.outgoingMappings
-        vd1.outgoingMappings.contains(first)
-        vd2.incomingMappings
-        vd2.incomingMappings.contains(first)
+        dC.outgoingMappings
+        dC.outgoingMappings.contains(first)
+        dF.incomingMappings
+        dF.incomingMappings.contains(first)
 
         when:
-        Mapping second = Mapping.map(vd1, vd2, "x * 9/5 + 32")
+        Mapping second = Mapping.map(dC, dF, "x * 9/5 + 32")
 
         then:
         second
         !second.hasErrors()
         first.id == second.id
-        vd1.outgoingMappings
-        vd1.outgoingMappings.contains(first)
-        vd2.incomingMappings
-        vd2.incomingMappings.contains(first)
+        dC.outgoingMappings
+        dC.outgoingMappings.contains(first)
+        dF.incomingMappings
+        dF.incomingMappings.contains(first)
 
         when:
-        Mapping third = Mapping.unmap(vd1, vd2)
+        Mapping third = Mapping.unmap(dC, dF)
 
         then:
         third
         third.id == first.id
-        !vd1.outgoingMappings
-        !vd1.outgoingMappings.contains(first)
-        !vd2.incomingMappings
-        !vd2.incomingMappings.contains(first)
+        !dC.outgoingMappings
+        !dC.outgoingMappings.contains(first)
+        !dF.incomingMappings
+        !dF.incomingMappings.contains(first)
 
         when:
-        Mapping fourth = Mapping.unmap(vd1, vd2)
+        Mapping fourth = Mapping.unmap(dC, dF)
 
         then:
         !fourth
-        !vd1.outgoingMappings
-        !vd1.outgoingMappings.contains(first)
-        !vd2.incomingMappings
-        !vd2.incomingMappings.contains(first)
+        !dC.outgoingMappings
+        !dC.outgoingMappings.contains(first)
+        !dF.incomingMappings
+        !dF.incomingMappings.contains(first)
     }
 }

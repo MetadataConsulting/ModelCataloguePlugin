@@ -26,27 +26,26 @@ class DataElementControllerISpec extends IntegrationSpec {
         springContext.getBean('customObjectMarshallers').register()
 
         //load fixturess
-        def fixtures =  fixtureLoader.load( "dataElements/author", "dataElements/writer",
-                                            "dataElements/title",)
+        def fixtures =  fixtureLoader.load( "dataElements/DE_author","dataElements/DE_title","dataElements/DE_writer" )
 
         rt = RelationshipType.findByName("supersession")
 
-        author = fixtures.author
-        writer = fixtures.writer
-        title = fixtures.title
+        author = fixtures.DE_author
+        writer = fixtures.DE_writer
+        title = fixtures.DE_title
 
-        rel = Relationship.link(author, writer, rt).save()
 
         controller = new DataElementController()
 
     }
 
+/*
     def cleanupSpec(){
-
-        Relationship.unlink(author, writer, rt)
-
+        author.delete()
+        title.delete()
+        writer.delete()
     }
-
+*/
     void "Get list of data elements as JSON"() {
 
         expect:
@@ -95,20 +94,22 @@ class DataElementControllerISpec extends IntegrationSpec {
 
         where:
         size    | id          | theParams
-        3       | author.id   | [sort: "id", order: "asc"]
-        2       | title.id    | [offset: 1, sort: "id", order: "desc"]
-        2       | writer.id   | [max: 2, sort: "id", order: "desc"]
-        1       | title.id    | [offset: 1, max: 1, sort: "id", order: "desc"]
+        3       | author.id   | [sort: "name", order: "asc"]
+        2       | title.id    | [offset: 1, sort: "name", order: "desc"]
+        2       | writer.id   | [max: 2, sort: "name", order: "desc"]
+        1       | title.id    | [offset: 1, max: 1, sort: "name", order: "desc"]
 
     }
 
     void "Get an element that contains relationships"()
     {
         expect:
-         DataElement.count()==3
+        DataElement.count()==3
 
 
         when:
+
+        Relationship.link(author, writer, rt).save()
 
         controller.request.contentType = "text/json"
         controller.params.id = author.id
@@ -131,6 +132,14 @@ class DataElementControllerISpec extends IntegrationSpec {
         result.outgoingRelationships.relationshipType.name == ["supersession"]
         result.outgoingRelationships.relationshipType.getAt("class") == ["uk.co.mc.core.RelationshipType"]
         result.outgoingRelationships.relationshipType.destinationToSource == ["supersedes"]
+
+        when:
+
+        Relationship.unlink(author, writer, rt)
+
+        then:
+
+        true
 
     }
 

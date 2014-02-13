@@ -1,6 +1,7 @@
 package uk.co.mc.core.util.marshalling
 
 import grails.converters.JSON
+import grails.test.spock.IntegrationSpec
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 import spock.lang.Shared
@@ -12,10 +13,11 @@ import uk.co.mc.core.RelationshipType
 /**
  * Created by adammilward on 10/02/2014.
  */
-class DataElementMarshallerSpec extends Specification{
+class DataElementMarshallerSpec extends IntegrationSpec{
 
     @Shared
-    def de1, de2, de3, rel, rel2, rt
+    def fixtureLoader, de1, de2, de3, rel, rel2, rt
+
 
     def setupSpec(){
 
@@ -24,11 +26,17 @@ class DataElementMarshallerSpec extends Specification{
         //register custom json Marshallers
         springContext.getBean('customObjectMarshallers').register()
 
+        def fixtures =  fixtureLoader.load( "dataElements/DE_author9", "dataElements/DE_author10", "dataElements/DE_author11", "relationshipTypes/RT_antonym")
+
+        de1 = fixtures.DE_author9
+        de2 = fixtures.DE_author10
+        de3 = fixtures.DE_author11
+        rt = fixtures.RT_antonym
+
     }
 
-    /*def cleanupSpec(){
-        Relationship.unlink(de1, de2, rt)
-        Relationship.unlink(de1, de3, rt)
+    /*
+    def cleanupSpec(){
         de1.delete()
         de2.delete()
         de3.delete()
@@ -39,15 +47,6 @@ class DataElementMarshallerSpec extends Specification{
 
         when:
 
-        de1 = new DataElement(id: 1, name: 'One', description: 'First data element').save()
-        de2 = new DataElement(id: 2, name: 'Two', description: 'Second data element').save()
-        de3 = new DataElement(id: 3, name: 'Three', description: 'Third data element').save()
-
-        rt = new RelationshipType(name:'Antonym',
-                sourceToDestination: 'AntonymousWith',
-                destinationToSource: 'AntonymousWith',
-                sourceClass: DataElement,
-                destinationClass: DataElement).save()
 
         rel = Relationship.link(de1, de2, rt)
         rel2 = Relationship.link(de1, de3, rt)
@@ -56,7 +55,18 @@ class DataElementMarshallerSpec extends Specification{
 
         def de1JSON = de1 as JSON
 
-        de1JSON.toString() == "{\"id\":$de1.id,\"name\":\"$de1.name\",\"description\":\"$de1.description\",\"status\":{\"enumType\":\"uk.co.mc.core.PublishedElement\$Status\",\"name\":\"DRAFT\"},\"versionNumber\":0.1,\"incomingRelationships\":[],\"outgoingRelationships\":[{\"sourcePath\":\"/DataElement/$de3.id\",\"sourceName\":\"$de3.name\",\"destinationPath\":\"/DataElement/$de1.id\",\"destinationName\":\"$de1.name\",\"relationshipType\":{\"class\":\"uk.co.mc.core.RelationshipType\",\"id\":$rt.id,\"destinationClass\":\"uk.co.mc.core.DataElement\",\"destinationToSource\":\"AntonymousWith\",\"name\":\"Antonym\",\"rule\":null,\"sourceClass\":\"uk.co.mc.core.DataElement\",\"sourceToDestination\":\"AntonymousWith\"}},{\"sourcePath\":\"/DataElement/$de2.id\",\"sourceName\":\"$de2.name\",\"destinationPath\":\"/DataElement/$de1.id\",\"destinationName\":\"$de1.name\",\"relationshipType\":{\"class\":\"uk.co.mc.core.RelationshipType\",\"id\":$rt.id,\"destinationClass\":\"uk.co.mc.core.DataElement\",\"destinationToSource\":\"AntonymousWith\",\"name\":\"Antonym\",\"rule\":null,\"sourceClass\":\"uk.co.mc.core.DataElement\",\"sourceToDestination\":\"AntonymousWith\"}}]}"
+        de1JSON.toString() == '{"id":31,"name":"auth9","description":"the DE_author of the book","status":{"enumType":"uk.co.mc.core.PublishedElement$Status","name":"DRAFT"},"versionNumber":0.1,"incomingRelationships":[],"outgoingRelationships":[{"sourcePath":"/DataElement/33","sourceName":"auth10","destinationPath":"/DataElement/31","destinationName":"auth9","relationshipType":{"class":"uk.co.mc.core.RelationshipType","id":8,"destinationClass":"uk.co.mc.core.DataElement","destinationToSource":"AntonymousWith","name":"Antonym","rule":null,"sourceClass":"uk.co.mc.core.DataElement","sourceToDestination":"AntonymousWith"}},{"sourcePath":"/DataElement/32","sourceName":"auth11","destinationPath":"/DataElement/31","destinationName":"auth9","relationshipType":{"class":"uk.co.mc.core.RelationshipType","id":8,"destinationClass":"uk.co.mc.core.DataElement","destinationToSource":"AntonymousWith","name":"Antonym","rule":null,"sourceClass":"uk.co.mc.core.DataElement","sourceToDestination":"AntonymousWith"}}]}'
+        when:
+
+        Relationship.unlink(de1, de2, rt)
+        Relationship.unlink(de1, de3, rt)
+
+        then:
+
+        de1.getRelations().size()==0
+        de2.getRelations().size()==0
+
+
 
     }
 

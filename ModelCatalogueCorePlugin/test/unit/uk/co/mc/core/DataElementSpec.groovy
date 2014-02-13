@@ -8,7 +8,7 @@ import spock.lang.Unroll
  * Created by adammilward on 05/02/2014.
  *
  * A Data Element is an atomic unit used to describe data
- * i.e. <subject> xxxxxxx </subject> tag allows us to describes the data between the tags as being an author
+ * i.e. <subject> xxxxxxx </subject> tag allows us to describes the data between the tags as being an DE_author
  *
  * DataElements are atomic therefore they CANNOT contain sub elements
  *
