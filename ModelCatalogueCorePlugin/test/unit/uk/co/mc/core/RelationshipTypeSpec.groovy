@@ -135,4 +135,16 @@ class RelationshipTypeSpec extends Specification {
     }
 
 
+    def "Get link info"() {
+        RelationshipType.initDefaultRelationshipTypes()
+        RelationshipType loaded = RelationshipType.containmentType
+
+        expect:
+        loaded
+
+        loaded.info
+        loaded.info.name == loaded.name
+        loaded.info.id == loaded.id
+        loaded.info.link == "/relationshipType/${loaded.id}"
+    }
 }

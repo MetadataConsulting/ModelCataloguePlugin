@@ -1,5 +1,7 @@
 package uk.co.mc.core
 
+import grails.util.GrailsNameUtils
+
 class RelationshipType {
 
     //name of the relationship type i.e. parentChild  or synonym
@@ -130,6 +132,15 @@ class RelationshipType {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
+
+    Map<String, Object> getInfo() {
+        [
+                id: id,
+                name: name,
+                link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
+        ]
     }
 }
 

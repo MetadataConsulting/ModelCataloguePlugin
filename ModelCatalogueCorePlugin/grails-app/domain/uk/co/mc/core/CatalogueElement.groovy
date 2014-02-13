@@ -1,5 +1,7 @@
 package uk.co.mc.core
 
+import grails.util.GrailsNameUtils
+
 
 /*
 * Catalogue Element - there are a number of catalogue elements that make up the model catalogue (please see
@@ -27,8 +29,7 @@ abstract class CatalogueElement {
 
     static mappedBy = [ outgoingRelationships: 'source', incomingRelationships: 'destination']
 
-    static transients = ['relations']
-
+    static transients = ['relations', 'info']
 
     /******************************************************************************************************************/
     /****functions for specifying relationships between catalogue elements using the uk.co.mc.core.Relationship class ************/
@@ -79,6 +80,14 @@ abstract class CatalogueElement {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
+    Map<String, Object> getInfo() {
+        [
+                id: id,
+                name: name,
+                link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
+        ]
     }
 
 }
