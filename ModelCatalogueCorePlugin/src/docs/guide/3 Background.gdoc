@@ -1,0 +1,13 @@
+h1. ISO11179
+
+An overview of the MDR as is here is shown below 4:
+
+!http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png!
+
+!ModelCatalogueCorePlugin/src/docs/images/MDRCore.png!
+
+ISO11179 is an international standard for metadata aimed at identifying and solving key interoperability problems between different systems.  It is based around the idea of looking at data elements from both the semantic and the syntactical aspects and making links between the two.  A data element is considered as concept which is used to model some aspect of reality, this data element is then given a particular set of values in a system (such as those used by a java application) which enables the system to model the data element; this set of values is referred to as a value domain.
+
+All systems are built up from data elements grouped in various ways; at its simplest level this could be a data dictionary for looking up terms, in a more complex system one would expect a hierarchy of data elements and data element concepts building up into a data model or an ontology.  In addition to this kind of classification the MDR is mapping between a concept and its representation, the data element is little more than a term, essentially a set of characters, and a context; however to work it needs a representation in a system, and thus - for a particular use case - a data element will have a one-to-one relationship with a Value Domain.  A value domain is in essence a variable or primitive in a programming language, or a field in a database table. It describes the data element as it is represented; in the case of speed it is probably going to be a number, and it is probably going to be attached to a set of units - depending on the system in question the value domain may be an integer between 2^31 -1 and -2^31 (system A) , or it may be a floating point number between -3.40282347E+38F to 3.40282347E+38F (system B), so it should be fairly clear that simply moving values from B to A may run into problems, not only is the range bigger, but also in system B we are representing the quantity with floating point numbers and in system A we are representing the concept with integers.  Perhaps also these numbers have different units, so one is metres per second and the other miles per hour, in different contexts such representations make sense, however ultimately these two values could be represented with the same number, say 7, and mean completely different things.
+
+As a further example we can explore the idea of two Hospital Trusts trying to exchange data, both with say a Hepatitis departments, but Trust One is using system A, built on Java-Oracle technology and Trust Two is using system B built on Microsoft .NET technology.
