@@ -195,34 +195,49 @@ class RelationshipISpec extends Specification{
     {
 
         when:
-        Relationship rel=new Relationship(args);
+        Relationship rel = new Relationship(args);
         rel.save()
 
         then:
-        !rel.hasErrors() == validates || rel.errors
+        (rel.errors.errorCount == 0) == validates
 
+
+        cleanup:
+        if (rel.id) rel.delete()
 
         where:
-
         testNumber | validates  | args
-        1          |false      | [ : ]
-        2          |false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2')]
-        3          |false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.contextType]
-        4          |true       | [source:cd1,destination:md1,relationshipType: RelationshipType.contextType]
-        5          |false      | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: RelationshipType.containmentType]
-        6          |true       | [source:md1,destination:de1,relationshipType: RelationshipType.containmentType]
-        7          |false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType: RelationshipType.hierarchyType]
-        8          |true       | [source:md1,destination:md1,relationshipType: RelationshipType.hierarchyType]
-        9          |false      | [source:new DataElement(name: 'parentModel'),destination:new Model(name:'model2'),relationshipType:  RelationshipType.inclusionType]
-        10          |true       | [source:cd1,destination:vd1, relationshipType:  RelationshipType.inclusionType]
-        11          | false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.instantiationType]
-        12          |true       | [source:de1,destination:vd1, relationshipType: RelationshipType.instantiationType]
-        // false       | [source:new DataElement(name: 'element1'),destination:new DataElement(name:'element2'),relationshipType: new Mapping()]
-        // true       | [source:new EnumeratedType(name: 'universitySubjects', enumerations: ['history', 'politics', 'science']), destination:new EnumeratedType(name: 'publicSubjects', enumerations: ['HIS', 'POL', 'SCI']),relationshipType: new Mapping(map: ['history':'HIS', 'politics':'POL', 'science':'SCI'])]
-        13          |false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
-        14          |true       | [source:de1,destination:de2,relationshipType: reltype]
-        15          |false      | [source:new ConceptualDomain(name: 'element1'),destination:new Model(name:'element2'),relationshipType: RelationshipType.supersessionType]
-        16          |true       | [source:de1,destination:de2,relationshipType: RelationshipType.supersessionType]
+        1  | false | [:]
+        2  | false | [source: new DataElement(name: 'element1'), destination: new DataElement(name: 'element2')]
+        3  | false | [source: new DataElement(name: 'element1'), destination: new DataElement(name: 'element2'), relationshipType: RelationshipType.contextType]
+        4  | true  | [source: cd1, destination: md1, relationshipType: RelationshipType.contextType]
+        5  | false | [source: new DataElement(name: 'element1'), destination: new DataElement(name: 'element2'), relationshipType: RelationshipType.containmentType]
+        6  | true  | [source: md1, destination: de1, relationshipType: RelationshipType.containmentType]
+        7  | false | [source: new DataElement(name: 'parentModel'), destination: new Model(name: 'model2'), relationshipType: RelationshipType.hierarchyType]
+        8  | true  | [source: md1, destination: md1, relationshipType: RelationshipType.hierarchyType]
+        9  | false | [source: new DataElement(name: 'parentModel'), destination: new Model(name: 'model2'), relationshipType: RelationshipType.inclusionType]
+        10 | true  | [source: cd1, destination: vd1, relationshipType: RelationshipType.inclusionType]
+        11 | false | [source: new ConceptualDomain(name: 'element1'), destination: new Model(name: 'element2'), relationshipType: RelationshipType.instantiationType]
+        12 | true  | [source: de1, destination: vd1, relationshipType: RelationshipType.instantiationType]
+        13 | false | [source: new ConceptualDomain(name: 'element1'), destination: new Model(name: 'element2'), relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
+        14 | true  | [source: de1, destination: de2, relationshipType: reltype]
+        15 | false | [source: new ConceptualDomain(name: 'element1'), destination: new Model(name: 'element2'), relationshipType: RelationshipType.supersessionType]
+        16 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType]
+        17 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: -1]
+        18 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMaxOccurs: -1]
+        19 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: 0]
+        20 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: 3, sourceMaxOccurs: 5]
+        21 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: 5, sourceMaxOccurs: 5]
+        22 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: 6, sourceMaxOccurs: 5]
+        23 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMaxOccurs: 0]
+        24 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: -1]
+        25 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMaxOccurs: -1]
+        26 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: 0]
+        27 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: 3, destinationMaxOccurs: 5]
+        28 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: 5, destinationMaxOccurs: 5]
+        29 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: 6, destinationMaxOccurs: 5]
+        30 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMaxOccurs: 0]
+
 
     }
 

@@ -27,16 +27,15 @@ package uk.co.mc.core
 class Relationship {
 
     CatalogueElement source
-
-//    TODO: save the cardinality for source and destination somehow
-//    e.g. following
-//
-//    Range sourceCardinality = 0..1
-//    Range destinatinCardinality = 1..Integer.MAX_VALUE
-
     CatalogueElement destination
 
     RelationshipType relationshipType
+
+    // cardinality
+    Integer sourceMinOccurs
+    Integer sourceMaxOccurs
+    Integer destinationMinOccurs
+    Integer destinationMaxOccurs
 
     static constraints = {
         relationshipType validator: { val, obj ->
@@ -48,6 +47,20 @@ class Relationship {
             return true;
 
         }
+        sourceMinOccurs nullable: true, min: 0, validator: { val, obj ->
+            if (!val) return true
+            if (!obj.sourceMaxOccurs) return true
+            if (val > obj.sourceMaxOccurs) return false
+            return true
+        }
+        sourceMaxOccurs nullable: true, min: 1
+        destinationMinOccurs nullable: true, min: 0, validator: { val, obj ->
+            if (!val) return true
+            if (!obj.destinationMaxOccurs) return true
+            if (val > obj.destinationMaxOccurs) return false
+            return true
+        }
+        destinationMaxOccurs nullable: true, min: 1
     }
 
     static Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
