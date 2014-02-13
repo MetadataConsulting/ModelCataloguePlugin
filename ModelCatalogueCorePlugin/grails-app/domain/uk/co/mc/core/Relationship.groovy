@@ -64,9 +64,7 @@ class Relationship {
     }
 
     static Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
-
-
-        if (source.id && destination.id && relationshipType.id) {
+        if (source?.id && destination?.id && relationshipType?.id) {
 
             Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
 
@@ -79,13 +77,13 @@ class Relationship {
         }
 
         Relationship relationshipInstance = new Relationship(
-                source: source.id ? source : null,
-                destination: destination.id ? destination : null,
-                relationshipType: relationshipType.id ? relationshipType : null
+                source: source?.id ? source : null,
+                destination: destination?.id ? destination : null,
+                relationshipType: relationshipType?.id ? relationshipType : null
         )
 
-        source.addToOutgoingRelationships(relationshipInstance)
-        destination.addToIncomingRelationships(relationshipInstance)
+        source?.addToOutgoingRelationships(relationshipInstance)
+        destination?.addToIncomingRelationships(relationshipInstance)
 
         relationshipInstance.save(flush: true)
 
@@ -101,10 +99,10 @@ class Relationship {
 
             Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
 
-            if (relationshipInstance) {
+            if (relationshipInstance && source && destination) {
 
-                source.removeFromOutgoingRelationships(relationshipInstance)
-                destination.removeFromIncomingRelationships(relationshipInstance)
+                source?.removeFromOutgoingRelationships(relationshipInstance)
+                destination?.removeFromIncomingRelationships(relationshipInstance)
                 relationshipInstance.delete()
             }
 
