@@ -52,8 +52,13 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         json.name == celsius.name
         json.description == celsius.description
         json.symbol == celsius.symbol
-        json.outgoingRelationships.size() == celsius.outgoingRelationships?.size() ?: 0
+        json.outgoingRelationships.size() == 1
+        json.outgoingRelationships[0].source == [id: celsius.id, name: celsius.name, link: "/measurementUnit/${celsius.id}"]
+        json.outgoingRelationships[0].destination == [id: fahrenheit.id, name: fahrenheit.name, link: "/measurementUnit/${fahrenheit.id}"]
+        json.outgoingRelationships[0].type == [id: type.id, name: type.name, link: "/relationshipType/${type.id}"]
+
         !json.incomingRelationships
+
     }
 
 }
