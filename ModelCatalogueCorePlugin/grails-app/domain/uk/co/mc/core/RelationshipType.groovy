@@ -31,12 +31,12 @@ class RelationshipType {
     String rule
 
     static constraints = {
-        def classValidator = {val, obj ->
+        def classValidator = { val, obj ->
             if (!val) return true
             if (!CatalogueElement.isAssignableFrom(val)) return "Only uk.co.mc.core.CatalogueElement child classes are allowed"
             return true
         }
-        name unique:true, maxSize: 255
+        name unique: true, maxSize: 255
         sourceToDestination maxSize: 255
         destinationToSource maxSize: 255
         sourceClass validator: classValidator
@@ -50,13 +50,13 @@ class RelationshipType {
         cache usage: 'read-only'
     }
 
-    boolean validateSourceDestination(CatalogueElement source, CatalogueElement destination){
+    boolean validateSourceDestination(CatalogueElement source, CatalogueElement destination) {
 
-        if(!sourceClass.isInstance(source)){
+        if (!sourceClass.isInstance(source)) {
             return false
         }
 
-        if(!destinationClass.isInstance(destination)){
+        if (!destinationClass.isInstance(destination)) {
             return false
         }
 
@@ -118,10 +118,6 @@ class RelationshipType {
 
     static getInstantiationType() {
         readByName("instantiation")
-    }
-
-    static getMappingType() {
-        readByName("mapping")
     }
 
     static getSupersessionType() {
