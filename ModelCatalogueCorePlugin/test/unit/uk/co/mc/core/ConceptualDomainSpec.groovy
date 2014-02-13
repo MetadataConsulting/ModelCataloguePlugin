@@ -21,7 +21,7 @@ class ConceptualDomainSpec extends Specification {
 
         when:
 
-        ConceptualDomain conceptInstance = new ConceptualDomain(args)
+        def conceptInstance = new ConceptualDomain(args)
 
         conceptInstance.save()
 
@@ -32,10 +32,34 @@ class ConceptualDomainSpec extends Specification {
         where:
 
         validates  | args
-        false | [name: "", description: "test concept description"]
+        false      | [name: "", description: "test concept description"]
         false      | [name:"t"*256, description: "test concept description"]
         false      | [name:"test concept", description: "t"*2001]
         true       | [name:"test concept", description: "test concept description"]
+
+    }
+
+    def "check  EqualsAndHashCode works"(){
+
+        when:
+        def a = new ConceptualDomain(name:"test concept", description: "test concept description").save()
+        def b = new ConceptualDomain(name:"test concept", description: "test concept description").save()
+        def c = new ConceptualDomain(name:"test conceptasdsfdfsad", description: "test concept description").save()
+
+        then:
+        a.equals(b)
+        b.equals(a)
+        !a.equals(c)
+
+    }
+
+    def "check toString works"(){
+
+        when:
+        def a = new ConceptualDomain(name:"test concept", description: "test concept description").save()
+
+        then:
+        a.toString() == "ConceptualDomain[id: 1, name: test concept]"
 
     }
 }

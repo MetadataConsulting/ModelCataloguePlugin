@@ -1,5 +1,6 @@
 package uk.co.mc.core
 
+import spock.lang.Shared
 import spock.lang.Specification
 
 /**
@@ -7,6 +8,18 @@ import spock.lang.Specification
  */
 
 class DataElementISpec extends Specification{
+
+    @Shared
+    def fixtureLoader, author, title, writer
+
+    def setupSpec(){
+        def fixtures =  fixtureLoader.load( "dataElements/author", "dataElements/writer",
+                "dataElements/title",)
+
+        author = fixtures.author
+        writer = fixtures.writer
+        title = fixtures.title
+    }
 
 
     def "create a new data element, finalize it and then try to change it"(){
@@ -43,77 +56,63 @@ class DataElementISpec extends Specification{
 
     }
 
-    def "create two data elements with the same code dataElement"(){
+    def "create writer data elements with the same code dataElement"(){
 
         when:
-
-        def dataElementInstance1 = new DataElement(name: "result1", description: "this is the the result description", code: "x123")
-        dataElementInstance1.save(flush:true)
-
-        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "x123")
+//has the same code as author
+        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "XXX")
         dataElementInstance2.validate()
 
         then:
 
         dataElementInstance2.hasErrors()
-        dataElementInstance1.delete()
-        dataElementInstance2.delete()
 
     }
 
 
     def "get all relations"() {
+        
         RelationshipType.initDefaultRelationshipTypes()
-        DataElement one     = new DataElement(name: "one")
-        DataElement two     = new DataElement(name: "two")
-        DataElement three   = new DataElement(name: "three")
-        DataElement four    = new DataElement(name: "four")
-
-        [one, two, three, four]*.save()
+        [author, writer, title]*.save()
 
         expect:
 
-        !one.hasErrors()    || !one.errors
-        !two.hasErrors()    || !two.errors
-        !three.hasErrors()  || !three.errors
-        !four.hasErrors()   || !four.errors
+        !author.hasErrors()    || !author.errors
+        !writer.hasErrors()    || !writer.errors
+        !title.hasErrors()  || !title.errors
 
-        one.createLinkTo(two, RelationshipType.supersessionType)
-        three.createLinkFrom(two, RelationshipType.supersessionType)
+        author.createLinkTo(writer, RelationshipType.supersessionType)
+        title.createLinkFrom(writer, RelationshipType.supersessionType)
 
-        one.relations
-        one.relations.size()    == 1
-        two.relations
-        two.relations.size()    == 2
-        three.relations
-        three.relations.size()  == 1
+        author.relations
+        author.relations.size()    == 1
+        writer.relations
+        writer.relations.size()    == 2
+        title.relations
+        title.relations.size()  == 1
 
-        two     in one.relations
+        writer     in author.relations
 
-        one     in two.relations
-        three   in two.relations
+        author     in writer.relations
+        title      in writer.relations
 
-        two     in three.relations
+        writer     in title.relations
 
-        two.getRelationsByType(RelationshipType.supersessionType).size() == 2
-        two.getIncomingRelationsByType(RelationshipType.supersessionType).size() == 1
-        two.getOutgoingRelationsByType(RelationshipType.supersessionType).size() == 1
+        writer.getRelationsByType(RelationshipType.supersessionType).size() == 2
+        writer.getIncomingRelationsByType(RelationshipType.supersessionType).size() == 1
+        writer.getOutgoingRelationsByType(RelationshipType.supersessionType).size() == 1
 
-        !two.getRelationsByType(RelationshipType.containmentType)
-        !two.getIncomingRelationsByType(RelationshipType.containmentType)
-        !two.getOutgoingRelationsByType(RelationshipType.containmentType)
+        !writer.getRelationsByType(RelationshipType.containmentType)
+        !writer.getIncomingRelationsByType(RelationshipType.containmentType)
+        !writer.getOutgoingRelationsByType(RelationshipType.containmentType)
 
-        one.removeLinkTo(two, RelationshipType.supersessionType)
-        three.removeLinkFrom(two, RelationshipType.supersessionType)
+        author.removeLinkTo(writer, RelationshipType.supersessionType)
+        title.removeLinkFrom(writer, RelationshipType.supersessionType)
 
-        !one.relations
-        !two.relations
-        !three.relations
+        !author.relations
+        !writer.relations
+        !title.relations
 
-        one.delete()
-        two.delete()
-        three.delete()
-        four.delete()
 
     }
 
