@@ -1,5 +1,6 @@
 package uk.co.mc.core
 
+import grails.test.spock.IntegrationSpec
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -7,7 +8,7 @@ import spock.lang.Specification
  * Created by adammilward on 05/02/2014.
  */
 
-class DataElementISpec extends Specification{
+class DataElementISpec extends IntegrationSpec{
 
     @Shared
     def fixtureLoader, author, title, writer
@@ -73,7 +74,6 @@ class DataElementISpec extends Specification{
     def "get all relations"() {
         
         RelationshipType.initDefaultRelationshipTypes()
-        [author, writer, title]*.save()
 
         expect:
 
