@@ -13,6 +13,19 @@ class DataElementController extends RestfulController<DataElement>{
         super(DataElement)
     }
 
+    @Override
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        def list = listAllResources(params)
+        def model=  [
+                success:    true,
+                total:      DataElement.count(),
+                size:       list.size(),
+                list:       list
+        ]
+        respond model
+    }
+
     /**
     @Override
     def index(Integer max) {

@@ -1,5 +1,8 @@
 package uk.co.mc.core
 
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
+
 /*
 * Conceptual Domains include value domains
 * i.e. a conceptual domain of a particular library could include a number of different
@@ -51,5 +54,25 @@ class ConceptualDomain extends CatalogueElement {
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ConceptualDomain)) {
+            return false;
+        }
+        if (this.is(obj)) {
+            return true;
+        }
+        ConceptualDomain cd = (ConceptualDomain) obj;
+        return new EqualsBuilder()
+                .append(name, cd?.name)
+                .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(name)
+                .toHashCode();
+    }
+
 
 }

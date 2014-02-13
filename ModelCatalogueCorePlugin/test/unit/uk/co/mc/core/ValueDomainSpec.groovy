@@ -13,6 +13,13 @@ import spock.lang.Unroll
 @Mock([ValueDomain, DataElement])
 class ValueDomainSpec extends Specification{
 
+    def fixtureLoader
+
+    def setupSpec(){
+
+
+    }
+
     @Unroll
     def "Value Domain creation for #args results in #validates"()
     {
@@ -63,6 +70,17 @@ class ValueDomainSpec extends Specification{
         valueDomainInstance.hasErrors()
         // the third argument is the real error message passed from the validator
         valueDomainInstance.errors.getFieldError("regexDef").arguments[3] == "Unclosed group near index 5\n(blah\n     ^"
+
+    }
+
+
+    def "check toString works"(){
+
+        when:
+        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name:"MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name:'test', enumerations: ['male','female','unknown'])).save()
+
+        then:
+        a.toString() == "ValueDomain[id: 1, name: ground_speed]"
 
     }
 

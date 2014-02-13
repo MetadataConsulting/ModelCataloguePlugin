@@ -1,5 +1,8 @@
 package uk.co.mc.core
 
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
+
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
 
@@ -29,6 +32,9 @@ import java.util.regex.PatternSyntaxException
 */
 
 class ValueDomain extends CatalogueElement  {
+
+
+    //FIXME valueDomain needs to be unique within a conceptual domain
 
 	MeasurementUnit unitOfMeasure
 	String regexDef
@@ -85,6 +91,26 @@ class ValueDomain extends CatalogueElement  {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ValueDomain)) {
+            return false;
+        }
+        if (this.is(obj)) {
+            return true;
+        }
+        ValueDomain cd = (ValueDomain) obj;
+        return new EqualsBuilder()
+                .append(name, cd?.name)
+                .append(includedIn, cd?.includedIn)
+                .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(includedIn)
+                .toHashCode();
     }
 
 }
