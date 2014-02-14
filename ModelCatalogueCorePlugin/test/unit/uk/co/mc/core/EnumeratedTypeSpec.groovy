@@ -12,7 +12,7 @@ class EnumeratedTypeSpec extends Specification {
 
 
     @Unroll
-    def "validates to #validates for #args "() {
+    def "validates to #validates for #args.name "() {
 
         expect:
 
@@ -32,9 +32,10 @@ class EnumeratedTypeSpec extends Specification {
 
         validates | args
         false     | [:]
-        false     | [name: 'test']
-        false     | [name: 'test', enumerations: ['male']]
-        true      | [name: 'test', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown']]
+        false | [name: 'test1']
+        false | [name: 'test2', enumerations: ['male']]
+        false | [name: 'test3', enumAsString: ('m:s|' * 2500) + 's:m']
+        true  | [name: 'test4', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown']]
     }
 
     @Unroll
