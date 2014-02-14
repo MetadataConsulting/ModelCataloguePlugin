@@ -1,7 +1,6 @@
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
-import org.springframework.web.context.support.WebApplicationContextUtils
 import uk.co.mc.core.util.marshalling.CustomObjectMarshallers
 import uk.co.mc.core.util.marshalling.DataElementMarshaller
+import uk.co.mc.core.util.marshalling.RelationshipMarshallers
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
@@ -53,7 +52,8 @@ Brief summary/description of the plugin.
 
             customObjectMarshallers( CustomObjectMarshallers ) {
                 marshallers = [
-                        new DataElementMarshaller()
+                        new DataElementMarshaller(),
+                        new RelationshipMarshallers()
                 ]
             }
     }
