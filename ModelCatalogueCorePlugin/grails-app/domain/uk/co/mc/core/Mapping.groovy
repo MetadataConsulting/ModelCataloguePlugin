@@ -12,7 +12,7 @@ class Mapping {
     }
 
     static constraints = {
-        source nullable: false
+        source nullable: false, unique: ['destination']
         destination nullable: false
         mapping nullable: false, blank: false, maxSize: 10000, validator: { val, obj ->
             if (!val) return true

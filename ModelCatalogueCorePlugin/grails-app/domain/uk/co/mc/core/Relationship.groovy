@@ -39,7 +39,7 @@ class Relationship {
 
 
     static constraints = {
-        relationshipType validator: { val, obj ->
+        relationshipType unique: ['source', 'destination'], validator: { val, obj ->
 
             if (!val) return true;
             if (!val.validateSourceDestination(obj.source, obj.destination)) {
