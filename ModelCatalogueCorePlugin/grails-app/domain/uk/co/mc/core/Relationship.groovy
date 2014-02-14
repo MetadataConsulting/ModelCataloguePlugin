@@ -37,6 +37,7 @@ class Relationship {
     Integer destinationMinOccurs
     Integer destinationMaxOccurs
 
+
     static constraints = {
         relationshipType validator: { val, obj ->
 

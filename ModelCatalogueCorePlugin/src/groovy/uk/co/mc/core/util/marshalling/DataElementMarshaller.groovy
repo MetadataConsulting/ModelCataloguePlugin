@@ -3,10 +3,10 @@ package uk.co.mc.core.util.marshalling
 import grails.converters.JSON
 import uk.co.mc.core.DataElement
 
-class DataElementMarshaller {
-	
-	void register() {
-		JSON.registerObjectMarshaller(DataElement) { DataElement dataElement ->
+class DataElementMarshaller implements MarshallersProvider {
+
+    void register() {
+        JSON.registerObjectMarshaller(DataElement) { DataElement dataElement ->
 
             //marshall incoming and outgoing relationships
 
