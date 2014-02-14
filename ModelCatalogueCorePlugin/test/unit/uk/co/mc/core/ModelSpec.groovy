@@ -72,7 +72,7 @@ class ModelSpec extends Specification{
 
     def "Get link info"() {
 
-        when:
+
         Model modelInstance = new Model(name: "result1", description: "this is the the result description").save()
 
         expect:

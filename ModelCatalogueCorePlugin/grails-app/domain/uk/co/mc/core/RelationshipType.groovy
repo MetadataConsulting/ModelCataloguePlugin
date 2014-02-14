@@ -1,6 +1,8 @@
 package uk.co.mc.core
 
 import grails.util.GrailsNameUtils
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
 
 class RelationshipType {
 
@@ -132,6 +134,25 @@ class RelationshipType {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof RelationshipType)) {
+            return false;
+        }
+        if (this.is(obj)) {
+            return true;
+        }
+        RelationshipType de = (RelationshipType) obj;
+        return new EqualsBuilder()
+                .append(name, de?.name)
+                .isEquals()
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(name)
+                .toHashCode()
     }
 
 

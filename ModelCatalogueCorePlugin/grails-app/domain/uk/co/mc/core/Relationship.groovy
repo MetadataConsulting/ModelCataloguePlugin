@@ -1,5 +1,8 @@
 package uk.co.mc.core
 
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
+
 /*
 * Users can create relationships between all catalogue elements. They include
 * DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
@@ -113,6 +116,30 @@ class Relationship {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}, type: ${relationshipType?.name}]"
+    }
+
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Relationship)) {
+            return false;
+        }
+        if (this.is(obj)) {
+            return true;
+        }
+        Relationship ce = (Relationship) obj;
+        return new EqualsBuilder()
+                .append(source, ce?.source)
+                .append(destination, ce?.destination)
+                .append(relationshipType, ce?.relationshipType)
+                .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(source)
+                .append(destination)
+                .append(relationshipType)
+                .toHashCode();
     }
 
 }

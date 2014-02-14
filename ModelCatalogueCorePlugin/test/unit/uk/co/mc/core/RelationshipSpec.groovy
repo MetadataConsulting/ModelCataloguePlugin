@@ -35,4 +35,29 @@ class RelationshipSpec extends Specification{
     RelationshipType createRelationshipType(){
         new RelationshipType(name:'relationship1', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: DataElement,destinationClass: DataElement)
     }
+
+
+
+    def "check  EqualsAndHashCode works"(){
+
+        when:
+        def rt = new RelationshipType(name:'relationship1', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: CatalogueElement,destinationClass: CatalogueElement).save()
+        def rt2 = new RelationshipType(name:'relationship2', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: CatalogueElement,destinationClass: CatalogueElement).save()
+
+        def de1 = new DataElement(name:"test2DE")
+        def de2 = new DataElement(name:"test1DE")
+
+        def a = Relationship.link( de1, de2, rt)
+        def b = Relationship.link( de1, de2, rt)
+        def c = Relationship.link( de1, new DataElement(name:"test3DE"), rt)
+        def d = Relationship.link( de1, de2, rt2)
+
+        then:
+        a.equals(b)
+        b.equals(a)
+        !a.equals(c)
+        !a.equals(d)
+
+    }
+
 }
