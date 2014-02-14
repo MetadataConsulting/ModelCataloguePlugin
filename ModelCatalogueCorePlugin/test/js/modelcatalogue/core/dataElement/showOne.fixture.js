@@ -19,7 +19,7 @@
          "class": "uk.co.mc.core.RelationshipType",
          "destinationToSource": "is related to"
       },
-      "sourceName": "Author",
+      "sourceName": "Author2",
       "sourcePath": "/DataElement/2",
       "destinationName": "Author"
    }],

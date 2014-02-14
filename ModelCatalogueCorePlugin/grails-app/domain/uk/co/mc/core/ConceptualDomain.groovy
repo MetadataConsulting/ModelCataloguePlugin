@@ -65,12 +65,14 @@ class ConceptualDomain extends CatalogueElement {
         ConceptualDomain cd = (ConceptualDomain) obj;
         return new EqualsBuilder()
                 .append(name, cd?.name)
+                .append(id, cd?.id)
                 .isEquals();
     }
 
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(name)
+                .append(id)
                 .toHashCode();
     }
 

@@ -1,5 +1,8 @@
 package uk.co.mc.core
 
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
+
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
@@ -113,6 +116,30 @@ class EnumeratedType extends DataType {
         }
         ret
     }
+
+
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof EnumeratedType)) {
+            return false;
+        }
+        if (this.is(obj)) {
+            return true;
+        }
+        EnumeratedType ce = (EnumeratedType) obj;
+        return new EqualsBuilder()
+                .append(name, ce?.name)
+                .append(enumAsString, ce?.enumAsString)
+                .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(name)
+                .append(enumAsString)
+                .toHashCode();
+    }
+
 
 
 }

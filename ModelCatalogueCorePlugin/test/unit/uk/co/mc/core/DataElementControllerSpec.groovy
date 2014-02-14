@@ -19,7 +19,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
     def setup() {
         assert (type = new RelationshipType(name: "relationship", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "relates to", destinationToSource: "is related to").save())
         assert (author = new DataElement(name:"Author", description: "the DE_author of the book", code: "XXX").save())
-        assert (title = new DataElement(name:"Author", description: "the DE_author of the book", code: "XXX").save())
+        assert (title = new DataElement(name:"Author2", description: "the DE_author of the book", code: "XXX2").save())
         assert !Relationship.link(author, title, type).hasErrors()
 
 

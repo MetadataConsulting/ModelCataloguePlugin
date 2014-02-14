@@ -103,13 +103,12 @@ class ValueDomain extends CatalogueElement  {
         ValueDomain cd = (ValueDomain) obj;
         return new EqualsBuilder()
                 .append(name, cd?.name)
-                .append(includedIn, cd?.includedIn)
                 .isEquals();
     }
 
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(includedIn)
+                .append(name)
                 .toHashCode();
     }
 

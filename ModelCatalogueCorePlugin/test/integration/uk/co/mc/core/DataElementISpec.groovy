@@ -21,13 +21,6 @@ class DataElementISpec extends IntegrationSpec{
         auth3 = fixtures.DE_author3
 
     }
-/*
-    def cleanupSpec(){
-        auth1.delete()
-        auth2.delete()
-        auth3.delete()
-    }
-*/
 
     def "create a new data element, finalize it and then try to change it"(){
 
@@ -66,7 +59,7 @@ class DataElementISpec extends IntegrationSpec{
     def "create writer data elements with the same code dataElement"(){
 
         when:
-//has the same code as DE_author
+
         def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "XXX_1")
         dataElementInstance2.validate()
 
