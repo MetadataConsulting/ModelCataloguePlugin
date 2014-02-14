@@ -43,24 +43,39 @@ class DataElementMarshallerSpec extends IntegrationSpec{
         rt.delete()
     }*/
 
-    def 'test json marshalling for incoming relationships'(){
+    def 'test json marshalling for outgoing relationships'(){
 
         when:
 
 
         rel = Relationship.link(de1, de2, rt)
-        rel2 = Relationship.link(de1, de3, rt)
 
         then:
 
-        def de1JSON = de1 as JSON
+        def dataElement = de1 as JSON
+        def json = JSON.parse(dataElement.toString())
 
-        de1JSON.toString() == '{"id":28,"name":"auth9","description":"the DE_author of the book","status":{"enumType":"uk.co.mc.core.PublishedElement$Status","name":"DRAFT"},"versionNumber":0.1,"incomingRelationships":[],"outgoingRelationships":[{"sourcePath":"/DataElement/30","sourceName":"auth10","destinationPath":"/DataElement/28","destinationName":"auth9","relationshipType":{"class":"uk.co.mc.core.RelationshipType","id":14,"destinationClass":"uk.co.mc.core.DataElement","destinationToSource":"AntonymousWith","name":"Antonym","rule":null,"sourceClass":"uk.co.mc.core.DataElement","sourceToDestination":"AntonymousWith"}},{"sourcePath":"/DataElement/29","sourceName":"auth11","destinationPath":"/DataElement/28","destinationName":"auth9","relationshipType":{"class":"uk.co.mc.core.RelationshipType","id":14,"destinationClass":"uk.co.mc.core.DataElement","destinationToSource":"AntonymousWith","name":"Antonym","rule":null,"sourceClass":"uk.co.mc.core.DataElement","sourceToDestination":"AntonymousWith"}}]}'
+        expect:
+        json
+        json.id == de1.id
+        json.name == de1.name
+        json.outgoingRelationships.destinationPath== ["/DataElement/$de1.id"]
+        json.outgoingRelationships.sourceName == ["$de2.name"]
+        json.outgoingRelationships.sourcePath == ["/DataElement/$de2.id"]
+        json.outgoingRelationships.destinationName == ["$de1.name"]
+        json.outgoingRelationships.relationshipType.sourceClass == ["uk.co.mc.core.DataElement"]
+        json.outgoingRelationships.relationshipType.id == [rt.id]
+        json.outgoingRelationships.relationshipType.sourceToDestination == ["AntonymousWith"]
+        json.outgoingRelationships.relationshipType.destinationClass == ["uk.co.mc.core.DataElement"]
+        json.outgoingRelationships.relationshipType.name == ["Antonym"]
+        json.outgoingRelationships.relationshipType.getAt("class") == ["uk.co.mc.core.RelationshipType"]
+        json.outgoingRelationships.relationshipType.destinationToSource == ["AntonymousWith"]
+
+
 
         when:
 
         Relationship.unlink(de1, de2, rt)
-        Relationship.unlink(de1, de3, rt)
 
         then:
 
