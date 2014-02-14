@@ -67,7 +67,7 @@ class DataElementISpec extends IntegrationSpec{
 
         when:
 //has the same code as DE_author
-        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "XXX")
+        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "XXX_1")
         dataElementInstance2.validate()
 
         then:

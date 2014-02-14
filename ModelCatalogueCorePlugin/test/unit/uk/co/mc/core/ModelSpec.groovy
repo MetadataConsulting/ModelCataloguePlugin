@@ -68,6 +68,17 @@ class ModelSpec extends Specification{
     }
 
 
+    def "Get link info"() {
+        Model modelInstance = new Model(name: "result1", description: "this is the the result description").save()
+
+        expect:
+        modelInstance
+
+        modelInstance.info
+        modelInstance.info.name == modelInstance.name
+        modelInstance.info.id == modelInstance.id
+        modelInstance.info.link == "/model/${modelInstance.id}"
+    }
 
 
 }

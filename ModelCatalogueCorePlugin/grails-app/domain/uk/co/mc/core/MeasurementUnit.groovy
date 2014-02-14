@@ -8,6 +8,12 @@ package uk.co.mc.core
 
 class MeasurementUnit extends CatalogueElement {
 
+    String symbol
+
+    static constraints = {
+        symbol nullable: true, size: 1..100
+    }
+
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }

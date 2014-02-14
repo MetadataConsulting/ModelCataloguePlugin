@@ -1,5 +1,7 @@
 package uk.co.mc.core
 
+import grails.util.GrailsNameUtils
+
 class RelationshipType {
 
     //name of the relationship type i.e. parentChild  or synonym
@@ -31,12 +33,12 @@ class RelationshipType {
     String rule
 
     static constraints = {
-        def classValidator = {val, obj ->
+        def classValidator = { val, obj ->
             if (!val) return true
             if (!CatalogueElement.isAssignableFrom(val)) return "Only uk.co.mc.core.CatalogueElement child classes are allowed"
             return true
         }
-        name unique:true, maxSize: 255
+        name unique: true, maxSize: 255
         sourceToDestination maxSize: 255
         destinationToSource maxSize: 255
         sourceClass validator: classValidator
@@ -50,13 +52,13 @@ class RelationshipType {
         cache usage: 'read-only'
     }
 
-    boolean validateSourceDestination(CatalogueElement source, CatalogueElement destination){
+    boolean validateSourceDestination(CatalogueElement source, CatalogueElement destination) {
 
-        if(!sourceClass.isInstance(source)){
+        if (!sourceClass.isInstance(source)) {
             return false
         }
 
-        if(!destinationClass.isInstance(destination)){
+        if (!destinationClass.isInstance(destination)) {
             return false
         }
 
@@ -120,10 +122,6 @@ class RelationshipType {
         readByName("instantiation")
     }
 
-    static getMappingType() {
-        readByName("mapping")
-    }
-
     static getSupersessionType() {
         readByName("supersession")
     }
@@ -134,6 +132,15 @@ class RelationshipType {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
+
+    Map<String, Object> getInfo() {
+        [
+                id: id,
+                name: name,
+                link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
+        ]
     }
 }
 
