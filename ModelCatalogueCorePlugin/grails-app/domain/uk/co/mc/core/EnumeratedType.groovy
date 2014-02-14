@@ -19,7 +19,7 @@ class EnumeratedType extends DataType {
     String enumAsString
 
     static constraints = {
-        enumAsString nullable: false, validator: { encodedVal, obj ->
+        enumAsString nullable: false, maxSize: 1000, validator: { encodedVal, obj ->
             Map<String, String> val = stringToMap(encodedVal)
             if (!val) return true
             if (val.size() < 2) return false
