@@ -11,17 +11,23 @@ import spock.lang.Specification
 class DataElementISpec extends IntegrationSpec{
 
     @Shared
-    def fixtureLoader, author, title, writer
+    def fixtureLoader, auth1, auth3, auth2
 
     def setupSpec(){
-        def fixtures =  fixtureLoader.load( "dataElements/author", "dataElements/writer",
-                "dataElements/title",)
+        def fixtures =  fixtureLoader.load( "dataElements/DE_author1", "dataElements/DE_author2", "dataElements/DE_author3")
 
-        author = fixtures.author
-        writer = fixtures.writer
-        title = fixtures.title
+        auth1 = fixtures.DE_author1
+        auth2 = fixtures.DE_author2
+        auth3 = fixtures.DE_author3
+
     }
-
+/*
+    def cleanupSpec(){
+        auth1.delete()
+        auth2.delete()
+        auth3.delete()
+    }
+*/
 
     def "create a new data element, finalize it and then try to change it"(){
 
@@ -60,8 +66,8 @@ class DataElementISpec extends IntegrationSpec{
     def "create writer data elements with the same code dataElement"(){
 
         when:
-//has the same code as author
-        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "XXX")
+//has the same code as DE_author
+        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "XXX_1")
         dataElementInstance2.validate()
 
         then:
@@ -72,46 +78,51 @@ class DataElementISpec extends IntegrationSpec{
 
 
     def "get all relations"() {
-        
+
         RelationshipType.initDefaultRelationshipTypes()
+
+        def author1 = DataElement.get(auth1.id)
+        def author2 = DataElement.get(auth2.id)
+        def author3 =  DataElement.get(auth3.id)
 
         expect:
 
-        !author.hasErrors()    || !author.errors
-        !writer.hasErrors()    || !writer.errors
-        !title.hasErrors()  || !title.errors
+        !author1.hasErrors()    || !author.errors
+        !author2.hasErrors()    || !writer.errors
+        !author3.hasErrors()  || !title.errors
 
-        author.createLinkTo(writer, RelationshipType.supersessionType)
-        title.createLinkFrom(writer, RelationshipType.supersessionType)
+        author2.createLinkTo(author1, RelationshipType.supersessionType)
+        author2.createLinkFrom(author3, RelationshipType.supersessionType)
 
-        author.relations
-        author.relations.size()    == 1
-        writer.relations
-        writer.relations.size()    == 2
-        title.relations
-        title.relations.size()  == 1
+        author1.relations
+        author1.relations.size()    == 1
+        author2.relations
+        author2.relations.size()    == 2
+        author3.relations
+        author3.relations.size()  == 1
 
-        writer     in author.relations
+        author2     in author1.relations
 
-        author     in writer.relations
-        title      in writer.relations
+        author1     in author2.relations
+        author3      in author2.relations
 
-        writer     in title.relations
+        author2     in author3.relations
 
-        writer.getRelationsByType(RelationshipType.supersessionType).size() == 2
-        writer.getIncomingRelationsByType(RelationshipType.supersessionType).size() == 1
-        writer.getOutgoingRelationsByType(RelationshipType.supersessionType).size() == 1
+        author2.getRelationsByType(RelationshipType.supersessionType).size() == 2
+        author2.getIncomingRelationsByType(RelationshipType.supersessionType).size() == 1
+        author2.getOutgoingRelationsByType(RelationshipType.supersessionType).size() == 1
 
-        !writer.getRelationsByType(RelationshipType.containmentType)
-        !writer.getIncomingRelationsByType(RelationshipType.containmentType)
-        !writer.getOutgoingRelationsByType(RelationshipType.containmentType)
+        !author2.getRelationsByType(RelationshipType.containmentType)
+        !author2.getIncomingRelationsByType(RelationshipType.containmentType)
+        !author2.getOutgoingRelationsByType(RelationshipType.containmentType)
 
-        author.removeLinkTo(writer, RelationshipType.supersessionType)
-        title.removeLinkFrom(writer, RelationshipType.supersessionType)
+        author2.removeLinkTo(author1, RelationshipType.supersessionType)
+        author2.removeLinkFrom(author3, RelationshipType.supersessionType)
 
-        !author.relations
-        !writer.relations
-        !title.relations
+
+        !author1.relations
+        !author2.relations
+        !author3.relations
 
 
     }

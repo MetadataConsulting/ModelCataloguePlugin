@@ -1,7 +1,7 @@
 package uk.co.mc.core
 
+import grails.test.spock.IntegrationSpec
 import spock.lang.Shared
-import spock.lang.Specification
 import spock.lang.Unroll
 
 /**
@@ -9,38 +9,41 @@ import spock.lang.Unroll
  */
 
 
-class RelationshipISpec extends Specification{
+class RelationshipISpec extends IntegrationSpec{
 
     @Shared
-    def cd1, md1, de1, vd1, de2, reltype, dt, ms
+    def fixtureLoader, cd1, md1, de1, vd1, de2, reltype, dt, ms
 
     def setupSpec(){
 
         RelationshipType.initDefaultRelationshipTypes()
 
-        cd1 =  new ConceptualDomain(name: 'element1').save()
-        md1 = new Model(name:'element2').save()
-        de1 = new DataElement(name:'data element1').save()
-        de2 = new DataElement(name:'element2').save()
-        dt = new DataType(name: "Float").save()
-        ms = new MeasurementUnit(name:"MPH").save()
-        reltype = new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for").save()
-        vd1 = new ValueDomain(name: "ground_speed", unitOfMeasure: ms, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?",  description: "the ground speed of the moving vehicle", dataType: dt).save()
+        def fixtures =  fixtureLoader.load( "conceptualDomains/CD_publicLibraries","models/M_book","dataElements/DE_author5", "dataElements/DE_title","dataTypes/DT_string", "measurementUnits/MU_milesPerHour", "relationshipTypes/RT_broaderTerm", "valueDomains/VD_schoolSubjects")
+
+
+        RelationshipType.initDefaultRelationshipTypes()
+
+        cd1 =  fixtures.CD_publicLibraries
+        md1 = fixtures.M_book
+        de1 = fixtures.DE_author5
+        de2 = fixtures.DE_title
+        dt = fixtures.DT_string
+        ms = fixtures.MU_milesPerHour
+        reltype = fixtures.RT_broaderTerm
+        vd1 = fixtures.VD_schoolSubjects
     }
 
-    def cleanupSpec(){
-
-        Relationship.list().each{ relationship ->
-
-            Relationship.unlink(relationship.source, relationship.destination, relationship.relationshipType)
-        }
+    /*def cleanupSpec(){
 
         cd1.delete()
-        md1.delete()
         de1.delete()
         de2.delete()
+        dt.delete()
+        ms.delete()
+        md1.delete()
+        reltype.delete()
         vd1.delete()
-    }
+    }*/
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
@@ -48,16 +51,10 @@ class RelationshipISpec extends Specification{
 
         when:
 
-        RelationshipType relType = new RelationshipType(
-                sourceToDestination: "Parent",
-                destinationToSource: "Child",
-                name: "Child Type",
-                sourceClass: DataElement,
-                destinationClass: DataElement
-        )
+        RelationshipType hierarchy = RelationshipType.findByName("hierarchy")
 
 
-        Relationship rel =  Relationship.link( de1, de2, relType)
+        Relationship rel =  Relationship.link( de1, de2, hierarchy)
 
         then:
 
@@ -70,44 +67,31 @@ class RelationshipISpec extends Specification{
 
         when:
 
-        RelationshipType relType = new RelationshipType(
-                sourceToDestination: "Parent",
-                destinationToSource: "Child",
-                name: "Child Type",
-                sourceClass: DataElement,
-                destinationClass: DataElement
-        )
+        de1 = DataElement.get(de1.id)
+        de2 = DataElement.get(de2.id)
 
-
-        DataElement DE1 = new DataElement(name:"test2DE")
-        DataElement DE2 = new DataElement(name:"test1DE")
-
-        then:
-
-        relType.save()
-        DE1.save()
-        DE2.save()
-
-
-
-        Relationship rel =  Relationship.link( DE1, DE2, relType)
+        Relationship rel =  Relationship.link( de1, de2, reltype)
 
         then:
 
         !rel.hasErrors()
 
         when:
-        DE1 = DataElement.get(DE1.id)
-        DE2 = DataElement.get(DE2.id)
 
         then:
-        DE1.outgoingRelationships?.contains(rel)
-        DE2.incomingRelationships?.contains(rel)
+        de1.outgoingRelationships?.contains(rel)
+        de2.incomingRelationships?.contains(rel)
+        !de2.outgoingRelationships?.contains(rel)
+        !de1.incomingRelationships?.contains(rel)
 
+        when:
 
-        !DE2.outgoingRelationships?.contains(rel)
-        !DE1.incomingRelationships?.contains(rel)
+        Relationship.unlink( de1, de2, reltype)
 
+        then:
+
+        !de1.outgoingRelationships?.contains(rel)
+        !de2.incomingRelationships?.contains(rel)
     }
 
 
@@ -116,28 +100,8 @@ class RelationshipISpec extends Specification{
 
         when:
 
-        RelationshipType relType = new RelationshipType(
-                sourceToDestination: "Parent",
-                destinationToSource: "Child",
-                name: "Child Type",
-                sourceClass: DataElement,
-                destinationClass: DataElement
-        )
-
-
-        DataElement DE1 = new DataElement(name:"test2DE")
-        DataElement DE2 = new DataElement(name:"test1DE")
-
-        then:
-
-        relType.save()
-        DE1.save()
-        DE2.save()
-
-
-
-        Relationship rel1 =  Relationship.link( DE1, DE2, relType)
-        Relationship rel2 =  Relationship.link( DE1, DE2, relType)
+        Relationship rel1 =  Relationship.link( de1, de2, reltype)
+        Relationship rel2 =  Relationship.link( de1, de2, reltype)
 
         then:
 
@@ -146,43 +110,37 @@ class RelationshipISpec extends Specification{
 
         rel1==rel2
 
+        de1.outgoingRelationships.size()==1
+        de2.incomingRelationships.size()==1
+
+        when:
+
+        Relationship.unlink( de1, de2, reltype)
+
+        then:
+
+        de1.outgoingRelationships.size()==0
+        de2.incomingRelationships.size()==0
+
     }
 
     def "Unlink relationship"()
     {
 
-        when:
-
-        RelationshipType relType = new RelationshipType(
-                sourceToDestination: "Parent",
-                destinationToSource: "Child",
-                name: "Child Type",
-                sourceClass: DataElement,
-                destinationClass: DataElement
-        )
-
-
-        DataElement DE1 = new DataElement(name:"test2DE")
-        DataElement DE2 = new DataElement(name:"test1DE")
-
-       then:
-        relType.save()
-        DE1.save()
-        DE2.save()
 
         when:
-        Relationship rel1 =  Relationship.link( DE1, DE2, relType)
+        Relationship rel1 =  Relationship.link( de1, de2, reltype)
 
         then:
         !rel1.hasErrors()
 
 
         when:
-        Relationship.unlink(DE1,DE2,relType)
+        Relationship.unlink(de1,de2,reltype)
 
         then:
-        !DE1.outgoingRelationships.contains(rel1)
-        !DE2.incomingRelationships.contains(rel1)
+        de1.outgoingRelationships.size()==0
+        de2.incomingRelationships.size()==0
 
 
 
@@ -208,20 +166,20 @@ class RelationshipISpec extends Specification{
         where:
         testNumber | validates  | args
         1  | false | [:]
-        2  | false | [source: new DataElement(name: 'element1'), destination: new DataElement(name: 'element2')]
-        3  | false | [source: new DataElement(name: 'element1'), destination: new DataElement(name: 'element2'), relationshipType: RelationshipType.contextType]
+        2  | false | [source: new DataElement(name: 'element1'), destination: de1]
+        3  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.contextType]
         4  | true  | [source: cd1, destination: md1, relationshipType: RelationshipType.contextType]
-        5  | false | [source: new DataElement(name: 'element1'), destination: new DataElement(name: 'element2'), relationshipType: RelationshipType.containmentType]
+        5  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.containmentType]
         6  | true  | [source: md1, destination: de1, relationshipType: RelationshipType.containmentType]
-        7  | false | [source: new DataElement(name: 'parentModel'), destination: new Model(name: 'model2'), relationshipType: RelationshipType.hierarchyType]
+        7  | false | [source: new DataElement(name: 'parentModel'), destination: md1, relationshipType: RelationshipType.hierarchyType]
         8  | true  | [source: md1, destination: md1, relationshipType: RelationshipType.hierarchyType]
-        9  | false | [source: new DataElement(name: 'parentModel'), destination: new Model(name: 'model2'), relationshipType: RelationshipType.inclusionType]
+        9  | false | [source: new DataElement(name: 'parentModel'), destination: md1, relationshipType: RelationshipType.inclusionType]
         10 | true  | [source: cd1, destination: vd1, relationshipType: RelationshipType.inclusionType]
-        11 | false | [source: new ConceptualDomain(name: 'element1'), destination: new Model(name: 'element2'), relationshipType: RelationshipType.instantiationType]
+        11 | false | [source: new ConceptualDomain(name: 'element1'), destination: md1, relationshipType: RelationshipType.instantiationType]
         12 | true  | [source: de1, destination: vd1, relationshipType: RelationshipType.instantiationType]
-        13 | false | [source: new ConceptualDomain(name: 'element1'), destination: new Model(name: 'element2'), relationshipType: new RelationshipType(name: "BroaderTerm", sourceClass: DataElement, destinationClass: DataElement, destinationToSource: "narrower terms", sourceToDestination: "broader term for")]
+        13 | false | [source: new ConceptualDomain(name: 'element1'), destination: md1, relationshipType: reltype]
         14 | true  | [source: de1, destination: de2, relationshipType: reltype]
-        15 | false | [source: new ConceptualDomain(name: 'element1'), destination: new Model(name: 'element2'), relationshipType: RelationshipType.supersessionType]
+        15 | false | [source: cd1, destination: md1, relationshipType: RelationshipType.supersessionType]
         16 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType]
         17 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: -1]
         18 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMaxOccurs: -1]
