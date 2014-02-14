@@ -2,9 +2,8 @@ h1. ISO11179
 
 An overview of the MDR as is here is shown below 4:
 
-!http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png!
+!http://www.metadataconsulting.co.uk/MDRCore.png!
 
-!ModelCatalogueCorePlugin/src/docs/images/MDRCore.png!
 
 ISO11179 is an international standard for metadata aimed at identifying and solving key interoperability problems between different systems.  It is based around the idea of looking at data elements from both the semantic and the syntactical aspects and making links between the two.  A data element is considered as concept which is used to model some aspect of reality, this data element is then given a particular set of values in a system (such as those used by a java application) which enables the system to model the data element; this set of values is referred to as a value domain.
 
