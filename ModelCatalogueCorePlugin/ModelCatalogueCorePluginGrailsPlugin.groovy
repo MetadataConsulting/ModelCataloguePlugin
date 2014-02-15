@@ -1,5 +1,7 @@
+import uk.co.mc.core.util.marshalling.CatalogueElementMarshallers
 import uk.co.mc.core.util.marshalling.CustomObjectMarshallers
 import uk.co.mc.core.util.marshalling.DataElementMarshaller
+import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 import uk.co.mc.core.util.marshalling.RelationshipMarshallers
 
 class ModelCatalogueCorePluginGrailsPlugin {
@@ -53,7 +55,9 @@ Brief summary/description of the plugin.
             customObjectMarshallers( CustomObjectMarshallers ) {
                 marshallers = [
                         new DataElementMarshaller(),
-                        new RelationshipMarshallers()
+                        new RelationshipMarshallers(),
+                        new CatalogueElementMarshallers(),
+                        new MeasurementUnitMarshallers()
                 ]
             }
     }
