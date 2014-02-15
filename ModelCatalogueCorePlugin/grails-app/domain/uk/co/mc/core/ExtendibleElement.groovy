@@ -23,28 +23,4 @@ abstract class ExtendibleElement extends PublishedElement{
     }
 
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ExtendibleElement)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        ExtendibleElement ce = (ExtendibleElement) obj;
-        return new EqualsBuilder()
-                .append(name, ce?.name)
-                .append(versionNumber, ce?.versionNumber)
-                .append(extensions, ce?.extensions)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(versionNumber)
-                .append(extensions)
-                .toHashCode();
-    }
-
-
 }

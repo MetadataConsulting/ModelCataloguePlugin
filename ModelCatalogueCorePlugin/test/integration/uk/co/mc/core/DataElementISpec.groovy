@@ -13,12 +13,19 @@ class DataElementISpec extends IntegrationSpec{
     @Shared
     def fixtureLoader, auth1, auth3, auth2
 
-    def setupSpec(){
+    def setup(){
         def fixtures =  fixtureLoader.load( "dataElements/DE_author1", "dataElements/DE_author2", "dataElements/DE_author3")
 
         auth1 = fixtures.DE_author1
         auth2 = fixtures.DE_author2
         auth3 = fixtures.DE_author3
+
+    }
+
+    def cleanup(){
+        auth1.delete()
+        auth1.delete()
+        auth1.delete()
 
     }
 
@@ -74,18 +81,23 @@ class DataElementISpec extends IntegrationSpec{
 
         RelationshipType.initDefaultRelationshipTypes()
 
+        when:
         def author1 = DataElement.get(auth1.id)
         def author2 = DataElement.get(auth2.id)
         def author3 =  DataElement.get(auth3.id)
 
-        expect:
+        then:
 
         !author1.hasErrors()    || !author.errors
         !author2.hasErrors()    || !writer.errors
-        !author3.hasErrors()  || !title.errors
+        !author3.hasErrors()    || !title.errors
+
+        when:
 
         author2.createLinkTo(author1, RelationshipType.supersessionType)
         author2.createLinkFrom(author3, RelationshipType.supersessionType)
+
+        then:
 
         author1.relations
         author1.relations.size()    == 1
@@ -109,13 +121,24 @@ class DataElementISpec extends IntegrationSpec{
         !author2.getIncomingRelationsByType(RelationshipType.containmentType)
         !author2.getOutgoingRelationsByType(RelationshipType.containmentType)
 
+        println(author3.relations)
+        println(author2.relations)
+        println(author1.relations)
+
+
+        when:
+
         author2.removeLinkTo(author1, RelationshipType.supersessionType)
         author2.removeLinkFrom(author3, RelationshipType.supersessionType)
 
 
-        !author1.relations
-        !author2.relations
-        !author3.relations
+        author2.save(flush:true)
+
+        then:
+
+        author1.relations==[]
+        author2.relations==[]
+        author3.relations==[]
 
 
     }

@@ -47,6 +47,7 @@ class Mapping {
         source.removeFromOutgoingMappings(old)
         destination.removeFromIncomingMappings(old)
         old.delete()
+
         old
     }
 
@@ -71,29 +72,5 @@ class Mapping {
     String toString() {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}]"
     }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Mapping)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        Mapping ce = (Mapping) obj;
-        return new EqualsBuilder()
-                .append(source, ce?.source)
-                .append(destination, ce?.destination)
-                .append(mapping, ce?.mapping)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(source)
-                .append(destination)
-                .append(mapping)
-                .toHashCode();
-    }
-
 
 }

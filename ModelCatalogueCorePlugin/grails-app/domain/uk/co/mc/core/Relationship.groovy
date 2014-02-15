@@ -40,6 +40,7 @@ class Relationship {
     Integer destinationMinOccurs
     Integer destinationMaxOccurs
 
+    static belongsTo = [source: CatalogueElement, destination: CatalogueElement ]
 
     static constraints = {
         relationshipType unique: ['source', 'destination'], validator: { val, obj ->
@@ -105,9 +106,9 @@ class Relationship {
 
             if (relationshipInstance && source && destination) {
 
-                source?.removeFromOutgoingRelationships(relationshipInstance)
                 destination?.removeFromIncomingRelationships(relationshipInstance)
-                relationshipInstance.delete()
+                source?.removeFromOutgoingRelationships(relationshipInstance)
+                relationshipInstance.delete(flush:true)
             }
 
         }
@@ -118,28 +119,5 @@ class Relationship {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}, type: ${relationshipType?.name}]"
     }
 
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Relationship)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        Relationship ce = (Relationship) obj;
-        return new EqualsBuilder()
-                .append(source, ce?.source)
-                .append(destination, ce?.destination)
-                .append(relationshipType, ce?.relationshipType)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(source)
-                .append(destination)
-                .append(relationshipType)
-                .toHashCode();
-    }
 
 }

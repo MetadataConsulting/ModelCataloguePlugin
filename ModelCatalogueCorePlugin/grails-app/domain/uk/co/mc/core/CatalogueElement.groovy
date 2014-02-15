@@ -47,6 +47,18 @@ abstract class CatalogueElement {
         ].flatten()
     }
 
+    List getIncomingRelations() {
+        return [
+                (incomingRelationships ?: []).collect { it.source }
+        ].flatten()
+    }
+
+    List getOutgoingRelations() {
+        return [
+                (outgoingRelationships ?: []).collect { it.destination }
+        ].flatten()
+    }
+
 
     List getIncomingRelationsByType(RelationshipType type) {
         Relationship.findAllByDestinationAndRelationshipType(this, type).collect {

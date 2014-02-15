@@ -62,8 +62,9 @@ class RelationshipISpec extends IntegrationSpec{
 
     }
 
-    def "Create Relationship if the catalogue elements have been persisted and add relations to the source and destination"()
+    def "Create Relationship if the catalogue elements have been persisted then delete relationship"()
     {
+
 
         when:
 
@@ -75,23 +76,16 @@ class RelationshipISpec extends IntegrationSpec{
         then:
 
         !rel.hasErrors()
-
-        when:
-
-        then:
-        de1.outgoingRelationships?.contains(rel)
-        de2.incomingRelationships?.contains(rel)
-        !de2.outgoingRelationships?.contains(rel)
-        !de1.incomingRelationships?.contains(rel)
+        de2.getIncomingRelations()
+        de1.getOutgoingRelations()
 
         when:
 
         Relationship.unlink( de1, de2, reltype)
 
         then:
-
-        !de1.outgoingRelationships?.contains(rel)
-        !de2.incomingRelationships?.contains(rel)
+        de2.getIncomingRelations() == []
+        de1.getOutgoingRelations() == []
     }
 
 
@@ -110,8 +104,8 @@ class RelationshipISpec extends IntegrationSpec{
 
         rel1==rel2
 
-        de1.outgoingRelationships.size()==1
-        de2.incomingRelationships.size()==1
+        de2.getIncomingRelations()
+        de1.getOutgoingRelations()
 
         when:
 
@@ -119,33 +113,10 @@ class RelationshipISpec extends IntegrationSpec{
 
         then:
 
-        de1.outgoingRelationships.size()==0
-        de2.incomingRelationships.size()==0
+        de2.getIncomingRelations() == []
+        de1.getOutgoingRelations() == []
 
     }
-
-    def "Unlink relationship"()
-    {
-
-
-        when:
-        Relationship rel1 =  Relationship.link( de1, de2, reltype)
-
-        then:
-        !rel1.hasErrors()
-
-
-        when:
-        Relationship.unlink(de1,de2,reltype)
-
-        then:
-        de1.outgoingRelationships.size()==0
-        de2.incomingRelationships.size()==0
-
-
-
-    }
-
 
 
     @Unroll

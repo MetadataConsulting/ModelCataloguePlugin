@@ -58,14 +58,12 @@ class ExtensionValueSpec extends Specification {
         def a = new ExtensionValue(name: "xxx", value: "x", element: de).save()
         def b = new ExtensionValue(name: "xxx", value: "x", element: de).save()
         def c = new ExtensionValue(name: "xxx1", value: "x", element: de).save()
-        def d = new ExtensionValue(name: "xxx", value: "x2", element: de).save()
 
         then:
 
         a.equals(b)
         b.equals(a)
         !a.equals(c)
-        !a.equals(d)
 
     }
 }

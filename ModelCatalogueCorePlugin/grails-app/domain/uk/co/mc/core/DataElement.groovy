@@ -17,7 +17,7 @@ class DataElement extends ExtendibleElement {
     String code
 
     static constraints = {
-        code nullable:true, maxSize: 255
+        code nullable:true, unique:true, maxSize: 255
     }
 
 

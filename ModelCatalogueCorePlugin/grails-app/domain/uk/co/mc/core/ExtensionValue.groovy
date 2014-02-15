@@ -32,14 +32,12 @@ class ExtensionValue extends CatalogueElement {
         ExtensionValue ce = (ExtensionValue) obj;
         return new EqualsBuilder()
                 .append(name, ce?.name)
-                .append(value, ce?.value)
                 .isEquals();
     }
 
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(name)
-                .append(value)
                 .toHashCode();
     }
 
