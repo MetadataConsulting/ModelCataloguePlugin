@@ -39,7 +39,7 @@ class ImportService {
                         vd.addToIncludedIn(cd)
 
                         def de = new DataElement(name: tokens[3],
-                                description: tokens[4])
+                                description: tokens[4], code: tokens[0])
                         //dataElementConcept: models,
                         //extension: ext).save(failOnError: true)
 
