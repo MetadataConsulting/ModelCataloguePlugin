@@ -1,8 +1,4 @@
 package uk.co.mc.core
-
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
 /*
 * Users can create relationships between all catalogue elements. They include
 * DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
@@ -40,7 +36,7 @@ class Relationship {
     Integer destinationMinOccurs
     Integer destinationMaxOccurs
 
-    static belongsTo = [source: CatalogueElement, destination: CatalogueElement ]
+    static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 
     static constraints = {
         relationshipType unique: ['source', 'destination'], validator: { val, obj ->
@@ -108,7 +104,7 @@ class Relationship {
 
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
-                relationshipInstance.delete(flush:true)
+                relationshipInstance.delete(flush: true)
             }
 
         }

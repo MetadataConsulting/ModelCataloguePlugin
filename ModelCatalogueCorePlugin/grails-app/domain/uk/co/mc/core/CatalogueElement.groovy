@@ -1,10 +1,8 @@
 package uk.co.mc.core
 
-import com.sun.org.apache.xml.internal.resolver.Catalog
 import grails.util.GrailsNameUtils
 import org.apache.commons.lang.builder.EqualsBuilder
 import org.apache.commons.lang.builder.HashCodeBuilder
-
 
 /*
 * Catalogue Element - there are a number of catalogue elements that make up the model catalogue (please see
@@ -17,26 +15,26 @@ abstract class CatalogueElement {
 
     String name
     String description
-		
-	static hasMany = [ incomingRelationships: Relationship, outgoingRelationships: Relationship  ]
-		
+
+    static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship]
+
     static constraints = {
         name size: 1..255
-        description nullable:true, maxSize:2000
-	}
+        description nullable: true, maxSize: 2000
+    }
 
     static mapping = {
         description type: "text"
     }
 
 
-    static mappedBy = [ outgoingRelationships: 'source', incomingRelationships: 'destination']
+    static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination']
 
     static transients = ['relations', 'info']
 
-    /******************************************************************************************************************/
+    /** ****************************************************************************************************************/
     /****functions for specifying relationships between catalogue elements using the uk.co.mc.core.Relationship class ************/
-    /******************************************************************************************************************/
+    /** ****************************************************************************************************************/
 
     /***********return all the relations************/
 

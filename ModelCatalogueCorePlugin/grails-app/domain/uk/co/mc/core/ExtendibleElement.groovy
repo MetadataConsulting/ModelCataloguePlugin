@@ -1,7 +1,5 @@
 package uk.co.mc.core
 
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
 import uk.co.mc.core.util.ExtendibleElementExtensionsWrapper
 
 /*
@@ -10,7 +8,7 @@ import uk.co.mc.core.util.ExtendibleElementExtensionsWrapper
 *
 * */
 
-abstract class ExtendibleElement extends PublishedElement{
+abstract class ExtendibleElement extends PublishedElement {
 
 
     static hasMany = [extensions: ExtensionValue]

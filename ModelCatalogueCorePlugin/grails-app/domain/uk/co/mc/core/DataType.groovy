@@ -1,6 +1,5 @@
 package uk.co.mc.core
 
-import groovy.transform.EqualsAndHashCode
 import org.apache.commons.lang.builder.EqualsBuilder
 import org.apache.commons.lang.builder.HashCodeBuilder
 

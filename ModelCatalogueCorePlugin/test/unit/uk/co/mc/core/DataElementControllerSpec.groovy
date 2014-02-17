@@ -1,6 +1,5 @@
 package uk.co.mc.core
 
-import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import uk.co.mc.core.util.marshalling.DataElementMarshaller
@@ -18,8 +17,8 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
     def setup() {
         assert (type = new RelationshipType(name: "relationship", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "relates to", destinationToSource: "is related to").save())
-        assert (author = new DataElement(name:"Author", description: "the DE_author of the book", code: "XXX").save())
-        assert (title = new DataElement(name:"Author2", description: "the DE_author of the book", code: "XXX2").save())
+        assert (author = new DataElement(name: "Author", description: "the DE_author of the book", code: "XXX").save())
+        assert (title = new DataElement(name: "Author2", description: "the DE_author of the book", code: "XXX2").save())
         assert !Relationship.link(author, title, type).hasErrors()
 
 
@@ -35,7 +34,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
     }
 
 
-    def "list items"(){
+    def "list items"() {
 
         response.format = "json"
 
@@ -45,10 +44,10 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
         expect:
         json.success
-        json.size           == 2
-        json.total          == 2
+        json.size == 2
+        json.total == 2
         json.list
-        json.list.size()    == 2
+        json.list.size() == 2
         json.list.any { it.id == author.id }
         json.list.any { it.id == title.id }
 
@@ -69,7 +68,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         json
         json.id == author.id
         json.name == author.name
-        json.outgoingRelationships.destinationPath== ["/DataElement/$author.id"]
+        json.outgoingRelationships.destinationPath == ["/DataElement/$author.id"]
         json.outgoingRelationships.sourceName == ["$title.name"]
         json.outgoingRelationships.sourcePath == ["/DataElement/$title.id"]
         json.outgoingRelationships.destinationName == ["$author.name"]
@@ -87,11 +86,10 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
     }
 
-    void "If element not found "()
-    {
+    void "If element not found "() {
 
         expect:
-        DataElement.count()==2
+        DataElement.count() == 2
 
 
         when:
