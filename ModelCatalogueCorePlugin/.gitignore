@@ -48,6 +48,7 @@ grails-app/assets/bower_components/*
 
 # other
 *.iws
+*.ipr
 **.gen.fixture.js
 
 
