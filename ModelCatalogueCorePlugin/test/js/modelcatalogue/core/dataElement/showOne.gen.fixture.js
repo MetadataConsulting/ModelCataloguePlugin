@@ -14,6 +14,8 @@
    "description": "the DE_author of the book",
    "name": "Author",
    "code": "XXX",
+   "extensions": null,
+   "versionNumber": 0.1,
    "incomingRelationships": {
       "count": 0,
       "link": "/dataElement/incoming/1"
