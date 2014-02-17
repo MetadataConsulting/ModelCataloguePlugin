@@ -20,14 +20,14 @@ abstract class CatalogueElementController<T> extends RestfulController<Catalogue
         if(params.max){ link +="max=${params.max}"}
         if(params.sort){ link += "&sort=${params.sort}"}
         if(params.order){ link += "&order=${params.order}"}
-        def nextOffset = ""
-        def previousOffset = ""
+        def nextLink = ""
+        def previousLink = ""
         if(params?.max && params.max<total){
             def offset = (params?.offset) ? params?.offset.toInteger() : 0
             def prev =  offset - params?.max
             def next = offset + params?.max
-            if( next < total){nextOffset = "${link}&offset=${next}"}
-            if( prev >= 0 ){previousOffset ="${link}&offset=${prev}"}
+            if( next < total){nextLink = "${link}&offset=${next}"}
+            if( prev >= 0 ){previousLink ="${link}&offset=${prev}"}
         }
 
         def model=  [
@@ -35,8 +35,8 @@ abstract class CatalogueElementController<T> extends RestfulController<Catalogue
                 total:      total,
                 size:       list.size(),
                 list:       list,
-                next: nextOffset,
-                previous: previousOffset,
+                next: nextLink,
+                previous: previousLink,
         ]
         respond model
     }
