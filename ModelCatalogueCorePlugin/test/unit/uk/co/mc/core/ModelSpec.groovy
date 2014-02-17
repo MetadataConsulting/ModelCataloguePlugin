@@ -13,11 +13,10 @@ import spock.lang.Unroll
  */
 @TestFor(Model)
 @Mock([Model, ExtensionValue])
-class ModelSpec extends Specification{
+class ModelSpec extends Specification {
 
     @Unroll
-    def "Model creation for #args results in #validates"()
-    {
+    def "Model creation for #args results in #validates"() {
 
         expect:
 
@@ -36,15 +35,15 @@ class ModelSpec extends Specification{
         where:
 
         validates | args
-        false | [name: "", description: "test model description"]
-        false      | [name:"t"*256, description: "test model description"]
-        false      | [name:"test model", description: "t"*2001]
-        true       | [name:"test model", description: "test model description"]
+        false     | [name: "", description: "test model description"]
+        false     | [name: "t" * 256, description: "test model description"]
+        false     | [name: "test model", description: "t" * 2001]
+        true      | [name: "test model", description: "test model description"]
 
     }
 
     @Unroll
-    def "create a new model and extend it to include additional metadata"(){
+    def "create a new model and extend it to include additional metadata"() {
 
         expect:
 
@@ -85,20 +84,20 @@ class ModelSpec extends Specification{
     }
 
 
-    def "check  EqualsAndHashCode works"(){
+    def "check  EqualsAndHashCode works"() {
 
         when:
-        def a = new Model(name:"test concept", description: "test concept description", versionNumber: 0.1)
-        def b = new Model(name:"test concept", description: "test concept description", versionNumber: 0.1)
-        def c = new Model(name:"test conceptasdsfdfsad", description: "test concept description", versionNumber: 0.1)
-        def d = new Model(name:"test concept", description: "test concept description", versionNumber: 0.1)
-        def e = new Model(name:"test concept", description: "test concept description", versionNumber: 0.1)
-        def f = new Model(name:"test concept", description: "test concept description", versionNumber: 0.2)
-        def ext = new ExtensionValue(name: "xxx", value: "x", element: d).save()
+        def a = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
+        def b = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
+        def c = new Model(name: "test conceptasdsfdfsad", description: "test concept description", versionNumber: 0.1)
+        def d = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
+        def e = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
+        def f = new Model(name: "test concept", description: "test concept description", versionNumber: 0.2)
+        def ext = new ExtensionValue(name: "xxx", extensionValue: "x", element: d).save()
         d.addToExtensions(ext)
         e.addToExtensions(ext)
-        assert(!d.save().hasErrors())
-        assert(!e.save().hasErrors())
+        assert (!d.save().hasErrors())
+        assert (!e.save().hasErrors())
 
         then:
         a.equals(b)

@@ -4,6 +4,7 @@ import grails.converters.JSON
 import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
 import spock.lang.Specification
+import uk.co.mc.core.fixtures.MockFixturesLoader
 
 /**
  * Abstract parent for restful controllers specification.
@@ -12,8 +13,10 @@ import spock.lang.Specification
  */
 abstract class AbstractRestfulControllerSpec extends Specification {
 
+    MockFixturesLoader fixturesLoader = new MockFixturesLoader()
+
     def setup() {
-        //setupMimeTypes()
+        setupMimeTypes()
     }
 
     protected void setupMimeTypes() {

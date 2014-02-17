@@ -1,9 +1,6 @@
 package uk.co.mc.core
 
-import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
 import spock.lang.Specification
 
 /**
@@ -29,7 +26,7 @@ class MappingSpec extends Specification {
         Mapping.mapValue("2*x", 2) == 4
     }
 
-    void "map value using instance method"(){
+    void "map value using instance method"() {
         expect:
         new Mapping(mapping: "5*x").map(4) == 20
     }

@@ -2,10 +2,6 @@ package uk.co.mc.core
 
 abstract class PublishedElement extends CatalogueElement{
 
-    enum Status {
-        DRAFT, PENDING, FINALIZED, REMOVED
-    }
-
     //version number - this gets iterated every time a new version is created from a finalized version
 
     Double versionNumber = 0.1
@@ -14,15 +10,15 @@ abstract class PublishedElement extends CatalogueElement{
     //it's version number is updated and any subsequent update will
     //be mean that the element is superceded. We will provide a supercede function
     //to do this
-    Status status = Status.DRAFT
+    PublishedElementStatus status = PublishedElementStatus.DRAFT
 
     static constraints = {
 
         status validator: { val , obj->
             if(!val){ return true}
-            def oldStatus
+            def oldStatus = null
             if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
-            if(oldStatus==Status.FINALIZED && val!=Status.FINALIZED){
+            if (oldStatus == PublishedElementStatus.FINALIZED && val != PublishedElementStatus.FINALIZED) {
                 return ['validator.finalized']
             }
             return true
@@ -51,7 +47,7 @@ abstract class PublishedElement extends CatalogueElement{
 
         //increment versionNumber of new object and reset status to draft
 
-        clonedElement.status = CatalogueElement.Status.DRAFT
+        clonedElement.status = CatalogueElement.PublishedElementStatus.DRAFT
 
         clonedElement.save(flush:true, failOnError: true)
 

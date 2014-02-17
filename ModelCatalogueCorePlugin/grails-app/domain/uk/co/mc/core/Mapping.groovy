@@ -1,8 +1,5 @@
 package uk.co.mc.core
 
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
 class Mapping {
 
     ValueDomain source
@@ -23,7 +20,7 @@ class Mapping {
         }
     }
 
-    static Mapping map(ValueDomain source, ValueDomain destination, String mapping){
+    static Mapping map(ValueDomain source, ValueDomain destination, String mapping) {
         if (!source || !source.id || !destination || !destination.id || !mapping) return null
         Mapping existing = findBySourceAndDestination(source, destination)
         if (existing) {
@@ -36,12 +33,12 @@ class Mapping {
         newOne
     }
 
-    static Mapping map(ValueDomain source, ValueDomain destination, Map mapping){
+    static Mapping map(ValueDomain source, ValueDomain destination, Map mapping) {
         map(source, destination, createMappingFunctionFromMap(mapping))
     }
 
 
-    static Mapping unmap(ValueDomain source, ValueDomain destination){
+    static Mapping unmap(ValueDomain source, ValueDomain destination) {
         Mapping old = findBySourceAndDestination(source, destination)
         if (!old) return null
         source.removeFromOutgoingMappings(old)
@@ -62,7 +59,7 @@ class Mapping {
     }
 
     static String createMappingFunctionFromMap(Map map) {
-        "${map.collectEntries{ key, value -> [key, "\"${value}\""]}.toMapString()}[x]"
+        "${map.collectEntries { key, value -> [key, "\"${value}\""] }.toMapString()}[x]"
     }
 
     static Object mapValue(String mapping, Object value) {
