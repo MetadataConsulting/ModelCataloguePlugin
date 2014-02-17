@@ -13,7 +13,7 @@ import spock.lang.Specification
 abstract class AbstractRestfulControllerSpec extends Specification {
 
     def setup() {
-        //setupMimeTypes()
+        setupMimeTypes()
     }
 
     protected void setupMimeTypes() {
