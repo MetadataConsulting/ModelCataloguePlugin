@@ -1,8 +1,6 @@
 package uk.co.mc.core
 
-import grails.rest.RestfulController
-
-class MeasurementUnitController extends RestfulController<MeasurementUnit> {
+class MeasurementUnitController extends CatalogueElementController<MeasurementUnit> {
 
     static responseFormats = ['json', 'xml']
 
