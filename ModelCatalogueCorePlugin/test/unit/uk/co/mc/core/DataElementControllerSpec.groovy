@@ -69,21 +69,8 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         json
         json.id == author.id
         json.name == author.name
-        json.outgoingRelationships.destinationPath== ["/DataElement/$author.id"]
-        json.outgoingRelationships.sourceName == ["$title.name"]
-        json.outgoingRelationships.sourcePath == ["/DataElement/$title.id"]
-        json.outgoingRelationships.destinationName == ["$author.name"]
-        json.outgoingRelationships.relationshipType.sourceClass == ["uk.co.mc.core.CatalogueElement"]
-        json.outgoingRelationships.relationshipType.id == [type.id]
-        json.outgoingRelationships.relationshipType.sourceToDestination == ["relates to"]
-        json.outgoingRelationships.relationshipType.destinationClass == ["uk.co.mc.core.CatalogueElement"]
-        json.outgoingRelationships.relationshipType.name == ["relationship"]
-        json.outgoingRelationships.relationshipType.getAt("class") == ["uk.co.mc.core.RelationshipType"]
-        json.outgoingRelationships.relationshipType.destinationToSource == ["is related to"]
-
-
-
-        !json.incomingRelationships
+        json.outgoingRelationships == [count: 1, link: "/dataElement/outgoing/${author.id}"]
+        json.incomingRelationships == [count:0, link:"/dataElement/incoming/${author.id}"]
 
     }
 
