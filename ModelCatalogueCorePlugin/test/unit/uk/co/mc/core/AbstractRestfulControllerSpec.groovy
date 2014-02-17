@@ -1,17 +1,24 @@
 package uk.co.mc.core
 
 import grails.converters.JSON
+import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
 import spock.lang.Specification
+import spock.lang.Unroll
 import uk.co.mc.core.fixtures.MockFixturesLoader
+
+import javax.servlet.http.HttpServletResponse
 
 /**
  * Abstract parent for restful controllers specification.
  *
  * The concrete subclass must use {@link grails.test.mixin.web.ControllerUnitTestMixin}.
  */
-abstract class AbstractRestfulControllerSpec extends Specification {
+abstract class AbstractRestfulControllerSpec<T> extends Specification {
+
+    private static final int DUMMY_ENTITIES_COUNT = 12
+
 
     MockFixturesLoader fixturesLoader = new MockFixturesLoader()
 
@@ -67,6 +74,93 @@ abstract class AbstractRestfulControllerSpec extends Specification {
         println "New fixture file created at $fixtureFile.canonicalPath"
         fixtureFile
     }
+
+
+    @Unroll
+    def "list items test: #no where max: #max offset: #offset"() {
+        fillWithDummyEntities()
+
+        expect:
+        resource.count() == total
+
+
+        when:
+        response.format = "json"
+        params.max = max
+        params.offset = offset
+
+        controller.index()
+        def json = response.json
+
+
+        then:
+
+        json.success
+        json.size == size
+        json.total == total
+        json.list
+        json.list.size() == size
+        json.next == next
+        json.previous == previous
+
+
+
+        where:
+
+        no | size | max | offset | total | next                                 | previous
+        1  | 10   | 10  | 0      | 12    | "/${resourceName}/?max=10&offset=10" | ""
+        2  | 5    | 5   | 0      | 12    | "/${resourceName}/?max=5&offset=5"   | ""
+        3  | 5    | 5   | 5      | 12    | "/${resourceName}/?max=5&offset=10"  | "/${resourceName}/?max=5&offset=0"
+        4  | 4    | 4   | 8      | 12    | ""                                   | "/${resourceName}/?max=4&offset=4"
+        5  | 2    | 10  | 10     | 12    | ""                                   | "/${resourceName}/?max=10&offset=0"
+        6  | 2    | 2   | 10     | 12    | ""                                   | "/${resourceName}/?max=2&offset=8"
+
+    }
+
+    String getResourceName() {
+        GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerSpec")
+    }
+
+    def "Return 404 for non-existing item as JSON"() {
+        response.format = "json"
+
+        params.id = "1000000"
+
+        controller.show()
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as XML"() {
+        response.format = "xml"
+
+        params.id = "1000000"
+
+        controller.show()
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+
+    def cleanup() {
+        resource.deleteAll(resource.list())
+    }
+
+    void fillWithDummyEntities() {
+        (resource.count() + 1).upto(DUMMY_ENTITIES_COUNT) {
+            assert resource.newInstance(getUniqueDummyConstructorArgs(it)).save()
+        }
+    }
+
+    Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
+        [name: "$resourceName $counter"]
+    }
+
+    abstract Class<T> getResource()
 
 
 }

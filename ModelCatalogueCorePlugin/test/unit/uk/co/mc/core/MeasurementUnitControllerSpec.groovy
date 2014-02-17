@@ -5,8 +5,6 @@ import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
 import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 
-import javax.servlet.http.HttpServletResponse
-
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
@@ -24,6 +22,7 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         assert (celsius = fixturesLoader.MU_degree_C.save())
         assert (fahrenheit = fixturesLoader.MU_degree_F.save())
         assert !Relationship.link(celsius, fahrenheit, relationshipType).hasErrors()
+
         new MeasurementUnitMarshallers().register()
     }
 
@@ -55,29 +54,7 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         json.incomingRelationships == [count: 0, link: "/measurementUnit/incoming/${celsius.id}"]
     }
 
-    def "Return 404 for non-existing item as JSON"() {
-        response.format = "json"
 
-        params.id = "100"
-
-        controller.show()
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
-
-    def "Return 404 for non-existing item as XML"() {
-        response.format = "xml"
-
-        params.id = "100"
-
-        controller.show()
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
 
     def "Show single existing item as XML"() {
         response.format = "xml"
@@ -146,6 +123,15 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         created.errors
         created.errors.size() == 1
         created.errors.first().field == 'symbol'
+    }
+
+
+    Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
+        [name: "Measurement Unit ${counter}", symbol: "MU${counter}"]
+    }
+
+    Class getResource() {
+        MeasurementUnit
     }
 
 }
