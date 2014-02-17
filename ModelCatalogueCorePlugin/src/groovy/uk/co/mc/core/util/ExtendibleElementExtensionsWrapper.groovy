@@ -91,11 +91,6 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
         element.extensions?.find { it.name == key }
     }
 
-    private ExtensionValue findExtensionValueByValue(key) {
-        if (!key) return null
-        element.extensions?.find { it.extensionValue == key }
-    }
-
     private Map<String, String> asReadOnlyMap() {
         Collections.unmodifiableMap(element.extensions.collectEntries {
             [it.name, it.extensionValue]
@@ -124,6 +119,6 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
         if (!existing) return null
         element.removeFromExtensions(existing)
         existing.delete(flush: true)
-        //existing.extensionValue
+        existing.extensionValue
     }
 }

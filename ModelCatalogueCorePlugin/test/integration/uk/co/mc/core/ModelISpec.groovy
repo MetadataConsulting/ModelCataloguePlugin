@@ -39,7 +39,7 @@ class ModelISpec extends IntegrationSpec{
 
         when:
 
-        modelInstance.status = PublishedElement.Status.FINALIZED
+        modelInstance.status = PublishedElementStatus.FINALIZED
         modelInstance.save(flush:true)
 
         then:
@@ -48,7 +48,7 @@ class ModelISpec extends IntegrationSpec{
 
         when:
 
-        modelInstance.status = PublishedElement.Status.PENDING
+        modelInstance.status = PublishedElementStatus.PENDING
         modelInstance.save()
 
         then:
