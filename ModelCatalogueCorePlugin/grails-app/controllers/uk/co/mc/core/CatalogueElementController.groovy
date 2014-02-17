@@ -20,8 +20,8 @@ abstract class CatalogueElementController<T> extends RestfulController<Catalogue
         if(params.max){ link +="max=${params.max}"}
         if(params.sort){ link += "&sort=${params.sort}"}
         if(params.order){ link += "&order=${params.order}"}
-        def nextOffset
-        def previousOffset
+        def nextOffset = ""
+        def previousOffset = ""
         if(params?.max && params.max<total){
             def offset = (params?.offset) ? params?.offset.toInteger() : 0
             def prev =  offset - params?.max

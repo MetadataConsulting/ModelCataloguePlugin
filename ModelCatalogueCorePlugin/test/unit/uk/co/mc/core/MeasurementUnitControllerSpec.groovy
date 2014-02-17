@@ -5,6 +5,8 @@ import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
 import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 
+import javax.servlet.http.HttpServletResponse
+
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
@@ -53,6 +55,30 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         json.incomingRelationships == [count: 0, link: "/measurementUnit/incoming/${celsius.id}"]
     }
 
+    def "Return 404 for non-existing item as JSON"() {
+        response.format = "json"
+
+        params.id = "100"
+
+        controller.show()
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as XML"() {
+        response.format = "xml"
+
+        params.id = "100"
+
+        controller.show()
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
     def "Show single existing item as XML"() {
         response.format = "xml"
 
@@ -74,6 +100,52 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         xml.incomingRelationships.@count == 0
         xml.incomingRelationships.@link == "/measurementUnit/incoming/${celsius.id}"
 
+    }
+
+    def "Create new instance from JSON"() {
+        expect:
+        !MeasurementUnit.findByName("Gram")
+
+        when:
+        response.format = "json"
+        request.json = [name: "Gram", symbol: "g"]
+
+        controller.save()
+
+        def created = response.json
+        def stored = MeasurementUnit.findByName("Gram")
+
+        recordResult 'saveOk', created
+
+        then:
+        stored
+        created
+        created.id == stored.id
+        created.name == "Gram"
+        created.symbol == "g"
+    }
+
+    def "Do not create new instance from JSON if data are wrong"() {
+        expect:
+        !MeasurementUnit.findByName("Gram")
+
+        when:
+        response.format = "json"
+        request.json = [name: "Gram", symbol: "g" * 200]
+
+        controller.save()
+
+        def created = response.json
+        def stored = MeasurementUnit.findByName("Gram")
+
+        recordResult 'saveErrors', created
+
+        then:
+        !stored
+        created
+        created.errors
+        created.errors.size() == 1
+        created.errors.first().field == 'symbol'
     }
 
 }

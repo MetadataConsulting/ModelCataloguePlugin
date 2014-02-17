@@ -15,31 +15,13 @@ class DataElementMarshaller implements MarshallersProvider {
         XML.registerObjectMarshaller(DataElement) { DataElement el, XML xml ->
             CatalogueElementMarshallers.buildXml(el, xml)
             xml.build {
-                code el.code
+                code el.code,
+                versionNumber: element.versionNumber
+                extensions: element.extensions
+
             }
         }
     }
-
-
-
-//    void register() {
-//        JSON.registerObjectMarshaller(DataElement) { DataElement dataElement ->
-//
-//            //marshall incoming and outgoing relationships
-//
-//			return [
-//			   id: dataElement.id,
-//               name: dataElement.name,
-//               description: dataElement.description,
-//               status: dataElement.status,
-//               versionNumber: dataElement.versionNumber,
-//               incomingRelationships: MarshallerUtils.marshallIncomingRelationships(dataElement),
-//               outgoingRelationships: MarshallerUtils.marshallOutgoingRelationships(dataElement)
-//			]
-//
-//		}
-//
-//	}
 
 }
 

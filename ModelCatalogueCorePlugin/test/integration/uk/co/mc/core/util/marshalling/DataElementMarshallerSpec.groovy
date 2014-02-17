@@ -59,19 +59,7 @@ class DataElementMarshallerSpec extends IntegrationSpec{
         json
         json.id == de1.id
         json.name == de1.name
-        json.outgoingRelationships.destinationPath== ["/DataElement/$de1.id"]
-        json.outgoingRelationships.sourceName == ["$de2.name"]
-        json.outgoingRelationships.sourcePath == ["/DataElement/$de2.id"]
-        json.outgoingRelationships.destinationName == ["$de1.name"]
-        json.outgoingRelationships.relationshipType.sourceClass == ["uk.co.mc.core.DataElement"]
-        json.outgoingRelationships.relationshipType.id == [rt.id]
-        json.outgoingRelationships.relationshipType.sourceToDestination == ["AntonymousWith"]
-        json.outgoingRelationships.relationshipType.destinationClass == ["uk.co.mc.core.DataElement"]
-        json.outgoingRelationships.relationshipType.name == ["Antonym"]
-        json.outgoingRelationships.relationshipType.getAt("class") == ["uk.co.mc.core.RelationshipType"]
-        json.outgoingRelationships.relationshipType.destinationToSource == ["AntonymousWith"]
-
-
+        json.outgoingRelationships == ["count":1, "link":"/dataElement/outgoing/${de1.id}"]
 
         when:
 

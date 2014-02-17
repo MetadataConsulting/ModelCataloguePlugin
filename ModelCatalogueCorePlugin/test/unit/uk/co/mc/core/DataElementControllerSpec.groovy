@@ -82,12 +82,12 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         where:
 
         no | size | max | offset | total | next                             | previous
-        1  | 10   | 10  | 0      | 12    | "/DataElement/?max=10&offset=10" | "null"
-        2  | 5    | 5   | 0      | 12    | "/DataElement/?max=5&offset=5"   | "null"
+        1  | 10   | 10  | 0      | 12    | "/DataElement/?max=10&offset=10" | ""
+        2  | 5    | 5   | 0      | 12    | "/DataElement/?max=5&offset=5"   | ""
         3  | 5    | 5   | 5      | 12    | "/DataElement/?max=5&offset=10"  | "/DataElement/?max=5&offset=0"
-        4  | 4    | 4   | 8      | 12    | "/DataElement/?max=4&offset=8"   | "/DataElement/?max=4&offset=4"
-        5  | 2    | 10  | 10     | 12    | "/DataElement/?max=10&offset=10" | "/DataElement/?max=10&offset=0"
-        6  | 2    | 2   | 10     | 12    | "/DataElement/?max=10&offset=10" | "/DataElement/?max=10&offset=0"
+        4  | 4    | 4   | 8      | 12    | ""                               | "/DataElement/?max=4&offset=4"
+        5  | 2    | 10  | 10     | 12    | ""                               | "/DataElement/?max=10&offset=0"
+        6  | 2    | 2   | 10     | 12    | ""                               | "/DataElement/?max=2&offset=8"
 
     }
 
