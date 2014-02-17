@@ -25,9 +25,6 @@ class ModelISpec extends IntegrationSpec{
 */
     def "create a new model, finalize it and then try to change it"(){
 
-        expect:
-
-        Model.list().size()==1
         when:
 
         Model modelInstance = Model.get(book.id)
