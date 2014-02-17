@@ -93,6 +93,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         def json = response.json
 
 
+        recordResult "list${no}", json
+
         then:
 
         json.success
