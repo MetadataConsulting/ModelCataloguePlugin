@@ -1,8 +1,4 @@
-import uk.co.mc.core.util.marshalling.CatalogueElementMarshallers
-import uk.co.mc.core.util.marshalling.CustomObjectMarshallers
-import uk.co.mc.core.util.marshalling.DataElementMarshaller
-import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
-import uk.co.mc.core.util.marshalling.RelationshipMarshallers
+import uk.co.mc.core.util.marshalling.*
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
@@ -47,19 +43,18 @@ Brief summary/description of the plugin.
     }
 
 
-
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
 
 
-            customObjectMarshallers( CustomObjectMarshallers ) {
-                marshallers = [
-                        new DataElementMarshaller(),
-                        new RelationshipMarshallers(),
-                        new CatalogueElementMarshallers(),
-                        new MeasurementUnitMarshallers()
-                ]
-            }
+        customObjectMarshallers(CustomObjectMarshallers) {
+            marshallers = [
+                    new DataElementMarshaller(),
+                    new RelationshipMarshallers(),
+                    new ValueDomainMarshaller(),
+                    new MeasurementUnitMarshallers()
+            ]
+        }
     }
 
     def doWithDynamicMethods = { ctx ->

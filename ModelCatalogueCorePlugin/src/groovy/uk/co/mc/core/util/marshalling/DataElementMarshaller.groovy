@@ -1,29 +1,28 @@
 package uk.co.mc.core.util.marshalling
 
-import grails.converters.JSON
 import grails.converters.XML
 import uk.co.mc.core.DataElement
 
-class DataElementMarshaller implements MarshallersProvider {
+class DataElementMarshaller extends ExtendibleElementMarshallers {
 
-    void register() {
-        JSON.registerObjectMarshaller(DataElement) { DataElement element ->
-            def ret = [code: element.code, versionNumber: element.versionNumber, extensions: element.extensions, status: element.status]
-            ret.putAll(CatalogueElementMarshallers.prepareJsonMap(element))
-            return ret
-        }
-        XML.registerObjectMarshaller(DataElement) { DataElement el, XML xml ->
-            CatalogueElementMarshallers.buildXml(el, xml)
-            xml.build {
-                code el.code
-                versionNumber el.versionNumber
-                extensions el.extensions
-                status el.status
-
-            }
-        }
+    DataElementMarshaller() {
+        super(DataElement)
     }
 
+    protected Map<String, Object> prepareJsonMap(element) {
+        if (!element) return [:]
+        def ret = super.prepareJsonMap(element)
+        ret.putAll code: element.code, foo: "bar"
+        return ret
+    }
+
+
+    protected void buildXml(element, XML xml) {
+        super.buildXml(element, xml)
+        xml.build {
+            code element.code
+        }
+    }
 }
 
 

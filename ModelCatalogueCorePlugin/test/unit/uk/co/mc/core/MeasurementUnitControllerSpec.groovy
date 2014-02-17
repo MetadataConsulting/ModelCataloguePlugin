@@ -3,6 +3,7 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
+import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 
 /**
@@ -53,7 +54,6 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         json.outgoingRelationships == [count: 1, link: "/measurementUnit/outgoing/${celsius.id}"]
         json.incomingRelationships == [count: 0, link: "/measurementUnit/incoming/${celsius.id}"]
     }
-
 
 
     def "Show single existing item as XML"() {
@@ -134,4 +134,8 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         MeasurementUnit
     }
 
+    @Override
+    List<AbstractMarshallers> getMarshallers() {
+        [new MeasurementUnitMarshallers()]
+    }
 }

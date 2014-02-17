@@ -2,11 +2,14 @@ package uk.co.mc.core
 
 import grails.converters.JSON
 import grails.util.GrailsNameUtils
+import groovy.util.slurpersupport.GPathResult
+import groovy.xml.XmlUtil
 import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
 import spock.lang.Specification
 import spock.lang.Unroll
 import uk.co.mc.core.fixtures.MockFixturesLoader
+import uk.co.mc.core.util.marshalling.AbstractMarshallers
 
 import javax.servlet.http.HttpServletResponse
 
@@ -24,6 +27,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     def setup() {
         setupMimeTypes()
+        marshallers.each { it.register() }
+        config.grails.converters.default.pretty.print = true
     }
 
     protected void setupMimeTypes() {
@@ -75,6 +80,20 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         fixtureFile
     }
 
+    /**
+     * Records the given xml text as fixture returning the file created or updated.
+     *
+     * @param fixtureName name of the fixture variable and the file holding it as well
+     * @param xml xml to be saved to the fixture
+     */
+    protected File recordResult(String fixtureName, GPathResult xml) {
+        File fixtureFile = new File("../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core/$controller.resourceName/${fixtureName}.gen.xml")
+        fixtureFile.parentFile.mkdirs()
+        fixtureFile.text = """${XmlUtil.serialize(xml)}"""
+        println "New xml file created at $fixtureFile.canonicalPath"
+        fixtureFile
+    }
+
 
     @Unroll
     def "list items test: #no where max: #max offset: #offset"() {
@@ -90,7 +109,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         params.offset = offset
 
         controller.index()
-        def json = response.json
+        Map json = response.json
 
 
         recordResult "list${no}", json
@@ -161,6 +180,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
         [name: "$resourceName $counter"]
     }
+
+    List<AbstractMarshallers> getMarshallers() { [] }
 
     abstract Class<T> getResource()
 
