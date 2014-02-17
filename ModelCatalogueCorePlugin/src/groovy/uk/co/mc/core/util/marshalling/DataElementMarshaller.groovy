@@ -15,7 +15,7 @@ class DataElementMarshaller implements MarshallersProvider {
         XML.registerObjectMarshaller(DataElement) { DataElement el, XML xml ->
             CatalogueElementMarshallers.buildXml(el, xml)
             xml.build {
-                code el.code,
+                code: el.code
                 versionNumber: el.versionNumber
                 extensions: el.extensions
 
