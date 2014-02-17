@@ -1,5 +1,8 @@
 package uk.co.mc.core
 
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
+
 
 /*
 * A data element is an atomic unit of data
@@ -50,5 +53,32 @@ class DataElement extends ExtendibleElement {
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, code: ${code}, version: ${version}, status: ${status}]"
     }
+
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof DataElement)) {
+            return false;
+        }
+        if (this.is(obj)) {
+            return true;
+        }
+        DataElement de = (DataElement) obj;
+        return new EqualsBuilder()
+                .append(name, de?.name)
+                .append(code, de?.code)
+                .append(versionNumber, de?.versionNumber)
+                .append(extensions, de?.extensions)
+                .isEquals()
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(name)
+                .append(code)
+                .append(versionNumber)
+                .append(extensions)
+                .toHashCode()
+    }
+
 
 }

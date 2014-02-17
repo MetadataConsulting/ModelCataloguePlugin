@@ -1,5 +1,8 @@
 package uk.co.mc.core
 
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
+
 class Mapping {
 
     ValueDomain source
@@ -44,6 +47,7 @@ class Mapping {
         source.removeFromOutgoingMappings(old)
         destination.removeFromIncomingMappings(old)
         old.delete()
+
         old
     }
 

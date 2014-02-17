@@ -123,7 +123,7 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
         ExtensionValue existing = findExtensionValueByName(key?.toString())
         if (!existing) return null
         element.removeFromExtensions(existing)
-        existing.delete()
-        existing.value
+        existing.delete(flush:true)
+        //existing.value
     }
 }

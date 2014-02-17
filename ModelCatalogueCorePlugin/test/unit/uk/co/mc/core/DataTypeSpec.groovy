@@ -12,7 +12,7 @@ class DataTypeSpec extends Specification{
 
 
     @Unroll
-    def "create a mew data type from #args validates to #validates" (){
+    def "create a new data type from #args validates to #validates" (){
 
         expect:
 
@@ -34,6 +34,21 @@ class DataTypeSpec extends Specification{
         false     | [:]              | 0
         false     | [name: "x" *256] | 0
         true      | [name: "String"] | 1
+
+    }
+
+
+    def "check  EqualsAndHashCode works"(){
+
+        when:
+        def a = new DataType(name:"test", description: "test concept description")
+        def b = new DataType(name:"test", description: "test concept description")
+        def c = new DataType(name:"test conceptasdsfdfsad", description: "test concept description")
+
+        then:
+        a.equals(b)
+        b.equals(a)
+        !a.equals(c)
 
     }
 

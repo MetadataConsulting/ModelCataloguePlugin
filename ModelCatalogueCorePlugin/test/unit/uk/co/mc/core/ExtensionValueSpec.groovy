@@ -50,4 +50,20 @@ class ExtensionValueSpec extends Specification {
         9 | true      | 1    | [name: "xxx", value: "x", element: de]
 
     }
+
+
+    def "check  EqualsAndHashCode works"(){
+
+        when:
+        def a = new ExtensionValue(name: "xxx", value: "x", element: de).save()
+        def b = new ExtensionValue(name: "xxx", value: "x", element: de).save()
+        def c = new ExtensionValue(name: "xxx1", value: "x", element: de).save()
+
+        then:
+
+        a.equals(b)
+        b.equals(a)
+        !a.equals(c)
+
+    }
 }

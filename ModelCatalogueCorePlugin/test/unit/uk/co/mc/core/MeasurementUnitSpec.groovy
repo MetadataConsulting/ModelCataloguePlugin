@@ -40,4 +40,19 @@ class MeasurementUnitSpec extends Specification {
         false     | 0    | [name: "Miles per Hour", description: "Number of miles the object achieves within one hour moving the current speed.", symbol: "x" * 101]
 
     }
+
+
+    def "check  EqualsAndHashCode works"(){
+
+        when:
+        def a = new MeasurementUnit(name: "MPH", description: "Miles per Hour")
+        def b = new MeasurementUnit(name:"MPH", description: "test meausre description")
+        def c = new MeasurementUnit(name:"KPH", description: "test measure description")
+
+        then:
+        a.equals(b)
+        b.equals(a)
+        !a.equals(c)
+
+    }
 }

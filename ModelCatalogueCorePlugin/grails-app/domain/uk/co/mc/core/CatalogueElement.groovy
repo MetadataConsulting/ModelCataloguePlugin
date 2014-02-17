@@ -1,6 +1,9 @@
 package uk.co.mc.core
 
+import com.sun.org.apache.xml.internal.resolver.Catalog
 import grails.util.GrailsNameUtils
+import org.apache.commons.lang.builder.EqualsBuilder
+import org.apache.commons.lang.builder.HashCodeBuilder
 
 
 /*
@@ -41,6 +44,18 @@ abstract class CatalogueElement {
         return [
                 (outgoingRelationships ?: []).collect { it.destination },
                 (incomingRelationships ?: []).collect { it.source }
+        ].flatten()
+    }
+
+    List getIncomingRelations() {
+        return [
+                (incomingRelationships ?: []).collect { it.source }
+        ].flatten()
+    }
+
+    List getOutgoingRelations() {
+        return [
+                (outgoingRelationships ?: []).collect { it.destination }
         ].flatten()
     }
 
@@ -88,6 +103,27 @@ abstract class CatalogueElement {
                 name: name,
                 link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
         ]
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof CatalogueElement)) {
+            return false;
+        }
+        if (this.is(obj)) {
+            return true;
+        }
+        CatalogueElement ce = (CatalogueElement) obj;
+        return new EqualsBuilder()
+                .append(name, ce?.name)
+                .append(id, ce?.id)
+                .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(name)
+                .append(id)
+                .toHashCode();
     }
 
 }

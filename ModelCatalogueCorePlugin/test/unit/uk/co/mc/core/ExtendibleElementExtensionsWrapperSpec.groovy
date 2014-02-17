@@ -77,7 +77,12 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         element.ext.size() == 2
 
         when:
+        def x =  element.ext
+        def xt = element.extensions
         element.ext.clear()
+        x =  element.ext
+        xt = element.extensions
+
 
         then:
         !element.extensions
