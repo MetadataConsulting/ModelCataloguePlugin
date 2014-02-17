@@ -30,7 +30,7 @@ class MeasurementUnit extends CatalogueElement {
         }
         MeasurementUnit ce = (MeasurementUnit) obj;
         return new EqualsBuilder()
-                .append(name, ce?.name)
+                .append(name, ce.name)
                 .isEquals();
     }
 

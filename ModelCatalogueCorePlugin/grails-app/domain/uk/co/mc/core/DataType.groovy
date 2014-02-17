@@ -30,7 +30,7 @@ class DataType extends CatalogueElement {
         }
         DataType ce = (DataType) obj;
         return new EqualsBuilder()
-                .append(name, ce?.name)
+                .append(name, ce.name)
                 .isEquals();
     }
 

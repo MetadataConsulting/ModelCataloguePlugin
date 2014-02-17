@@ -128,8 +128,8 @@ class EnumeratedType extends DataType {
         }
         EnumeratedType ce = (EnumeratedType) obj;
         return new EqualsBuilder()
-                .append(name, ce?.name)
-                .append(enumAsString, ce?.enumAsString)
+                .append(name, ce.name)
+                .append(enumAsString, ce.enumAsString)
                 .isEquals();
     }
 

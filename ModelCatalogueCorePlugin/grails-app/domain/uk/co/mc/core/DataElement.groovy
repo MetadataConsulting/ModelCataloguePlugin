@@ -64,10 +64,10 @@ class DataElement extends ExtendibleElement {
         }
         DataElement de = (DataElement) obj;
         return new EqualsBuilder()
-                .append(name, de?.name)
-                .append(code, de?.code)
-                .append(versionNumber, de?.versionNumber)
-                .append(extensions, de?.extensions)
+                .append(name, de.name)
+                .append(code, de.code)
+                .append(versionNumber, de.versionNumber)
+                .append(extensions, de.extensions)
                 .isEquals()
     }
 

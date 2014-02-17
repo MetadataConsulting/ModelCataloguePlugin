@@ -31,7 +31,7 @@ class ExtensionValue extends CatalogueElement {
         }
         ExtensionValue ce = (ExtensionValue) obj;
         return new EqualsBuilder()
-                .append(name, ce?.name)
+                .append(name, ce.name)
                 .isEquals();
     }
 

@@ -8,7 +8,7 @@ class DataElementMarshaller implements MarshallersProvider {
 
     void register() {
         JSON.registerObjectMarshaller(DataElement) { DataElement element ->
-            def ret = [code: element.code]
+            def ret = [code: element.code, versionNumber: element.versionNumber, extensions: element.extensions]
             ret.putAll(CatalogueElementMarshallers.prepareJsonMap(element))
             return ret
         }

@@ -114,8 +114,8 @@ abstract class CatalogueElement {
         }
         CatalogueElement ce = (CatalogueElement) obj;
         return new EqualsBuilder()
-                .append(name, ce?.name)
-                .append(id, ce?.id)
+                .append(name, ce.name)
+                .append(id, ce.id)
                 .isEquals();
     }
 

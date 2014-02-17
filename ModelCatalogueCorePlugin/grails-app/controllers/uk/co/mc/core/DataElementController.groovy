@@ -5,7 +5,7 @@ import grails.rest.RestfulController
 import grails.transaction.Transactional
 
 @Transactional(readOnly = true)
-class DataElementController extends RestfulController<DataElement>{
+class DataElementController extends ModelCatalogueController<DataElement>{
 
     static responseFormats = ['json', 'xml']
 
@@ -13,19 +13,6 @@ class DataElementController extends RestfulController<DataElement>{
         super(DataElement)
     }
 
-
-    @Override
-    def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
-        def list = listAllResources(params)
-        def model=  [
-                success:    true,
-                total:      DataElement.count(),
-                size:       list.size(),
-                list:       list
-        ]
-        respond model
-    }
 
     /**
 

@@ -24,8 +24,8 @@ class DataElementISpec extends IntegrationSpec{
 
     def cleanup(){
         auth1.delete()
-        auth1.delete()
-        auth1.delete()
+        auth2.delete()
+        auth3.delete()
 
     }
 

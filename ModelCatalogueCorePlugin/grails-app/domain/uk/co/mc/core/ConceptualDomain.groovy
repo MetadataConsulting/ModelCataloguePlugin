@@ -64,8 +64,8 @@ class ConceptualDomain extends CatalogueElement {
         }
         ConceptualDomain cd = (ConceptualDomain) obj;
         return new EqualsBuilder()
-                .append(name, cd?.name)
-                .append(id, cd?.id)
+                .append(name, cd.name)
+                .append(id, cd.id)
                 .isEquals();
     }
 

@@ -145,7 +145,7 @@ class RelationshipType {
         }
         RelationshipType de = (RelationshipType) obj;
         return new EqualsBuilder()
-                .append(name, de?.name)
+                .append(name, de.name)
                 .isEquals()
     }
 

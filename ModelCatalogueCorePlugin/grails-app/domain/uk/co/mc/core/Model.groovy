@@ -77,9 +77,9 @@ class Model extends ExtendibleElement  {
         }
         Model de = (Model) obj;
         return new EqualsBuilder()
-                .append(name, de?.name)
-                .append(versionNumber, de?.versionNumber)
-                .append(extensions, de?.extensions)
+                .append(name, de.name)
+                .append(versionNumber, de.versionNumber)
+                .append(extensions, de.extensions)
                 .isEquals()
     }
 

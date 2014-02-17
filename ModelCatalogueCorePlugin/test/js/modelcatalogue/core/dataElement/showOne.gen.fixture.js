@@ -7,30 +7,18 @@
 
     window.fixtures.dataElement.showOne = {
    "id": 1,
-   "outgoingRelationships": [{
-      "destinationPath": "/DataElement/1",
-      "relationshipType": {
-         "id": 1,
-         "sourceClass": "uk.co.mc.core.CatalogueElement",
-         "sourceToDestination": "relates to",
-         "destinationClass": "uk.co.mc.core.CatalogueElement",
-         "name": "relationship",
-         "rule": null,
-         "class": "uk.co.mc.core.RelationshipType",
-         "destinationToSource": "is related to"
-      },
-      "sourceName": "Author2",
-      "sourcePath": "/DataElement/2",
-      "destinationName": "Author"
-   }],
-   "status": {
-      "enumType": "uk.co.mc.core.PublishedElement$Status",
-      "name": "DRAFT"
+   "outgoingRelationships": {
+      "count": 1,
+      "link": "/dataElement/outgoing/1"
    },
    "description": "the DE_author of the book",
    "name": "Author",
-   "versionNumber": 0.1,
-   "incomingRelationships": []
+   "code": "XXX",
+   "incomingRelationships": {
+      "count": 0,
+      "link": "/dataElement/incoming/1"
+   },
+   "version": 0
 }
 
 })(window)
