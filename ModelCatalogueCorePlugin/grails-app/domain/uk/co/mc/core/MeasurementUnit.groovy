@@ -14,6 +14,7 @@ class MeasurementUnit extends CatalogueElement {
     String symbol
 
     static constraints = {
+        name unique:true
         symbol nullable: true, size: 1..100
     }
 
