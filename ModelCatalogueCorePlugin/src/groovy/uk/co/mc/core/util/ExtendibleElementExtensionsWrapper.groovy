@@ -38,7 +38,7 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
     @Override
     String get(Object key) {
         if (isEmpty()) return null
-        findExtensionValueByName(key)?.value
+        findExtensionValueByName(key)?.extensionValue
     }
 
     @Override
@@ -93,25 +93,25 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
 
     private ExtensionValue findExtensionValueByValue(key) {
         if (!key) return null
-        element.extensions?.find { it.value == key }
+        element.extensions?.find { it.extensionValue == key }
     }
 
     private Map<String, String> asReadOnlyMap() {
         Collections.unmodifiableMap(element.extensions.collectEntries {
-            [it.name, it.value]
+            [it.name, it.extensionValue]
         })
     }
 
     private String createOrUpdate(String name, String value) {
         ExtensionValue existing = findExtensionValueByName(name)
         if (existing) {
-            String old = existing.value
-            existing.value = value?.toString()
+            String old = existing.extensionValue
+            existing.extensionValue = value?.toString()
             existing.save()
             assert existing.errors.errorCount == 0
             return old
         }
-        ExtensionValue newOne = new ExtensionValue(name: name?.toString(), value: value?.toString(), element: element)
+        ExtensionValue newOne = new ExtensionValue(name: name?.toString(), extensionValue: value?.toString(), element: element)
         element.addToExtensions(newOne)
         newOne.save()
         assert newOne.errors.errorCount == 0
@@ -123,7 +123,7 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
         ExtensionValue existing = findExtensionValueByName(key?.toString())
         if (!existing) return null
         element.removeFromExtensions(existing)
-        existing.delete(flush:true)
-        //existing.value
+        existing.delete(flush: true)
+        //existing.extensionValue
     }
 }

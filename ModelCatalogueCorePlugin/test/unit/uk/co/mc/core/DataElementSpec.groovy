@@ -28,10 +28,10 @@ import spock.lang.Unroll
  *
  */
 @Mock([DataElement, ExtensionValue])
-class DataElementSpec extends Specification{
+class DataElementSpec extends Specification {
 
     @Unroll
-    def "create a new data element from #args validates to #validates"(){
+    def "create a new data element from #args validates to #validates"() {
 
         expect:
 
@@ -45,23 +45,23 @@ class DataElementSpec extends Specification{
 
         then:
 
-        !dataElementInstance.hasErrors()==validates
+        !dataElementInstance.hasErrors() == validates
         dataElementInstance.versionNumber == 0.1
         DataElement.list().size() == size
 
 
         where:
 
-        validates |   size    | args
-        false     |   0       | [name: "x" * 256, description: "this is the the result description"]
-        false     |   0       | [name: "x", description: "x"*2001]
-        false     |   0       | [name: "result1", description: "this is the the result description", code:"x" * 256]
-        true      |   1       | [name: "result1", description: "this is the the result description", code:"NHIC12341"]
+        validates | size | args
+        false     | 0    | [name: "x" * 256, description: "this is the the result description"]
+        false     | 0    | [name: "x", description: "x" * 2001]
+        false     | 0    | [name: "result1", description: "this is the the result description", code: "x" * 256]
+        true      | 1    | [name: "result1", description: "this is the the result description", code: "NHIC12341"]
 
     }
 
     @Unroll
-    def "create a new data element and extend it to include additional metadata"(){
+    def "create a new data element and extend it to include additional metadata"() {
 
         expect:
 
@@ -86,20 +86,20 @@ class DataElementSpec extends Specification{
     }
 
 
-    def "check  EqualsAndHashCode works"(){
+    def "check  EqualsAndHashCode works"() {
 
         when:
-        def a = new DataElement(name:"test concept", description: "test concept description", code:"xxx", versionNumber: 0.1)
-        def b = new DataElement(name:"test concept", description: "test concept description", code:"xxx", versionNumber: 0.1)
-        def c = new DataElement(name:"test conceptasdsfdfsad", description: "test concept description", versionNumber: 0.1)
-        def d = new DataElement(name:"test concept", description: "test concept description", code:"xxx", versionNumber: 0.1)
-        def e = new DataElement(name:"test concept", description: "test concept description", code:"xxx", versionNumber: 0.1)
-        def f = new DataElement(name:"test concept", description: "test concept description", code:"xxx", versionNumber: 0.2)
-        def ext = new ExtensionValue(name: "xxx", value: "x", element: d).save()
+        def a = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
+        def b = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
+        def c = new DataElement(name: "test conceptasdsfdfsad", description: "test concept description", versionNumber: 0.1)
+        def d = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
+        def e = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
+        def f = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.2)
+        def ext = new ExtensionValue(name: "xxx", extensionValue: "x", element: d).save()
         d.addToExtensions(ext)
         e.addToExtensions(ext)
-        assert(!d.save().hasErrors())
-        assert(!e.save().hasErrors())
+        assert (!d.save().hasErrors())
+        assert (!e.save().hasErrors())
 
         then:
         a.equals(b)
