@@ -150,7 +150,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
         def updated = response.json
 
-        recordResult 'saveOk', updated
+        recordResult 'updateOk', updated
 
         then:
         updated
@@ -178,7 +178,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
         def updated = response.json
 
-        recordResult 'saveErrors', updated
+        recordResult 'updateErrors', updated
 
         then:
         updated
