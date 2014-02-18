@@ -25,9 +25,9 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
         respond model
     }
 
-    def incoming(Serializable id, Integer max) {
+    def incoming(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        def element = queryForResource(id)
+        def element = queryForResource(params.id)
         if (!element) {
             notFound()
             return
@@ -44,9 +44,9 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
         respond model
     }
 
-    def outgoing(Serializable id, Integer max) {
+    def outgoing(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        def element = queryForResource(id)
+        def element = queryForResource(params.id)
         if (!element) {
             notFound()
             return

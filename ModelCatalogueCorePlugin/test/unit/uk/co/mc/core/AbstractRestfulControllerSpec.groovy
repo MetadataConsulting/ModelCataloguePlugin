@@ -170,7 +170,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def "Return 404 for non-existing item as JSON for incoming relationships"() {
         response.format = "json"
 
-        controller.incoming("1000000", 10)
+        params.id = "1000000"
+
+        controller.incoming(10)
 
         expect:
         response.text == ""
@@ -180,7 +182,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def "Return 404 for non-existing item as XML for incoming relationships"() {
         response.format = "xml"
 
-        controller.incoming("1000000", 10)
+        params.id = "1000000"
+
+        controller.incoming(10)
 
         expect:
         response.text == ""
@@ -190,7 +194,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def "Return 404 for non-existing item as JSON for outgoing relationships"() {
         response.format = "json"
 
-        controller.outgoing("1000000", 10)
+        params.id = "1000000"
+
+        controller.outgoing(10)
 
         expect:
         response.text == ""
@@ -200,7 +206,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def "Return 404 for non-existing item as XML for outgoing relationships"() {
         response.format = "xml"
 
-        controller.outgoing("1000000", 10)
+        params.id = "1000000"
+
+        controller.outgoing(10)
 
         expect:
         response.text == ""
