@@ -125,6 +125,67 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         created.errors.first().field == 'symbol'
     }
 
+    def "edit instance from JSON"() {
+        def instance = MeasurementUnit.findByName(celsius.name)
+
+        expect:
+        instance
+
+
+        when:
+        def newDescription = "measures temperature"
+        response.format = "json"
+        params.id = instance.id
+        request.json = [description: newDescription]
+
+        controller.update()
+
+        def updated = response.json
+
+        recordResult 'updateOk', updated
+
+        then:
+        updated
+        updated.id == instance.id
+        updated.name == instance.name
+        updated.description == newDescription
+        updated.symbol == instance.symbol
+
+
+    }
+
+    def "edit instance with bad JSON"() {
+        def instance = MeasurementUnit.findByName(celsius.name)
+
+        expect:
+        instance
+
+        when:
+        response.format = "json"
+        params.id = instance.id
+        request.json = [name: "g" * 256]
+
+        controller.update()
+
+        def updated = response.json
+
+        recordResult 'updateErrors', updated
+
+        then:
+        updated
+        updated.errors
+        updated.errors.size() == 1
+        updated.errors.first().field == 'name'
+
+
+    }
+
+    def "get outgoing relationships"() {
+        params.id = celsius.id
+        response.format = "json"
+
+    }
+
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
         [name: "Measurement Unit ${counter}", symbol: "MU${counter}"]

@@ -1,12 +1,6 @@
 package uk.co.mc.core
 
-import grails.converters.JSON
-import grails.rest.RestfulController
-import grails.transaction.Transactional
-
-class DataElementController extends CatalogueElementController<DataElement>{
-
-    static responseFormats = ['json', 'xml']
+class DataElementController extends CatalogueElementController<DataElement> {
 
     DataElementController() {
         super(DataElement)

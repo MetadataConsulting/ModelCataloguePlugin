@@ -150,7 +150,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
         def updated = response.json
 
-        recordResult 'saveOk', updated
+        recordResult 'updateOk', updated
 
         then:
         updated
@@ -178,7 +178,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
         def updated = response.json
 
-        recordResult 'saveErrors', updated
+        recordResult 'updateErrors', updated
 
         then:
         updated
@@ -188,6 +188,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
 
     }
+
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
         [name: "Author${counter}", description: "the DE_author of the book", code: "XXX${counter}"]

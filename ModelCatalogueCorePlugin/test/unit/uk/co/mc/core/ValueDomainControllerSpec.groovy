@@ -159,7 +159,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
         def updated = response.json
 
-        recordResult 'saveOk', updated
+        recordResult 'updateOk', updated
 
         then:
         updated
@@ -186,7 +186,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
         def updated = response.json
 
-        recordResult 'saveErrors', updated
+        recordResult 'updateErrors', updated
 
         then:
         updated
