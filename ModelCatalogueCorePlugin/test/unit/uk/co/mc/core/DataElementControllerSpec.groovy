@@ -20,10 +20,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         assert (author = new DataElement(name:"Author", description: "the DE_author of the book", code: "XXX").save())
         assert (author1 = new DataElement(name:"Author1", description: "the DE_author of the book", code: "XXX21").save())
         assert !Relationship.link(author, author1, type).hasErrors()
-
-
         author.ext.foo = "bar"
-
         def de = new DataElementMarshaller()
         de.register()
 
@@ -35,13 +32,9 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
     def "Show single existing item"() {
         response.format = "json"
-
         params.id = "${author.id}"
-
         controller.show()
-
         def json = response.json
-
         recordResult 'showOne', json
 
         expect:
@@ -61,11 +54,8 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
     def "Show single existing item xml"() {
         response.format = "xml"
-
         params.id = "${author.id}"
-
         controller.show()
-
         GPathResult xml = response.xml
 
         expect:
@@ -93,9 +83,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         when:
         response.format = "json"
         request.json = [name: "C13052", description: "a new data element", code: "NHIC123"]
-
         controller.save()
-
         def created = response.json
         def stored = DataElement.findByName("C13052")
 

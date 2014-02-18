@@ -98,7 +98,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
         when:
         response.format = "json"
-        request.json = [name: "air speed", description: "air speed of the plane", unitOfMeasure: [id: 1, name: "MPH"], dataType: [id: 1, name: "integer"]]
+        request.json = [name: "air speed", description: "air speed of the plane", unitOfMeasure: [id: 1], dataType: [id: 1]]
 
         controller.save()
 
@@ -150,10 +150,9 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
         when:
         def newDescription = "a new description for the ground speed"
-        def newUnit = [id: 2, name: "KPH"]
         response.format = "json"
         params.id = instance.id
-        request.json = [name:instance.name, description: newDescription,unitOfMeasure: newUnit]
+        request.json = [name:instance.name, description: newDescription,unitOfMeasure: [id: 2]]
 
         controller.update()
 

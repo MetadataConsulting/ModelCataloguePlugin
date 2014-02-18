@@ -8,7 +8,7 @@ class ConceptualDomainMarshaller implements MarshallersProvider {
 
     void register() {
         JSON.registerObjectMarshaller(ConceptualDomain) { ConceptualDomain element ->
-            def ret = []
+            Map ret = new HashMap()
             ret.putAll(CatalogueElementMarshallers.prepareJsonMap(element))
             return ret
         }
