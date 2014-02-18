@@ -28,7 +28,7 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         assert (newInstance = fixturesLoader.MU_milesPerHour)
         assert (badInstance = new MeasurementUnit(name: "", symbol: "km"))
         assert (propertiesToEdit = [symbol: "_C_"])
-        assert (propertiesToCheck = ['name','description', 'symbol'])
+        assert (propertiesToCheck = ['name', 'symbol'])
     }
 
     def cleanup() {

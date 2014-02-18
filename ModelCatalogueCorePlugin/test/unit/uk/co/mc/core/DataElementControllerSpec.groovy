@@ -31,7 +31,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         //configuration properties for abstract controller
         assert (newInstance = fixturesLoader.DE_author2)
         assert (badInstance = new DataElement(name: "", description:"asdf"))
-        assert (propertiesToEdit = [description: "edited description "])
+        assert (propertiesToEdit = [description: "edited description ", code: "AA123"])
         assert (propertiesToCheck = ['name','description', 'code'])
 
 

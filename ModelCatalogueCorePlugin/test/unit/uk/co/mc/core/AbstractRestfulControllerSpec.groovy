@@ -13,6 +13,7 @@ import uk.co.mc.core.fixtures.MockFixturesLoader
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 
 import javax.servlet.http.HttpServletResponse
+import java.lang.reflect.Array
 
 /**
  * Abstract parent for restful controllers specification.
@@ -164,6 +165,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
     def "Show single existing item as JSON"() {
+
+        when:
         response.format = "json"
 
         params.id = "${loadItem1.id}"
@@ -174,19 +177,18 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         recordResult 'showOne', json
 
-        expect:
+        then:
         json
         json.id == loadItem1.id
         json.version == loadItem1.version
         json.outgoingRelationships == [count: 1, link: "/${resourceName}/outgoing/${loadItem1.id}"]
         json.incomingRelationships == [count: 0, link: "/${resourceName}/incoming/${loadItem1.id}"]
 
-        propertiesToCheck.each{ property ->
-            json[property] == loadItem1.getProperty(property)
-        }
+        jsonPropertyCheck(json, loadItem1)
+
+
 
     }
-
 
 
 
@@ -234,9 +236,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         created
         created.id == stored.id
         created.version == stored.version
-        propertiesToCheck.each{ property ->
-            created[property] == newInstance.getProperty(property)
-        }
+        jsonPropertyCheck(created, newInstance)
     }
 
 
@@ -266,9 +266,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         created.@id == stored.id
         created.@version == stored.version
 
-        propertiesToCheck.each{ property ->
-            created.getProperty(property) == newInstance.getProperty(property)
-        }
+        xmlPropertyCheck(created, newInstance)
 
     }
 
@@ -292,9 +290,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         xml.incomingRelationships.@count == 0
         xml.incomingRelationships.@link == "/${resourceName}/incoming/${loadItem1.id}"
 
-        propertiesToCheck.each{ property ->
-            xml.getProperty(property) == newInstance.getProperty(property)
-        }
+        xmlPropertyCheck(xml, loadItem1)
 
     }
 
@@ -319,9 +315,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         updated
         updated.id == instance.id
         updated.version == instance.version
-        propertiesToCheck.each{ property ->
-            updated[property] == instance.getProperty(property)
-        }
+        jsonPropertyCheck(updated, loadItem1)
 
     }
 
@@ -349,10 +343,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         updated
         updated.@id == instance.id
         updated.@version == instance.version
-        propertiesToCheck.each{ property ->
-            updated[property] == loadItem1.getProperty(property)
-
-        }
+        xmlPropertyCheck(updated, loadItem1)
 
     }
 
@@ -545,6 +536,72 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
 
+    boolean jsonPropertyCheck(json, loadItem){
+
+        def errors = ""
+        for( int j = 0 ; ( j < propertiesToCheck.size() ) && errors.isEmpty() ; j++ ) {
+            def property = propertiesToCheck[j]
+            def subProperties = property.toString().replaceAll("\\@", "").split("\\.")
+            def jsonProp = json
+            def loadProp = loadItem
+
+            if(subProperties.size()>1){
+                for( int i = 0 ; (i < subProperties.size()) ; i++){
+                    def subProperty = subProperties[i]
+                    jsonProp = jsonProp[subProperty]
+                    loadProp = loadProp.getProperty(subProperty)
+                }
+            }else{
+                jsonProp = json[property]
+                loadProp = loadItem.getProperty(property)
+            }
+
+            if( jsonProp != loadProp){ errors = "error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}" }
+        }
+
+        if(errors!=""){ println(errors); return false}
+
+        return true
+
+    }
+
+    boolean xmlPropertyCheck(xml, loadItem){
+
+
+        def errors = ""
+        for( int j = 0 ; ( j < propertiesToCheck.size() ) && errors.isEmpty() ; j++ ) {
+            def property = propertiesToCheck[j]
+            def subProperties = property.toString().split("\\.")
+            def xmlProp = xml
+            def loadProp = loadItem
+
+            if(subProperties.size()>1){
+                for( int i = 0 ; (i < subProperties.size()) ; i++){
+                    def subProperty = subProperties[i]
+                    if(subProperty.contains("@")){
+                        xmlProp = xmlProp[subProperty]
+                        subProperty = subProperty.replaceAll("\\@", "")
+                        loadProp = loadProp.getProperty(subProperty)
+                    }else{
+                        xmlProp = xmlProp[subProperty]
+                        loadProp = loadProp.getProperty(subProperty)
+                    }
+
+
+                }
+            }else{
+                xmlProp = xml.getProperty(property)
+                loadProp = loadItem.getProperty(property)
+            }
+
+            if( xmlProp != loadProp){ errors = "error: property to check: ${propertiesToCheck[j]}  where xml:${xmlProp} !=  item:${loadProp}" }
+        }
+
+        if(errors!=""){ println(errors); return false}
+
+        return true
+
+    }
 
 
 

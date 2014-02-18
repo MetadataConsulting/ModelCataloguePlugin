@@ -1,5 +1,5 @@
 import uk.co.mc.core.DataType
 
 fixture{
-    DT_string(DataType, name: "string")
+    DT_string(DataType, name: "string", description: "a string")
 }

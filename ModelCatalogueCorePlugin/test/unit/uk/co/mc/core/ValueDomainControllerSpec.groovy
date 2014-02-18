@@ -33,7 +33,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         assert (newInstance = new ValueDomain(name: "ground_speed2", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer))
         assert (badInstance = new ValueDomain(name: "", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer))
         assert (propertiesToEdit = [description: "something different"])
-        assert (propertiesToCheck = ['name','description', 'unitOfMeasure', 'dataType'])
+        assert (propertiesToCheck = ['name','description', 'unitOfMeasure.name', 'dataType.@id'])
 
     }
 
