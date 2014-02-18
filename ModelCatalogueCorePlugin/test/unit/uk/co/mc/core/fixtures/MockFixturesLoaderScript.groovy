@@ -6,9 +6,14 @@ package uk.co.mc.core.fixtures
 abstract class MockFixturesLoaderScript extends Script {
 
     Map<String, Object> fixtures = [:]
+    MockFixturesLoader loader
 
-    static void fixture(Closure closure) {
+    void fixture(Closure closure) {
         closure()
+    }
+
+    void load(String... args) {
+        fixtures.putAll loader.load(args)
     }
 
     def methodMissing(String name, args) {
@@ -18,5 +23,11 @@ abstract class MockFixturesLoaderScript extends Script {
         fixtures[name] = cls.newInstance(objArgs)
     }
 
+    def propertyMissing(String name) {
+        fixtures[name]
+    }
 
+    def propertyMissing(String name, def arg) {
+        fixtures[name] = arg
+    }
 }
