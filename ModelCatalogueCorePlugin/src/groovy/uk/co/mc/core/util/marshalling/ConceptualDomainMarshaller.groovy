@@ -4,17 +4,21 @@ import grails.converters.JSON
 import grails.converters.XML
 import uk.co.mc.core.ConceptualDomain
 
-class ConceptualDomainMarshaller implements MarshallersProvider {
+class ConceptualDomainMarshaller extends CatalogueElementMarshallers {
 
-    void register() {
-        JSON.registerObjectMarshaller(ConceptualDomain) { ConceptualDomain element ->
-            Map ret = new HashMap()
-            ret.putAll(CatalogueElementMarshallers.prepareJsonMap(element))
-            return ret
-        }
-        XML.registerObjectMarshaller(ConceptualDomain) { ConceptualDomain el, XML xml ->
-            CatalogueElementMarshallers.buildXml(el, xml)
-            xml.build {}
+    ConceptualDomainMarshaller() {
+        super(ConceptualDomain)
+    }
+
+    protected Map<String, Object> prepareJsonMap(el) {
+        if (!el) return [:]
+        def ret = super.prepareJsonMap(el)
+        ret
+    }
+
+    protected void buildXml(el, XML xml) {
+        super.buildXml(el, xml)
+        xml.build {
         }
     }
 
