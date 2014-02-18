@@ -12,7 +12,7 @@ class DataElementMarshaller extends ExtendibleElementMarshallers {
     protected Map<String, Object> prepareJsonMap(element) {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
-        ret.putAll code: element.code, foo: "bar"
+        ret.putAll code: element.code
         return ret
     }
 

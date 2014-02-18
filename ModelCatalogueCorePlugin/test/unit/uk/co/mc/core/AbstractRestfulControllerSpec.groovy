@@ -1,6 +1,7 @@
 package uk.co.mc.core
 
 import grails.converters.JSON
+import grails.converters.XML
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import groovy.xml.XmlUtil
@@ -22,6 +23,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     private static final int DUMMY_ENTITIES_COUNT = 12
 
+    def newInstance, badInstance, propertiesToCheck, propertiesToEdit, loadItem2, loadItem1
 
     MockFixturesLoader fixturesLoader = new MockFixturesLoader()
 
@@ -96,6 +98,23 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
 
+    /**
+     * Records the given xml text as fixture returning the file created or updated.
+     *
+     * @param fixtureName name of the fixture variable and the file holding it as well
+     * @param xml xml string to be saved to the fixture
+     */
+    protected File recordInput(String fixtureName, String xml) {
+        File fixtureFile = new File("../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core/$controller.resourceName/${fixtureName}.gen.xml")
+        fixtureFile.parentFile.mkdirs()
+        fixtureFile.text = """${
+            XmlUtil.serialize(xml).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+        }"""
+        println "New xml file created at $fixtureFile.canonicalPath"
+        fixtureFile
+    }
+
+
     @Unroll
     def "list items test: #no where max: #max offset: #offset"() {
         fillWithDummyEntities()
@@ -141,6 +160,273 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     String getResourceName() {
         GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerSpec")
+    }
+
+
+    def "Show single existing item as JSON"() {
+        response.format = "json"
+
+        params.id = "${loadItem1.id}"
+
+        controller.show()
+
+        def json = response.json
+
+        recordResult 'showOne', json
+
+        expect:
+        json
+        json.id == loadItem1.id
+        json.version == loadItem1.version
+        json.outgoingRelationships == [count: 1, link: "/${resourceName}/outgoing/${loadItem1.id}"]
+        json.incomingRelationships == [count: 0, link: "/${resourceName}/incoming/${loadItem1.id}"]
+
+        propertiesToCheck.each{ property ->
+            json[property] == loadItem1.getProperty(property)
+        }
+
+    }
+
+
+
+
+
+    def "Do not create new instance from JSON with bad json name"() {
+        expect:
+        !resource.findByName("b"*256)
+
+        when:
+        response.format = "json"
+        request.json = badInstance.properties
+
+        controller.save()
+
+        def created = response.json
+        def stored = resource.findByName("b"*256)
+
+        recordResult 'saveErrors', created
+
+        then:
+        !stored
+        created
+        created.errors
+        created.errors.size() >= 1
+        created.errors.first().field == 'name'
+    }
+
+    def "Create new instance from JSON"() {
+        expect:
+        !resource.findByName(newInstance.name)
+
+        when:
+        response.format = "json"
+        request.json = newInstance.properties
+
+        controller.save()
+
+        def created = response.json
+        def stored = resource.findByName(newInstance.name)
+
+        recordResult 'saveOk', created
+
+        then:
+        stored
+        created
+        created.id == stored.id
+        created.version == stored.version
+        propertiesToCheck.each{ property ->
+            created[property] == newInstance.getProperty(property)
+        }
+    }
+
+
+    def "Create new instance from XML"() {
+        expect:
+        !resource.findByName(newInstance.name)
+
+        when:
+        response.format = "xml"
+
+        def xml =  newInstance.encodeAsXML()
+
+        recordInput("createInput", xml)
+
+        request.xml = xml
+
+        controller.save()
+
+        GPathResult created = response.xml
+        def stored = resource.findByName(newInstance.name)
+
+        recordResult("createOk", created)
+
+        then:
+        stored
+        created
+        created.@id == stored.id
+        created.@version == stored.version
+
+        propertiesToCheck.each{ property ->
+            created.getProperty(property) == newInstance.getProperty(property)
+        }
+
+    }
+
+
+    def "Show single existing item as XML"() {
+        response.format = "xml"
+
+        params.id = "${loadItem1.id}"
+
+        controller.show()
+
+        GPathResult xml = response.xml
+        recordResult("showOne", xml)
+
+        expect:
+        xml
+        xml.@id == loadItem1.id
+        xml.@version == loadItem1.version
+        xml.outgoingRelationships.@count == 1
+        xml.outgoingRelationships.@link == "/${resourceName}/outgoing/${loadItem1.id}"
+        xml.incomingRelationships.@count == 0
+        xml.incomingRelationships.@link == "/${resourceName}/incoming/${loadItem1.id}"
+
+        propertiesToCheck.each{ property ->
+            xml.getProperty(property) == newInstance.getProperty(property)
+        }
+
+    }
+
+    def "edit instance description from JSON"() {
+        def instance = resource.findByName(loadItem1.name)
+
+        expect:
+        instance
+
+        when:
+        response.format = "json"
+        params.id = instance.id
+        request.json = [description: "blah blah blah blah"]
+
+        controller.update()
+
+        def updated = response.json
+
+        recordResult 'updateOk', updated
+
+        then:
+        updated
+        updated.id == instance.id
+        updated.version == instance.version
+        propertiesToCheck.each{ property ->
+            updated[property] == instance.getProperty(property)
+        }
+
+    }
+
+    def "edit instance from XML"() {
+        def instance = resource.findByName(loadItem1.name)
+
+        expect:
+        instance
+
+        when:
+        response.format = "xml"
+        params.id = instance.id
+
+        loadItem1.properties = propertiesToEdit
+
+        request.xml = loadItem1.encodeAsXML()
+
+        controller.update()
+
+        GPathResult updated = response.xml
+
+        recordResult 'updateOk', updated
+
+        then:
+        updated
+        updated.@id == instance.id
+        updated.@version == instance.version
+        propertiesToCheck.each{ property ->
+            updated[property] == loadItem1.getProperty(property)
+
+        }
+
+    }
+
+    def "Do not create new instance with bad XML"() {
+        expect:
+        !resource.findByName("")
+
+        when:
+        response.format = "xml"
+        def xml = badInstance.encodeAsXML()
+        request.xml = xml
+
+        controller.save()
+
+        GPathResult created = response.xml
+        def stored = resource.findByName("")
+
+        recordResult 'saveErrors', created
+
+        then:
+        !stored
+        created
+        created == "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
+    }
+
+    def "edit instance with bad JSON name"() {
+        def instance = resource.findByName(loadItem1.name)
+
+        expect:
+        instance
+
+        when:
+        response.format = "json"
+        params.id = instance.id
+        request.json = [name: "g" * 256]
+
+        controller.update()
+
+        def updated = response.json
+
+        recordResult 'updateErrors', updated
+
+        then:
+        updated
+        updated.errors
+        updated.errors.size() == 1
+        updated.errors.first().field == 'name'
+
+
+    }
+
+    def "edit instance with bad XML"() {
+        def instance = resource.findByName(loadItem1.name)
+
+        expect:
+        instance
+
+        when:
+        response.format = "xml"
+        params.id = instance.id
+        request.xml = badInstance.encodeAsXML()
+
+        controller.update()
+
+        def updated = response.xml
+
+        recordResult 'updateErrors', updated
+
+        then:
+        updated
+        updated== "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
+
+
+
     }
 
     def "Return 404 for non-existing item as JSON"() {
@@ -257,6 +543,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         response.status == HttpServletResponse.SC_NO_CONTENT
         !resource.get(params.id)
     }
+
+
+
 
 
     def cleanup() {
