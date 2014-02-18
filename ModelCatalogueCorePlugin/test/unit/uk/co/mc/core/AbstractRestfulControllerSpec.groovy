@@ -28,7 +28,6 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def setup() {
         setupMimeTypes()
         marshallers.each { it.register() }
-        config.grails.converters.default.pretty.print = true
     }
 
     protected void setupMimeTypes() {
@@ -89,7 +88,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     protected File recordResult(String fixtureName, GPathResult xml) {
         File fixtureFile = new File("../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core/$controller.resourceName/${fixtureName}.gen.xml")
         fixtureFile.parentFile.mkdirs()
-        fixtureFile.text = """${XmlUtil.serialize(xml)}"""
+        fixtureFile.text = """${
+            XmlUtil.serialize(xml).replace("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+        }"""
         println "New xml file created at $fixtureFile.canonicalPath"
         fixtureFile
     }
