@@ -1,28 +1,30 @@
 package uk.co.mc.core.util.marshalling
 
-import grails.converters.JSON
 import grails.converters.XML
 import uk.co.mc.core.ValueDomain
 
-class ValueDomainMarshaller implements MarshallersProvider {
+class ValueDomainMarshaller extends CatalogueElementMarshallers {
 
-    void register() {
-        JSON.registerObjectMarshaller(ValueDomain) { ValueDomain element ->
-            def ret = [unitOfMeasure: element.unitOfMeasure, regexDef: element.regexDef, dataType: element.dataType]
-            ret.putAll(CatalogueElementMarshallers.prepareJsonMap(element))
-            return ret
-        }
-        XML.registerObjectMarshaller(ValueDomain) { ValueDomain el, XML xml ->
-            CatalogueElementMarshallers.buildXml(el, xml)
-            xml.build {
-                unitOfMeasure el.unitOfMeasure
-                regexDef el.regexDef
-                dataType el.dataType
-
-            }
-        }
+    ValueDomainMarshaller() {
+        super(ValueDomain)
     }
 
+    protected Map<String, Object> prepareJsonMap(el) {
+        if (!el) return [:]
+        def ret = super.prepareJsonMap(el)
+        ret.putAll unitOfMeasure: el.unitOfMeasure, regexDef: el.regexDef, dataType: el.dataType
+        ret
+    }
+
+    protected void buildXml(el, XML xml) {
+        super.buildXml(el, xml)
+        xml.build {
+            unitOfMeasure el.unitOfMeasure
+            regexDef el.regexDef
+            dataType el.dataType
+
+        }
+    }
 }
 
 

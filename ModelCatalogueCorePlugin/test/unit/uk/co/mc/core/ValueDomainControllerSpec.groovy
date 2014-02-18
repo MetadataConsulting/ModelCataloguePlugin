@@ -3,13 +3,14 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
+import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ValueDomainMarshaller
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ValueDomainController)
-@Mock([DataElement,ValueDomain, Relationship, RelationshipType, MeasurementUnit, DataType])
+@Mock([DataElement, ValueDomain, Relationship, RelationshipType, MeasurementUnit, DataType])
 class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
     def author, mph, integer, kph, groundSpeed1
@@ -20,7 +21,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         assert (mph = new MeasurementUnit(name: "MPH").save())
         assert (kph = new MeasurementUnit(name: "KPH").save())
         assert (integer = new DataType(name: "integer").save())
-        assert (author = new DataElement(name:"Author", description: "the DE_author of the book", code: "XXX").save())
+        assert (author = new DataElement(name: "Author", description: "the DE_author of the book", code: "XXX").save())
         assert (groundSpeed1 = new ValueDomain(name: "ground_speed1", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer).save())
         assert !Relationship.link(author, groundSpeed1, type).hasErrors()
 
@@ -61,8 +62,8 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         json.description == groundSpeed1.description
         json.unitOfMeasure.name == groundSpeed1.unitOfMeasure.name
         json.dataType.name == groundSpeed1.dataType.name
-        json.incomingRelationships == [count:1, link:"/valueDomain/incoming/${groundSpeed1.id}"]
-        json.outgoingRelationships == [count:0, link:"/valueDomain/outgoing/${groundSpeed1.id}"]
+        json.incomingRelationships == [count: 1, link: "/valueDomain/incoming/${groundSpeed1.id}"]
+        json.outgoingRelationships == [count: 0, link: "/valueDomain/outgoing/${groundSpeed1.id}"]
 
     }
 
@@ -91,14 +92,13 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
     }
 
 
-
     def "Create new instance from JSON"() {
         expect:
         !ValueDomain.findByName("air speed")
 
         when:
         response.format = "json"
-        request.json = [name: "air speed", description: "air speed of the plane", unitOfMeasure: [id: 1], dataType: [id: 1]]
+        request.json = [name: "air speed", description: "air speed of the plane", unitOfMeasure: [id: 1, name: "MPH"], dataType: [id: 1, name: "integer"]]
 
         controller.save()
 
@@ -124,7 +124,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
         when:
         response.format = "json"
-        request.json = [name: "badElement" , description: "test"]
+        request.json = [name: "badElement", description: "test"]
 
         controller.save()
 
@@ -150,9 +150,10 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
         when:
         def newDescription = "a new description for the ground speed"
+        def newUnit = [id: 2, name: "KPH"]
         response.format = "json"
         params.id = instance.id
-        request.json = [name:instance.name, description: newDescription,unitOfMeasure: [id: 2]]
+        request.json = [name: instance.name, description: newDescription, unitOfMeasure: newUnit]
 
         controller.update()
 
@@ -179,7 +180,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         when:
         response.format = "json"
         params.id = instance.id
-        request.json = [name:"g"*256]
+        request.json = [name: "g" * 256]
 
         controller.update()
 
@@ -206,7 +207,10 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         [name: "ground_speed_${counter}", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer]
     }
 
-
+    @Override
+    List<AbstractMarshallers> getMarshallers() {
+        [new ValueDomainMarshaller()]
+    }
 }
 
 

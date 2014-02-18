@@ -3,6 +3,7 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
+import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.DataElementMarshaller
 
 /**
@@ -17,12 +18,11 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
     def setup() {
         assert (type = new RelationshipType(name: "relationship", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "relates to", destinationToSource: "is related to").save())
-        assert (author = new DataElement(name:"Author", description: "the DE_author of the book", code: "XXX").save())
-        assert (author1 = new DataElement(name:"Author1", description: "the DE_author of the book", code: "XXX21").save())
+        assert (author = new DataElement(name: "Author", description: "the DE_author of the book", code: "XXX").save())
+        assert (author1 = new DataElement(name: "Author1", description: "the DE_author of the book", code: "XXX21").save())
         assert !Relationship.link(author, author1, type).hasErrors()
+
         author.ext.foo = "bar"
-        def de = new DataElementMarshaller()
-        de.register()
 
     }
 
@@ -32,9 +32,13 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
     def "Show single existing item"() {
         response.format = "json"
+
         params.id = "${author.id}"
+
         controller.show()
+
         def json = response.json
+
         recordResult 'showOne', json
 
         expect:
@@ -44,19 +48,23 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         json.name == author.name
         json.description == author.description
         json.code == author.code
-        json?.extensions[0].name == "foo"
-        json?.extensions[0].extensionValue == "bar"
+        json.ext == [foo: 'bar']
         json.outgoingRelationships == [count: 1, link: "/dataElement/outgoing/${author.id}"]
-        json.incomingRelationships == [count:0, link:"/dataElement/incoming/${author.id}"]
+        json.incomingRelationships == [count: 0, link: "/dataElement/incoming/${author.id}"]
 
     }
 
 
     def "Show single existing item xml"() {
         response.format = "xml"
+
         params.id = "${author.id}"
+
         controller.show()
+
         GPathResult xml = response.xml
+
+        recordResult("show-single", xml)
 
         expect:
         xml
@@ -65,15 +73,16 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         xml.name == author.name
         xml.description == author.description
         xml.code == author.code
-        //FIXME the marshaller for extension values will be rewritten and then this will change
-        xml.extensions[0]=="barfoo"
+        xml.extensions.size() == 1
+        xml.extensions.extension[0].@key == "foo"
+        xml.extensions.extension[0].text() == "bar"
+
         xml.outgoingRelationships.@link == "/dataElement/outgoing/${author.id}"
         xml.outgoingRelationships.@count == 1
         xml.incomingRelationships.@link == "/dataElement/incoming/${author.id}"
         xml.incomingRelationships.@count == 0
 
     }
-
 
 
     def "Create new instance from JSON"() {
@@ -83,7 +92,9 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         when:
         response.format = "json"
         request.json = [name: "C13052", description: "a new data element", code: "NHIC123"]
+
         controller.save()
+
         def created = response.json
         def stored = DataElement.findByName("C13052")
 
@@ -105,7 +116,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
 
         when:
         response.format = "json"
-        request.json = [name: "badElement" , description: "test", code: "x" * 256 ]
+        request.json = [name: "badElement", description: "test", code: "x" * 256]
 
         controller.save()
 
@@ -133,7 +144,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         def newDescription = "a new description for the book"
         response.format = "json"
         params.id = instance.id
-        request.json = [name:instance.name, description: newDescription]
+        request.json = [name: instance.name, description: newDescription]
 
         controller.update()
 
@@ -147,7 +158,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         updated.name == instance.name
         updated.description == newDescription
         updated.code == instance.code
-        updated.status.name == instance.status.toString()
+        updated.status == instance.status.toString()
 
 
     }
@@ -161,7 +172,7 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         when:
         response.format = "json"
         params.id = instance.id
-        request.json = [name:"g"*256]
+        request.json = [name: "g" * 256]
 
         controller.update()
 
@@ -186,6 +197,10 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         DataElement
     }
 
+    @Override
+    List<AbstractMarshallers> getMarshallers() {
+        [new DataElementMarshaller()]
+    }
 }
 
 

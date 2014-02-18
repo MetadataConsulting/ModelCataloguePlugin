@@ -92,6 +92,7 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
     }
 
     private Map<String, String> asReadOnlyMap() {
+        if (!element.extensions) return Collections.emptyMap()
         Collections.unmodifiableMap(element.extensions.collectEntries {
             [it.name, it.extensionValue]
         })
