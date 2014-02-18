@@ -13,9 +13,59 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
     @Override
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        def total = resource.count()
+        def total = countResources()
         def list = listAllResources(params)
-        def link = "/${resourceName}/?"
+        def model = [
+                success: true,
+                total: total,
+                size: list.size(),
+                list: list
+        ]
+        model.putAll nextAndPreviousLinks("/${resourceName}/", total)
+        respond model
+    }
+
+    def incoming(Serializable id, Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        def element = queryForResource(id)
+        if (!element) {
+            notFound()
+            return
+        }
+        int total = Relationship.countByDestination(element)
+        def list = Relationship.findAllByDestination(element, params)
+        def model = [
+                success: true,
+                total: total,
+                size: list.size(),
+                list: list
+        ]
+        model.putAll nextAndPreviousLinks("/${resourceName}/incoming/${id}", total)
+        respond model
+    }
+
+    def outgoing(Serializable id, Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        def element = queryForResource(id)
+        if (!element) {
+            notFound()
+            return
+        }
+        int total = Relationship.countBySource(element)
+        def list = Relationship.findAllBySource(element, params)
+        def model = [
+                success: true,
+                total: total,
+                size: list.size(),
+                list: list
+        ]
+        model.putAll nextAndPreviousLinks("/${resourceName}/outgoing/${id}", total)
+        respond model
+    }
+
+
+    private Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
+        def link = "${baseLink}?"
         if (params.max) {
             link += "max=${params.max}"
         }
@@ -38,15 +88,9 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
                 previousLink = "${link}&offset=${prev}"
             }
         }
-
-        def model = [
-                success: true,
-                total: total,
-                size: list.size(),
-                list: list,
+        [
                 next: nextLink,
-                previous: previousLink,
+                previous: previousLink
         ]
-        respond model
     }
 }

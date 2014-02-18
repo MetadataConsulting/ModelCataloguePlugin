@@ -110,7 +110,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         params.offset = offset
 
         controller.index()
-        Map json = response.json
+        JSONElement json = response.json
 
 
         recordResult "list${no}", json
@@ -165,6 +165,97 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         expect:
         response.text == ""
         response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as JSON for incoming relationships"() {
+        response.format = "json"
+
+        controller.incoming("1000000", 10)
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as XML for incoming relationships"() {
+        response.format = "xml"
+
+        controller.incoming("1000000", 10)
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as JSON for outgoing relationships"() {
+        response.format = "json"
+
+        controller.outgoing("1000000", 10)
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as XML for outgoing relationships"() {
+        response.format = "xml"
+
+        controller.outgoing("1000000", 10)
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as JSON on delete"() {
+        response.format = "json"
+
+        params.id = "1000000"
+
+        controller.delete()
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as XML on delete"() {
+        response.format = "xml"
+
+        params.id = "1000000"
+
+        controller.delete()
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+
+    def "Return 204 for existing item as JSON on delete"() {
+        response.format = "json"
+
+        params.id = "1"
+
+        controller.delete()
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NO_CONTENT
+        !resource.get(params.id)
+    }
+
+    def "Return 204 for existing item as XML on delete"() {
+        response.format = "xml"
+
+        params.id = "1"
+
+        controller.delete()
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NO_CONTENT
+        !resource.get(params.id)
     }
 
 
