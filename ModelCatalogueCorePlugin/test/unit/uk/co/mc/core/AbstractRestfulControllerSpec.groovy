@@ -147,15 +147,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
         where:
-
-        no | size | max | offset | total | next                                 | previous
-        1  | 10   | 10  | 0      | 12    | "/${resourceName}/?max=10&offset=10" | ""
-        2  | 5    | 5   | 0      | 12    | "/${resourceName}/?max=5&offset=5"   | ""
-        3  | 5    | 5   | 5      | 12    | "/${resourceName}/?max=5&offset=10"  | "/${resourceName}/?max=5&offset=0"
-        4  | 4    | 4   | 8      | 12    | ""                                   | "/${resourceName}/?max=4&offset=4"
-        5  | 2    | 10  | 10     | 12    | ""                                   | "/${resourceName}/?max=10&offset=0"
-        6  | 2    | 2   | 10     | 12    | ""                                   | "/${resourceName}/?max=2&offset=8"
-
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/")
     }
 
     String getResourceName() {
@@ -180,6 +172,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         json
         json.id == loadItem1.id
         json.version == loadItem1.version
+        json.elementType == loadItem1.class.name
+        json.elementTypeName == GrailsNameUtils.getNaturalName(loadItem1.class.simpleName)
         json.outgoingRelationships == [count: 1, link: "/${resourceName}/outgoing/${loadItem1.id}"]
         json.incomingRelationships == [count: 0, link: "/${resourceName}/incoming/${loadItem1.id}"]
 
@@ -284,6 +278,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         xml
         xml.@id == loadItem1.id
         xml.@version == loadItem1.version
+        xml.@elementType == loadItem1.class.name
+        xml.@elementTypeName == GrailsNameUtils.getNaturalName(loadItem1.class.simpleName)
         xml.outgoingRelationships.@count == 1
         xml.outgoingRelationships.@link == "/${resourceName}/outgoing/${loadItem1.id}"
         xml.incomingRelationships.@count == 0
@@ -453,12 +449,61 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         response.status == HttpServletResponse.SC_NOT_FOUND
     }
 
+
+    def "Return 404 for non-existing item as JSON for incoming relationships queried by type"() {
+        response.format = "json"
+
+        params.id = "1"
+
+        controller.incoming(10, "no-such-type")
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as XML for incoming relationships queried by type"() {
+        response.format = "xml"
+
+        params.id = "1"
+        controller.incoming(10, "no-such-type")
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as JSON for outgoing relationships queried by type"() {
+        response.format = "json"
+
+        params.id = "1"
+
+        controller.outgoing(10, "no-such-type")
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+    def "Return 404 for non-existing item as XML for outgoing relationships queried by type"() {
+        response.format = "xml"
+
+        params.id = "1"
+
+        controller.outgoing(10, "no-such-type")
+
+        expect:
+        response.text == ""
+        response.status == HttpServletResponse.SC_NOT_FOUND
+    }
+
+
     def "Return 404 for non-existing item as JSON for incoming relationships"() {
         response.format = "json"
 
         params.id = "1000000"
 
-        controller.incoming(10)
+        controller.incoming(10, null)
 
         expect:
         response.text == ""
@@ -470,7 +515,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         params.id = "1000000"
 
-        controller.incoming(10)
+        controller.incoming(10, null)
 
         expect:
         response.text == ""
@@ -482,7 +527,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         params.id = "1000000"
 
-        controller.outgoing(10)
+        controller.outgoing(10, null)
 
         expect:
         response.text == ""
@@ -494,7 +539,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         params.id = "1000000"
 
-        controller.outgoing(10)
+        controller.outgoing(10, null)
 
         expect:
         response.text == ""
@@ -622,6 +667,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
     void fillWithDummyEntities(int limit = DUMMY_ENTITIES_COUNT) {
+        if (limit <= resource.count()) return
         (resource.count() + 1).upto(limit) {
             assert resource.newInstance(getUniqueDummyConstructorArgs(it)).save()
         }
@@ -635,134 +681,276 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     abstract Class<T> getResource()
 
+
+    protected RelationshipType prepareTypeAndDummyEntities() {
+        fixturesLoader.load('relationshipTypes/RT_relationship')
+        fillWithDummyEntities(15)
+        RelationshipType relationshipType = fixturesLoader.RT_relationship.save() ?: RelationshipType.findByName('relationship')
+        assert relationshipType
+        relationshipType
+    }
+
+    protected linkRelationshipsToDummyEntities(String incomingOrOutgoing) {
+        mockDynamicFindersForRelationships()
+        RelationshipType relationshipType = prepareTypeAndDummyEntities()
+
+        def first = resource.get(1)
+        first."${incomingOrOutgoing}Relationships" = first."${incomingOrOutgoing}Relationships" ?: []
+
+        for (unit in resource.list()) {
+            if (unit != first) {
+                if (incomingOrOutgoing == "incoming") {
+                    assert !Relationship.link(unit, first, relationshipType).hasErrors()
+                } else {
+                    assert !Relationship.link(first, unit, relationshipType).hasErrors()
+                }
+                if (first."${incomingOrOutgoing}Relationships".size() == 12) {
+                    break
+                }
+            }
+        }
+
+        assert first."${incomingOrOutgoing}Relationships"
+        assert first."${incomingOrOutgoing}Relationships".size() == 12
+        first
+    }
+
+    private static void mockDynamicFindersForRelationships() {
+        Relationship.metaClass.static.findAllBySource = { CatalogueElement el, params = [:] ->
+            if (!el.outgoingRelationships) {
+                return []
+            }
+            el.outgoingRelationships.drop(params.offset as Integer ?: 0).take(params.max as Integer ?: 0)
+        }
+
+        Relationship.metaClass.static.findAllByDestination = { CatalogueElement el, params = [:] ->
+            if (!el.incomingRelationships) {
+                return []
+            }
+            el.incomingRelationships.drop(params.offset as Integer ?: 0).take(params.max as Integer ?: 0)
+        }
+        Relationship.metaClass.static.findAllBySourceAndRelationshipType = { CatalogueElement el, RelationshipType type, params = [:] ->
+            if (!el.outgoingRelationships) {
+                return []
+            }
+            el.outgoingRelationships.findAll {
+                it.relationshipType == type
+            }.drop(params.offset as Integer ?: 0).take(params.max as Integer ?: 0)
+        }
+
+        Relationship.metaClass.static.findAllByDestinationAndRelationshipType = { CatalogueElement el, RelationshipType type, params = [:] ->
+            if (!el.incomingRelationships) {
+                return []
+            }
+            el.incomingRelationships.findAll {
+                it.relationshipType == type
+            }.drop(params.offset as Integer ?: 0).take(params.max as Integer ?: 0)
+        }
+        Relationship.metaClass.static.countBySourceAndRelationshipType = { CatalogueElement el, RelationshipType type ->
+            if (!el.outgoingRelationships) {
+                return 0
+            }
+            el.outgoingRelationships.count { it.relationshipType == type }
+        }
+
+        Relationship.metaClass.static.countByDestinationAndRelationshipType = { CatalogueElement el, RelationshipType type ->
+            if (!el.incomingRelationships) {
+                return 0
+            }
+            el.incomingRelationships.count { it.relationshipType == type }
+        }
+    }
+
+    def checkJsonRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
+
+        response.format = "json"
+        params.offset = offset
+        params.id = first.id
+
+        controller."${incomingOrOutgoing}"(max, null)
+        JSONElement json = response.json
+
+
+        recordResult "${incomingOrOutgoing}${no}", json
+
+
+        assert json.success
+        assert json.total == total
+        assert json.size == size
+        assert json.list
+        assert json.list.size() == size
+        assert json.next == next
+        assert json.previous == previous
+
+        def item = json.list[0]
+
+
+        assert item.type
+        assert item.type.name == "relationship"
+        assert item.type.sourceToDestination == "relates to"
+        assert item.direction == incomingOrOutgoing == "incoming" ? "destinationToSource" : "sourceToDestination"
+        assert item.type.destinationToSource == "is relationship of"
+        assert item.relation
+        assert item.relation.id
+        assert item.relation.elementType
+
+
+        def relation = Class.forName(item.relation.elementType).get(item.relation.id)
+
+        assert item.relation.name == relation.name
+        assert item.relation.id == relation.id
+    }
+
+    def checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
+
+        response.format = "json"
+        params.offset = offset
+        params.id = first.id
+
+        controller."${incomingOrOutgoing}"(max, "relationship")
+        JSONElement json = response.json
+
+
+        recordResult "${incomingOrOutgoing}WithRightType${no}", json
+
+
+        assert json.success
+        assert json.total == total
+        assert json.size == size
+        assert json.list
+        assert json.list.size() == size
+        assert json.next == next.replace("/1", "/1/relationship")
+        assert json.previous == previous.replace("/1", "/1/relationship")
+
+        def item = json.list[0]
+
+
+        assert item.type
+        assert item.type.name == "relationship"
+        assert item.type.sourceToDestination == "relates to"
+        assert item.direction == incomingOrOutgoing == "incoming" ? "destinationToSource" : "sourceToDestination"
+        assert item.type.destinationToSource == "is relationship of"
+        assert item.relation
+        assert item.relation.id
+        assert item.relation.elementType
+
+
+        def relation = Class.forName(item.relation.elementType).get(item.relation.id)
+
+        assert item.relation.name == relation.name
+        assert item.relation.id == relation.id
+    }
+
+    def checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
+
+        response.format = "json"
+        params.offset = offset
+        params.id = first.id
+
+        RelationshipType type2 = new RelationshipType(name: "xyz", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "xyz", destinationToSource: "zyx")
+        assert type2.save()
+
+        controller."${incomingOrOutgoing}"(max, type2.name)
+        JSONObject json = response.json
+
+
+        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", json
+
+
+        assert json.success
+        assert !json.list
+        assert json.total == 0
+        assert json.size == 0
+
+        type2.delete()
+    }
+
+    def getPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4"],
+                [5, 2, 10, 10, 12, "", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8"]
+        ]
+    }
+
     // Following needs to be copied to subclasses. Grails mocking framework is not yet capable of handling such
     // level of abstraction
 
     /*
-
     @Unroll
     def "get outgoing relationships pagination: #no where max: #max offset: #offset"() {
-        fixturesLoader.load('relationshipTypes/RT_relationship')
-        RelationshipType relationshipType = fixturesLoader.RT_relationship.save() ?: RelationshipType.findByName('relationship')
-        fillWithDummyEntities(15)
-
-        expect:
-        relationshipType
-
-        when:
-
-        def first = resource.get(1)
-
-        first.outgoingRelationships = first.outgoingRelationships ?: []
-
-        for (unit in resource.list()) {
-            if (unit != first) {
-                assert !Relationship.link(first, unit, relationshipType).hasErrors()
-                if (first.outgoingRelationships.size() == 12) {
-                    break
-                }
-            }
-        }
-
-        then:
-        first.outgoingRelationships
-        first.outgoingRelationships.size() == 12
-
-        when:
-        response.format = "json"
-        params.offset = offset
-        params.id = first.id
-
-        controller.outgoing(max)
-        JSONElement json = response.json
-
-
-        recordResult "outgoing${no}", json
-
-        then:
-
-        json.success
-        json.total == total
-        json.size == size
-        json.list
-        json.list.size() == size
-        json.next == next
-        json.previous == previous
+        checkJsonRelations(no, size, max, offset, total, next, previous, "outgoing")
 
         cleanup:
-        relationshipType?.delete()
+        RelationshipType.findByName("relationship")?.delete()
 
         where:
-        no | size | max | offset | total | next                                                       | previous
-        1  | 10   | 10  | 0      | 12    | "/${resourceName}/outgoing/1?max=10&offset=10" | ""
-        2  | 5    | 5   | 0      | 12    | "/${resourceName}/outgoing/1?max=5&offset=5"   | ""
-        3  | 5    | 5   | 5      | 12    | "/${resourceName}/outgoing/1?max=5&offset=10"  | "/${resourceName}/outgoing/1?max=5&offset=0"
-        4  | 4    | 4   | 8      | 12    | ""                                             | "/${resourceName}/outgoing/1?max=4&offset=4"
-        5  | 2    | 10  | 10     | 12    | ""                                             | "/${resourceName}/outgoing/1?max=10&offset=0"
-        6  | 2    | 2   | 10     | 12    | ""                                             | "/${resourceName}/outgoing/1?max=2&offset=8"
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
     }
 
     @Unroll
     def "get incoming relationships pagination: #no where max: #max offset: #offset"() {
-        fixturesLoader.load('relationshipTypes/RT_relationship')
-        RelationshipType relationshipType = fixturesLoader.RT_relationship.save() ?: RelationshipType.findByName('relationship')
-        fillWithDummyEntities(15)
-
-        expect:
-        relationshipType
-
-        when:
-        def first = resource.get(1)
-        first.incomingRelationships = first.incomingRelationships ?: []
-
-        for (unit in  resource.list()) {
-            if (unit != first) {
-                assert !Relationship.link(unit, first, relationshipType).hasErrors()
-                if (first.incomingRelationships.size() == 12) {
-                    break
-                }
-            }
-        }
-
-        then:
-        first.incomingRelationships
-        first.incomingRelationships.size() == 12
-
-        when:
-        response.format = "json"
-        params.offset = offset
-        params.id = first.id
-
-        controller.incoming(max)
-        JSONElement json = response.json
-
-
-        recordResult "incoming${no}", json
-
-        then:
-
-        json.success
-        json.total == total
-        json.size == size
-        json.list
-        json.list.size() == size
-        json.next == next
-        json.previous == previous
+        checkJsonRelations(no, size, max, offset, total, next, previous, "incoming")
 
         cleanup:
-        relationshipType?.delete()
+        RelationshipType.findByName("relationship")?.delete()
 
         where:
-        no | size | max | offset | total | next                                                       | previous
-        1  | 10   | 10  | 0      | 12    | "/${resourceName}/incoming/1?max=10&offset=10" | ""
-        2  | 5    | 5   | 0      | 12    | "/${resourceName}/incoming/1?max=5&offset=5"   | ""
-        3  | 5    | 5   | 5      | 12    | "/${resourceName}/incoming/1?max=5&offset=10"  | "/${resourceName}/incoming/1?max=5&offset=0"
-        4  | 4    | 4   | 8      | 12    | ""                                             | "/${resourceName}/incoming/1?max=4&offset=4"
-        5  | 2    | 10  | 10     | 12    | ""                                             | "/${resourceName}/incoming/1?max=10&offset=0"
-        6  | 2    | 2   | 10     | 12    | ""                                             | "/${resourceName}/incoming/1?max=2&offset=8"
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
     }
 
 
+    @Unroll
+    def "get outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+    }
+
+    @Unroll
+    def "get incoming relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+    }
+
+
+    @Unroll
+    def "get outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+    }
+
+    @Unroll
+    def "get incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+    }
      */
 
 }

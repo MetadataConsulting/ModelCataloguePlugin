@@ -25,41 +25,57 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
         respond model
     }
 
-    def incoming(Integer max) {
+    def incoming(Integer max, String typeParam) {
         params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
             return
         }
-        int total = element.incomingRelationships.size()
-        def list = element.incomingRelationships.drop(params.int('offset') ?: 0).take(params.max)
+        RelationshipType type = typeParam ? RelationshipType.findByName(typeParam) : null
+        if (typeParam && !type) {
+            notFound()
+            return
+        }
+        int total = type ? Relationship.countByDestinationAndRelationshipType(element, type) : (element.incomingRelationships?.size() ?: 0)
+        def list = type ? Relationship.findAllByDestinationAndRelationshipType(element, type, params) : Relationship.findAllByDestination(element, params)
         def model = [
                 success: true,
                 total: total,
                 size: list.size(),
-                list: list
+                list: list.collect {
+                    [id: it.id, type: it.relationshipType, relation: it.source, direction: "destinationToSource"]
+                }
         ]
-        model.putAll nextAndPreviousLinks("/${resourceName}/incoming/${params.id}", total)
+        String baseLink = "/${resourceName}/incoming/${params.id}" + (typeParam ? "/${typeParam}" : "")
+        model.putAll nextAndPreviousLinks(baseLink, total)
         respond model
     }
 
-    def outgoing(Integer max) {
+    def outgoing(Integer max, String typeParam) {
         params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
             return
         }
-        int total = element.outgoingRelationships.size()
-        def list = element.outgoingRelationships.drop(params.int('offset') ?: 0).take(params.max)
+        RelationshipType type = typeParam ? RelationshipType.findByName(typeParam) : null
+        if (typeParam && !type) {
+            notFound()
+            return
+        }
+        int total = type ? Relationship.countBySourceAndRelationshipType(element, type) : (element.outgoingRelationships.size() ?: 0)
+        def list = type ? Relationship.findAllBySourceAndRelationshipType(element, type, params) : Relationship.findAllBySource(element, params)
         def model = [
                 success: true,
                 total: total,
                 size: list.size(),
-                list: list
+                list: list.collect {
+                    [id: it.id, type: it.relationshipType, relation: it.destination, direction: "sourceToDestination"]
+                }
         ]
-        model.putAll nextAndPreviousLinks("/${resourceName}/outgoing/${params.id}", total)
+        String baseLink = "/${resourceName}/outgoing/${params.id}" + (typeParam ? "/${typeParam}" : "")
+        model.putAll nextAndPreviousLinks(baseLink, total)
         respond model
     }
 
