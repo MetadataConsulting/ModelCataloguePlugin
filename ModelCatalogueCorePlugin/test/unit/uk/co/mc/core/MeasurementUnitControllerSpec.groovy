@@ -37,9 +37,10 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         relationshipType.delete()
     }
 
+    // -- begin copy and pasted
 
     @Unroll
-    def "get outgoing relationships pagination: #no where max: #max offset: #offset"() {
+    def "get json outgoing relationships pagination: #no where max: #max offset: #offset"() {
         checkJsonRelations(no, size, max, offset, total, next, previous, "outgoing")
 
         cleanup:
@@ -50,7 +51,7 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
     }
 
     @Unroll
-    def "get incoming relationships pagination: #no where max: #max offset: #offset"() {
+    def "get json incoming relationships pagination: #no where max: #max offset: #offset"() {
         checkJsonRelations(no, size, max, offset, total, next, previous, "incoming")
 
         cleanup:
@@ -62,31 +63,53 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
 
 
     @Unroll
-    def "get outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
+    def "get json outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/relationship")
     }
 
     @Unroll
-    def "get incoming relationships pagination with type: #no where max: #max offset: #offset"() {
+    def "get json incoming relationships pagination with type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/relationship")
     }
 
 
     @Unroll
-    def "get outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+    def "get json outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/xyz")
+    }
+
+    @Unroll
+    def "get json incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/xyz")
+    }
+
+    @Unroll
+    def "get xml outgoing relationships pagination: #no where max: #max offset: #offset"() {
+        checkXmlRelations(no, size, max, offset, total, next, previous, "outgoing")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
@@ -96,8 +119,8 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
     }
 
     @Unroll
-    def "get incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
-        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+    def "get xml incoming relationships pagination: #no where max: #max offset: #offset"() {
+        checkXmlRelations(no, size, max, offset, total, next, previous, "incoming")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
@@ -105,6 +128,54 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         where:
         [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
     }
+
+
+    @Unroll
+    def "get xml outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/relationship")
+    }
+
+    @Unroll
+    def "get xml incoming relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/relationship")
+    }
+
+
+    @Unroll
+    def "get xml outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/xyz")
+    }
+
+    @Unroll
+    def "get xml incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/xyz")
+    }
+
+    // -- end copy and pasted
 
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {

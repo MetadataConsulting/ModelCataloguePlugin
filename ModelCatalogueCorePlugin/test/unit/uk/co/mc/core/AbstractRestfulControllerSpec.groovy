@@ -11,6 +11,8 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import uk.co.mc.core.fixtures.MockFixturesLoader
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
+import uk.co.mc.core.util.marshalling.RelationshipMarshallers
+import uk.co.mc.core.util.marshalling.RelationshipsMarshaller
 
 import javax.servlet.http.HttpServletResponse
 
@@ -29,7 +31,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     def setup() {
         setupMimeTypes()
-        marshallers.each { it.register() }
+        [marshallers, [new RelationshipMarshallers(), new RelationshipsMarshaller()]].flatten().each { it.register() }
     }
 
     protected void setupMimeTypes() {
@@ -97,7 +99,6 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         fixtureFile
     }
 
-
     /**
      * Records the given xml text as fixture returning the file created or updated.
      *
@@ -113,7 +114,6 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         println "New xml file created at $fixtureFile.canonicalPath"
         fixtureFile
     }
-
 
     /**
      * Records the given xml text as fixture returning the file created or updated.
@@ -207,15 +207,12 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         jsonPropertyCheck(json, loadItem1)
 
 
-
     }
-
-
 
 
     def "Do not create new instance from JSON with bad json name"() {
         expect:
-        !resource.findByName("b"*256)
+        !resource.findByName("b" * 256)
 
         when:
         response.format = "json"
@@ -224,7 +221,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         controller.save()
 
         JSONElement created = response.json
-        def stored = resource.findByName("b"*256)
+        def stored = resource.findByName("b" * 256)
 
         recordResult 'saveErrors', created
 
@@ -273,7 +270,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         when:
         response.format = "xml"
 
-        def xml =  newInstance.encodeAsXML()
+        def xml = newInstance.encodeAsXML()
 
         recordInputXML("createInput", xml)
 
@@ -455,8 +452,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         then:
         updated
-        updated== "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
-
+        updated == "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
 
 
     }
@@ -634,7 +630,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
 
-    boolean jsonPropertyCheck(json, loadItem){
+    boolean jsonPropertyCheck(json, loadItem) {
         for (int j = 0; (j < propertiesToCheck.size()); j++) {
             def property = propertiesToCheck[j]
             property = property.toString().replaceAll("\\@", "")
@@ -642,21 +638,21 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
             def jsonProp = json
             def loadProp = loadItem
 
-            if(subProperties.size()>1){
-                for( int i = 0 ; (i < subProperties.size()) ; i++){
+            if (subProperties.size() > 1) {
+                for (int i = 0; (i < subProperties.size()); i++) {
                     def subProperty = subProperties[i]
                     jsonProp = jsonProp[subProperty]
                     loadProp = loadProp.getProperty(subProperty)
                 }
-            }else{
+            } else {
                 jsonProp = json[property]
                 loadProp = loadItem.getProperty(property)
             }
 
             def jsonMap = JSON.parse(jsonProp.toString())
-            if(jsonMap){
+            if (jsonMap) {
                 jsonProp = JSON.parse(jsonProp.toString())
-            }else{
+            } else {
                 jsonProp = jsonProp.toString()
                 loadProp = loadProp.toString()
             }
@@ -671,27 +667,27 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
 
-    boolean xmlPropertyCheck(xml, loadItem){
+    boolean xmlPropertyCheck(xml, loadItem) {
         for (int j = 0; (j < propertiesToCheck.size()); j++) {
             def property = propertiesToCheck[j]
             def subProperties = property.toString().split("\\.")
             def xmlProp = xml
             def loadProp = loadItem
 
-            if(subProperties.size()>1){
-                for( int i = 0 ; (i < subProperties.size()) ; i++){
+            if (subProperties.size() > 1) {
+                for (int i = 0; (i < subProperties.size()); i++) {
                     def subProperty = subProperties[i]
-                    if(subProperty.contains("@")){
+                    if (subProperty.contains("@")) {
                         xmlProp = xmlProp[subProperty]
                         subProperty = subProperty.replaceAll("\\@", "")
                         loadProp = loadProp.getProperty(subProperty)
-                    }else{
+                    } else {
                         xmlProp = xmlProp[subProperty]
                         loadProp = loadProp.getProperty(subProperty)
                     }
                 }
-            }else{
-                xmlProp = (xml[property].toString())?:null
+            } else {
+                xmlProp = (xml[property].toString()) ?: null
                 loadProp = loadItem.getProperty(property.toString().replaceAll("\\@", ""))
             }
 
@@ -702,7 +698,6 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         return true
 
     }
-
 
 
     def cleanup() {
@@ -804,14 +799,14 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         }
     }
 
-    def checkJsonRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+    private checkJsonRelationsInternal(typeParam, no, size, max, offset, total, next, previous, incomingOrOutgoing) {
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
 
         response.format = "json"
         params.offset = offset
         params.id = first.id
 
-        controller."${incomingOrOutgoing}"(max, null)
+        controller."${incomingOrOutgoing}"(max, typeParam)
         JSONElement json = response.json
 
 
@@ -845,45 +840,12 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert item.relation.id == relation.id
     }
 
+    def checkJsonRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        checkJsonRelationsInternal(null, no, size, max, offset, total, next, previous, incomingOrOutgoing)
+    }
+
     def checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
-
-        response.format = "json"
-        params.offset = offset
-        params.id = first.id
-
-        controller."${incomingOrOutgoing}"(max, "relationship")
-        JSONElement json = response.json
-
-
-        recordResult "${incomingOrOutgoing}WithRightType${no}", json
-
-
-        assert json.success
-        assert json.total == total
-        assert json.size == size
-        assert json.list
-        assert json.list.size() == size
-        assert json.next == next.replace("/1", "/1/relationship")
-        assert json.previous == previous.replace("/1", "/1/relationship")
-
-        def item = json.list[0]
-
-
-        assert item.type
-        assert item.type.name == "relationship"
-        assert item.type.sourceToDestination == "relates to"
-        assert item.direction == incomingOrOutgoing == "incoming" ? "destinationToSource" : "sourceToDestination"
-        assert item.type.destinationToSource == "is relationship of"
-        assert item.relation
-        assert item.relation.id
-        assert item.relation.elementType
-
-
-        def relation = Class.forName(item.relation.elementType).get(item.relation.id)
-
-        assert item.relation.name == relation.name
-        assert item.relation.id == relation.id
+        checkJsonRelationsInternal("relationship", no, size, max, offset, total, next, previous, incomingOrOutgoing)
     }
 
     def checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
@@ -911,7 +873,83 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         type2.delete()
     }
 
-    def getPaginationParameters(String baseLink) {
+    def checkXmlRelationsInternal(typeParam, no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
+
+        response.format = "xml"
+        params.offset = offset
+        params.id = first.id
+
+        controller."${incomingOrOutgoing}"(max, typeParam)
+        GPathResult result = response.xml
+
+
+        recordResult "${incomingOrOutgoing}${no}", result
+
+
+        assert result
+        assert result.@success.text() == "true"
+        assert result.@total.text() == "${total}"
+        assert result.@size.text() == "${size}"
+        assert result.relationship
+        assert result.relationship.size() == size
+        assert result.next.text() == next
+        assert result.previous.text() == previous
+
+        def item = result.relationship[0]
+
+
+        assert item.type
+        assert item.type.name == "relationship"
+        assert item.type.sourceToDestination == "relates to"
+        assert item.direction == incomingOrOutgoing == "incoming" ? "destinationToSource" : "sourceToDestination"
+        assert item.type.destinationToSource == "is relationship of"
+        assert item.relation
+        assert item.relation.@id
+        assert item.relation.@elementType
+
+
+        def relation = Class.forName(item.relation.@elementType.text()).get(item.relation.@id.text() as Long)
+
+        assert item.relation.name == relation.name
+        assert item.relation.@id == "${relation.id}"
+    }
+
+    def checkXmlRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        checkXmlRelationsInternal(null, no, size, max, offset, total, next, previous, incomingOrOutgoing)
+    }
+
+    def checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        checkXmlRelationsInternal("relationship", no, size, max, offset, total, next, previous, incomingOrOutgoing)
+    }
+
+    def checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
+
+        response.format = "xml"
+        params.offset = offset
+        params.id = first.id
+
+        RelationshipType type2 = new RelationshipType(name: "xyz", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "xyz", destinationToSource: "zyx")
+        assert type2.save()
+
+        controller."${incomingOrOutgoing}"(max, type2.name)
+        GPathResult result = response.xml
+
+
+        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", result
+
+
+        assert result
+        assert result.@success.text() == "true"
+        assert result.@total.text() == "0"
+        assert result.@size.text() == "0"
+        assert result.relationship.isEmpty()
+
+        type2.delete()
+    }
+
+    protected static getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
                 [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
@@ -927,8 +965,10 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     // level of abstraction
 
     /*
+     // -- begin copy and pasted
+
     @Unroll
-    def "get outgoing relationships pagination: #no where max: #max offset: #offset"() {
+    def "get json outgoing relationships pagination: #no where max: #max offset: #offset"() {
         checkJsonRelations(no, size, max, offset, total, next, previous, "outgoing")
 
         cleanup:
@@ -939,7 +979,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
     @Unroll
-    def "get incoming relationships pagination: #no where max: #max offset: #offset"() {
+    def "get json incoming relationships pagination: #no where max: #max offset: #offset"() {
         checkJsonRelations(no, size, max, offset, total, next, previous, "incoming")
 
         cleanup:
@@ -951,31 +991,53 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
     @Unroll
-    def "get outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
+    def "get json outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/relationship")
     }
 
     @Unroll
-    def "get incoming relationships pagination with type: #no where max: #max offset: #offset"() {
+    def "get json incoming relationships pagination with type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/relationship")
     }
 
 
     @Unroll
-    def "get outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+    def "get json outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/xyz")
+    }
+
+    @Unroll
+    def "get json incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/xyz")
+    }
+
+    @Unroll
+    def "get xml outgoing relationships pagination: #no where max: #max offset: #offset"() {
+        checkXmlRelations(no, size, max, offset, total, next, previous, "outgoing")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
@@ -985,8 +1047,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
     @Unroll
-    def "get incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
-        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+    def "get xml incoming relationships pagination: #no where max: #max offset: #offset"() {
+        checkXmlRelations(no, size, max, offset, total, next, previous, "incoming")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
@@ -994,6 +1056,54 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         where:
         [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
     }
+
+
+    @Unroll
+    def "get xml outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/relationship")
+    }
+
+    @Unroll
+    def "get xml incoming relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/relationship")
+    }
+
+
+    @Unroll
+    def "get xml outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/xyz")
+    }
+
+    @Unroll
+    def "get xml incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/xyz")
+    }
+
+    // -- end copy and pasted
      */
 
 }
