@@ -27,39 +27,39 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
 
     def incoming(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        def element = queryForResource(params.id)
+        CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
             return
         }
-        int total = Relationship.countByDestination(element)
-        def list = Relationship.findAllByDestination(element, params)
+        int total = element.incomingRelationships.size()
+        def list = element.incomingRelationships.drop(params.int('offset') ?: 0).take(params.max)
         def model = [
                 success: true,
                 total: total,
                 size: list.size(),
                 list: list
         ]
-        model.putAll nextAndPreviousLinks("/${resourceName}/incoming/${id}", total)
+        model.putAll nextAndPreviousLinks("/${resourceName}/incoming/${params.id}", total)
         respond model
     }
 
     def outgoing(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        def element = queryForResource(params.id)
+        CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
             return
         }
-        int total = Relationship.countBySource(element)
-        def list = Relationship.findAllBySource(element, params)
+        int total = element.outgoingRelationships.size()
+        def list = element.outgoingRelationships.drop(params.int('offset') ?: 0).take(params.max)
         def model = [
                 success: true,
                 total: total,
                 size: list.size(),
                 list: list
         ]
-        model.putAll nextAndPreviousLinks("/${resourceName}/outgoing/${id}", total)
+        model.putAll nextAndPreviousLinks("/${resourceName}/outgoing/${params.id}", total)
         respond model
     }
 

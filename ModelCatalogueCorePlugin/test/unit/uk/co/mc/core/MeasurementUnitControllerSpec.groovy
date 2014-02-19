@@ -3,6 +3,9 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
+import org.codehaus.groovy.grails.web.json.JSONElement
+import spock.lang.Shared
+import spock.lang.Unroll
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 
@@ -13,6 +16,7 @@ import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 @Mock([MeasurementUnit, Relationship, RelationshipType])
 class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
 
+    @Shared
     MeasurementUnit celsius
     MeasurementUnit fahrenheit
     RelationshipType relationshipType
@@ -151,7 +155,6 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         updated.description == newDescription
         updated.symbol == instance.symbol
 
-
     }
 
     def "edit instance with bad JSON"() {
@@ -180,12 +183,126 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
 
     }
 
-    def "get outgoing relationships"() {
-        params.id = celsius.id
-        response.format = "json"
 
+    @Unroll
+    def "get outgoing relationships pagination: #no where max: #max offset: #offset"() {
+        RelationshipType relationshipType = fixturesLoader.RT_relationship.save() ?: RelationshipType.findByName('relationship')
+        fillWithDummyEntities(15)
+
+        expect:
+        relationshipType
+
+        when:
+
+        def first = resource.get(1)
+
+        first.outgoingRelationships = first.outgoingRelationships ?: []
+
+        for (unit in resource.list()) {
+            if (unit != first) {
+                assert !Relationship.link(first, unit, relationshipType).hasErrors()
+                if (first.outgoingRelationships.size() == 12) {
+                    break
+                }
+            }
+        }
+
+        then:
+        first.outgoingRelationships
+        first.outgoingRelationships.size() == 12
+
+        when:
+        response.format = "json"
+        params.offset = offset
+        params.id = first.id
+
+        controller.outgoing(max)
+        JSONElement json = response.json
+
+
+        recordResult "outgoing${no}", json
+
+        then:
+
+        json.success
+        json.total == total
+        json.size == size
+        json.list
+        json.list.size() == size
+        json.next == next
+        json.previous == previous
+
+        cleanup:
+        relationshipType?.delete()
+
+        where:
+        no | size | max | offset | total | next                                           | previous
+        1  | 10   | 10  | 0      | 12    | "/${resourceName}/outgoing/1?max=10&offset=10" | ""
+        2  | 5    | 5   | 0      | 12    | "/${resourceName}/outgoing/1?max=5&offset=5"   | ""
+        3  | 5    | 5   | 5      | 12    | "/${resourceName}/outgoing/1?max=5&offset=10"  | "/${resourceName}/outgoing/1?max=5&offset=0"
+        4  | 4    | 4   | 8      | 12    | ""                                             | "/${resourceName}/outgoing/1?max=4&offset=4"
+        5  | 2    | 10  | 10     | 12    | ""                                             | "/${resourceName}/outgoing/1?max=10&offset=0"
+        6  | 2    | 2   | 10     | 12    | ""                                             | "/${resourceName}/outgoing/1?max=2&offset=8"
     }
 
+    @Unroll
+    def "get incoming relationships pagination: #no where max: #max offset: #offset"() {
+        RelationshipType relationshipType = fixturesLoader.RT_relationship.save() ?: RelationshipType.findByName('relationship')
+        fillWithDummyEntities(15)
+
+        expect:
+        relationshipType
+
+        when:
+        def first = resource.get(1)
+        first.incomingRelationships = first.incomingRelationships ?: []
+
+        for (unit in resource.list()) {
+            if (unit != first) {
+                assert !Relationship.link(unit, first, relationshipType).hasErrors()
+                if (first.incomingRelationships.size() == 12) {
+                    break
+                }
+            }
+        }
+
+        then:
+        first.incomingRelationships
+        first.incomingRelationships.size() == 12
+
+        when:
+        response.format = "json"
+        params.offset = offset
+        params.id = first.id
+
+        controller.incoming(max)
+        JSONElement json = response.json
+
+
+        recordResult "incoming${no}", json
+
+        then:
+
+        json.success
+        json.total == total
+        json.size == size
+        json.list
+        json.list.size() == size
+        json.next == next
+        json.previous == previous
+
+        cleanup:
+        relationshipType?.delete()
+
+        where:
+        no | size | max | offset | total | next                                           | previous
+        1  | 10   | 10  | 0      | 12    | "/${resourceName}/incoming/1?max=10&offset=10" | ""
+        2  | 5    | 5   | 0      | 12    | "/${resourceName}/incoming/1?max=5&offset=5"   | ""
+        3  | 5    | 5   | 5      | 12    | "/${resourceName}/incoming/1?max=5&offset=10"  | "/${resourceName}/incoming/1?max=5&offset=0"
+        4  | 4    | 4   | 8      | 12    | ""                                             | "/${resourceName}/incoming/1?max=4&offset=4"
+        5  | 2    | 10  | 10     | 12    | ""                                             | "/${resourceName}/incoming/1?max=10&offset=0"
+        6  | 2    | 2   | 10     | 12    | ""                                             | "/${resourceName}/incoming/1?max=2&offset=8"
+    }
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
         [name: "Measurement Unit ${counter}", symbol: "MU${counter}"]
