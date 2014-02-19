@@ -1,6 +1,7 @@
 package uk.co.mc.core
 
 import grails.rest.RestfulController
+import uk.co.mc.core.util.Elements
 import uk.co.mc.core.util.Relationships
 
 abstract class CatalogueElementController<T> extends RestfulController<T> {
@@ -16,14 +17,15 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
         params.max = Math.min(max ?: 10, 100)
         def total = countResources()
         def list = listAllResources(params)
-        def model = [
-                success: true,
+        def links = nextAndPreviousLinks("/${resourceName}/", total)
+        respond new Elements(
                 total: total,
-                size: list.size(),
-                list: list
-        ]
-        model.putAll nextAndPreviousLinks("/${resourceName}/", total)
-        respond model
+                elements: list,
+                previous: links.previous,
+                next: links.next,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 0
+        )
     }
 
     def incoming(Integer max, String typeParam) {
@@ -59,7 +61,9 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
                 previous: links.previous,
                 next: links.next,
                 direction: direction,
-                total: total
+                total: total,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 0
         )
     }
 

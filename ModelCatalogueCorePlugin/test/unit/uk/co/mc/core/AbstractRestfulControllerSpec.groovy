@@ -11,6 +11,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import uk.co.mc.core.fixtures.MockFixturesLoader
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
+import uk.co.mc.core.util.marshalling.ElementsMarshaller
 import uk.co.mc.core.util.marshalling.RelationshipMarshallers
 import uk.co.mc.core.util.marshalling.RelationshipsMarshaller
 
@@ -31,7 +32,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     def setup() {
         setupMimeTypes()
-        [marshallers, [new RelationshipMarshallers(), new RelationshipsMarshaller()]].flatten().each { it.register() }
+        [marshallers, [new RelationshipMarshallers(), new RelationshipsMarshaller(), new ElementsMarshaller()]].flatten().each {
+            it.register()
+        }
     }
 
     protected void setupMimeTypes() {
@@ -143,7 +146,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
     @Unroll
-    def "list items test: #no where max: #max offset: #offset"() {
+    def "list json items test: #no where max: #max offset: #offset"() {
         fillWithDummyEntities()
 
         expect:
@@ -166,10 +169,49 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         json.success
         json.size == size
         json.total == total
+        json.offset == offset
+        json.page == max
         json.list
         json.list.size() == size
         json.next == next
         json.previous == previous
+
+
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/")
+    }
+
+    @Unroll
+    def "list xml items test: #no where max: #max offset: #offset"() {
+        fillWithDummyEntities()
+
+        expect:
+        resource.count() == total
+
+
+        when:
+        response.format = "xml"
+        params.max = max
+        params.offset = offset
+
+        controller.index()
+        GPathResult xml = response.xml
+
+
+        recordResult "list${no}", xml
+
+        then:
+
+        xml.@success.text() == "true"
+        xml.@size.text() == "${size}"
+        xml.@total.text() == "${total}"
+        xml.@offset.text() == "${offset}"
+        xml.@page.text() == "${max}"
+        xml.element
+        xml.element.size() == size
+        xml.next.text() == next
+        xml.previous.text() == previous
 
 
 
@@ -816,6 +858,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert json.success
         assert json.total == total
         assert json.size == size
+        assert json.offset == offset
+        assert json.page == max
         assert json.list
         assert json.list.size() == size
         assert json.next == next
@@ -869,6 +913,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert !json.list
         assert json.total == 0
         assert json.size == 0
+        assert json.offset == offset
+        assert json.page == max
 
         type2.delete()
     }
@@ -891,6 +937,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert result.@success.text() == "true"
         assert result.@total.text() == "${total}"
         assert result.@size.text() == "${size}"
+        assert result.@offset.text() == "${offset}"
+        assert result.@page.text() == "${max}"
         assert result.relationship
         assert result.relationship.size() == size
         assert result.next.text() == next
@@ -943,6 +991,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert result
         assert result.@success.text() == "true"
         assert result.@total.text() == "0"
+        assert result.@offset.text() == "${offset}"
+        assert result.@page.text() == "${max}"
         assert result.@size.text() == "0"
         assert result.relationship.isEmpty()
 

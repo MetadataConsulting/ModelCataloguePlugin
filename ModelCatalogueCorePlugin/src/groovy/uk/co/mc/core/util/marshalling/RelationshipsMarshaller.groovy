@@ -18,6 +18,8 @@ class RelationshipsMarshaller extends AbstractMarshallers {
         [
                 success: true,
                 total: relationsList.total,
+                page: relationsList.page,
+                offset: relationsList.offset,
                 size: relationsList.relationships.size(),
                 list: relationsList.relationships.collect {
                     [id: it.id, type: it.relationshipType, relation: (relationsList.direction == "sourceToDestination" ? it.destination : it.source), direction: relationsList.direction]
@@ -45,6 +47,8 @@ class RelationshipsMarshaller extends AbstractMarshallers {
     @Override
     protected void addXmlAttributes(Object relationsList, XML xml) {
         xml.attribute("total", "${relationsList.total}")
+        xml.attribute("offset", "${relationsList.offset}")
+        xml.attribute("page", "${relationsList.page}")
         xml.attribute("size", "${relationsList.relationships.size()}")
         xml.attribute("success", "true")
     }
