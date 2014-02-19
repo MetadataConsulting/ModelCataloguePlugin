@@ -2,7 +2,8 @@ package uk.co.mc.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import uk.co.mc.core.util.marshalling.DataTypeMarshaller
+import spock.lang.Unroll
+import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.EnumeratedTypeMarshaller
 
 /**
@@ -80,6 +81,78 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
         EnumeratedType
     }
 
+    @Override
+    List<AbstractMarshallers> getMarshallers() {
+        [new EnumeratedTypeMarshaller()]
+    }
+
+    @Unroll
+    def "get outgoing relationships pagination: #no where max: #max offset: #offset"() {
+        checkJsonRelations(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+    }
+
+    @Unroll
+    def "get incoming relationships pagination: #no where max: #max offset: #offset"() {
+        checkJsonRelations(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+    }
+
+
+    @Unroll
+    def "get outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+    }
+
+    @Unroll
+    def "get incoming relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+    }
+
+
+    @Unroll
+    def "get outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+    }
+
+    @Unroll
+    def "get incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+    }
 }
 
 
