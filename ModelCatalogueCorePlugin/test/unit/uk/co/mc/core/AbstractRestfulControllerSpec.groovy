@@ -330,7 +330,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         loadItem1.properties = propertiesToEdit
 
-        request.xml = loadItem1.encodeAsXML()
+        def xml = loadItem1.encodeAsXML()
+
+        request.xml = xml
 
         recordInput("updateInput", xml)
 
