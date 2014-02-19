@@ -407,7 +407,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.update()
 
-        JSONObject updated = response.xml
+        GPathResult updated = response.xml
 
         recordResult 'updateErrors', updated
 
