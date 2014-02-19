@@ -1,27 +1,23 @@
 package uk.co.mc.core.util.marshalling
 
 import grails.converters.XML
-import uk.co.mc.core.DataElement
+import uk.co.mc.core.Model
 
-class DataElementMarshaller extends ExtendibleElementMarshallers {
+class ModelMarshaller extends ExtendibleElementMarshallers {
 
-    DataElementMarshaller() {
-        super(DataElement)
+    ModelMarshaller() {
+        super(Model)
     }
 
     protected Map<String, Object> prepareJsonMap(element) {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
-        ret.putAll code: element.code
         return ret
     }
 
 
     protected void buildXml(element, XML xml) {
         super.buildXml(element, xml)
-        xml.build {
-            code element.code
-        }
     }
 }
 

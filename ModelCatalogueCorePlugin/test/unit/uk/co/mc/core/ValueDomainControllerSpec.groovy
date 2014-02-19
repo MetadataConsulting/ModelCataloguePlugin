@@ -3,8 +3,6 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
-import org.codehaus.groovy.grails.web.json.JSONElement
-import spock.lang.Unroll
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ValueDomainMarshaller
 
@@ -15,11 +13,10 @@ import uk.co.mc.core.util.marshalling.ValueDomainMarshaller
 @Mock([DataElement, ValueDomain, Relationship, RelationshipType, MeasurementUnit, DataType])
 class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
-    def author, mph, integer, kph, groundSpeed1
+    def author, mph, integer, kph
     RelationshipType type
 
     def setup() {
-        fixturesLoader.load('relationshipTypes/RT_relationship')
         assert (type = new RelationshipType(name: "relationship", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "relates to", destinationToSource: "is related to").save())
         assert (mph = new MeasurementUnit(name: "MPH").save())
         assert (kph = new MeasurementUnit(name: "KPH").save())
@@ -28,9 +25,22 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         assert (groundSpeed1 = new ValueDomain(name: "ground_speed1", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer).save())
         assert !Relationship.link(author, groundSpeed1, type).hasErrors()
 
+        fixturesLoader.load('measurementUnits/MU_kph','dataElements/DE_author', 'measurementUnits/MU_milesPerHour','dataTypes/DT_integer', 'relationshipTypes/RT_relationship')
 
-        def de = new ValueDomainMarshaller()
-        de.register()
+        new ValueDomainMarshaller().register()
+        assert (type = fixturesLoader.RT_relationship.save())
+        assert (mph = fixturesLoader.MU_milesPerHour.save())
+        assert (kph = fixturesLoader.MU_kph.save())
+        assert (integer = fixturesLoader.DT_integer.save())
+        assert (author = fixturesLoader.DE_author.save())
+        assert (loadItem1 = new ValueDomain(name: "ground_speed", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer).save())
+        assert !Relationship.link(loadItem1, author, type).hasErrors()
+
+        //configuration properties for abstract controller
+        assert (newInstance = new ValueDomain(name: "ground_speed2", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer))
+        assert (badInstance = new ValueDomain(name: "", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer))
+        assert (propertiesToEdit = [description: "something different"])
+        assert (propertiesToCheck = ['name','description', 'unitOfMeasure.name', 'dataType.@id'])
 
     }
 
