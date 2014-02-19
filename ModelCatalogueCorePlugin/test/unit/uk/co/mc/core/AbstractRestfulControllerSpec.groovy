@@ -1,19 +1,18 @@
 package uk.co.mc.core
 
 import grails.converters.JSON
-import grails.converters.XML
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import groovy.xml.XmlUtil
 import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
+import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.lang.Unroll
 import uk.co.mc.core.fixtures.MockFixturesLoader
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 
 import javax.servlet.http.HttpServletResponse
-import java.lang.reflect.Array
 
 /**
  * Abstract parent for restful controllers specification.
@@ -173,7 +172,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.show()
 
-        def json = response.json
+        JSONObject json = response.json
 
         recordResult 'showOne', json
 
@@ -203,7 +202,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.save()
 
-        def created = response.json
+        JSONElement created = response.json
         def stored = resource.findByName("b"*256)
 
         recordResult 'saveErrors', created
@@ -226,7 +225,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.save()
 
-        def created = response.json
+        JSONObject created = response.json
         def stored = resource.findByName(newInstance.name)
 
         recordResult 'saveOk', created
@@ -307,7 +306,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.update()
 
-        def updated = response.json
+        JSONObject updated = response.json
 
         recordResult 'updateOk', updated
 
@@ -382,7 +381,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.update()
 
-        def updated = response.json
+        JSONObject updated = response.json
 
         recordResult 'updateErrors', updated
 
@@ -408,7 +407,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.update()
 
-        def updated = response.xml
+        JSONObject updated = response.xml
 
         recordResult 'updateErrors', updated
 
@@ -545,9 +544,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
     boolean jsonPropertyCheck(json, loadItem){
-
-        def errors = ""
-        for( int j = 0 ; ( j < propertiesToCheck.size() ) && errors.isEmpty() ; j++ ) {
+        for (int j = 0; (j < propertiesToCheck.size()); j++) {
             def property = propertiesToCheck[j]
             property = property.toString().replaceAll("\\@", "")
             def subProperties = property.split("\\.")
@@ -565,20 +562,17 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
                 loadProp = loadItem.getProperty(property)
             }
 
-            if( jsonProp.toString() != loadProp.toString()){ errors = "error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}" }
+            if (jsonProp.toString() != loadProp.toString()) {
+                throw new AssertionError("error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}")
+            }
         }
-
-        if(errors!=""){ println(errors); return false}
 
         return true
 
     }
 
     boolean xmlPropertyCheck(xml, loadItem){
-
-
-        def errors = ""
-        for( int j = 0 ; ( j < propertiesToCheck.size() ) && errors.isEmpty() ; j++ ) {
+        for (int j = 0; (j < propertiesToCheck.size()); j++) {
             def property = propertiesToCheck[j]
             def subProperties = property.toString().split("\\.")
             def xmlProp = xml
@@ -603,11 +597,10 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
                 loadProp = loadItem.getProperty(property.toString().replaceAll("\\@", ""))
             }
 
-            if( xmlProp != loadProp){ errors = "error: property to check: ${propertiesToCheck[j]}  where xml:${xmlProp} !=  item:${loadProp}" }
+            if (xmlProp != loadProp) {
+                throw new AssertionError("error: property to check: ${propertiesToCheck[j]}  where xml:${xmlProp} !=  item:${loadProp}")
+            }
         }
-
-        if(errors!=""){ println(errors); return false}
-
         return true
 
     }
