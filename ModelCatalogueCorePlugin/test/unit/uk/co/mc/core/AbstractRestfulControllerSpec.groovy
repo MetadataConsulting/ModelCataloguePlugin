@@ -332,6 +332,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         request.xml = loadItem1.encodeAsXML()
 
+        recordInput("updateInput", xml)
+
         controller.update()
 
         GPathResult updated = response.xml
@@ -354,6 +356,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         response.format = "xml"
         def xml = badInstance.encodeAsXML()
         request.xml = xml
+
+        recordInput("saveErrorsInput", xml)
 
         controller.save()
 
@@ -403,7 +407,11 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         when:
         response.format = "xml"
         params.id = instance.id
-        request.xml = badInstance.encodeAsXML()
+        def xml = badInstance.encodeAsXML()
+
+        recordInput("updateErrorsInput", xml)
+
+        request.xml = xml
 
         controller.update()
 
