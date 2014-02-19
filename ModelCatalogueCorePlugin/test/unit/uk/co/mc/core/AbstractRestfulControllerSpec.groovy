@@ -541,7 +541,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         def errors = ""
         for( int j = 0 ; ( j < propertiesToCheck.size() ) && errors.isEmpty() ; j++ ) {
             def property = propertiesToCheck[j]
-            def subProperties = property.toString().replaceAll("\\@", "").split("\\.")
+            property = property.toString().replaceAll("\\@", "")
+            def subProperties = property.split("\\.")
             def jsonProp = json
             def loadProp = loadItem
 
@@ -556,7 +557,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
                 loadProp = loadItem.getProperty(property)
             }
 
-            if( jsonProp != loadProp){ errors = "error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}" }
+            if( jsonProp.toString() != loadProp.toString()){ errors = "error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}" }
         }
 
         if(errors!=""){ println(errors); return false}
@@ -590,8 +591,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
                 }
             }else{
-                xmlProp = xml.getProperty(property)
-                loadProp = loadItem.getProperty(property)
+                xmlProp = xml[property]
+                loadProp = loadItem.getProperty(property.toString().replaceAll("\\@", ""))
             }
 
             if( xmlProp != loadProp){ errors = "error: property to check: ${propertiesToCheck[j]}  where xml:${xmlProp} !=  item:${loadProp}" }
