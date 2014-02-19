@@ -1,19 +1,18 @@
 package uk.co.mc.core
 
 import grails.converters.JSON
-import grails.converters.XML
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import groovy.xml.XmlUtil
 import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
+import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.lang.Unroll
 import uk.co.mc.core.fixtures.MockFixturesLoader
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 
 import javax.servlet.http.HttpServletResponse
-import java.lang.reflect.Array
 
 /**
  * Abstract parent for restful controllers specification.
@@ -173,7 +172,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.show()
 
-        def json = response.json
+        JSONObject json = response.json
 
         recordResult 'showOne', json
 
@@ -203,7 +202,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.save()
 
-        def created = response.json
+        JSONElement created = response.json
         def stored = resource.findByName("b"*256)
 
         recordResult 'saveErrors', created
@@ -226,7 +225,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.save()
 
-        def created = response.json
+        JSONObject created = response.json
         def stored = resource.findByName(newInstance.name)
 
         recordResult 'saveOk', created
@@ -307,7 +306,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.update()
 
-        def updated = response.json
+        JSONObject updated = response.json
 
         recordResult 'updateOk', updated
 
@@ -333,6 +332,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         request.xml = loadItem1.encodeAsXML()
 
+        recordInput("updateInput", xml)
+
         controller.update()
 
         GPathResult updated = response.xml
@@ -355,6 +356,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         response.format = "xml"
         def xml = badInstance.encodeAsXML()
         request.xml = xml
+
+        recordInput("saveErrorsInput", xml)
 
         controller.save()
 
@@ -382,7 +385,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         controller.update()
 
-        def updated = response.json
+        JSONObject updated = response.json
 
         recordResult 'updateErrors', updated
 
@@ -404,11 +407,15 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         when:
         response.format = "xml"
         params.id = instance.id
-        request.xml = badInstance.encodeAsXML()
+        def xml = badInstance.encodeAsXML()
+
+        recordInput("updateErrorsInput", xml)
+
+        request.xml = xml
 
         controller.update()
 
-        def updated = response.xml
+        GPathResult updated = response.xml
 
         recordResult 'updateErrors', updated
 
@@ -447,7 +454,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def "Return 404 for non-existing item as JSON for incoming relationships"() {
         response.format = "json"
 
-        controller.incoming("1000000", 10)
+        params.id = "1000000"
+
+        controller.incoming(10)
 
         expect:
         response.text == ""
@@ -457,7 +466,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def "Return 404 for non-existing item as XML for incoming relationships"() {
         response.format = "xml"
 
-        controller.incoming("1000000", 10)
+        params.id = "1000000"
+
+        controller.incoming(10)
 
         expect:
         response.text == ""
@@ -467,7 +478,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def "Return 404 for non-existing item as JSON for outgoing relationships"() {
         response.format = "json"
 
-        controller.outgoing("1000000", 10)
+        params.id = "1000000"
+
+        controller.outgoing(10)
 
         expect:
         response.text == ""
@@ -477,7 +490,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def "Return 404 for non-existing item as XML for outgoing relationships"() {
         response.format = "xml"
 
-        controller.outgoing("1000000", 10)
+        params.id = "1000000"
+
+        controller.outgoing(10)
 
         expect:
         response.text == ""
@@ -537,9 +552,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
     boolean jsonPropertyCheck(json, loadItem){
-
-        def errors = ""
-        for( int j = 0 ; ( j < propertiesToCheck.size() ) && errors.isEmpty() ; j++ ) {
+        for (int j = 0; (j < propertiesToCheck.size()); j++) {
             def property = propertiesToCheck[j]
             property = property.toString().replaceAll("\\@", "")
             def subProperties = property.split("\\.")
@@ -557,20 +570,17 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
                 loadProp = loadItem.getProperty(property)
             }
 
-            if( jsonProp.toString() != loadProp.toString()){ errors = "error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}" }
+            if (jsonProp.toString() != loadProp.toString()) {
+                throw new AssertionError("error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}")
+            }
         }
-
-        if(errors!=""){ println(errors); return false}
 
         return true
 
     }
 
     boolean xmlPropertyCheck(xml, loadItem){
-
-
-        def errors = ""
-        for( int j = 0 ; ( j < propertiesToCheck.size() ) && errors.isEmpty() ; j++ ) {
+        for (int j = 0; (j < propertiesToCheck.size()); j++) {
             def property = propertiesToCheck[j]
             def subProperties = property.toString().split("\\.")
             def xmlProp = xml
@@ -593,11 +603,10 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
                 loadProp = loadItem.getProperty(property.toString().replaceAll("\\@", ""))
             }
 
-            if( xmlProp != loadProp){ errors = "error: property to check: ${propertiesToCheck[j]}  where xml:${xmlProp} !=  item:${loadProp}" }
+            if (xmlProp != loadProp) {
+                throw new AssertionError("error: property to check: ${propertiesToCheck[j]}  where xml:${xmlProp} !=  item:${loadProp}")
+            }
         }
-
-        if(errors!=""){ println(errors); return false}
-
         return true
 
     }
@@ -608,8 +617,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         resource.deleteAll(resource.list())
     }
 
-    void fillWithDummyEntities() {
-        (resource.count() + 1).upto(DUMMY_ENTITIES_COUNT) {
+    void fillWithDummyEntities(int limit = DUMMY_ENTITIES_COUNT) {
+        (resource.count() + 1).upto(limit) {
             assert resource.newInstance(getUniqueDummyConstructorArgs(it)).save()
         }
     }
@@ -622,5 +631,134 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     abstract Class<T> getResource()
 
+    // Following needs to be copied to subclasses. Grails mocking framework is not yet capable of handling such
+    // level of abstraction
+
+    /*
+
+    @Unroll
+    def "get outgoing relationships pagination: #no where max: #max offset: #offset"() {
+        fixturesLoader.load('relationshipTypes/RT_relationship')
+        RelationshipType relationshipType = fixturesLoader.RT_relationship.save() ?: RelationshipType.findByName('relationship')
+        fillWithDummyEntities(15)
+
+        expect:
+        relationshipType
+
+        when:
+
+        def first = resource.get(1)
+
+        first.outgoingRelationships = first.outgoingRelationships ?: []
+
+        for (unit in resource.list()) {
+            if (unit != first) {
+                assert !Relationship.link(first, unit, relationshipType).hasErrors()
+                if (first.outgoingRelationships.size() == 12) {
+                    break
+                }
+            }
+        }
+
+        then:
+        first.outgoingRelationships
+        first.outgoingRelationships.size() == 12
+
+        when:
+        response.format = "json"
+        params.offset = offset
+        params.id = first.id
+
+        controller.outgoing(max)
+        JSONElement json = response.json
+
+
+        recordResult "outgoing${no}", json
+
+        then:
+
+        json.success
+        json.total == total
+        json.size == size
+        json.list
+        json.list.size() == size
+        json.next == next
+        json.previous == previous
+
+        cleanup:
+        relationshipType?.delete()
+
+        where:
+        no | size | max | offset | total | next                                                       | previous
+        1  | 10   | 10  | 0      | 12    | "/${resourceName}/outgoing/1?max=10&offset=10" | ""
+        2  | 5    | 5   | 0      | 12    | "/${resourceName}/outgoing/1?max=5&offset=5"   | ""
+        3  | 5    | 5   | 5      | 12    | "/${resourceName}/outgoing/1?max=5&offset=10"  | "/${resourceName}/outgoing/1?max=5&offset=0"
+        4  | 4    | 4   | 8      | 12    | ""                                             | "/${resourceName}/outgoing/1?max=4&offset=4"
+        5  | 2    | 10  | 10     | 12    | ""                                             | "/${resourceName}/outgoing/1?max=10&offset=0"
+        6  | 2    | 2   | 10     | 12    | ""                                             | "/${resourceName}/outgoing/1?max=2&offset=8"
+    }
+
+    @Unroll
+    def "get incoming relationships pagination: #no where max: #max offset: #offset"() {
+        fixturesLoader.load('relationshipTypes/RT_relationship')
+        RelationshipType relationshipType = fixturesLoader.RT_relationship.save() ?: RelationshipType.findByName('relationship')
+        fillWithDummyEntities(15)
+
+        expect:
+        relationshipType
+
+        when:
+        def first = resource.get(1)
+        first.incomingRelationships = first.incomingRelationships ?: []
+
+        for (unit in  resource.list()) {
+            if (unit != first) {
+                assert !Relationship.link(unit, first, relationshipType).hasErrors()
+                if (first.incomingRelationships.size() == 12) {
+                    break
+                }
+            }
+        }
+
+        then:
+        first.incomingRelationships
+        first.incomingRelationships.size() == 12
+
+        when:
+        response.format = "json"
+        params.offset = offset
+        params.id = first.id
+
+        controller.incoming(max)
+        JSONElement json = response.json
+
+
+        recordResult "incoming${no}", json
+
+        then:
+
+        json.success
+        json.total == total
+        json.size == size
+        json.list
+        json.list.size() == size
+        json.next == next
+        json.previous == previous
+
+        cleanup:
+        relationshipType?.delete()
+
+        where:
+        no | size | max | offset | total | next                                                       | previous
+        1  | 10   | 10  | 0      | 12    | "/${resourceName}/incoming/1?max=10&offset=10" | ""
+        2  | 5    | 5   | 0      | 12    | "/${resourceName}/incoming/1?max=5&offset=5"   | ""
+        3  | 5    | 5   | 5      | 12    | "/${resourceName}/incoming/1?max=5&offset=10"  | "/${resourceName}/incoming/1?max=5&offset=0"
+        4  | 4    | 4   | 8      | 12    | ""                                             | "/${resourceName}/incoming/1?max=4&offset=4"
+        5  | 2    | 10  | 10     | 12    | ""                                             | "/${resourceName}/incoming/1?max=10&offset=0"
+        6  | 2    | 2   | 10     | 12    | ""                                             | "/${resourceName}/incoming/1?max=2&offset=8"
+    }
+
+
+     */
 
 }

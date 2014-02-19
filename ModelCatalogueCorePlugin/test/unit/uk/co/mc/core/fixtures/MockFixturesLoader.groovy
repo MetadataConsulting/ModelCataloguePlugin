@@ -23,6 +23,7 @@ class MockFixturesLoader {
                 throw new IllegalArgumentException("Fixture file $fixtureFile.canonicalPath does not exist!")
             }
             MockFixturesLoaderScript script = shell.parse(fixtureFile)
+            script.setLoader this
             script.run()
             fixtures.putAll(script.fixtures)
         }
