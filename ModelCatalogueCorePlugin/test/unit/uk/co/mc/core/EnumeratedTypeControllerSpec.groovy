@@ -24,15 +24,51 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
         assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
 
         //configuration properties for abstract controller
-        assert (newInstance = new EnumeratedType(name: "sub4", enumAsString: ['h':'history', 'p':'politics', 'sci':'science']))
+        assert (newInstance = new EnumeratedType(name: "sub4", enumerations: [h:'history', p:'politics', sci:'science']))
         assert (badInstance = new EnumeratedType(name: "", description:"asdf"))
-        assert (propertiesToEdit = [description: "edited description "])
-        assert (propertiesToCheck = ['name'])
+        assert (propertiesToEdit = [description: "edited description ", enumerations: [T1:'test1', T2:'test2', T3:'test3']])
+        assert (propertiesToCheck = ['name', 'description', 'enumerations'])
 
     }
 
     def cleanup() {
         type.delete()
+    }
+
+
+    //override the xml check with extra check for enumerations
+    //FIX ME this is a bit of a hack but it provably isn't worth the time
+    //to create a specific check for arbitrary attributes within the property
+    //you are checking for
+
+    @Override
+    boolean xmlPropertyCheck(xml, loadItem){
+
+
+        def xmlProp = (xml["name"].toString())?:null
+
+        if (xmlProp != loadItem.getProperty("name")) {
+            throw new AssertionError("error: property to check: name  where xml:${xml["name"] } !=  item:${loadItem.getProperty("name")}")
+        }
+
+        xmlProp = (xml["description"].toString())?:null
+
+        if (xmlProp != loadItem.getProperty("description")) {
+            throw new AssertionError("error: property to check: description  where xml:${xml["description"] } !=  item:${loadItem.getProperty("description")}")
+        }
+
+        xmlProp = xml.depthFirst().find{it.name()=="enumerations"}
+        if(xmlProp){
+            xmlProp = xmlProp.attributes()
+            if(xmlProp!=loadItem.getProperty("enumerations")){
+                throw new AssertionError("error: property to check: enumeration  where xml:${xmlProp} !=  item:${loadItem.getProperty("enumerations")}")
+
+            }
+        }
+
+        return true
+
+
     }
 
 
