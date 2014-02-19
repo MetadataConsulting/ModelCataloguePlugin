@@ -587,8 +587,6 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
                         xmlProp = xmlProp[subProperty]
                         loadProp = loadProp.getProperty(subProperty)
                     }
-
-
                 }
             }else{
                 xmlProp = xml[property]
