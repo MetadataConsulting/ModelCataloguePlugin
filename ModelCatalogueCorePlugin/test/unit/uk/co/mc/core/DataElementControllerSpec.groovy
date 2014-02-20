@@ -26,12 +26,13 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
         assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
 
         loadItem1.ext.foo = "bar"
+        loadItem1.ext.another = "test"
 
         //configuration properties for abstract controller
         assert (newInstance = fixturesLoader.DE_author2)
         assert (badInstance = new DataElement(name: "", description: "asdf"))
         assert (propertiesToEdit = [description: "edited description ", code: "AA123"])
-        assert (propertiesToCheck = ['name', 'description', 'code', '@status', '@versionNumber'])
+        assert (propertiesToCheck = ['name', 'description', 'code', '@status', '@versionNumber', 'ext.foo', 'ext.another'])
 
 
     }
@@ -39,6 +40,58 @@ class DataElementControllerSpec extends AbstractRestfulControllerSpec {
     def cleanup() {
         type.delete()
     }
+
+    @Override
+    boolean xmlPropertyCheck(xml, loadItem){
+
+        def xmlProp = (xml["name"].toString())?:null
+
+        if (xmlProp != loadItem["name"]) {
+            throw new AssertionError("error: property to check: name  where xml:${xml["name"] } !=  item:${loadItem.getProperty("name")}")
+        }
+
+        xmlProp = (xml["description"].toString())?:null
+
+        if (xmlProp != loadItem.getProperty("description")) {
+            throw new AssertionError("error: property to check: description  where xml:${xml["description"] } !=  item:${loadItem.getProperty("description")}")
+        }
+
+        xmlProp = (xml["code"].toString())?:null
+
+        if (xmlProp != loadItem.getProperty("code")) {
+            throw new AssertionError("error: property to check: description  where xml:${xml["code"] } !=  item:${loadItem.getProperty("code")}")
+        }
+
+        xmlProp = (xml["@status"].toString())?:null
+
+        if (xmlProp != loadItem.getProperty("status").toString()) {
+            throw new AssertionError("error: property to check: description  where xml:${xml["@status"] } !=  item:${loadItem.getProperty("status")}")
+        }
+
+        xmlProp = (xml["@versionNumber"].toString())?:null
+
+        if (xmlProp != loadItem.getProperty("versionNumber").toString()) {
+            throw new AssertionError("error: property to check: description  where xml:${xml["@versionNumber"] } !=  item:${loadItem.getProperty("versionNumber")}")
+        }
+
+
+
+        loadItem = loadItem.getProperty("ext")
+
+        loadItem.each{ key, value ->
+                def extension = xml.depthFirst().find{it.name()=="extension" && it.@key == key}
+                if(value!=extension.toString()){
+                    throw new AssertionError("error: property to check: extension  where xml:${xmlProp} !=  item:${loadItem.getProperty("enumerations")}")
+
+                }
+        }
+
+
+        return true
+
+    }
+
+
 
     @Unroll
     def "get outgoing relationships pagination: #no where max: #max offset: #offset"() {
