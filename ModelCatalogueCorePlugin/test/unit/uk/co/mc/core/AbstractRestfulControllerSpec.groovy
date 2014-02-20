@@ -219,9 +219,6 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/")
     }
 
-    String getResourceName() {
-        GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerSpec")
-    }
 
 
     def "Show single existing item as JSON"() {
@@ -362,15 +359,23 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
     def "edit instance description from JSON"() {
-        def instance = resource.findByName(loadItem1.name)
+
+        def json = propertiesToEdit
+        def properties = new HashMap()
+        properties.putAll(loadItem1.properties)
+        def instance = resource.newInstance(properties)
+        instance.properties = propertiesToEdit
+
 
         expect:
         instance
+        loadItem1
+        json
 
         when:
         response.format = "json"
-        params.id = instance.id
-        def json = [description: "blah blah blah blah"]
+        params.id = loadItem1.id
+
         request.json = json
 
 
@@ -384,25 +389,29 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         then:
         updated
-        updated.id == instance.id
-        updated.version == instance.version
-        jsonPropertyCheck(updated, loadItem1)
+        updated.id == loadItem1.id
+        updated.version == loadItem1.version
+        jsonPropertyCheck(updated, instance)
 
     }
 
     def "edit instance from XML"() {
-        def instance = resource.findByName(loadItem1.name)
+
+        def properties = new HashMap()
+        properties.putAll(loadItem1.properties)
+        def instance = resource.newInstance(properties)
+        instance.properties = propertiesToEdit
 
         expect:
         instance
+        loadItem1
 
         when:
+
         response.format = "xml"
-        params.id = instance.id
+        params.id = loadItem1.id
 
-        loadItem1.properties = propertiesToEdit
-
-        def xml = loadItem1.encodeAsXML()
+        def xml = instance.encodeAsXML()
         request.xml = xml
 
         recordInputXML("updateInput", xml)
@@ -415,9 +424,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         then:
         updated
-        updated.@id == instance.id
-        updated.@version == instance.version
-        xmlPropertyCheck(updated, loadItem1)
+        updated.@id == loadItem1.id
+        updated.@version == loadItem1.version
+        xmlPropertyCheck(updated, instance)
 
     }
 
@@ -695,8 +704,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
             if (jsonMap) {
                 jsonProp = JSON.parse(jsonProp.toString())
             } else {
-                jsonProp = jsonProp.toString()
-                loadProp = loadProp.toString()
+                jsonProp = (jsonProp.toString()!="{}")?:null
+                loadProp = (loadProp.toString()!="[:]")?:null
             }
 
             if (jsonProp != loadProp) {
@@ -755,6 +764,10 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
         [name: "$resourceName $counter"]
+    }
+
+    String getResourceName() {
+        GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerSpec")
     }
 
     List<AbstractMarshallers> getMarshallers() { [] }

@@ -56,9 +56,15 @@ class EnumeratedTypeController extends CatalogueElementController<EnumeratedType
             return
         }
 
-        instance.properties = getParametersToBind()
+
+        if(request.format == "json"){
+            instance.properties = request.getJSON()
+        }else{
+            instance.properties = getParametersToBind()
+        }
 
         if(request.format == "xml"){
+
             def xml = request.getXML()
             instance.enumerations = getXMLEnumerations(xml)
         }

@@ -124,4 +124,14 @@ abstract class CatalogueElement {
                 .toHashCode();
     }
 
+    def beforeDelete(){
+        outgoingRelationships.each{ relationship->
+            relationship.beforeDelete()
+            relationship.delete(flush:true)
+        }
+        incomingRelationships.each{ relationship ->
+            relationship.beforeDelete()
+            relationship.delete(flush:true)
+        }
+    }
 }

@@ -2,6 +2,7 @@ package uk.co.mc.core
 
 import grails.test.mixin.Mock
 import spock.lang.Specification
+import uk.co.mc.core.fixtures.MockFixturesLoader
 
 /**
  * Created by adammilward on 03/02/2014.
@@ -11,8 +12,10 @@ import spock.lang.Specification
  *
  */
 
-@Mock([Relationship, DataElement, ValueDomain, Model, MeasurementUnit, DataType, RelationshipType])
+@Mock([Relationship, DataElement, DataType, RelationshipType])
 class RelationshipSpec extends Specification{
+
+    MockFixturesLoader fixturesLoader = new MockFixturesLoader()
 
     def "Won't create uk.co.mc.core.Relationship if the catalogue elements have not been persisted"()
     {
@@ -27,6 +30,46 @@ class RelationshipSpec extends Specification{
         then:
 
         rel.hasErrors()
+
+
+    }
+
+    def "Create relationship then delete an element on one side of the relationship"(){
+
+        def loadItem1, loadItem2, type, rel
+        fixturesLoader.load('dataElements/DE_author', 'dataElements/DE_author1', 'dataElements/DE_author2', 'relationshipTypes/RT_relationship')
+
+        assert (loadItem1 = fixturesLoader.DE_author.save())
+        assert (loadItem2 = fixturesLoader.DE_author1.save())
+        assert (type = fixturesLoader.RT_relationship.save())
+
+        def item1Id = loadItem1.id
+        def item2Id = loadItem2.id
+
+
+        when:
+
+        rel = Relationship.link(loadItem1, loadItem2, type)
+       !rel.hasErrors()
+        def relId = rel.id
+
+        then:
+
+        loadItem1.outgoingRelations == [loadItem2]
+        loadItem2.incomingRelations == [loadItem1]
+
+
+        when:
+
+        loadItem1.delete(flush:true, failOnError:true)
+
+        then:
+
+        !DataElement.get(item1Id)
+        !Relationship.get(relId)
+
+        loadItem1.outgoingRelations == []
+        loadItem2.incomingRelations == []
 
 
     }
