@@ -11,7 +11,7 @@ class ModelCatalogueCorePluginGrailsPlugin {
     ]
 
     // TODO Fill in these fields
-    def title = "uk.co.mc.core.Model Catalogue Core Plugin Plugin" // Headline display name of the plugin
+    def title = "Model Catalogue Core Plugin Plugin" // Headline display name of the plugin
     def author = "Your name"
     def authorEmail = ""
     def description = '''\

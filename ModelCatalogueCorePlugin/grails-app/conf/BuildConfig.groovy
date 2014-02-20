@@ -75,3 +75,6 @@ codenarc.reports = {
         title = 'Sample Report'
     }
 }
+
+// release
+grails.project.repos.metadataSnapshots.url = "http://repository-metadata.forge.cloudbees.com/snapshot/"
