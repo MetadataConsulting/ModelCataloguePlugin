@@ -49,10 +49,16 @@ Brief summary/description of the plugin.
 
         customObjectMarshallers(CustomObjectMarshallers) {
             marshallers = [
+                    new ConceptualDomainMarshaller(),
                     new DataElementMarshaller(),
+                    new DataTypeMarshaller(),
+                    new ElementsMarshaller(),
+                    new EnumeratedTypeMarshaller(),
+                    new MeasurementUnitMarshallers(),
+                    new ModelMarshaller(),
                     new RelationshipMarshallers(),
+                    new RelationshipsMarshaller(),
                     new ValueDomainMarshaller(),
-                    new MeasurementUnitMarshallers()
             ]
         }
     }

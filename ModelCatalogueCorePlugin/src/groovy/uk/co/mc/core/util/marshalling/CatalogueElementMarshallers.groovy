@@ -19,6 +19,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 name: el.name,
                 description: el.description,
                 version: el.version,
+                elementType: el.class.name,
+                elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/outgoing/$el.id"],
                 incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/incoming/$el.id"]
 
@@ -37,6 +39,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
     protected void addXmlAttributes(el, XML xml) {
         xml.attribute("id", "${el.id}")
         xml.attribute("version", "${el.version}")
+        xml.attribute("elementType", "${el.class.name}")
+        xml.attribute("elementTypeName", "${GrailsNameUtils.getNaturalName(el.class.simpleName)}")
     }
 
 }
