@@ -1,0 +1,58 @@
+h2. ConceptualDomain
+
+ConceptualDomains provide context for Models and include ValueDomains.
+As a context for a model, a conceptual domain allows a system to know which ValueDomain(s) to use to instantiate the DataElement(s) contained within it.
+h3. Specified Relationships
+[inclusion] (includes) ValueDomain
+[context] (contextFor) Model
+
+h2. Model
+
+A Model contains DataElements.
+i.e.
+- a model for a book:
+<xs:complexType name="Book">
+ <xs:element name="author" type="xs:string"/>
+ <xs:element name="isbn" type="xs:string"/>
+ <xs:complexType name="Chapter">
+  <xs:element name="content" type="xs:string"/>
+ </xs:complexType>
+</xs:complexType>
+- contains the data elements author and isbn.
+A model within the context of a ConceptualDomain can instantiate the containing data elements with the appropriate value domains i.e. the rules and constraints that are applicable in the given context. Models exhibit hierarchical relationships between one another and can be parents of, or children of other models. Models are publishable elements i.e. once a model is finalized it cannot be changed instead a new version will be created that supersedes the original.
+h3. Specified Relationships
+[containment](contains) DataElements
+[context](contextOf) ConceptualDomain
+[hierarchy](parentOf)(childOf) Model
+
+h2. DataElement
+
+A DataElement is an atomic unit used to describe another piece data. It can be instantiated by a value domain when it is contained in a Model within the context of a ConceptualDomain
+Data Elements are publishable elements i.e. once a data element is finalized it cannot be changed, instead a new version will be created that supersedes the original.
+h3. Specified Relationships
+[containment](containedIn) Model
+[instantiation](instantiatedBy) ValueDomain
+[supersession](supersedes)(supersededBy) DataElement
+
+
+h2. ValueDomain
+
+A ValueDomain captures information regarding the rules and constraints upon a piece of data i.e. a regular expression or an enumerated set of allowable values.
+i.e. <xs:simpleType name="CANCERTREATMENT">
+       <xs:restriction base="xs:string">
+        <xs:enumeration value="Chemo" />
+        <xs:enumeration value="Surgery" />
+        <xs:enumeration value="Radiotherapy" />
+        <xs:enumeration value="Other" />
+       </xs:restriction>
+     </xs:simpleType>
+ValueDomains can instantiate DataElements with this information. i.e. <xs:element name="treatment" type="CANCERTREATMENT"/>
+As they are included in ConceptualDomains, Models within the context of the same ConceptualDomain can use the corresponding ValueDomains to instantiate their containing DataElements.
+h3. Specified Relationships
+[inclusion](includedIn) ConceptualDomain
+[instantiation](instantiates) DataElement
+[usance](uses) DataType/EnumeratedType
+
+
+
+
