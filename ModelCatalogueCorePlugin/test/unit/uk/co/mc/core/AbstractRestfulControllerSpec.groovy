@@ -28,7 +28,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     def newInstance, badInstance, propertiesToCheck, propertiesToEdit, loadItem2, loadItem1
 
-    FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures", getClass().classLoader)
+    FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
 
     def setup() {
         setupMimeTypes()

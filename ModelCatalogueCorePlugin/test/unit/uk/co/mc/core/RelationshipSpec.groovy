@@ -15,7 +15,7 @@ import org.modelcatalogue.fixtures.FixturesLoader
 @Mock([Relationship, DataElement, DataType, RelationshipType])
 class RelationshipSpec extends Specification{
 
-    FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures", getClass().getClassLoader())
+    FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
 
     def "Won't create uk.co.mc.core.Relationship if the catalogue elements have not been persisted"()
     {
@@ -44,7 +44,6 @@ class RelationshipSpec extends Specification{
         assert (type = fixturesLoader.RT_relationship.save())
 
         def item1Id = loadItem1.id
-        def item2Id = loadItem2.id
 
 
         when:
