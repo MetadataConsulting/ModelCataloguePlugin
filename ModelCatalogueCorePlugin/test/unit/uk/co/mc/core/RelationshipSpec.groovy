@@ -2,7 +2,7 @@ package uk.co.mc.core
 
 import grails.test.mixin.Mock
 import spock.lang.Specification
-import uk.co.mc.core.fixtures.MockFixturesLoader
+import org.modelcatalogue.fixtures.FixturesLoader
 
 /**
  * Created by adammilward on 03/02/2014.
@@ -15,7 +15,7 @@ import uk.co.mc.core.fixtures.MockFixturesLoader
 @Mock([Relationship, DataElement, DataType, RelationshipType])
 class RelationshipSpec extends Specification{
 
-    MockFixturesLoader fixturesLoader = new MockFixturesLoader()
+    FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures", getClass().getClassLoader())
 
     def "Won't create uk.co.mc.core.Relationship if the catalogue elements have not been persisted"()
     {
