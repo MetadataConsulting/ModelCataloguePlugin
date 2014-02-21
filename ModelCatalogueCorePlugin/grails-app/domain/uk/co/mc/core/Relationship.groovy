@@ -115,5 +115,11 @@ class Relationship {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}, type: ${relationshipType?.name}]"
     }
 
+    def beforeDelete(){
+        if (source && destination) {
+            destination?.removeFromIncomingRelationships(this)
+            source?.removeFromOutgoingRelationships(this)
+        }
+    }
 
 }
