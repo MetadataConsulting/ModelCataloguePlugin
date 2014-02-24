@@ -2,12 +2,32 @@ package uk.co.mc.core
 
 import grails.test.mixin.Mock
 import spock.lang.Specification
+import spock.lang.Unroll
 
 /**
  * Created by ladin on 10.02.14.
  */
 @Mock(RelationshipType)
 class RelationshipTypeSpec extends Specification {
+
+
+    @Unroll
+    def "'#name' is valid name == #valid"() {
+        def type = new RelationshipType(name: name)
+        type.validate()
+
+        expect:
+        type.errors.hasFieldErrors("name") == !valid
+
+        where:
+        valid | name
+        true  | "relationship"
+        true  | "relationship1"
+        true  | "relation-ship"
+        false | "relation ship"
+        true  | "Relationship"
+        true  | "relationShip"
+    }
 
     def "you can init default types without duplicates"() {
         expect:

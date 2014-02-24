@@ -40,7 +40,7 @@ class RelationshipType {
             if (!CatalogueElement.isAssignableFrom(val)) return "Only uk.co.mc.core.CatalogueElement child classes are allowed"
             return true
         }
-        name unique: true, maxSize: 255
+        name unique: true, maxSize: 255, matches: /[a-z\-0-9A-Z]+/
         sourceToDestination maxSize: 255
         destinationToSource maxSize: 255
         sourceClass validator: classValidator
