@@ -29,20 +29,7 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         assertRestForwardUrlMapping(method, "/api/modelCatalogue/core$url", controller: controller, action: action, paramsAssertions)
 
         where:
-        method  | url                                           | controller        | action            | paramsAssertions
-        "GET"   | "/measurementUnit"                            | "measurementUnit" | "index"           | {}
-        "POST"  | "/measurementUnit"                            | "measurementUnit" | "save"            | {}
-        "GET"   | "/measurementUnit/1"                          | "measurementUnit" | "show"            | { id = "1" }
-        "DELETE"| "/measurementUnit/1"                          | "measurementUnit" | "delete"          | { id = "1" }
-        "PUT"   | "/measurementUnit/1"                          | "measurementUnit" | "update"          | { id = "1" }
-        "GET"   | "/measurementUnit/1/outgoing"                 | "measurementUnit" | "outgoing"        | { id = "1" }
-        "GET"   | "/measurementUnit/1/incoming"                 | "measurementUnit" | "incoming"        | { id = "1" }
-        "GET"   | "/measurementUnit/1/outgoing/relationship"    | "measurementUnit" | "outgoing"        | { id = "1" ; type = "relationship" }
-        "GET"   | "/measurementUnit/1/incoming/relationship"    | "measurementUnit" | "incoming"        | { id = "1" ; type = "relationship" }
-        "POST"  | "/measurementUnit/1/outgoing/relationship"    | "measurementUnit" | "addOutgoing"     | { id = "1" ; type = "relationship" }
-        "POST"  | "/measurementUnit/1/incoming/relationship"    | "measurementUnit" | "addIncoming"     | { id = "1" ; type = "relationship" }
-        "DELETE"| "/measurementUnit/1/outgoing/relationship"    | "measurementUnit" | "removeOutgoing"  | { id = "1" ; type = "relationship" }
-        "DELETE"| "/measurementUnit/1/incoming/relationship"    | "measurementUnit" | "removeIncoming"  | { id = "1" ; type = "relationship" }
+        [method, url, controller, action, paramsAssertions] << generateAssertionsForCatalogueElementControllers('conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'model', 'valueDomain')
     }
 
     def "for method #method and url /api/modelCatalogue/core#url there should be no mappings found"() {
@@ -63,5 +50,40 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         webRequest.currentRequest.method = method
         assertForwardUrlMapping(assertions, url, paramAssertions)
     }
+
+
+    private generateAssertionsForCatalogueElementControllers(String... controllers ) {
+        def ret = []
+        for(controller in controllers) {
+            ret.addAll generateRestAssertion(controller)
+            ret.addAll generateRelationshipRestAssertions(controller)
+        }
+        ret
+    }
+
+    private generateRestAssertion(String controller) {
+        [
+      // method  | url              | controller | action            | paramsAssertions
+        ["GET"   , "/$controller"   , controller , "index"           , {}            ],
+        ["POST"  , "/$controller"   , controller , "save"            , {}            ],
+        ["GET"   , "/$controller/1" , controller , "show"            , { id = "1" }  ],
+        ["DELETE", "/$controller/1" , controller , "delete"          , { id = "1" }  ],
+        ["PUT"   , "/$controller/1" , controller , "update"          , { id = "1" }  ]
+        ]
+    }
+
+    private generateRelationshipRestAssertions(String controller) {
+        [
+        [ "GET"   , "/$controller/1/outgoing"                 , controller , "outgoing"        , { id = "1" }                          ],
+        [ "GET"   , "/$controller/1/incoming"                 , controller , "incoming"        , { id = "1" }                          ],
+        [ "GET"   , "/$controller/1/outgoing/relationship"    , controller , "outgoing"        , { id = "1" ; type = "relationship" }  ],
+        [ "GET"   , "/$controller/1/incoming/relationship"    , controller , "incoming"        , { id = "1" ; type = "relationship" }  ],
+        [ "POST"  , "/$controller/1/outgoing/relationship"    , controller , "addOutgoing"     , { id = "1" ; type = "relationship" }  ],
+        [ "POST"  , "/$controller/1/incoming/relationship"    , controller , "addIncoming"     , { id = "1" ; type = "relationship" }  ],
+        [ "DELETE", "/$controller/1/outgoing/relationship"    , controller , "removeOutgoing"  , { id = "1" ; type = "relationship" }  ],
+        [ "DELETE", "/$controller/1/incoming/relationship"    , controller , "removeIncoming"  , { id = "1" ; type = "relationship" }  ]
+        ]
+    }
+
 
 }
