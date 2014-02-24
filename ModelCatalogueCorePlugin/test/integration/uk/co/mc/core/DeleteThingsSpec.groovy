@@ -1,44 +1,88 @@
 package uk.co.mc.core
 
 import grails.test.spock.IntegrationSpec
+import groovy.util.slurpersupport.GPathResult
 import spock.lang.Shared
+import spock.lang.Unroll
+import uk.co.mc.core.util.ResultRecorder
+
+import javax.servlet.http.HttpServletResponse
 
 /**
  * Created by adammilward on 05/02/2014.
  */
 
+@Mixin(ResultRecorder)
 class DeleteThingsSpec extends IntegrationSpec{
 
-    @Shared
-    def fixtureLoader
 
+    MeasurementUnitController controller
+    String controllerName
 
-    def "check delete works"(){
+    def setup(){
+        controller = new MeasurementUnitController()
+        controllerName = "$controller.resourceName"
+    }
+
+    @Unroll
+    def "json bad delete i.e. MU used in another resource, returns errors"(){
 
         def m, et, vd1
         expect:
+
         assert(m = new MeasurementUnit(name:"cm per hour", symbol: "cmph").save())
         assert(et = new EnumeratedType(name: "enum", enumerations:['1':'this', '2':'that', '3':'theOther']).save())
         assert(vd1 = new ValueDomain(name: "ground_speed", unitOfMeasure: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save())
 
+
         when:
 
-        m.delete(flush:true, failOnError:true)
-        et.delete(flush:true, failOnError:true)
+        controller.response.format = "json"
 
+        controller.params.id = m.id
+
+        controller.delete()
+
+        def json = controller.response.json
+
+        recordResult 'deleteFailed', json, controllerName, "MeasurementUnit"
 
         then:
 
-        !m.id
+        json.errors == "Cannot delete cm per hour due to referential integrity constraint violation (/measurementUnit/delete/${m.id})"
+        controller.response.status == HttpServletResponse.SC_NOT_IMPLEMENTED
 
-        //!m.id
-        //!et.id
+    }
 
-        println(vd1.unitOfMeasure)
-        //vd1.unitOfMeasure.id
-        //vd1.dataType.id
+    @Unroll
+    def "xml bad delete i.e. MU used in another resource, returns errors"(){
+
+        def m, et, vd1
+        expect:
+
+        def controller = new MeasurementUnitController()
+
+        assert(m = new MeasurementUnit(name:"cm per hour", symbol: "cmph").save())
+        assert(et = new EnumeratedType(name: "enum", enumerations:['1':'this', '2':'that', '3':'theOther']).save())
+        assert(vd1 = new ValueDomain(name: "ground_speed", unitOfMeasure: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save())
 
 
+        when:
+
+        controller.response.format = "xml"
+
+        controller.params.id = m.id
+
+        controller.delete()
+
+        GPathResult xml = controller.response.xml
+
+        recordResult 'deleteFailed', xml, controllerName
+
+        then:
+
+        xml == "Cannot delete cm per hour due to referential integrity constraint violation (/measurementUnit/delete/${m.id})"
+        controller.response.status == HttpServletResponse.SC_NOT_IMPLEMENTED
 
     }
 

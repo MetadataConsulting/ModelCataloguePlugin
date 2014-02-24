@@ -6,11 +6,13 @@ import spock.lang.Unroll
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 
+import javax.servlet.http.HttpServletResponse
+
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(MeasurementUnitController)
-@Mock([MeasurementUnit, Relationship, RelationshipType])
+@Mock([MeasurementUnit, Relationship, RelationshipType, EnumeratedType, DataType, ValueDomain])
 class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
 
     RelationshipType relationshipType
@@ -36,6 +38,7 @@ class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
         loadItem2.delete()
         relationshipType.delete()
     }
+
 
     // -- begin copy and pasted
 
