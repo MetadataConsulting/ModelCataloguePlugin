@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse
 abstract class CatalogueElementController<T> extends RestfulController<T> {
 
     static responseFormats = ['json', 'xml']
-    static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "PUT", addOutgoing: "PUT", removeIncoming: "DELETE", removeOutgoing: "DELETE"]
+    static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE"]
 
     CatalogueElementController(Class<T> resource) {
         super(resource)
