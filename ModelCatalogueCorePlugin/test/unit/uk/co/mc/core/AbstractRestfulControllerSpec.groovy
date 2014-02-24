@@ -9,7 +9,7 @@ import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Specification
 import spock.lang.Unroll
-import uk.co.mc.core.fixtures.MockFixturesLoader
+import org.modelcatalogue.fixtures.FixturesLoader
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ElementsMarshaller
 import uk.co.mc.core.util.marshalling.RelationshipMarshallers
@@ -28,7 +28,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     def newInstance, badInstance, propertiesToCheck, propertiesToEdit, loadItem2, loadItem1
 
-    MockFixturesLoader fixturesLoader = new MockFixturesLoader()
+    FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
 
     def setup() {
         setupMimeTypes()
