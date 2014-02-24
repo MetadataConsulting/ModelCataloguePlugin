@@ -20,9 +20,10 @@ class ConceptualDomainControllerSpec extends AbstractRestfulControllerSpec {
 
     def setup() {
         new ConceptualDomainMarshaller().register()
-        fixturesLoader.load('conceptualDomains/CD_publicLibraries', 'models/M_book', 'relationshipTypes/RT_relationship', 'conceptualDomains/CD_universityLibraries')
+        fixturesLoader.load('conceptualDomains/CD_publicLibraries', 'conceptualDomains/CD_schoolLibraries', 'models/M_book', 'relationshipTypes/RT_relationship', 'conceptualDomains/CD_universityLibraries')
 
         assert (loadItem1 = fixturesLoader.CD_publicLibraries.save())
+        assert (loadItem2 = fixturesLoader.CD_schoolLibraries.save())
         assert (book = fixturesLoader.M_book.save())
         assert (type = fixturesLoader.RT_relationship.save())
         assert !Relationship.link(loadItem1, book, type).hasErrors()

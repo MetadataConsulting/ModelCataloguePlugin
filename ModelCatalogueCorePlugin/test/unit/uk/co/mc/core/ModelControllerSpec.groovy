@@ -16,11 +16,11 @@ class ModelControllerSpec extends AbstractRestfulControllerSpec {
 
     def setup() {
 
-        fixturesLoader.load('models/M_book', 'models/M_chapter1', 'dataElements/DE_author2',  'relationshipTypes/RT_relationship')
+        fixturesLoader.load('models/M_book', 'models/M_chapter1', 'models/M_chapter2', 'dataElements/DE_author2',  'relationshipTypes/RT_relationship')
         new ModelMarshaller().register()
 
         assert (loadItem1 = fixturesLoader.M_book.save())
-        assert (loadItem2 = fixturesLoader.DE_author2.save())
+        assert (loadItem2 = fixturesLoader.M_chapter2.save())
         assert (type = fixturesLoader.RT_relationship.save())
         assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
 
@@ -47,6 +47,10 @@ class ModelControllerSpec extends AbstractRestfulControllerSpec {
         Model
     }
 
+
+    List<AbstractMarshallers> getMarshallers() {
+        [new ModelMarshaller()]
+    }
 
 }
 
