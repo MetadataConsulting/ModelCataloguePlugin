@@ -2,12 +2,16 @@ package uk.co.brc.modelcatalogue
 
 import uk.co.mc.core.*
 
+import javax.xml.crypto.Data
+
 class ImportService {
 
     static transactional = true
     def grailsApplication
 
     def importData() {
+
+        DataType.initDefaultDataTypes()
 
         def applicationContext = grailsApplication.mainContext
         String basePath = applicationContext.getResource("/").getFile().toString()
@@ -129,11 +133,7 @@ class ImportService {
     private static importDataTypes(name, dataType) {
 
         //default data type to return is the string data type
-        def dataTypeReturn = DataType.findByName("String")
-
-        if (!dataTypeReturn) {
-            dataTypeReturn = new DataType(name: "String").save()
-        }
+        def dataTypeReturn
 
         dataType.each { line ->
 
@@ -168,11 +168,15 @@ class ImportService {
                 if (enumerated) {
 
                     //FIXME we need to query the enumerated types to ensure we don't include duplicate enumerated sets
-                    //dataTypeReturn = EnumeratedType.findWhere(enumerations:enumerations)
+                    dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumerations.toString())
 
-                    //if(!dataTypeReturn){
-                    dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
-                    //}
+                    if(!dataTypeReturn){
+                     dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
+                    }
+                }else{
+
+                    dataTypeReturn = (DataType.findByName(name))?:DataType.findByName("String")
+
                 }
             }
         }

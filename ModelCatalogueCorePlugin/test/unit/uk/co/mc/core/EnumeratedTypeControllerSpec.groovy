@@ -73,7 +73,7 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
 
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
-        [name: "ENumeratedType${counter}", enumerations: ['H': 'history', 'P': 'politics', 'SCI': 'science', 'GEO': 'geography']]
+        [name: "ENumeratedType${counter}", enumerations: ["H${counter}": "history${counter}", "P${counter}": "politics${counter}", "SCI${counter}": "science${counter}", "GEO${counter}": "geography${counter}"]]
     }
 
     Class getResource() {
