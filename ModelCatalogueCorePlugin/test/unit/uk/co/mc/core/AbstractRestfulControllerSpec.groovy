@@ -1,6 +1,7 @@
 package uk.co.mc.core
 
 import grails.converters.JSON
+import grails.converters.XML
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import groovy.xml.XmlUtil
@@ -125,6 +126,10 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
      * @param xml xml string to be saved to the fixture
      */
     protected File recordInputJSON(String fixtureName, Map json) {
+        recordInputJSON fixtureName, new JSON(json).toString(true)
+    }
+
+    protected File recordInputJSON(String fixtureName, String json) {
 
         File fixtureFile = new File("../ModelCatalogueCorePlugin/test/js/modelcatalogue/core/$controller.resourceName/${fixtureName}.gen.fixture.js")
         fixtureFile.parentFile.mkdirs()
@@ -135,13 +140,11 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     fixtures['$controller.resourceName'] = fixtures['$controller.resourceName'] || {};
     var $controller.resourceName = fixtures['$controller.resourceName']
 
-    window.fixtures.${controller.resourceName}.$fixtureName = ${new JSON(json).toString(true)}
+    window.fixtures.${controller.resourceName}.$fixtureName = ${json}
 
 })(window)"""
         println "New fixture file created at $fixtureFile.canonicalPath"
         fixtureFile
-
-
     }
 
 
@@ -679,6 +682,201 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         response.status == HttpServletResponse.SC_NO_CONTENT
         !resource.get(params.id)
     }
+
+
+    @Unroll
+    def "Link existing elements using add to #direction endpoint with JSON result"(){
+        def type = prepareTypeAndDummyEntities()
+
+        response.format = 'json'
+        request.json = loadItem2 as JSON
+        controller."add${direction.capitalize()}"(loadItem1.id, type.name)
+        def json = response.json
+
+        recordResult "add${direction.capitalize()}" , json
+
+        def expectedSource =        direction == "outgoing" ? loadItem1 : loadItem2
+        def expectedDestination =   direction == "outgoing" ? loadItem2 : loadItem1
+
+        expect:
+        response.status == HttpServletResponse.SC_CREATED
+        json.source
+        json.source.id      == expectedSource.id
+        json.destination
+        json.destination.id == expectedDestination.id
+        json.type
+        json.type.id        == type.id
+
+        where:
+        direction << ["incoming", "outgoing"]
+    }
+
+    @Unroll
+    def "Link existing elements using add to #direction endpoint with XML result"(){
+        def type = prepareTypeAndDummyEntities()
+
+        response.format = 'xml'
+        request.xml = loadItem2.encodeAsXML()
+        controller."add${direction.capitalize()}"(loadItem1.id, type.name)
+        def xml = response.xml
+
+        recordResult "add${direction.capitalize()}" , xml
+
+        def expectedSource =        direction == "outgoing" ? loadItem1 : loadItem2
+        def expectedDestination =   direction == "outgoing" ? loadItem2 : loadItem1
+
+        expect:
+        response.status             == HttpServletResponse.SC_CREATED
+        xml.source
+        xml.source.@id.text()       == "${expectedSource.id}"
+        xml.destination
+        xml.destination.@id.text()  == "${expectedDestination.id}"
+        xml.type
+        xml.type.@id.text()         == "${type.id}"
+
+        where:
+        direction << ["incoming", "outgoing"]
+    }
+
+    @Unroll
+    def "Unlink existing elements using add to #direction endpoint with #format result"(){
+        def type = prepareTypeAndDummyEntities()
+
+        if (direction == "outgoing") {
+            Relationship.link(loadItem1, loadItem2, type)
+        } else {
+            Relationship.link(loadItem2, loadItem1, type)
+        }
+
+        response.format = format.toLowerCase()
+
+        def input = loadItem2."encodeAs$format"()
+
+        "recordInput$format" "remove${direction.capitalize()}$format", input
+
+        request."${format.toLowerCase()}"= input
+
+        controller."remove${direction.capitalize()}"(loadItem1.id, type.name)
+
+
+        expect:
+        response.status == HttpServletResponse.SC_NO_CONTENT
+
+        where:
+        format | direction
+        "XML"  | "outgoing"
+        "JSON" | "outgoing"
+        "XML"  | "incoming"
+        "JSON" | "incoming"
+    }
+
+    @Unroll
+    def "Link existing elements using add to #direction endpoint with failing constraint as JSON result"(){
+        def type = prepareTypeAndDummyEntities()
+        type.rule = "return false"
+        type.save()
+
+        response.format = 'json'
+        request.json = loadItem2 as JSON
+        controller."add${direction.capitalize()}"(loadItem1.id, type.name)
+        def json = response.json
+
+        recordResult "add${direction.capitalize()}Failed" , json
+
+        expect:
+        response.status == 422 // unprocessable entity
+        json.errors
+        json.errors.size() >= 1
+        json.errors.first().field == 'relationshipType'
+
+        where:
+        direction << ["incoming", "outgoing"]
+    }
+
+
+    @Unroll
+    def "Link existing elements using add to #direction endpoint with failing constraint as XML result"(){
+        def type = prepareTypeAndDummyEntities()
+        type.rule = "return false"
+        type.save()
+
+        response.format = 'xml'
+        request.xml = loadItem2.encodeAsXML()
+        controller."add${direction.capitalize()}"(loadItem1.id, type.name)
+        def xml = response.xml
+
+        recordResult "add${direction.capitalize()}Failed" , xml
+
+        expect:
+        response.status == 422 // unprocessable entity
+        xml.name() == "errors"
+        xml.error.size() >= 1
+        xml.error[0].@field.text() == 'relationshipType'
+
+        where:
+        direction << ["incoming", "outgoing"]
+    }
+
+
+    @Unroll
+    def "#action with non-existing one to #direction endpoint with #format result"(){
+        def type = prepareTypeAndDummyEntities()
+
+        response.format = format.toLowerCase()
+
+        def item = resource.newInstance()
+        item.id = 1000000
+
+        def input = item."encodeAs$format"()
+
+        "recordInput$format" "${action}${direction.capitalize()}WrongInputDest$format", input
+
+        request."${format.toLowerCase()}"= input
+        controller."${action}${direction.capitalize()}"(loadItem1.id, type.name)
+
+
+        expect:
+        response.status == HttpServletResponse.SC_NOT_FOUND
+
+        where:
+        action   | format | direction
+        "add"    | "XML"  | "outgoing"
+        "add"    | "JSON" | "outgoing"
+        "add"    | "XML"  | "incoming"
+        "add"    | "JSON" | "incoming"
+        "remove" | "XML"  | "outgoing"
+        "remove" | "JSON" | "outgoing"
+        "remove" | "XML"  | "incoming"
+        "remove" | "JSON" | "incoming"
+    }
+
+    @Unroll
+    def "#action with not-existing type to #direction endpoint with #format result"(){
+        response.format = format.toLowerCase()
+
+        def input = loadItem2."encodeAs$format"()
+        "recordInput$format" "${action}${direction.capitalize()}WrongIntupTypet$format", input
+
+        request."${format.toLowerCase()}" = input
+        controller."${action}${direction.capitalize()}"(loadItem1.id, "no-such-type")
+
+        expect:
+        response.status == HttpServletResponse.SC_NOT_FOUND
+
+        where:
+        action   | format | direction
+        "add"    | "XML"  | "outgoing"
+        "add"    | "JSON" | "outgoing"
+        "add"    | "XML"  | "incoming"
+        "add"    | "JSON" | "incoming"
+        "remove" | "XML"  | "outgoing"
+        "remove" | "JSON" | "outgoing"
+        "remove" | "XML"  | "incoming"
+        "remove" | "JSON" | "incoming"
+
+    }
+
+
 
 
     boolean jsonPropertyCheck(json, loadItem) {
