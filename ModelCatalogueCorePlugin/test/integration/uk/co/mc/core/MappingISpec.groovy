@@ -63,6 +63,22 @@ class MappingISpec extends IntegrationSpec {
 
     }
 
+    def "map will fail if source and destination is the same"(){
+
+        when:
+
+        def dC = ValueDomain.get(degreeC.id)
+        def dF = ValueDomain.get(degreeF.id)
+
+        Mapping self = Mapping.map(dC, dC, "x")
+
+        then:
+        self
+        self.hasErrors()
+        self.errors.getFieldError("destination")
+
+    }
+
     def "create mapping using map "(){
 
         when:
