@@ -1,6 +1,7 @@
 package uk.co.mc.core.util.marshalling
 
 import grails.converters.XML
+import grails.util.GrailsNameUtils
 import uk.co.mc.core.ValueDomain
 
 class ValueDomainMarshaller extends CatalogueElementMarshallers {
@@ -12,7 +13,10 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
-        ret.putAll unitOfMeasure: el.unitOfMeasure, regexDef: el.regexDef, dataType: el.dataType
+        ret.putAll unitOfMeasure: el.unitOfMeasure,
+                regexDef: el.regexDef,
+                dataType: el.dataType,
+                mappings: [count: el.outgoingMappings.size(), link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/mapping/$el.id"]
         ret
     }
 
@@ -22,7 +26,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
             unitOfMeasure el.unitOfMeasure
             regexDef el.regexDef
             dataType el.dataType
-
+            mappings count: el.outgoingMappings.size(), link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/mapping/$el.id"
         }
     }
 }

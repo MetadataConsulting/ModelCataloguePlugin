@@ -1,7 +1,6 @@
 package uk.co.mc.core
 
 import grails.converters.JSON
-import grails.converters.XML
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import groovy.xml.XmlUtil
@@ -1066,15 +1065,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         recordResult "${incomingOrOutgoing}${no}", json
 
 
-        assert json.success
-        assert json.total == total
-        assert json.size == size
-        assert json.offset == offset
-        assert json.page == max
-        assert json.list
-        assert json.list.size() == size
-        assert json.next == next
-        assert json.previous == previous
+        checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
 
         def item = json.list[0]
 
@@ -1093,6 +1084,19 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         assert item.relation.name == relation.name
         assert item.relation.id == relation.id
+    }
+
+    protected static checkJsonCorrectListValues(JSONElement json, total, size, offset, max, next, previous) {
+        assert json.success
+        assert json.total == total
+        assert json.size == size
+        assert json.offset == offset
+        assert json.page == max
+        assert json.list
+        assert json.list.size() == size
+        assert json.next == next
+        assert json.previous == previous
+        true
     }
 
     def checkJsonRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
@@ -1145,15 +1149,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
         assert result
-        assert result.@success.text() == "true"
-        assert result.@total.text() == "${total}"
-        assert result.@size.text() == "${size}"
-        assert result.@offset.text() == "${offset}"
-        assert result.@page.text() == "${max}"
+        checkXmlCorrectListValues(result, total, size, offset, max, next, previous)
         assert result.relationship
         assert result.relationship.size() == size
-        assert result.next.text() == next
-        assert result.previous.text() == previous
 
         def item = result.relationship[0]
 
@@ -1172,6 +1170,17 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         assert item.relation.name == relation.name
         assert item.relation.@id == "${relation.id}"
+    }
+
+    protected static checkXmlCorrectListValues(GPathResult xml, total, size, offset, max, next, previous) {
+        assert xml.@success.text() == "true"
+        assert xml.@total.text() == "${total}"
+        assert xml.@size.text() == "${size}"
+        assert xml.@offset.text() == "${offset}"
+        assert xml.@page.text() == "${max}"
+        assert xml.next.text() == next
+        assert xml.previous.text() == previous
+        true
     }
 
     def checkXmlRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
