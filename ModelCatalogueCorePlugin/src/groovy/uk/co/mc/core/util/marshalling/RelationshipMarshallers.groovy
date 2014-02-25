@@ -36,7 +36,7 @@ class RelationshipMarshallers extends AbstractMarshallers {
         xml.attribute('id', "$rel.id")
     }
 
-    private static void renderInfo(String what, Map info, XML xml) {
+    static void renderInfo(String what, Map info, XML xml) {
         xml.build {
             "$what" {
                 for (e in info.entrySet()) {

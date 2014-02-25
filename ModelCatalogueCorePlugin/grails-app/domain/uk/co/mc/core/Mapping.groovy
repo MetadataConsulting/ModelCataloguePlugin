@@ -44,7 +44,6 @@ class Mapping {
         source.removeFromOutgoingMappings(old)
         destination.removeFromIncomingMappings(old)
         old.delete()
-
         old
     }
 

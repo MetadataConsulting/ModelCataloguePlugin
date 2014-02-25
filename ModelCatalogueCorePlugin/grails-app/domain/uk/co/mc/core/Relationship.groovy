@@ -97,16 +97,13 @@ class Relationship {
 
     static Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
         if (source?.id && destination?.id && relationshipType?.id) {
-
             Relationship relationshipInstance = findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
-
             if (relationshipInstance && source && destination) {
-
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
                 relationshipInstance.delete(flush: true)
+                return relationshipInstance
             }
-
         }
         return null
     }

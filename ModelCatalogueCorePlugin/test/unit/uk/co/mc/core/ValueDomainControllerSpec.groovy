@@ -3,11 +3,9 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
-import uk.co.mc.core.util.marshalling.AbstractMarshallers
-import uk.co.mc.core.util.marshalling.DataElementMarshaller
-import uk.co.mc.core.util.marshalling.MappingsMarshaller
-import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
-import uk.co.mc.core.util.marshalling.ValueDomainMarshaller
+import uk.co.mc.core.util.marshalling.*
+
+import javax.servlet.http.HttpServletResponse
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
@@ -59,7 +57,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
     @Override
     List<AbstractMarshallers> getMarshallers() {
-        [new ValueDomainMarshaller(), new DataElementMarshaller(), new MappingsMarshaller(), new MeasurementUnitMarshallers()]
+        [new ValueDomainMarshaller(), new DataElementMarshaller(), new MappingsMarshaller(), new MappingMarshallers(), new MeasurementUnitMarshallers()]
     }
 
     @Unroll
@@ -131,6 +129,159 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
         where:
         [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/mapping")
+    }
+
+
+    @Unroll
+    def "return 404 for non existing domain calling #method method with #format format"() {
+        response.format = format
+        params.id = 1000000
+
+        when:
+        controller."$method"()
+
+        then:
+        response.status == HttpServletResponse.SC_NOT_FOUND
+
+        where:
+        format | method
+        "json" | "mappings"
+        "xml"  | "mappings"
+        "json" | "addMapping"
+        "xml"  | "addMapping"
+        "json" | "removeMapping"
+        "xml"  | "removeMapping"
+    }
+
+    @Unroll
+    def "return 404 for non existing other side calling #method method with #format format"() {
+        response.format = format
+        params.id = loadItem1.id
+        params.destination = 10000000
+
+        request."$format" = payload
+
+        when:
+        controller."$method"()
+
+        then:
+        response.status == status
+
+        where:
+        format | method          | payload
+        "json" | "addMapping"    | """{"mapping":"x"}"""
+        "json" | "removeMapping" | """{"mapping":"x"}"""
+        "xml"  | "addMapping"    | """<mapping>x</mapping>"""
+        "xml"  | "removeMapping" | """<mapping>x</mapping>"""
+    }
+
+    @Unroll
+    def "Map existing domains with failing constraint #format"(){
+        response.format = format
+        request."$format" = payload
+
+        params.id           = loadItem1.id
+        params.destination  = loadItem2.id
+
+        controller.addMapping()
+        def result = response."$format"
+
+        recordResult "addMappingFailed" , result
+
+        expect:
+        response.status == 422 // unprocessable entity
+        test.call(result)
+
+        where:
+        format | payload                      | test
+        "json" | """{"mapping":"y"}"""        | { it.errors && it.errors.first().field == "mapping" }
+        "xml"  | """<mapping>y</mapping>"""   | { it.name() == "errors" && it.error[0].@field.text() == "mapping" }
+    }
+
+    @Unroll
+    def "unmap non existing mapping will return 404 for #format request"(){
+        response.format = format
+
+        Mapping.unmap(loadItem1, loadItem2)
+
+        params.id           = loadItem1.id
+        params.destination  = loadItem2.id
+
+        controller.removeMapping()
+
+        expect:
+        response.status == HttpServletResponse.SC_NOT_FOUND
+
+        where:
+        format << ["json", "xml"]
+    }
+
+
+    @Unroll
+    def "unmap existing mapping will return 204 for #format request"(){
+        response.format = format
+
+        Mapping.map(loadItem1, loadItem2, [one: "one"])
+
+        params.id           = loadItem1.id
+        params.destination  = loadItem2.id
+
+        controller.removeMapping()
+
+        expect:
+        response.status == HttpServletResponse.SC_NO_CONTENT
+
+        where:
+        format << ["json", "xml"]
+    }
+
+    def "map valid domains with json"() {
+        response.format = "json"
+        request.json = """{"mapping":"x"}"""
+
+        params.id           = loadItem1.id
+        params.destination  = loadItem2.id
+
+        controller.addMapping()
+
+        def json = response.json
+
+        recordResult "addMapping" , json
+
+        expect:
+        json.mapping            == "x"
+        json.source
+        json.source.id          == loadItem1.id
+        json.source.link        == loadItem1.info.link
+        json.destination
+        json.destination.id     == loadItem2.id
+        json.destination.link   == loadItem2.info.link
+    }
+
+
+    def "map valid domains with xml"() {
+        response.format = "xml"
+        request.xml = """<mapping>x</mapping>"""
+
+        params.id           = loadItem1.id
+        params.destination  = loadItem2.id
+
+        controller.addMapping()
+
+        def xml = response.xml
+
+        recordResult "addMapping" , xml
+
+        expect:
+        xml.mapping.text()            == "x"
+        xml.source
+        xml.source.@id.text()         == "$loadItem1.id"
+        xml.source.link.text()        == loadItem1.info.link
+        xml.source.name.text()        == loadItem1.name
+        xml.destination
+        xml.destination.@id.text()    == "$loadItem2.id"
+        xml.destination.link.text()   == loadItem2.info.link
+        xml.destination.name.text()   == loadItem2.name
     }
 
     protected mapToDummyEntities(ValueDomain toBeLinked) {

@@ -7,9 +7,9 @@ import groovy.xml.XmlUtil
 import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.fixtures.FixturesLoader
 import spock.lang.Specification
 import spock.lang.Unroll
-import org.modelcatalogue.fixtures.FixturesLoader
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ElementsMarshaller
 import uk.co.mc.core.util.marshalling.RelationshipMarshallers
@@ -738,7 +738,44 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
     @Unroll
+    def "Unlink non existing elements using add to #direction endpoint with #format result"(){
+        def type = prepareTypeAndDummyEntities()
+
+        if (direction == "outgoing") {
+            Relationship.unlink(loadItem1, loadItem2, type)
+        } else {
+            Relationship.unlink(loadItem2, loadItem1, type)
+        }
+
+        response.format = format.toLowerCase()
+
+        def input = loadItem2."encodeAs$format"()
+
+        "recordInput$format" "removeNonExisting${direction.capitalize()}$format", input
+
+        request."${format.toLowerCase()}"= input
+
+        controller."remove${direction.capitalize()}"(loadItem1.id, type.name)
+
+
+        expect:
+        response.status == HttpServletResponse.SC_NOT_FOUND
+
+        where:
+        format | direction
+        "XML"  | "outgoing"
+        "JSON" | "outgoing"
+        "XML"  | "incoming"
+        "JSON" | "incoming"
+    }
+
+    @Unroll
     def "Unlink existing elements using add to #direction endpoint with #format result"(){
+        Relationship.metaClass.static.findBySourceAndDestinationAndRelationshipType = { CatalogueElement source, CatalogueElement destination, RelationshipType type ->
+            source.outgoingRelationships.find { it.relationshipType == type && it.destination == destination}
+        }
+
+
         def type = prepareTypeAndDummyEntities()
 
         if (direction == "outgoing") {
