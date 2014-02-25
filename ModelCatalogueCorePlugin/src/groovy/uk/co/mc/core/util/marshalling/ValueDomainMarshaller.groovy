@@ -16,7 +16,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
         ret.putAll unitOfMeasure: el.unitOfMeasure,
                 regexDef: el.regexDef,
                 dataType: el.dataType,
-                mappings: [count: el.outgoingMappings.size(), link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/mapping/$el.id"]
+                mappings: [count: el.outgoingMappings?.size() ?: 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/mapping/$el.id"]
         ret
     }
 
@@ -26,7 +26,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
             unitOfMeasure el.unitOfMeasure
             regexDef el.regexDef
             dataType el.dataType
-            mappings count: el.outgoingMappings.size(), link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/mapping/$el.id"
+            mappings count: el.outgoingMappings?.size() ?: 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/mapping/$el.id"
         }
     }
 }

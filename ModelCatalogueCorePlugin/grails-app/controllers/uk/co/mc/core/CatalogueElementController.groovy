@@ -160,7 +160,7 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
         int total = type ? Relationship."countBy${sourceOrDestination}AndRelationshipType"(element, type) : (element."${incomingOrOutgoing}Relationships".size() ?: 0)
         def list = type ? Relationship."findAllBy${sourceOrDestination}AndRelationshipType"(element, type, params) : Relationship."findAllBy${sourceOrDestination}"(element, params)
         def direction = sourceOrDestination == "Source" ? "sourceToDestination" : "destinationToSource"
-        def links = nextAndPreviousLinks("/${resourceName}/${incomingOrOutgoing}/${params.id}" + (typeParam ? "/${typeParam}" : ""), total)
+        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/${incomingOrOutgoing}" + (typeParam ? "/${typeParam}" : ""), total)
 
         respond new Relationships(
                 items: list,

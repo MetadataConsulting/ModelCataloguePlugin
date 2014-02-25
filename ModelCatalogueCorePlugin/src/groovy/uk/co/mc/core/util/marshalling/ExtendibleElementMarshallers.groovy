@@ -2,9 +2,6 @@ package uk.co.mc.core.util.marshalling
 
 import grails.converters.XML
 
-/**
- * Created by ladin on 14.02.14.
- */
 class ExtendibleElementMarshallers extends PublishedElementMarshallers {
 
     ExtendibleElementMarshallers(Class type) {
