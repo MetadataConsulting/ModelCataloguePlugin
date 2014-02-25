@@ -4,6 +4,7 @@ import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.springframework.dao.DataIntegrityViolationException
 import uk.co.mc.core.util.Elements
+
 import javax.servlet.http.HttpServletResponse
 import static org.springframework.http.HttpStatus.NO_CONTENT
 
@@ -24,7 +25,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         def links = nextAndPreviousLinks("/${resourceName}/", total)
         respond new Elements(
                 total: total,
-                elements: list,
+                items: list,
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
