@@ -33,8 +33,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         )
     }
 
-    @Transactional
     @Override
+    @Transactional
     def delete() {
         if(handleReadOnly()) {
             return
@@ -50,7 +50,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             instance.delete flush:true
         }catch (DataIntegrityViolationException e){
             response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
-
+            def model =  [errors: message(code: "uk.co.mc.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])] // STATUS CODE 501
+            respond model
+            return
+        } catch (Exception e){
             def model =  [errors: message(code: "uk.co.mc.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])] // STATUS CODE 501
             respond model
             return
@@ -65,7 +68,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             '*'{ render status: NO_CONTENT } // NO CONTENT STATUS CODE
         }
     }
-
 
     protected Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
         def link = "${baseLink}?"
@@ -96,4 +98,5 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 previous: previousLink
         ]
     }
+
 }
