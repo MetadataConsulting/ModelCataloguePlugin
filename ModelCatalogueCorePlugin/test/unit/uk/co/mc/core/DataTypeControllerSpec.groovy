@@ -32,7 +32,7 @@ class DataTypeControllerSpec extends AbstractRestfulControllerSpec {
     }
 
     def cleanup() {
-        type.delete()
+        RelationshipType.deleteAll(RelationshipType.list())
     }
 
 

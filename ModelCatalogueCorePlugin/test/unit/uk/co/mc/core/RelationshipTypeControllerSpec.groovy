@@ -8,10 +8,10 @@ import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.fixtures.FixturesLoader
 import spock.lang.Specification
 import spock.lang.Unroll
 import uk.co.mc.core.util.ResultRecorder
-import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ElementsMarshaller
 import uk.co.mc.core.util.marshalling.RelationshipMarshallers
 import uk.co.mc.core.util.marshalling.RelationshipTypeMarshaller
@@ -19,25 +19,40 @@ import uk.co.mc.core.util.marshalling.RelationshipsMarshaller
 
 import javax.servlet.http.HttpServletResponse
 
+
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(RelationshipTypeController)
-@Mock([RelationshipType, Relationship])
 @Mixin(ResultRecorder)
+@Mock([RelationshipType, Model, ValueDomain, ConceptualDomain, DataType])
 class RelationshipTypeControllerSpec extends Specification {
 
-    def controllerName, relClass
-    
+    private static final int DUMMY_ENTITIES_COUNT = 12
+
+    def controllerName, relClass, loadItem1, newInstance, badInstance, propertiesToEdit, propertiesToCheck
+    FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
+
     def setup() {
-        new RelationshipTypeMarshaller().register()
-
-        RelationshipType.initDefaultRelationshipTypes()
-
+        [[new RelationshipMarshallers(), new RelationshipTypeMarshaller(), new RelationshipsMarshaller(), new ElementsMarshaller()]].flatten().each {
+            it.register()
+        }
         setupMimeTypes()
         controllerName = controller.resourceName
         relClass = "RelationshipType"
 
+        fixturesLoader.load('relationshipTypes/RT_pubRelationship', 'relationshipTypes/RT_antonym')
+
+        assert (loadItem1 = fixturesLoader.RT_pubRelationship.save(flush:true))
+
+        assert (newInstance = new RelationshipType(name:"Antonym",
+                sourceToDestination: "AntonymousWith",
+                destinationToSource: "AntonymousWith",
+                sourceClass: DataElement,
+                destinationClass: DataElement))
+        assert (badInstance = new RelationshipType(name: "asdsd_!* dasdsa"))
+        assert (propertiesToEdit = [name: "changedName", sourceClass: PublishedElement, destinationClass: PublishedElement])
+        assert (propertiesToCheck = ['name'])
 
     }
 
@@ -67,11 +82,14 @@ class RelationshipTypeControllerSpec extends Specification {
     }
 
     def cleanup() {
+
     }
 
 
     @Unroll
     def "list json items test: #no where max: #max offset: #offset"() {
+
+        fillWithDummyEntities()
 
         expect:
         RelationshipType.count() == total
@@ -102,11 +120,14 @@ class RelationshipTypeControllerSpec extends Specification {
         json.previous == previous
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/RelationshipType/")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/relationshipType/")
     }
 
     @Unroll
     def "list xml items test: #no where max: #max offset: #offset"() {
+
+
+        fillWithDummyEntities()
 
         expect:
         RelationshipType.count() == total
@@ -139,7 +160,7 @@ class RelationshipTypeControllerSpec extends Specification {
 
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/RelationshipType/")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/relationshipType/")
     }
 
 
@@ -163,8 +184,6 @@ class RelationshipTypeControllerSpec extends Specification {
         json.version == loadItem1.version
         json.elementType == loadItem1.class.name
         json.elementTypeName == GrailsNameUtils.getNaturalName(loadItem1.class.simpleName)
-        json.outgoingRelationships == [count: 1, link: "/RelationshipType/outgoing/${loadItem1.id}"]
-        json.incomingRelationships == [count: 0, link: "/RelationshipType/incoming/${loadItem1.id}"]
 
         jsonPropertyCheck(json, loadItem1)
 
@@ -206,7 +225,7 @@ class RelationshipTypeControllerSpec extends Specification {
         request.json = json
 
 
-        recordInputJSON 'createInput', json, controllerName, getClass
+        recordInputJSON 'createInput', json, controllerName, "RelationshipType"
 
 
         controller.save()
@@ -298,7 +317,7 @@ class RelationshipTypeControllerSpec extends Specification {
         request.json = json
 
 
-        recordInputJSON 'updateInput', json, controllerName
+        recordInputJSON 'updateInput', json, controllerName, "RelationshipType"
 
         controller.update()
 
@@ -370,7 +389,7 @@ class RelationshipTypeControllerSpec extends Specification {
         then:
         !stored
         created
-        created == "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
+        created == "asdsd_!* dasdsaProperty [name] of class [class uk.co.mc.core.RelationshipType] with value [asdsd_!* dasdsa] does not match the required pattern [[a-z\\-0-9A-Z]+]Property [sourceToDestination] of class [class uk.co.mc.core.RelationshipType] cannot be nullProperty [destinationToSource] of class [class uk.co.mc.core.RelationshipType] cannot be nullProperty [sourceClass] of class [class uk.co.mc.core.RelationshipType] cannot be nullProperty [destinationClass] of class [class uk.co.mc.core.RelationshipType] cannot be null"
     }
 
     def "edit instance with bad JSON name"() {
@@ -422,8 +441,7 @@ class RelationshipTypeControllerSpec extends Specification {
 
         then:
         updated
-        updated == "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
-
+        updated == "asdsd_!* dasdsaProperty [name] of class [class uk.co.mc.core.RelationshipType] with value [asdsd_!* dasdsa] does not match the required pattern [[a-z\\-0-9A-Z]+]"
 
     }
 
@@ -452,101 +470,7 @@ class RelationshipTypeControllerSpec extends Specification {
     }
 
 
-    def "Return 404 for non-existing item as JSON for incoming relationships queried by type"() {
-        response.format = "json"
 
-        params.id = "1"
-
-        controller.incoming(10, "no-such-type")
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
-
-    def "Return 404 for non-existing item as XML for incoming relationships queried by type"() {
-        response.format = "xml"
-
-        params.id = "1"
-        controller.incoming(10, "no-such-type")
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
-
-    def "Return 404 for non-existing item as JSON for outgoing relationships queried by type"() {
-        response.format = "json"
-
-        params.id = "1"
-
-        controller.outgoing(10, "no-such-type")
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
-
-    def "Return 404 for non-existing item as XML for outgoing relationships queried by type"() {
-        response.format = "xml"
-
-        params.id = "1"
-
-        controller.outgoing(10, "no-such-type")
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
-
-
-    def "Return 404 for non-existing item as JSON for incoming relationships"() {
-        response.format = "json"
-
-        params.id = "1000000"
-
-        controller.incoming(10, null)
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
-
-    def "Return 404 for non-existing item as XML for incoming relationships"() {
-        response.format = "xml"
-
-        params.id = "1000000"
-
-        controller.incoming(10, null)
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
-
-    def "Return 404 for non-existing item as JSON for outgoing relationships"() {
-        response.format = "json"
-
-        params.id = "1000000"
-
-        controller.outgoing(10, null)
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
-
-    def "Return 404 for non-existing item as XML for outgoing relationships"() {
-        response.format = "xml"
-
-        params.id = "1000000"
-
-        controller.outgoing(10, null)
-
-        expect:
-        response.text == ""
-        response.status == HttpServletResponse.SC_NOT_FOUND
-    }
 
     def "Return 404 for non-existing item as JSON on delete"() {
         response.format = "json"
@@ -678,32 +602,21 @@ class RelationshipTypeControllerSpec extends Specification {
     }
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
-        [name: "$resourceName $counter"]
-    }
-
-
-
-    protected RelationshipType prepareTypeAndDummyEntities() {
-        fixturesLoader.load('relationshipTypes/RT_relationship')
-        fillWithDummyEntities(15)
-        RelationshipType relationshipType = fixturesLoader.RT_relationship.save() ?: RelationshipType.findByName('relationship')
-        assert relationshipType
-        relationshipType
+        [name: "relationshipType${counter}", sourceToDestination: "${counter}superseded by", destinationToSource: "${counter}supersedes", sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"]
     }
 
 
     protected static getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 5, 5, 0, 6, "${baseLink}?max=5&offset=10", ""],
-                [2, 5, 5, 0, 6, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 3, 6, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 4, 4, 3, 6, "", "${baseLink}?max=4&offset=4"],
-                [5, 2, 5, 3, 6, "", "${baseLink}?max=5&offset=0"],
-                [6, 2, 2, 3, 6, "", "${baseLink}?max=2&offset=8"]
+                [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4"],
+                [5, 2, 10, 10, 12, "", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8"]
         ]
     }
-
 
     // -- end copy and pasted
 

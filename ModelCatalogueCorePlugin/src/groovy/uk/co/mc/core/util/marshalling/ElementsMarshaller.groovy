@@ -30,7 +30,7 @@ class ElementsMarshaller extends AbstractMarshallers {
     @Override
     protected void buildXml(Object elements, XML xml) {
         xml.build {
-            for (CatalogueElement el in elements.elements) {
+            for (el in elements.elements) {
                 element el
             }
             previous elements.previous
