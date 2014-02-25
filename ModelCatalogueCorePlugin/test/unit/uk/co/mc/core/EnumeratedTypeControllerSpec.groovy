@@ -25,7 +25,7 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
         assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
 
         //configuration properties for abstract controller
-        assert (newInstance = new EnumeratedType(name: "sub4", enumerations: [h: 'history', p: 'politics', sci: 'science']))
+        assert (newInstance = new EnumeratedType(name: "sub4", enumerations: [h1: 'history', p1: 'politics', sci1: 'science']))
         assert (badInstance = new EnumeratedType(name: "", description: "asdf"))
         assert (propertiesToEdit = [description: "edited description ", enumerations: ["T1": 'test1', "T2": 'test2', "T3": 'test3']])
         assert (propertiesToCheck = ['name', 'description', 'enumerations'])
@@ -73,7 +73,7 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
 
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {
-        [name: "ENumeratedType${counter}", enumerations: ['H': 'history', 'P': 'politics', 'SCI': 'science', 'GEO': 'geography']]
+        [name: "ENumeratedType${counter}", enumerations: ["H${counter}": "history${counter}", "P${counter}": "politics${counter}", "SCI${counter}": "science${counter}", "GEO${counter}": "geography${counter}"]]
     }
 
     Class getResource() {
