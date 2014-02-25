@@ -21,8 +21,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 version: el.version,
                 elementType: el.class.name,
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
-                outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/outgoing/$el.id"],
-                incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/incoming/$el.id"]
+                outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"],
+                incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"]
 
         ]
     }
@@ -31,8 +31,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         xml.build {
             name el.name
             description el.description
-            outgoingRelationships count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/outgoing/$el.id"
-            incomingRelationships count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/incoming/$el.id"
+            outgoingRelationships count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"
+            incomingRelationships count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"
         }
     }
 

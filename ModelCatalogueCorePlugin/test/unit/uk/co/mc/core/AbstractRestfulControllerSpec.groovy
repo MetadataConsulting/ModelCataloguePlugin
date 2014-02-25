@@ -242,8 +242,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         json.version == loadItem1.version
         json.elementType == loadItem1.class.name
         json.elementTypeName == GrailsNameUtils.getNaturalName(loadItem1.class.simpleName)
-        json.outgoingRelationships == [count: 1, link: "/${resourceName}/outgoing/${loadItem1.id}"]
-        json.incomingRelationships == [count: 0, link: "/${resourceName}/incoming/${loadItem1.id}"]
+        json.outgoingRelationships == [count: 1, link: "/${resourceName}/${loadItem1.id}/outgoing"]
+        json.incomingRelationships == [count: 0, link: "/${resourceName}/${loadItem1.id}/incoming"]
 
         jsonPropertyCheck(json, loadItem1)
 
@@ -352,9 +352,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         xml.@elementType == loadItem1.class.name
         xml.@elementTypeName == GrailsNameUtils.getNaturalName(loadItem1.class.simpleName)
         xml.outgoingRelationships.@count == 1
-        xml.outgoingRelationships.@link == "/${resourceName}/outgoing/${loadItem1.id}"
+        xml.outgoingRelationships.@link == "/${resourceName}/${loadItem1.id}/outgoing"
         xml.incomingRelationships.@count == 0
-        xml.incomingRelationships.@link == "/${resourceName}/incoming/${loadItem1.id}"
+        xml.incomingRelationships.@link == "/${resourceName}/${loadItem1.id}/incoming"
 
         xmlPropertyCheck(xml, loadItem1)
 
@@ -1245,7 +1245,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
     }
 
     @Unroll
@@ -1256,7 +1256,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming")
     }
 
 
@@ -1268,7 +1268,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/relationship")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
     }
 
     @Unroll
@@ -1279,7 +1279,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/relationship")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
     }
 
 
@@ -1291,7 +1291,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/xyz")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
     }
 
     @Unroll
@@ -1302,7 +1302,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/xyz")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
     }
 
     @Unroll
@@ -1313,7 +1313,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
     }
 
     @Unroll
@@ -1324,7 +1324,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming")
     }
 
 
@@ -1336,7 +1336,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/relationship")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
     }
 
     @Unroll
@@ -1347,7 +1347,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/relationship")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
     }
 
 
@@ -1359,7 +1359,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1/xyz")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
     }
 
     @Unroll
@@ -1370,7 +1370,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/incoming/1/xyz")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
     }
 
     // -- end copy and pasted

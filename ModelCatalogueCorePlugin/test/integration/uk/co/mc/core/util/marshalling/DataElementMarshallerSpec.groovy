@@ -59,7 +59,7 @@ class DataElementMarshallerSpec extends IntegrationSpec{
         json
         json.id == de1.id
         json.name == de1.name
-        json.outgoingRelationships == ["count":1, "link":"/dataElement/outgoing/${de1.id}"]
+        json.outgoingRelationships == ["count":1, "link":"/dataElement/${de1.id}/outgoing"]
 
         when:
 

@@ -1,7 +1,5 @@
 package uk.co.mc.core.util.marshalling
 
-import grails.converters.XML
-import uk.co.mc.core.CatalogueElement
 import uk.co.mc.core.util.Elements
 
 /**
