@@ -130,7 +130,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         item.destination.@elementType.text() == mapping.destination.class.name
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/mapping/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/mapping")
     }
 
     protected mapToDummyEntities(ValueDomain toBeLinked) {
@@ -159,7 +159,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
     }
 
     @Unroll

@@ -32,6 +32,18 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         [method, url, controller, action, paramsAssertions] << generateAssertionsForCatalogueElementControllers('conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'model', 'valueDomain')
     }
 
+    def "value domain extra mappings mehtod #method maps and url #url maps to action #action"() {
+        expect:
+        assertRestForwardUrlMapping(method, url, controller: "valueDomain", action: action) {
+            id = "1"
+        }
+        where:
+        method      | action             | url
+        "GET"       | "mappings"         | "/api/modelCatalogue/core/valueDomain/1/mapping"
+        //"POST"      | "addMapping"       | "/api/modelCatalogue/core/valueDomain/1/mapping"
+        //"DELETE"    | "removeMapping"    | "/api/modelCatalogue/core/valueDomain/1/mapping"
+    }
+
     def "for method #method and url /api/modelCatalogue/core#url there should be no mappings found"() {
         when:
         assertRestForwardUrlMapping([controller: "foo", action: "bar"], method, "/api/modelCatalogue/core$url", {})

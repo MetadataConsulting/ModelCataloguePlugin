@@ -18,7 +18,7 @@ class ValueDomainController extends CatalogueElementController<ValueDomain> {
 
         int total = domain.outgoingMappings.size()
         def list = Mapping.findAllBySource(domain, params)
-        def links = nextAndPreviousLinks("/${resourceName}/mapping/${params.id}", total)
+        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/mapping", total)
 
         respond new Mappings(
                 items: list,
