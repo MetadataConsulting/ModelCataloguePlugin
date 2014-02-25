@@ -23,7 +23,7 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
         def links = nextAndPreviousLinks("/${resourceName}/", total)
         respond new Elements(
                 total: total,
-                elements: list,
+                items: list,
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
@@ -163,7 +163,7 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
         def links = nextAndPreviousLinks("/${resourceName}/${incomingOrOutgoing}/${params.id}" + (typeParam ? "/${typeParam}" : ""), total)
 
         respond new Relationships(
-                relationships: list,
+                items: list,
                 previous: links.previous,
                 next: links.next,
                 direction: direction,
@@ -173,7 +173,7 @@ abstract class CatalogueElementController<T> extends RestfulController<T> {
         )
     }
 
-    private Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
+    protected Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
         def link = "${baseLink}?"
         if (params.max) {
             link += "max=${params.max}"

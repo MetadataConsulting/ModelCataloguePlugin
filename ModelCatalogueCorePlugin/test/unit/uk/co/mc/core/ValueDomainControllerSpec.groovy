@@ -5,13 +5,15 @@ import grails.test.mixin.TestFor
 import spock.lang.Unroll
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.DataElementMarshaller
+import uk.co.mc.core.util.marshalling.MappingsMarshaller
+import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 import uk.co.mc.core.util.marshalling.ValueDomainMarshaller
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ValueDomainController)
-@Mock([DataElement, ValueDomain, Relationship, RelationshipType, MeasurementUnit, DataType])
+@Mock([DataElement, ValueDomain, Relationship, RelationshipType, MeasurementUnit, DataType, Mapping])
 class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
     def author, mph, integer, kph
@@ -57,8 +59,95 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
 
     @Override
     List<AbstractMarshallers> getMarshallers() {
-        [new ValueDomainMarshaller(), new DataElementMarshaller()]
+        [new ValueDomainMarshaller(), new DataElementMarshaller(), new MappingsMarshaller(), new MeasurementUnitMarshallers()]
     }
+
+    @Unroll
+    def "get json mapping: #no where max: #max offset: #offset\""() {
+        fillWithDummyEntities(15)
+        ValueDomain first = ValueDomain.get(1)
+        mapToDummyEntities(first)
+
+        when:
+        params.id = first.id
+        params.offset = offset
+        params.max = max
+        response.format = "json"
+        controller.mappings(max)
+        def json = response.json
+
+        recordResult"mapping$no", json
+
+        then:
+        checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
+
+        when:
+        def item  = json.list[0]
+        def mapping = first.outgoingMappings.find {it.id == item.id}
+
+        then:
+        item.mapping == mapping.mapping
+        item.destination
+        item.destination.id == mapping.destination.id
+        item.destination.elementType
+        item.destination.elementType == mapping.destination.class.name
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/mapping/1")
+    }
+
+
+    @Unroll
+    def "get xml mapping: #no where max: #max offset: #offset\""() {
+        fillWithDummyEntities(15)
+        ValueDomain first = ValueDomain.get(1)
+        mapToDummyEntities(first)
+
+        when:
+        params.id = first.id
+        params.offset = offset
+        params.max = max
+        response.format = "xml"
+        controller.mappings(max)
+        def xml = response.xml
+
+        recordResult"mapping$no", xml
+
+        then:
+        checkXmlCorrectListValues(xml, total, size, offset, max, next, previous)
+        xml.mapping.size() == size
+
+
+        when:
+        def item  = xml.mapping[0]
+        def mapping = first.outgoingMappings.find {it.id == item.@id.text() as Long}
+
+        then:
+        item.mapping.text() == mapping.mapping
+        item.destination
+        item.destination.@id.text() == "$mapping.destination.id"
+        item.destination.@elementType
+        item.destination.@elementType.text() == mapping.destination.class.name
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/mapping")
+    }
+
+    protected mapToDummyEntities(ValueDomain toBeLinked) {
+        for (domain in resource.list()) {
+            if (domain != toBeLinked) {
+                Mapping.map(toBeLinked, domain, "x")
+                if (toBeLinked.outgoingMappings.size() == 12) {
+                    break
+                }
+            }
+        }
+
+        assert toBeLinked.outgoingMappings
+        assert toBeLinked.outgoingMappings.size() == 12
+        toBeLinked
+    }
+
 
     // -- begin copy and pasted
 
@@ -70,7 +159,7 @@ class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/outgoing/1")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
     }
 
     @Unroll
