@@ -181,7 +181,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/")
     }
 
     @Unroll
@@ -218,7 +218,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/")
     }
 
 
@@ -1088,7 +1088,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         }
     }
 
-    private checkJsonRelationsInternal(typeParam, no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+    private checkJsonRelationsInternal(typeParam, no, size, max, offset, total, next, previous, self, incomingOrOutgoing) {
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
 
         response.format = "json"
@@ -1102,7 +1102,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         recordResult "${incomingOrOutgoing}${no}", json
 
 
-        checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
+        checkJsonCorrectListValues(json, total, size, offset, max, next, previous, self)
 
         def item = json.list[0]
 
@@ -1123,7 +1123,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert item.relation.id == relation.id
     }
 
-    protected static checkJsonCorrectListValues(JSONElement json, total, size, offset, max, next, previous) {
+    protected static checkJsonCorrectListValues(JSONElement json, total, size, offset, max, next, previous, self) {
         assert json.success
         assert json.total == total
         assert json.size == size
@@ -1133,15 +1133,16 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert json.list.size() == size
         assert json.next == next
         assert json.previous == previous
+        assert json.self == self
         true
     }
 
-    def checkJsonRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        checkJsonRelationsInternal(null, no, size, max, offset, total, next, previous, incomingOrOutgoing)
+    def checkJsonRelations(no, size, max, offset, total, next, previous, self, incomingOrOutgoing) {
+        checkJsonRelationsInternal(null, no, size, max, offset, total, next, previous, self, incomingOrOutgoing)
     }
 
-    def checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        checkJsonRelationsInternal("relationship", no, size, max, offset, total, next, previous, incomingOrOutgoing)
+    def checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, self, incomingOrOutgoing) {
+        checkJsonRelationsInternal("relationship", no, size, max, offset, total, next, previous, self, incomingOrOutgoing)
     }
 
     def checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
@@ -1171,7 +1172,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         type2.delete()
     }
 
-    def checkXmlRelationsInternal(typeParam, no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+    def checkXmlRelationsInternal(typeParam, no, size, max, offset, total, next, previous, self, incomingOrOutgoing) {
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
 
         response.format = "xml"
@@ -1186,7 +1187,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
         assert result
-        checkXmlCorrectListValues(result, total, size, offset, max, next, previous)
+        checkXmlCorrectListValues(result, total, size, offset, max, next, previous, self)
         assert result.relationship
         assert result.relationship.size() == size
 
@@ -1209,7 +1210,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert item.relation.@id == "${relation.id}"
     }
 
-    protected static checkXmlCorrectListValues(GPathResult xml, total, size, offset, max, next, previous) {
+    protected static checkXmlCorrectListValues(GPathResult xml, total, size, offset, max, next, previous, self) {
         assert xml.@success.text() == "true"
         assert xml.@total.text() == "${total}"
         assert xml.@size.text() == "${size}"
@@ -1217,15 +1218,16 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         assert xml.@page.text() == "${max}"
         assert xml.next.text() == next
         assert xml.previous.text() == previous
+        assert xml.self.text() == self
         true
     }
 
-    def checkXmlRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        checkXmlRelationsInternal(null, no, size, max, offset, total, next, previous, incomingOrOutgoing)
+    def checkXmlRelations(no, size, max, offset, total, next, previous, self, incomingOrOutgoing) {
+        checkXmlRelationsInternal(null, no, size, max, offset, total, next, previous, self, incomingOrOutgoing)
     }
 
-    def checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        checkXmlRelationsInternal("relationship", no, size, max, offset, total, next, previous, incomingOrOutgoing)
+    def checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, self, incomingOrOutgoing) {
+        checkXmlRelationsInternal("relationship", no, size, max, offset, total, next, previous, self, incomingOrOutgoing)
     }
 
     def checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
@@ -1258,13 +1260,13 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     protected static getPaginationParameters(String baseLink) {
         [
-                // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4"],
-                [5, 2, 10, 10, 12, "", "${baseLink}?max=10&offset=0"],
-                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8"]
+                // no,size, max, offset, total, next, previous, self
+                [1, 10, 10, 0, 12, "${baseLink}?offset=10", "", baseLink],
+                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", "", "${baseLink}?max=5"],
+                [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5", "${baseLink}?max=5&offset=5"],
+                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4", "${baseLink}?max=4&offset=8"],
+                [5, 2, 10, 10, 12, "", "${baseLink}", "${baseLink}?offset=10"],
+                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8", "${baseLink}?max=2&offset=10"]
         ]
     }
 
@@ -1282,7 +1284,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing")
     }
 
     @Unroll
@@ -1293,7 +1295,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming")
     }
 
 
@@ -1305,7 +1307,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
     }
 
     @Unroll
@@ -1316,7 +1318,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
     }
 
 
@@ -1328,7 +1330,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
     }
 
     @Unroll
@@ -1339,7 +1341,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
     }
 
     @Unroll
@@ -1350,7 +1352,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing")
     }
 
     @Unroll
@@ -1361,7 +1363,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming")
     }
 
 
@@ -1373,7 +1375,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
     }
 
     @Unroll
@@ -1384,7 +1386,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
     }
 
 
@@ -1396,7 +1398,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
     }
 
     @Unroll
@@ -1407,7 +1409,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
     }
 
     // -- end copy and pasted

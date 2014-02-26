@@ -22,12 +22,13 @@ class ValueDomainController extends CatalogueElementController<ValueDomain> {
 
         int total = domain.outgoingMappings.size()
         def list = Mapping.findAllBySource(domain, params)
-        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/mapping", total)
+        def links = generateLinks("/${resourceName}/${params.id}/mapping", total)
 
         respond new Mappings(
                 items: list,
                 previous: links.previous,
                 next: links.next,
+                self: links.self,
                 total: total,
                 offset: params.int('offset') ?: 0,
                 page: params.int('max') ?: 0

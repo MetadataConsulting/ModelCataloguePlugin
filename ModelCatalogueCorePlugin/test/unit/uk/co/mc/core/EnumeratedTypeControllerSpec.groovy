@@ -89,47 +89,47 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
 
     @Unroll
     def "get json outgoing relationships pagination: #no where max: #max offset: #offset"() {
-        checkJsonRelations(no, size, max, offset, total, next, previous, "outgoing")
+        checkJsonRelations(no, size, max, offset, total, next, previous, self, "outgoing")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing")
     }
 
     @Unroll
     def "get json incoming relationships pagination: #no where max: #max offset: #offset"() {
-        checkJsonRelations(no, size, max, offset, total, next, previous, "incoming")
+        checkJsonRelations(no, size, max, offset, total, next, previous, self, "incoming")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming")
     }
 
 
     @Unroll
     def "get json outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
-        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, self, "outgoing")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
     }
 
     @Unroll
     def "get json incoming relationships pagination with type: #no where max: #max offset: #offset"() {
-        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, self, "incoming")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
     }
 
 
@@ -141,7 +141,7 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
     }
 
     @Unroll
@@ -152,52 +152,52 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
     }
 
     @Unroll
     def "get xml outgoing relationships pagination: #no where max: #max offset: #offset"() {
-        checkXmlRelations(no, size, max, offset, total, next, previous, "outgoing")
+        checkXmlRelations(no, size, max, offset, total, next, previous, self, "outgoing")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing")
     }
 
     @Unroll
     def "get xml incoming relationships pagination: #no where max: #max offset: #offset"() {
-        checkXmlRelations(no, size, max, offset, total, next, previous, "incoming")
+        checkXmlRelations(no, size, max, offset, total, next, previous, self, "incoming")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming")
     }
 
 
     @Unroll
     def "get xml outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
-        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, self, "outgoing")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
     }
 
     @Unroll
     def "get xml incoming relationships pagination with type: #no where max: #max offset: #offset"() {
-        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, self, "incoming")
 
         cleanup:
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
     }
 
 
@@ -209,7 +209,7 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
     }
 
     @Unroll
@@ -220,7 +220,7 @@ class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
         RelationshipType.findByName("relationship")?.delete()
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
+        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
     }
 
     // -- end copy and pasted
