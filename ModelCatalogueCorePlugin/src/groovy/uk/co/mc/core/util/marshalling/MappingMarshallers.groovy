@@ -33,6 +33,6 @@ class MappingMarshallers extends AbstractMarshallers {
 
     protected void addXmlAttributes(map, XML xml) {
         super.addXmlAttributes(map, xml)
-        xml.attribute('id', "$map.id")
+        addXmlAttribute(map.id, "id", xml)
     }
 }

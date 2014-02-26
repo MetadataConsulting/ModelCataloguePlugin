@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse
  */
 @TestFor(MeasurementUnitController)
 @Mock([MeasurementUnit, Relationship, RelationshipType, EnumeratedType, DataType, ValueDomain])
-class MeasurementUnitControllerSpec extends AbstractRestfulControllerSpec {
+class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     RelationshipType relationshipType
 

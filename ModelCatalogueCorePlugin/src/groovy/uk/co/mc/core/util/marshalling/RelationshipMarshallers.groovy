@@ -33,7 +33,7 @@ class RelationshipMarshallers extends AbstractMarshallers {
 
     protected void addXmlAttributes(rel, XML xml) {
         super.addXmlAttributes(rel, xml)
-        xml.attribute('id', "$rel.id")
+        addXmlAttribute(rel.id, "id", xml)
     }
 
     static void renderInfo(String what, Map info, XML xml) {

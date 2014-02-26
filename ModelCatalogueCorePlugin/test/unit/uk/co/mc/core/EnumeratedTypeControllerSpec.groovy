@@ -11,7 +11,7 @@ import uk.co.mc.core.util.marshalling.EnumeratedTypeMarshaller
  */
 @TestFor(EnumeratedTypeController)
 @Mock([EnumeratedType, Relationship, RelationshipType])
-class EnumeratedTypeControllerSpec extends AbstractRestfulControllerSpec {
+class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     RelationshipType type
 

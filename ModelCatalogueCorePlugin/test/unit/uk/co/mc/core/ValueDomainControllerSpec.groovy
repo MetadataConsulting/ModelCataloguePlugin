@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse
  */
 @TestFor(ValueDomainController)
 @Mock([DataElement, ValueDomain, Relationship, RelationshipType, MeasurementUnit, DataType, Mapping])
-class ValueDomainControllerSpec extends AbstractRestfulControllerSpec {
+class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     def author, mph, integer, kph
     RelationshipType type

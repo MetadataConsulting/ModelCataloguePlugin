@@ -34,4 +34,8 @@ abstract class AbstractMarshallers {
 
     protected void addXmlAttributes(element, XML xml) {}
 
+    protected void addXmlAttribute(property, String attribute, XML xml) {
+        if(property!=null){xml.attribute(attribute, "${property}")}
+    }
+
 }

@@ -37,10 +37,10 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
     }
 
     protected void addXmlAttributes(el, XML xml) {
-        xml.attribute("id", "${el.id}")
-        xml.attribute("version", "${el.version}")
-        xml.attribute("elementType", "${el.class.name}")
-        xml.attribute("elementTypeName", "${GrailsNameUtils.getNaturalName(el.class.simpleName)}")
+        addXmlAttribute(el.id, "id", xml)
+        addXmlAttribute(el.version, "version", xml)
+        addXmlAttribute(el.class.name, "elementType", xml)
+        addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }
 
 }

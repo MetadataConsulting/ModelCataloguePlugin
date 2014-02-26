@@ -46,10 +46,10 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
 
     @Override
     protected void addXmlAttributes(Object elements, XML xml) {
-        xml.attribute("total", "${elements.total}")
-        xml.attribute("page", "${elements.page}")
-        xml.attribute("offset", "${elements.offset}")
-        xml.attribute("size", "${elements.items.size()}")
-        xml.attribute("success", "true")
+        addXmlAttribute(elements.total, "total", xml)
+        addXmlAttribute(elements.page, "page", xml)
+        addXmlAttribute(elements.offset, "offset", xml)
+        addXmlAttribute(elements.items.size(), "size", xml)
+        addXmlAttribute("true", "success", xml)
     }
 }
