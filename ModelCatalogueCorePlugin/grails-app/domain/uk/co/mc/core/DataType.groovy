@@ -48,12 +48,12 @@ class DataType extends CatalogueElement {
             [name: "Boolean", description: "java.lang.Boolean"],
             [name: "Date", description: "java.util.Date"],
             [name: "Time", description: "java.sql.Time"],
-            [name: "Currency", description: "java.util.Currency"],
+            [name: "Currency", description: "java.util.Currency"]
     ]
 
     static initDefaultDataTypes() {
         for (definition in defaultRelationshipTypesDefinitions) {
-            DataType existing = DataType(definition.name)
+            DataType existing = DataType.findByName(definition.name)
             if (!existing) {
                 new DataType(definition).save()
             }

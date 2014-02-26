@@ -37,6 +37,7 @@ grails-app/assets/bower_components/*
 
 # plugin release file
 /*.zip
+/*.zip.sha1
 
 # older plugin install locations
 /plugins
@@ -51,6 +52,9 @@ grails-app/assets/bower_components/*
 *.ipr
 **.gen.fixture.js
 **.gen.xml
+/plugin.xml
+/grails-model-catalogue-core-plugin-0.0.1/*
+
 
 
 

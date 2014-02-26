@@ -9,6 +9,13 @@ class ImportService {
     static transactional = true
     def grailsApplication
 
+    private static final QUOTED_CHARS = [
+            "\\": "&#92;",
+            ":": "&#58;",
+            "|": "&#124;",
+            "%": "&#37;",
+    ]
+
     def importData() {
 
         DataType.initDefaultDataTypes()
@@ -167,8 +174,12 @@ class ImportService {
 
                 if (enumerated) {
 
-                    //FIXME we need to query the enumerated types to ensure we don't include duplicate enumerated sets
-                    dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumerations.toString())
+
+                    String enumString  = enumerations.sort() collect { key, val ->
+                        "${this.quote(key)}:${this.quote(val)}"
+                    }.join('|')
+
+                    dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
 
                     if(!dataTypeReturn){
                      dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
@@ -178,6 +189,8 @@ class ImportService {
                     dataTypeReturn = (DataType.findByName(name))?:DataType.findByName("String")
 
                 }
+            }else{
+                dataTypeReturn = DataType.findByName("String")
             }
         }
         return dataTypeReturn
@@ -189,5 +202,14 @@ class ImportService {
             cd = new ConceptualDomain(name: name, description: description).save()
         }
         return cd
+    }
+
+    private static String quote(String s) {
+        if (s == null) return null
+        String ret = s
+        QUOTED_CHARS.each { original, replacement ->
+            ret = ret.replace(original, replacement)
+        }
+        ret
     }
 }

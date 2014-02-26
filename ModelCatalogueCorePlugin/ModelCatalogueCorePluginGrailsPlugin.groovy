@@ -1,8 +1,9 @@
+import grails.util.Holders
 import uk.co.mc.core.util.marshalling.*
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.0.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging
@@ -12,10 +13,10 @@ class ModelCatalogueCorePluginGrailsPlugin {
 
     // TODO Fill in these fields
     def title = "Model Catalogue Core Plugin Plugin" // Headline display name of the plugin
-    def author = "Your name"
-    def authorEmail = ""
+    def author = "Adam Milward, Vladimír Oraný"
+    def authorEmail = "adam.milward@outlook.com, vladimir@orany.cz"
     def description = '''\
-Brief summary/description of the plugin.
+Model catalogue core plugin (metadata registry)
 '''
 
     // URL to the plugin's documentation
