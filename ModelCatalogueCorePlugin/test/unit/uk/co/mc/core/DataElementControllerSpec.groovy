@@ -2,6 +2,7 @@ package uk.co.mc.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.util.GrailsNameUtils
 import spock.lang.Unroll
 import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
@@ -32,7 +33,7 @@ class DataElementControllerSpec extends CatalogueElementRestfulControllerSpec {
         assert (newInstance = fixturesLoader.DE_author2)
         assert (badInstance = new DataElement(name: "", description: "asdf"))
         assert (propertiesToEdit = [description: "edited description ", code: "AA123"])
-        assert (propertiesToCheck = ['name', 'description', 'code', '@status', '@versionNumber', 'ext'])
+        //assert (propertiesToCheck = ['name', 'description', 'code', '@status', '@versionNumber', 'ext'])
 
 
     }
@@ -41,61 +42,61 @@ class DataElementControllerSpec extends CatalogueElementRestfulControllerSpec {
         type.delete()
     }
 
-//overrider xml property check so we can look at extensions
 
-    @Override
-    boolean xmlPropertyCheck(xml, loadItem){
+    def xmlCustomPropertyCheck(xml, item){
 
-        def xmlProp = (xml["name"].toString())?:null
+        super.xmlCustomPropertyCheck(xml, item)
+        checkProperty(xml.code, item.code, "code")
+        checkProperty(xml.@status, item.status, "status")
+        checkProperty(xml.@versionNumber, item.versionNumber, "versionNumber")
 
-        if (xmlProp != loadItem["name"]) {
-            throw new AssertionError("error: property to check: name  where xml:${xml["name"] } !=  item:${loadItem.getProperty("name")}")
-        }
-
-        xmlProp = (xml["description"].toString())?:null
-
-        if (xmlProp != loadItem.getProperty("description")) {
-            throw new AssertionError("error: property to check: description  where xml:${xml["description"] } !=  item:${loadItem.getProperty("description")}")
-        }
-
-        xmlProp = (xml["code"].toString())?:null
-
-        if (xmlProp != loadItem.getProperty("code")) {
-            throw new AssertionError("error: property to check: description  where xml:${xml["code"] } !=  item:${loadItem.getProperty("code")}")
-        }
-
-        xmlProp = (xml["@status"].toString())?:null
-
-        if (xmlProp != loadItem.getProperty("status").toString()) {
-            throw new AssertionError("error: property to check: description  where xml:${xml["@status"] } !=  item:${loadItem.getProperty("status")}")
-        }
-
-        xmlProp = (xml["@versionNumber"].toString())?:null
-
-        if (xmlProp != loadItem.getProperty("versionNumber").toString()) {
-            throw new AssertionError("error: property to check: description  where xml:${xml["@versionNumber"] } !=  item:${loadItem.getProperty("versionNumber")}")
-        }
-
-
-
-        loadItem = loadItem.getProperty("ext")
-
-        loadItem.each{ key, value ->
+        def inputItem = item.getProperty("ext")
+        inputItem.each{ key, value ->
             def extension = xml.depthFirst().find{it.name()=="extension" && it.@key == key}
-            if(value!=extension.toString()){
-                throw new AssertionError("error: property to check: extension  where xml:${xmlProp} !=  item:${loadItem.getProperty("enumerations")}")
-
-            }
+            checkProperty(value, extension.toString(), "extension")
         }
-
 
         return true
+    }
 
+    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
+
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        checkProperty(xml.code, inputItem.code, "code")
+        checkProperty(xml.@status, outputItem.status, "status")
+        checkProperty(xml.@versionNumber, outputItem.versionNumber, "versionNumber")
+
+        inputItem.getProperty("ext").each{ key, value ->
+            def extension = xml.depthFirst().find{it.name()=="extension" && it.@key == key}
+            checkProperty(value, extension.toString(), "extension")
+        }
+
+        return true
     }
 
 
+    def customJsonPropertyCheck(item, json){
+
+        super.customJsonPropertyCheck(item, json)
+        checkProperty(json.code , item.code, "code")
+        checkProperty(json.status , item.status, "status")
+        checkProperty(json.ext, item.ext, "extension")
+        checkProperty(json.versionNumber , item.versionNumber, "versionNumber")
+
+        return true
+    }
 
 
+    def customJsonPropertyCheck(inputItem, json, outputItem){
+
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
+        checkProperty(json.code , inputItem.code, "code")
+        checkProperty(json.status , outputItem.status, "status")
+        checkProperty(json.ext , inputItem.ext, "extension")
+        checkProperty(json.versionNumber , outputItem.versionNumber, "versionNumber")
+        return true
+
+    }
 
     // -- begin copy and pasted
 

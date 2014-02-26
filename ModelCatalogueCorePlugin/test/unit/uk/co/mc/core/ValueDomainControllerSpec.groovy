@@ -3,6 +3,7 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
+import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.*
 
 import javax.servlet.http.HttpServletResponse
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ValueDomainController)
+@Mixin(ResultRecorder)
 @Mock([DataElement, ValueDomain, Relationship, RelationshipType, MeasurementUnit, DataType, Mapping])
 class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
@@ -34,7 +36,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         assert (newInstance = new ValueDomain(name: "ground_speed2", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer))
         assert (badInstance = new ValueDomain(name: "", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer))
         assert (propertiesToEdit = [description: "something different"])
-        assert (propertiesToCheck = ['name', 'description', 'unitOfMeasure.name', 'dataType.@id'])
+        //assert (propertiesToCheck = ['name', 'description', 'unitOfMeasure.name', 'dataType.@id'])
 
     }
 
@@ -44,6 +46,46 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         integer?.delete()
         type?.delete()
     }
+
+
+    def xmlCustomPropertyCheck(xml, item){
+
+        super.xmlCustomPropertyCheck(xml, item)
+        checkProperty(xml.unitOfMeasure.name, item.unitOfMeasure.name, "unitOfMeasure")
+        checkProperty(xml.dataType.@id, item.dataType.id, "dataType")
+        return true
+    }
+
+    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
+
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        checkProperty(xml.unitOfMeasure.name, inputItem.unitOfMeasure.name, "unitOfMeasure")
+        checkProperty(xml.dataType.@id, inputItem.dataType.id, "dataType")
+
+        return true
+    }
+
+
+    def customJsonPropertyCheck(item, json){
+
+        super.customJsonPropertyCheck(item, json)
+        checkProperty(json.unitOfMeasure.name, item.unitOfMeasure.name, "unitOfMeasure")
+        checkProperty(json.dataType.id, item.dataType.id, "dataType")
+
+        return true
+    }
+
+
+    def customJsonPropertyCheck(inputItem, json, outputItem){
+
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
+        checkProperty(json.unitOfMeasure.name, inputItem.unitOfMeasure.name, "unitOfMeasure")
+        checkProperty(json.dataType.id, inputItem.dataType.id, "dataType")
+
+        return true
+
+    }
+
 
 
     Class getResource() { ValueDomain }
@@ -74,7 +116,8 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         controller.mappings(max)
         def json = response.json
 
-        recordResult"mapping$no", json
+        recordResult "mapping$no", json, resourceName
+
 
         then:
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
@@ -109,7 +152,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         controller.mappings(max)
         def xml = response.xml
 
-        recordResult"mapping$no", xml
+        recordResult "mapping$no", xml, resourceName
 
         then:
         checkXmlCorrectListValues(xml, total, size, offset, max, next, previous)
@@ -186,7 +229,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         controller.addMapping()
         def result = response."$format"
 
-        recordResult "addMappingFailed" , result
+        recordResult "addMappingFailed" , result, resourceName
 
         expect:
         response.status == 422 // unprocessable entity
@@ -246,7 +289,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
         def json = response.json
 
-        recordResult "addMapping" , json
+        recordResult "addMapping" , json, resourceName
 
         expect:
         json.mapping            == "x"
@@ -270,7 +313,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
         def xml = response.xml
 
-        recordResult "addMapping" , xml
+        recordResult "addMapping" , xml, resourceName
 
         expect:
         xml.mapping.text()            == "x"

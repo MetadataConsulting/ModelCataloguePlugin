@@ -42,7 +42,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         controller."add${direction.capitalize()}"(loadItem1.id, type.name)
         def json = response.json
 
-        recordResult "add${direction.capitalize()}" , json, controllerName, thisClass
+        recordResult "add${direction.capitalize()}" , json, resourceName
 
         def expectedSource =        direction == "outgoing" ? loadItem1 : loadItem2
         def expectedDestination =   direction == "outgoing" ? loadItem2 : loadItem1
@@ -69,7 +69,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         controller."add${direction.capitalize()}"(loadItem1.id, type.name)
         def xml = response.xml
 
-        recordResult "add${direction.capitalize()}" , xml, controllerName
+        recordResult "add${direction.capitalize()}" , xml, resourceName
 
         def expectedSource =        direction == "outgoing" ? loadItem1 : loadItem2
         def expectedDestination =   direction == "outgoing" ? loadItem2 : loadItem1
@@ -103,10 +103,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
 
         if(format=="JSON"){
-            recordInputJSON fixtureName, input, controllerName, thisClass
+            recordInputJSON fixtureName, input, resourceName
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input, controllerName
+            recordInputXML fixtureName, input, resourceName
         }
 
 
@@ -148,10 +148,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
 
         if(format=="JSON"){
-            recordInputJSON fixtureName, input, controllerName, thisClass
+            recordInputJSON fixtureName, input, resourceName
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input, controllerName
+            recordInputXML fixtureName, input, resourceName
         }
 
         request."${format.toLowerCase()}"= input
@@ -181,7 +181,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         controller."add${direction.capitalize()}"(loadItem1.id, type.name)
         def json = response.json
 
-        recordResult "add${direction.capitalize()}Failed" , json, controllerName, thisClass
+        recordResult "add${direction.capitalize()}Failed" , json, resourceName
 
         expect:
         response.status == 422 // unprocessable entity
@@ -205,7 +205,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         controller."add${direction.capitalize()}"(loadItem1.id, type.name)
         def xml = response.xml
 
-        recordResult "add${direction.capitalize()}Failed" , xml, controllerName
+        recordResult "add${direction.capitalize()}Failed" , xml, resourceName
 
         expect:
         response.status == 422 // unprocessable entity
@@ -232,10 +232,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
 
         if(format=="JSON"){
-            recordInputJSON fixtureName, input, controllerName, thisClass
+            recordInputJSON fixtureName, input, resourceName
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input, controllerName
+            recordInputXML fixtureName, input, resourceName
         }
 
         request."${format.toLowerCase()}"= input
@@ -265,10 +265,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
 
         if(format=="JSON"){
-            recordInputJSON fixtureName, input, controllerName, thisClass
+            recordInputJSON fixtureName, input, resourceName
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input, controllerName
+            recordInputXML fixtureName, input, resourceName
         }
 
         request."${format.toLowerCase()}" = input
@@ -380,7 +380,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         JSONElement json = response.json
 
 
-        recordResult "${incomingOrOutgoing}${no}", json, controllerName, thisClass
+        recordResult "${incomingOrOutgoing}${no}", json, resourceName
 
 
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
@@ -439,7 +439,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         JSONObject json = response.json
 
 
-        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", json, controllerName, thisClass
+        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", json, resourceName
 
 
         assert json.success
@@ -463,7 +463,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         GPathResult result = response.xml
 
 
-        recordResult "${incomingOrOutgoing}${no}", result, controllerName
+        recordResult "${incomingOrOutgoing}${no}", result, resourceName
 
 
         assert result
@@ -514,7 +514,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         GPathResult result = response.xml
 
 
-        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", result, controllerName
+        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", result, resourceName
 
 
         assert result
@@ -630,50 +630,67 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
 
         super.xmlCustomPropertyCheck(xml, item)
 
+        checkProperty(xml.name, item.name, "name")
+        checkProperty(xml.description, item.description, "description")
         checkProperty(xml.@elementType, item.class.name, "elementType")
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
-        checkProperty(xml.incomingRelationships.@count, 0, "incomingRelationships")
+        checkProperty(xml.incomingRelationships.@count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingRelationships")
         checkProperty(xml.incomingRelationships.@link, "/${resourceName}/${item.id}/incoming", "incomingRelationships")
+        checkProperty(xml.outgoingRelationships.@count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingRelationships")
+        checkProperty(xml.outgoingRelationships.@link, "/${resourceName}/${item.id}/outgoing", "outgoingRelationships")
 
         return true
     }
 
     def xmlCustomPropertyCheck(inputItem, xml, outputItem){
+
         super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        checkProperty(xml.name, inputItem.name, "name")
+        checkProperty(xml.description, inputItem.description, "description")
         checkProperty(xml.@elementType, inputItem.class.name, "elementType")
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(inputItem.class.simpleName), "elementTypeName")
-        checkProperty(xml.incomingRelationships.@count, 0, "incomingRelationships")
+        checkProperty(xml.incomingRelationships.@count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingRelationships")
         checkProperty(xml.incomingRelationships.@link, "/${resourceName}/${outputItem.id}/incoming", "incomingRelationships")
+        checkProperty(xml.outgoingRelationships.@count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingRelationships")
+        checkProperty(xml.outgoingRelationships.@link, "/${resourceName}/${outputItem.id}/outgoing", "outgoingRelationships")
 
         return true
     }
 
 
     def customJsonPropertyCheck(item, json){
+
         super.customJsonPropertyCheck(item, json)
+        checkProperty(json.name , item.name, "name")
+        checkProperty(json.description , item.description, "description")
         checkProperty(json.elementType , item.class.name, "elementType")
         checkProperty(json.elementTypeName , GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
-        checkProperty(json.outgoingRelationships, [count: 1, link: "/${resourceName}/${item.id}/outgoing"], "elementType")
-        checkProperty(json.incomingRelationships, [count: 0, link: "/${resourceName}/${item.id}/incoming"], "elementType")
+        checkProperty(json.outgoingRelationships.count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingCount")
+        checkProperty(json.outgoingRelationships.link, "/${resourceName}/${item.id}/outgoing", "outgoingLink")
+        checkProperty(json.incomingRelationships.count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingCount")
+        checkProperty(json.incomingRelationships.link, "/${resourceName}/${item.id}/incoming", "incomingLink")
         return true
     }
+
+
 
 
     def customJsonPropertyCheck(inputItem, json, outputItem){
+
         super.customJsonPropertyCheck(inputItem, json, outputItem)
+        checkProperty(json.name , inputItem.name, "name")
+        checkProperty(json.description , inputItem.description, "description")
         checkProperty(json.elementType , inputItem.class.name, "elementType")
         checkProperty(json.elementTypeName , GrailsNameUtils.getNaturalName(inputItem.class.simpleName), "elementTypeName")
-        checkProperty(json.outgoingRelationships, [count: 1, link: "/${resourceName}/${outputItem.id}/outgoing"], "elementType")
-        checkProperty(json.incomingRelationships, [count: 0, link: "/${resourceName}/${outputItem.id}/incoming"], "elementType")
+        checkProperty(json.outgoingRelationships.count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingCount")
+        checkProperty(json.outgoingRelationships.link, "/${resourceName}/${outputItem.id}/outgoing", "outgoingLink")
+        checkProperty(json.incomingRelationships.count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingCount")
+        checkProperty(json.incomingRelationships.link, "/${resourceName}/${outputItem.id}/incoming", "incomingLink")
+
         return true
 
-//        json.id == item.id
-//        json.version == item.version
-        //json.elementType == item.class.name
-        //json.elementTypeName == GrailsNameUtils.getNaturalName(item.class.simpleName)
-        //json.outgoingRelationships == [count: 1, link: "/${resourceName}/${item.id}/outgoing"]
-        //json.incomingRelationships == [count: 0, link: "/${resourceName}/${item.id}/incoming"]
     }
+
 
 
 

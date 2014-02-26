@@ -3,6 +3,7 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
+import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
 
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletResponse
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(MeasurementUnitController)
+@Mixin(ResultRecorder)
 @Mock([MeasurementUnit, Relationship, RelationshipType, EnumeratedType, DataType, ValueDomain])
 class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpec {
 
@@ -30,13 +32,48 @@ class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpe
         assert (newInstance = fixturesLoader.MU_milesPerHour)
         assert (badInstance = new MeasurementUnit(name: "", symbol: "km"))
         assert (propertiesToEdit = [symbol: "_C_"])
-        assert (propertiesToCheck = ['name', 'symbol'])
+        //assert (propertiesToCheck = ['name', 'symbol'])
     }
 
     def cleanup() {
         loadItem1.delete()
         loadItem2.delete()
         relationshipType.delete()
+    }
+
+
+    def xmlCustomPropertyCheck(xml, item){
+
+        super.xmlCustomPropertyCheck(xml, item)
+        checkProperty(xml.symbol, item.symbol, "symbol")
+
+        return true
+    }
+
+    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
+
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        checkProperty(xml.symbol, inputItem.symbol, "symbol")
+
+        return true
+    }
+
+
+    def customJsonPropertyCheck(item, json){
+
+        super.customJsonPropertyCheck(item, json)
+        checkProperty(json.symbol , item.symbol, "symbol")
+
+        return true
+    }
+
+
+    def customJsonPropertyCheck(inputItem, json, outputItem){
+
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
+        checkProperty(json.symbol , inputItem.symbol, "symbol")
+        return true
+
     }
 
 

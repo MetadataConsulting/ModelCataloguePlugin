@@ -3,6 +3,7 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
+import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.EnumeratedTypeMarshaller
 
@@ -10,6 +11,7 @@ import uk.co.mc.core.util.marshalling.EnumeratedTypeMarshaller
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(EnumeratedTypeController)
+@Mixin(ResultRecorder)
 @Mock([EnumeratedType, Relationship, RelationshipType])
 class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec {
 
@@ -28,7 +30,7 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
         assert (newInstance = new EnumeratedType(name: "sub4", enumerations: [h1: 'history', p1: 'politics', sci1: 'science']))
         assert (badInstance = new EnumeratedType(name: "", description: "asdf"))
         assert (propertiesToEdit = [description: "edited description ", enumerations: ["T1": 'test1', "T2": 'test2', "T3": 'test3']])
-        assert (propertiesToCheck = ['name', 'description', 'enumerations'])
+        //assert (propertiesToCheck = ['name', 'description', 'enumerations'])
 
     }
 
@@ -36,40 +38,49 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
         type.delete()
     }
 
-    //override the xml check with extra check for enumerations
-    //FIX ME this is a bit of a hack but it provably isn't worth the time
-    //to create a specific check for arbitrary attributes within the property
-    //you are checking for
+    def xmlCustomPropertyCheck(xml, item){
 
-    @Override
-    boolean xmlPropertyCheck(xml, loadItem) {
+        super.xmlCustomPropertyCheck(xml, item)
 
-
-        def xmlProp = (xml["name"].toString()) ?: null
-
-        if (xmlProp != loadItem.getProperty("name")) {
-            throw new AssertionError("error: property to check: name  where xml:${xml["name"]} !=  item:${loadItem.getProperty("name")}")
-        }
-
-        xmlProp = (xml["description"].toString()) ?: null
-
-        if (xmlProp != loadItem.getProperty("description")) {
-            throw new AssertionError("error: property to check: description  where xml:${xml["description"]} !=  item:${loadItem.getProperty("description")}")
-        }
-
-        xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
+        def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
         if (xmlProp) {
             xmlProp = xmlProp.attributes()
-            if (xmlProp != loadItem.getProperty("enumerations")) {
-                throw new AssertionError("error: property to check: enumeration  where xml:${xmlProp} !=  item:${loadItem.getProperty("enumerations")}")
-
-            }
+            checkProperty(xmlProp, item.getProperty("enumerations"), "enumerations")
         }
 
         return true
+    }
 
+    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
+
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
+        if (xmlProp) {
+            xmlProp = xmlProp.attributes()
+            checkProperty(xmlProp, inputItem.getProperty("enumerations"), "enumerations")
+        }
+
+        return true
+    }
+
+
+    def customJsonPropertyCheck(item, json){
+
+        super.customJsonPropertyCheck(item, json)
+        checkProperty(json.enumerations , item.enumerations, "enumerations")
+
+        return true
+    }
+
+
+    def customJsonPropertyCheck(inputItem, json, outputItem){
+
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
+        checkProperty(json.enumerations , inputItem.enumerations, "enumerations")
+        return true
 
     }
+
 
 
     Map<String, Object> getUniqueDummyConstructorArgs(int counter) {

@@ -29,9 +29,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     private static final int DUMMY_ENTITIES_COUNT = 12
 
-    def newInstance, badInstance, propertiesToCheck, propertiesToEdit, loadItem2, loadItem1
-    String controllerName
-    String thisClass
+    def newInstance, badInstance, propertiesToEdit, loadItem2, loadItem1
     String badXmlCreateError = "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
     String badXmlUpdateError = "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
 
@@ -44,8 +42,6 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
             it.register()
         }
 
-        controllerName = controller.resourceName
-        thisClass = getClass().toString()
     }
 
     def cleanup() {
@@ -100,7 +96,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         String list = "list${no}"
 
 
-        recordResult list, json, controllerName, thisClass
+        recordResult list, json, resourceName
 
         then:
 
@@ -137,7 +133,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         GPathResult xml = response.xml
 
         String list = "list${no}"
-        recordResult list, xml, controllerName
+        recordResult list, xml, resourceName
 
         then:
 
@@ -170,14 +166,12 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         JSONObject json = response.json
 
-        recordResult 'showOne', json, controllerName, thisClass
+        recordResult 'showOne', json, resourceName
 
         then:
         json
 
-        customJsonPropertyCheck json, loadItem1
-        jsonPropertyCheck json, loadItem1
-
+        customJsonPropertyCheck loadItem1, json
 
     }
 
@@ -186,19 +180,14 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
     def "Show single existing item as XML"() {
         response.format = "xml"
-
         params.id = "${loadItem1.id}"
-
         controller.show()
-
         GPathResult xml = response.xml
-        recordResult "showOne", xml, controllerName
+        recordResult "showOne", xml, resourceName
 
         expect:
         xml
-
         xmlCustomPropertyCheck xml, loadItem1
-        xmlPropertyCheck xml, loadItem1
 
     }
 
@@ -210,13 +199,10 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         when:
         response.format = "json"
         request.json = badInstance.properties
-
         controller.save()
-
         JSONElement created = response.json
         def stored = resource.findByName(badInstance.name)
-
-        recordResult 'saveErrors', created, controllerName, thisClass
+        recordResult 'saveErrors', created, resourceName
 
         then:
         !stored
@@ -232,26 +218,19 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         when:
         response.format = "json"
-
         def json = newInstance.properties
         request.json = json
-
-
-        recordInputJSON 'createInput', json, controllerName, thisClass
-
-
+        recordInputJSON 'createInput', json, resourceName
         controller.save()
-
         JSONObject created = response.json
         def stored = resource.findByName(newInstance.name)
-
-        recordResult 'saveOk', created, controllerName, thisClass
+        recordResult 'saveOk', created, resourceName
 
         then:
         stored
         created
         customJsonPropertyCheck newInstance, created, stored
-        jsonPropertyCheck created, newInstance
+
     }
 
 
@@ -261,19 +240,13 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         when:
         response.format = "xml"
-
         def xml = newInstance.encodeAsXML()
-
-        recordInputXML "createInput", xml, controllerName
-
+        recordInputXML "createInput", xml, resourceName
         request.xml = xml
-
         controller.save()
-
         GPathResult created = response.xml
         def stored = resource.findByName(newInstance.name)
-
-        recordResult "createOk", created, controllerName
+        recordResult "createOk", created, resourceName
 
         then:
         stored
@@ -282,7 +255,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         created.@version == stored.version
 
         xmlCustomPropertyCheck newInstance, created, stored
-        xmlPropertyCheck newInstance, created
+
 
     }
 
@@ -307,19 +280,17 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         request.json = json
 
 
-        recordInputJSON 'updateInput', json, controllerName, thisClass
+        recordInputJSON 'updateInput', json, resourceName
 
         controller.update()
 
         JSONObject updated = response.json
 
-        recordResult 'updateOk', updated, controllerName, thisClass
+        recordResult 'updateOk', updated, resourceName
 
         then:
         updated
-        updated.id == loadItem1.id
-        updated.version == loadItem1.version
-        jsonPropertyCheck(updated, instance)
+        customJsonPropertyCheck instance, updated, loadItem1
 
     }
 
@@ -342,19 +313,17 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         def xml = instance.encodeAsXML()
         request.xml = xml
 
-        recordInputXML "updateInput", xml, controllerName
+        recordInputXML "updateInput", xml, resourceName
 
         controller.update()
 
         GPathResult updated = response.xml
 
-        recordResult 'updateOk', updated, controllerName
+        recordResult 'updateOk', updated, resourceName
 
         then:
         updated
-        updated.@id == loadItem1.id
-        updated.@version == loadItem1.version
-        xmlPropertyCheck(updated, instance)
+        xmlCustomPropertyCheck instance, updated, loadItem1
 
     }
 
@@ -367,14 +336,14 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         def xml = badInstance.encodeAsXML()
         request.xml = xml
 
-        recordInputXML "saveErrorsInput", xml, controllerName
+        recordInputXML "saveErrorsInput", xml, resourceName
 
         controller.save()
 
         GPathResult created = response.xml
         def stored = resource.findByName("")
 
-        recordResult 'saveErrors', created, controllerName
+        recordResult 'saveErrors', created, resourceName
 
         then:
         !stored
@@ -397,7 +366,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         JSONObject updated = response.json
 
-        recordResult 'updateErrors', updated, controllerName, thisClass
+        recordResult 'updateErrors', updated, resourceName
 
         then:
         updated
@@ -419,7 +388,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         params.id = instance.id
         def xml = badInstance.encodeAsXML()
 
-        recordInputXML "updateErrorsInput", xml, controllerName
+        recordInputXML "updateErrorsInput", xml, resourceName
 
         request.xml = xml
 
@@ -427,13 +396,11 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         GPathResult updated = response.xml
 
-        recordResult 'updateErrors', updated, controllerName
+        recordResult 'updateErrors', updated, resourceName
 
         then:
         updated
         updated.depthFirst().find { it.@field == 'name'} == badXmlUpdateError
-        //updated == "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
-
 
     }
 
@@ -514,75 +481,75 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
 
-    boolean jsonPropertyCheck(json, loadItem) {
-        for (int j = 0; (j < propertiesToCheck.size()); j++) {
-            def property = propertiesToCheck[j]
-            property = property.toString().replaceAll("\\@", "")
-            def subProperties = property.split("\\.")
-            def jsonProp = json
-            def loadProp = loadItem
-
-            if (subProperties.size() > 1) {
-                for (int i = 0; (i < subProperties.size()); i++) {
-                    def subProperty = subProperties[i]
-                    jsonProp = jsonProp[subProperty]
-                    loadProp = loadProp.getProperty(subProperty)
-                }
-            } else {
-                jsonProp = json[property]
-                loadProp = loadItem.getProperty(property)
-            }
-
-            def jsonMap = JSON.parse(jsonProp.toString())
-            if (jsonMap) {
-                jsonProp = JSON.parse(jsonProp.toString())
-            } else {
-                jsonProp = (jsonProp.toString()!="{}")?:null
-                loadProp = (loadProp.toString()!="[:]")?:null
-            }
-
-            if (jsonProp != loadProp) {
-                throw new AssertionError("error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}")
-            }
-        }
-
-        return true
-
-    }
-
-
-    boolean xmlPropertyCheck(xml, loadItem) {
-        for (int j = 0; (j < propertiesToCheck.size()); j++) {
-            def property = propertiesToCheck[j]
-            def subProperties = property.toString().split("\\.")
-            def xmlProp = xml
-            def loadProp = loadItem
-
-            if (subProperties.size() > 1) {
-                for (int i = 0; (i < subProperties.size()); i++) {
-                    def subProperty = subProperties[i]
-                    if (subProperty.contains("@")) {
-                        xmlProp = xmlProp[subProperty]
-                        subProperty = subProperty.replaceAll("\\@", "")
-                        loadProp = loadProp.getProperty(subProperty)
-                    } else {
-                        xmlProp = xmlProp[subProperty]
-                        loadProp = loadProp.getProperty(subProperty)
-                    }
-                }
-            } else {
-                xmlProp = (xml[property].toString()) ?: null
-                loadProp = loadItem.getProperty(property.toString().replaceAll("\\@", ""))
-            }
-
-            if (xmlProp.toString() != loadProp.toString()) {
-                throw new AssertionError("error: property to check: ${propertiesToCheck[j]}  where xml:${xmlProp} !=  item:${loadProp}")
-            }
-        }
-        return true
-
-    }
-
+//    boolean jsonPropertyCheck(json, loadItem) {
+//        for (int j = 0; (j < propertiesToCheck.size()); j++) {
+//            def property = propertiesToCheck[j]
+//            property = property.toString().replaceAll("\\@", "")
+//            def subProperties = property.split("\\.")
+//            def jsonProp = json
+//            def loadProp = loadItem
+//
+//            if (subProperties.size() > 1) {
+//                for (int i = 0; (i < subProperties.size()); i++) {
+//                    def subProperty = subProperties[i]
+//                    jsonProp = jsonProp[subProperty]
+//                    loadProp = loadProp.getProperty(subProperty)
+//                }
+//            } else {
+//                jsonProp = json[property]
+//                loadProp = loadItem.getProperty(property)
+//            }
+//
+//            def jsonMap = JSON.parse(jsonProp.toString())
+//            if (jsonMap) {
+//                jsonProp = JSON.parse(jsonProp.toString())
+//            } else {
+//                jsonProp = (jsonProp.toString()!="{}")?:null
+//                loadProp = (loadProp.toString()!="[:]")?:null
+//            }
+//
+//            if (jsonProp != loadProp) {
+//                throw new AssertionError("error: property to check: ${propertiesToCheck[j]}  where json:${jsonProp} !=  item:${loadProp}")
+//            }
+//        }
+//
+//        return true
+//
+//    }
+//
+//
+//    boolean xmlPropertyCheck(xml, loadItem) {
+//        for (int j = 0; (j < propertiesToCheck.size()); j++) {
+//            def property = propertiesToCheck[j]
+//            def subProperties = property.toString().split("\\.")
+//            def xmlProp = xml
+//            def loadProp = loadItem
+//
+//            if (subProperties.size() > 1) {
+//                for (int i = 0; (i < subProperties.size()); i++) {
+//                    def subProperty = subProperties[i]
+//                    if (subProperty.contains("@")) {
+//                        xmlProp = xmlProp[subProperty]
+//                        subProperty = subProperty.replaceAll("\\@", "")
+//                        loadProp = loadProp.getProperty(subProperty)
+//                    } else {
+//                        xmlProp = xmlProp[subProperty]
+//                        loadProp = loadProp.getProperty(subProperty)
+//                    }
+//                }
+//            } else {
+//                xmlProp = (xml[property].toString()) ?: null
+//                loadProp = loadItem.getProperty(property.toString().replaceAll("\\@", ""))
+//            }
+//
+//            if (xmlProp.toString() != loadProp.toString()) {
+//                throw new AssertionError("error: property to check: ${propertiesToCheck[j]}  where xml:${xmlProp} !=  item:${loadProp}")
+//            }
+//        }
+//        return true
+//
+//    }
+//
 
     void fillWithDummyEntities(int limit = DUMMY_ENTITIES_COUNT) {
         if (limit <= resource.count()) return
@@ -639,12 +606,14 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def xmlCustomPropertyCheck(xml, item){
         checkProperty(xml.@id, item.id, "id")
         checkProperty(xml.@version, item.version, "version")
+        //xmlPropertyCheck xml, item
         return true
     }
 
     def xmlCustomPropertyCheck(inputItem, xml, outputItem){
         checkProperty(xml.@id, outputItem.id, "id")
         checkProperty(xml.@version, outputItem.version, "version")
+        //xmlPropertyCheck outputItem, xml
         return true
     }
 
@@ -652,6 +621,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def customJsonPropertyCheck(item, json){
         checkProperty(json.id , item.id, "id")
         checkProperty(json.version , item.version, "version")
+        //jsonPropertyCheck json, item
         return true
     }
 
@@ -659,13 +629,28 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     def customJsonPropertyCheck(inputItem, json, outputItem){
         checkProperty(json.id , outputItem.id, "id")
         checkProperty(json.version , outputItem.version, "version")
+        //jsonPropertyCheck json, outputItem
         return true
     }
 
 
-    def checkProperty(property, value, propertyNames){
+    def checkProperty(property, value, propertyName){
+        property = property.toString()
+        value = value.toString()
+        if(property!= value && (property!="" && value!=null)) {
+            throw new AssertionError("error: property to check: ${propertyName}  where property: ${property} !=  item: ${value}")
+        }
+    }
+
+    def checkProperty(JSONObject property, value, propertyName){
         if (property != value) {
-            throw new AssertionError("error: property to check: ${propertyName}  where json: ${property} !=  item: ${$value}")
+            throw new AssertionError("error: property to check: ${propertyName}  where property: ${property} !=  item: ${value}")
+        }
+    }
+
+    def checkProperty(Map property, Map value, propertyName){
+        if (property != value) {
+            throw new AssertionError("error: property to check: ${propertyName}  where property: ${property} !=  item: ${value}")
         }
     }
 

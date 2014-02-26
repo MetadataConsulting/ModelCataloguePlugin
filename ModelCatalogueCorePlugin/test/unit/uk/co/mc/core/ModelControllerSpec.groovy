@@ -2,6 +2,8 @@ package uk.co.mc.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import spock.lang.Unroll
+import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ModelMarshaller
 
@@ -9,8 +11,9 @@ import uk.co.mc.core.util.marshalling.ModelMarshaller
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ModelController)
+@Mixin(ResultRecorder)
 @Mock([Model,DataElement, Relationship, RelationshipType])
-class ModelControllerSpec extends AbstractRestfulControllerSpec {
+class ModelControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     RelationshipType type
 
@@ -28,13 +31,50 @@ class ModelControllerSpec extends AbstractRestfulControllerSpec {
         assert (newInstance = fixturesLoader.M_chapter1)
         assert (badInstance = new Model(name: "", description:"asdf"))
         assert (propertiesToEdit = [description: "edited description "])
-        assert (propertiesToCheck = ['name','description', '@status', '@versionNumber'])
+       // assert (propertiesToCheck = ['name','description', '@status', '@versionNumber'])
 
 
     }
 
     def cleanup() {
         type.delete()
+    }
+
+    def xmlCustomPropertyCheck(xml, item){
+
+        super.xmlCustomPropertyCheck(xml, item)
+        checkProperty(xml.@status, item.status, "status")
+        checkProperty(xml.@versionNumber, item.versionNumber, "versionNumber")
+        return true
+    }
+
+    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
+
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        checkProperty(xml.@status, outputItem.status, "status")
+        checkProperty(xml.@versionNumber, outputItem.versionNumber, "versionNumber")
+
+        return true
+    }
+
+
+    def customJsonPropertyCheck(item, json){
+
+        super.customJsonPropertyCheck(item, json)
+        checkProperty(json.status , item.status, "status")
+        checkProperty(json.versionNumber , item.versionNumber, "versionNumber")
+
+        return true
+    }
+
+
+    def customJsonPropertyCheck(inputItem, json, outputItem){
+
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
+        checkProperty(json.status , outputItem.status, "status")
+        checkProperty(json.versionNumber , outputItem.versionNumber, "versionNumber")
+        return true
+
     }
 
 
@@ -51,6 +91,146 @@ class ModelControllerSpec extends AbstractRestfulControllerSpec {
     List<AbstractMarshallers> getMarshallers() {
         [new ModelMarshaller()]
     }
+
+    // -- begin copy and pasted
+
+    @Unroll
+    def "get json outgoing relationships pagination: #no where max: #max offset: #offset"() {
+        checkJsonRelations(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
+    }
+
+    @Unroll
+    def "get json incoming relationships pagination: #no where max: #max offset: #offset"() {
+        checkJsonRelations(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming")
+    }
+
+
+    @Unroll
+    def "get json outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
+    }
+
+    @Unroll
+    def "get json incoming relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
+    }
+
+
+    @Unroll
+    def "get json outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
+    }
+
+    @Unroll
+    def "get json incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
+    }
+
+    @Unroll
+    def "get xml outgoing relationships pagination: #no where max: #max offset: #offset"() {
+        checkXmlRelations(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing")
+    }
+
+    @Unroll
+    def "get xml incoming relationships pagination: #no where max: #max offset: #offset"() {
+        checkXmlRelations(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming")
+    }
+
+
+    @Unroll
+    def "get xml outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/relationship")
+    }
+
+    @Unroll
+    def "get xml incoming relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/relationship")
+    }
+
+
+    @Unroll
+    def "get xml outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/outgoing/xyz")
+    }
+
+    @Unroll
+    def "get xml incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
+
+        cleanup:
+        RelationshipType.findByName("relationship")?.delete()
+
+        where:
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/1/incoming/xyz")
+    }
+
+    // -- end copy and pasted
 
 }
 

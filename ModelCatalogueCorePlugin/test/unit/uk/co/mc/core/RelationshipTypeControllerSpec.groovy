@@ -41,7 +41,7 @@ class RelationshipTypeControllerSpec extends AbstractRestfulControllerSpec {
                 destinationClass: DataElement))
         assert (badInstance = new RelationshipType(name: "", sourceClass: PublishedElement))
         assert (propertiesToEdit = [name: "changedName", sourceClass: PublishedElement, destinationClass: PublishedElement])
-        assert (propertiesToCheck = ['name'])
+        //assert (propertiesToCheck = ['name'])
         badXmlUpdateError = null
 
     }
@@ -64,6 +64,29 @@ class RelationshipTypeControllerSpec extends AbstractRestfulControllerSpec {
     @Override
     List<AbstractMarshallers> getMarshallers() {
         [new RelationshipTypeMarshaller()]
+    }
+
+
+    def xmlCustomPropertyCheck(xml, item){
+        checkProperty(xml.name, item.name, "name")
+        return true
+    }
+
+    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
+        checkProperty(xml.name, inputItem.name, "name")
+        return true
+    }
+
+
+    def customJsonPropertyCheck(item, json){
+        checkProperty(json.name , item.name, "name")
+        return true
+    }
+
+
+    def customJsonPropertyCheck(inputItem, json, outputItem){
+        checkProperty(json.id , outputItem.id, "id")
+        return true
     }
 
 }

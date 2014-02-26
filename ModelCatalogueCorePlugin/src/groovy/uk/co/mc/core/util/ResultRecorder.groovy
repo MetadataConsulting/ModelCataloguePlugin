@@ -27,24 +27,24 @@ class ResultRecorder {
     private static final String JSONFILEPATH = "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core"
 
 
-    protected static File recordResult(String fixtureName, JSONElement json, String controller, String domainClass) {
-        File fixtureFile = newFixture(JSONFILEPATH, controller, fixtureName)
+    protected static File recordResult(String fixtureName, JSONElement json, String domainClass) {
+        File fixtureFile = newFixture(JSONFILEPATH, "${domainClass}/fixtures", fixtureName, "gen.fixture.js")
         fixtureFile.parentFile.mkdirs()
         fixtureFile.text = getFixtureText(domainClass, fixtureName, new JSON(json).toString(true))
         log.info "New fixture file created at $fixtureFile.canonicalPath"
         fixtureFile
     }
 
-    protected static File recordInputJSON(String fixtureName, Map json, String controller, String domainClass) {
-        File fixtureFile = newFixture(JSONFILEPATH, controller, fixtureName)
+    protected static File recordInputJSON(String fixtureName, Map json, String domainClass) {
+        File fixtureFile = newFixture(JSONFILEPATH, "${domainClass}/fixtures", fixtureName, "gen.fixture.js")
         fixtureFile.parentFile.mkdirs()
         fixtureFile.text = getFixtureText(domainClass, fixtureName, new JSON(json).toString(true))
         log.info "New fixture file created at $fixtureFile.canonicalPath"
         fixtureFile
     }
 
-    protected static File recordInputJSON(String fixtureName, String json, String controller, String domainClass) {
-        File fixtureFile = newFixture(JSONFILEPATH, controller, fixtureName)
+    protected static File recordInputJSON(String fixtureName, String json, String domainClass) {
+        File fixtureFile = newFixture(JSONFILEPATH, "${domainClass}/fixtures", fixtureName, "gen.fixture.js")
         fixtureFile.text = getFixtureText(domainClass, fixtureName, json)
         log.info "New fixture file created at $fixtureFile.canonicalPath"
         fixtureFile
@@ -58,23 +58,23 @@ class ResultRecorder {
      * @param xml xml to be saved to the fixture
      */
     protected static File recordResult(String fixtureName, GPathResult xml, String controller) {
-        File fixtureFile = newFixture(XMLFILEPATH, controller, fixtureName)
+        File fixtureFile = newFixture(XMLFILEPATH, controller, fixtureName, "gen.xml")
         fixtureFile.text = getXmlFixtureText(xml)
         log.info "New xml file created at $fixtureFile.canonicalPath"
         fixtureFile
     }
 
     protected static File recordInputXML(String fixtureName, String xml, String controller) {
-        File fixtureFile = newFixture(XMLFILEPATH, controller, fixtureName)
+        File fixtureFile = newFixture(XMLFILEPATH, controller, fixtureName, "gen.xml")
         fixtureFile.text = getXmlFixtureText(xml)
         log.info "New xml file created at $fixtureFile.canonicalPath"
         fixtureFile
     }
 
 
-    private static File newFixture(String filePath, controller, fixtureName){
+    private static File newFixture(String filePath, prefix, fixtureName, suffix){
 
-        def fixtureFile =  new File("${filePath}/${controller}/${fixtureName}.gen.xml")
+        def fixtureFile =  new File("${filePath}/${prefix}/${fixtureName}.${suffix}")
         fixtureFile.parentFile.mkdirs()
         return fixtureFile
     }

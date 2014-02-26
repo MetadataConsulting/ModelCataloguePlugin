@@ -20,17 +20,13 @@ class DataTypeControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     def setup() {
         fixturesLoader.load('dataTypes/DT_integer', 'dataTypes/DT_double', 'dataTypes/DT_string', 'relationshipTypes/RT_relationship')
-
         assert (loadItem1 = fixturesLoader.DT_integer.save())
         assert (loadItem2 = fixturesLoader.DT_double.save())
         assert (type = fixturesLoader.RT_relationship.save())
         assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
-
-        //configuration properties for abstract controller
         assert (newInstance = fixturesLoader.DT_string)
         assert (badInstance = new DataType(name: "", description: "asdf"))
         assert (propertiesToEdit = [description: "edited description "])
-        assert (propertiesToCheck = ['name', 'description'])
 
     }
 
