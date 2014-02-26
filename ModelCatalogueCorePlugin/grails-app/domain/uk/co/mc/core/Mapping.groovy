@@ -13,7 +13,10 @@ class Mapping {
 
     static constraints = {
         source nullable: false, unique: ['destination']
-        destination nullable: false
+        destination nullable: false, validator: { val, obj ->
+            if (!val || !obj.source) return true
+            return val != obj.source
+        }
         mapping nullable: false, blank: false, maxSize: 10000, validator: { val, obj ->
             if (!val) return true
             return validateMapping(val)
@@ -44,7 +47,6 @@ class Mapping {
         source.removeFromOutgoingMappings(old)
         destination.removeFromIncomingMappings(old)
         old.delete()
-
         old
     }
 

@@ -68,8 +68,9 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
             notFound()
             return
         }
-        outgoing ?  Relationship.unlink(source, destination, relationshipType) :  Relationship.unlink(destination, source, relationshipType)
-        response.status = HttpServletResponse.SC_NO_CONTENT
+        Relationship old = outgoing ?  Relationship.unlink(source, destination, relationshipType) :  Relationship.unlink(destination, source, relationshipType)
+        response.status = old ? HttpServletResponse.SC_NO_CONTENT : HttpServletResponse.SC_NOT_FOUND
+
     }
 
     private addRelation(Long id, String type, boolean outgoing) {
@@ -110,7 +111,7 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
         respond rel
     }
 
-    private parseOtherSide() {
+    protected parseOtherSide() {
         def otherSide = [:]
 
         withFormat {

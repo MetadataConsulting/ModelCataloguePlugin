@@ -22,7 +22,14 @@ class ModelCatalogueCorePluginUrlMappings {
                 action = [GET: "incoming", POST: "addIncoming", DELETE: "removeIncoming"]
             }
             "/$controller/$id/mapping" {
-                action = [GET: "mappings", POST: "addMapping", DELETE: "removeMapping"]
+                action = [GET: "mappings"]
+                constraints {
+                    controller inList: ['valueDomain']
+                }
+            }
+
+            "/$controller/$id/mapping/$destination" {
+                action = [POST: "addMapping", DELETE: "removeMapping"]
                 constraints {
                     controller inList: ['valueDomain']
                 }

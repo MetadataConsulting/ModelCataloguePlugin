@@ -2,14 +2,7 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 import spock.lang.Unroll
-import uk.co.mc.core.CatalogueElementController
-import uk.co.mc.core.ConceptualDomainController
-import uk.co.mc.core.DataElementController
-import uk.co.mc.core.DataTypeController
-import uk.co.mc.core.EnumeratedTypeController
-import uk.co.mc.core.MeasurementUnitController
-import uk.co.mc.core.ModelController
-import uk.co.mc.core.ValueDomainController
+import uk.co.mc.core.*
 
 @TestFor(ModelCatalogueCorePluginUrlMappings)
 @Mock([
@@ -34,14 +27,12 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
 
     def "value domain extra mappings mehtod #method maps and url #url maps to action #action"() {
         expect:
-        assertRestForwardUrlMapping(method, url, controller: "valueDomain", action: action) {
-            id = "1"
-        }
+        assertRestForwardUrlMapping(method, url, controller: "valueDomain", action: action, paramsToCheck)
         where:
-        method      | action             | url
-        "GET"       | "mappings"         | "/api/modelCatalogue/core/valueDomain/1/mapping"
-        //"POST"      | "addMapping"       | "/api/modelCatalogue/core/valueDomain/1/mapping"
-        //"DELETE"    | "removeMapping"    | "/api/modelCatalogue/core/valueDomain/1/mapping"
+        method      | action             | url                                                  | paramsToCheck
+        "GET"       | "mappings"         | "/api/modelCatalogue/core/valueDomain/1/mapping"     | {id = "1"}
+        "POST"      | "addMapping"       | "/api/modelCatalogue/core/valueDomain/1/mapping/2"   | {id = "1" ; destination = "2"}
+        "DELETE"    | "removeMapping"    | "/api/modelCatalogue/core/valueDomain/1/mapping/2"   | {id = "1" ; destination = "2"}
     }
 
     def "for method #method and url /api/modelCatalogue/core#url there should be no mappings found"() {
