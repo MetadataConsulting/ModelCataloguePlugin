@@ -19,7 +19,6 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
                 list: elements.items,
                 previous: elements.previous,
                 next: elements.next,
-                self: elements.self
         ]
     }
 
@@ -29,7 +28,6 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         xml.build {
             previous elements.previous
             next elements.next
-            self elements.self
         }
     }
 

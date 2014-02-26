@@ -120,7 +120,7 @@ class RelationshipTypeControllerSpec extends Specification {
         json.previous == previous
 
         where:
-        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/relationshipType/")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/relationshipType/")
     }
 
     @Unroll
@@ -160,7 +160,7 @@ class RelationshipTypeControllerSpec extends Specification {
 
 
         where:
-        [no, size, max, offset, total, next, previous, self] << getPaginationParameters("/relationshipType/")
+        [no, size, max, offset, total, next, previous] << getPaginationParameters("/relationshipType/")
     }
 
 
@@ -608,13 +608,13 @@ class RelationshipTypeControllerSpec extends Specification {
 
     protected static getPaginationParameters(String baseLink) {
         [
-                // no,size, max, offset, total, next, previous, self
-                [1, 10, 10, 0, 12, "${baseLink}?offset=10", "", "${baseLink}?max=10"],
-                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", "", "${baseLink}?max=5"],
-                [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5", "${baseLink}?max=5&offset=5"],
-                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4", "${baseLink}?max=4&offset=8"],
-                [5, 2, 10, 10, 12, "", "${baseLink}", "${baseLink}?offset=10"],
-                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8", "${baseLink}?max=2&offset=10"]
+                // no,size, max , off. tot. next                           , previous
+                [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4"],
+                [5, 2, 10, 10, 12, "", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8"]
         ]
     }
 

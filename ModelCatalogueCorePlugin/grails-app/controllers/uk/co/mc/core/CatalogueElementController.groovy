@@ -1,5 +1,7 @@
 package uk.co.mc.core
 
+import grails.rest.RestfulController
+import uk.co.mc.core.util.Elements
 import uk.co.mc.core.util.Relationships
 
 import javax.servlet.http.HttpServletResponse
@@ -143,13 +145,12 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
         int total = type ? Relationship."countBy${sourceOrDestination}AndRelationshipType"(element, type) : (element."${incomingOrOutgoing}Relationships".size() ?: 0)
         def list = type ? Relationship."findAllBy${sourceOrDestination}AndRelationshipType"(element, type, params) : Relationship."findAllBy${sourceOrDestination}"(element, params)
         def direction = sourceOrDestination == "Source" ? "sourceToDestination" : "destinationToSource"
-        def links = generateLinks("/${resourceName}/${params.id}/${incomingOrOutgoing}" + (typeParam ? "/${typeParam}" : ""), total)
+        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/${incomingOrOutgoing}" + (typeParam ? "/${typeParam}" : ""), total)
 
         respond new Relationships(
                 items: list,
                 previous: links.previous,
                 next: links.next,
-                self: links.self,
                 direction: direction,
                 total: total,
                 offset: params.int('offset') ?: 0,

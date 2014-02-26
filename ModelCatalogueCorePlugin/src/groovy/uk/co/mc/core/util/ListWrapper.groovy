@@ -5,7 +5,6 @@ package uk.co.mc.core.util
 abstract class ListWrapper {
     String next
     String previous
-    String self
     int total
     int page
     int offset
