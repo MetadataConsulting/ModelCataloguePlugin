@@ -50,6 +50,7 @@ module.exports = function(config) {
             'karma-firefox-launcher',
             'karma-safari-launcher',
             'karma-junit-reporter',
+            'karma-osx-reporter',
             'karma-coffee-preprocessor'
         ],
 
