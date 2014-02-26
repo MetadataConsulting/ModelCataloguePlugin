@@ -50,6 +50,7 @@ module.exports = function(config) {
             'karma-firefox-launcher',
             'karma-safari-launcher',
             'karma-junit-reporter',
+            'karma-osx-reporter',
             'karma-coffee-preprocessor'
         ],
 
@@ -61,7 +62,7 @@ module.exports = function(config) {
             // options passed to the coffee compiler
             options: {
                 bare: true,
-                sourceMap: false
+                sourceMap: true
             },
             // transforming the filenames
             transformPath: function(path) {
