@@ -1,0 +1,21 @@
+ID: 	UC_4
+Title: 	Add data element to model basket
+Description: 	User accesses the system to create a new model by dragging data elements into the modelBasket
+Primary Actor: 	User
+Preconditions: 	None 
+Postconditions: model basket is updated with the relevant information
+
+Main
+Success Scenario: 
+1. User navigates to list of data elements (see UC_1)
+2. User selects the data element(s) they want to add to their model by dragging and dropping the data element into the model basket which is positioned in the user menu
+3. The model basket count is updated
+4. The user clicks on the model basket and can preview the items in the basket
+5. The user clicks in the model basket and is taken to the the model basket page (see UC_10)
+
+Extensions: 
+3a. the basket could be persisted in the system across sessions?	
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: Medium

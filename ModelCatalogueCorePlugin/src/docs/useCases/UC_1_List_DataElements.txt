@@ -1,0 +1,36 @@
+ID: 	UC_1
+Title: 	List Data Elements
+Description: 	User accesses the system to view a list of data elements that are included in the Hepatitis model
+Primary Actor: 	User
+Preconditions: 	None 
+Postconditions: None
+
+Main
+Success Scenario: 
+1. User select list data elements from the menu
+2. System displays list of data elements
+3. User clicks on the filter by model button (i.e. in the column header)
+4. User is presented with a popup with a list of models to filter on 
+5. User chooses the model to filter by (hepatitis)
+6. System displays a list of the data elements included in the hepatitis model (including: name, description, link)
+
+Extensions: 	
+2a. No data elements are displayed
+— 2a1. System displays error message saying there are no data elements available.
+4a. No models are included in the filter list
+- 4a1 the filter by model button will return an error saying there are no models to filter on
+4b. User searches for the models rather than simply selecting them (i.e. there maybe many models to filter on)
+- 4b1 the list of models will return the models that match the search query
+5a. User selects multiple models to filter on
+- 5a1 the data elements will be filtered by multiple models
+
+N.B. Filters should be "saved". i.e. if a user navigates to a particular dataElement and returns to the page they would expect the list would have the same filter in place
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: High
+
+
+
+
+
