@@ -6,8 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException
 import uk.co.mc.core.util.Elements
 
 import javax.servlet.http.HttpServletResponse
-import static org.springframework.http.HttpStatus.NO_CONTENT
 
+import static org.springframework.http.HttpStatus.NO_CONTENT
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
@@ -48,12 +48,12 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         try{
             instance.delete flush:true
-        }catch (DataIntegrityViolationException e){
-            response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
+        }catch (DataIntegrityViolationException ignored){
+            response.status = HttpServletResponse.SC_CONFLICT
             def model =  [errors: message(code: "uk.co.mc.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])] // STATUS CODE 501
             respond model
             return
-        } catch (Exception e){
+        } catch (Exception ignored){
             def model =  [errors: message(code: "uk.co.mc.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])] // STATUS CODE 501
             respond model
             return
