@@ -87,11 +87,15 @@ describe "Model Catalogue Provider", ->
         nextList.previous = "/measurementUnit/?max=10&offset=0"
 
         $httpBackend
-          .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/?offset=10")
+          .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/?max=10&offset=10")
           .respond(nextList)
 
         nextResult = null
         nextError  = null
+
+        console.log(result.next)
+        console.log(result.next.url)
+
         result.next().then( (_result_) ->
           nextResult = _result_
         , (_error_) ->
@@ -165,7 +169,7 @@ describe "Model Catalogue Provider", ->
           expect(result.symbol).toBe("°C")
 
 
-          describe "fetched instance if enhanced", ->
+          describe "fetched instance is enhanced", ->
             it "outgoing and incoming relationships are functions", ->
               $httpBackend
               .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/1/outgoing")
@@ -207,6 +211,32 @@ describe "Model Catalogue Provider", ->
               $httpBackend.flush()
 
               expect(status).toBe(204)
+
+            it "has update method", ->
+              expectedPayload = {
+                symbol:       "°C"
+                description:  "Celsius, also known as centigrade,[1] is a scale and unit of measurement for temperature. It is named after the Swedish astronomer Anders Celsius (1701–1744), who developed a similar temperature scale. The degree Celsius (°C) can refer to a specific temperature on the Celsius scale as well as a unit to indicate a temperature interval, a difference between two temperatures or an uncertainty. The unit was known until 1948 as \"centigrade\" from the Latin centum translated as 100 and gradus translated as \"steps\"."
+                name:         "Degrees of Celsius"
+                version:      1
+              }
+
+              result.version = 1
+
+              $httpBackend
+              .when("PUT", "#{modelCatalogue.getApiRoot()}/measurementUnit/1", expectedPayload)
+              .respond(fixtures.measurementUnit.updateOk)
+
+              expect(angular.isFunction(result.update)).toBeTruthy()
+
+              updated = null
+
+              result.update().then((result) -> updated = result)
+
+              expect(updated).toBeNull()
+
+              $httpBackend.flush()
+
+              expect(updated).toBeDefined()
 
 
 
@@ -344,4 +374,125 @@ describe "Model Catalogue Provider", ->
           expect(result.id).toBe(1)
           expect(result.version).toBe(1)
           expect(result.name).toBe(fixtures.measurementUnit.updateOk.name)
+          expect(result.update).toBeDefined()
 
+        it "returns 404 if the resource does not exist", ->
+          payloadWithId = angular.extend({}, fixtures.measurementUnit.updateInput)
+          payloadWithId.id = 1000000
+
+          $httpBackend
+          .when("PUT", "#{modelCatalogue.getApiRoot()}/measurementUnit/1000000", fixtures.measurementUnit.updateInput)
+          .respond(404)
+
+          result = null
+          error  = null
+
+          measurementUnits.update(payloadWithId).then( (_result_) ->
+            result = _result_
+          , (_error_) ->
+            error  = _error_
+          )
+
+          expect(result).toBeNull()
+          expect(error).toBeNull()
+
+          $httpBackend.flush()
+
+          expect(error).toBeDefined()
+          expect(error.status).toBe(404)
+          expect(result).toBeNull()
+
+        it "updates failed if wrong input", ->
+          payloadWithId = angular.extend({}, fixtures.measurementUnit.updateInput)
+          payloadWithId.id = 1
+          payloadWithId.name = fixtures.measurementUnit.updateErrors.errors[0]["rejected-value"]
+
+          payloadWithoutId = angular.extend({}, payloadWithId)
+          delete payloadWithoutId.id
+
+          $httpBackend
+          .when("PUT", "#{modelCatalogue.getApiRoot()}/measurementUnit/1", payloadWithoutId)
+          .respond(fixtures.measurementUnit.updateErrors)
+
+          result = null
+          error  = null
+
+          measurementUnits.update(payloadWithId).then( (_result_) ->
+            result = _result_
+          , (_error_) ->
+            error  = _error_
+          )
+
+          expect(result).toBeNull()
+          expect(error).toBeNull()
+
+          $httpBackend.flush()
+
+          expect(result).toBeNull()
+          expect(error).toBeDefined()
+          expect(error.data).toBeDefined()
+          expect(error.data.errors).toBeDefined()
+          expect(error.data.errors[0].field).toBe("name")
+          expect(error.data.errors[0]["rejected-value"]).toBe(fixtures.measurementUnit.updateErrors.errors[0]["rejected-value"])
+          expect(error.data.errors[0].message).toBe(fixtures.measurementUnit.updateErrors.errors[0].message)
+
+      describe "can save new entity", ->
+        it "saves if input data ok", ->
+          payload = {
+            name:    "Miles per hour"
+            symbol:  "MPH"
+          }
+
+          $httpBackend
+          .when("POST", "#{modelCatalogue.getApiRoot()}/measurementUnit", payload)
+          .respond(fixtures.measurementUnit.saveOk)
+
+          result = null
+          error  = null
+
+          measurementUnits.save(payload).then( (_result_) ->
+            result = _result_
+          , (_error_) ->
+            error  = _error_
+          )
+
+          expect(result).toBeNull()
+          expect(error).toBeNull()
+
+          $httpBackend.flush()
+
+          expect(error).toBeNull()
+          expect(result).toBeDefined()
+          expect(result.id).toBe(fixtures.measurementUnit.saveOk.id)
+          expect(result.version).toBe(fixtures.measurementUnit.saveOk.version)
+          expect(result.name).toBe(fixtures.measurementUnit.saveOk.name)
+          expect(result.update).toBeDefined()
+
+        it "save failed if wrong input", ->
+          payload = {symbol: "MPH"}
+
+          $httpBackend
+          .when("POST", "#{modelCatalogue.getApiRoot()}/measurementUnit", payload)
+          .respond(fixtures.measurementUnit.saveErrors)
+
+          result = null
+          error  = null
+
+          measurementUnits.save(payload).then( (_result_) ->
+            result = _result_
+          , (_error_) ->
+            error  = _error_
+          )
+
+          expect(result).toBeNull()
+          expect(error).toBeNull()
+
+          $httpBackend.flush()
+
+          expect(result).toBeNull()
+          expect(error).toBeDefined()
+          expect(error.data).toBeDefined()
+          expect(error.data.errors).toBeDefined()
+          expect(error.data.errors[0].field).toBe("name")
+          expect(error.data.errors[0]["rejected-value"]).toBe(fixtures.measurementUnit.saveErrors.errors[0]["rejected-value"])
+          expect(error.data.errors[0].message).toBe(fixtures.measurementUnit.saveErrors.errors[0].message)

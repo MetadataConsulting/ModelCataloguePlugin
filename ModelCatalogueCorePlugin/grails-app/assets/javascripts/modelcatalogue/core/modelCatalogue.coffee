@@ -93,7 +93,19 @@ angular.module('mc.modelCatalogue', []).provider 'modelCatalogue', [ ->
 
   # Class defintion
   class CatalogueElement
-    init: (element) ->
+    constructor: ($http, $q, element, elementResource) ->
+      @defaultExcludes = ['elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships']
+
+      @$http    = $http
+      @$q       = $q
+      @resource = elementResource
+
+      @updatableProperties = []
+
+      for name, ignored of element
+       unless name in @defaultExcludes
+          @updatableProperties.push(name)
+
       angular.extend(@, element)
       if element.hasOwnProperty('incomingRelationships')
         incoming = element.incomingRelationships
@@ -106,15 +118,15 @@ angular.module('mc.modelCatalogue', []).provider 'modelCatalogue', [ ->
         @outgoingRelationships.url   = outgoing.link
         @outgoingRelationships.total = outgoing.count
 
-    constructor: ($http, $q, element, elementResource) ->
-      @$http    = $http
-      @$q       = $q
-      @resource = elementResource
+    delete:                 () -> @resource.delete(@id)
 
-      @init(element)
+    update:                 () ->
+      payload = {}
+      for name in @updatableProperties
+        payload[name] = this[name]
+      @resource.update(payload)
 
-    delete:   () -> @resource.delete(@id)
-    update:   () -> @resource.update(this)
+    getUpdatableProperties: () -> angular.copy(@updatableProperties)
 
 
   class CatalogueElementResource
@@ -132,12 +144,15 @@ angular.module('mc.modelCatalogue', []).provider 'modelCatalogue', [ ->
     delete: (id) ->
       httpUnwrappedRequest(@$http, @$q, {method: 'DELETE', url: "#{@getIndexPath()}/#{id}"})
 
+    save: (data) ->
+      httpUnwrappedRequest(@$http, @$q, {method: 'POST', url: "#{@getIndexPath()}", data: data}, createElementEnhancer(@$http, @$q, @))
+
     update: (data) ->
       if !data.id?
         throw "Missing ID, use save instead"
       props = angular.copy(data)
       delete props.id
-      httpUnwrappedRequest(@$http, @$q, {method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props})
+      httpUnwrappedRequest(@$http, @$q, {method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props}, createElementEnhancer(@$http, @$q, @))
 
     list: (params = {}) ->
       httpUnwrappedRequest(@$http, @$q, {method: 'GET', url: @getIndexPath(), params: params}, createListEnhancer(@$http, @$q, @, params))
