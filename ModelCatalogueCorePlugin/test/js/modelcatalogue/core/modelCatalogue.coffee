@@ -93,9 +93,6 @@ describe "Model Catalogue Provider", ->
         nextResult = null
         nextError  = null
 
-        console.log(result.next)
-        console.log(result.next.url)
-
         result.next().then( (_result_) ->
           nextResult = _result_
         , (_error_) ->
