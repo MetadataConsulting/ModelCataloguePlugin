@@ -21,7 +21,7 @@ angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.r
         if list.next? and list.next != ""
           nextUrl = list.next
           list.next = () ->
-            rest({method: 'GET', url: "#{apiRoot}#{nextUrl}", params: params}, enhancer)
+            rest({method: 'GET', url: "#{apiRoot}#{nextUrl}", params: params, enhancer: enhancer})
           list.next.size   = Math.min(list.page, list.total - (list.offset + list.page))
           list.next.url    = nextUrl
           list.next.total  = list.total
@@ -43,7 +43,7 @@ angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.r
         if list.previous? and list.previous != ""
           prevUrl = list.previous
           list.previous = () ->
-            rest({method: 'GET', url: "#{apiRoot}#{prevUrl}", params: params}, enhancer)
+            rest({method: 'GET', url: "#{apiRoot}#{prevUrl}", params: params, enhancer: enhancer})
           list.previous.size   = Math.min(list.page, list.offset)
           list.previous.total  = list.total
           list.previous.url    = prevUrl
@@ -91,12 +91,12 @@ angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.r
         angular.extend(@, element)
         if element.hasOwnProperty('incomingRelationships')
           incoming = element.incomingRelationships
-          @incomingRelationships       = () -> rest({method: 'GET', url: "#{apiRoot}#{incoming.link}"}, createListEnhancer(@resource))
+          @incomingRelationships       = () -> rest({method: 'GET', url: "#{apiRoot}#{incoming.link}", enhancer: createListEnhancer(@resource)})
           @incomingRelationships.url   = incoming.link
           @incomingRelationships.total = incoming.count
         if element.hasOwnProperty('outgoingRelationships')
           outgoing = element.outgoingRelationships
-          @outgoingRelationships = () -> rest({method: 'GET', url: "#{apiRoot}#{outgoing.link}"}, createListEnhancer(@resource))
+          @outgoingRelationships = () -> rest({method: 'GET', url: "#{apiRoot}#{outgoing.link}", enhancer: createListEnhancer(@resource)})
           @outgoingRelationships.url   = outgoing.link
           @outgoingRelationships.total = outgoing.count
 
@@ -118,23 +118,23 @@ angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.r
         "#{apiRoot}/#{@pathName}"
 
       get: (id) ->
-        rest({method: 'GET', url: "#{@getIndexPath()}/#{id}"}, createElementEnhancer(@))
+        rest({method: 'GET', url: "#{@getIndexPath()}/#{id}", enhancer: createElementEnhancer(@)})
 
       delete: (id) ->
         rest({method: 'DELETE', url: "#{@getIndexPath()}/#{id}"})
 
       save: (data) ->
-        rest({method: 'POST', url: "#{@getIndexPath()}", data: data}, createElementEnhancer(@))
+        rest({method: 'POST', url: "#{@getIndexPath()}", data: data, enhancer: createElementEnhancer(@)})
 
       update: (data) ->
         if !data.id?
           throw "Missing ID, use save instead"
         props = angular.copy(data)
         delete props.id
-        rest({method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props}, createElementEnhancer(@))
+        rest({method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, enhancer: createElementEnhancer(@)})
 
       list: (params = {}) ->
-        rest({method: 'GET', url: @getIndexPath(), params: params}, createListEnhancer(@, params))
+        rest({method: 'GET', url: @getIndexPath(), params: params, enhancer: createListEnhancer(@, params)})
 
     class ModelCatalogue
       getApiRoot: ->

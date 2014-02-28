@@ -1,6 +1,9 @@
 # creates function which will return promise always resolving to given value
 angular.module('mc.util.rest', []).factory 'rest', [ '$q', '$http', ($q, $http) ->
-  (config, enhancer = (toBeEnhanced)-> toBeEnhanced) ->
+  (config) ->
+    enhancer = if config.enhancer then config.enhancer else (toBeEnhanced)-> toBeEnhanced
+    delete config.enhancer
+
     deferred = $q.defer()
 
     $http(config).then(

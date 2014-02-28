@@ -32,12 +32,12 @@ describe "constant promise function factory", ->
 
     expect(angular.equals(result, value)).toBeTruthy()
 
-  it "enhances returned data on success", ->
+  it "enhances returned data on success when enhancer part of config", ->
     value   = {hello: "World"}
     result  = null
     $httpBackend.when("GET", "/foobar").respond(value)
 
-    promise = rest({ method: "GET", url: "/foobar"}, (_result_) -> _result_.world = "Hello" ; _result_)
+    promise = rest({ method: "GET", url: "/foobar", enhancer: (_result_) -> _result_.world = "Hello" ; _result_})
 
     expect(promise).toBeDefined()
     expect(promise.then).toBeDefined()
