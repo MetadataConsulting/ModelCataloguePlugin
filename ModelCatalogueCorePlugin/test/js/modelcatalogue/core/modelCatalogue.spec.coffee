@@ -5,6 +5,8 @@ describe "Model Catalogue Provider", ->
   modelCatalogue  = null
 
   beforeEach module "mc.modelCatalogue"
+  beforeEach module "mc.core.listDecorator"
+  beforeEach module "mc.core.catalogueElement"
 
   beforeEach inject (_modelCatalogue_, _$httpBackend_, _$rootScope_) ->
     modelCatalogue = _modelCatalogue_

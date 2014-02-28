@@ -1,6 +1,16 @@
-describe "constant promise function factory", ->
+describe "mc.util.rest", ->
 
   beforeEach module "mc.util.rest"
+  beforeEach module( (restProvider) ->
+    condition = (input) ->
+      input.world?
+    factory   = () ->
+      (input) ->
+        input.enhanced = true
+        input
+    restProvider.registerEnhancerFactory('greeter', condition, factory)
+    return
+  )
 
   rest          = null
   $httpBackend  = null
@@ -32,12 +42,12 @@ describe "constant promise function factory", ->
 
     expect(angular.equals(result, value)).toBeTruthy()
 
-  it "enhances returned data on success when enhancer part of config", ->
-    value   = {hello: "World"}
+  it "enhances returned data on success when enhancer condition met", ->
+    value   = {hello: "World", world: "Hello"}
     result  = null
     $httpBackend.when("GET", "/foobar").respond(value)
 
-    promise = rest({ method: "GET", url: "/foobar", enhancer: (_result_) -> _result_.world = "Hello" ; _result_})
+    promise = rest({ method: "GET", url: "/foobar"})
 
     expect(promise).toBeDefined()
     expect(promise.then).toBeDefined()
@@ -52,6 +62,7 @@ describe "constant promise function factory", ->
 
     expect(result.hello).toBe("World")
     expect(result.world).toBe("Hello")
+    expect(result.enhanced).toBeTruthy()
 
   it "returns status if no data and status is 2xx", ->
     result  = null
