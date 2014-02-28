@@ -16,8 +16,8 @@ describe "Model Catalogue Provider", ->
     $httpBackend.verifyNoOutstandingRequest()
 
   it "model catalogue has api root assigned", ->
-    expect(modelCatalogue.getApiRoot).toBeDefined()
-    expect(modelCatalogue.getApiRoot()).toBe("/api/modelCatalogue/core")
+    expect(modelCatalogue.getModelCatalogueApiRoot).toBeDefined()
+    expect(modelCatalogue.getModelCatalogueApiRoot()).toBe("/api/modelCatalogue/core")
 
 
   it "creates catalogue element resource", ->
@@ -87,7 +87,7 @@ describe "Model Catalogue Provider", ->
         nextList.previous = "/measurementUnit/?max=10&offset=0"
 
         $httpBackend
-          .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/?max=10&offset=10")
+          .when("GET", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/?max=10&offset=10")
           .respond(nextList)
 
         nextResult = null
@@ -114,7 +114,7 @@ describe "Model Catalogue Provider", ->
         expect(angular.isFunction(nextResult.previous)).toBeTruthy()
 
         $httpBackend
-        .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/?max=10&offset=0")
+        .when("GET", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/?max=10&offset=0")
         .respond(fixtures.measurementUnit.list1)
 
         result = null
@@ -140,7 +140,7 @@ describe "Model Catalogue Provider", ->
       describe "can get single resource", ->
         it "will respond with expected resource if exists", ->
           $httpBackend
-          .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/1")
+          .when("GET", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1")
           .respond(fixtures.measurementUnit.showOne)
 
           result = null
@@ -169,10 +169,10 @@ describe "Model Catalogue Provider", ->
           describe "fetched instance is enhanced", ->
             it "outgoing and incoming relationships are functions", ->
               $httpBackend
-              .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/1/outgoing")
+              .when("GET", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1/outgoing")
               .respond(fixtures.measurementUnit.outgoing1)
               $httpBackend
-              .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/1/incoming")
+              .when("GET", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1/incoming")
               .respond(fixtures.measurementUnit.incoming1)
 
               expect(angular.isFunction(result.incomingRelationships)).toBeTruthy()
@@ -194,7 +194,7 @@ describe "Model Catalogue Provider", ->
 
             it "has delete method", ->
               $httpBackend
-              .when("DELETE", "#{modelCatalogue.getApiRoot()}/measurementUnit/1")
+              .when("DELETE", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1")
               .respond(204)
 
               expect(angular.isFunction(result.delete)).toBeTruthy()
@@ -220,7 +220,7 @@ describe "Model Catalogue Provider", ->
               result.version = 1
 
               $httpBackend
-              .when("PUT", "#{modelCatalogue.getApiRoot()}/measurementUnit/1", expectedPayload)
+              .when("PUT", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1", expectedPayload)
               .respond(fixtures.measurementUnit.updateOk)
 
               expect(angular.isFunction(result.update)).toBeTruthy()
@@ -239,7 +239,7 @@ describe "Model Catalogue Provider", ->
 
         it "will respond with 404 if the resource does not exist", ->
           $httpBackend
-          .when("GET", "#{modelCatalogue.getApiRoot()}/measurementUnit/10000000")
+          .when("GET", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/10000000")
           .respond(404)
 
           result = null
@@ -265,7 +265,7 @@ describe "Model Catalogue Provider", ->
       describe "can delete resource", ->
         it "will delete existing resource and return 204", ->
           $httpBackend
-          .when("DELETE", "#{modelCatalogue.getApiRoot()}/measurementUnit/1")
+          .when("DELETE", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1")
           .respond(204)
 
           result = null
@@ -291,7 +291,7 @@ describe "Model Catalogue Provider", ->
 
         it "will return 404 if the resource does not exist", ->
           $httpBackend
-          .when("DELETE", "#{modelCatalogue.getApiRoot()}/measurementUnit/1000000")
+          .when("DELETE", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1000000")
           .respond(404)
 
           result = null
@@ -318,7 +318,7 @@ describe "Model Catalogue Provider", ->
 
         it "will return 409 if constraints are violated", ->
           $httpBackend
-          .when("DELETE", "#{modelCatalogue.getApiRoot()}/measurementUnit/2")
+          .when("DELETE", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/2")
           .respond(409)
 
           result = null
@@ -349,7 +349,7 @@ describe "Model Catalogue Provider", ->
           payloadWithId.id = 1
 
           $httpBackend
-          .when("PUT", "#{modelCatalogue.getApiRoot()}/measurementUnit/1", fixtures.measurementUnit.updateInput)
+          .when("PUT", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1", fixtures.measurementUnit.updateInput)
           .respond(fixtures.measurementUnit.updateOk)
 
           result = null
@@ -378,7 +378,7 @@ describe "Model Catalogue Provider", ->
           payloadWithId.id = 1000000
 
           $httpBackend
-          .when("PUT", "#{modelCatalogue.getApiRoot()}/measurementUnit/1000000", fixtures.measurementUnit.updateInput)
+          .when("PUT", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1000000", fixtures.measurementUnit.updateInput)
           .respond(404)
 
           result = null
@@ -408,7 +408,7 @@ describe "Model Catalogue Provider", ->
           delete payloadWithoutId.id
 
           $httpBackend
-          .when("PUT", "#{modelCatalogue.getApiRoot()}/measurementUnit/1", payloadWithoutId)
+          .when("PUT", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit/1", payloadWithoutId)
           .respond(fixtures.measurementUnit.updateErrors)
 
           result = null
@@ -441,7 +441,7 @@ describe "Model Catalogue Provider", ->
           }
 
           $httpBackend
-          .when("POST", "#{modelCatalogue.getApiRoot()}/measurementUnit", payload)
+          .when("POST", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit", payload)
           .respond(fixtures.measurementUnit.saveOk)
 
           result = null
@@ -469,7 +469,7 @@ describe "Model Catalogue Provider", ->
           payload = {symbol: "MPH"}
 
           $httpBackend
-          .when("POST", "#{modelCatalogue.getApiRoot()}/measurementUnit", payload)
+          .when("POST", "#{modelCatalogue.getModelCatalogueApiRoot()}/measurementUnit", payload)
           .respond(fixtures.measurementUnit.saveErrors)
 
           result = null

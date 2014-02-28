@@ -1,58 +1,64 @@
 angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.rest']).provider 'modelCatalogue', [ ->
 
   # Private variables
-  apiRoot = '/api/modelCatalogue/core'
+  modelCatalogueApiRoot = '/api/modelCatalogue/core'
 
   # Public API for configuration
-  @getApiRoot = () ->
-    apiRoot
+  @getModelCatalogueApiRoot = () ->
+    modelCatalogueApiRoot
 
-  @setApiRoot = (newApiRoot) ->
-    apiRoot = newApiRoot
+  @setModelCatalogueApiRoot = (newApiRoot) ->
+    modelCatalogueApiRoot = newApiRoot
 
   # Method for instantiating
   @$get = ['createConstantPromise', 'rest', (createConstantPromise, rest) ->
-
     # replaces previous/next links with functions fetching given results
     # size and url properties can be called directly on enhnaced next and previous functions
-    createListEnhancer = (elementResource, params = {}) ->
-      enhancer = (list) ->
-        return if list.$enhanced
-        if list.next? and list.next != ""
-          nextUrl = list.next
-          list.next = () ->
-            rest({method: 'GET', url: "#{apiRoot}#{nextUrl}", params: params, enhancer: enhancer})
-          list.next.size   = Math.min(list.page, list.total - (list.offset + list.page))
-          list.next.url    = nextUrl
-          list.next.total  = list.total
+    class ListDecorator
+      @createEnhancer: (resource) ->
+        (list) ->
+          if list.hasOwnProperty('next') or list.hasOwnProperty('previous')
+            new ListDecorator(list, resource)
+          else
+            list
+
+      constructor: (list, resource) ->
+        @resource = resource
+        angular.extend(@, list)
+
+        if @next
+          nextUrl = @next
+          @next = () -> rest({method: 'GET', url: "#{modelCatalogueApiRoot}#{nextUrl}", enhancer: ListDecorator.createEnhancer(@resource)})
+          @next.size   = Math.min(@page, @total - (@offset + @page))
+          @next.url    = nextUrl
+          @next.total  = @total
         else
-          list.next = createConstantPromise({
-            total:      list.total
+          @next = createConstantPromise({
+            total:      @total
             list:       []
             size:       0
-            page:       list.page
+            page:       @page
             success:    false
           # promising this will return same empty list
             next:       createConstantPromise(this)
           # promising list will get back to regular lists
             previous:   createConstantPromise(list),
-            offset:     list.offset + list.page
+            offset:     @offset + @page
           })
-          list.next.size   = 0
-          list.next.total  = list.total
-        if list.previous? and list.previous != ""
-          prevUrl = list.previous
-          list.previous = () ->
-            rest({method: 'GET', url: "#{apiRoot}#{prevUrl}", params: params, enhancer: enhancer})
-          list.previous.size   = Math.min(list.page, list.offset)
-          list.previous.total  = list.total
-          list.previous.url    = prevUrl
+          @next.size   = 0
+          @next.total  = @total
+        if @previous
+          prevUrl = @previous
+          @previous = () -> rest({method: 'GET', url: "#{modelCatalogueApiRoot}#{prevUrl}", enhancer: ListDecorator.createEnhancer(@resource)})
+          @previous.size   = Math.min(@page, @offset)
+          @previous.total  = @total
+          @previous.url    = prevUrl
         else
-          list.previous = createConstantPromise({
-            total:      list.total
+          @previous = createConstantPromise({
+            total:      @total
             list:       []
             size:       0
-            page:       list.page
+            page:       @page
             success:    false
           # promising list will get back to regular lists
             next:       createConstantPromise(list)
@@ -60,28 +66,27 @@ angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.r
             previous:   createConstantPromise(this)
             offset:     0
           })
-          list.previous.size   = 0
-          list.previous.total  = list.total
-        list.$enhanced = true
+          @previous.size   = 0
+          @previous.total  = @total
 
-        enhance = createElementEnhancer(elementResource)
-        for element, i in list.list
-          list.list[i] = enhance element
+
+        enhance = CatalogueElement.createEnhancer(@resource)
+        for element, i in @list
+          @list[i] = enhance element
 
         list
 
-    createElementEnhancer = (elementResource) ->
-      (element) ->
-        # all catalogue elements have element type, we can constraint this somehow later
-        if element.hasOwnProperty('elementType')
-          return new CatalogueElement(element, elementResource)
-        element
-
     # Class defintion
     class CatalogueElement
-      constructor: (element, elementResource) ->
+      @createEnhancer: (resource) ->
+        (element) ->
+          if element.hasOwnProperty('elementType')
+            new CatalogueElement(element, resource)
+          else
+            element
+
+      constructor: (element, @resource) ->
         @defaultExcludes = ['elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships']
-        @resource = elementResource
         @updatableProperties = []
 
         for name, ignored of element
@@ -91,12 +96,12 @@ angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.r
         angular.extend(@, element)
         if element.hasOwnProperty('incomingRelationships')
           incoming = element.incomingRelationships
-          @incomingRelationships       = () -> rest({method: 'GET', url: "#{apiRoot}#{incoming.link}", enhancer: createListEnhancer(@resource)})
+          @incomingRelationships       = () -> rest({method: 'GET', url: "#{modelCatalogueApiRoot}#{incoming.link}", enhancer: ListDecorator.createEnhancer(@resource)})
           @incomingRelationships.url   = incoming.link
           @incomingRelationships.total = incoming.count
         if element.hasOwnProperty('outgoingRelationships')
           outgoing = element.outgoingRelationships
-          @outgoingRelationships = () -> rest({method: 'GET', url: "#{apiRoot}#{outgoing.link}", enhancer: createListEnhancer(@resource)})
+          @outgoingRelationships = () -> rest({method: 'GET', url: "#{modelCatalogueApiRoot}#{outgoing.link}", enhancer: ListDecorator.createEnhancer(@resource)})
           @outgoingRelationships.url   = outgoing.link
           @outgoingRelationships.total = outgoing.count
 
@@ -115,30 +120,30 @@ angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.r
         @pathName = pathName
 
       getIndexPath: () ->
-        "#{apiRoot}/#{@pathName}"
+        "#{modelCatalogueApiRoot}/#{@pathName}"
 
       get: (id) ->
-        rest({method: 'GET', url: "#{@getIndexPath()}/#{id}", enhancer: createElementEnhancer(@)})
+        rest({method: 'GET', url: "#{@getIndexPath()}/#{id}", enhancer: CatalogueElement.createEnhancer(@)})
 
       delete: (id) ->
         rest({method: 'DELETE', url: "#{@getIndexPath()}/#{id}"})
 
       save: (data) ->
-        rest({method: 'POST', url: "#{@getIndexPath()}", data: data, enhancer: createElementEnhancer(@)})
+        rest({method: 'POST', url: "#{@getIndexPath()}", data: data, enhancer: CatalogueElement.createEnhancer(@)})
 
       update: (data) ->
         if !data.id?
           throw "Missing ID, use save instead"
         props = angular.copy(data)
         delete props.id
-        rest({method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, enhancer: createElementEnhancer(@)})
+        rest({method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, enhancer: CatalogueElement.createEnhancer(@)})
 
       list: (params = {}) ->
-        rest({method: 'GET', url: @getIndexPath(), params: params, enhancer: createListEnhancer(@, params)})
+        rest({method: 'GET', url: @getIndexPath(), params: params, enhancer: ListDecorator.createEnhancer(@)})
 
     class ModelCatalogue
-      getApiRoot: ->
-        apiRoot
+      getModelCatalogueApiRoot: ->
+        modelCatalogueApiRoot
 
       elements: (pathName) ->
         new CatalogueElementResource(pathName)
