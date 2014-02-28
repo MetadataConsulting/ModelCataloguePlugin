@@ -15,10 +15,6 @@ describe "Model Catalogue Provider", ->
     $httpBackend.verifyNoOutstandingExpectation()
     $httpBackend.verifyNoOutstandingRequest()
 
-  it "model catalogue has api root assigned", ->
-    expect(modelCatalogue.getModelCatalogueApiRoot).toBeDefined()
-    expect(modelCatalogue.getModelCatalogueApiRoot()).toBe("/api/modelCatalogue/core")
-
 
   it "creates catalogue element resource", ->
     expect(modelCatalogue.elements).toBeDefined()

@@ -1,17 +1,8 @@
-angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.rest']).provider 'modelCatalogue', [ ->
+angular.module('mc.modelCatalogue', ['mc.util.createConstantPromise', 'mc.util.rest', 'mc.core.modelCatalogueApiRoot']).provider 'modelCatalogue', [ ->
 
-  # Private variables
-  modelCatalogueApiRoot = '/api/modelCatalogue/core'
-
-  # Public API for configuration
-  @getModelCatalogueApiRoot = () ->
-    modelCatalogueApiRoot
-
-  @setModelCatalogueApiRoot = (newApiRoot) ->
-    modelCatalogueApiRoot = newApiRoot
 
   # Method for instantiating
-  @$get = ['createConstantPromise', 'rest', (createConstantPromise, rest) ->
+  @$get = ['createConstantPromise', 'rest', 'modelCatalogueApiRoot', (createConstantPromise, rest, modelCatalogueApiRoot) ->
     # replaces previous/next links with functions fetching given results
     # size and url properties can be called directly on enhnaced next and previous functions
     class ListDecorator
