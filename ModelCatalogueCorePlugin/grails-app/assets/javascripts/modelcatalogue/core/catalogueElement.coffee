@@ -15,9 +15,8 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest']).provider 'catalogue
           @defaultExcludes = ['elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships']
           @updatableProperties = []
 
-          for name, ignored of element
-            unless name in @defaultExcludes
-              @updatableProperties.push(name)
+          for name, ignored of element unless name in @defaultExcludes
+            @updatableProperties.push(name)
 
           angular.extend(@, element)
           if element.hasOwnProperty('incomingRelationships')
