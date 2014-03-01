@@ -2,6 +2,11 @@ package uk.co.mc.core
 
 class Mapping {
 
+    static searchable = {
+        source reference:true
+        destination reference:true
+    }
+
     ValueDomain source
     ValueDomain destination
 

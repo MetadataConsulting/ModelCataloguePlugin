@@ -5,7 +5,7 @@ import grails.test.spock.IntegrationSpec
 /**
  * Created by adammilward on 12/02/2014.
  */
-class ValueDomainISpec extends IntegrationSpec {
+class ValueDomainISpec extends AbstractIntegrationSpec {
 
     /* def fixtureLoader
 

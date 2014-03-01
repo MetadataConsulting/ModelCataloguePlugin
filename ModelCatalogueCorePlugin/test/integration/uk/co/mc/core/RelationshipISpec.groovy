@@ -9,28 +9,24 @@ import spock.lang.Unroll
  */
 
 
-class RelationshipISpec extends IntegrationSpec{
+class RelationshipISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def fixtureLoader, cd1, md1, de1, vd1, de2, reltype, dt, ms
+    def cd1, md1, de1, vd1, de2, reltype, dt, ms
 
     def setupSpec(){
 
+        loadFixtures()
         RelationshipType.initDefaultRelationshipTypes()
 
-        def fixtures =  fixtureLoader.load( "conceptualDomains/CD_publicLibraries","models/M_book","dataElements/DE_author5", "dataElements/DE_title","dataTypes/DT_string", "measurementUnits/MU_milesPerHour", "relationshipTypes/RT_broaderTerm", "valueDomains/VD_schoolSubjects")
-
-
-        RelationshipType.initDefaultRelationshipTypes()
-
-        cd1 =  fixtures.CD_publicLibraries
-        md1 = fixtures.M_book
-        de1 = fixtures.DE_author5
-        de2 = fixtures.DE_title
-        dt = fixtures.DT_string
-        ms = fixtures.MU_milesPerHour
-        reltype = fixtures.RT_broaderTerm
-        vd1 = fixtures.VD_schoolSubjects
+        cd1 =  ConceptualDomain.findByName("public libraries")
+        md1 = Model.findByName("book")
+        de1 = DataElement.findByName("auth5")
+        de2 = DataElement.findByName("title")
+        dt = DataType.findByName("string")
+        ms = MeasurementUnit.findByName("Miles per hour")
+        reltype = RelationshipType.findByName("BroaderTerm")
+        vd1 = ValueDomain.findByName("school subject")
     }
 
     /*def cleanupSpec(){

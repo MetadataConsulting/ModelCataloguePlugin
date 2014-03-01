@@ -114,3 +114,7 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 grails.views.gsp.encoding="UTF-8"
+
+elasticSearch.client.mode = 'local'
+elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
+elasticSearch.datastoreImpl = 'hibernateDatastore'

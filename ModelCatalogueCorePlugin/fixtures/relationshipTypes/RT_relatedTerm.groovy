@@ -7,4 +7,5 @@ fixture{
             destinationToSource: "relatedTo",
             sourceClass: DataElement,
             destinationClass: DataElement)
+
 }

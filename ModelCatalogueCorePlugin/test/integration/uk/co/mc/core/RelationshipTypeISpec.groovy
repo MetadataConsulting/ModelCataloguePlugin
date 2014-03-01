@@ -7,20 +7,19 @@ import spock.lang.Specification
 /**
  * Created by ladin on 10.02.14.
  */
-class RelationshipTypeISpec extends IntegrationSpec {
+class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     @Shared
-    def fixtureLoader, md1, de1, cd1, md2, vd
+    def md1, de1, cd1, md2, vd
 
     def setupSpec(){
+        loadFixtures()
         RelationshipType.initDefaultRelationshipTypes()
-        def fixtures =  fixtureLoader.load("dataElements/DE_author4", "models/M_book","models/M_chapter1", "conceptualDomains/CD_publicLibraries", "valueDomains/VD_uni2Subjects")
-
-        md1 = fixtures.M_book
-        md2 = fixtures.M_chapter1
-        de1 = fixtures.DE_author4
-        cd1 = fixtures.CD_publicLibraries
-        vd = fixtures.VD_uni2Subjects
+        md1 = Model.findByName("book")
+        md2 = Model.findByName("chapter1")
+        de1 = DataElement.findByName("DE_author1")
+        cd1 = ConceptualDomain.findByName("public libraries")
+        vd = ValueDomain.findByName("value domain uni subjects 2")
 
     }
 

@@ -16,6 +16,12 @@ abstract class CatalogueElement {
     String name
     String description
 
+    static searchable = {
+        name boost:5
+        incomingRelationships component:true
+        outgoingRelationships component:true
+    }
+
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship]
 
     static constraints = {

@@ -78,25 +78,25 @@ class ValueDomainSpec extends Specification {
 
     }
 
-    def "check  EqualsAndHashCode works"() {
-
-        when:
-        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
-        def b = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
-        def c = new ValueDomain(name: "ground_speed1", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
-        def d = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test1', enumerations: ['male', 'female', 'unknown'])).save()
-        def e = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "KPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
-        def f = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "string")).save()
-
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-        !a.equals(d)
-        !a.equals(e)
-        !a.equals(f)
-
-    }
+//    def "check  EqualsAndHashCode works"() {
+//
+//        when:
+//        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
+//        def b = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
+//        def c = new ValueDomain(name: "ground_speed1", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
+//        def d = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test1', enumerations: ['male', 'female', 'unknown'])).save()
+//        def e = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "KPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
+//        def f = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "string")).save()
+//
+//
+//        then:
+//        a.equals(b)
+//        b.equals(a)
+//        !a.equals(c)
+//        !a.equals(d)
+//        !a.equals(e)
+//        !a.equals(f)
+//
+//    }
 
 }

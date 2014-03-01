@@ -31,6 +31,14 @@ import java.util.regex.PatternSyntaxException
 class ValueDomain extends CatalogueElement  {
 
 
+    static searchable = {
+        regexDef index:'no'
+        dataType component:true
+        unitOfMeasure component:true
+        outgoingMappings component:true
+        incomingMappings component:true
+    }
+
     //FIXME valueDomain needs to be unique within a conceptual domain
 
 	MeasurementUnit unitOfMeasure
@@ -90,27 +98,27 @@ class ValueDomain extends CatalogueElement  {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ValueDomain)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        ValueDomain cd = (ValueDomain) obj;
-        return new EqualsBuilder()
-                .append(name, cd.name)
-                .append(unitOfMeasure, cd.unitOfMeasure)
-                .append(dataType, cd.dataType)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(unitOfMeasure)
-                .append(dataType)
-                .toHashCode();
-    }
+//    public boolean equals(Object obj) {
+//        if (!(obj instanceof ValueDomain)) {
+//            return false;
+//        }
+//        if (this.is(obj)) {
+//            return true;
+//        }
+//        ValueDomain cd = (ValueDomain) obj;
+//        return new EqualsBuilder()
+//                .append(name, cd.name)
+//                .append(unitOfMeasure, cd.unitOfMeasure)
+//                .append(dataType, cd.dataType)
+//                .isEquals();
+//    }
+//
+//    public int hashCode() {
+//        return new HashCodeBuilder()
+//                .append(name)
+//                .append(unitOfMeasure)
+//                .append(dataType)
+//                .toHashCode();
+//    }
 
 }

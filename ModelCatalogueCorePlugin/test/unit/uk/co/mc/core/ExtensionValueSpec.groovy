@@ -41,13 +41,13 @@ class ExtensionValueSpec extends Specification {
         r | validates | size | args
         1 | false     | 0    | [:]
         2 | false     | 0    | [name: "x" * 256]
-        3 | false     | 0    | [name: "x" * 256, value: "x"]
-        4 | false     | 0    | [name: "x" * 256, value: "x" * 1001]
+        3 | false     | 0    | [name: "x" * 256, extensionValue: "x"]
+        4 | false     | 0    | [name: "x" * 256, extensionValue: "x" * 1001]
         5 | false     | 0    | [name: "x" * 256, element: de]
         6 | true      | 1    | [name: "xxx", element: de]
-        7 | false     | 0    | [name: "xxx" * 256, value: "x", element: de]
-        8 | false     | 0    | [name: "xxx" * 256, value: "x" * 1001, element: de]
-        9 | true      | 1    | [name: "xxx", value: "x", element: de]
+        7 | false     | 0    | [name: "xxx" * 256, extensionValue: "x", element: de]
+        8 | false     | 0    | [name: "xxx" * 256, extensionValue: "x" * 1001, element: de]
+        9 | true      | 1    | [name: "xxx", extensionValue: "x", element: de]
 
     }
 

@@ -47,13 +47,18 @@ grails-app/assets/bower_components/*
 # "temporary" build files
 /target
 
+# elasticsearch index
+/data
+
+
 # other
 *.iws
 *.ipr
 **.gen.fixture.js
 **.gen.xml
 /plugin.xml
-/grails-model-catalogue-core-plugin-0.0.1/*
+/grails-model-catalogue-core-plugin-0.0.1/**
+
 
 
 

@@ -7,25 +7,19 @@ import spock.lang.Shared
  * Created by adammilward on 05/02/2014.
  */
 
-class DataElementISpec extends IntegrationSpec{
+class DataElementISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def fixtureLoader, auth1, auth3, auth2
+    def auth1, auth3, auth2
 
-    def setup(){
-        def fixtures =  fixtureLoader.load( "dataElements/DE_author1", "dataElements/DE_author2", "dataElements/DE_author3")
-
+    def setupSpec(){
+        loadFixtures()
         auth1 = fixtures.DE_author1
         auth2 = fixtures.DE_author2
         auth3 = fixtures.DE_author3
-
     }
 
-    def cleanup(){
-        auth1.delete()
-        auth2.delete()
-        auth3.delete()
-
+    def cleanupSpec(){
     }
 
     def "create a new data element, finalize it and then try to change it"(){
