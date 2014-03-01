@@ -22,24 +22,24 @@ class ExtensionValue extends CatalogueElement {
     }
 
 
-//    public boolean equals(Object obj) {
-//        if (!(obj instanceof ExtensionValue)) {
-//            return false;
-//        }
-//        if (this.is(obj)) {
-//            return true;
-//        }
-//        ExtensionValue ce = (ExtensionValue) obj;
-//        return new EqualsBuilder()
-//                .append(name, ce.name)
-//                .isEquals();
-//    }
-//
-//    public int hashCode() {
-//        return new HashCodeBuilder()
-//                .append(name)
-//                .toHashCode();
-//    }
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ExtensionValue)) {
+            return false;
+        }
+        if (this.is(obj)) {
+            return true;
+        }
+        ExtensionValue ce = (ExtensionValue) obj;
+        return new EqualsBuilder()
+                .append(name, ce.name)
+                .isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(name)
+                .toHashCode();
+    }
 
 
 }
