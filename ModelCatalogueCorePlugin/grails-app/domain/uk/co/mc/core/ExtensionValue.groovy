@@ -7,6 +7,12 @@ class ExtensionValue extends CatalogueElement {
 
     /* the name property from catalogue element is a key for the extension */
 
+    static searchable = {
+        name boost:5
+        element reference:true
+        except = ['incomingRelationships', 'outgoingRelationships']
+    }
+
     String extensionValue
 
     static belongsTo = [element: ExtendibleElement]

@@ -25,11 +25,6 @@ package uk.co.mc.core
 
 class Relationship {
 
-    static searchable = {
-        source reference:true
-        destination reference:true
-    }
-
     CatalogueElement source
     CatalogueElement destination
 

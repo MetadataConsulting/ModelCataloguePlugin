@@ -18,8 +18,7 @@ abstract class CatalogueElement {
 
     static searchable = {
         name boost:5
-        incomingRelationships component:true
-        outgoingRelationships component:true
+        except = ['incomingRelationships', 'outgoingRelationships']
     }
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship]

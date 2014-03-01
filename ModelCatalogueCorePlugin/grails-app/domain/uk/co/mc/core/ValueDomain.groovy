@@ -30,13 +30,12 @@ import java.util.regex.PatternSyntaxException
 
 class ValueDomain extends CatalogueElement  {
 
-
     static searchable = {
+        name boost:5
         regexDef index:'no'
         dataType component:true
         unitOfMeasure component:true
-        outgoingMappings component:true
-        incomingMappings component:true
+        except = ['incomingRelationships', 'outgoingRelationships', 'outgoingMappings', 'incomingMappings']
     }
 
     //FIXME valueDomain needs to be unique within a conceptual domain
