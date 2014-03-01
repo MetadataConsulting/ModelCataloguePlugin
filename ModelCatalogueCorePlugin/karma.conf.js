@@ -6,8 +6,8 @@ module.exports = function(config) {
 
         browsers: [
             'Chrome',
-            'Firefox', // Firefox is slow!
-            'Safari'
+            // 'Firefox', // Firefox is slow!
+            // 'Safari',  // Safari keeps old tabs open causing testing multiple times
         ],
         reporters: ['progress', 'junit', 'coverage', 'osx'],
         singleRun: false,

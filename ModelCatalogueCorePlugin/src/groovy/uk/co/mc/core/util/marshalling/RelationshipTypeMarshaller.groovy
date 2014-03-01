@@ -21,7 +21,8 @@ class RelationshipTypeMarshaller extends AbstractMarshallers {
                 sourceToDestination: el.sourceToDestination,
                 destinationToSource: el.destinationToSource,
                 sourceClass: el.sourceClass,
-                destinationClass: el.destinationClass
+                destinationClass: el.destinationClass,
+                link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
         ]
     }
 
@@ -38,6 +39,7 @@ class RelationshipTypeMarshaller extends AbstractMarshallers {
     protected void addXmlAttributes(el, XML xml) {
         addXmlAttribute(el.id, "id", xml)
         addXmlAttribute(el.version, "version", xml)
+        addXmlAttribute("/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id", "link", xml)
         addXmlAttribute(el.class.name, "elementType", xml)
         addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }

@@ -1,6 +1,5 @@
 package uk.co.mc.core
 
-import grails.converters.JSON
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
@@ -9,11 +8,8 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.fixtures.FixturesLoader
 import spock.lang.Specification
 import spock.lang.Unroll
-import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ElementsMarshaller
-import uk.co.mc.core.util.marshalling.RelationshipMarshallers
-import uk.co.mc.core.util.marshalling.RelationshipsMarshaller
 
 import javax.servlet.http.HttpServletResponse
 
@@ -169,6 +165,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         then:
         json
+        json.link == "/${resourceName}/1"
 
         customJsonPropertyCheck loadItem1, json
 
@@ -186,6 +183,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         expect:
         xml
+        xml.@link
+        xml.@link.text() == "/${resourceName}/1"
         xmlCustomPropertyCheck xml, loadItem1
 
     }
