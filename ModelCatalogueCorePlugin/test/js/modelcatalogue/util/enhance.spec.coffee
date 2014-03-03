@@ -60,7 +60,7 @@ describe "mc.util.enhance", ->
     expect(result.foo.enhanced).toBeTruthy()
 
   it "in case of promise enhances the final result", ->
-    promise = createConstantPromise(hello: "World", world: "Hello")()
+    promise = createConstantPromise(hello: "World", world: "Hello")
     result = null
 
     enhance(promise).then (_result_) ->

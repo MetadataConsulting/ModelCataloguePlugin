@@ -14,11 +14,7 @@ describe "mc.util.createConstantPromise", ->
 
     expect(angular.isFunction(factory)).toBeTruthy()
 
-    promised = factory(value)
-
-    expect(angular.isFunction(promised)).toBeTruthy()
-
-    promise = promised()
+    promise = factory(value)
 
     expect(promise.then).toBeDefined()
 
