@@ -1,14 +1,15 @@
-angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.core.modelCatalogueApiRoot', 'mc.util.createConstantPromise']).provider 'listDecorator', ['restProvider', (restProvider)->
+angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.createConstantPromise']).provider 'listDecorator', ['enhanceProvider', (enhanceProvider)->
 
-  @$get = ['modelCatalogueApiRoot', 'createConstantPromise', (modelCatalogueApiRoot, createConstantPromise) ->
-    (list, response, rest) ->
+  @$get = ['modelCatalogueApiRoot', 'createConstantPromise', 'rest', (modelCatalogueApiRoot, createConstantPromise, rest) ->
+    (list) ->
+      enhance = @enhance
       class ListDecorator
         constructor: (list) ->
           angular.extend(@, list)
 
           if @next
             nextUrl = @next
-            @next = () -> rest({method: 'GET', url: "#{modelCatalogueApiRoot}#{nextUrl}"})
+            @next = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{nextUrl}"
             @next.size   = Math.min(@page, @total - (@offset + @page))
             @next.url    = nextUrl
             @next.total  = @total
@@ -29,7 +30,7 @@ angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.core.modelCatalogue
             @next.total  = @total
           if @previous
             prevUrl = @previous
-            @previous = () -> rest({method: 'GET', url: "#{modelCatalogueApiRoot}#{prevUrl}"})
+            @previous = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{prevUrl}"
             @previous.size   = Math.min(@page, @offset)
             @previous.total  = @total
             @previous.url    = prevUrl
@@ -55,7 +56,7 @@ angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.core.modelCatalogue
 
   condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
 
-  restProvider.registerEnhancerFactory('listDecorator', condition, @$get)
+  enhanceProvider.registerEnhancerFactory('listDecorator', condition, @$get)
 
   @
 ]

@@ -1,18 +1,11 @@
-angular.module('mc.core.catalogueElement', ['mc.util.rest']).provider 'catalogueElement', [ 'restProvider', (restProvider) ->
+angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).provider 'catalogueElement', [ 'enhanceProvider', (enhanceProvider) ->
 
-  @$get = [ 'modelCatalogueApiRoot', (modelCatalogueApiRoot) ->
-    (element, response, rest) ->
-
+  @$get = [ 'modelCatalogueApiRoot', 'rest', (modelCatalogueApiRoot, rest) ->
+    (element) ->
+      enhance = @enhance
       class CatalogueElement
-        @createEnhancer: (resource) ->
-          (element) ->
-            if element.hasOwnProperty('elementType')
-              new CatalogueElement(element, resource)
-            else
-              element
-
-        constructor: (element, @resource) ->
-          @defaultExcludes = ['elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships']
+        constructor: (element) ->
+          @defaultExcludes = ['elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link']
           @updatableProperties = []
 
           for name, ignored of element
@@ -22,23 +15,24 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest']).provider 'catalogue
           angular.extend(@, element)
           if element.hasOwnProperty('incomingRelationships')
             incoming = element.incomingRelationships
-            @incomingRelationships       = () -> rest({method: 'GET', url: "#{modelCatalogueApiRoot}#{incoming.link}"})
+            @incomingRelationships       = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{incoming.link}"
             @incomingRelationships.url   = incoming.link
             @incomingRelationships.total = incoming.count
           if element.hasOwnProperty('outgoingRelationships')
             outgoing = element.outgoingRelationships
-            @outgoingRelationships = () -> rest({method: 'GET', url: "#{modelCatalogueApiRoot}#{outgoing.link}"})
+            @outgoingRelationships = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{outgoing.link}"
             @outgoingRelationships.url   = outgoing.link
             @outgoingRelationships.total = outgoing.count
 
-        delete:    () -> rest({method: 'DELETE', url: "#{modelCatalogueApiRoot}#{@link}"})
-        validate:  () -> rest({method: 'get', url: "#{modelCatalogueApiRoot}#{@link}/validate"})
+        delete:    () -> enhance rest method: 'DELETE', url: "#{modelCatalogueApiRoot}#{@link}"
+        validate:  () -> enahnce rest method: 'GET', url: "#{modelCatalogueApiRoot}#{@link}/validate"
 
         update:    () ->
           payload = {}
           for name in @updatableProperties
             payload[name] = this[name]
-          rest({method: 'PUT', url: "#{modelCatalogueApiRoot}#{@link}"}, payload)
+          delete payload.id
+          enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{@link}", data: payload
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)
       # wrap original element
@@ -47,7 +41,7 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest']).provider 'catalogue
 
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
 
-  restProvider.registerEnhancerFactory('catalogueElement', condition, @$get)
+  enhanceProvider.registerEnhancerFactory('catalogueElement', condition, @$get)
 
   @
 ]

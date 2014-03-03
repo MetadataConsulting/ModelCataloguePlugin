@@ -1,35 +1,7 @@
-angular.module('mc.util.rest', []).provider 'rest', [ ->
-  enhancers = []
-
-  ###
-  Registers new enhancer definiton, the enahcerFactory is either funciton or minification
-  safe array (@see $injector).
-  ###
-  @registerEnhancerFactory = (name, condition, enhancerFactory, priority = 0) ->
-    # we might want to add some assertion later
-    enhancers.push({priority: priority, name: name, condition: condition, factory: enhancerFactory})
+angular.module('mc.util.rest', ['mc.util.enhance']).provider 'rest', [ ->
 
   # factory method
-  @$get = [ '$q', '$http', '$injector', ($q, $http, $injector) ->
-    # dependency aware initialization
-    for enhancer in enhancers
-      enhancer.enhancer = $injector.invoke(enhancer.factory)
-
-    enhance = (result, response, rest) ->
-      # for object and array enhance deepth first
-      if angular.isArray(result)
-        for item, i in result when item?
-          result[i] = enhance item, response, rest
-      else if angular.isObject(result)
-        for name, value of result when value?
-          result[name] = enhance value, response, rest
-
-      # enhance current object
-      for enhancer in enhancers when enhancer.condition(result)
-        result = enhancer.enhancer(result, response, rest)
-
-      # and return enhanced value
-      result
+  @$get = [ '$q', '$http', ($q, $http) ->
 
     rest = (config) ->
       deferred = $q.defer()
@@ -37,13 +9,15 @@ angular.module('mc.util.rest', []).provider 'rest', [ ->
       $http(config).then(
         (response) ->
           if !response.data and response.status >=200 and response.status < 300
-            deferred.resolve enhance(response.status, response, rest)
+            deferred.resolve response.status
           else if !response.data.errors?
-            deferred.resolve enhance(response.data, response, rest)
+            deferred.resolve response.data
           else
-            deferred.reject enhance(response, response, rest)
+            deferred.reject response
       , (response) ->
-        deferred.reject enhance(response, response, rest)
+        deferred.reject response
+      , (update) ->
+        deferred.update update
       )
       deferred.promise
   ]

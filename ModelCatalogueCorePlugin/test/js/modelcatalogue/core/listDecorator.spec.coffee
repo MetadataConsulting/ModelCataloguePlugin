@@ -2,18 +2,20 @@ describe "mc.core.listDecorator", ->
 
   listDecorator         = null
   rest                  = null
+  enhance               = null
   $httpBackend          = null
   $rootScope            = null
   modelCatalogueApiRoot = null
 
   beforeEach module "mc.core.listDecorator"
 
-  beforeEach inject (_listDecorator_, _rest_, _$httpBackend_, _$rootScope_, _modelCatalogueApiRoot_) ->
+  beforeEach inject (_listDecorator_, _rest_, _enhance_, _$httpBackend_, _$rootScope_, _modelCatalogueApiRoot_) ->
     listDecorator         = _listDecorator_
     rest                  = _rest_
     $httpBackend          = _$httpBackend_
     $rootScope            = _$rootScope_
     modelCatalogueApiRoot = _modelCatalogueApiRoot_
+    enhance               = _enhance_
 
   it "can list resource", ->
     $httpBackend
@@ -22,7 +24,7 @@ describe "mc.core.listDecorator", ->
 
     result = null
     error  = null
-    rest(method: 'GET', url: '/foo').then( (_result_) ->
+    enhance(rest(method: 'GET', url: '/foo')).then( (_result_) ->
       result = _result_
     , (_error_) ->
       error = _error_

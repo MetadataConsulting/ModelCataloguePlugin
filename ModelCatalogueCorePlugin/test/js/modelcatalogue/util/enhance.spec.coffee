@@ -1,6 +1,7 @@
 describe "mc.util.enhance", ->
 
   beforeEach module "mc.util.enhance"
+  beforeEach module "mc.util.createConstantPromise"
   beforeEach module( (enhanceProvider) ->
     condition = (input) ->
       input.world?
@@ -13,9 +14,13 @@ describe "mc.util.enhance", ->
   )
 
   enhance = null
+  createConstantPromise = null
+  $rootScope = null
 
-  beforeEach inject (_enhance_) ->
+  beforeEach inject (_enhance_, _createConstantPromise_, _$rootScope_) ->
     enhance = _enhance_
+    createConstantPromise = _createConstantPromise_
+    $rootScope = _$rootScope_
 
   it "does not enhance if condition is not met", ->
     result = enhance({hello: "world"})
@@ -53,6 +58,21 @@ describe "mc.util.enhance", ->
     expect(result.foo.hello).toBe("World")
     expect(result.foo.world).toBe("Hello")
     expect(result.foo.enhanced).toBeTruthy()
+
+  it "in case of promise enhances the final result", ->
+    promise = createConstantPromise(hello: "World", world: "Hello")()
+    result = null
+
+    enhance(promise).then (_result_) ->
+      result = _result_
+
+    $rootScope.$apply()
+
+    expect(result).toBeDefined()
+    expect(result.hello).toBe("World")
+    expect(result.world).toBe("Hello")
+    expect(result.enhanced).toBeTruthy()
+
 
 
 

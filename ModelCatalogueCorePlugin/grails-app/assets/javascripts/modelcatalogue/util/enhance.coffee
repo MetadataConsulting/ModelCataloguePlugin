@@ -10,12 +10,20 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
     enhancers.push({priority: priority, name: name, condition: condition, factory: enhancerFactory})
 
   # factory method
-  @$get = [ '$injector', ($injector) ->
-    # dependency aware initialization
-    for enhancer in enhancers
-      enhancer.enhancer = $injector.invoke(enhancer.factory)
-
+  @$get = [ '$injector', '$q', ($injector, $q) ->
     enhance = (result) ->
+      if result.then? and angular.isFunction(result.then)
+        deferred = $q.defer()
+        result.then(
+          (response) ->
+            deferred.resolve enhance(response)
+        , (response) ->
+          deferred.reject enhance(response)
+        , (response) ->
+          deferred.update enhance(response)
+        )
+        return deferred.promise
+
       # for object and array enhance deepth first
       if angular.isArray(result)
         for item, i in result when item?
@@ -30,6 +38,13 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
 
       # and return enhanced value
       result
+
+    # dependency aware initialization
+    for enhancer in enhancers
+      enhancer.enhancer = $injector.invoke(enhancer.factory)
+      enhancer.enhance  = enhance
+
+    enhance
   ]
 
   # Always return this from CoffeeScript AngularJS factory functions!
