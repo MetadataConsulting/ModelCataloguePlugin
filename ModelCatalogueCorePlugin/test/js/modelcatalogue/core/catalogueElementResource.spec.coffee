@@ -288,6 +288,34 @@ describe "mc.core.catalogueElementResource", ->
           expect(result.name).toBe(fixtures.measurementUnit.updateOk.name)
           expect(result.update).toBeDefined()
 
+        it "validates ok if entity exists", ->
+          payloadWithId = angular.extend({}, fixtures.measurementUnit.updateInput)
+
+          $httpBackend
+          .when("POST", "#{modelCatalogueApiRoot}/measurementUnit/validate", fixtures.measurementUnit.updateInput)
+          .respond(fixtures.measurementUnit.updateOk)
+
+          result = null
+          error  = null
+
+          measurementUnits.validate(fixtures.measurementUnit.updateInput).then( (_result_) ->
+            result = _result_
+          , (_error_) ->
+            error  = _error_
+          )
+
+          expect(result).toBeNull()
+          expect(error).toBeNull()
+
+          $httpBackend.flush()
+
+          expect(error).toBeNull()
+          expect(result).toBeDefined()
+          expect(result.id).toBe(1)
+          expect(result.version).toBe(1)
+          expect(result.name).toBe(fixtures.measurementUnit.updateOk.name)
+          expect(result.update).toBeDefined()
+
         it "returns 404 if the resource does not exist", ->
           payloadWithId = angular.extend({}, fixtures.measurementUnit.updateInput)
           payloadWithId.id = 1000000
