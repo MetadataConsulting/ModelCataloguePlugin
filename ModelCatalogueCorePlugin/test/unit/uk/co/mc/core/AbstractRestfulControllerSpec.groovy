@@ -191,17 +191,18 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
 
-    def "Do not create new instance from JSON with bad json name"() {
+    @Unroll
+    def "Do not #action new instance from JSON with bad json name"() {
         expect:
         !resource.findByName(badInstance.name)
 
         when:
         response.format = "json"
         request.json = badInstance.properties
-        controller.save()
+        controller."$action"()
         JSONElement created = response.json
         def stored = resource.findByName(badInstance.name)
-        recordResult 'saveErrors', created, resourceName
+        recordResult action + 'Errors', created, resourceName
 
         then:
         !stored
@@ -209,6 +210,9 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         created.errors
         created.errors.size() >= 1
         created.errors.first().field == "name"
+
+        where:
+        action << ['save', 'validate']
     }
 
     def "Create new instance from JSON"() {
@@ -335,19 +339,22 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         def xml = badInstance.encodeAsXML()
         request.xml = xml
 
-        recordInputXML "saveErrorsInput", xml, resourceName
+        recordInputXML action + "ErrorsInput", xml, resourceName
 
-        controller.save()
+        controller."$action"()
 
         GPathResult created = response.xml
         def stored = resource.findByName("")
 
-        recordResult 'saveErrors', created, resourceName
+        recordResult action + 'Errors', created, resourceName
 
         then:
         !stored
         created
         created.depthFirst().find { it.@field == 'name'} == badXmlCreateError
+
+        where:
+        action << ['save', 'validate']
     }
 
     def "edit instance with bad JSON name"() {

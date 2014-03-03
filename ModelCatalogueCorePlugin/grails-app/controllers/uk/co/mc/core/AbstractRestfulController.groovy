@@ -33,6 +33,22 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         )
     }
 
+
+    def validate() {
+        if(handleReadOnly()) {
+            return
+        }
+        def instance = createResource(getParametersToBind())
+
+        instance.validate()
+        if (instance.hasErrors()) {
+            respond instance.errors, view:'create' // STATUS CODE 422
+            return
+        }
+
+        respond instance
+    }
+
     @Override
     @Transactional
     def delete() {
@@ -50,23 +66,14 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             instance.delete flush:true
         }catch (DataIntegrityViolationException ignored){
             response.status = HttpServletResponse.SC_CONFLICT
-            def model =  [errors: message(code: "uk.co.mc.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])] // STATUS CODE 501
-            respond model
+            respond errors: message(code: "uk.co.mc.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"]) // STATUS CODE 409
             return
         } catch (Exception ignored){
-            def model =  [errors: message(code: "uk.co.mc.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])] // STATUS CODE 501
-            respond model
+            respond errors: message(code: "uk.co.mc.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])  // STATUS CODE 501
             return
         }
 
-
-        request.withFormat {
-            form {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT } // NO CONTENT STATUS CODE
-        }
+        render status: NO_CONTENT // NO CONTENT STATUS CODE
     }
 
     protected Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
