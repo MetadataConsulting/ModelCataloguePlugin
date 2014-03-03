@@ -64,6 +64,56 @@ describe "mc.util.rest", ->
     expect(result.world).toBe("Hello")
     expect(result.enhanced).toBeTruthy()
 
+  it "deep enhances returned lists on success when enhancer condition met", ->
+    value   = [{hello: "World", world: "Hello"}]
+    result  = null
+    $httpBackend.when("GET", "/foobar").respond(value)
+
+    promise = rest({ method: "GET", url: "/foobar"})
+
+    expect(promise).toBeDefined()
+    expect(promise.then).toBeDefined()
+
+    promise.then((_result_) ->
+      result = _result_
+    )
+
+    expect(result).toBeNull()
+
+    $httpBackend.flush()
+
+    expect(result).toBeDefined()
+    expect(angular.isArray(result)).toBeTruthy()
+    expect(result.length).toBe(1)
+    expect(result[0].hello).toBe("World")
+    expect(result[0].world).toBe("Hello")
+    expect(result[0].enhanced).toBeTruthy()
+
+  it "deep enhances returned objects on success when enhancer condition met", ->
+    value   = {foo: {hello: "World", world: "Hello"}}
+    result  = null
+    $httpBackend.when("GET", "/foobar").respond(value)
+
+    promise = rest({ method: "GET", url: "/foobar"})
+
+    expect(promise).toBeDefined()
+    expect(promise.then).toBeDefined()
+
+    promise.then((_result_) ->
+      result = _result_
+    )
+
+    expect(result).toBeNull()
+
+    $httpBackend.flush()
+
+    expect(result).toBeDefined()
+    expect(angular.isObject(result)).toBeTruthy()
+    expect(result.foo).toBeDefined()
+    expect(result.foo.hello).toBe("World")
+    expect(result.foo.world).toBe("Hello")
+    expect(result.foo.enhanced).toBeTruthy()
+
   it "returns status if no data and status is 2xx", ->
     result  = null
     $httpBackend.when("GET", "/foobar").respond(204)
