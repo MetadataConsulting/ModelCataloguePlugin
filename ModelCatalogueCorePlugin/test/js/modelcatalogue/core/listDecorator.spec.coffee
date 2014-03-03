@@ -9,8 +9,7 @@ describe "mc.core.listDecorator", ->
 
   beforeEach module "mc.core.listDecorator"
 
-  beforeEach inject (_listDecorator_, _rest_, _enhance_, _$httpBackend_, _$rootScope_, _modelCatalogueApiRoot_) ->
-    listDecorator         = _listDecorator_
+  beforeEach inject (_rest_, _enhance_, _$httpBackend_, _$rootScope_, _modelCatalogueApiRoot_) ->
     rest                  = _rest_
     $httpBackend          = _$httpBackend_
     $rootScope            = _$rootScope_

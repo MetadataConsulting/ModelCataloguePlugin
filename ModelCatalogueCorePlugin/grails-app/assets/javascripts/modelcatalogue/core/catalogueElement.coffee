@@ -1,8 +1,7 @@
-angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).provider 'catalogueElement', [ 'enhanceProvider', (enhanceProvider) ->
-
-  @$get = [ 'modelCatalogueApiRoot', 'rest', (modelCatalogueApiRoot, rest) ->
-    (element) ->
-      enhance = @enhance
+angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).config [ 'enhanceProvider', (enhanceProvider) ->
+  condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
+  factory   = [ 'modelCatalogueApiRoot', 'rest', (modelCatalogueApiRoot, rest) ->
+    (element, enhance = @enhance) ->
       class CatalogueElement
         constructor: (element) ->
           @defaultExcludes = ['elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link']
@@ -38,10 +37,5 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).
       # wrap original element
       new CatalogueElement(element)
   ]
-
-  condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-
-  enhanceProvider.registerEnhancerFactory('catalogueElement', condition, @$get)
-
-  @
+  enhanceProvider.registerEnhancerFactory('catalogueElement', condition, factory)
 ]
