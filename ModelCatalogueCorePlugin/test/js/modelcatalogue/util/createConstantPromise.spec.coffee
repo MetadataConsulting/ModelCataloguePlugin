@@ -1,4 +1,4 @@
-describe "constant promise function factory", ->
+describe "mc.util.createConstantPromise", ->
   beforeEach module "mc.util.createConstantPromise"
 
   factory    = null
