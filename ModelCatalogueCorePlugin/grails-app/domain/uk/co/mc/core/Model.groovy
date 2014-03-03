@@ -7,6 +7,12 @@ class Model extends ExtendibleElement  {
 
     static transients = ['contains', 'hasContextOf', 'parentOf', 'childOf']
 
+    static searchable = {
+        name boost:5
+        extensions component:true
+        except = ['ext', 'contains', 'hasContextOf', 'parentOf', 'childOf', 'incomingRelationships', 'outgoingRelationships']
+    }
+
     //CONTAINMENT
 
     List/*<DataElement>*/ getContains() {

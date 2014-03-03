@@ -12,9 +12,15 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     static responseFormats = ['json', 'xml']
+    def searchService
 
     AbstractRestfulController(Class<T> resource) {
         super(resource)
+    }
+
+    def search(){
+        def result =  searchService.search(resource, params.search)
+        respond result
     }
 
     @Override

@@ -11,6 +11,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class MeasurementUnit extends CatalogueElement {
 
+    static searchable = {
+        name boost:5
+        except = ['incomingRelationships', 'outgoingRelationships']
+    }
+
     String symbol
 
     static constraints = {

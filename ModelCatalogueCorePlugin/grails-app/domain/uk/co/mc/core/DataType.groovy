@@ -13,6 +13,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class DataType extends CatalogueElement {
 
+    static searchable = {
+        name boost:5
+        except = ['incomingRelationships', 'outgoingRelationships']
+    }
+
     static constraints = {
         name unique: true, size: 2..255
     }

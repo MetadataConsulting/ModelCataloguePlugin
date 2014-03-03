@@ -70,7 +70,6 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
     }
 
 
-
     @Unroll
     def "list json items test: #no where max: #max offset: #offset"() {
         fillWithDummyEntities()

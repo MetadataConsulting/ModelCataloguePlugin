@@ -59,6 +59,9 @@ grails.project.dependency.resolution = {
         // codenarc static analysis
         provided ":codenarc:0.20"
 
+        //elastic search
+        compile ":elasticsearch-gorm:0.0.2.3"
+
         // test coverage
         test ":code-coverage:1.2.7"
 

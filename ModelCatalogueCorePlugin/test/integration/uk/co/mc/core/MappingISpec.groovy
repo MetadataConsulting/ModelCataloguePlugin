@@ -4,16 +4,15 @@ import grails.test.spock.IntegrationSpec
 import spock.lang.Shared
 import spock.lang.Unroll
 
-class MappingISpec extends IntegrationSpec {
+class MappingISpec extends AbstractIntegrationSpec {
 
     @Shared
-    def fixtureLoader, degreeC, degreeF
+    def degreeC, degreeF
 
     def setupSpec(){
-        def fixtures =  fixtureLoader.load( "valueDomains/VD_degree_C", "valueDomains/VD_degree_F")
-
-        degreeC = fixtures.VD_degree_C
-        degreeF = fixtures.VD_degree_F
+        loadFixtures()
+        degreeC = ValueDomain.findByName("value domain Celsius")
+        degreeF = ValueDomain.findByName("value domain Fahrenheit")
 
     }
 
@@ -57,7 +56,7 @@ class MappingISpec extends IntegrationSpec {
         false     | 0    | [:]
         false     | 0    | [name: "x" * 256]
         false     | 0    | [ name: "String", source: degreeC, destination: degreeF, mapping: "foo" ]
-        true      | 1    | [ name: "String", source: degreeC, destination: degreeF, mapping: "x * 2" ]
+        true      | 1    | [ name: "String1", source: degreeC, destination: degreeF, mapping: "x * 2" ]
 
 
 

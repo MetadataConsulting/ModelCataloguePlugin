@@ -10,6 +10,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 * i.e. ValueDomain subjects uses EnumeratedType enumerations ['politics', 'history', 'science']
 * */
 
+//FIXME marshalling and unmarshalling for enumerated type as string at the moment it returns the enum as string
+//but we need ext. please see enumAsStringConverter.groovy for marshalling to index
+
 class EnumeratedType extends DataType {
 
     private static final QUOTED_CHARS = [
@@ -18,6 +21,12 @@ class EnumeratedType extends DataType {
             "|": "&#124;",
             "%": "&#37;",
     ]
+
+    static searchable = {
+        name boost:5
+        enumAsString converter: EnumAsStringConverter
+        except = ['incomingRelationships', 'outgoingRelationships']
+    }
 
     String enumAsString
 

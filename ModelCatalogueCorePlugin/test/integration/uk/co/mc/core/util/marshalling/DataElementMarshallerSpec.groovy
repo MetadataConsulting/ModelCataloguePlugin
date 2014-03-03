@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.web.context.ServletContextHolder
 import org.springframework.web.context.support.WebApplicationContextUtils
 import spock.lang.Shared
 import spock.lang.Specification
+import uk.co.mc.core.AbstractIntegrationSpec
 import uk.co.mc.core.DataElement
 import uk.co.mc.core.Relationship
 import uk.co.mc.core.RelationshipType
@@ -13,10 +14,10 @@ import uk.co.mc.core.RelationshipType
 /**
  * Created by adammilward on 10/02/2014.
  */
-class DataElementMarshallerSpec extends IntegrationSpec{
+class DataElementMarshallerSpec extends AbstractIntegrationSpec{
 
     @Shared
-    def fixtureLoader, de1, de2, de3, rel, rel2, rt
+    def de1, de2, de3, rel, rt
 
 
     def setupSpec(){
@@ -26,12 +27,12 @@ class DataElementMarshallerSpec extends IntegrationSpec{
         //register custom json Marshallers
         springContext.getBean('customObjectMarshallers').register()
 
-        def fixtures =  fixtureLoader.load( "dataElements/DE_author9", "dataElements/DE_author10", "dataElements/DE_author11", "relationshipTypes/RT_antonym")
+        loadFixtures()
 
-        de1 = fixtures.DE_author9
-        de2 = fixtures.DE_author10
-        de3 = fixtures.DE_author11
-        rt = fixtures.RT_antonym
+        de1 = DataElement.findByName("auth7")
+        de2 = DataElement.findByName("auth7")
+        de3 = DataElement.findByName("auth7")
+        rt = RelationshipType.findByName("Synonym")
 
     }
 

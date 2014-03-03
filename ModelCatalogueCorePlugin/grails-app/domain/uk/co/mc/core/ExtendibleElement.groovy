@@ -10,6 +10,9 @@ import uk.co.mc.core.util.ExtendibleElementExtensionsWrapper
 
 abstract class ExtendibleElement extends PublishedElement {
 
+    static searchable = {
+        except = ['ext']
+    }
 
     static hasMany = [extensions: ExtensionValue]
     static transients = ['ext']
@@ -17,7 +20,7 @@ abstract class ExtendibleElement extends PublishedElement {
     Map<String, String> ext = new ExtendibleElementExtensionsWrapper(this)
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, extensions: ${extension}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, extensions: ${extensions}]"
     }
 
 

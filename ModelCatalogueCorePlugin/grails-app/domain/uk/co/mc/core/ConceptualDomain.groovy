@@ -22,6 +22,12 @@ class ConceptualDomain extends CatalogueElement {
 
     static transients = ['isContextFor', 'includes']
 
+    static searchable = {
+        name boost:5
+
+        except = ['isContextFor', 'includes', 'incomingRelationships', 'outgoingRelationships']
+    }
+
     //CONTEXT
 
     List/*<Model>*/ getIsContextFor() {

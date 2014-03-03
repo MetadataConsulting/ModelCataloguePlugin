@@ -7,16 +7,14 @@ import spock.lang.Shared
  * Created by adammilward on 05/02/2014.
  */
 
-class ModelISpec extends IntegrationSpec{
+class ModelISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def fixtureLoader, book
+    def book
 
     def setupSpec(){
-        def fixtures =  fixtureLoader.load("models/M_book")
-
-        book = fixtures.M_book
-
+        loadFixtures()
+        book = Model.findByName("book")
     }
 /*
     def cleanupSpec(){

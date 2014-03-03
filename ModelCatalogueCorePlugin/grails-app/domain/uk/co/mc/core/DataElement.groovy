@@ -12,6 +12,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class DataElement extends ExtendibleElement {
 
+    static searchable = {
+        name boost:5
+        extensions component:true
+        code boost:5
+        except = ['incomingRelationships', 'outgoingRelationships']
+    }
+
     //nearly all examples that we are working with have a unique data element code i.e. NHIC105495432
     //however conceptually this should not be mandatory
     String code

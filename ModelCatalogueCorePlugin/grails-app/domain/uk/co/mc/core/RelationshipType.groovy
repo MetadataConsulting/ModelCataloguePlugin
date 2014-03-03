@@ -6,6 +6,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class RelationshipType {
 
+    static searchable = {
+        name boost: 5
+        except = ['rule', 'sourceClass', 'destinationClass', 'defaultRelationshipTypesDefinitions']
+    }
+
     //name of the relationship type i.e. parentChild  or synonym
     String name
 
