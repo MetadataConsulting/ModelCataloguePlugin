@@ -78,6 +78,7 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
     private generateRelationshipRestAssertions(String controller) {
         [
       // method   | url                                       | controller | action            | paramsAssertions
+        [ "POST"  , "/$controller/validate"                   , controller , "validate"        , { }                                   ],
         [ "POST"  , "/$controller/1/validate"                 , controller , "validate"        , { id = "1" }                          ],
         [ "GET"   , "/$controller/1/outgoing"                 , controller , "outgoing"        , { id = "1" }                          ],
         [ "GET"   , "/$controller/1/incoming"                 , controller , "incoming"        , { id = "1" }                          ],

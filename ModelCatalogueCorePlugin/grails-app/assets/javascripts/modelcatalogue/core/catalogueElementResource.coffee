@@ -24,6 +24,9 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
         delete props.id
         enhance rest method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props
 
+      validate: (data) ->
+        enhance rest method: 'POST', url: "#{@getIndexPath()}/validate}", data: data
+
       list: (params = {}) ->
         enhance rest method: 'GET', url: @getIndexPath(), params: params
 
