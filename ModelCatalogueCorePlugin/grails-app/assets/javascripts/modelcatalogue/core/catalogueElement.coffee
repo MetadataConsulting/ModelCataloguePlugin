@@ -5,6 +5,7 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).
       class CatalogueElement
         constructor: (element) ->
           @defaultExcludes = ['id','elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link']
+          @listProperties  = ['outgoingRelationships', 'incomingRelationships', 'mappings' ]
           @getUpdatePayload = () ->
             payload = {}
             for name in @updatableProperties
@@ -18,16 +19,11 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).
               @updatableProperties.push(name)
 
           angular.extend(@, element)
-          if element.hasOwnProperty('incomingRelationships')
-            incoming = element.incomingRelationships
-            @incomingRelationships       = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{incoming.link}"
-            @incomingRelationships.url   = incoming.link
-            @incomingRelationships.total = incoming.count
-          if element.hasOwnProperty('outgoingRelationships')
-            outgoing = element.outgoingRelationships
-            @outgoingRelationships = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{outgoing.link}"
-            @outgoingRelationships.url   = outgoing.link
-            @outgoingRelationships.total = outgoing.count
+          for prop in @listProperties when element.hasOwnProperty(prop)
+            list = element[prop]
+            this[prop]       = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{list.link}"
+            this[prop].url   = list.link
+            this[prop].total = list.count
 
         delete:    () -> enhance rest method: 'DELETE', url: "#{modelCatalogueApiRoot}#{@link}"
         validate:  () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{@link}/validate", data: @getUpdatePayload()
