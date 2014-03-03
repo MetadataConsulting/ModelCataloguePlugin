@@ -10,7 +10,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 action = [GET: "show", PUT: "update", DELETE: "delete"]
             }
             "/$controller/$id/validate" {
-                action = [GET: "validate"]
+                action = [POST: "validate"]
             }
             "/$controller/$id/incoming" {
                 action = [GET: "incoming"]

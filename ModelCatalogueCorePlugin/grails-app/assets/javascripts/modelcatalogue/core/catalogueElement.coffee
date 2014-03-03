@@ -4,7 +4,13 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).
     (element, enhance = @enhance) ->
       class CatalogueElement
         constructor: (element) ->
-          @defaultExcludes = ['elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link']
+          @defaultExcludes = ['id','elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link']
+          @getUpdatePayload = () ->
+            payload = {}
+            for name in @updatableProperties
+              payload[name] = this[name]
+            payload
+
           @updatableProperties = []
 
           for name, ignored of element
@@ -24,14 +30,8 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).
             @outgoingRelationships.total = outgoing.count
 
         delete:    () -> enhance rest method: 'DELETE', url: "#{modelCatalogueApiRoot}#{@link}"
-        validate:  () -> enahnce rest method: 'GET', url: "#{modelCatalogueApiRoot}#{@link}/validate"
-
-        update:    () ->
-          payload = {}
-          for name in @updatableProperties
-            payload[name] = this[name]
-          delete payload.id
-          enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{@link}", data: payload
+        validate:  () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{@link}/validate", data: @getUpdatePayload()
+        update:    () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{@link}", data: @getUpdatePayload()
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)
       # wrap original element

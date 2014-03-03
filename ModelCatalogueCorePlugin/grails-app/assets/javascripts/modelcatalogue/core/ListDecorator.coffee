@@ -1,8 +1,7 @@
-angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.createConstantPromise']).provider 'listDecorator', ['enhanceProvider', (enhanceProvider)->
-
-  @$get = ['modelCatalogueApiRoot', 'createConstantPromise', 'rest', (modelCatalogueApiRoot, createConstantPromise, rest) ->
-    (list) ->
-      enhance = @enhance
+angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.createConstantPromise']).config ['enhanceProvider', (enhanceProvider)->
+  condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
+  factory   = ['modelCatalogueApiRoot', 'createConstantPromise', 'rest', (modelCatalogueApiRoot, createConstantPromise, rest) ->
+    (list, enhance = @enhance) ->
       class ListDecorator
         constructor: (list) ->
           angular.extend(@, list)
@@ -14,16 +13,16 @@ angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.
             @next.url    = nextUrl
             @next.total  = @total
           else
-            @next = createConstantPromise({
+            @next = () -> createConstantPromise({
               total:      @total
               list:       []
               size:       0
               page:       @page
               success:    false
             # promising this will return same empty list
-              next:       createConstantPromise(this)
+              next:       () -> createConstantPromise(this)
             # promising list will get back to regular lists
-              previous:   createConstantPromise(list),
+              previous:   () -> createConstantPromise(list),
               offset:     @offset + @page
             })
             @next.size   = 0
@@ -35,16 +34,16 @@ angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.
             @previous.total  = @total
             @previous.url    = prevUrl
           else
-            @previous = createConstantPromise({
+            @previous = () -> createConstantPromise({
               total:      @total
               list:       []
               size:       0
               page:       @page
               success:    false
             # promising list will get back to regular lists
-              next:       createConstantPromise(list)
+              next:       () -> createConstantPromise(list)
             # promising this will return same empty list
-              previous:   createConstantPromise(this)
+              previous:   () -> createConstantPromise(this)
               offset:     0
             })
             @previous.size   = 0
@@ -54,9 +53,5 @@ angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.
       new ListDecorator(list)
   ]
 
-  condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
-
-  enhanceProvider.registerEnhancerFactory('listDecorator', condition, @$get)
-
-  @
+  enhanceProvider.registerEnhancerFactory('listDecorator', condition, factory)
 ]

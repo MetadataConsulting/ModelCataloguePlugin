@@ -126,7 +126,31 @@ describe "mc.core.catalogueElementResource", ->
 
               expect(updated).toBeDefined()
 
+            it "has validate method", ->
+              expectedPayload = {
+                symbol:       "°C"
+                description:  "Celsius, also known as centigrade,[1] is a scale and unit of measurement for temperature. It is named after the Swedish astronomer Anders Celsius (1701–1744), who developed a similar temperature scale. The degree Celsius (°C) can refer to a specific temperature on the Celsius scale as well as a unit to indicate a temperature interval, a difference between two temperatures or an uncertainty. The unit was known until 1948 as \"centigrade\" from the Latin centum translated as 100 and gradus translated as \"steps\"."
+                name:         "Degrees of Celsius"
+                version:      1
+              }
 
+              result.version = 1
+
+              $httpBackend
+              .when("POST", "#{modelCatalogueApiRoot}/measurementUnit/1/validate", expectedPayload)
+              .respond(fixtures.measurementUnit.updateOk)
+
+              expect(angular.isFunction(result.validate)).toBeTruthy()
+
+              validationResult = null
+
+              result.validate().then((result) -> validationResult = result)
+
+              expect(validationResult).toBeNull()
+
+              $httpBackend.flush()
+
+              expect(validationResult).toBeDefined()
 
         it "will respond with 404 if the resource does not exist", ->
           $httpBackend
