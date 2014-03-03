@@ -9,11 +9,14 @@ class ModelCatalogueCorePluginUrlMappings {
             "/$controller/$id" {
                 action = [GET: "show", PUT: "update", DELETE: "delete"]
             }
-            "/$controller/$id/outgoing" {
-                action = [GET: "outgoing"]
+            "/$controller/$id/validate" {
+                action = [GET: "validate"]
             }
             "/$controller/$id/incoming" {
                 action = [GET: "incoming"]
+            }
+            "/$controller/$id/outgoing" {
+                action = [GET: "outgoing"]
             }
             "/$controller/$id/outgoing/$type" {
                 action = [GET: "outgoing", POST: "addOutgoing", DELETE: "removeOutgoing"]
