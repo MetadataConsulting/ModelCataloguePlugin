@@ -15,8 +15,9 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest']).provider 'catalogue
           @defaultExcludes = ['elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships']
           @updatableProperties = []
 
-          for name, ignored of element unless name in @defaultExcludes
-            @updatableProperties.push(name)
+          for name, ignored of element
+            unless name in @defaultExcludes
+              @updatableProperties.push(name)
 
           angular.extend(@, element)
           if element.hasOwnProperty('incomingRelationships')
@@ -30,9 +31,10 @@ angular.module('mc.core.catalogueElement', ['mc.util.rest']).provider 'catalogue
             @outgoingRelationships.url   = outgoing.link
             @outgoingRelationships.total = outgoing.count
 
-        delete:                 () -> rest({method: 'DELETE', url: "#{modelCatalogueApiRoot}#{@link}"})
+        delete:    () -> rest({method: 'DELETE', url: "#{modelCatalogueApiRoot}#{@link}"})
+        validate:  () -> rest({method: 'get', url: "#{modelCatalogueApiRoot}#{@link}/validate"})
 
-        update:                 () ->
+        update:    () ->
           payload = {}
           for name in @updatableProperties
             payload[name] = this[name]

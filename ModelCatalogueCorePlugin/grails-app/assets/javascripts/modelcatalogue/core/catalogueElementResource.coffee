@@ -1,4 +1,4 @@
-angular.module('mc.modelCatalogue', ['mc.core.modelCatalogueApiRoot', 'mc.util.rest']).provider 'modelCatalogue', [ ->
+angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRoot', 'mc.util.rest']).provider 'catalogueElementResource', [ ->
   # Method for instantiating
   @$get = ['modelCatalogueApiRoot', 'rest', (modelCatalogueApiRoot, rest) ->
     class CatalogueElementResource
@@ -27,14 +27,7 @@ angular.module('mc.modelCatalogue', ['mc.core.modelCatalogueApiRoot', 'mc.util.r
       list: (params = {}) ->
         rest({method: 'GET', url: @getIndexPath(), params: params})
 
-    class ModelCatalogue
-      getModelCatalogueApiRoot: ->
-        modelCatalogueApiRoot
-
-      elements: (pathName) ->
-        new CatalogueElementResource(pathName)
-
-    new ModelCatalogue()
+    (pathName) -> new CatalogueElementResource(pathName)
   ]
   # Always return this from CoffeeScript AngularJS factory functions!
   @
