@@ -7,7 +7,6 @@ describe "mc.core.ui.resourceTable", ->
   it "element get compiled",  inject ($compile, $rootScope, $httpBackend, modelCatalogueApiRoot) ->
     $httpBackend.when("GET", "#{modelCatalogueApiRoot}/measurementUnit").respond(fixtures.measurementUnit.list2)
 
-    $rootScope.resourceName = 'measurementUnit'
     $rootScope.columns      =
       ID:     'id'
       Name:   'name'
@@ -15,7 +14,7 @@ describe "mc.core.ui.resourceTable", ->
 
 
     element = $compile('''
-    <table resource-table="resourceName" columns="columns"></table>
+    <table resource-table="measurement{{'Unit'}}" columns="columns"></table>
     ''')($rootScope)
 
     $rootScope.$digest()
@@ -49,6 +48,8 @@ describe "mc.core.ui.resourceTable", ->
     expect(element.find('tbody tr:last-child td.resource-table-item-cell:nth-child(2)').text()).toBe('Measurement Unit 5')
     expect(element.find('tbody tr:last-child td.resource-table-item-cell:nth-child(3)').text()).toBe('MU5')
 
-
-
-#    console.log(element)
+    # the columns are live
+    delete $rootScope.columns.ID
+    $rootScope.$digest()
+    expect(element.find('thead tr th.resource-table-header-cell').length).toBe(2)
+    expect(element.find('tbody tr:first-child td.resource-table-item-cell').length).toBe(2)

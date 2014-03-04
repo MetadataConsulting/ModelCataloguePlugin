@@ -1,5 +1,10 @@
 angular.module('mc.core.ui.resourceTable', ['mc.core.catalogueElementResource']).directive 'resourceTable',  ['catalogueElementResource', (catalogueElementResource) -> {
     restrict: 'A'
+    scope:
+      # it makes no sense to change the resource name
+      resourceName: '@resourceTable'
+      # but you may want to change the columns
+      columns: '=columns'
     template: '''
       <thead>
         <tr class="resource-table-header-row">
@@ -12,13 +17,13 @@ angular.module('mc.core.ui.resourceTable', ['mc.core.catalogueElementResource'])
           </tr>
       </tbody>
     '''
-    controller: ['$scope', '$element', '$attrs', 'catalogueElementResource', ($scope, $element, $attrs, catalogueElementResource) ->
+    controller: ['$scope', '$element', 'catalogueElementResource', ($scope, $element, catalogueElementResource) ->
       $element.addClass('resource-table')
-      @resource = catalogueElementResource($scope.$eval($attrs.resourceTable))
+      @resource = catalogueElementResource($scope.resourceName)
       @resource.list().then (result) ->
         $scope.resourceList = result
 
-      $scope.columns = if $attrs.columns? then $scope.$eval($attrs.columns) else {name: 'Name', description: 'Description'}
+      $scope.columns = if $scope.columns? then $scope.columns else {name: 'Name', description: 'Description'}
     ]
   }
 ]
