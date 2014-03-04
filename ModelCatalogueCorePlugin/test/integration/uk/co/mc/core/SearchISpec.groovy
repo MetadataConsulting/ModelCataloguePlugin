@@ -7,13 +7,13 @@ import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Shared
 import spock.lang.Unroll
+import uk.co.mc.core.util.DefaultResultRecorder
 import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.DataElementMarshaller
 
 /**
  * Created by adammilward on 05/02/2014.
  */
-@Mixin(ResultRecorder)
 class SearchISpec extends AbstractIntegrationSpec{
 
  //runs ok in integration test (test-app :integration), fails as part of test-app (Grails Bug) - uncomment to run
@@ -42,16 +42,15 @@ class SearchISpec extends AbstractIntegrationSpec{
     }
 
 
-    def "search model catalogue - paginate results"(){
-
-
-        
-
-    }
-
-
     @Unroll
     def "#no - text search for resource "(){
+
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                className[0].toLowerCase() + className.substring(1)
+        )
+
 
         JSONElement json
         GPathResult xml
@@ -69,10 +68,10 @@ class SearchISpec extends AbstractIntegrationSpec{
 
         if(response=="json"){
             json = controller.response.json
-            recordResult recordName, json, className[0].toLowerCase() + className.substring(1)
+            recorder.recordResult recordName, json
         }else{
             xml = controller.response.xml
-            recordResult recordName, xml, className[0].toLowerCase() + className.substring(1)
+            recorder.recordResult recordName, xml
         }
         then:
 
@@ -122,5 +121,114 @@ class SearchISpec extends AbstractIntegrationSpec{
        22 | "DataElement"       | new DataElementController()         | "metadata"                      | "xml"     | "DE_author1"              | 1
 
     }
+
+    @Unroll
+    def "#no -  search model catalogue - paginate results"(){
+
+        def controller = new SearchController()
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "search"
+        )
+
+
+        when:
+
+
+        controller.response.format = "json"
+        controller.params.max = max
+        controller.params.offset = offset
+        controller.params.search = searchString
+        controller.params.sort = sort
+        controller.params.order = order
+
+        controller.index()
+        JSONElement json = controller.response.json
+
+        String list = "list${no}"
+
+
+        recorder.recordResult list, json
+
+        then:
+
+        json.success
+        json.total == total
+        json.offset == offset
+        json.page == max
+        json.list
+        json.list.size() == size
+        json.next == next
+        json.previous == previous
+
+
+
+        where:
+        [no, size, max, offset, total, next, previous, searchString, sort, order] << getPaginationParameters()
+
+
+    }
+
+
+
+    protected static getPaginationParameters() {
+        [
+                // no,size, max , off. tot. next, previous, searchstring                           , previous
+                [1, 7, 10, 0, 7, "", "",  "domain"],
+                [2, 5, 5, 0, 7, "/search/domain?max=5&sort=name&order=ASC&offset=5", "", "domain", "name", "ASC"],
+                [3, 2, 2, 5, 7, "", "/search/domain?max=2&sort=name&order=ASC&offset=3", "domain", "name", "ASC"],
+                [4, 4, 4, 1, 7, "/search/domain?max=4&sort=name&order=ASC&offset=5", "", "domain", "name", "ASC"],
+                [5, 2, 2, 2, 7, "/search/domain?max=2&sort=name&order=ASC&offset=4", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
+                [6, 2, 2, 4, 7, "/search/domain?max=2&sort=name&offset=6", "/search/domain?max=2&sort=name&offset=2", "domain", "name", ""],
+                [7, 2, 2, 4, 7, "/search/domain?max=2&offset=6", "/search/domain?max=2&offset=2", "domain", "", ""]
+        ]
+    }
+
+@Unroll
+    def "#no - bad search params"(){
+
+        def controller = new SearchController()
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "badSearch"
+        )
+
+        when:
+        controller.response.format = "json"
+        controller.params.max = max
+        controller.params.offset = offset
+        controller.params.search = searchString
+        controller.params.sort = sort
+        controller.params.order = order
+
+        controller.index()
+        JSONElement json = controller.response.json
+
+        String list = "list${no}"
+
+        recorder.recordResult list, json
+
+        then:
+
+        json.errors == error
+
+        where:
+        [no, size, max, offset, total, searchString, sort, order, error] << getBadParameters()
+
+
+
+
+    }
+
+    protected static getBadParameters() {
+        [
+                // no,size, max , off. tot. next, previous, searchstring                           , previous
+                [1, 2, 2, 4, 7, "domain", "name", "blah blah blah", "Illegal argument: No enum constant org.elasticsearch.search.sort.SortOrder.BLAH BLAH BLAH"],
+                [2, 2, 2, 4, 7, "", "name","", "No query string to search on"]
+        ]
+    }
+
 
 }

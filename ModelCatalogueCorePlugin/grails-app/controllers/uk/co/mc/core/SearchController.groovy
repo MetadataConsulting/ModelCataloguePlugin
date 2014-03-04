@@ -4,26 +4,34 @@ import uk.co.mc.core.util.Elements
 
 class SearchController {
 
+    static responseFormats = ['json', 'xml']
+
     def searchService
 
     def index(){
         def results =  searchService.search(params)
-        def total = results.size()
-        def links = nextAndPreviousLinks("/search/", total)
-        respond new Elements(
-                total: total,
-                items: results,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0
-        )
+        if(results.errors){
+            respond results
+            return
+        }
+
+            def total = (results.total)?results.total.intValue():0
+            def links = nextAndPreviousLinks("/search/", total)
+            respond new Elements(
+                    total: total,
+                    items: results.searchResults,
+                    previous: links.previous,
+                    next: links.next,
+                    offset: params.int('offset') ?: 0,
+                    page: params.int('max') ?: 0
+            )
+
     }
 
 
 //copied and pasted
     protected Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
-        def link = "${baseLink}?"
+        def link = "${baseLink}${params.search}?"
         if (params.max) {
             link += "max=${params.max}"
         }
@@ -32,9 +40,6 @@ class SearchController {
         }
         if (params.order) {
             link += "&order=${params.order}"
-        }
-        if (params.search){
-            link +=  "&search=${params.search}"
         }
         def nextLink = ""
         def previousLink = ""

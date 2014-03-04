@@ -50,7 +50,7 @@ class ModelCatalogueCorePluginUrlMappings {
         }
 
         "/api/modelCatalogue/core/search/$search" (controller:"search") {
-            action = [GET: "search"]
+            action = [GET: "index"]
         }
 
 	}

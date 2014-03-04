@@ -20,16 +20,23 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     def search(){
         def results =  searchService.search(resource, params)
-        def total = results.size()
+
+        if(results.errors){
+            respond results
+            return
+        }
+
+        def total = (results.total)?results.total.intValue():0
         def links = nextAndPreviousLinks("/${resourceName}/search", total)
-        respond new Elements(
-                total: total,
-                items: results,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0
-        )
+            respond new Elements(
+                    total: total,
+                    items: results.searchResults,
+                    previous: links.previous,
+                    next: links.next,
+                    offset: params.int('offset') ?: 0,
+                    page: params.int('max') ?: 0
+            )
+
     }
 
     @Override

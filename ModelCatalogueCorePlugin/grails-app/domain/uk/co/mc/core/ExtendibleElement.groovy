@@ -11,6 +11,7 @@ import uk.co.mc.core.util.ExtendibleElementExtensionsWrapper
 abstract class ExtendibleElement extends PublishedElement {
 
     static searchable = {
+        extensions component:true
         except = ['ext']
     }
 

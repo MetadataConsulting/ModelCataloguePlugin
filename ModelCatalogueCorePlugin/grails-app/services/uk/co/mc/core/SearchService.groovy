@@ -11,45 +11,64 @@ class SearchService {
     def elasticSearchService
 
     def search(Class resource, Map params) {
-        def searchResults =  resource.search(){
-            bool {
-                must {
-                    query_string(query: params.search)
+        def searchResults = [:]
+        def searchParams = getSearchParams(params)
+        if(searchParams.errors){
+            searchResults.put("errors" , searchParams.errors)
+            return searchResults
+        }
+        try{
+            searchResults = resource.search(searchParams){
+                bool {
+                    must {
+                        query_string(query: params.search)
+                    }
                 }
             }
-            if(params.max){
-            size : "$params.max"
-            }
-            if(params.sort){
-                sort : ["order": ((params.order)?params.order.toLowerCase():"asc")]
-            }
-            if(params.offset){
-                from : "$params.offset"
-            }
-        }.searchResults
+        }catch(IllegalArgumentException e){
+            searchResults.put("errors" , "Illegal argument: ${e.getMessage()}")
+        }catch(Exception e){
+            searchResults.put("errors" , e.getMessage())
+        }
 
         return searchResults
     }
 
     def search(Map params){
-        def searchResults = elasticSearchService.search(){
-            bool {
-                must {
-                    query_string(query: params.search)
+        def searchResults = [:]
+        def searchParams = getSearchParams(params)
+        if(searchParams.errors){
+            searchResults.put("errors" , searchParams.errors)
+            return searchResults
+        }
+        try{
+            searchResults = elasticSearchService.search(searchParams){
+                bool {
+                    must {
+                        query_string(query: params.search)
+                    }
                 }
             }
-            if(params.max){
-                size : "$params.max"
-            }
-            if(params.sort){
-                sort : ["order": ((params.order)?params.order.toLowerCase():"asc")]
-            }
-            if(params.offset){
-                from : "$params.offset"
-            }
-        }.searchResults
+        }catch(IllegalArgumentException e){
+            searchResults.put("errors" , "Illegal argument: ${e.getMessage()}")
+        }catch(Exception e){
+            searchResults.put("errors" , e.getMessage())
+        }
 
         return searchResults
+    }
+
+    private static Map getSearchParams(Map params){
+        def searchParams = [:]
+        if(!params.search){
+            searchParams.put("errors" , "No query string to search on")
+            return searchParams
+        }
+        if(params.max){ searchParams.put("size" , "$params.max")}
+        if(params.sort){searchParams.put("sort" , "name")}
+        if(params.order){searchParams.put("order" , params.order.toLowerCase())}
+        if(params.offset){searchParams.put("from" , "$params.offset")}
+        return searchParams
     }
 
 }
