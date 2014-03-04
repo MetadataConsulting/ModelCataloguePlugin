@@ -3,7 +3,6 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
-import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ModelMarshaller
 
@@ -11,7 +10,6 @@ import uk.co.mc.core.util.marshalling.ModelMarshaller
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ModelController)
-@Mixin(ResultRecorder)
 @Mock([Model,DataElement, Relationship, RelationshipType])
 class ModelControllerSpec extends CatalogueElementRestfulControllerSpec {
 

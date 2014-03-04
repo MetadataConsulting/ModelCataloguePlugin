@@ -3,7 +3,6 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
-import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.*
 
 import javax.servlet.http.HttpServletResponse
@@ -12,7 +11,6 @@ import javax.servlet.http.HttpServletResponse
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(ValueDomainController)
-@Mixin(ResultRecorder)
 @Mock([DataElement, ValueDomain, Relationship, RelationshipType, MeasurementUnit, DataType, Mapping])
 class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
@@ -116,7 +114,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         controller.mappings(max)
         def json = response.json
 
-        recordResult "mapping$no", json, resourceName
+        recordResult "mapping$no", json
 
 
         then:
@@ -152,7 +150,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         controller.mappings(max)
         def xml = response.xml
 
-        recordResult "mapping$no", xml, resourceName
+        recordResult "mapping$no", xml
 
         then:
         checkXmlCorrectListValues(xml, total, size, offset, max, next, previous)
@@ -229,7 +227,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         controller.addMapping()
         def result = response."$format"
 
-        recordResult "addMappingFailed" , result, resourceName
+        recordResult "addMappingFailed", result
 
         expect:
         response.status == 422 // unprocessable entity
@@ -289,7 +287,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
         def json = response.json
 
-        recordResult "addMapping" , json, resourceName
+        recordResult "addMapping", json
 
         expect:
         json.mapping            == "x"
@@ -313,7 +311,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
         def xml = response.xml
 
-        recordResult "addMapping" , xml, resourceName
+        recordResult "addMapping", xml
 
         expect:
         xml.mapping.text()            == "x"

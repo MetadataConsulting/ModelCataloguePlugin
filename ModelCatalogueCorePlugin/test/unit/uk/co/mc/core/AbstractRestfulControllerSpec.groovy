@@ -8,6 +8,8 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.fixtures.FixturesLoader
 import spock.lang.Specification
 import spock.lang.Unroll
+import uk.co.mc.core.util.DefaultResultRecorder
+import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ElementsMarshaller
 
@@ -21,7 +23,7 @@ import javax.servlet.http.HttpServletResponse
  *
  */
 
-abstract class AbstractRestfulControllerSpec<T> extends Specification {
+abstract class AbstractRestfulControllerSpec<T> extends Specification implements ResultRecorder {
 
     private static final int DUMMY_ENTITIES_COUNT = 12
 
@@ -31,8 +33,14 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
 
     FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
+    ResultRecorder recorder
 
     def setup() {
+        recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                resourceName
+        )
         setupMimeTypes()
         [marshallers, [new ElementsMarshaller()]].flatten().each {
             it.register()
@@ -91,7 +99,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         String list = "list${no}"
 
 
-        recordResult list, json, resourceName
+        recordResult list, json
 
         then:
 
@@ -128,7 +136,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         GPathResult xml = response.xml
 
         String list = "list${no}"
-        recordResult list, xml, resourceName
+        recordResult list, xml
 
         then:
 
@@ -161,7 +169,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         JSONObject json = response.json
 
-        recordResult 'showOne', json, resourceName
+        recordResult 'showOne', json
 
         then:
         json
@@ -179,7 +187,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         params.id = "${loadItem1.id}"
         controller.show()
         GPathResult xml = response.xml
-        recordResult "showOne", xml, resourceName
+        recordResult "showOne", xml
 
         expect:
         xml
@@ -201,7 +209,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         controller."$action"()
         JSONElement created = response.json
         def stored = resource.findByName(badInstance.name)
-        recordResult action + 'Errors', created, resourceName
+        recordResult action + 'Errors', created
 
         then:
         !stored
@@ -222,11 +230,11 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         response.format = "json"
         def json = newInstance.properties
         request.json = json
-        recordInputJSON 'createInput', json, resourceName
+        recordInputJSON 'createInput', json
         controller.save()
         JSONObject created = response.json
         def stored = resource.findByName(newInstance.name)
-        recordResult 'saveOk', created, resourceName
+        recordResult 'saveOk', created
 
         then:
         stored
@@ -243,12 +251,12 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         when:
         response.format = "xml"
         def xml = newInstance.encodeAsXML()
-        recordInputXML "createInput", xml, resourceName
+        recordInputXML "createInput", xml
         request.xml = xml
         controller.save()
         GPathResult created = response.xml
         def stored = resource.findByName(newInstance.name)
-        recordResult "createOk", created, resourceName
+        recordResult "createOk", created
 
         then:
         stored
@@ -282,13 +290,13 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         request.json = json
 
 
-        recordInputJSON 'updateInput', json, resourceName
+        recordInputJSON 'updateInput', json
 
         controller.update()
 
         JSONObject updated = response.json
 
-        recordResult 'updateOk', updated, resourceName
+        recordResult 'updateOk', updated
 
         then:
         updated
@@ -315,13 +323,13 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         def xml = instance.encodeAsXML()
         request.xml = xml
 
-        recordInputXML "updateInput", xml, resourceName
+        recordInputXML "updateInput", xml
 
         controller.update()
 
         GPathResult updated = response.xml
 
-        recordResult 'updateOk', updated, resourceName
+        recordResult 'updateOk', updated
 
         then:
         updated
@@ -338,14 +346,14 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         def xml = badInstance.encodeAsXML()
         request.xml = xml
 
-        recordInputXML action + "ErrorsInput", xml, resourceName
+        recordInputXML action + "ErrorsInput", xml
 
         controller."$action"()
 
         GPathResult created = response.xml
         def stored = resource.findByName("")
 
-        recordResult action + 'Errors', created, resourceName
+        recordResult action + 'Errors', created
 
         then:
         !stored
@@ -371,7 +379,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         JSONObject updated = response.json
 
-        recordResult 'updateErrors', updated, resourceName
+        recordResult 'updateErrors', updated
 
         then:
         updated
@@ -393,7 +401,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         params.id = instance.id
         def xml = badInstance.encodeAsXML()
 
-        recordInputXML "updateErrorsInput", xml, resourceName
+        recordInputXML "updateErrorsInput", xml
 
         request.xml = xml
 
@@ -401,7 +409,7 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
 
         GPathResult updated = response.xml
 
-        recordResult 'updateErrors', updated, resourceName
+        recordResult 'updateErrors', updated
 
         then:
         updated
@@ -659,4 +667,28 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification {
         }
     }
 
+    @Override
+    File recordResult(String fixtureName, JSONElement json) {
+        recorder.recordResult(fixtureName, json)
+    }
+
+    @Override
+    File recordResult(String fixtureName, GPathResult xml) {
+        recorder.recordResult(fixtureName, xml)
+    }
+
+    @Override
+    File recordInputJSON(String fixtureName, Map json) {
+        recorder.recordInputJSON(fixtureName, json)
+    }
+
+    @Override
+    File recordInputJSON(String fixtureName, String json) {
+        recorder.recordInputJSON(fixtureName, json)
+    }
+
+    @Override
+    File recordInputXML(String fixtureName, String xml) {
+        recorder.recordInputXML(fixtureName, xml)
+    }
 }

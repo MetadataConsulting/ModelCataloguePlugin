@@ -1,19 +1,15 @@
 package uk.co.mc.core
 
-import grails.test.mixin.TestFor
-import grails.test.spock.IntegrationSpec
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
-import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Shared
 import spock.lang.Unroll
+import uk.co.mc.core.util.DefaultResultRecorder
 import uk.co.mc.core.util.ResultRecorder
-import uk.co.mc.core.util.marshalling.DataElementMarshaller
 
 /**
  * Created by adammilward on 05/02/2014.
  */
-@Mixin(ResultRecorder)
 class SearchISpec extends AbstractIntegrationSpec{
 
 
@@ -50,6 +46,11 @@ class SearchISpec extends AbstractIntegrationSpec{
 
     @Unroll
     def "#no - json search for resource"(){
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                className[0].toLowerCase() + className.substring(1)
+        )
 
         JSONElement json
         GPathResult xml
@@ -65,16 +66,16 @@ class SearchISpec extends AbstractIntegrationSpec{
 
         String recordName = "searchElement${no}"
 
-        def x = CatalogueElement.get(37)
-        def y = CatalogueElement.get(28)
-        def z = CatalogueElement.get(8)
+        CatalogueElement.get(37)
+        CatalogueElement.get(28)
+        CatalogueElement.get(8)
 
         if(response=="json"){
             json = controller.response.json
-            recordResult recordName, json, className[0].toLowerCase() + className.substring(1)
+            recorder.recordResult recordName, json
         }else{
             xml = controller.response.xml
-            recordResult recordName, xml, className[0].toLowerCase() + className.substring(1)
+            recorder.recordResult recordName, xml
         }
         then:
 

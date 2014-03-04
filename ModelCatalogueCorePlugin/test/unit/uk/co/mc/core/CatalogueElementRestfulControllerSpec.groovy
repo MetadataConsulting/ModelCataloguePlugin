@@ -3,14 +3,9 @@ package uk.co.mc.core
 import grails.converters.JSON
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
-import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.modelcatalogue.fixtures.FixturesLoader
-import spock.lang.Specification
 import spock.lang.Unroll
-import uk.co.mc.core.util.marshalling.AbstractMarshallers
-import uk.co.mc.core.util.marshalling.ElementsMarshaller
 import uk.co.mc.core.util.marshalling.RelationshipMarshallers
 import uk.co.mc.core.util.marshalling.RelationshipsMarshaller
 
@@ -42,7 +37,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         controller."add${direction.capitalize()}"(loadItem1.id, type.name)
         def json = response.json
 
-        recordResult "add${direction.capitalize()}" , json, resourceName
+        recordResult "add${direction.capitalize()}", json
 
         def expectedSource =        direction == "outgoing" ? loadItem1 : loadItem2
         def expectedDestination =   direction == "outgoing" ? loadItem2 : loadItem1
@@ -69,7 +64,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         controller."add${direction.capitalize()}"(loadItem1.id, type.name)
         def xml = response.xml
 
-        recordResult "add${direction.capitalize()}" , xml, resourceName
+        recordResult "add${direction.capitalize()}", xml
 
         def expectedSource =        direction == "outgoing" ? loadItem1 : loadItem2
         def expectedDestination =   direction == "outgoing" ? loadItem2 : loadItem1
@@ -103,10 +98,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
 
         if(format=="JSON"){
-            recordInputJSON fixtureName, input, resourceName
+            recordInputJSON fixtureName, input
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input, resourceName
+            recordInputXML fixtureName, input
         }
 
 
@@ -148,10 +143,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
 
         if(format=="JSON"){
-            recordInputJSON fixtureName, input, resourceName
+            recordInputJSON fixtureName, input
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input, resourceName
+            recordInputXML fixtureName, input
         }
 
         request."${format.toLowerCase()}"= input
@@ -181,7 +176,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         controller."add${direction.capitalize()}"(loadItem1.id, type.name)
         def json = response.json
 
-        recordResult "add${direction.capitalize()}Failed" , json, resourceName
+        recordResult "add${direction.capitalize()}Failed", json
 
         expect:
         response.status == 422 // unprocessable entity
@@ -205,7 +200,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         controller."add${direction.capitalize()}"(loadItem1.id, type.name)
         def xml = response.xml
 
-        recordResult "add${direction.capitalize()}Failed" , xml, resourceName
+        recordResult "add${direction.capitalize()}Failed", xml
 
         expect:
         response.status == 422 // unprocessable entity
@@ -232,10 +227,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
 
         if(format=="JSON"){
-            recordInputJSON fixtureName, input, resourceName
+            recordInputJSON fixtureName, input
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input, resourceName
+            recordInputXML fixtureName, input
         }
 
         request."${format.toLowerCase()}"= input
@@ -265,10 +260,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
 
         if(format=="JSON"){
-            recordInputJSON fixtureName, input, resourceName
+            recordInputJSON fixtureName, input
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input, resourceName
+            recordInputXML fixtureName, input
         }
 
         request."${format.toLowerCase()}" = input
@@ -380,7 +375,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         JSONElement json = response.json
 
 
-        recordResult "${incomingOrOutgoing}${no}", json, resourceName
+        recordResult "${incomingOrOutgoing}${no}", json
 
 
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
@@ -439,7 +434,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         JSONObject json = response.json
 
 
-        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", json, resourceName
+        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", json
 
 
         assert json.success
@@ -463,7 +458,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         GPathResult result = response.xml
 
 
-        recordResult "${incomingOrOutgoing}${no}", result, resourceName
+        recordResult "${incomingOrOutgoing}${no}", result
 
 
         assert result
@@ -514,7 +509,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         GPathResult result = response.xml
 
 
-        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", result, resourceName
+        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", result
 
 
         assert result

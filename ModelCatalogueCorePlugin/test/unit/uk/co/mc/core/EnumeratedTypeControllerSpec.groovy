@@ -3,7 +3,6 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
-import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.EnumeratedTypeMarshaller
 
@@ -11,7 +10,6 @@ import uk.co.mc.core.util.marshalling.EnumeratedTypeMarshaller
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(EnumeratedTypeController)
-@Mixin(ResultRecorder)
 @Mock([EnumeratedType, Relationship, RelationshipType])
 class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec {
 
