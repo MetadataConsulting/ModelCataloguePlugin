@@ -3,6 +3,7 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
   @$get = ['modelCatalogueApiRoot', 'rest', 'enhance', (modelCatalogueApiRoot, rest, enhance) ->
     class CatalogueElementResource
       constructor: (pathName) ->
+        throw "Resource pathname must be defined" if not pathName?
         @pathName = pathName
 
       getIndexPath: () ->
