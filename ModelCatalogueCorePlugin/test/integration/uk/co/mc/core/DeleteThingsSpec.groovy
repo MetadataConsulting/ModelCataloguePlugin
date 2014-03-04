@@ -2,8 +2,8 @@ package uk.co.mc.core
 
 import grails.test.spock.IntegrationSpec
 import groovy.util.slurpersupport.GPathResult
-import spock.lang.Shared
 import spock.lang.Unroll
+import uk.co.mc.core.util.DefaultResultRecorder
 import uk.co.mc.core.util.ResultRecorder
 
 import javax.servlet.http.HttpServletResponse
@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse
 //
 
 //
-@Mixin(ResultRecorder)
 class DeleteThingsSpec extends IntegrationSpec{
 
  //runs ok in integration test (test-app :integration), fails as part of test-app (Grails Bug) - uncomment to run
@@ -24,10 +23,16 @@ class DeleteThingsSpec extends IntegrationSpec{
 
     MeasurementUnitController controller
     String controllerName
+    ResultRecorder recorder
 
     def setup(){
         controller = new MeasurementUnitController()
         controllerName = "$controller.resourceName"
+        recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                controllerName
+        )
     }
 
     @Unroll
@@ -38,7 +43,7 @@ class DeleteThingsSpec extends IntegrationSpec{
 
         assert(m = new MeasurementUnit(name:"cm per hour", symbol: "cmph").save())
         assert(et = new EnumeratedType(name: "enum", enumerations:['1':'this', '2':'that', '3':'theOther']).save())
-        assert(vd1 = new ValueDomain(name: "ground_speed", unitOfMeasure: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save())
+        assert(new ValueDomain(name: "ground_speed", unitOfMeasure: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save())
 
 
         when:
@@ -51,7 +56,7 @@ class DeleteThingsSpec extends IntegrationSpec{
 
         def json = controller.response.json
 
-        recordResult 'deleteFailed', json, "measurementUnit"
+        recorder.recordResult 'deleteFailed', json
 
         then:
 
@@ -70,7 +75,7 @@ class DeleteThingsSpec extends IntegrationSpec{
 
         assert(m = new MeasurementUnit(name:"cm per hour", symbol: "cmph").save())
         assert(et = new EnumeratedType(name: "enum", enumerations:['1':'this', '2':'that', '3':'theOther']).save())
-        assert(vd1 = new ValueDomain(name: "ground_speed", unitOfMeasure: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save())
+        assert(new ValueDomain(name: "ground_speed", unitOfMeasure: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save())
 
 
         when:
@@ -83,7 +88,7 @@ class DeleteThingsSpec extends IntegrationSpec{
 
         GPathResult xml = controller.response.xml
 
-        recordResult 'deleteFailed', xml, "measurementUnit"
+        recorder.recordResult 'deleteFailed', xml
 
         then:
 

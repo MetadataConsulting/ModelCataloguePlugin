@@ -3,16 +3,13 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
-import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.DataTypeMarshaller
-import uk.co.mc.core.util.marshalling.RelationshipTypeMarshaller
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(DataTypeController)
-@Mixin(ResultRecorder)
 @Mock([DataType, Relationship, RelationshipType, Model])
 class DataTypeControllerSpec extends CatalogueElementRestfulControllerSpec {
 

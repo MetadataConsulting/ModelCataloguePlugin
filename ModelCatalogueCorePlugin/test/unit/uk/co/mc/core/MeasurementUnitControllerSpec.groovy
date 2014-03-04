@@ -3,17 +3,13 @@ package uk.co.mc.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Unroll
-import uk.co.mc.core.util.ResultRecorder
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
-
-import javax.servlet.http.HttpServletResponse
 
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(MeasurementUnitController)
-@Mixin(ResultRecorder)
 @Mock([MeasurementUnit, Relationship, RelationshipType, EnumeratedType, DataType, ValueDomain])
 class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpec {
 
