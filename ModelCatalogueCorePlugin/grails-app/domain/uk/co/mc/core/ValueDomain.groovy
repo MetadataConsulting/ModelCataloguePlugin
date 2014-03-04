@@ -35,7 +35,11 @@ class ValueDomain extends CatalogueElement  {
         regexDef index:'no'
         dataType component:true
         unitOfMeasure component:true
-        except = ['incomingRelationships', 'outgoingRelationships', 'outgoingMappings', 'incomingMappings']
+        incomingRelationships component: true
+        outgoingRelationships component: true
+        incomingMappings component: true
+        outgoingMappings component: true
+
     }
 
     //FIXME valueDomain needs to be unique within a conceptual domain

@@ -16,7 +16,8 @@ class DataElement extends ExtendibleElement {
         name boost:5
         extensions component:true
         code boost:5
-        except = ['incomingRelationships', 'outgoingRelationships']
+        incomingRelationships component: true
+        outgoingRelationships component: true
     }
 
     //nearly all examples that we are working with have a unique data element code i.e. NHIC105495432

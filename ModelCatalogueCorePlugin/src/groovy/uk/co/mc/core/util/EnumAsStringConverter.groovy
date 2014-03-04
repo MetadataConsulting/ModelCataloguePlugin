@@ -1,11 +1,11 @@
-package uk.co.mc.core
+package uk.co.mc.core.util
 
 import java.beans.PropertyEditorSupport
 
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ExtensionsConverter extends PropertyEditorSupport {
+class EnumAsStringConverter extends PropertyEditorSupport {
 
     @Override
     def String getAsText() {

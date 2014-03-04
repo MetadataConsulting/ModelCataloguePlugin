@@ -10,7 +10,8 @@ class ExtensionValue extends CatalogueElement {
     static searchable = {
         name boost:5
         element reference:true
-        except = ['incomingRelationships', 'outgoingRelationships']
+        incomingRelationships component: true
+        outgoingRelationships component: true
     }
 
     String extensionValue

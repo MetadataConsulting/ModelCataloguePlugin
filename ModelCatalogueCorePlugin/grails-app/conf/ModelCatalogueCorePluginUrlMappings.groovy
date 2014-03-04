@@ -6,6 +6,9 @@ class ModelCatalogueCorePluginUrlMappings {
             "/$controller" {
                 action = [GET: "index", POST: "save"]
             }
+            "/$controller/search/$search" {
+                action = [GET: "search"]
+            }
             "/$controller/validate" {
                 action = [POST: "validate"]
             }
@@ -44,6 +47,10 @@ class ModelCatalogueCorePluginUrlMappings {
             constraints {
                 controller inList: ['conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'model', 'valueDomain']
             }
+        }
+
+        "/api/modelCatalogue/core/search/$search" (controller:"search") {
+            action = [GET: "search"]
         }
 
 	}

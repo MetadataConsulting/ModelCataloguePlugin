@@ -2,6 +2,7 @@ package uk.co.mc.core
 
 import org.apache.commons.lang.builder.EqualsBuilder
 import org.apache.commons.lang.builder.HashCodeBuilder
+import uk.co.mc.core.util.EnumAsStringConverter
 
 /*
 * Enumerated Types are data types that contain a list of enumerated values
@@ -11,7 +12,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 * */
 
 //FIXME marshalling and unmarshalling for enumerated type as string at the moment it returns the enum as string
-//but we need ext. please see enumAsStringConverter.groovy for marshalling to index
+//but we need ext.
+// please see enumAsStringConverter.groovy for marshalling to index
 
 class EnumeratedType extends DataType {
 
@@ -25,7 +27,8 @@ class EnumeratedType extends DataType {
     static searchable = {
         name boost:5
         enumAsString converter: EnumAsStringConverter
-        except = ['incomingRelationships', 'outgoingRelationships']
+        incomingRelationships component: true
+        outgoingRelationships component: true
     }
 
     String enumAsString

@@ -2,6 +2,10 @@ package uk.co.mc.core
 
 class Mapping {
 
+    static searchable = {
+        except = ['source', 'destination']
+    }
+
     ValueDomain source
     ValueDomain destination
 

@@ -17,11 +17,6 @@ import javax.servlet.http.HttpServletResponse
 @Mixin(ResultRecorder)
 class DeleteThingsSpec extends IntegrationSpec{
 
-    def "placeholder test"(){
-        expect:
-        true
-    }
-
  //runs ok in integration test (test-app :integration), fails as part of test-app (Grails Bug) - uncomment to run
 //RE: http://jira.grails.org/browse/GRAILS-11047?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel
 
