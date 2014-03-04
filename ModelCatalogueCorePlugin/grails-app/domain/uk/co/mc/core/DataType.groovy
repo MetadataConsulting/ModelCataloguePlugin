@@ -15,7 +15,8 @@ class DataType extends CatalogueElement {
 
     static searchable = {
         name boost:5
-        except = ['incomingRelationships', 'outgoingRelationships']
+        incomingRelationships component: true
+        outgoingRelationships component: true
     }
 
     static constraints = {

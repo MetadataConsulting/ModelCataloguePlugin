@@ -25,6 +25,11 @@ package uk.co.mc.core
 
 class Relationship {
 
+    static searchable = {
+        except = ['source', 'destination']
+        relationshipType component:true
+    }
+
     CatalogueElement source
     CatalogueElement destination
 

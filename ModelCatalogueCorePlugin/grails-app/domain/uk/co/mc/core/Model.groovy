@@ -10,7 +10,9 @@ class Model extends ExtendibleElement  {
     static searchable = {
         name boost:5
         extensions component:true
-        except = ['ext', 'contains', 'hasContextOf', 'parentOf', 'childOf', 'incomingRelationships', 'outgoingRelationships']
+        incomingRelationships component: true
+        outgoingRelationships component: true
+        except = ['ext', 'contains', 'hasContextOf', 'parentOf', 'childOf']
     }
 
     //CONTAINMENT

@@ -24,8 +24,9 @@ class ConceptualDomain extends CatalogueElement {
 
     static searchable = {
         name boost:5
-
-        except = ['isContextFor', 'includes', 'incomingRelationships', 'outgoingRelationships']
+        incomingRelationships component: true
+        outgoingRelationships component: true
+        except = ['isContextFor', 'includes']
     }
 
     //CONTEXT
