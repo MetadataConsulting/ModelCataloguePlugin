@@ -17,8 +17,7 @@ class RelationshipSpec extends Specification{
 
     FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
 
-    def "Won't create uk.co.mc.core.Relationship if the catalogue elements have not been persisted"()
-    {
+    def "Won't create org.modelcatalogue.core.Relationship if the catalogue elements have not been persisted"() {
 
         expect:
         Relationship.list().isEmpty()

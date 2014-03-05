@@ -58,7 +58,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
                 try{
                     props.sourceClass = this.class.classLoader.loadClass(src)
                 }catch(ClassNotFoundException e){
-                    instance.errors.rejectValue("sourceClass", "uk.co.mc.core.RelationshipType.sourceClass.domainNotFound")
+                    instance.errors.rejectValue("sourceClass", "org.modelcatalogue.core.RelationshipType.sourceClass.domainNotFound")
                 }
             }
             def dest = json?.destinationClass.toString()
@@ -66,7 +66,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
                 try{
                     props.destinationClass = this.class.classLoader.loadClass(dest)
                 }catch(ClassNotFoundException e){
-                    instance.errors.rejectValue("destinationClass", "uk.co.mc.core.RelationshipType.destinationClass.domainNotFound")
+                    instance.errors.rejectValue("destinationClass", "org.modelcatalogue.core.RelationshipType.destinationClass.domainNotFound")
                 }
             }
             instance.properties = props
@@ -84,7 +84,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
                 try{
                     props.sourceClass = this.class.classLoader.loadClass(src)
                 }catch(ClassNotFoundException e){
-                    instance.errors.rejectValue("sourceClass", "uk.co.mc.core.RelationshipType.sourceClass.domainNotFound")
+                    instance.errors.rejectValue("sourceClass", "org.modelcatalogue.core.RelationshipType.sourceClass.domainNotFound")
                 }
             }
             def dest = xml.getProperty("destinationClass").toString()
@@ -92,7 +92,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
                 try{
                     props.destinationClass = this.class.classLoader.loadClass(dest)
                 }catch(ClassNotFoundException e){
-                    instance.errors.rejectValue("destinationClass", "uk.co.mc.core.RelationshipType.destinationClass.domainNotFound")
+                    instance.errors.rejectValue("destinationClass", "org.modelcatalogue.core.RelationshipType.destinationClass.domainNotFound")
                 }
             }
             instance.properties = props

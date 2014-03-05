@@ -52,7 +52,7 @@ class SearchISpec extends AbstractIntegrationSpec{
         GPathResult xml
 
         expect:
-        def domain = grailsApplication.getArtefact("Domain", "uk.co.mc.core.${className}")?.getClazz()
+        def domain = grailsApplication.getArtefact("Domain", "org.modelcatalogue.core.${className}")?.getClazz()
         def expectedResult = domain.findByName(expectedResultName)
 
         when:

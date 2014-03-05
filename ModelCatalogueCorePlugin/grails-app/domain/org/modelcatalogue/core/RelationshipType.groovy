@@ -42,7 +42,7 @@ class RelationshipType {
     static constraints = {
         def classValidator = { val, obj ->
             if (!val) return true
-            if (!CatalogueElement.isAssignableFrom(val)) return "Only uk.co.mc.core.CatalogueElement child classes are allowed"
+            if (!CatalogueElement.isAssignableFrom(val)) return "Only org.modelcatalogue.core.CatalogueElement child classes are allowed"
             return true
         }
         name unique: true, maxSize: 255, matches: /[a-z\-0-9A-Z]+/
