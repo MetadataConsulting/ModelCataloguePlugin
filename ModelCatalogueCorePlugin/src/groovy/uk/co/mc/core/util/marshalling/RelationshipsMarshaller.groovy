@@ -14,7 +14,9 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
     protected Map<String, Object> prepareJsonMap(Object relationsList) {
         def ret = super.prepareJsonMap(relationsList)
         ret.list = relationsList.items.collect {
-                    [id: it.id, type: it.relationshipType, relation: (relationsList.direction == "sourceToDestination" ? it.destination : it.source), direction: relationsList.direction]
+            def theOwner    = relationsList.direction == "sourceToDestination" ? it.source : it.destination
+            def theRelation = relationsList.direction == "sourceToDestination" ? it.destination : it.source
+            [id: it.id, type: it.relationshipType, relation: theRelation, direction: relationsList.direction, removeLink: getDeleteLink(theOwner, it)]
         }
         ret
     }
@@ -23,12 +25,18 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
     protected void buildItemsXml(Object relationsList, XML xml) {
         xml.build {
             for (Relationship rel in relationsList.items) {
-                relationship(id: rel.id) {
+                def theOwner    = relationsList.direction == "sourceToDestination" ? rel.source : rel.destination
+                def theRelation = relationsList.direction == "sourceToDestination" ? rel.destination : rel.source
+                relationship(id: rel.id, removeLink: getDeleteLink(theOwner, rel)) {
                     type rel.relationshipType
                     direction relationsList.direction
-                    relation(relationsList.direction == "sourceToDestination" ? rel.destination : rel.source)
+                    relation(theRelation)
                 }
             }
         }
+    }
+
+    protected static getDeleteLink(theOwner, Relationship rel) {
+        "${theOwner.info.link}/${theOwner == rel.source ? 'outgoing' : 'incoming'}/${rel.relationshipType.name}"
     }
 }

@@ -392,6 +392,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         assert item.relation
         assert item.relation.id
         assert item.relation.elementType
+        assert item.removeLink == "/${resourceName}/${first.id}/${incomingOrOutgoing}/relationship"
 
 
         def relation = Class.forName(item.relation.elementType).get(item.relation.id)
@@ -478,6 +479,8 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         assert item.relation
         assert item.relation.@id
         assert item.relation.@elementType
+
+        assert item.@removeLink.text() ==  "/${resourceName}/${first.id}/${incomingOrOutgoing}/relationship"
 
 
         def relation = Class.forName(item.relation.@elementType.text()).get(item.relation.@id.text() as Long)
