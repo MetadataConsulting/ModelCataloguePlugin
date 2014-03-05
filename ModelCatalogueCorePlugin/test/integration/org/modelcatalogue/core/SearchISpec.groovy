@@ -82,7 +82,7 @@ class SearchISpec extends AbstractIntegrationSpec{
             assert xml.@size == total
             assert xml.@total == total
             assert xml.@offset.text() == "0"
-            assert xml.@page.text() ==  "0"
+            assert xml.@page.text() ==  "10"
             assert xml.element
             assert xml.element.size() ==  total
             assert xml.depthFirst().find {  it.name == expectedResult.name }
