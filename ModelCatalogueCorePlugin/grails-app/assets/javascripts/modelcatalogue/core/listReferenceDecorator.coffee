@@ -2,11 +2,7 @@ angular.module('mc.core.listReferenceDecorator', ['mc.util.rest', 'mc.util.enhan
   condition = (list) -> list.hasOwnProperty('count') and list.hasOwnProperty('link')
   factory   = ['modelCatalogueApiRoot', 'rest', (modelCatalogueApiRoot, rest) ->
     (listReference, enhance = @enhance) ->
-      query = () ->
-        result = rest method: 'GET', url: "#{modelCatalogueApiRoot}#{listReference.link}"
-        console.log(result)
-        result.then (result) -> console.log result
-        enhance result
+      query = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{listReference.link}"
       query.total = listReference.count
       query.link  = "#{modelCatalogueApiRoot}#{listReference.link}".toString()
       query

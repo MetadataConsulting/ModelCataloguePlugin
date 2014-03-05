@@ -6,6 +6,7 @@ import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import spock.lang.Unroll
+import uk.co.mc.core.util.marshalling.ElementsMarshaller
 import uk.co.mc.core.util.marshalling.RelationshipMarshallers
 import uk.co.mc.core.util.marshalling.RelationshipsMarshaller
 
@@ -23,7 +24,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
 
     def setup() {
         setupMimeTypes()
-        [marshallers, [new RelationshipMarshallers(), new RelationshipsMarshaller()]].flatten().each {
+        [marshallers, [new RelationshipMarshallers(), new RelationshipsMarshaller(), new ElementsMarshaller()]].flatten().each {
             it.register()
         }
     }
