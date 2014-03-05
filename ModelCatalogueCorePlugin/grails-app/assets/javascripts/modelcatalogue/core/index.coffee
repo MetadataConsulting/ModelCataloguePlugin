@@ -7,4 +7,5 @@ angular.module 'mc.core', [
   'mc.core.listEnhancer'
   'mc.core.listReferenceEnhancer'
   'mc.core.modelCatalogueApiRoot'
+  'mc.core.removableItemEnhancer'
 ]

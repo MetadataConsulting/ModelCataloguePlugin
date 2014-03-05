@@ -3,4 +3,5 @@ angular.module 'mc.core', [
   'mc.util.createConstantPromise'
   'mc.util.enhance'
   'mc.util.rest'
+  'mc.util.names'
 ]
