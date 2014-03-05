@@ -6,6 +6,16 @@ angular.module('mc.core.listReferenceDecorator', ['mc.util.rest', 'mc.util.enhan
       query = (tail = null) -> enhance rest method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}"
       query.total = listReference.count
       query.link  = link.toString()
+      query.add   = (tail, payload) ->
+        if not payload?
+          payload = tail
+          tail    = null
+        enhance rest method: 'POST', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload
+      query.remove = (tail, payload) ->
+        if not payload?
+          payload = tail
+          tail    = null
+        enhance rest method: 'DELETE', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload
       query
   ]
 
