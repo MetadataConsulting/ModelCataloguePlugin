@@ -17,13 +17,13 @@ class EnumeratedTypeController extends CatalogueElementController<EnumeratedType
 
         def json = request.getJSON()
         if(json){
-            def instance = Object.createResource(json)
+            def instance = super.createResource(json)
             return instance
         }
 
         def xml = request.getXML()
         if(xml){
-            EnumeratedType instance = Object.createResource(params)
+            EnumeratedType instance = super.createResource(params)
             instance.enumerations = getXMLEnumerations(xml)
             return instance
         }

@@ -38,7 +38,7 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
 
     def xmlCustomPropertyCheck(xml, item){
 
-        Object.xmlCustomPropertyCheck(xml, item)
+        super.xmlCustomPropertyCheck(xml, item)
 
         def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
         if (xmlProp) {
@@ -51,7 +51,7 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
 
     def xmlCustomPropertyCheck(inputItem, xml, outputItem){
 
-        Object.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
         def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
         if (xmlProp) {
             xmlProp = xmlProp.attributes()
@@ -64,7 +64,7 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
 
     def customJsonPropertyCheck(item, json){
 
-        Object.customJsonPropertyCheck(item, json)
+        super.customJsonPropertyCheck(item, json)
         checkProperty(json.enumerations , item.enumerations, "enumerations")
 
         return true
@@ -73,7 +73,7 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
 
     def customJsonPropertyCheck(inputItem, json, outputItem){
 
-        Object.customJsonPropertyCheck(inputItem, json, outputItem)
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
         checkProperty(json.enumerations , inputItem.enumerations, "enumerations")
         return true
 

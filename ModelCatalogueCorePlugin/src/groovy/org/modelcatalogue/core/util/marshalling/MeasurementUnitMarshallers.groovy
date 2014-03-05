@@ -14,13 +14,13 @@ class MeasurementUnitMarshallers extends CatalogueElementMarshallers {
 
     protected Map<String, Object> prepareJsonMap(unit) {
         if (!unit) return [:]
-        def ret = Object.prepareJsonMap(unit)
+        def ret = super.prepareJsonMap(unit)
         ret.putAll(symbol: unit.symbol)
         return ret
     }
 
     protected void buildXml(el, XML xml) {
-        Object.buildXml(el, xml)
+        super.buildXml(el, xml)
         xml.build {
             symbol el.symbol
         }

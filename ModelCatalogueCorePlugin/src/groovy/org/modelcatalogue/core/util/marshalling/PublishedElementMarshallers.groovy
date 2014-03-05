@@ -14,7 +14,7 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
 
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
-        def ret = Object.prepareJsonMap(el)
+        def ret = super.prepareJsonMap(el)
         ret.putAll(
                 versionNumber: el.versionNumber,
                 status: el.status.toString()
@@ -24,7 +24,7 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
 
     @Override
     protected void addXmlAttributes(el, XML xml) {
-        Object.addXmlAttributes(el, xml)
+        super.addXmlAttributes(el, xml)
         addXmlAttribute(el.versionNumber, "versionNumber", xml)
         addXmlAttribute(el.status, "status", xml)
     }

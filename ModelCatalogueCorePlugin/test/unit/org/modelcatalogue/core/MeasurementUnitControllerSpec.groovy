@@ -42,7 +42,7 @@ class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpe
 
     def xmlCustomPropertyCheck(xml, item){
 
-        Object.xmlCustomPropertyCheck(xml, item)
+        super.xmlCustomPropertyCheck(xml, item)
         checkProperty(xml.symbol, item.symbol, "symbol")
 
         return true
@@ -50,7 +50,7 @@ class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpe
 
     def xmlCustomPropertyCheck(inputItem, xml, outputItem){
 
-        Object.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
         checkProperty(xml.symbol, inputItem.symbol, "symbol")
 
         return true
@@ -59,7 +59,7 @@ class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpe
 
     def customJsonPropertyCheck(item, json){
 
-        Object.customJsonPropertyCheck(item, json)
+        super.customJsonPropertyCheck(item, json)
         checkProperty(json.symbol , item.symbol, "symbol")
 
         return true
@@ -68,7 +68,7 @@ class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpe
 
     def customJsonPropertyCheck(inputItem, json, outputItem){
 
-        Object.customJsonPropertyCheck(inputItem, json, outputItem)
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
         checkProperty(json.symbol , inputItem.symbol, "symbol")
         return true
 

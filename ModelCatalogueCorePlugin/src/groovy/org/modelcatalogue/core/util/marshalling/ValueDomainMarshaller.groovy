@@ -12,7 +12,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
 
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
-        def ret = Object.prepareJsonMap(el)
+        def ret = super.prepareJsonMap(el)
         ret.putAll unitOfMeasure: el.unitOfMeasure,
                 regexDef: el.regexDef,
                 dataType: el.dataType,
@@ -21,7 +21,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
     }
 
     protected void buildXml(el, XML xml) {
-        Object.buildXml(el, xml)
+        super.buildXml(el, xml)
         xml.build {
             unitOfMeasure el.unitOfMeasure
             regexDef el.regexDef

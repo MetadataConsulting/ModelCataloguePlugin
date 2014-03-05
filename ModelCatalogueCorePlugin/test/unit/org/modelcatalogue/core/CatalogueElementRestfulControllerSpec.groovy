@@ -627,7 +627,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
 
     def xmlCustomPropertyCheck(xml, item){
 
-        Object.xmlCustomPropertyCheck(xml, item)
+        super.xmlCustomPropertyCheck(xml, item)
 
         checkProperty(xml.name, item.name, "name")
         checkProperty(xml.description, item.description, "description")
@@ -643,7 +643,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
 
     def xmlCustomPropertyCheck(inputItem, xml, outputItem){
 
-        Object.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
         checkProperty(xml.name, inputItem.name, "name")
         checkProperty(xml.description, inputItem.description, "description")
         checkProperty(xml.@elementType, inputItem.class.name, "elementType")
@@ -659,7 +659,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
 
     def customJsonPropertyCheck(item, json){
 
-        Object.customJsonPropertyCheck(item, json)
+        super.customJsonPropertyCheck(item, json)
         checkProperty(json.name , item.name, "name")
         checkProperty(json.description , item.description, "description")
         checkProperty(json.elementType , item.class.name, "elementType")
@@ -676,7 +676,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
 
     def customJsonPropertyCheck(inputItem, json, outputItem){
 
-        Object.customJsonPropertyCheck(inputItem, json, outputItem)
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
         checkProperty(json.name , inputItem.name, "name")
         checkProperty(json.description , inputItem.description, "description")
         checkProperty(json.elementType , inputItem.class.name, "elementType")
