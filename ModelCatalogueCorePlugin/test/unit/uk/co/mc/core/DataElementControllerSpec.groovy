@@ -2,6 +2,7 @@ package uk.co.mc.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import spock.lang.IgnoreIf
 import spock.lang.Unroll
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.DataElementMarshaller
@@ -11,6 +12,7 @@ import uk.co.mc.core.util.marshalling.DataElementMarshaller
  */
 @TestFor(DataElementController)
 @Mock([DataElement, Relationship, RelationshipType, ExtensionValue])
+@IgnoreIf({ System.getProperty('test.all') == null })
 class DataElementControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     RelationshipType type

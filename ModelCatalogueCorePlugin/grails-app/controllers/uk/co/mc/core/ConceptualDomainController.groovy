@@ -1,8 +1,6 @@
 package uk.co.mc.core
 
-class ConceptualDomainController extends CatalogueElementController<ConceptualDomain>{
-
-    static responseFormats = ['json', 'xml']
+class ConceptualDomainController extends CatalogueElementController<ConceptualDomain> {
 
     ConceptualDomainController() {
         super(ConceptualDomain)

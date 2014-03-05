@@ -6,15 +6,15 @@ describe "mc.core.ui.decoratedListTable", ->
   beforeEach module 'mc.core.ui.decoratedListTable'
 
   it "element get compiled",  inject ($compile, $rootScope, $httpBackend, modelCatalogueApiRoot, catalogueElementResource) ->
-    $httpBackend.when("GET", "#{modelCatalogueApiRoot}/measurementUnit").respond(fixtures.measurementUnit.list2)
-    $httpBackend.when("GET", "#{modelCatalogueApiRoot}/measurementUnit/?max=5&offset=5").respond(fixtures.measurementUnit.list3)
-    $httpBackend.when("GET", "#{modelCatalogueApiRoot}/measurementUnit/?max=5&offset=0").respond(fixtures.measurementUnit.list2)
+    $httpBackend.when("GET", "#{modelCatalogueApiRoot}/valueDomain").respond(fixtures.valueDomain.list2)
+    $httpBackend.when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=5&offset=5").respond(fixtures.valueDomain.list3)
+    $httpBackend.when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=5&offset=0").respond(fixtures.valueDomain.list2)
 
-    measurementUnits = catalogueElementResource('measurementUnit')
+    valueDomains = catalogueElementResource('valueDomain')
 
     $rootScope.muList = null
 
-    measurementUnits.list().then (response) ->
+    valueDomains.list().then (response) ->
       $rootScope.muList = response
 
     $httpBackend.flush()
@@ -22,7 +22,6 @@ describe "mc.core.ui.decoratedListTable", ->
     $rootScope.columns = [
       {header: 'ID', value: 'id'}
       {header: 'Name', value: (element) -> element.name }
-      {header: 'Symbol', value: 'symbol'}
     ]
 
     element = $compile('''
@@ -46,20 +45,17 @@ describe "mc.core.ui.decoratedListTable", ->
     expect(element.find('tr.dl-table-item-row').length).toBe(5)
 
     # appropriate cells with expected classes and content
-    expect(element.find('thead tr th.dl-table-header-cell').length).toBe(3)
+    expect(element.find('thead tr th.dl-table-header-cell').length).toBe(2)
     expect(element.find('thead tr th.dl-table-header-cell:nth-child(1)').text()).toBe('ID')
     expect(element.find('thead tr th.dl-table-header-cell:nth-child(2)').text()).toBe('Name')
-    expect(element.find('thead tr th.dl-table-header-cell:nth-child(3)').text()).toBe('Symbol')
 
-    expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(3)
+    expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(2)
     expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(1)').text()).toBe('1')
-    expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(2)').text()).toBe('Degrees of Celsius')
-    expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(3)').text()).toBe('°C')
+    expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(2)').text()).toBe('ground_speed')
 
-    expect(element.find('tbody tr:last-child td.dl-table-item-cell').length).toBe(3)
+    expect(element.find('tbody tr:last-child td.dl-table-item-cell').length).toBe(2)
     expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(1)').text()).toBe('5')
-    expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(2)').text()).toBe('Measurement Unit 5')
-    expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(3)').text()).toBe('MU5')
+    expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(2)').text()).toBe('ground_speed_5')
 
     # next and previous links
     expect(element.find('a.dl-table-prev.disabled').length).toBe(1)
@@ -83,8 +79,8 @@ describe "mc.core.ui.decoratedListTable", ->
     $rootScope.columns.pop()
     $rootScope.$digest()
 
-    expect(element.find('thead tr th.dl-table-header-cell').length).toBe(2)
-    expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(2)
+    expect(element.find('thead tr th.dl-table-header-cell').length).toBe(1)
+    expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(1)
 
 
 

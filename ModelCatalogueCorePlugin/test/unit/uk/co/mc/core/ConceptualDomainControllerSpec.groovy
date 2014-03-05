@@ -2,6 +2,7 @@ package uk.co.mc.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import spock.lang.IgnoreIf
 import spock.lang.Unroll
 import uk.co.mc.core.util.marshalling.AbstractMarshallers
 import uk.co.mc.core.util.marshalling.ConceptualDomainMarshaller
@@ -13,6 +14,7 @@ import uk.co.mc.core.util.marshalling.ModelMarshaller
  */
 @TestFor(ConceptualDomainController)
 @Mock([ConceptualDomain, Relationship, RelationshipType, Model])
+@IgnoreIf({ System.getProperty('test.all') == null })
 class ConceptualDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     Model book

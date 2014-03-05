@@ -19,7 +19,7 @@ describe "mc.core.listDecorator", ->
   it "can list resource", ->
     $httpBackend
     .when("GET", '/foo')
-    .respond(fixtures.measurementUnit.list1)
+    .respond(fixtures.valueDomain.list1)
 
     result = null
     error  = null
@@ -63,15 +63,15 @@ describe "mc.core.listDecorator", ->
     expect(emptyResult.success).toBeFalsy()
 
 
-    nextList = angular.copy(fixtures.measurementUnit.list1)
+    nextList = angular.copy(fixtures.valueDomain.list1)
     nextList.size = 2
     nextList.list = nextList.list.slice(0, 2)
     nextList.offset = 10
-    nextList.next = fixtures.measurementUnit.list1.next.replace("offset=10", "offset=20")
-    nextList.previous = "/measurementUnit/?max=10&offset=0"
+    nextList.next = fixtures.valueDomain.list1.next.replace("offset=10", "offset=20")
+    nextList.previous = "/valueDomain/?max=10&offset=0"
 
     $httpBackend
-    .when("GET", "#{modelCatalogueApiRoot}/measurementUnit/?max=10&offset=10")
+    .when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=10&offset=10")
     .respond(nextList)
 
     nextResult = null
@@ -98,8 +98,8 @@ describe "mc.core.listDecorator", ->
     expect(angular.isFunction(nextResult.previous)).toBeTruthy()
 
     $httpBackend
-    .when("GET", "#{modelCatalogueApiRoot}/measurementUnit/?max=10&offset=0")
-    .respond(fixtures.measurementUnit.list1)
+    .when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=10&offset=0")
+    .respond(fixtures.valueDomain.list1)
 
     result = null
     error  = null

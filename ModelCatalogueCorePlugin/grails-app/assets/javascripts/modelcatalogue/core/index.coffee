@@ -5,5 +5,6 @@ angular.module 'mc.core', [
   'mc.core.catalogueElement'
   'mc.core.catalogueElementResource'
   'mc.core.listDecorator'
+  'mc.core.listReferenceDecorator'
   'mc.core.modelCatalogueApiRoot'
 ]
