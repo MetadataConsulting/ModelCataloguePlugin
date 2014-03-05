@@ -115,8 +115,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
 
     @Unroll
-    def "testNumber #testNumber uk.co.mc.core.Relationship creation for #args results #validates"()
-    {
+    def "testNumber #testNumber org.modelcatalogue.core.Relationship creation for #args results #validates"() {
 
         when:
         Relationship rel = new Relationship(args);

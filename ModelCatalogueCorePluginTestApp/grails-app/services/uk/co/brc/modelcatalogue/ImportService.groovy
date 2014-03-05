@@ -1,8 +1,6 @@
 package uk.co.brc.modelcatalogue
 
-import uk.co.mc.core.*
-
-import javax.xml.crypto.Data
+import org.modelcatalogue.core.*
 
 class ImportService {
 
@@ -175,21 +173,21 @@ class ImportService {
                 if (enumerated) {
 
 
-                    String enumString  = enumerations.sort() collect { key, val ->
+                    String enumString = enumerations.sort() collect { key, val ->
                         "${this.quote(key)}:${this.quote(val)}"
                     }.join('|')
 
                     dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
 
-                    if(!dataTypeReturn){
-                     dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
+                    if (!dataTypeReturn) {
+                        dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
                     }
-                }else{
+                } else {
 
-                    dataTypeReturn = (DataType.findByName(name))?:DataType.findByName("String")
+                    dataTypeReturn = (DataType.findByName(name)) ?: DataType.findByName("String")
 
                 }
-            }else{
+            } else {
                 dataTypeReturn = DataType.findByName("String")
             }
         }

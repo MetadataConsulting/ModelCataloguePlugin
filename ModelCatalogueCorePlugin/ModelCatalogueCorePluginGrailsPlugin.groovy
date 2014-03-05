@@ -1,5 +1,4 @@
 import org.modelcatalogue.core.util.marshalling.*
-import uk.co.mc.core.util.marshalling.*
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version

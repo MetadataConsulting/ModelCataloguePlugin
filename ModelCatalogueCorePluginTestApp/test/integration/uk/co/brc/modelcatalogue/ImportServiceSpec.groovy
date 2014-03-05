@@ -1,7 +1,7 @@
 package uk.co.brc.modelcatalogue
 
+import org.modelcatalogue.core.*
 import spock.lang.Specification
-import uk.co.mc.core.*
 
 /**
  * Created by adammilward on 11/02/2014.

@@ -28,8 +28,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification implements
     private static final int DUMMY_ENTITIES_COUNT = 12
 
     def newInstance, badInstance, propertiesToEdit, loadItem2, loadItem1
-    String badXmlCreateError = "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
-    String badXmlUpdateError = "Property [name] of class [class uk.co.mc.core.${resourceName.capitalize()}] cannot be null"
+    String badXmlCreateError = "Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
+    String badXmlUpdateError = "Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
 
 
     FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")

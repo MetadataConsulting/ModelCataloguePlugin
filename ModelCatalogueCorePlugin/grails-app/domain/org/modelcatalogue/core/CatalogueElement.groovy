@@ -38,7 +38,7 @@ abstract class CatalogueElement {
     static transients = ['relations', 'info']
 
     /** ****************************************************************************************************************/
-    /****functions for specifying relationships between catalogue elements using the uk.co.mc.core.Relationship class ************/
+    /****functions for specifying relationships between catalogue elements using the org.modelcatalogue.core.Relationship class ************/
     /** ****************************************************************************************************************/
 
     /***********return all the relations************/

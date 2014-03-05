@@ -1,5 +1,4 @@
-import uk.co.brc.modelcatalogue.ImportService
-import uk.co.mc.core.RelationshipType
+import org.modelcatalogue.core.RelationshipType
 
 class BootStrap {
 
