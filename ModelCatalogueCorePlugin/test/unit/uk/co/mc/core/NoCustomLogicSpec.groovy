@@ -1,8 +1,7 @@
-package uk.co.mc.core.uk.co.mc.core
+package uk.co.mc.core
 
 import spock.lang.Specification
 import spock.lang.Unroll
-import uk.co.mc.core.*
 import uk.co.mc.core.util.Elements
 import uk.co.mc.core.util.ListWrapper
 import uk.co.mc.core.util.marshalling.*
