@@ -43,3 +43,24 @@ describe "mc.core.listReferenceDecorator", ->
     expect(result).toEqual(expected)
 
 
+  it "you can supply url tail to returned method", ->
+    expected = {foo:  'bar'}
+
+
+    enhanced = enhance {count: 1, link: "/foo/bar"}
+
+    expect(angular.isFunction(enhanced)).toBeTruthy()
+
+    $httpBackend.expect("GET", "#{modelCatalogueApiRoot}/foo/bar/barbar").respond(expected)
+
+    result = null
+
+    enhanced('barbar').then (_result_) -> result = _result_
+
+    expect(result).toBeNull()
+
+    $httpBackend.flush()
+
+    expect(result).toEqual(expected)
+
+
