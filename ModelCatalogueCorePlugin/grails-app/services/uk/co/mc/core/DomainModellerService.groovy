@@ -67,7 +67,7 @@ class DomainModellerService {
             println "contexts"
             println "${model.hasContextOf[0].name}"
             println " -- "
-            println "contains (DataElement <- ValueDomain <- DataType)"
+            println "contains (DataElement ( ValueDomain - DataType ))"
             def dataElements = model.contains
             dataElements.each{ DataElement dataElement->
                 def instantiatedBy = dataElement.instantiatedBy
@@ -107,54 +107,3 @@ class DomainModellerService {
     }
 
 }
-
-
-
-
-
-
-
-//'/CAN_CUH.csv':
-//{ tokens ->
-//    def categories = ["NHIC Datasets", "Ovarian Cancer", "CUH", "Round 1", tokens[1], tokens[2]]
-//    def cd = findOrCreateConceptualDomain("NHIC", "NHIC conceptual domain i.e. value domains used the NHIC project")
-//    def models = importModels(categories, cd)
-//    def dataTypes = [tokens[5]]
-//    def dataType = importDataTypes(tokens[3], dataTypes)
-//    def ext = new HashMap()
-//
-//    def vd = new ValueDomain(name: tokens[3].replaceAll("\\s", "_"),
-//            //conceptualDomain: cd,
-//            dataType: dataType,
-//            description: tokens[5]).save(failOnError: true);
-//
-//    vd.addToIncludedIn(cd)
-//
-//    def de = new DataElement(name: tokens[3],
-//            description: tokens[4], code: tokens[0])
-//    //dataElementConcept: models,
-//    //extension: ext).save(failOnError: true)
-//
-//    de.save()
-//
-//    de.ext.put("NHIC_Identifier:", tokens[0].take(255));
-//    de.ext.put("Link_to_existing definition:", tokens[6].take(255));
-//    de.ext.put("Notes_from_GD_JCIS", tokens[7].take(255));
-//    de.ext.put("[Optional]_Local_Identifier", tokens[8].take(255));
-//    de.ext.put("A", tokens[9].take(255));
-//    de.ext.put("B", tokens[10].take(255));
-//    de.ext.put("C", tokens[11].take(255));
-//    de.ext.put("D", tokens[12].take(255));
-//    de.ext.put("E", tokens[13].take(255));
-//    de.ext.put("F", tokens[14].take(255));
-//    de.ext.put("G", tokens[15].take(255));
-//    de.ext.put("H", tokens[16]);
-//    de.ext.put("E2", tokens[17].take(255))
-//
-//
-//    de.addToInstantiatedBy(vd)
-//
-//    //de.addToDataElementValueDomains(vd);
-//    //de.save();
-//    println "importing: " + tokens[0] + "_Round1_CAN"
-//}

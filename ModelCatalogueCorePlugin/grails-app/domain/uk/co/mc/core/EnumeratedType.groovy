@@ -2,7 +2,6 @@ package uk.co.mc.core
 
 import org.apache.commons.lang.builder.EqualsBuilder
 import org.apache.commons.lang.builder.HashCodeBuilder
-import uk.co.mc.core.util.EnumAsStringConverter
 
 /*
 * Enumerated Types are data types that contain a list of enumerated values

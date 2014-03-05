@@ -1,4 +1,4 @@
-package uk.co.mc.core.util
+package uk.co.mc.core
 
 import java.beans.PropertyEditorSupport
 

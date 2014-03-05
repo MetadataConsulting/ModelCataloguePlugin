@@ -8,7 +8,8 @@ class RelationshipType {
 
     static searchable = {
         name boost: 5
-        except = ['rule', 'sourceClass', 'destinationClass', 'defaultRelationshipTypesDefinitions']
+        sourceClass converter: RelationshipTypeClassConverter
+        except = ['rule', 'destinationClass', 'defaultRelationshipTypesDefinitions']
     }
 
     //name of the relationship type i.e. parentChild  or synonym
