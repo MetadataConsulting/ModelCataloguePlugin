@@ -12,7 +12,7 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
 
     @Override
     protected Map<String, Object> prepareJsonMap(Object relationsList) {
-        def ret = Object.prepareJsonMap(relationsList)
+        def ret = super.prepareJsonMap(relationsList)
         ret.list = relationsList.items.collect {
             def theOwner    = relationsList.direction == "sourceToDestination" ? it.source : it.destination
             def theRelation = relationsList.direction == "sourceToDestination" ? it.destination : it.source

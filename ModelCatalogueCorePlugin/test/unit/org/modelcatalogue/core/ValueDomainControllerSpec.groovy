@@ -48,7 +48,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     def xmlCustomPropertyCheck(xml, item){
 
-        Object.xmlCustomPropertyCheck(xml, item)
+        super.xmlCustomPropertyCheck(xml, item)
         checkProperty(xml.unitOfMeasure.name, item.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(xml.dataType.@id, item.dataType.id, "dataType")
         return true
@@ -56,7 +56,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     def xmlCustomPropertyCheck(inputItem, xml, outputItem){
 
-        Object.xmlCustomPropertyCheck(inputItem, xml, outputItem)
+        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
         checkProperty(xml.unitOfMeasure.name, inputItem.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(xml.dataType.@id, inputItem.dataType.id, "dataType")
 
@@ -66,7 +66,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     def customJsonPropertyCheck(item, json){
 
-        Object.customJsonPropertyCheck(item, json)
+        super.customJsonPropertyCheck(item, json)
         checkProperty(json.unitOfMeasure.name, item.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(json.dataType.id, item.dataType.id, "dataType")
 
@@ -76,7 +76,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     def customJsonPropertyCheck(inputItem, json, outputItem){
 
-        Object.customJsonPropertyCheck(inputItem, json, outputItem)
+        super.customJsonPropertyCheck(inputItem, json, outputItem)
         checkProperty(json.unitOfMeasure.name, inputItem.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(json.dataType.id, inputItem.dataType.id, "dataType")
 

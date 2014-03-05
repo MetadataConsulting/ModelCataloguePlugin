@@ -23,7 +23,7 @@ class MappingMarshallers extends AbstractMarshallers {
     }
 
     protected void buildXml(map, XML xml) {
-        Object.buildXml(map, xml)
+        super.buildXml(map, xml)
         xml.build {
             RelationshipMarshallers.renderInfo('source', map.source.info, xml)
             RelationshipMarshallers.renderInfo('destination', map.destination.info, xml)
@@ -32,7 +32,7 @@ class MappingMarshallers extends AbstractMarshallers {
     }
 
     protected void addXmlAttributes(map, XML xml) {
-        Object.addXmlAttributes(map, xml)
+        super.addXmlAttributes(map, xml)
         addXmlAttribute(map.id, "id", xml)
     }
 }

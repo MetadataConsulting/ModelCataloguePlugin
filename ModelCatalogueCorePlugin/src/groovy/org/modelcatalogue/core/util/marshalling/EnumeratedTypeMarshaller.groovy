@@ -11,14 +11,14 @@ class EnumeratedTypeMarshaller extends CatalogueElementMarshallers {
 
     protected Map<String, Object> prepareJsonMap(element) {
         if (!element) return [:]
-        def ret = Object.prepareJsonMap(element)
+        def ret = super.prepareJsonMap(element)
         ret.putAll enumerations: element.enumerations
         return ret
     }
 
 
     protected void buildXml(element, XML xml) {
-        Object.buildXml(element, xml)
+        super.buildXml(element, xml)
         xml.build {
             enumerations element.enumerations
         }

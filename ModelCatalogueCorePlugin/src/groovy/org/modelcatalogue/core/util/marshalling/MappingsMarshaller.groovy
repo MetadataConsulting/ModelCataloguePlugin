@@ -12,7 +12,7 @@ class MappingsMarshaller extends ListWrapperMarshaller {
 
     @Override
     protected Map<String, Object> prepareJsonMap(Object mappings) {
-        def ret = Object.prepareJsonMap(mappings)
+        def ret = super.prepareJsonMap(mappings)
         ret.list = mappings.items.collect {
             [id: it.id, mapping: it.mapping, destination: it.destination]
         }
