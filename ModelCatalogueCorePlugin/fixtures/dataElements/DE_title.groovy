@@ -1,4 +1,4 @@
-import uk.co.mc.core.DataElement
+import org.modelcatalogue.core.DataElement
 
 fixture{
     DE_title(DataElement, name:"title",

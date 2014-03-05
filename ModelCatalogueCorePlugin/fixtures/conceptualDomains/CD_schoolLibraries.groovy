@@ -1,4 +1,4 @@
-import uk.co.mc.core.ConceptualDomain
+import org.modelcatalogue.core.ConceptualDomain
 
 fixture {
     CD_schoolLibraries(ConceptualDomain, name: "school libraries",

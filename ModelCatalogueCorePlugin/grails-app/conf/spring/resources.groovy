@@ -1,14 +1,4 @@
-import uk.co.mc.core.util.marshalling.ConceptualDomainMarshaller
-import uk.co.mc.core.util.marshalling.CustomObjectMarshallers
-import uk.co.mc.core.util.marshalling.DataElementMarshaller
-import uk.co.mc.core.util.marshalling.DataTypeMarshaller
-import uk.co.mc.core.util.marshalling.ElementsMarshaller
-import uk.co.mc.core.util.marshalling.EnumeratedTypeMarshaller
-import uk.co.mc.core.util.marshalling.MeasurementUnitMarshallers
-import uk.co.mc.core.util.marshalling.ModelMarshaller
-import uk.co.mc.core.util.marshalling.RelationshipMarshallers
-import uk.co.mc.core.util.marshalling.RelationshipsMarshaller
-import uk.co.mc.core.util.marshalling.ValueDomainMarshaller
+import org.modelcatalogue.core.util.marshalling.*
 
 beans = {
     customObjectMarshallers( CustomObjectMarshallers ) {
