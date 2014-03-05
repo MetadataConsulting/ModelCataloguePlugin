@@ -2,8 +2,8 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
   enhancers = []
 
   ###
-  Registers new enhancer definiton, the enahcerFactory is either funciton or minification
-  safe array (@see $injector).
+    Registers new enhancer definiton, the enhancerFactory is either funciton or minification
+    safe array (@see $injector).
   ###
   @registerEnhancerFactory = (name, condition, enhancerFactory, priority = 0) ->
     # we might want to add some assertion later
@@ -43,6 +43,19 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
     for enhancer in enhancers
       enhancer.enhancer = $injector.invoke(enhancer.factory)
       enhancer.enhance  = enhance
+
+    ###
+      Returns list of names of all registered enhancers.
+    ###
+    enhance.getAvailableEnhancers = () ->
+      enhancer.name for enhancer in enhancers
+
+    ###
+      Returns registered enhancer of given name or undefined.
+    ###
+    enhance.getEnhancer = (name) ->
+      return enhancer.enhancer for enhancer in enhancers when enhancer.name == name
+
 
     enhance
   ]

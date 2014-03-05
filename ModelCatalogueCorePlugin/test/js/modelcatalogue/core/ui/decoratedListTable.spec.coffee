@@ -2,7 +2,7 @@ describe "mc.core.ui.decoratedListTable", ->
 
   beforeEach module 'mc.core.catalogueElementResource'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
-  beforeEach module 'mc.core.listDecorator'
+  beforeEach module 'mc.core.listEnhancer'
   beforeEach module 'mc.core.ui.decoratedListTable'
 
   it "element get compiled",  inject ($compile, $rootScope, $httpBackend, modelCatalogueApiRoot, catalogueElementResource) ->

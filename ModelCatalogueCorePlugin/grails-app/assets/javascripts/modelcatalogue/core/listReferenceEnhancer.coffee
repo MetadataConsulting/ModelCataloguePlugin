@@ -1,4 +1,4 @@
-angular.module('mc.core.listReferenceDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.createConstantPromise']).config ['enhanceProvider', (enhanceProvider)->
+angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.createConstantPromise']).config ['enhanceProvider', (enhanceProvider)->
   condition = (list) -> list.hasOwnProperty('count') and list.hasOwnProperty('link')
   factory   = ['modelCatalogueApiRoot', 'rest', (modelCatalogueApiRoot, rest) ->
     (listReference, enhance = @enhance) ->
@@ -19,5 +19,5 @@ angular.module('mc.core.listReferenceDecorator', ['mc.util.rest', 'mc.util.enhan
       query
   ]
 
-  enhanceProvider.registerEnhancerFactory('listReferenceDecorator', condition, factory)
+  enhanceProvider.registerEnhancerFactory('listReference', condition, factory)
 ]

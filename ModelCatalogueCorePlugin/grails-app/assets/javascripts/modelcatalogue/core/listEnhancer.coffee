@@ -1,4 +1,4 @@
-angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.createConstantPromise']).config ['enhanceProvider', (enhanceProvider)->
+angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.createConstantPromise']).config ['enhanceProvider', (enhanceProvider)->
   condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
   factory   = ['modelCatalogueApiRoot', 'createConstantPromise', 'rest', (modelCatalogueApiRoot, createConstantPromise, rest) ->
     (list, enhance = @enhance) ->
@@ -53,5 +53,5 @@ angular.module('mc.core.listDecorator', ['mc.util.rest', 'mc.util.enhance', 'mc.
       new ListDecorator(list)
   ]
 
-  enhanceProvider.registerEnhancerFactory('listDecorator', condition, factory)
+  enhanceProvider.registerEnhancerFactory('list', condition, factory)
 ]

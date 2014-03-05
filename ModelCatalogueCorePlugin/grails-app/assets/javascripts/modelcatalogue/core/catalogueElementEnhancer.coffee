@@ -1,4 +1,4 @@
-angular.module('mc.core.catalogueElement', ['mc.util.rest', 'mc.util.enhance']).config [ 'enhanceProvider', (enhanceProvider) ->
+angular.module('mc.core.catalogueElementEnhancer', ['mc.util.rest', 'mc.util.enhance']).config [ 'enhanceProvider', (enhanceProvider) ->
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
   factory   = [ 'modelCatalogueApiRoot', 'rest', (modelCatalogueApiRoot, rest) ->
     (element, enhance = @enhance) ->

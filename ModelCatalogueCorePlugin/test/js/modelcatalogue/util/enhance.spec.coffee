@@ -74,6 +74,31 @@ describe "mc.util.enhance", ->
     expect(result.enhanced).toBeTruthy()
 
 
+  it "can list available enhancer names", ->
+    expect(enhance.getAvailableEnhancers).toBeFunction()
+
+    enhancers = enhance.getAvailableEnhancers()
+
+    expect(enhancers).toEqual(['greeter'])
+
+    expect(enhance.getEnhancer).toBeFunction()
+
+    greeter = enhance.getEnhancer('greeter')
+
+    expect(greeter).toBeFunction()
+    expect(greeter)
+
+
+    result  = greeter hello: "World", world: "Hello"
+
+    expect(result).toBeDefined()
+    expect(result.hello).toBe("World")
+    expect(result.world).toBe("Hello")
+    expect(result.enhanced).toBeTruthy()
+
+    nothing = enhance.getEnhancer('nothing')
+
+    expect(nothing).toBeUndefined()
 
 
 
