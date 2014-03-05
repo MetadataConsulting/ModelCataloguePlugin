@@ -8,7 +8,7 @@ class BootStrap {
 
         RelationshipType.initDefaultRelationshipTypes()
 
-        importService.importData()
+       // importService.importData()
 
     }
     def destroy = {

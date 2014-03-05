@@ -7,18 +7,15 @@ import java.beans.PropertyEditorSupport
  */
 class RelationshipTypeClassConverter extends PropertyEditorSupport {
 
-    def grailsApplication
-
     @Override
     def String getAsText() {
-        return value.toString()
+        return value.getName()
     }
 
     @Override
     void setAsText(String text) {
-        //grailsApplication.getArtefact("Domain",text)?.getClazz()?.get(1)
-        //def cl = this.class.classLoader.loadClass(text)
-        this.value = text
+        Class domain = Class.forName(text, true, Thread.currentThread().contextClassLoader)
+        this.value = domain
     }
 
 }
