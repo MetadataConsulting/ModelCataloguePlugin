@@ -6,8 +6,8 @@ describe "mc.core.catalogueElementResource", ->
   modelCatalogueApiRoot     = null
 
   beforeEach module "mc.core.catalogueElementResource"
-  beforeEach module "mc.core.catalogueElement"
-  beforeEach module "mc.core.listReferenceDecorator"
+  beforeEach module "mc.core.catalogueElementEnhancer"
+  beforeEach module "mc.core.listReferenceEnhancer"
 
   beforeEach inject (_catalogueElementResource_, _modelCatalogueApiRoot_, _$httpBackend_, _$rootScope_) ->
     catalogueElementResource  = _catalogueElementResource_
@@ -310,8 +310,6 @@ describe "mc.core.catalogueElementResource", ->
           expect(result.update).toBeDefined()
 
         it "validates ok if entity exists", ->
-          payloadWithId = angular.extend({}, fixtures.valueDomain.updateInput)
-
           $httpBackend
           .when("POST", "#{modelCatalogueApiRoot}/valueDomain/validate", fixtures.valueDomain.updateInput)
           .respond(fixtures.valueDomain.updateOk)

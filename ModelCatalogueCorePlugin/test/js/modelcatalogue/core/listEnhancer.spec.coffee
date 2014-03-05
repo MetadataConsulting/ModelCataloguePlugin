@@ -1,13 +1,12 @@
-describe "mc.core.listDecorator", ->
+describe "mc.core.listEnhancer", ->
 
-  listDecorator         = null
   rest                  = null
   enhance               = null
   $httpBackend          = null
   $rootScope            = null
   modelCatalogueApiRoot = null
 
-  beforeEach module "mc.core.listDecorator"
+  beforeEach module "mc.core.listEnhancer"
 
   beforeEach inject (_rest_, _enhance_, _$httpBackend_, _$rootScope_, _modelCatalogueApiRoot_) ->
     rest                  = _rest_
