@@ -19,5 +19,5 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
       query
   ]
 
-  enhanceProvider.registerEnhancerFactory('listReferenceDecorator', condition, factory)
+  enhanceProvider.registerEnhancerFactory('listReference', condition, factory)
 ]

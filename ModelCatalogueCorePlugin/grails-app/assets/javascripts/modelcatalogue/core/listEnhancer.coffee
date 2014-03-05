@@ -53,5 +53,5 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
       new ListDecorator(list)
   ]
 
-  enhanceProvider.registerEnhancerFactory('listDecorator', condition, factory)
+  enhanceProvider.registerEnhancerFactory('list', condition, factory)
 ]
