@@ -42,7 +42,8 @@ class DomainModellerService {
 
                 ValueDomain valueDomain = new ValueDomain(
                                     name: name,
-                                    dataType: dataType
+                                    dataType: dataType,
+                                    description: formatDomainConstraints(constraint)
                                     ).save()
                 DataElement dataElement = new DataElement(
                                     name: name
@@ -65,13 +66,13 @@ class DomainModellerService {
             println "Model Name : ${model.name}"
             println "-"*100
             println "contexts"
-            println "${model.hasContextOf[0].name}"
+            println "${model.hasContextOf[0]?.name}"
             println " -- "
-            println "contains (DataElement ( ValueDomain - DataType ))"
+            println "contains"
             def dataElements = model.contains
             dataElements.each{ DataElement dataElement->
                 def instantiatedBy = dataElement.instantiatedBy
-                println " -- ${dataElement.name} - (${instantiatedBy[0].name}  - ${instantiatedBy[0].dataType.name} )"
+                println " -- ${dataElement.name} (${instantiatedBy[0].dataType.name}) (${instantiatedBy[0].description})"
             }
 
         }
@@ -89,6 +90,38 @@ class DomainModellerService {
             cd = new ConceptualDomain(name: name, description: description).save()
         }
         return cd
+    }
+
+    String formatDomainConstraints(constraints){
+
+        Map formatted = [:]
+        constraints.each{ constraint ->
+            def propertyName = constraint.constraintPropertyName
+            def constraintClass = constraint.getClass().getSimpleName()
+            def constraintParameter
+            String formattedProperty = formatted.get(propertyName)
+            if(constraintClass=="ValidatorConstraint"){
+                constraintParameter == "custom validator"
+            }else if(constraintClass=="SizeConstraint"){
+                constraintParameter = "[$constraint.constraintParameter.to ..  $constraint.constraintParameter.from]"
+            }else{
+                constraintParameter = constraint.constraintParameter
+            }
+
+            if(formattedProperty){
+                formattedProperty += ", ${constraintClass} : ${constraintParameter}"
+                formatted.put(propertyName, formattedProperty)
+            }else{
+                formatted.put(propertyName, "${constraintClass} : ${constraintParameter}")
+            }
+        }
+
+        if(formatted.isEmpty()){
+            return "no constraints"
+        }
+
+        return formatted.toString()
+
     }
 
 
