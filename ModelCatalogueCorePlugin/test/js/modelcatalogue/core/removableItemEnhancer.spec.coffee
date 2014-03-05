@@ -17,8 +17,6 @@ describe "mc.core.removableItemEnancer", ->
 
     item = enhanced.list[0]
 
-    console.log item
-
     expect(angular.isFunction(item.remove)).toBeTruthy()
 
     $httpBackend.expect("DELETE", "#{modelCatalogueApiRoot}#{item.removeLink}").respond(204)
