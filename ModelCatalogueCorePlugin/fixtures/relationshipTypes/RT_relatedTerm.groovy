@@ -1,5 +1,5 @@
-import uk.co.mc.core.DataElement
-import uk.co.mc.core.RelationshipType
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.RelationshipType
 
 fixture{
     RT_relatedTerm(RelationshipType, name:"RelatedTerm",

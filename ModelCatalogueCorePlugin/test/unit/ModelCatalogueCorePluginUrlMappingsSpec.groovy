@@ -1,8 +1,8 @@
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import org.modelcatalogue.core.*
 import spock.lang.Specification
 import spock.lang.Unroll
-import uk.co.mc.core.*
 
 @TestFor(ModelCatalogueCorePluginUrlMappings)
 @Mock([
