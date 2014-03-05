@@ -1,4 +1,4 @@
-package uk.co.mc.core
+package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
