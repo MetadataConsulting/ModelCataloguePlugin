@@ -28,7 +28,7 @@ angular.module('mc.core.ui.decoratedListTable', []).directive 'decoratedListTabl
       </table>
     '''
 
-    controller: ['$scope', '$element', 'catalogueElementResource', ($scope, $element, catalogueElementResource) ->
+    controller: ['$scope', '$element', ($scope, $element) ->
       updateControls = (list) ->
         if list.next.size == 0
           $element.find('a.dl-table-next').addClass('disabled')

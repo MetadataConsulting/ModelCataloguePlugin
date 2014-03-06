@@ -1,20 +1,19 @@
-<!DOCTYPE html>
-<html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<html ng-app="demo">
 <head>
-    <title>Test</title>
-    <asset:javascript src="modelcatalogue/app.js"/>
+    <title>Model Catalogue Core Demo Page</title>
+    <asset:javascript src="demo.js"/>
+    <g:javascript>
+
+        angular.module('demo.config', ['mc.core.modelCatalogueApiRoot']) .value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
+
+    </g:javascript>
 </head>
 
 <body>
-
-<div ng-app="mc.core">
-    <decorated-list-table list="muList" columns="[
-      {header: 'ID', value: 'id'}
-      {header: 'Name', value: 'name'}
-    ]"></decorated-list-table>
+<h1>Model Catalogue Core Demo Page</h1>
+<div ng-controller="demo.DemoCtrl">
+    <decorated-list-table list="list" columns="columns"></decorated-list-table>
 </div>
-
-<p>test</p>
-
 </body>
 </html>
