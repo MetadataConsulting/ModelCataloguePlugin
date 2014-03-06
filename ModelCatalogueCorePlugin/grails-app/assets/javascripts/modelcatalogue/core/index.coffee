@@ -1,3 +1,4 @@
+
 angular.module 'mc.core', [
   # depends on util
   'mc.util'

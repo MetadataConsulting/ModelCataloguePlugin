@@ -1,4 +1,4 @@
-angular.module 'mc.core', [
+angular.module 'mc.util', [
   # list of modules
   'mc.util.createConstantPromise'
   'mc.util.enhance'

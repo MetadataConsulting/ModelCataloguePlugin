@@ -53,5 +53,9 @@ class ModelCatalogueCorePluginUrlMappings {
             action = [GET: "index"]
         }
 
+        
+        "/"(view:"index")
+
+
 	}
 }

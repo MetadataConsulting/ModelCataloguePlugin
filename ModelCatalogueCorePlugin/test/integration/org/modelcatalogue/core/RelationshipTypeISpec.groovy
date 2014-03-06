@@ -21,16 +21,6 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     }
 
-    /*def cleanupSpec(){
-
-        de1.delete()
-        md2.delete()
-        md1.delete()
-        cd1.delete()
-        vd.delete()
-
-    }*/
-
     def "read by name returns read only instance"() {
 
         RelationshipType containment = RelationshipType.readByName("containment")
@@ -54,10 +44,6 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         def model = Model.get(md1.id)
         def element =  DataElement.get(de1.id)
 
-        expect:
-        !model.contains
-        !element.containedIn
-
         when:
         model.addToContains(element)
 
@@ -79,63 +65,58 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
         then:
         model.contains
-        model.contains.size()       == 1
+        model.contains.contains(element)
         element.containedIn
-        element.containedIn.size()  == 1
+        element.containedIn.contains(model)
 
         when:
         element.removeFromContainedIn(model)
 
         then:
 
-        !model.contains
-        !element.containedIn
+        !model.contains.contains(element)
+        !element.containedIn.contains(model)
 
     }
 
     def "conceptual domains can provide context for model, models have context of conceptual domains"(){
 
-        def model = md1
-        def conceptualDomain = cd1
+        def model = Model.get(md1.id)
+        def conceptualDomain =  ConceptualDomain.get(cd1.id)
 
-        expect:
-        model.save()
-        conceptualDomain.save()
-        !model.hasContextOf
-        !conceptualDomain.isContextFor
 
         when:
         model.addToHasContextOf(conceptualDomain)
 
         then:
         model.hasContextOf
-        model.hasContextOf.size()       == 1
+        model.hasContextOf.contains(conceptualDomain)
         conceptualDomain.isContextFor
-        conceptualDomain.isContextFor.size()  == 1
+        conceptualDomain.isContextFor.contains(model)
 
         when:
         model.removeFromHasContextOf(conceptualDomain)
 
         then:
-        !model.hasContextOf
-        !conceptualDomain.isContextFor
+        !model.hasContextOf.contains(conceptualDomain)
+        !conceptualDomain.isContextFor.contains(model)
 
         when:
         conceptualDomain.addToIsContextFor(model)
 
         then:
         model.hasContextOf
-        model.hasContextOf.size()       == 1
+        model.hasContextOf.contains(conceptualDomain)
         conceptualDomain.isContextFor
-        conceptualDomain.isContextFor.size()  == 1
+        conceptualDomain.isContextFor.contains(model)
 
         when:
 
         conceptualDomain.removeFromIsContextFor(model)
 
         then:
-        !model.hasContextOf
-        !conceptualDomain.isContextFor
+        !model.hasContextOf.contains(conceptualDomain)
+        !conceptualDomain.isContextFor.contains(model)
 
     }
 
@@ -144,44 +125,38 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         def book = Model.get(md1.id)
         def chapter = Model.get(md2.id)
 
-        expect:
-        book.save()
-        chapter.save()
-        !book.parentOf
-        !chapter.childOf
-
         when:
         book.addToParentOf(chapter)
 
         then:
         book.parentOf
-        book.parentOf.size()       == 1
+        book.parentOf.contains(chapter)
         chapter.childOf
-        chapter.childOf.size()  == 1
+        chapter.childOf.contains(book)
 
         when:
         book.removeFromParentOf(chapter)
 
         then:
-        !book.parentOf
-        !chapter.childOf
+        !book.parentOf.contains(chapter)
+        !chapter.childOf.contains(book)
 
         when:
         chapter.addToChildOf(book)
 
         then:
         book.parentOf
-        book.parentOf.size()       == 1
+        book.parentOf.contains(chapter)
         chapter.childOf
-        chapter.childOf.size()  == 1
+        chapter.childOf.contains(book)
 
         when:
         chapter.removeFromChildOf(book)
 
 
         then:
-        !book.parentOf
-        !chapter.childOf
+        !book.parentOf.contains(chapter)
+        !chapter.childOf.contains(book)
 
     }
 
@@ -191,18 +166,14 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         def university = ConceptualDomain.get(cd1.id)
         def subjects = ValueDomain.get(vd.id)
 
-        expect:
-        !university.includes
-        !subjects.includedIn
-
         when:
         university.addToIncludes(subjects)
 
         then:
         university.includes
-        university.includes.size()       == 1
+        university.includes.contains(subjects)
         subjects.includedIn
-        subjects.includedIn.size()  == 1
+        subjects.includedIn.contains(university)
 
         when:
         university.removeFromIncludes(subjects)
@@ -216,9 +187,9 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
         then:
         university.includes
-        university.includes.size()       == 1
+        university.includes.contains(subjects)
         subjects.includedIn
-        subjects.includedIn.size()  == 1
+        subjects.includedIn.contains(university)
 
         when:
         subjects.removeFromIncludedIn(university)
@@ -236,19 +207,14 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         def course = DataElement.get(de1.id)
         def subjects = ValueDomain.get(vd.id)
 
-        expect:
-
-        !course.instantiatedBy
-        !subjects.instantiates
-
         when:
         course.addToInstantiatedBy(subjects)
 
         then:
         course.instantiatedBy
-        course.instantiatedBy.size()       == 1
+        course.instantiatedBy.contains(subjects)
         subjects.instantiates
-        subjects.instantiates.size()  == 1
+        subjects.instantiates.contains(course)
 
         when:
         course.removeFromInstantiatedBy(subjects)
@@ -259,58 +225,21 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
         when:
         subjects.addToInstantiates(course)
+        def x = course.instantiatedBy
+        def y = subjects.instantiates
 
         then:
         course.instantiatedBy
-        course.instantiatedBy.size()       == 1
+        course.instantiatedBy.contains(subjects)
         subjects.instantiates
-        subjects.instantiates.size()  == 1
+        subjects.instantiates.contains(course)
 
         when:
         subjects.removeFromInstantiates(course)
 
         then:
-        !course.instantiatedBy
-        !subjects.instantiates
+        !course.instantiatedBy.contains(subjects)
+        !subjects.instantiates.contains(course)
     }
-
-
-    /*def "data types can be mapped to other data types and mapped from other data types"(){
-
-        EnumeratedType subjectsA = new EnumeratedType(name: "subA", enumerations:['history', 'politics', 'science']).save()
-        EnumeratedType subjectsB = new EnumeratedType(name: "subB", enumerations:['HIS', 'POL', 'SCI']).save()
-
-        expect:
-        subjectsA.save()
-        subjectsB.save()
-        !subjectsA.mapsTo
-        !subjectsB.mapsFrom
-
-        when:
-        subjectsA.addToMapsTo(subjectsB)
-
-        then:
-        subjectsA.mapsTo
-        subjectsA.mapsTo.size()       == 1
-        subjectsB.mapsFrom
-        subjectsB.mapsFrom.size()  == 1
-
-        when:
-        subjectsA.removeFromMapsTo(subjectsB)
-
-        then:
-        !subjectsA.mapsTo
-        !subjectsB.mapsFrom
-
-        when:
-        subjectsB.addToMapsFrom(subjectsA)
-
-        then:
-        subjectsA.mapsTo
-        subjectsA.mapsTo.size()       == 1
-        subjectsB.mapsFrom
-        subjectsB.mapsFrom.size()  == 1
-    }*/
-
 
 }
