@@ -50,8 +50,8 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        //compile ":coffee-asset-pipeline:1.5.0"
-        //compile ":less-asset-pipeline:1.5.0"
+        compile ":coffee-asset-pipeline:1.5.0"
+        // compile ":less-asset-pipeline:1.5.0"
         compile ":hibernate:3.6.10.7"
 
         test ':build-test-data:1.1.1'
