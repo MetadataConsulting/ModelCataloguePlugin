@@ -14,19 +14,19 @@
         angular.module('demo.config', ['mc.core.modelCatalogueApiRoot']).value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
     </script>
 
-    <!-- example of customization -->
-    <script type="text/ng-template" id="modelcatalogue/core/ui/decoratedList.html">
-      <div>
-          <p ng-hide="list.list">No data</p>
-          <ul>
-            <li ng-repeat="item in list.list">{{item.name}}</li>
-          </ul>
-      </div>
-    </script>
+    %{--<!-- example of customization -->--}%
+    %{--<script type="text/ng-template" id="modelcatalogue/core/ui/decoratedList.html">--}%
+    %{--<div>--}%
+    %{--<p ng-hide="list.list">No data</p>--}%
+    %{--<ul>--}%
+    %{--<li ng-repeat="item in list.list">{{item.name}}</li>--}%
+    %{--</ul>--}%
+    %{--</div>--}%
+    %{--</script>--}%
 
 </head>
 
-<body>
+<body ng-controller="demo.DemoCtrl">
 
 <!-- Fixed navbar -->
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -46,8 +46,53 @@
 <div class="container">
     <h1>Model Catalogue Core Demo Page</h1>
 
-    <div ng-controller="demo.DemoCtrl">
-        <decorated-list list="list" columns="columns"/>
+    <div>
+        <form class="form" role="form" ng-submit="show()">
+            <div class="form-group">
+                <label for="expression">Expression</label>
+                <input type="text" class="form-control" id="expression" ng-model="expression"
+                       placeholder="Resource Path">
+            </div>
+            <button type="submit" class="btn btn-primary">Show</button>
+        </form>
+    </div>
+
+    <div>
+        <h2>Decorated List Widget</h2>
+        <decorated-list list="list" columns="columns"></decorated-list>
+    </div>
+
+    <div>
+        <h2>Configure Columns</h2>
+        <table class="table">
+            <tr ng-show="columns">
+                <th>
+                    Header
+                </th>
+                <th>
+                    Value
+                </th>
+                <th>
+                    Class
+                </th>
+                <th>
+                    &nbsp;
+                </th>
+            </tr>
+            <tr ng-repeat="column in columns">
+                <td><input class="form-control" ng-model="column.header"/></td>
+                <td><input class="form-control" ng-model="column.value"/></td>
+                <td><input class="form-control" ng-model="column.classes"/></td>
+                <td>
+                    <button class="btn btn-success btn-sm" ng-click="addColumn($index, column)"><span
+                            class="glyphicon glyphicon-plus"></span> Add</button>
+                    <button class="btn btn-danger btn-sm" ng-class="{disabled: columns.length <= 1}"
+                            ng-click="removeColumn($index)"><span class="glyphicon glyphicon-minus"></span> Remove
+                    </button>
+                </td>
+            </tr>
+        </table>
+
     </div>
 </div>
 </body>

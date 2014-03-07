@@ -12,12 +12,28 @@ angular.module('demo', [
   'mc.core.listEnhancer'
 
 ]).controller('demo.DemoCtrl', ['catalogueElementResource', '$scope', (catalogueElementResource, $scope)->
-  resource = catalogueElementResource('dataElement')
-  resource.list().then (unitsList) ->
-    $scope.list = unitsList
+  $scope.resource = catalogueElementResource
+  $scope.expression = '''resource('dataElement').list()'''
+
+  $scope.show = () ->
+    listFun = $scope.$eval($scope.expression)
+    if listFun? and listFun.then?
+      listFun.then (result) ->
+        $scope.list = result
+
 
   $scope.columns = [
-    {header: 'ID', value: 'id', classes: 'col-md-3'}
-    {header: 'Name', classes: 'col-md-9', value: (element) -> element.name }
+    {header: 'Code', value: 'code', classes: 'col-md-2'}
+    {header: 'Name', value: 'name', classes: 'col-md-4'}
+    {header: 'Description', value: 'description', classes: 'col-md-6'}
   ]
+
+  $scope.removeColumn = (index) ->
+    return if $scope.columns.length <= 1
+    $scope.columns.splice(index, 1)
+
+  $scope.addColumn = (index, column = {header: 'ID', value: 'id', classes: 'col-md-2'}) ->
+    $scope.columns.splice(index + 1, 0, angular.copy(column))
+
+  $scope.show()
 ])
