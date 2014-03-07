@@ -10,9 +10,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 * i.e. ValueDomain subjects uses EnumeratedType enumerations ['politics', 'history', 'science']
 * */
 
-//FIXME marshalling and unmarshalling for enumerated type as string at the moment it returns the enum as string
-//but we need ext.
-// please see enumAsStringConverter.groovy for marshalling to index
+//TODO marshalling and unmarshalling for enumerated type as string at the moment it returns the enum as string
+//but we need ext. please see enumAsStringConverter.groovy for marshalling to index
 
 class EnumeratedType extends DataType {
 
@@ -23,14 +22,9 @@ class EnumeratedType extends DataType {
             "%": "&#37;",
     ]
 
-    static searchable = {
-        name boost:5
-        enumAsString converter: EnumAsStringConverter
-        incomingRelationships component: true
-        outgoingRelationships component: true
-    }
-
     String enumAsString
+
+    static transients = ['enumerations']
 
     static constraints = {
         enumAsString nullable: false, unique:true, maxSize: 10000, validator: { encodedVal, obj ->
@@ -41,7 +35,13 @@ class EnumeratedType extends DataType {
         }
     }
 
-    static transients = ['enumerations']
+    static searchable = {
+        name boost:5
+        enumAsString converter: EnumAsStringConverter
+        incomingRelationships component: true
+        outgoingRelationships component: true
+    }
+
 
     /**
      * Sets the map containing the enum values.

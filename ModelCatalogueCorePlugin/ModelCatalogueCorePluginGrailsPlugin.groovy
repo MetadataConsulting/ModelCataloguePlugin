@@ -1,8 +1,9 @@
+import org.modelcatalogue.core.DomainModellerService
 import org.modelcatalogue.core.util.marshalling.*
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
-    def version = "0.0.1"
+    def version = "0.0.2"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging
@@ -71,8 +72,9 @@ Model catalogue core plugin (metadata registry)
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
         //register custom json Marshallers
-
+        //ctx.domainModellerService.modelDomains()
         ctx.getBean('customObjectMarshallers').register()
+
 
     }
 

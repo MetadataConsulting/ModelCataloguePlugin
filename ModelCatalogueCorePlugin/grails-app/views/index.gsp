@@ -4,9 +4,7 @@
     <title>Model Catalogue Core Demo Page</title>
     <asset:javascript src="demo.js"/>
     <g:javascript>
-
         angular.module('demo.config', ['mc.core.modelCatalogueApiRoot']) .value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
-
     </g:javascript>
 </head>
 

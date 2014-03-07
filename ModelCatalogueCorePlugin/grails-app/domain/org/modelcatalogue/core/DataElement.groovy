@@ -12,6 +12,14 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class DataElement extends ExtendibleElement {
 
+    String code
+
+    static transients = ['containedIn', 'instantiatedBy']
+
+    static constraints = {
+        code nullable:true, unique:true, maxSize: 255
+    }
+
     static searchable = {
         name boost:5
         extensions component:true
@@ -19,17 +27,6 @@ class DataElement extends ExtendibleElement {
         incomingRelationships component: true
         outgoingRelationships component: true
     }
-
-    //nearly all examples that we are working with have a unique data element code i.e. NHIC105495432
-    //however conceptually this should not be mandatory
-    String code
-
-    static constraints = {
-        code nullable:true, unique:true, maxSize: 255
-    }
-
-
-    static transients = ['containedIn', 'instantiatedBy']
 
     List/*<DataElement>*/ getContainedIn() {
         getIncomingRelationsByType(RelationshipType.containmentType)

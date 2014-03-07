@@ -9,7 +9,7 @@ angular.module('demo', [
   'mc.core.listEnhancer'
 
 ]).controller('demo.DemoCtrl', ['catalogueElementResource', '$scope', (catalogueElementResource, $scope)->
-  resource = catalogueElementResource('measurementUnit')
+  resource = catalogueElementResource('valueDomain')
   resource.list().then (unitsList) ->
     $scope.list = unitsList
 
@@ -21,5 +21,6 @@ angular.module('demo', [
   $scope.columns = [
     {header: 'ID', value: 'id'}
     {header: 'Name', value: (element) -> element.name }
+    {header: 'Description', value: (element) -> element.description }
   ]
 ])
