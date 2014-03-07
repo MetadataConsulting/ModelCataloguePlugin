@@ -37,7 +37,7 @@
     <div class="container">
         <h1>Model Catalogue Core Demo Page</h1>
         <div ng-controller="demo.DemoCtrl">
-            <decorated-list-table list="list" columns="columns"/>
+            <decorated-list list="list" columns="columns"/>
         </div>
     </div>
 </body>

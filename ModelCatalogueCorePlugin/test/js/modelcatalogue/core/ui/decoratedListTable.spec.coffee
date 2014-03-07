@@ -2,7 +2,6 @@ describe "mc.core.ui.decoratedListTable", ->
 
   beforeEach module 'mc.core.catalogueElementResource'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
-  beforeEach module 'mc.core.listEnhancer'
   beforeEach module 'mc.core.ui.decoratedListTable'
 
   it "element get compiled",  inject ($compile, $rootScope, $httpBackend, modelCatalogueApiRoot, catalogueElementResource) ->
@@ -25,7 +24,7 @@ describe "mc.core.ui.decoratedListTable", ->
     ]
 
     element = $compile('''
-    <decorated-list-table list="muList" columns="columns"></decorated-list-table>
+    <decorated-list list="muList" columns="columns"></decorated-list>
     ''')($rootScope)
 
     $rootScope.$digest()
@@ -87,7 +86,7 @@ describe "mc.core.ui.decoratedListTable", ->
 
 
     element = $compile('''
-    <decorated-list-table list="muList"></decorated-list-table>
+    <decorated-list list="muList"></decorated-list>
     ''')($rootScope)
     $rootScope.$digest()
 

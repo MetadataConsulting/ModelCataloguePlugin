@@ -1,11 +1,5 @@
-angular.module('mc.core.ui.decoratedListTable', []).directive 'decoratedListTable',  [-> {
-    restrict: 'E'
-    replace: true
-    scope:
-      list: '='
-      columns: '=?'
-
-    template: '''
+angular.module('mc.core.ui.decoratedListTable', ['mc.core.ui.decoratedList']).run [ '$templateCache', ($templateCache) ->
+  $templateCache.put 'modelcatalogue/core/ui/decoratedList.html', '''
       <table class="dl-table table">
         <thead>
           <tr class="dl-table-header-row">
@@ -29,38 +23,4 @@ angular.module('mc.core.ui.decoratedListTable', []).directive 'decoratedListTabl
         </tfoot>
       </table>
     '''
-
-    controller: ['$scope', ($scope) ->
-      nextOrPrev = (nextOrPrevFn) ->
-        return if nextOrPrevFn.size == 0
-        $scope.loading = true
-        nextOrPrevFn().then (result) ->
-          $scope.loading = false
-          $scope.list = result
-
-      hasNextOrPrev = (nextOrPrevFn) -> nextOrPrevFn.size? and nextOrPrevFn.size != 0
-
-      $scope.previous       = -> nextOrPrev($scope.list.previous)
-      $scope.next           = -> nextOrPrev($scope.list.next)
-      $scope.hasPrevious    = -> hasNextOrPrev($scope.list.previous)
-      $scope.hasNext        = -> hasNextOrPrev($scope.list.next)
-
-      $scope.columns ?= [
-        {header: 'Name', value: 'name', classes: 'col-md-4'}
-        {header: 'Descripton', value: 'description', classes: 'col-md-8'}
-      ]
-
-      $scope.list ?=
-        list: []
-        next: {size: 0}
-        previous: {size: 0}
-
-      $scope.evaluateClasses = (classes, element) ->
-        if angular.isFunction(classes) then classes(element) else classes
-
-      $scope.evaluateValue = (value, element) ->
-        if angular.isFunction(value) then value(element) else element[value]
-
-    ]
-  }
 ]
