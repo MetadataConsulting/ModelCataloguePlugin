@@ -51,7 +51,13 @@
             <div class="form-group">
                 <label for="expression">Expression</label>
                 <input type="text" class="form-control" id="expression" ng-model="expression"
-                       placeholder="Resource Path">
+                       placeholder="Expression returning list promise">
+                <span class="help-block">
+                    <a ng-click="expression = listResource      ; show() ; columns = valueDomainColumns">Get Resource List</a> ~
+                    <a ng-click="expression = listRelTypes      ; show() ; columns = relationshipTypeColumns">Get Relationship Types List</a> ~
+                    <a ng-click="expression = searchSomething   ; show() ; columns = idAndNameColumns">Global Search</a> ~
+                    <a ng-click="expression = searchModel       ; show() ; columns = idAndNameColumns">Search Model</a>
+                </span>
             </div>
             <button type="submit" class="btn btn-primary">Show</button>
         </form>
@@ -64,6 +70,11 @@
 
     <div>
         <h2>Configure Columns</h2>
+        <p>
+            <a ng-click="expression = listResource      ; show() ; columns = valueDomainColumns">Value Domain</a> ~
+            <a ng-click="expression = listRelTypes      ; show() ; columns = relationshipTypeColumns">Relationship Type</a> ~
+            <a ng-click="columns = idAndNameColumns">Type, ID and Name</a>
+        </p>
         <table class="table">
             <tr ng-show="columns">
                 <th>

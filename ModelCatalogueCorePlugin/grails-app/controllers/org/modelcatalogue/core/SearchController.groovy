@@ -8,7 +8,8 @@ class SearchController {
 
     def searchService
 
-    def index(){
+    def index(Integer max){
+        params.max = Math.min(max ?: 10, 100)
         def results =  searchService.search(params)
         if(results.errors){
             respond results

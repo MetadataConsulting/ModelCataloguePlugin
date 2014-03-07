@@ -18,7 +18,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         super(resource)
     }
 
-    def search(){
+    def search(Integer max){
+        params.max = Math.min(max ?: 10, 100)
         def results =  searchService.search(resource, params)
 
         if(results.errors){
