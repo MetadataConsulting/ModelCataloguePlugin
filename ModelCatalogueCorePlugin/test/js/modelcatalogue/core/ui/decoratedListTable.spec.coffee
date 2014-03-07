@@ -2,7 +2,6 @@ describe "mc.core.ui.decoratedListTable", ->
 
   beforeEach module 'mc.core.catalogueElementResource'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
-  beforeEach module 'mc.core.listEnhancer'
   beforeEach module 'mc.core.ui.decoratedListTable'
 
   it "element get compiled",  inject ($compile, $rootScope, $httpBackend, modelCatalogueApiRoot, catalogueElementResource) ->
@@ -20,12 +19,12 @@ describe "mc.core.ui.decoratedListTable", ->
     $httpBackend.flush()
 
     $rootScope.columns = [
-      {header: 'ID', value: 'id'}
-      {header: 'Name', value: (element) -> element.name }
+      {header: 'ID', classes: 'col-md-4', value: 'id'}
+      {header: 'Name', classes: 'col-md-8', value: (element) -> element.name }
     ]
 
     element = $compile('''
-    <decorated-list-table list="muList" columns="columns"></decorated-list-table>
+    <decorated-list list="muList" columns="columns"></decorated-list>
     ''')($rootScope)
 
     $rootScope.$digest()
@@ -48,6 +47,8 @@ describe "mc.core.ui.decoratedListTable", ->
     expect(element.find('thead tr th.dl-table-header-cell').length).toBe(2)
     expect(element.find('thead tr th.dl-table-header-cell:nth-child(1)').text()).toBe('ID')
     expect(element.find('thead tr th.dl-table-header-cell:nth-child(2)').text()).toBe('Name')
+    expect(element.find('thead tr th.dl-table-header-cell:nth-child(1)').hasClass('col-md-4')).toBeTruthy()
+    expect(element.find('thead tr th.dl-table-header-cell:nth-child(2)').hasClass('col-md-8')).toBeTruthy()
 
     expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(2)
     expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(1)').text()).toBe('1')
@@ -58,19 +59,19 @@ describe "mc.core.ui.decoratedListTable", ->
     expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(2)').text()).toBe('ground_speed_5')
 
     # next and previous links
-    expect(element.find('a.dl-table-prev.disabled').length).toBe(1)
-    expect(element.find('a.dl-table-next:not(.disabled)').length).toBe(1)
+    expect(element.find('li.dl-table-prev.disabled').length).toBe(1)
+    expect(element.find('li.dl-table-next:not(.disabled)').length).toBe(1)
 
     expect($rootScope.muList.offset).toBe(0)
 
-    element.find('a.dl-table-prev.disabled').click()
+    element.find('li.dl-table-prev.disabled a').click()
     expect($rootScope.muList.offset).toBe(0)
 
-    element.find('a.dl-table-next:not(.disabled)').click()
+    element.find('li.dl-table-next:not(.disabled) a').click()
     $httpBackend.flush()
     expect($rootScope.muList.offset).toBe(5)
 
-    element.find('a.dl-table-prev:not(.disabled)').click()
+    element.find('li.dl-table-prev:not(.disabled) a').click()
     $httpBackend.flush()
     expect($rootScope.muList.offset).toBe(0)
 
@@ -85,7 +86,7 @@ describe "mc.core.ui.decoratedListTable", ->
 
 
     element = $compile('''
-    <decorated-list-table list="muList"></decorated-list-table>
+    <decorated-list list="muList"></decorated-list>
     ''')($rootScope)
     $rootScope.$digest()
 
