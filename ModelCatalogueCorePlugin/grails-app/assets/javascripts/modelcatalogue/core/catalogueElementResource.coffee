@@ -31,6 +31,9 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
       list: (params = {}) ->
         enhance rest method: 'GET', url: @getIndexPath(), params: params
 
+      search: (query) ->
+        enhance rest method: 'GET', url: "#{@getIndexPath()}/search", params: {search: query}
+
     (pathName) -> new CatalogueElementResource(pathName)
   ]
   # Always return this from CoffeeScript AngularJS factory functions!

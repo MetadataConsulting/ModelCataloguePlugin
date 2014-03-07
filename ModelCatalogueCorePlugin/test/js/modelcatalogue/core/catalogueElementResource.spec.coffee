@@ -455,3 +455,31 @@ describe "mc.core.catalogueElementResource", ->
           expect(error.data.errors[0].field).toBe("name")
           expect(error.data.errors[0]["rejected-value"]).toBe(fixtures.valueDomain.saveErrors.errors[0]["rejected-value"])
           expect(error.data.errors[0].message).toBe(fixtures.valueDomain.saveErrors.errors[0].message)
+
+    describe "can search resource", ->
+      it "works", ->
+        $httpBackend
+        .when("GET", "#{modelCatalogueApiRoot}/valueDomain/search?search=foo")
+        .respond(fixtures.valueDomain.searchElement15)
+
+        result = null
+        error  = null
+
+        valueDomains.search('foo').then( (_result_) ->
+          result = _result_
+        , (_error_) ->
+          error = _error_
+        )
+
+        expect(result).toBeNull()
+
+        $httpBackend.flush()
+
+        expect(result).toBeDefined()
+        expect(result.total).toBe(4)
+        expect(result.page).toBe(10)
+        expect(result.size).toBe(4)
+        expect(result.offset).toBe(0)
+        expect(result.list).toBeDefined()
+        expect(result.list.length).toBe(4)
+
