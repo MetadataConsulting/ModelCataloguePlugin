@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.decoratedListTable', ['mc.core.ui.decoratedList']).run [ '$templateCache', ($templateCache) ->
-  $templateCache.put 'modelcatalogue/core/ui/decoratedList.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/decoratedList.html', '''
       <table class="dl-table table">
         <thead>
           <tr class="dl-table-header-row">
@@ -8,7 +8,7 @@ angular.module('mc.core.ui.decoratedListTable', ['mc.core.ui.decoratedList']).ru
         </thead>
         <tbody>
             <tr class="dl-table-item-row" ng-repeat="element in list.list">
-              <td ng-init="value = evaluateValue(column.value, element)" class="dl-table-item-cell" ng-class="evaluateClasses(column.classes, value, element)" ng-repeat="column in columns">{{value}}</td>
+              <td class="dl-table-item-cell" ng-class="evaluateClasses(column.classes, evaluateValue(column.value, element), element)" ng-repeat="column in columns">{{evaluateValue(column.value, element)}}</td>
             </tr>
         </tbody>
         <tfoot>
@@ -23,4 +23,4 @@ angular.module('mc.core.ui.decoratedListTable', ['mc.core.ui.decoratedList']).ru
         </tfoot>
       </table>
     '''
-]
+  ]
