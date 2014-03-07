@@ -1,7 +1,9 @@
 #= require jquery/dist/jquery
 #= require bootstrap/dist/js/bootstrap
 #= require angular/angular
-#= require_tree modelcatalogue
+#= require modelcatalogue/util/index
+#= require modelcatalogue/core/index
+#= require modelcatalogue/core/ui/index
 
 angular.module('demo', [
   'demo.config'
@@ -10,7 +12,7 @@ angular.module('demo', [
   'mc.core.listEnhancer'
 
 ]).controller('demo.DemoCtrl', ['catalogueElementResource', '$scope', (catalogueElementResource, $scope)->
-  resource = catalogueElementResource('measurementUnit')
+  resource = catalogueElementResource('dataElement')
   resource.list().then (unitsList) ->
     $scope.list = unitsList
 
