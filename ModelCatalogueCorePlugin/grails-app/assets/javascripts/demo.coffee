@@ -1,4 +1,5 @@
 #= require jquery/dist/jquery
+#= require bootstrap/dist/js/bootstrap
 #= require angular/angular
 #= require_tree modelcatalogue
 
@@ -13,13 +14,8 @@ angular.module('demo', [
   resource.list().then (unitsList) ->
     $scope.list = unitsList
 
-  $scope.list =
-      list: []
-      next: {size: 0}
-      previous: {size: 0}
-
   $scope.columns = [
-    {header: 'ID', value: 'id'}
-    {header: 'Name', value: (element) -> element.name }
+    {header: 'ID', value: 'id', classes: 'col-md-3'}
+    {header: 'Name', classes: 'col-md-9', value: (element) -> element.name }
   ]
 ])
