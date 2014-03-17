@@ -39,7 +39,7 @@ class SearchISpec extends AbstractIntegrationSpec{
 
 
     @Unroll
-    def "#no - text search for resource "(){
+    def "#no - text search for #className "(){
 
         ResultRecorder recorder = DefaultResultRecorder.create(
                 "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
@@ -97,24 +97,26 @@ class SearchISpec extends AbstractIntegrationSpec{
         2 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "json"    | "boolean"                 | 1
         3 | "DataType"          | new DataTypeController()            | "boolean"                       | "xml"     | "boolean"                 | 1
         4 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "xml"     | "boolean"                 | 1
-        5 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "json"    | "DE_author1"              | 1
-        6 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "xml"     | "DE_author1"              | 1
-        7 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "json"    | "public libraries"        | 3
-        8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 3
+// search for symbol, not supported for the default implementation
+//        5 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "json"    | "DE_author1"              | 1
+//        6 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "xml"     | "DE_author1"              | 1
+        7 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "json"    | "public libraries"        | 1
+        8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 1
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1
        10 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "xml"     | "sub1"                    | 1
        11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees of Celsius"      | 1
        12 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "xml"     | "Degrees of Celsius"      | 1
        13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1
        14 | "Model"             | new ModelController()               | "Jabberwocky"                   | "xml"     | "chapter1"                | 1
-       15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 4
-       16 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "xml"     | "value domain Celsius"    | 4
+       15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1
+       16 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "xml"     | "value domain Celsius"    | 1
        17 | "RelationshipType"  | new RelationshipTypeController()    | "context"                       | "json"    | "context"                 | 1
        18 | "RelationshipType"  | new RelationshipTypeController()    | "context"                       | "xml"     | "context"                 | 1
-       19 | "ValueDomain"       | new ValueDomainController()         | "°F"                            | "xml"     | "value domain Fahrenheit" | 1
-       20 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                          | "json"    | "gender"                  | 1
-       21 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                          | "xml"     | "gender"                  | 1
-       22 | "DataElement"       | new DataElementController()         | "metadata"                      | "xml"     | "DE_author1"              | 1
+// search in nested elements not supported
+//       19 | "ValueDomain"       | new ValueDomainController()         | "°F"                            | "xml"     | "value domain Fahrenheit" | 1
+//       20 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                          | "json"    | "gender"                  | 1
+//       21 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                          | "xml"     | "gender"                  | 1
+//       22 | "DataElement"       | new DataElementController()         | "metadata"                      | "xml"     | "DE_author1"              | 1
 
     }
 
@@ -170,14 +172,14 @@ class SearchISpec extends AbstractIntegrationSpec{
 
     protected static getPaginationParameters() {
         [
-                // no,size, max , off. tot. next, previous, searchstring                           , previous
-                [1, 7, 10, 0, 7, "", "",  "domain"],
-                [2, 5, 5, 0, 7, "/search/domain?max=5&sort=name&order=ASC&offset=5", "", "domain", "name", "ASC"],
-                [3, 2, 2, 5, 7, "", "/search/domain?max=2&sort=name&order=ASC&offset=3", "domain", "name", "ASC"],
-                [4, 4, 4, 1, 7, "/search/domain?max=4&sort=name&order=ASC&offset=5", "", "domain", "name", "ASC"],
-                [5, 2, 2, 2, 7, "/search/domain?max=2&sort=name&order=ASC&offset=4", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
-                [6, 2, 2, 4, 7, "/search/domain?max=2&sort=name&offset=6", "/search/domain?max=2&sort=name&offset=2", "domain", "name", ""],
-                [7, 2, 2, 4, 7, "/search/domain?max=2&offset=6", "/search/domain?max=2&offset=2", "domain", "", ""]
+                // no,size, max , off. tot. next, previous, search, sort, order
+                [1, 7, 10, 0, 7, "",                                                    "",                                                     "domain"],
+                [2, 5, 5, 0, 7, "/search/domain?max=5&sort=name&order=ASC&offset=5",    "",                                                     "domain", "name",   "ASC"],
+                [3, 2, 2, 5, 7, "",                                                     "/search/domain?max=2&sort=name&order=ASC&offset=3",    "domain", "name",   "ASC"],
+                [4, 4, 4, 1, 7, "/search/domain?max=4&sort=name&order=ASC&offset=5",    "",                                                     "domain", "name",   "ASC"],
+                [5, 2, 2, 2, 7, "/search/domain?max=2&sort=name&order=ASC&offset=4",    "/search/domain?max=2&sort=name&order=ASC&offset=0",    "domain", "name",   "ASC"],
+                [6, 2, 2, 4, 7, "/search/domain?max=2&sort=name&offset=6",              "/search/domain?max=2&sort=name&offset=2",              "domain", "name",   ""],
+                [7, 2, 2, 4, 7, "/search/domain?max=2&offset=6",                        "/search/domain?max=2&offset=2",                        "domain", null,     null]
         ]
     }
 
@@ -221,7 +223,6 @@ class SearchISpec extends AbstractIntegrationSpec{
     protected static getBadParameters() {
         [
                 // no,size, max , off. tot. next, previous, searchstring                           , previous
-                [1, 2, 2, 4, 7, "domain", "name", "blah blah blah", "Illegal argument: No enum constant org.elasticsearch.search.sort.SortOrder.BLAH BLAH BLAH"],
                 [2, 2, 2, 4, 7, "", "name","", "No query string to search on"]
         ]
     }
