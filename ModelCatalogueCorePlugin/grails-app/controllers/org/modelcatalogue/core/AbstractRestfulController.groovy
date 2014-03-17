@@ -12,7 +12,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     static responseFormats = ['json', 'xml']
-    def searchService
+    def modelCatalogueSearchService
 
     AbstractRestfulController(Class<T> resource) {
         super(resource)
@@ -20,7 +20,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     def search(Integer max){
         params.max = Math.min(max ?: 10, 100)
-        def results =  searchService.search(resource, params)
+        def results =  modelCatalogueSearchService.search(resource, params)
 
         if(results.errors){
             respond results
