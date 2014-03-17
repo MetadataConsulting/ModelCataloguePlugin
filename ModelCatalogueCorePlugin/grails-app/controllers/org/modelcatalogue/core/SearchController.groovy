@@ -6,11 +6,11 @@ class SearchController {
 
     static responseFormats = ['json', 'xml']
 
-    def searchService
+    def modelCatalogueSearchService
 
     def index(Integer max){
         params.max = Math.min(max ?: 10, 100)
-        def results =  searchService.search(params)
+        def results =  modelCatalogueSearchService.search(params)
         if(results.errors){
             respond results
             return

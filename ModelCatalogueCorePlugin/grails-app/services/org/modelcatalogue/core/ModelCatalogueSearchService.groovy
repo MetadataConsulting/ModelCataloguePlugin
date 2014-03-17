@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-class SearchService {
+class ModelCatalogueSearchService {
 
     def elasticSearchService
 
