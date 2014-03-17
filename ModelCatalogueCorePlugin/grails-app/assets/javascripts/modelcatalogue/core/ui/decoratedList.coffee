@@ -36,7 +36,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
         if angular.isFunction(classes) then classes(element) else classes
 
       $scope.evaluateValue = (value, element) ->
-        if angular.isFunction(value) then value(element) else element[value]
+        if angular.isFunction(value) then value(element) else $scope.$eval(value, element)
 
     ]
   }

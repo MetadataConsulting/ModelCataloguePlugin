@@ -1,7 +1,6 @@
 describe "mc.util.enhance", ->
 
   beforeEach module "mc.util.enhance"
-  beforeEach module "mc.util.createConstantPromise"
   beforeEach module( (enhanceProvider) ->
     condition = (input) ->
       input.world?
@@ -14,13 +13,13 @@ describe "mc.util.enhance", ->
   )
 
   enhance = null
-  createConstantPromise = null
   $rootScope = null
+  $q = null
 
-  beforeEach inject (_enhance_, _createConstantPromise_, _$rootScope_) ->
+  beforeEach inject (_enhance_, _$rootScope_, _$q_) ->
     enhance = _enhance_
-    createConstantPromise = _createConstantPromise_
     $rootScope = _$rootScope_
+    $q = _$q_
 
   it "does not enhance if condition is not met", ->
     result = enhance({hello: "world"})
@@ -60,7 +59,7 @@ describe "mc.util.enhance", ->
     expect(result.foo.enhanced).toBeTruthy()
 
   it "in case of promise enhances the final result", ->
-    promise = createConstantPromise(hello: "World", world: "Hello")
+    promise = $q.when(hello: "World", world: "Hello")
     result = null
 
     enhance(promise).then (_result_) ->

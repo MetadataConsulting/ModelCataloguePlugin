@@ -52,6 +52,7 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
     def "search controller url mapping"() {
         expect:
         assertRestForwardUrlMapping("index", "/api/modelCatalogue/core/search/author", controller: "search", action: "index", { search = "author"} )
+        assertRestForwardUrlMapping("index", "/api/modelCatalogue/core/search", controller: "search", action: "index", {} )
 
     }
 
@@ -73,13 +74,14 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
 
     private generateRestAssertion(String controller) {
         [
-      // method  | url                          | controller | action            | paramsAssertions
-        ["GET"   , "/$controller"               , controller , "index"           , {}            ],
-        ["POST"  , "/$controller"               , controller , "save"            , {}            ],
-        ["GET"   , "/$controller/1"             , controller , "show"            , { id = "1" }  ],
-        ["DELETE", "/$controller/1"             , controller , "delete"          , { id = "1" }  ],
-        ["PUT"   , "/$controller/1"             , controller , "update"          , { id = "1" }  ],
-        ["GET"   , "/$controller/search/author" , controller , "search"          , { search = "author"} ],
+      // method  | url                                  | controller | action            | paramsAssertions
+        ["GET"   , "/$controller"                       , controller , "index"           , {}            ],
+        ["POST"  , "/$controller"                       , controller , "save"            , {}            ],
+        ["GET"   , "/$controller/1"                     , controller , "show"            , { id = "1" }  ],
+        ["DELETE", "/$controller/1"                     , controller , "delete"          , { id = "1" }  ],
+        ["PUT"   , "/$controller/1"                     , controller , "update"          , { id = "1" }  ],
+        ["GET"   , "/$controller/search/author"         , controller , "search"          , { search = "author"} ],
+        ["GET"   , "/$controller/search"                , controller , "search"          , {}            ],
         ]
     }
 

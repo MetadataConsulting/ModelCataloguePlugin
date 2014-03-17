@@ -6,7 +6,7 @@ class ModelCatalogueCorePluginUrlMappings {
             "/$controller" {
                 action = [GET: "index", POST: "save"]
             }
-            "/$controller/search/$search" {
+            "/$controller/search/$search?" {
                 action = [GET: "search"]
             }
             "/$controller/validate" {
