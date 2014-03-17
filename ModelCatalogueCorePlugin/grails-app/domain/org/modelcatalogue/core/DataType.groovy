@@ -13,7 +13,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class DataType extends CatalogueElement {
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         incomingRelationships component: true
         outgoingRelationships component: true

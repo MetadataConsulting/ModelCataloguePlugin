@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 class Mapping {
 
-    static searchable = {
+    static elasticGormSearchable = {
         except = ['source', 'destination']
     }
 

@@ -25,7 +25,7 @@ abstract class CatalogueElement {
         description nullable: true, maxSize: 2000
     }
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         except = ['incomingRelationships', 'outgoingRelationships']
     }

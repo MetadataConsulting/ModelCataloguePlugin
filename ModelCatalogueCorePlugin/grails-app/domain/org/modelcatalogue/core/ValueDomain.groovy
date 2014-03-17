@@ -27,7 +27,7 @@ import java.util.regex.PatternSyntaxException
 
 class ValueDomain extends CatalogueElement  {
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         regexDef index:'no'
         dataType component:true

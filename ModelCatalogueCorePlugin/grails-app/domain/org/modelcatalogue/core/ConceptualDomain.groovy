@@ -22,7 +22,7 @@ class ConceptualDomain extends CatalogueElement {
 
     static transients = ['isContextFor', 'includes']
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         incomingRelationships component: true
         outgoingRelationships component: true

@@ -20,14 +20,3 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 }
-
-grails.mime.types = [
-        json:          ['application/json', 'text/json'],
-        xml:           ['text/xml', 'application/xml']
-]
-
-//elastic search default - need to change this in production potentially
-
-//elasticSearch.client.mode = 'local'
-//elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
-//elasticSearch.datastoreImpl = 'hibernateDatastore'

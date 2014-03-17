@@ -20,7 +20,7 @@ class DataElement extends ExtendibleElement {
         code nullable:true, unique:true, maxSize: 255
     }
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         extensions component:true
         code boost:5

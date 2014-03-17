@@ -25,7 +25,7 @@ package org.modelcatalogue.core
 
 class Relationship {
 
-    static searchable = {
+    static elasticGormSearchable = {
         except = ['source', 'destination']
         relationshipType component:true
     }

@@ -3,6 +3,7 @@ import org.modelcatalogue.core.RelationshipType
 class BootStrap {
 
     def importService
+    def domainModellerService
 
     def init = { servletContext ->
 
@@ -10,7 +11,8 @@ class BootStrap {
 
         environments {
             development {
-                importService.importData()
+                //importService.importData()
+                domainModellerService.modelDomains()
             }
         }
 

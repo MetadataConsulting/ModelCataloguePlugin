@@ -6,7 +6,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class RelationshipType {
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost: 5
         sourceClass converter: RelationshipTypeClassConverter
         destinationClass converter: RelationshipTypeClassConverter

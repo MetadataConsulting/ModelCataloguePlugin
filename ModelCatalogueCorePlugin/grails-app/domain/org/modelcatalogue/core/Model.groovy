@@ -7,7 +7,7 @@ class Model extends ExtendibleElement  {
 
     static transients = ['contains', 'hasContextOf', 'parentOf', 'childOf']
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         extensions component:true
         incomingRelationships component: true

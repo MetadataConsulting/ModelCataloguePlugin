@@ -11,7 +11,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class MeasurementUnit extends CatalogueElement {
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         incomingRelationships component: true
         outgoingRelationships component: true

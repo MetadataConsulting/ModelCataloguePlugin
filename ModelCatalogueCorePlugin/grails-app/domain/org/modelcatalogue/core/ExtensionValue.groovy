@@ -7,7 +7,7 @@ class ExtensionValue extends CatalogueElement {
 
     /* the name property from catalogue element is a key for the extension */
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         incomingRelationships component: true
         outgoingRelationships component: true

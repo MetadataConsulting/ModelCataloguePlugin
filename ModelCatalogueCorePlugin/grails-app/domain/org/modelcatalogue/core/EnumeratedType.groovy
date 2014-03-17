@@ -35,7 +35,7 @@ class EnumeratedType extends DataType {
         }
     }
 
-    static searchable = {
+    static elasticGormSearchable = {
         name boost:5
         enumAsString converter: EnumAsStringConverter
         incomingRelationships component: true
