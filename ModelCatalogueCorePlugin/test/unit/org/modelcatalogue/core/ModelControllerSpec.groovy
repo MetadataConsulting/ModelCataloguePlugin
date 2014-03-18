@@ -25,7 +25,7 @@ class ModelControllerSpec extends CatalogueElementRestfulControllerSpec {
         assert (loadItem1 = fixturesLoader.M_book.save())
         assert (loadItem2 = fixturesLoader.M_chapter2.save())
         assert (type = fixturesLoader.RT_relationship.save())
-        assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
+        assert !(new RelationshipService().link(loadItem1, loadItem2, type).hasErrors())
 
         //configuration properties for abstract controller
         assert (newInstance = fixturesLoader.M_chapter1)

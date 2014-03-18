@@ -22,7 +22,7 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
         assert (loadItem1 = fixturesLoader.ET_schoolSubjects.save())
         assert (loadItem2 = fixturesLoader.ET_uniSubjects.save())
         assert (type = fixturesLoader.RT_relationship.save())
-        assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
+        assert !(new RelationshipService().link(loadItem1, loadItem2, type).hasErrors())
 
         //configuration properties for abstract controller
         assert (newInstance = new EnumeratedType(name: "sub4", enumerations: [h1: 'history', p1: 'politics', sci1: 'science']))

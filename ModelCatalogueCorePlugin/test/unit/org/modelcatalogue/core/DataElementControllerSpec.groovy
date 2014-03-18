@@ -24,7 +24,7 @@ class DataElementControllerSpec extends CatalogueElementRestfulControllerSpec {
         assert (loadItem1 = fixturesLoader.DE_author.save())
         assert (loadItem2 = fixturesLoader.DE_author1.save())
         assert (type = fixturesLoader.RT_relationship.save())
-        assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
+        assert !(new RelationshipService().link(loadItem1, loadItem2, type).hasErrors())
 
         loadItem1.ext.foo = "bar"
 

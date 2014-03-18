@@ -13,6 +13,8 @@ class RelationshipISpec extends AbstractIntegrationSpec{
     @Shared
     def cd1, md1, de1, vd1, de2, reltype, dt, ms
 
+    @Shared RelationshipService relationshipService
+
     def setupSpec(){
 
         loadFixtures()
@@ -49,7 +51,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         RelationshipType hierarchy = RelationshipType.findByName("hierarchy")
 
 
-        Relationship rel =  Relationship.link( de1, de2, hierarchy)
+        Relationship rel =  relationshipService.link( de1, de2, hierarchy)
 
         then:
 
@@ -66,7 +68,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         de1 = DataElement.get(de1.id)
         de2 = DataElement.get(de2.id)
 
-        Relationship rel =  Relationship.link( de1, de2, reltype)
+        Relationship rel =  relationshipService.link( de1, de2, reltype)
 
         then:
 
@@ -76,7 +78,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         when:
 
-        Relationship.unlink( de1, de2, reltype)
+        relationshipService.unlink( de1, de2, reltype)
 
         then:
         de2.getIncomingRelations() == []
@@ -89,8 +91,8 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         when:
 
-        Relationship rel1 =  Relationship.link( de1, de2, reltype)
-        Relationship rel2 =  Relationship.link( de1, de2, reltype)
+        Relationship rel1 =  relationshipService.link( de1, de2, reltype)
+        Relationship rel2 =  relationshipService.link( de1, de2, reltype)
 
         then:
 
@@ -104,7 +106,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         when:
 
-        Relationship.unlink( de1, de2, reltype)
+        relationshipService.unlink( de1, de2, reltype)
 
         then:
 

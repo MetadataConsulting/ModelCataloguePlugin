@@ -27,9 +27,11 @@ class SearchISpec extends AbstractIntegrationSpec{
         def cd = ConceptualDomain.findByName("public libraries")
         def mod = Model.findByName("book")
 
-        Relationship.link(cd, mod, RelationshipType.findByName("context"))
-        Relationship.link(de, vd, RelationshipType.findByName("instantiation"))
-        Relationship.link(mod, de, RelationshipType.findByName("containment"))
+        RelationshipService relationshipService = new RelationshipService()
+
+        relationshipService.link(cd, mod, RelationshipType.findByName("context"))
+        relationshipService.link(de, vd, RelationshipType.findByName("instantiation"))
+        relationshipService.link(mod, de, RelationshipType.findByName("containment"))
 
         elasticSearchService.index()
     }

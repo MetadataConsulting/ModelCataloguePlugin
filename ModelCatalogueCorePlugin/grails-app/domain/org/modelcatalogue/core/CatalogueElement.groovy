@@ -13,6 +13,8 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 abstract class CatalogueElement {
 
+    def relationshipService
+
     String name
     String description
 
@@ -81,19 +83,19 @@ abstract class CatalogueElement {
 
 
     Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
-        Relationship.link(this, destination, type)
+        relationshipService.link(this, destination, type)
     }
 
     Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
-        Relationship.link(source, this, type)
+        relationshipService.link(source, this, type)
     }
 
     void removeLinkTo(CatalogueElement destination, RelationshipType type) {
-        Relationship.unlink(this, destination, type)
+        relationshipService.unlink(this, destination, type)
     }
 
     void removeLinkFrom(CatalogueElement source, RelationshipType type) {
-        Relationship.unlink(source, this, type)
+        relationshipService.unlink(source, this, type)
     }
 
     String toString() {

@@ -9,6 +9,8 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
     static responseFormats = ['json', 'xml']
     static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE"]
 
+    def relationshipService
+
     CatalogueElementController(Class<T> resource) {
         super(resource)
     }
@@ -66,7 +68,7 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
             notFound()
             return
         }
-        Relationship old = outgoing ?  Relationship.unlink(source, destination, relationshipType) :  Relationship.unlink(destination, source, relationshipType)
+        Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType) :  relationshipService.unlink(destination, source, relationshipType)
         response.status = old ? HttpServletResponse.SC_NO_CONTENT : HttpServletResponse.SC_NOT_FOUND
 
     }
@@ -98,7 +100,7 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
             notFound()
             return
         }
-        Relationship rel = outgoing ?  Relationship.link(source, destination, relationshipType) :  Relationship.link(destination, source, relationshipType)
+        Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType) :  relationshipService.link(destination, source, relationshipType)
 
         if (rel.hasErrors()) {
             respond rel.errors

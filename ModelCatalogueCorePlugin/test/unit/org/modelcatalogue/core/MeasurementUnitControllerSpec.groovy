@@ -24,7 +24,7 @@ class MeasurementUnitControllerSpec extends CatalogueElementRestfulControllerSpe
         assert (relationshipType = fixturesLoader.RT_relationship.save())
         assert (loadItem1 = fixturesLoader.MU_degree_C.save())
         assert (loadItem2 = fixturesLoader.MU_degree_F.save())
-        assert !Relationship.link(loadItem1, loadItem2, relationshipType).hasErrors()
+        assert !(new RelationshipService().link(loadItem1, loadItem2, relationshipType).hasErrors())
 
         //configuration properties for abstract controller
         assert (newInstance = fixturesLoader.MU_milesPerHour)

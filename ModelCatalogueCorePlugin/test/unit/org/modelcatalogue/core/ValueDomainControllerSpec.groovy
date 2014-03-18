@@ -28,7 +28,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         assert (author = fixturesLoader.DE_author.save())
         assert (loadItem1 = new ValueDomain(name: "ground_speed", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer).save())
         assert (loadItem2 = new ValueDomain(name: "ground_speed5", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer).save())
-        assert !Relationship.link(loadItem1, author, type).hasErrors()
+        assert !(new RelationshipService().link(loadItem1, author, type).hasErrors())
 
         //configuration properties for abstract controller
         assert (newInstance = new ValueDomain(name: "ground_speed2", unitOfMeasure: mph, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: integer))

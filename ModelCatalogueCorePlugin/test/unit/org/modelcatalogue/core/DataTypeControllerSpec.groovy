@@ -22,7 +22,7 @@ class DataTypeControllerSpec extends CatalogueElementRestfulControllerSpec {
         assert (loadItem1 = fixturesLoader.DT_integer.save())
         assert (loadItem2 = fixturesLoader.DT_double.save())
         assert (type = fixturesLoader.RT_relationship.save())
-        assert !Relationship.link(loadItem1, loadItem2, type).hasErrors()
+        assert !(new RelationshipService().link(loadItem1, loadItem2, type).hasErrors())
         assert (newInstance = fixturesLoader.DT_string)
         assert (badInstance = new DataType(name: "", description: "asdf"))
         assert (propertiesToEdit = [description: "edited description "])
