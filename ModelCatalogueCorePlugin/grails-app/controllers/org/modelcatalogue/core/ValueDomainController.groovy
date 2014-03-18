@@ -8,6 +8,8 @@ class ValueDomainController extends CatalogueElementController<ValueDomain> {
 
     static allowedMethods = [mappings: "GET", removoMapping: "DELETE", addMapping: "POST"]
 
+    def mappingService
+
     ValueDomainController() {
         super(ValueDomain)
     }
@@ -68,7 +70,7 @@ class ValueDomainController extends CatalogueElementController<ValueDomain> {
                     mappingString = request.getJSON().mapping
                 }
             }
-            Mapping mapping = Mapping.map(domain, destination, mappingString)
+            Mapping mapping = mappingService.map(domain, destination, mappingString)
             if (mapping.hasErrors()) {
                 respond mapping.errors
                 return
@@ -77,7 +79,7 @@ class ValueDomainController extends CatalogueElementController<ValueDomain> {
             respond mapping
             return
         }
-        Mapping old = Mapping.unmap(domain, destination)
+        Mapping old = mappingService.unmap(domain, destination)
         if (old) {
             response.status = HttpServletResponse.SC_NO_CONTENT
         } else {

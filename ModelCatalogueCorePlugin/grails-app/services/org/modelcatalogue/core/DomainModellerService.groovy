@@ -1,10 +1,10 @@
 package org.modelcatalogue.core
 
-import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 
-@Transactional
 class DomainModellerService {
+
+    static transactional = true
 
     def grailsApplication
 

@@ -8,6 +8,8 @@ class MappingISpec extends AbstractIntegrationSpec {
     @Shared
     def degreeC, degreeF
 
+    @Shared MappingService mappingService = new MappingService()
+
     def setupSpec(){
         loadFixtures()
         degreeC = ValueDomain.findByName("value domain Celsius")
@@ -66,9 +68,8 @@ class MappingISpec extends AbstractIntegrationSpec {
         when:
 
         def dC = ValueDomain.get(degreeC.id)
-        def dF = ValueDomain.get(degreeF.id)
 
-        Mapping self = Mapping.map(dC, dC, "x")
+        Mapping self = mappingService.map(dC, dC, "x")
 
         then:
         self
@@ -84,13 +85,13 @@ class MappingISpec extends AbstractIntegrationSpec {
         def dC = ValueDomain.get(degreeC.id)
         def dF = ValueDomain.get(degreeF.id)
 
-        Mapping zero = Mapping.map(dC, new ValueDomain(name: "none"), "x")
+        Mapping zero = mappingService.map(dC, new ValueDomain(name: "none"), "x")
 
         then:
         !zero
 
         when:
-        Mapping first = Mapping.map(dC, dF, "x * 9/5 + 32")
+        Mapping first = mappingService.map(dC, dF, "x * 9/5 + 32")
 
         then:
         first
@@ -101,7 +102,7 @@ class MappingISpec extends AbstractIntegrationSpec {
         dF.incomingMappings.contains(first)
 
         when:
-        Mapping second = Mapping.map(dC, dF, "x * 9/5 + 32")
+        Mapping second = mappingService.map(dC, dF, "x * 9/5 + 32")
 
         then:
         second
@@ -113,7 +114,7 @@ class MappingISpec extends AbstractIntegrationSpec {
         dF.incomingMappings.contains(first)
 
         when:
-        Mapping third = Mapping.unmap(dC, dF)
+        Mapping third = mappingService.unmap(dC, dF)
 
         then:
         third
@@ -124,7 +125,7 @@ class MappingISpec extends AbstractIntegrationSpec {
         !dF.incomingMappings.contains(first)
 
         when:
-        Mapping fourth = Mapping.unmap(dC, dF)
+        Mapping fourth = mappingService.unmap(dC, dF)
 
         then:
         !fourth

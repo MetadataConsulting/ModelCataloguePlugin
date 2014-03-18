@@ -13,7 +13,7 @@ class MappingSpec extends Specification {
         def map = [1: "one", 2: "two", 3: "three"]
 
         when:
-        String mapFunctionString = Mapping.createMappingFunctionFromMap(map)
+        String mapFunctionString = MappingService.createMappingFunctionFromMap(map)
 
         then:
         mapFunctionString == """[1:"one", 2:"two", 3:"three"][x]"""

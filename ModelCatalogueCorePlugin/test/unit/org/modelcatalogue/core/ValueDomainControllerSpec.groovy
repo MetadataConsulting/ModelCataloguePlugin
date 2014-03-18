@@ -18,6 +18,8 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
     RelationshipType type
 
     def setup() {
+        controller.relationshipService = new RelationshipService()
+        controller.mappingService = new MappingService()
         fixturesLoader.load('measurementUnits/MU_kph', 'dataElements/DE_author', 'measurementUnits/MU_milesPerHour', 'dataTypes/DT_integer', 'relationshipTypes/RT_relationship')
 
         new ValueDomainMarshaller().register()
@@ -243,7 +245,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
     def "unmap non existing mapping will return 404 for #format request"(){
         response.format = format
 
-        Mapping.unmap(loadItem1, loadItem2)
+        controller.mappingService.unmap(loadItem1, loadItem2)
 
         params.id           = loadItem1.id
         params.destination  = loadItem2.id
@@ -262,7 +264,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
     def "unmap existing mapping will return 204 for #format request"(){
         response.format = format
 
-        Mapping.map(loadItem1, loadItem2, [one: "one"])
+        controller.mappingService.map(loadItem1, loadItem2, [one: "one"])
 
         params.id           = loadItem1.id
         params.destination  = loadItem2.id
@@ -328,7 +330,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
     protected mapToDummyEntities(ValueDomain toBeLinked) {
         for (domain in resource.list()) {
             if (domain != toBeLinked) {
-                Mapping.map(toBeLinked, domain, "x")
+                controller.mappingService.map(toBeLinked, domain, "x")
                 if (toBeLinked.outgoingMappings.size() == 12) {
                     break
                 }

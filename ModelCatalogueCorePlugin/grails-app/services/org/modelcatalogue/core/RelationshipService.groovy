@@ -1,9 +1,8 @@
 package org.modelcatalogue.core
 
-import grails.transaction.Transactional
-
-@Transactional
 class RelationshipService {
+
+    static transactional = true
 
     static Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
         if (source?.id && destination?.id && relationshipType?.id) {
