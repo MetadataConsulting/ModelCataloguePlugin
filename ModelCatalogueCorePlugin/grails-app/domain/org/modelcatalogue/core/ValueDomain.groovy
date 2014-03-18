@@ -39,6 +39,8 @@ class ValueDomain extends CatalogueElement  {
 
     }
 
+    static searchable = false
+
     //FIXME valueDomain needs to be unique within a conceptual domain
 
 	MeasurementUnit unitOfMeasure

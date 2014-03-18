@@ -6,6 +6,8 @@ class Mapping {
         except = ['source', 'destination']
     }
 
+    static searchable = false
+
     ValueDomain source
     ValueDomain destination
 

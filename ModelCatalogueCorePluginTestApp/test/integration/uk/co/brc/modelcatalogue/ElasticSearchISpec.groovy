@@ -39,7 +39,7 @@ class ElasticSearchISpec extends IntegrationSpec{
     def setupSpec(){
         FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
 
-        Map fixtures = fixturesLoader.load("dataTypes/DT_integer")
+        Map fixtures = fixturesLoader.load("dataTypes/*")
 
         fixtures.each{ key, value ->
             value.save()

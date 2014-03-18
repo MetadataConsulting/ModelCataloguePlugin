@@ -1,3 +1,4 @@
+import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 
 class ModelCatalogueElasticSearchPluginGrailsPlugin {
@@ -20,6 +21,8 @@ Brief summary/description of the plugin.
 
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/model-catalogue-elastic-search-plugin"
+
+    def loadBefore = ['elasticsearchGorm']
 
     // Extra (optional) plugin metadata
 
@@ -44,25 +47,26 @@ Brief summary/description of the plugin.
 
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
+
+        application.domainClasses.each{ GrailsDomainClass domainClass ->
+            def elasticGormSearchable = (domainClass.clazz.hasProperty('elasticGormSearchable'))? domainClass.clazz.elasticGormSearchable : null
+            if(elasticGormSearchable){
+               domainClass.clazz.metaClass.static.searchable = elasticGormSearchable
+            }
+        }
+
+        springConfig.addAlias('modelCatalogueSearchService','modelCatalogueElasticSearchPluginModelCatalogueSearchService')
+
     }
 
     def doWithDynamicMethods = { ctx ->
         // TODO Implement registering dynamic methods to classes (optional)
 
-        ctx.grailsApplication.domainClasses.each{ GrailsDomainClass domainClass ->
-
-            def elasticGormSearchable = domainClass.clazz.elasticGormSearchable
-
-            if(elasticGormSearchable){
-                domainClass.metaClass.static.searchable = elasticGormSearchable
-            }
-
-        }
-
     }
 
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
+
     }
 
     def onChange = { event ->

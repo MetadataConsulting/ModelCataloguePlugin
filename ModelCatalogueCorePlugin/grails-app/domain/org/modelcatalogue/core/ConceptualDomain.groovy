@@ -29,6 +29,8 @@ class ConceptualDomain extends CatalogueElement {
         except = ['isContextFor', 'includes']
     }
 
+    static searchable = false
+
     //CONTEXT
 
     List/*<Model>*/ getIsContextFor() {

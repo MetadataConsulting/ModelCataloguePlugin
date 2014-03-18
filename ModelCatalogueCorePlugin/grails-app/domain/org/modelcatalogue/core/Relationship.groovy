@@ -30,6 +30,8 @@ class Relationship {
         relationshipType component:true
     }
 
+    static searchable = false
+
     CatalogueElement source
     CatalogueElement destination
 

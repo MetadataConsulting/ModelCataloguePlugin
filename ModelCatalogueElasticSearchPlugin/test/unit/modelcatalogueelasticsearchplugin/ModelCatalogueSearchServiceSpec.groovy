@@ -1,6 +1,7 @@
 package modelcatalogueelasticsearchplugin
 
 import grails.test.mixin.TestFor
+import org.modelcatalogue.core.elasticsearch.ModelCatalogueSearchService
 import spock.lang.Specification
 
 /**

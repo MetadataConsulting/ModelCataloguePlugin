@@ -1,4 +1,4 @@
-package modelcatalogueelasticsearchplugin
+package org.modelcatalogue.core.elasticsearch
 
 import grails.transaction.Transactional
 

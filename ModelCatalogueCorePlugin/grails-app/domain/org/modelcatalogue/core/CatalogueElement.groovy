@@ -30,6 +30,8 @@ abstract class CatalogueElement {
         except = ['incomingRelationships', 'outgoingRelationships']
     }
 
+    static searchable = false
+
     static mapping = {
         description type: "text"
     }
