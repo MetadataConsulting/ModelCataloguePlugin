@@ -27,7 +27,9 @@ import java.util.regex.PatternSyntaxException
 
 class ValueDomain extends CatalogueElement  {
 
-    static elasticGormSearchable = {
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
+    static searchable = {
         name boost:5
         regexDef index:'no'
         dataType component:true
@@ -38,8 +40,6 @@ class ValueDomain extends CatalogueElement  {
         outgoingMappings component: true
 
     }
-
-    static searchable = false
 
     //FIXME valueDomain needs to be unique within a conceptual domain
 

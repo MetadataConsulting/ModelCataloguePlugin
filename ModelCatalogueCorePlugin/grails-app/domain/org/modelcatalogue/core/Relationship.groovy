@@ -25,12 +25,12 @@ package org.modelcatalogue.core
 
 class Relationship {
 
-    static elasticGormSearchable = {
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
+    static searchable = {
         except = ['source', 'destination']
         relationshipType component:true
     }
-
-    static searchable = false
 
     CatalogueElement source
     CatalogueElement destination

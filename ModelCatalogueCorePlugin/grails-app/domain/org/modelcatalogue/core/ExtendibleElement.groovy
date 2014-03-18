@@ -10,7 +10,9 @@ import org.modelcatalogue.core.util.ExtendibleElementExtensionsWrapper
 
 abstract class ExtendibleElement extends PublishedElement {
 
-    static elasticGormSearchable = {
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
+    static searchable = {
         extensions component:true
         except = ['ext']
     }

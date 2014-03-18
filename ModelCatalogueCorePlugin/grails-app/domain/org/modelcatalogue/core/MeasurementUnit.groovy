@@ -11,7 +11,9 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class MeasurementUnit extends CatalogueElement {
 
-    static elasticGormSearchable = {
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
+    static searchable = {
         name boost:5
         incomingRelationships component: true
         outgoingRelationships component: true

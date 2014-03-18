@@ -2,11 +2,11 @@ package org.modelcatalogue.core
 
 class Mapping {
 
-    static elasticGormSearchable = {
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
+    static searchable = {
         except = ['source', 'destination']
     }
-
-    static searchable = false
 
     ValueDomain source
     ValueDomain destination

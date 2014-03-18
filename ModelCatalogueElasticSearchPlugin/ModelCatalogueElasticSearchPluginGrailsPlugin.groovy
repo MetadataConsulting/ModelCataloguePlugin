@@ -47,16 +47,7 @@ Brief summary/description of the plugin.
 
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
-
-        application.domainClasses.each{ GrailsDomainClass domainClass ->
-            def elasticGormSearchable = (domainClass.clazz.hasProperty('elasticGormSearchable'))? domainClass.clazz.elasticGormSearchable : null
-            if(elasticGormSearchable){
-               domainClass.clazz.metaClass.static.searchable = elasticGormSearchable
-            }
-        }
-
         springConfig.addAlias('modelCatalogueSearchService','modelCatalogueElasticSearchPluginModelCatalogueSearchService')
-
     }
 
     def doWithDynamicMethods = { ctx ->

@@ -25,12 +25,12 @@ abstract class CatalogueElement {
         description nullable: true, maxSize: 2000
     }
 
-    static elasticGormSearchable = {
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
+    static searchable = {
         name boost:5
         except = ['incomingRelationships', 'outgoingRelationships']
     }
-
-    static searchable = false
 
     static mapping = {
         description type: "text"

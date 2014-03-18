@@ -39,7 +39,7 @@ class ElasticSearchISpec extends IntegrationSpec{
     def setupSpec(){
         FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
 
-        Map fixtures = fixturesLoader.load("dataTypes/*")
+        Map fixtures = fixturesLoader.load("dataTypes/*", "conceptualDomains/*","dataElements/*","enumeratedTypes/*","measurementUnits/*","models/*","relationshipTypes/*")
 
         fixtures.each{ key, value ->
             value.save()
@@ -47,12 +47,12 @@ class ElasticSearchISpec extends IntegrationSpec{
 
         RelationshipType.initDefaultRelationshipTypes()
         def de = DataElement.findByName("DE_author1")
-        def vd = ValueDomain.findByName("value domain Celsius")
+      //  def vd = ValueDomain.findByName("value domain Celsius")
         def cd = ConceptualDomain.findByName("public libraries")
         def mod = Model.findByName("book")
 
         Relationship.link(cd, mod, RelationshipType.findByName("context"))
-        Relationship.link(de, vd, RelationshipType.findByName("instantiation"))
+   //     Relationship.link(de, vd, RelationshipType.findByName("instantiation"))
         Relationship.link(mod, de, RelationshipType.findByName("containment"))
 
         elasticSearchService.index()
@@ -97,7 +97,7 @@ class ElasticSearchISpec extends IntegrationSpec{
 
         if(json){
             assert json
-            assert json.total == total
+             assert json.total == total
             assert json.list.get(0).id == expectedResult.id
             assert json.list.get(0).name == expectedResult.name
         }else if(xml){
@@ -131,14 +131,14 @@ class ElasticSearchISpec extends IntegrationSpec{
         12 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "xml"     | "Degrees of Celsius"      | 1
         13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1
         14 | "Model"             | new ModelController()               | "Jabberwocky"                   | "xml"     | "chapter1"                | 1
-        15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 4
-        16 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "xml"     | "value domain Celsius"    | 4
+   //     15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 4
+   //     16 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "xml"     | "value domain Celsius"    | 4
         17 | "RelationshipType"  | new RelationshipTypeController()    | "context"                       | "json"    | "context"                 | 1
         18 | "RelationshipType"  | new RelationshipTypeController()    | "context"                       | "xml"     | "context"                 | 1
-        19 | "ValueDomain"       | new ValueDomainController()         | "°F"                            | "xml"     | "value domain Fahrenheit" | 1
+  //      19 | "ValueDomain"       | new ValueDomainController()         | "°F"                            | "xml"     | "value domain Fahrenheit" | 1
         20 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                          | "json"    | "gender"                  | 1
         21 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                          | "xml"     | "gender"                  | 1
-        22 | "DataElement"       | new DataElementController()         | "metadata"                      | "xml"     | "DE_author1"              | 1
+ //       22 | "DataElement"       | new DataElementController()         | "metadata"                      | "xml"     | "DE_author1"              | 1
 
     }
 
@@ -190,18 +190,15 @@ class ElasticSearchISpec extends IntegrationSpec{
 
     }
 
-
-
     protected static getPaginationParameters() {
         [
-                // no,size, max , off. tot. next, previous, searchstring                           , previous
-                [1, 7, 10, 0, 7, "", "",  "domain"],
-                [2, 5, 5, 0, 7, "/search/domain?max=5&sort=name&order=ASC&offset=5", "", "domain", "name", "ASC"],
-                [3, 2, 2, 5, 7, "", "/search/domain?max=2&sort=name&order=ASC&offset=3", "domain", "name", "ASC"],
-                [4, 4, 4, 1, 7, "/search/domain?max=4&sort=name&order=ASC&offset=5", "", "domain", "name", "ASC"],
-                [5, 2, 2, 2, 7, "/search/domain?max=2&sort=name&order=ASC&offset=4", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
-                [6, 2, 2, 4, 7, "/search/domain?max=2&sort=name&offset=6", "/search/domain?max=2&sort=name&offset=2", "domain", "name", ""],
-                [7, 2, 2, 4, 7, "/search/domain?max=2&offset=6", "/search/domain?max=2&offset=2", "domain", "", ""]
+        //      no, size, max , off. tot. next, previous, search, previous, sort, order
+                [1,  3, 10, 0, 3, "", "",  "domain"],
+                [2, 2, 2, 0, 3, "/search/domain?max=2&sort=name&order=ASC&offset=2", "", "domain", "name", "ASC"],
+                [3, 1, 2, 2, 3, "", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
+                [4, 1, 1, 1, 3, "/search/domain?max=1&sort=name&order=ASC&offset=2", "/search/domain?max=1&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
+                [5, 1, 2, 2, 3, "", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
+                [6, 1, 1, 1, 3, "/search/domain?max=1&sort=name&offset=2", "/search/domain?max=1&sort=name&offset=0", "domain", "name", ""]
         ]
     }
 

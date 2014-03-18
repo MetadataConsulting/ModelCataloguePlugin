@@ -26,8 +26,3 @@ grails.mime.types = [
         xml:           ['text/xml', 'application/xml']
 ]
 
-//elastic search default - need to change this in production potentially
-
-//elasticSearch.client.mode = 'local'
-//elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
-//elasticSearch.datastoreImpl = 'hibernateDatastore'
