@@ -41,7 +41,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        test "org.modelcatalogue:simple-fixtures:0.1.3"
+        test "org.modelcatalogue:simple-fixtures:0.1.2"
     }
 
     plugins {
@@ -59,9 +59,6 @@ grails.project.dependency.resolution = {
 
         // codenarc static analysis
         provided ":codenarc:0.20"
-
-        //elastic search
-        //compile ":elasticsearch-gorm:0.0.2.3"
 
         // test coverage
         test ":code-coverage:1.2.7"
