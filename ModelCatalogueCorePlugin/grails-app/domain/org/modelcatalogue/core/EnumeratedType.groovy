@@ -35,6 +35,8 @@ class EnumeratedType extends DataType {
         }
     }
 
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
     static searchable = {
         name boost:5
         enumAsString converter: EnumAsStringConverter

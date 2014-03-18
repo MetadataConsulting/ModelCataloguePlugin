@@ -22,6 +22,8 @@ class ConceptualDomain extends CatalogueElement {
 
     static transients = ['isContextFor', 'includes']
 
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
     static searchable = {
         name boost:5
         incomingRelationships component: true

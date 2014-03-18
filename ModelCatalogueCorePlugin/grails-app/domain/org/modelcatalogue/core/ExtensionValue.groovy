@@ -7,6 +7,8 @@ class ExtensionValue extends CatalogueElement {
 
     /* the name property from catalogue element is a key for the extension */
 
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
     static searchable = {
         name boost:5
         incomingRelationships component: true

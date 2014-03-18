@@ -20,6 +20,8 @@ class DataElement extends ExtendibleElement {
         code nullable:true, unique:true, maxSize: 255
     }
 
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
     static searchable = {
         name boost:5
         extensions component:true

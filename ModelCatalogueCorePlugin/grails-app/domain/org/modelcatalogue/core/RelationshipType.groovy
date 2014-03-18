@@ -6,11 +6,13 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class RelationshipType {
 
+    //static elasticGormSearchable =
+
     static searchable = {
         name boost: 5
         sourceClass converter: RelationshipTypeClassConverter
         destinationClass converter: RelationshipTypeClassConverter
-        except = ['rule', 'defaultRelationshipTypesDefinitions']
+        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions']
     }
 
     //name of the relationship type i.e. parentChild  or synonym

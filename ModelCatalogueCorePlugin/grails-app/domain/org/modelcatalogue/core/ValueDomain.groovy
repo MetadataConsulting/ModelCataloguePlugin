@@ -27,6 +27,8 @@ import java.util.regex.PatternSyntaxException
 
 class ValueDomain extends CatalogueElement  {
 
+    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+
     static searchable = {
         name boost:5
         regexDef index:'no'
