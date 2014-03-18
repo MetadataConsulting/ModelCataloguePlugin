@@ -2,8 +2,6 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.codehaus.groovy.grails.web.converters.configuration.configtest
-import org.omg.CosNaming._NamingContextExtStub
 
 @Transactional
 class DomainModellerService {
@@ -190,7 +188,7 @@ class DomainModellerService {
         if(modelName){
             Model relatedModel = Model.findByName(modelName)
             if(relatedModel){
-                Relationship.link(model, relatedModel, manyToMany)
+                new RelationshipService().link(model, relatedModel, manyToMany)
             }
         }
     }
@@ -203,7 +201,7 @@ class DomainModellerService {
             transients= new RelationshipType(destinationClass: DataElement, sourceClass: Model, destinationToSource: "transient properties of", sourceToDestination: "transient properties for", name: "transients").save()
         }
         if(element){
-            Relationship.link(model, element, transients)
+            new RelationshipService().link(model, element, transients)
         }
 
     }

@@ -27,6 +27,7 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         [marshallers, [new RelationshipMarshallers(), new RelationshipsMarshaller(), new ElementsMarshaller()]].flatten().each {
             it.register()
         }
+        controller.relationshipService = new RelationshipService()
     }
 
     @Unroll
@@ -88,9 +89,9 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         def type = prepareTypeAndDummyEntities()
 
         if (direction == "outgoing") {
-            Relationship.unlink(loadItem1, loadItem2, type)
+            controller.relationshipService.unlink(loadItem1, loadItem2, type)
         } else {
-            Relationship.unlink(loadItem2, loadItem1, type)
+            controller.relationshipService.unlink(loadItem2, loadItem1, type)
         }
 
         response.format = format.toLowerCase()
@@ -132,9 +133,9 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         def type = prepareTypeAndDummyEntities()
 
         if (direction == "outgoing") {
-            Relationship.link(loadItem1, loadItem2, type)
+            controller.relationshipService.link(loadItem1, loadItem2, type)
         } else {
-            Relationship.link(loadItem2, loadItem1, type)
+            controller.relationshipService.link(loadItem2, loadItem1, type)
         }
 
         response.format = format.toLowerCase()
@@ -304,9 +305,9 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         for (unit in resource.list()) {
             if (unit != first) {
                 if (incomingOrOutgoing == "incoming") {
-                    assert !Relationship.link(unit, first, relationshipType).hasErrors()
+                    assert !controller.relationshipService.link(unit, first, relationshipType).hasErrors()
                 } else {
-                    assert !Relationship.link(first, unit, relationshipType).hasErrors()
+                    assert !controller.relationshipService.link(first, unit, relationshipType).hasErrors()
                 }
                 if (first."${incomingOrOutgoing}Relationships".size() == 12) {
                     break

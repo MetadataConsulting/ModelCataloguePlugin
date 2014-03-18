@@ -53,15 +53,14 @@ abstract class PublishedElement extends CatalogueElement{
 
         def relations = this.relations()
 
-        relations.each{ relation ->
+        def relationshipService = new RelationshipService()
 
-
-            Relationship.link(clonedElement, relation, relation.relationshipType)
-
+        relations.each { relation ->
+            relationshipService.link(clonedElement, relation, relation.relationshipType)
         }
 
         def supersession = RelationshipType.findByName("Supersession")
-        Relationship.link(clonedElement, this, supersession)
+        relationshipService.link(clonedElement, this, supersession)
 
 
         // Grant the current user principal administrative permission

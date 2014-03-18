@@ -24,7 +24,7 @@ class RelationshipSpec extends Specification{
 
         when:
 
-        Relationship rel =  Relationship.link(new DataElement(name:"test2DE") , new DataElement(name:"test1DE"), createRelationshipType())
+        Relationship rel =  new RelationshipService().link(new DataElement(name:"test2DE") , new DataElement(name:"test1DE"), createRelationshipType())
 
         then:
 
@@ -47,7 +47,7 @@ class RelationshipSpec extends Specification{
 
         when:
 
-        rel = Relationship.link(loadItem1, loadItem2, type)
+        rel = new RelationshipService().link(loadItem1, loadItem2, type)
        !rel.hasErrors()
         def relId = rel.id
 
