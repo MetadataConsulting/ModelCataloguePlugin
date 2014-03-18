@@ -18,10 +18,6 @@ class ImportServiceSpec extends Specification {
     def
     "import nhic spreadsheet"() {
 
-        expect:
-        Model.list().isEmpty();
-
-
         when:
         importService.importData()
 
