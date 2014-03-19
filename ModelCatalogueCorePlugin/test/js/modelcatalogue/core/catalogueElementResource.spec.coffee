@@ -476,10 +476,10 @@ describe "mc.core.catalogueElementResource", ->
         $httpBackend.flush()
 
         expect(result).toBeDefined()
-        expect(result.total).toBe(4)
+        expect(result.total).toBe(1)
         expect(result.page).toBe(10)
-        expect(result.size).toBe(4)
+        expect(result.size).toBe(1)
         expect(result.offset).toBe(0)
         expect(result.list).toBeDefined()
-        expect(result.list.length).toBe(4)
+        expect(result.list.length).toBe(1)
 
