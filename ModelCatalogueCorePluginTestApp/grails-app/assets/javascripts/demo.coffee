@@ -78,7 +78,7 @@ angular.module('demo', [
           $log.info "Instead of list got: ", result
 
 
-
+  $scope.selection = []
 
   $scope.columns = $scope.valueDomainColumns()
 

@@ -4,10 +4,26 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
     scope:
       list: '='
       columns: '=?'
+      selection: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
-    controller: ['$scope', ($scope) ->
+    controller: ['$scope', "$log" , ($scope, $log) ->
+      $scope.hasSelection = () -> $scope.selection?
+
+      $scope.allSelected = false
+
+      $scope.updateSelectAll = (val) ->
+        $scope.allSelected = val
+        element._selected = $scope.allSelected for element in $scope.list.list
+        $scope.updateSelection()
+
+      $scope.updateSelection = () ->
+        $log.info('update selection called')
+        newSelection = []
+        newSelection.push(element) for element in $scope.list.list when element._selected
+        $scope.selection = newSelection
+
       nextOrPrev = (nextOrPrevFn) ->
         return if nextOrPrevFn.size == 0
         $scope.loading = true

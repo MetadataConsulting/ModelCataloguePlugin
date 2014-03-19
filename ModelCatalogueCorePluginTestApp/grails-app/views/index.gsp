@@ -66,7 +66,7 @@
 
     <div>
         <h2>Decorated List Widget</h2>
-        <decorated-list list="list" columns="columns"></decorated-list>
+        <decorated-list list="list" columns="columns" selection="selection"></decorated-list>
     </div>
 
     <div>

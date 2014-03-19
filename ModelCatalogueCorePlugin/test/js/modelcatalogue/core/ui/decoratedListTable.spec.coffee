@@ -94,3 +94,32 @@ describe "mc.core.ui.decoratedListTable", ->
     expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(2)
     expect(element.find('thead tr th.dl-table-header-cell:first-child').text()).toBe('Name')
 
+
+    $rootScope.selection = []
+
+    element = $compile('''
+    <decorated-list list="muList" selection="selection"></decorated-list>
+    ''')($rootScope)
+    $rootScope.$digest()
+
+    expect(element.find('thead tr th:first-child.dl-table-select-all-cell.col-md-1').length).toBe(1)
+    expect(element.find('tbody tr:first-child td:first-child.dl-table-select-item-cell').length).toBe(1)
+
+    element.find('tbody tr:first-child td:first-child.dl-table-select-item-cell input').click()
+    $rootScope.$digest()
+
+    expect($rootScope.selection.length).toBe(1)
+
+    element.find('thead tr th:first-child.dl-table-select-all-cell input').click()
+    $rootScope.$digest()
+
+
+    expect($rootScope.selection.length).toBe(5)
+
+    element.find('thead tr th:first-child.dl-table-select-all-cell input').click()
+    $rootScope.$digest()
+
+
+    expect($rootScope.selection.length).toBe(0)
+
+
