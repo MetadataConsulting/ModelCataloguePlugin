@@ -4,17 +4,11 @@
 #= require modelcatalogue/util/index
 #= require modelcatalogue/core/index
 #= require modelcatalogue/core/ui/index
+#= require modelcatalogue/core/ui/bs/index
 
 angular.module('demo', [
   'demo.config'
-  'mc.core.ui.decoratedListTable'
-  'mc.core.catalogueElementResource'
-  'mc.core.listEnhancer'
-  'mc.core.catalogueElementEnhancer'
-  'mc.core.listReferenceEnhancer'
-  'mc.core.removableItemEnhancer'
-  'mc.core.modelCatalogueSearch'
-
+  'mc.core.ui.bs'
 ]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q)->
   $scope.listResource     = """resource("dataElement").list()"""
   $scope.listRelTypes     = """resource("relationshipType").list()"""

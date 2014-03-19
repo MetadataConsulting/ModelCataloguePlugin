@@ -8,7 +8,29 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
-    controller: ['$scope', "$log" , ($scope, $log) ->
+    controller: ['$scope' , ($scope) ->
+      updatePages = (list) ->
+        if list.total is 0
+          $scope.pages = []
+          $scope.hasMorePrevPages = false
+          $scope.hasMoreNextPages = false
+        else if list.total <= list.page
+          $scope.pages = [1]
+          $scope.hasMorePrevPages = false
+          $scope.hasMoreNextPages = false
+        else
+          pages = []
+          page = 1
+          lowerTen = Math.floor(list.currentPage / 10) * 10
+          upperTen = lowerTen + 10
+          while (page - 1) * list.page <= list.total
+            if lowerTen <= page  < upperTen
+              pages.push page
+            page++
+          $scope.hasMorePrevPages = lowerTen != 0
+          $scope.hasMoreNextPages = (Math.floor(list.total / list.page) + 1) >= upperTen
+          $scope.pages = pages
+
       $scope.hasSelection = () -> $scope.selection?
 
       $scope.allSelected = false
@@ -19,15 +41,22 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
         $scope.updateSelection()
 
       $scope.updateSelection = () ->
-        $log.info('update selection called')
         newSelection = []
         newSelection.push(element) for element in $scope.list.list when element._selected
         $scope.selection = newSelection
 
       nextOrPrev = (nextOrPrevFn) ->
         return if nextOrPrevFn.size == 0
+        return if $scope.loading
         $scope.loading = true
         nextOrPrevFn().then (result) ->
+          $scope.loading = false
+          $scope.list = result
+
+      $scope.goto = (page) ->
+        return if $scope.loading
+        $scope.loading = true
+        $scope.list.goto(page).then (result) ->
           $scope.loading = false
           $scope.list = result
 
@@ -47,6 +76,10 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
         list: []
         next: {size: 0}
         previous: {size: 0}
+        total: 0
+
+
+      $scope.$watch 'list', updatePages
 
       $scope.evaluateClasses = (classes, element) ->
         if angular.isFunction(classes) then classes(element) else classes

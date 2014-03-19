@@ -24,6 +24,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             # promising list will get back to regular lists
               previous:   () -> $q.when(list),
               offset:     @offset + @page
+              currentPage:1
             })
             @next.size   = 0
             @next.total  = @total
@@ -45,11 +46,29 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             # promising this will return same empty list
               previous:   () -> $q.when(this)
               offset:     0
+              currentPage:1
             })
             @previous.size   = 0
             @previous.total  = @total
 
-      # return new list decorator
+          @currentPage = Math.floor(@offset / @page) + 1
+
+          @goto = (page) ->
+            return $q.when(@) if @total == 0
+            theOffset = (page - 1) * @page
+            theLink   = "#{modelCatalogueApiRoot}#{@previous.url ? @next.url}"
+
+            if theLink.indexOf('offset=') >= 0
+              theLink = theLink.replace /offset=(\d+)/, (originalOffset) => "offset=#{theOffset}"
+            else if theLink.indexOf('?') >= 0
+              theLink = "theLink&offset=#{theOffset}"
+            else
+              theLink = "theLink?offset=#{theOffset}"
+
+            enhance rest method: 'GET', url: theLink
+
+
+            # return new list decorator
       new ListDecorator(list)
   ]
 

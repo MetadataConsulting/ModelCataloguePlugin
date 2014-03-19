@@ -2,7 +2,7 @@ describe "mc.core.ui.decoratedListTable", ->
 
   beforeEach module 'mc.core.catalogueElementResource'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
-  beforeEach module 'mc.core.ui.decoratedListTable'
+  beforeEach module 'mc.core.ui.bs.decoratedListTable'
 
   it "element get compiled",  inject ($compile, $rootScope, $httpBackend, modelCatalogueApiRoot, catalogueElementResource) ->
     $httpBackend.when("GET", "#{modelCatalogueApiRoot}/valueDomain").respond(fixtures.valueDomain.list2)

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.decoratedListTable', ['mc.core.ui.decoratedList']).run [ '$templateCache', ($templateCache) ->
+angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/decoratedList.html', '''
       <table class="dl-table table">
         <thead>
@@ -18,11 +18,14 @@ angular.module('mc.core.ui.decoratedListTable', ['mc.core.ui.decoratedList']).ru
             </tr>
         </tbody>
         <tfoot>
-          <tr>
-            <td colspan="{{hasSelection() ? columns.length + 1 : columns.length}}">
-              <ul class="pager">
-                <li class="previous dl-table-prev" ng-class="{disabled: !hasPrevious() || loading}"><a ng-click="previous()">Previous</a></li>
-                <li class="next dl-table-next" ng-class="{disabled: !hasNext() || loading}"><a ng-click="next()">Next</a></li>
+          <tr ng-hide="list.total <= list.page">
+            <td colspan="{{hasSelection() ? columns.length + 1 : columns.length}}" class="text-center">
+              <ul class="pagination">
+                <li class="previous dl-table-prev" ng-class="{disabled: !hasPrevious()}"><a ng-click="previous()">Previous</a></li>
+                <li ng-show="hasMorePrevPages"><a ng-click="goto(pages[0] - 1)" class>...</a></li>
+                <li ng-repeat="page in pages"  ng-class="{active: page == list.currentPage}"><a ng-click="goto(page)">{{page}}</a></li>
+                <li ng-show="hasMoreNextPages"><a ng-click="goto(pages[pages.length - 1] + 1)" class>...</a></li>
+                <li class="next dl-table-next" ng-class="{disabled: !hasNext()}"><a ng-click="next()">Next</a></li>
               </ul>
             </td>
           </tr>
