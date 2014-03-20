@@ -20,8 +20,8 @@ describe "mc.core.ui.decoratedListTable", ->
     $httpBackend.flush()
 
     $rootScope.columns = [
-      {header: 'ID', classes: 'col-md-4', value: 'id'}
-      {header: 'Name', classes: 'col-md-8', value: (element) -> element.name }
+      {header: 'ID', classes: 'col-md-4', value: 'id', show: 'show()'}
+      {header: 'Name', classes: 'col-md-8', show: 'show()', value: (element) -> element.name }
     ]
 
     element = $compile('''
@@ -124,23 +124,33 @@ describe "mc.core.ui.decoratedListTable", ->
     expect($rootScope.selection.length).toBe(0)
 
     element = $compile('''
-    <decorated-list list="muList" selection="selection"></decorated-list>
+    <decorated-list list="muList" selection="selection" columns="columns"></decorated-list>
     ''')($rootScope)
     $rootScope.$digest()
 
     event = null
-    $rootScope.$on 'showCatalogueElement', (_event_) -> event = _event_
+    payload = null
+    $rootScope.$on 'showCatalogueElement', (_event_, _payload_) ->
+      event   = _event_
+      payload = _payload_
 
     expect(event).toBeNull()
 
     $rootScope.$digest()
     expect(event).toBeNull()
+    expect(payload).toBeNull()
 
-    element.find('tbody tr:first-child').click()
+    link = element.find('tbody tr:first-child td a')
+
+    expect(link.length).toBe(1)
+
+    link.click()
 
     $rootScope.$digest()
 
     expect(event).not.toBeNull()
+    expect(payload).not.toBeNull()
+    expect(payload).toEqual($rootScope.muList.list[0])
 
 
 

@@ -30,20 +30,20 @@ angular.module('demo', [
   $scope.indicator        = """resource("dataElement").search("NHS_NUMBER_STATUS_INDICATOR_CODE") >>> $r.list[0]"""
 
   $scope.valueDomainColumns = () -> [
-    {header: 'Code', value: 'code', classes: 'col-md-2'}
-    {header: 'Name', value: 'name', classes: 'col-md-4'}
+    {header: 'Code', value: 'code', classes: 'col-md-2', show: true}
+    {header: 'Name', value: 'name', classes: 'col-md-4', show: true}
     {header: 'Description', value: 'description', classes: 'col-md-6'}
   ]
 
   $scope.idAndNameColumns = () -> [
 
     {header: 'Type', value: 'elementTypeName', classes: 'col-md-5'}
-    {header: 'ID', value: 'id', classes: 'col-md-2'}
-    {header: 'Name', value: 'name', classes: 'col-md-5'}
+    {header: 'ID', value: 'id', classes: 'col-md-2', show: true}
+    {header: 'Name', value: 'name', classes: 'col-md-5', show: true}
   ]
 
   $scope.relationshipTypeColumns = () -> [
-    {header: 'Name', value: 'name', classes: 'col-md-2'}
+    {header: 'Name', value: 'name', classes: 'col-md-2', show: true}
     {header: 'Source to Destination', value: 'sourceToDestination', classes: 'col-md-2'}
     {header: 'Destination to Source', value: 'destinationToSource', classes: 'col-md-2'}
     {header: 'Source Class', value: 'sourceClass', classes: 'col-md-3'}
@@ -53,7 +53,7 @@ angular.module('demo', [
   $scope.relationshipsColumns = () -> [
 
     {header: 'Relation',    value: 'type[direction]', classes: 'col-md-6'}
-    {header: 'Destinaiton', value: 'relation.name', classes: 'col-md-6'}
+    {header: 'Destinaiton', value: 'relation.name', classes: 'col-md-6', show: 'relation.show()'}
   ]
 
   $scope.resource         = catalogueElementResource

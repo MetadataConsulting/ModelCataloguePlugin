@@ -5,7 +5,6 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
       list: '='
       columns: '=?'
       selection: '=?'
-      itemClick: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
@@ -98,6 +97,13 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
 
       $scope.evaluateValue = (value, element) ->
         if angular.isFunction(value) then value(element) else $scope.$eval(value, element)
+
+      $scope.showItem = (show, element) ->
+        show = 'show()' if show == true
+        if angular.isFunction(show) then show(element) else $scope.$eval(show, element)
+
+      $scope.showEnabled = (show) ->
+        show?
 
     ]
   }

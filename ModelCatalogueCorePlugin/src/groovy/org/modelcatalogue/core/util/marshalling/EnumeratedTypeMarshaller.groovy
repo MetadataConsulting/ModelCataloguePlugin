@@ -3,7 +3,7 @@ package org.modelcatalogue.core.util.marshalling
 import grails.converters.XML
 import org.modelcatalogue.core.EnumeratedType
 
-class EnumeratedTypeMarshaller extends CatalogueElementMarshallers {
+class EnumeratedTypeMarshaller extends DataTypeMarshaller {
 
     EnumeratedTypeMarshaller() {
         super(EnumeratedType)

@@ -94,6 +94,9 @@
                     Class
                 </th>
                 <th>
+                    Show
+                </th>
+                <th>
                     &nbsp;
                 </th>
             </tr>
@@ -101,6 +104,7 @@
                 <td><input class="form-control" ng-model="column.header"/></td>
                 <td><input class="form-control" ng-model="column.value"/></td>
                 <td><input class="form-control" ng-model="column.classes"/></td>
+                <td><input class="form-control" ng-model="column.show"/></td>
                 <td>
                     <button class="btn btn-success btn-sm" ng-click="addColumn($index, column)"><span
                             class="glyphicon glyphicon-plus"></span> Add</button>
