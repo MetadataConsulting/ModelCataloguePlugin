@@ -49,7 +49,7 @@ Model catalogue core plugin (metadata registry)
         // TODO Implement runtime spring config (optional)
 
 
-        customObjectMarshallers(CustomObjectMarshallers) {
+        modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
                     new ConceptualDomainMarshaller(),
                     new DataElementMarshaller(),
@@ -63,6 +63,7 @@ Model catalogue core plugin (metadata registry)
                     new ValueDomainMarshaller(),
             ]
         }
+
     }
 
     def doWithDynamicMethods = { ctx ->
@@ -73,8 +74,7 @@ Model catalogue core plugin (metadata registry)
         // TODO Implement post initialization spring config (optional)
         //register custom json Marshallers
         //ctx.domainModellerService.modelDomains()
-        ctx.getBean('customObjectMarshallers').register()
-
+        ctx.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
 
     }
 

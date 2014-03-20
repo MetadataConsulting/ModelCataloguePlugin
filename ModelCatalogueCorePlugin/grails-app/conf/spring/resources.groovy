@@ -1,7 +1,7 @@
 import org.modelcatalogue.core.util.marshalling.*
 
 beans = {
-    customObjectMarshallers( CustomObjectMarshallers ) {
+    customObjectMarshallers( ModelCatalogueCorePluginCustomObjectMarshallers ) {
         marshallers = [
                             new ConceptualDomainMarshaller(),
                             new DataElementMarshaller(),

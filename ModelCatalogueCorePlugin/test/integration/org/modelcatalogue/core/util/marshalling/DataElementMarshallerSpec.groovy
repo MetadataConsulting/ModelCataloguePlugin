@@ -20,7 +20,7 @@ class DataElementMarshallerSpec extends AbstractIntegrationSpec{
         def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
 
         //register custom json Marshallers
-        springContext.getBean('customObjectMarshallers').register()
+        springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
 
         loadFixtures()
 

@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util.marshalling
 
-class CustomObjectMarshallers {
+class ModelCatalogueCorePluginCustomObjectMarshallers {
 
     List<AbstractMarshallers> marshallers = []
 
