@@ -14,7 +14,7 @@ class BootStrap {
         environments {
             development {
                 importService.importData()
-                domainModellerService.modelDomains()
+                //domainModellerService.modelDomains()
             }
         }
 

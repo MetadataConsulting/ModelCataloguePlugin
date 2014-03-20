@@ -12,7 +12,8 @@ beans = {
                             new ModelMarshaller(),
                             new RelationshipMarshallers(),
                             new RelationshipsMarshaller(),
-                            new ValueDomainMarshaller()
+                            new ValueDomainMarshaller(),
+                            new ExtensionValueMarshaller()
                 ]
     }
 }
