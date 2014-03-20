@@ -1,8 +1,9 @@
 describe "mc.core.ui.decoratedListTable", ->
 
   beforeEach module 'mc.core.catalogueElementResource'
+  beforeEach module 'mc.core.catalogueElementEnhancer'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
-  beforeEach module 'mc.core.ui.decoratedListTable'
+  beforeEach module 'mc.core.ui.bs.decoratedListTable'
 
   it "element get compiled",  inject ($compile, $rootScope, $httpBackend, modelCatalogueApiRoot, catalogueElementResource) ->
     $httpBackend.when("GET", "#{modelCatalogueApiRoot}/valueDomain").respond(fixtures.valueDomain.list2)
@@ -93,4 +94,54 @@ describe "mc.core.ui.decoratedListTable", ->
     expect(element.find('thead tr th.dl-table-header-cell').length).toBe(2)
     expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(2)
     expect(element.find('thead tr th.dl-table-header-cell:first-child').text()).toBe('Name')
+
+
+    $rootScope.selection = []
+
+    element = $compile('''
+    <decorated-list list="muList" selection="selection"></decorated-list>
+    ''')($rootScope)
+    $rootScope.$digest()
+
+    expect(element.find('thead tr th:first-child.dl-table-select-all-cell.col-md-1').length).toBe(1)
+    expect(element.find('tbody tr:first-child td:first-child.dl-table-select-item-cell').length).toBe(1)
+
+    element.find('tbody tr:first-child td:first-child.dl-table-select-item-cell input').click()
+    $rootScope.$digest()
+
+    expect($rootScope.selection.length).toBe(1)
+
+    element.find('thead tr th:first-child.dl-table-select-all-cell input').click()
+    $rootScope.$digest()
+
+
+    expect($rootScope.selection.length).toBe(5)
+
+    element.find('thead tr th:first-child.dl-table-select-all-cell input').click()
+    $rootScope.$digest()
+
+
+    expect($rootScope.selection.length).toBe(0)
+
+    element = $compile('''
+    <decorated-list list="muList" selection="selection"></decorated-list>
+    ''')($rootScope)
+    $rootScope.$digest()
+
+    event = null
+    $rootScope.$on 'showCatalogueElement', (_event_) -> event = _event_
+
+    expect(event).toBeNull()
+
+    $rootScope.$digest()
+    expect(event).toBeNull()
+
+    element.find('tbody tr:first-child').click()
+
+    $rootScope.$digest()
+
+    expect(event).not.toBeNull()
+
+
+
 

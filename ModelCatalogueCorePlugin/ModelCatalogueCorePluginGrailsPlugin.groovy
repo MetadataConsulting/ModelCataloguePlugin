@@ -1,9 +1,8 @@
-import org.modelcatalogue.core.DomainModellerService
 import org.modelcatalogue.core.util.marshalling.*
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
-    def version = "0.0.2"
+    def version = "0.1-alpha1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging
@@ -23,10 +22,12 @@ Model catalogue core plugin (metadata registry)
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/model-catalogue-core-plugin"
 
+    def packaging = "binary"
+
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = "APACHE"
+    def license = "MIT"
 
     // Details of company behind the plugin (if there is one)
 //    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]

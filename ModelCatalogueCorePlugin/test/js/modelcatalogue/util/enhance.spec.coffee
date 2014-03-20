@@ -38,6 +38,9 @@ describe "mc.util.enhance", ->
     expect(result.hello).toBe("World")
     expect(result.world).toBe("Hello")
     expect(result.enhanced).toBeTruthy()
+    expect(result.__enhancedBy).toEqual(['greeter'])
+    expect(enhance.isEnhancedBy(result, 'greeter')).toBeTruthy()
+    expect(enhance.isEnhancedBy(result, 'meeter')).toBeFalsy()
 
   it "deep enhances returned lists on success when enhancer condition met", ->
     result  = enhance [{hello: "World", world: "Hello"}]

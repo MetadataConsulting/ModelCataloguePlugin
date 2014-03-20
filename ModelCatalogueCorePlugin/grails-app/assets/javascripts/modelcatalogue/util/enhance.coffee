@@ -34,7 +34,11 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
 
       # enhance current object
       for enhancer in enhancers when enhancer.condition(result)
+        enhancedBy = result.__enhancedBy ? []
+        continue if enhancer.name in enhancedBy
+        enhancedBy.push(enhancer.name)
         result = enhancer.enhancer(result)
+        result.__enhancedBy = enhancedBy
 
       # and return enhanced value
       result
@@ -55,6 +59,12 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
     ###
     enhance.getEnhancer = (name) ->
       return enhancer.enhancer for enhancer in enhancers when enhancer.name == name
+
+    ###
+      Returns true if enhanced by enhancer of given name
+    ###
+    enhance.isEnhancedBy = (object, name) ->
+      name in (object?.__enhancedBy ? [])
 
 
     enhance

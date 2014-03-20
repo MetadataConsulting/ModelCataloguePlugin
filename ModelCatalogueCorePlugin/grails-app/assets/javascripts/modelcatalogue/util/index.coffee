@@ -3,7 +3,7 @@
 #= require enhance
 #= require names
 
-angular.module 'mc.core', [
+angular.module 'mc.util', [
   # list of modules
   'mc.util.enhance'
   'mc.util.rest'
