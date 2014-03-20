@@ -28,6 +28,7 @@ describe "mc.util.enhance", ->
     expect(result.hello).toBeDefined()
     expect(result.hello).toBe("world")
     expect(result.enhanced).toBeUndefined()
+    expect(enhance.isEnhanced(result)).toBeFalsy()
 
 
 

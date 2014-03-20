@@ -8,6 +8,11 @@ class DataTypeMarshaller extends CatalogueElementMarshallers {
         super(DataType)
     }
 
+    DataTypeMarshaller(Class<? extends DataType> cls) {
+        super(cls)
+    }
+
+
 }
 
 

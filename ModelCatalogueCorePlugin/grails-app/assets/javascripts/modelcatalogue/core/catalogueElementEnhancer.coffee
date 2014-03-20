@@ -4,6 +4,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['mc.util.rest', 'mc.util.enh
     (element, enhance = @enhance) ->
       class CatalogueElement
         constructor: (element) ->
+          angular.extend(@, element)
+
           @defaultExcludes = ['id','elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
           @getUpdatePayload = () ->
             payload = {}
@@ -24,12 +26,12 @@ angular.module('mc.core.catalogueElementEnhancer', ['mc.util.rest', 'mc.util.enh
             unless name in @defaultExcludes
               @updatableProperties.push(name)
 
-          angular.extend(@, element)
+          self = @
 
-        delete:    () -> enhance rest method: 'DELETE', url: "#{modelCatalogueApiRoot}#{@link}"
-        validate:  () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{@link}/validate", data: @getUpdatePayload()
-        update:    () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{@link}", data: @getUpdatePayload()
-        show:      () -> $rootScope.$broadcast('showCatalogueElement', @) ; @
+          self['delete']  = () -> enhance rest method: 'DELETE', url: "#{modelCatalogueApiRoot}#{self.link}"
+          self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
+          self.update         = () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload()
+          self.show           = () -> $rootScope.$broadcast('showCatalogueElement', self) ; self
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)
       # wrap original element

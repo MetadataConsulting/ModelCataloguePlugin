@@ -66,6 +66,11 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
     enhance.isEnhancedBy = (object, name) ->
       name in (object?.__enhancedBy ? [])
 
+    ###
+      Returns true if enhanced by any enhancer
+    ###
+    enhance.isEnhanced = (object) ->
+      object?.__enhancedBy?
 
     enhance
   ]
