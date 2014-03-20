@@ -53,6 +53,7 @@
                 <input type="text" class="form-control" id="expression" ng-model="expression"
                        placeholder="Expression returning list promise">
                 <span class="help-block">
+                    <a ng-click="expression = indicator         ; show() ; columns = relationshipsColumns()">Show Indicator</a> ~
                     <a ng-click="expression = listResource      ; show() ; columns = valueDomainColumns()">Get Resource List</a> ~
                     <a ng-click="expression = listRelTypes      ; show() ; columns = relationshipTypeColumns()">Get Relationship Types List</a> ~
                     <a ng-click="expression = searchSomething   ; show() ; columns = idAndNameColumns()">Global Search</a> ~
@@ -64,12 +65,16 @@
         </form>
     </div>
 
-    <div>
+    <div ng-show="element">
+        <catalogue-element-view element="element"></catalogue-element-view>
+    </div>
+
+    <div ng-show="!list.empty">
         <h2>Decorated List Widget</h2>
         <decorated-list list="list" columns="columns" selection="selection"></decorated-list>
     </div>
 
-    <div>
+    <div ng-show="!list.empty">
         <h2>Configure Columns</h2>
         <p>
             <a ng-click="expression = listResource      ; show() ; columns = valueDomainColumns()">Value Domain</a> ~

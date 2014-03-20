@@ -99,7 +99,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     @Override
     List<AbstractMarshallers> getMarshallers() {
-        [new ValueDomainMarshaller(), new DataElementMarshaller(), new MappingsMarshaller(), new MappingMarshallers(), new MeasurementUnitMarshallers()]
+        [new ValueDomainMarshaller(), new DataElementMarshaller(), new DataTypeMarshaller(), new MappingsMarshaller(), new MappingMarshallers(), new MeasurementUnitMarshallers()]
     }
 
     @Unroll

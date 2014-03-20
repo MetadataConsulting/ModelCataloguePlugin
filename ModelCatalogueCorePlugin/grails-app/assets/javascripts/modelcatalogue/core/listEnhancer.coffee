@@ -1,7 +1,7 @@
 angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
   condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
   factory   = ['$q', 'modelCatalogueApiRoot', 'rest', ($q, modelCatalogueApiRoot, rest) ->
-    (list, enhance = @enhance) ->
+    listEnhancer = (list, enhance = @enhance) ->
       class ListDecorator
         constructor: (list) ->
           angular.extend(@, list)
@@ -59,7 +59,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             theLink   = "#{modelCatalogueApiRoot}#{@previous.url ? @next.url}"
 
             if theLink.indexOf('offset=') >= 0
-              theLink = theLink.replace /offset=(\d+)/, (originalOffset) => "offset=#{theOffset}"
+              theLink = theLink.replace /offset=(\d+)/, () => "offset=#{theOffset}"
             else if theLink.indexOf('?') >= 0
               theLink = "theLink&offset=#{theOffset}"
             else
@@ -70,6 +70,18 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
 
             # return new list decorator
       new ListDecorator(list)
+
+    listEnhancer.createEmptyList = () -> {
+      list: []
+      next: {size: 0}
+      previous: {size: 0}
+      total: 0
+      empty: true
+      source: 'catalogue-element-view'
+    }
+
+    listEnhancer
+
   ]
 
   enhanceProvider.registerEnhancerFactory('list', condition, factory)

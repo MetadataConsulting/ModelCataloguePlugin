@@ -145,3 +145,11 @@ describe "mc.core.listEnhancer", ->
     expect(gotoResult.currentPage).toBe(2)
     expect(gotoResult.list).toBeDefined()
     expect(gotoResult.list.length).toBe(2)
+
+    listEnhancer = enhance.getEnhancer('list')
+    emptyList = listEnhancer.createEmptyList()
+    expect(emptyList.total).toBe(0)
+    expect(emptyList.list).toEqual([])
+    expect(emptyList.next).toEqual(size: 0)
+    expect(emptyList.previous).toEqual(size: 0)
+    expect(emptyList.empty).toBeTruthy()

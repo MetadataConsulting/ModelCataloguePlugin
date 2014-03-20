@@ -5,16 +5,29 @@
 #= require modelcatalogue/core/index
 #= require modelcatalogue/core/ui/index
 #= require modelcatalogue/core/ui/bs/index
+#= require modelcatalogue/core/ui/bs/elementViews/index
 
 angular.module('demo', [
   'demo.config'
   'mc.core.ui.bs'
+  'ui.bootstrap'
+
 ]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q)->
+  emptyList =
+    list: []
+    next: {size: 0}
+    previous: {size: 0}
+    total: 0
+    empty: true
+    source: 'demo'
+
+
   $scope.listResource     = """resource("dataElement").list()"""
   $scope.listRelTypes     = """resource("relationshipType").list()"""
   $scope.searchSomething  = """search("patient")"""
   $scope.searchModel      = """resource("model").search("patient")"""
   $scope.outgoing         = """resource("dataElement").list() >>> $r.list[0].outgoingRelationships()"""
+  $scope.indicator        = """resource("dataElement").search("NHS_NUMBER_STATUS_INDICATOR_CODE") >>> $r.list[0]"""
 
   $scope.valueDomainColumns = () -> [
     {header: 'Code', value: 'code', classes: 'col-md-2'}
@@ -40,12 +53,12 @@ angular.module('demo', [
   $scope.relationshipsColumns = () -> [
 
     {header: 'Relation',    value: 'type[direction]', classes: 'col-md-6'}
-    {header: 'Destinaiton', value: 'relation.dataType.name + ": " + relation.name', classes: 'col-md-6'}
+    {header: 'Destinaiton', value: 'relation.name', classes: 'col-md-6'}
   ]
 
   $scope.resource         = catalogueElementResource
   $scope.search           = modelCatalogueSearch
-  $scope.expression       = $scope.listResource
+  $scope.expression       = $scope.indicator
 
   $scope.show = () ->
     $log.info "Evaluating: #{$scope.expression}"
@@ -53,8 +66,12 @@ angular.module('demo', [
       $q.when($scope.$eval($scope.expression)).then (result) ->
         if result?.size?
           $scope.list = result
+          $scope.element = null
+        if result?.elementType?
+          $scope.list = emptyList
+          $scope.element = result
         else
-          $log.info "Instead of list got: ", result
+          $log.info "Instead of list or element got: ", result
     else
       parts     = $scope.expression?.split /\s*>>>\s*/g
       lastPart  = parts[0]
@@ -68,13 +85,17 @@ angular.module('demo', [
         $log.info 'expression in chain {{', lastPart, '}} resolved to ', result
         if result?.size?
           $scope.list = result
+          $scope.element = null
+        if result?.elementType?
+          $scope.list = emptyList
+          $scope.element = result
         else
           $log.info "Instead of list got: ", result
 
 
   $scope.selection = []
 
-  $scope.columns = $scope.valueDomainColumns()
+  $scope.columns = $scope.relationshipsColumns()
 
   $scope.removeColumn = (index) ->
     return if $scope.columns.length <= 1
@@ -85,4 +106,7 @@ angular.module('demo', [
 
 
   $scope.show()
+
+  $scope.$on 'showCatalogueElement', (event, element) ->
+    $scope.element = element
 ])

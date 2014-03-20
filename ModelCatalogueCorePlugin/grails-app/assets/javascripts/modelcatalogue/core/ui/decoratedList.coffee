@@ -5,10 +5,19 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
       list: '='
       columns: '=?'
       selection: '=?'
+      itemClick: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
     controller: ['$scope' , ($scope) ->
+      emptyList =
+        list: []
+        next: {size: 0}
+        previous: {size: 0}
+        total: 0
+        empty: true
+        source: 'directive'
+
       updatePages = (list) ->
         if list.total is 0
           $scope.pages = []
@@ -72,11 +81,14 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
         {header: 'Descripton', value: 'description', classes: 'col-md-8'}
       ]
 
-      $scope.list ?=
-        list: []
-        next: {size: 0}
-        previous: {size: 0}
-        total: 0
+      $scope.itemClick ?= (item) ->
+        if item.show? and angular.isFunction(item.show)
+          item.show()
+        else
+          item._selected = !item._selected
+
+
+      $scope.list ?= emptyList
 
 
       $scope.$watch 'list', updatePages

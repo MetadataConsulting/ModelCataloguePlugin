@@ -1,6 +1,7 @@
 describe "mc.core.ui.decoratedListTable", ->
 
   beforeEach module 'mc.core.catalogueElementResource'
+  beforeEach module 'mc.core.catalogueElementEnhancer'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
   beforeEach module 'mc.core.ui.bs.decoratedListTable'
 
@@ -121,5 +122,26 @@ describe "mc.core.ui.decoratedListTable", ->
 
 
     expect($rootScope.selection.length).toBe(0)
+
+    element = $compile('''
+    <decorated-list list="muList" selection="selection"></decorated-list>
+    ''')($rootScope)
+    $rootScope.$digest()
+
+    event = null
+    $rootScope.$on 'showCatalogueElement', (_event_) -> event = _event_
+
+    expect(event).toBeNull()
+
+    $rootScope.$digest()
+    expect(event).toBeNull()
+
+    element.find('tbody tr:first-child').click()
+
+    $rootScope.$digest()
+
+    expect(event).not.toBeNull()
+
+
 
 

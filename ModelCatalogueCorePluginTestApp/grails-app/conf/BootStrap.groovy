@@ -1,3 +1,4 @@
+import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.RelationshipType
 
 class BootStrap {
@@ -8,10 +9,11 @@ class BootStrap {
     def init = { servletContext ->
 
         RelationshipType.initDefaultRelationshipTypes()
+        DataType.initDefaultDataTypes()
 
         environments {
             development {
-                //importService.importData()
+                importService.importData()
                 domainModellerService.modelDomains()
             }
         }
