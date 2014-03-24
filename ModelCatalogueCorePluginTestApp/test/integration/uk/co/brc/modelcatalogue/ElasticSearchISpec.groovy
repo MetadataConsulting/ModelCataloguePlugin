@@ -13,6 +13,7 @@ import org.modelcatalogue.core.MeasurementUnitController
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ModelController
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeController
 import org.modelcatalogue.core.SearchController
@@ -51,9 +52,9 @@ class ElasticSearchISpec extends IntegrationSpec{
         def cd = ConceptualDomain.findByName("public libraries")
         def mod = Model.findByName("book")
 
-        Relationship.link(cd, mod, RelationshipType.findByName("context"))
+        RelationshipService.link(cd, mod, RelationshipType.findByName("context"))
    //     Relationship.link(de, vd, RelationshipType.findByName("instantiation"))
-        Relationship.link(mod, de, RelationshipType.findByName("containment"))
+        RelationshipService.link(mod, de, RelationshipType.findByName("containment"))
 
         elasticSearchService.index()
     }
@@ -117,9 +118,9 @@ class ElasticSearchISpec extends IntegrationSpec{
         where:
 
         no| className           | controller                          | searchString                    | response  | expectedResultName        | total
-        1 | "DataType"          | new DataTypeController()            | "boolean"                       | "json"    | "boolean"                 | 1
+        1 | "DataType"          | new DataTypeController()            | "boolean"                       | "json"    | "boolean"                 | 2
         2 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "json"    | "boolean"                 | 1
-        3 | "DataType"          | new DataTypeController()            | "boolean"                       | "xml"     | "boolean"                 | 1
+        3 | "DataType"          | new DataTypeController()            | "boolean"                       | "xml"     | "boolean"                 | 2
         4 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "xml"     | "boolean"                 | 1
         5 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "json"    | "DE_author1"              | 1
         6 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "xml"     | "DE_author1"              | 1

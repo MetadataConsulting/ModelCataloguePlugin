@@ -59,7 +59,7 @@ class DataElementMarshallerSpec extends AbstractIntegrationSpec{
 
         when:
 
-        Relationship.unlink(de1, de2, rt)
+        RelationshipService.unlink(de1, de2, rt)
 
         then:
 
