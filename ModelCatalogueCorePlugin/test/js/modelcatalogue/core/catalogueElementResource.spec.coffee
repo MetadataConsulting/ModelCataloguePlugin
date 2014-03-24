@@ -457,7 +457,7 @@ describe "mc.core.catalogueElementResource", ->
           expect(error.data.errors[0].message).toBe(fixtures.valueDomain.saveErrors.errors[0].message)
 
     describe "can search resource", ->
-      it "works", ->
+      it "works", inject ($httpBackend) ->
         $httpBackend
         .when("GET", "#{modelCatalogueApiRoot}/valueDomain/search?search=foo")
         .respond(fixtures.valueDomain.searchElement15)
@@ -482,4 +482,29 @@ describe "mc.core.catalogueElementResource", ->
         expect(result.offset).toBe(0)
         expect(result.list).toBeDefined()
         expect(result.list.length).toBe(1)
+      it "works with additional params", inject ($httpBackend) ->
+        $httpBackend
+        .when("GET", "#{modelCatalogueApiRoot}/valueDomain/search?offset=10&search=foo")
+        .respond(angular.extend(angular.copy(fixtures.valueDomain.searchElement15), {total:0, offset: 10, list: []}))
+
+        result = null
+        error  = null
+
+        valueDomains.search('foo', {offset: 10}).then( (_result_) ->
+          result = _result_
+        , (_error_) ->
+          error = _error_
+        )
+
+        expect(result).toBeNull()
+
+        $httpBackend.flush()
+
+        expect(result).toBeDefined()
+        expect(result.total).toBe(0)
+        expect(result.page).toBe(10)
+        expect(result.size).toBe(1)
+        expect(result.offset).toBe(10)
+        expect(result.list).toBeDefined()
+        expect(result.list.length).toBe(0)
 

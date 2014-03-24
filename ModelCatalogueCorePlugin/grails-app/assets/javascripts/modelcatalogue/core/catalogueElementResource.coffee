@@ -31,8 +31,9 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
       list: (params = {}) ->
         enhance rest method: 'GET', url: @getIndexPath(), params: params
 
-      search: (query) ->
-        enhance rest method: 'GET', url: "#{@getIndexPath()}/search", params: {search: query}
+      search: (query, additionalParams = {}) ->
+        params = angular.extend({search: query}, additionalParams)
+        enhance rest method: 'GET', url: "#{@getIndexPath()}/search", params: params
 
     (pathName) -> new CatalogueElementResource(pathName)
   ]
