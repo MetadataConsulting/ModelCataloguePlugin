@@ -76,7 +76,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
       $scope.hasNext        = -> hasNextOrPrev($scope.list.next)
 
       $scope.columns ?= [
-        {header: 'Name', value: 'name', classes: 'col-md-4'}
+        {header: 'Name', value: 'name', classes: 'col-md-4', show: true}
         {header: 'Descripton', value: 'description', classes: 'col-md-8'}
       ]
 
