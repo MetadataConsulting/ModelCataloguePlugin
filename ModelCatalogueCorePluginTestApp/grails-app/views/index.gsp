@@ -53,12 +53,12 @@
                 <input type="text" class="form-control" id="expression" ng-model="expression"
                        placeholder="Expression returning list promise">
                 <span class="help-block">
-                    <a ng-click="expression = indicator         ; show() ; columns = relationshipsColumns()">Show Indicator</a> ~
-                    <a ng-click="expression = listResource      ; show() ; columns = valueDomainColumns()">Get Resource List</a> ~
-                    <a ng-click="expression = listRelTypes      ; show() ; columns = relationshipTypeColumns()">Get Relationship Types List</a> ~
-                    <a ng-click="expression = searchSomething   ; show() ; columns = idAndNameColumns()">Global Search</a> ~
-                    <a ng-click="expression = searchModel       ; show() ; columns = idAndNameColumns()">Search Model</a> ~
-                    <a ng-click="expression = outgoing          ; show() ; columns = relationshipsColumns()">Outgoing Relationship</a>
+                    <a ng-click="expression = indicator         ; show()">Show Indicator</a> ~
+                    <a ng-click="expression = listResource      ; show()">Get Resource List</a> ~
+                    <a ng-click="expression = listRelTypes      ; show()">Get Relationship Types List</a> ~
+                    <a ng-click="expression = searchSomething   ; show()">Global Search</a> ~
+                    <a ng-click="expression = searchModel       ; show()">Search Model</a> ~
+                    <a ng-click="expression = outgoing          ; show()">Outgoing Relationship</a>
                 </span>
             </div>
             <button type="submit" class="btn btn-primary">Show</button>
@@ -76,12 +76,6 @@
 
     <div ng-show="!list.empty">
         <h2>Configure Columns</h2>
-        <p>
-            <a ng-click="expression = listResource      ; show() ; columns = valueDomainColumns()">Value Domain</a> ~
-            <a ng-click="expression = listRelTypes      ; show() ; columns = relationshipTypeColumns()">Relationship Type</a> ~
-            <a ng-click="expression = outgoing          ; show() ; columns = relationshipsColumns()">Relationships</a> ~
-            <a ng-click="columns = idAndNameColumns()">Type, ID and Name</a>
-        </p>
         <table class="table">
             <tr ng-show="columns">
                 <th>
@@ -114,6 +108,8 @@
                 </td>
             </tr>
         </table>
+
+        <pre>{{columns | json}}</pre>
 
     </div>
 </div>

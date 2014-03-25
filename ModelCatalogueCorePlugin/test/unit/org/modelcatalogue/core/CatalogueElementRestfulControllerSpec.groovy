@@ -640,8 +640,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
         checkProperty(xml.incomingRelationships.@count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingRelationships")
         checkProperty(xml.incomingRelationships.@link, "/${resourceName}/${item.id}/incoming", "incomingRelationships")
+        checkProperty(xml.incomingRelationships.@itemType, "relationship", "itemType")
         checkProperty(xml.outgoingRelationships.@count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingRelationships")
         checkProperty(xml.outgoingRelationships.@link, "/${resourceName}/${item.id}/outgoing", "outgoingRelationships")
+        checkProperty(xml.outgoingRelationships.@itemType, "relationship", "itemType")
 
         return true
     }
@@ -655,8 +657,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(inputItem.class.simpleName), "elementTypeName")
         checkProperty(xml.incomingRelationships.@count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingRelationships")
         checkProperty(xml.incomingRelationships.@link, "/${resourceName}/${outputItem.id}/incoming", "incomingRelationships")
+        checkProperty(xml.incomingRelationships.@itemType, "relationship", "itemType")
         checkProperty(xml.outgoingRelationships.@count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingRelationships")
         checkProperty(xml.outgoingRelationships.@link, "/${resourceName}/${outputItem.id}/outgoing", "outgoingRelationships")
+        checkProperty(xml.outgoingRelationships.@itemType, "relationship", "itemType")
 
         return true
     }
@@ -671,8 +675,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         checkProperty(json.elementTypeName , GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
         checkProperty(json.outgoingRelationships.count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingCount")
         checkProperty(json.outgoingRelationships.link, "/${resourceName}/${item.id}/outgoing", "outgoingLink")
+        checkProperty(json.outgoingRelationships.itemType, "relationship", "outgoingItemType")
         checkProperty(json.incomingRelationships.count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingCount")
         checkProperty(json.incomingRelationships.link, "/${resourceName}/${item.id}/incoming", "incomingLink")
+        checkProperty(json.incomingRelationships.itemType, "relationship", "incomingItemType")
         return true
     }
 

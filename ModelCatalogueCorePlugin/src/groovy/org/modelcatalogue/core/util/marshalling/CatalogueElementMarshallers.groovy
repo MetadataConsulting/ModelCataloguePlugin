@@ -24,8 +24,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 elementType: el.class.name,
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
-                outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"],
-                incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"]
+                outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, itemType: 'relationship', link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"],
+                incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, itemType: 'relationship', link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"]
         ]
 
         def relationships   = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
@@ -41,8 +41,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         xml.build {
             name el.name
             description el.description
-            outgoingRelationships count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"
-            incomingRelationships count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"
+            outgoingRelationships count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, itemType: 'relationship', link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"
+            incomingRelationships count: el.incomingRelationships ? el.incomingRelationships.size() : 0, itemType: 'relationship', link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"
         }
 
         def relationships   = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
@@ -61,14 +61,14 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     private Closure addRelationsJson(String incomingOrOutgoing, CatalogueElement el, Map ret) {
         { String relationshipType, String name ->
-            ret[name] = [count: el."count${name.capitalize()}"(), link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
+            ret[name] = [count: el."count${name.capitalize()}"(), itemType: 'relationship', link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
         }
     }
 
     private Closure addRelationsXml(String incomingOrOutgoing, CatalogueElement el, XML xml) {
         { String relationshipType, String name ->
             xml. build {
-                "${name}" count: el."count${name.capitalize()}"(), link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"
+                "${name}" count: el."count${name.capitalize()}"(), itemType: 'relationship', link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"
             }
         }
     }

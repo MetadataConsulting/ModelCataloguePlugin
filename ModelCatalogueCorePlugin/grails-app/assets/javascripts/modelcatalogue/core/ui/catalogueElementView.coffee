@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names']).directive 'catalogueElementView',  [-> {
+angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.core.ui.columns']).directive 'catalogueElementView',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -6,7 +6,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', 'enhance', 'names' , ($scope, $log, $filter, enhance, names) ->
+    controller: ['$scope', '$log', '$filter', 'enhance', 'names', 'columns' , ($scope, $log, $filter, enhance, names, columns) ->
       propExludes     = ['version', 'name', 'description']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -18,33 +18,17 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           size++
         size
 
-      relationshipsColumns = [
-            {header: 'Relation',        value: 'type[direction]',                               classes: 'col-md-3'}
-            {header: 'Destination',     value: "relation.name",                                 classes: 'col-md-6', show: "relation.show()"}
-            {header: 'Identification',  value: "relation.elementTypeName + ': ' + relation.id", classes: 'col-md-3', show: "relation.show()"}
-          ]
-
-      mappingColumns = [
-        {header: 'Destination',     value: "destination.name",                                    classes: 'col-md-4', show: 'destination.show()'}
-        {header: 'Mapping',         value: 'mapping',                                             classes: 'col-md-5'}
-        {header: 'Identification',  value: "destination.elementTypeName + ': ' + destination.id", classes: 'col-md-3', show: 'destination.show()'}
-      ]
-
       onElementUpdate = (element) ->
         tabs = []
 
         for name, fn of element when enhance.isEnhancedBy(fn, 'listReference')
           tabDefintion =
             heading:  names.getNaturalName(name)
-            value:    listEnhancer.createEmptyList()
+            value:    listEnhancer.createEmptyList(fn.itemType)
             disabled: fn.total == 0
             loader:   fn
             type:     'decorated-list'
-
-          if name == 'mappings'
-            tabDefintion.columns = mappingColumns
-          else
-            tabDefintion.columns = relationshipsColumns
+            columns:   columns(fn.itemType)
 
           tabs.push tabDefintion
 
@@ -110,6 +94,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return if not tab.loader?
         if !tab.disabled and tab.value.empty
           tab.loader().then (result) ->
+            tab.columns = columns(result.itemType)
             tab.value = result
 
 

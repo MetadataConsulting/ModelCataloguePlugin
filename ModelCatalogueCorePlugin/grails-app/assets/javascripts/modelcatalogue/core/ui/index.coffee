@@ -3,6 +3,7 @@
 #= require decoratedList
 #= require catalogueElementView
 #= require propertiesPane
+#= require columns
 
 angular.module('mc.core.ui', [
   # depends on
@@ -11,4 +12,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.decoratedList'
   'mc.core.ui.catalogueElementView'
   'mc.core.ui.propertiesPane'
+  'mc.core.ui.columns'
 ])

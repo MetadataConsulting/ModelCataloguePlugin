@@ -71,13 +71,14 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             # return new list decorator
       new ListDecorator(list)
 
-    listEnhancer.createEmptyList = () -> {
+    listEnhancer.createEmptyList = (itemType = null) -> {
       list: []
       next: {size: 0}
       previous: {size: 0}
       total: 0
       empty: true
       source: 'catalogue-element-view'
+      itemType: itemType
     }
 
     listEnhancer

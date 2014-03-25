@@ -147,9 +147,10 @@ describe "mc.core.listEnhancer", ->
     expect(gotoResult.list.length).toBe(2)
 
     listEnhancer = enhance.getEnhancer('list')
-    emptyList = listEnhancer.createEmptyList()
+    emptyList = listEnhancer.createEmptyList('relationships')
     expect(emptyList.total).toBe(0)
     expect(emptyList.list).toEqual([])
     expect(emptyList.next).toEqual(size: 0)
     expect(emptyList.previous).toEqual(size: 0)
     expect(emptyList.empty).toBeTruthy()
+    expect(emptyList.itemType).toBe('relationships')
