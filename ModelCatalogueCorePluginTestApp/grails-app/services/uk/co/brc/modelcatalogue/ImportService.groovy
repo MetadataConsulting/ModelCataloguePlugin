@@ -45,14 +45,14 @@ class ImportService {
                                 dataType: dataType,
                                 description: tokens[5]).save(failOnError: true);
 
-                        vd.addToIncludedIn(cd)
+                        assert vd.addToIncludedIn(cd)
 
                         def de = new DataElement(name: tokens[3],
                                 description: tokens[4], code: tokens[0])
                         //dataElementConcept: models,
                         //extension: ext).save(failOnError: true)
 
-                        de.save()
+                        de.save(failOnError: true)
 
                         de.ext.put("NHIC_Identifier:", tokens[0].take(255));
                         de.ext.put("Link_to_existing definition:", tokens[6].take(255));
@@ -69,7 +69,10 @@ class ImportService {
                         de.ext.put("E2", tokens[17].take(255))
 
 
-                        de.addToInstantiatedBy(vd)
+                        assert de.addToInstantiatedBy(vd)
+
+                        de.save(failOnError: true)
+                        vd.save(failOnError: true)
 
                         //de.addToDataElementValueDomains(vd);
                         //de.save();

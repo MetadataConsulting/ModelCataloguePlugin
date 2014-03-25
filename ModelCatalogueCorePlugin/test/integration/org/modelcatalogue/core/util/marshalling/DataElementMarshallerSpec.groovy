@@ -2,7 +2,10 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.AbstractIntegrationSpec
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.RelationshipService
+import org.modelcatalogue.core.RelationshipType
 import org.springframework.web.context.support.WebApplicationContextUtils
 import spock.lang.Shared
 
@@ -59,7 +62,7 @@ class DataElementMarshallerSpec extends AbstractIntegrationSpec{
 
         when:
 
-        Relationship.unlink(de1, de2, rt)
+        new RelationshipService().unlink(de1, de2, rt)
 
         then:
 

@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.marshalling.*
 import spock.lang.Unroll
 
@@ -18,6 +19,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
     RelationshipType type
 
     def setup() {
+        CatalogueElementDynamicHelper.addShortcuts(ValueDomain, DataElement, DataType, MeasurementUnit)
         controller.relationshipService = new RelationshipService()
         controller.mappingService = new MappingService()
         fixturesLoader.load('measurementUnits/MU_kph', 'dataElements/DE_author', 'measurementUnits/MU_milesPerHour', 'dataTypes/DT_integer', 'relationshipTypes/RT_relationship')

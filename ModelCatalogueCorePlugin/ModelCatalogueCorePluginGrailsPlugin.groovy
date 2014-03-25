@@ -1,3 +1,5 @@
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.marshalling.*
 
 class ModelCatalogueCorePluginGrailsPlugin {
@@ -70,6 +72,11 @@ Model catalogue core plugin (metadata registry)
 
     def doWithDynamicMethods = { ctx ->
         // TODO Implement registering dynamic methods to classes (optional)
+        ctx.grailsApplication.domainClasses.each {
+            if (CatalogueElement.isAssignableFrom(it.clazz)) {
+                CatalogueElementDynamicHelper.addShortcuts(it.clazz)
+            }
+        }
     }
 
     def doWithApplicationContext = { ctx ->

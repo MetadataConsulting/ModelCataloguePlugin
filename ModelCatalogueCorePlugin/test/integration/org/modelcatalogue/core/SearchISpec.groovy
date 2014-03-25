@@ -17,7 +17,7 @@ class SearchISpec extends AbstractIntegrationSpec{
 
 
     @Shared
-    def grailsApplication, elasticSearchService
+    def grailsApplication
 
     def setupSpec(){
         loadFixtures()
@@ -32,8 +32,6 @@ class SearchISpec extends AbstractIntegrationSpec{
         relationshipService.link(cd, mod, RelationshipType.findByName("context"))
         relationshipService.link(de, vd, RelationshipType.findByName("instantiation"))
         relationshipService.link(mod, de, RelationshipType.findByName("containment"))
-
-        elasticSearchService.index()
     }
 
     def cleanup(){
