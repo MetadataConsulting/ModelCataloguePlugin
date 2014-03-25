@@ -5,4 +5,7 @@ package org.modelcatalogue.core.util
  */
 class Mappings extends ListWrapper {
 
+    Mappings() {
+        itemType = "mapping"
+    }
 }

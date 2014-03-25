@@ -4,4 +4,8 @@ package org.modelcatalogue.core.util
  */
 class Relationships extends ListWrapper {
     String direction
+
+    Relationships() {
+        itemType = 'relationship'
+    }
 }

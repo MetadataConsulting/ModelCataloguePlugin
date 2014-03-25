@@ -147,6 +147,7 @@ class SearchISpec extends AbstractIntegrationSpec{
         String list = "list${no}"
 
 
+
         recorder.recordResult list, json
 
         then:

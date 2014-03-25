@@ -123,6 +123,8 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
         then:
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
+        json.listType == "mappings"
+        json.itemType == "mapping"
 
         when:
         def item  = json.list[0]

@@ -5,6 +5,7 @@ package org.modelcatalogue.core.util
 abstract class ListWrapper {
     String next
     String previous
+    String itemType
     int total
     int page
     int offset

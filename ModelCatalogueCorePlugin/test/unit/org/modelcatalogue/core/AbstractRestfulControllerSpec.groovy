@@ -112,6 +112,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification implements
         json.list.size() == size
         json.next == next
         json.previous == previous
+        json.listType == "elements"
+        json.itemType == resourceName
 
 
 

@@ -383,6 +383,8 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
 
 
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
+        assert json.listType == "relationships"
+        assert json.itemType == "relationship"
 
         def item = json.list[0]
 
