@@ -83,6 +83,18 @@ abstract class CatalogueElement {
         [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
     }
 
+    int countIncomingRelationsByType(RelationshipType type) {
+        Relationship.countByDestinationAndRelationshipType(this, type)
+    }
+
+    int countOutgoingRelationsByType(RelationshipType type) {
+        Relationship.countBySourceAndRelationshipType(this, type)
+    }
+
+    int countRelationsByType(RelationshipType type) {
+        countOutgoingRelationsByType(type) + countIncomingRelationsByType(type)
+    }
+
 
     Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
         relationshipService.link(this, destination, type)
@@ -92,11 +104,11 @@ abstract class CatalogueElement {
         relationshipService.link(source, this, type)
     }
 
-    void removeLinkTo(CatalogueElement destination, RelationshipType type) {
+    Relationship removeLinkTo(CatalogueElement destination, RelationshipType type) {
         relationshipService.unlink(this, destination, type)
     }
 
-    void removeLinkFrom(CatalogueElement source, RelationshipType type) {
+    Relationship removeLinkFrom(CatalogueElement source, RelationshipType type) {
         relationshipService.unlink(source, this, type)
     }
 

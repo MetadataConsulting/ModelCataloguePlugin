@@ -31,33 +31,9 @@ class ConceptualDomain extends CatalogueElement {
         except = ['isContextFor', 'includes']
     }
 
-    //CONTEXT
-
-    List/*<Model>*/ getIsContextFor() {
-        getOutgoingRelationsByType(RelationshipType.contextType)
-    }
-
-    Relationship addToIsContextFor(Model model) {
-        createLinkTo(model, RelationshipType.contextType)
-    }
-
-    void removeFromIsContextFor(Model model) {
-        removeLinkTo(model, RelationshipType.contextType)
-    }
-
-    //INCLUSION
-
-    List/*<ValueDomain>*/ getIncludes() {
-        getOutgoingRelationsByType(RelationshipType.inclusionType)
-    }
-
-    Relationship addToIncludes(ValueDomain valueDomain) {
-        createLinkTo(valueDomain, RelationshipType.inclusionType)
-    }
-
-    void removeFromIncludes(ValueDomain valueDomain) {
-        removeLinkTo(valueDomain, RelationshipType.inclusionType)
-    }
+    static relationships = [
+            outgoing: [context: 'isContextFor', inclusion: 'includes']
+    ]
 
 
     String toString() {

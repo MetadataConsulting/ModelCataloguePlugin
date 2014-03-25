@@ -5,6 +5,7 @@ import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.marshalling.ElementsMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse
 abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulControllerSpec {
 
     def setup() {
+        CatalogueElementDynamicHelper.addShortcuts resource
         setupMimeTypes()
         [marshallers, [new RelationshipMarshallers(), new RelationshipsMarshaller(), new ElementsMarshaller()]].flatten().each {
             it.register()

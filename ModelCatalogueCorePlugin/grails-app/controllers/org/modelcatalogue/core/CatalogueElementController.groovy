@@ -15,12 +15,12 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
         super(resource)
     }
 
-    def incoming(Integer max, String typeParam) {
-        relationships(max, typeParam, "Destination", "incoming")
+    def incoming(Integer max, String type) {
+        relationships(max, type, "Destination", "incoming")
     }
 
-    def outgoing(Integer max, String typeParam) {
-        relationships(max, typeParam, "Source", "outgoing")
+    def outgoing(Integer max, String type) {
+        relationships(max, type, "Source", "outgoing")
     }
 
     def addOutgoing(Long id, String type) {

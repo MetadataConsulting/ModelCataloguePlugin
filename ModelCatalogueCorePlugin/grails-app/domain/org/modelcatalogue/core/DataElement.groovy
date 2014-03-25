@@ -14,8 +14,6 @@ class DataElement extends ExtendibleElement {
 
     String code
 
-    static transients = ['containedIn', 'instantiatedBy']
-
     static constraints = {
         code nullable:true, unique:true, maxSize: 255
     }
@@ -28,34 +26,13 @@ class DataElement extends ExtendibleElement {
         code boost:5
         incomingRelationships component: true
         outgoingRelationships component: true
+        except =  ['containedIn', 'instantiatedBy']
     }
 
-    List/*<DataElement>*/ getContainedIn() {
-        getIncomingRelationsByType(RelationshipType.containmentType)
-    }
-
-    Relationship addToContainedIn(Model model) {
-        createLinkFrom(model, RelationshipType.containmentType)
-    }
-
-    void removeFromContainedIn(Model model) {
-        removeLinkFrom(model, RelationshipType.containmentType)
-    }
-
-
-    //INSTANTIATION
-
-    List/*<ValueDomain>*/ getInstantiatedBy() {
-        getOutgoingRelationsByType(RelationshipType.instantiationType)
-    }
-
-    Relationship addToInstantiatedBy(ValueDomain valueDomain) {
-        createLinkTo(valueDomain, RelationshipType.instantiationType)
-    }
-
-    void removeFromInstantiatedBy(ValueDomain valueDomain) {
-        removeLinkTo(valueDomain, RelationshipType.instantiationType)
-    }
+    static relationships = [
+            incoming: [containment: 'containedIn'],
+            outgoing: [instantiation: 'instantiatedBy']
+    ]
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, code: ${code}, version: ${version}, status: ${status}]"
