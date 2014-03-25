@@ -8,7 +8,7 @@ Postconditions: catalogue element is linked to the catalogue element
 Main
 Success Scenario: 
 1. User clicks add (shortcut) relation on the edit catalogue element screen (see UC_3)
-2. User is then presented with elements that fulfil the relationship type constraints i.e. if the linked element must be a value domain 
+2. User is then presented with elements that fulfill the relationship type constraints i.e. if the linked element must be a value domain
 3. User selects the element they want to add as a relation
 4. Relation is added and displayed on edit catalogue element page
 
