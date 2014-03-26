@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.SecuredRuleExecutor
+
 class Mapping {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
@@ -30,17 +32,11 @@ class Mapping {
     }
 
     static boolean validateMapping(String mappingText) {
-        try {
-            GroovyShell shell = new GroovyShell(new Binding(x: 0))
-            shell.evaluate(mappingText)
-            return true
-        } catch (ignore) {
-            return false
-        }
+        new SecuredRuleExecutor(x: 0).validate(mappingText)
     }
 
     static Object mapValue(String mapping, Object value) {
-        new GroovyShell(new Binding(x: value)).evaluate(mapping)
+        new SecuredRuleExecutor(x: value).execute(mapping)
     }
 
     String toString() {
