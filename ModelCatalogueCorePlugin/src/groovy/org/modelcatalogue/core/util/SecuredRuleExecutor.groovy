@@ -1,15 +1,13 @@
 package org.modelcatalogue.core.util
 
+import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.VariableExpression
-
-import static org.codehaus.groovy.syntax.Types.*
-
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
-
+import org.codehaus.groovy.syntax.Types
 
 class SecuredRuleExecutor {
 
@@ -25,6 +23,10 @@ class SecuredRuleExecutor {
 
         boolean asBoolean() {
             !compilationFailedMessage
+        }
+
+        String toString() {
+            compilationFailedMessage ? "FAILED with $compilationFailedMessage" : "PASSED"
         }
     }
 
@@ -53,10 +55,22 @@ class SecuredRuleExecutor {
         }
 
         secureASTCustomizer.addExpressionCheckers(new SecureASTCustomizer.ExpressionChecker() {
+
+            Set<String> names = new HashSet(binding.variables.keySet())
+
             @Override boolean isAuthorized(Expression expression) {
-                if (!(expression instanceof VariableExpression)) return true
-                VariableExpression variableExpression = expression
-                return variableExpression.name in binding.variables.keySet()
+                if (expression instanceof BinaryExpression && expression.operation.meaning == Types.ASSIGN) {
+                    if (expression.leftExpression instanceof VariableExpression) {
+                        names << expression.leftExpression.name
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+                if (expression instanceof VariableExpression) {
+                    return expression.name in names
+                }
+                true
             }
         })
 
