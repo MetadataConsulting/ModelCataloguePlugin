@@ -32,7 +32,7 @@ class ImportServiceSpec extends Specification {
         !valueDomains.isEmpty()
 
         when:
-        def core = models.find { it.name == "CORE" }
+        def core = models.find { it.name == "MAIN" }
         def patientIdentity = models.find { it.name == "PATIENT IDENTITY DETAILS" }
         def NHICConceptualDomain = ConceptualDomain.findByName("NHIC")
         def indicatorCode = dataTypes.find { it.name == "NHS_NUMBER_STATUS_INDICATOR_CODE" }

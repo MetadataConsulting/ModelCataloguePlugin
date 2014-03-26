@@ -1,3 +1,4 @@
+import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.RelationshipType
 

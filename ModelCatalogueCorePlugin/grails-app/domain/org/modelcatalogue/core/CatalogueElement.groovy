@@ -84,11 +84,20 @@ abstract class CatalogueElement {
     }
 
     int countIncomingRelationsByType(RelationshipType type) {
-        Relationship.countByDestinationAndRelationshipType(this, type)
+        if (this.isAttached()) {
+            Relationship.countByDestinationAndRelationshipType(this, type)
+        }else{
+            Relationship.countByDestinationAndRelationshipType(CatalogueElement.get(this.id), type)
+        }
+
     }
 
     int countOutgoingRelationsByType(RelationshipType type) {
-        Relationship.countBySourceAndRelationshipType(this, type)
+        if (this.isAttached()) {
+            Relationship.countBySourceAndRelationshipType(this, type)
+        }else{
+            Relationship.countBySourceAndRelationshipType(CatalogueElement.get(this.id), type)
+        }
     }
 
     int countRelationsByType(RelationshipType type) {

@@ -7,14 +7,14 @@ To use the model catalogue core plugin in your grails app, include the following
 
 ```
 repositories {	 
-		mavenRepo("http://dl.bintray.com/adam-milward/ModelCatalogueCore") 
-	}
+    mavenRepo("http://dl.bintray.com/adam-milward/ModelCatalogueCore") 
+}
 ```
 
 and 
 
 ```
 plugins{ 
-		compile ":model-catalogue-core-plugin:<version>" </br>
-	}
+    compile ":model-catalogue-core-plugin:<version>"
+}
 ```
