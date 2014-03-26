@@ -15,6 +15,8 @@ class SecuredRuleExecutorSpec extends Specification {
          "'text'",
          "true",
          "x.unitOfMeasure",
+         "y = x",
+         "int y = x"
     ]
 
     static List<String> INVALID_EXPRESSIONS = [
@@ -23,7 +25,9 @@ class SecuredRuleExecutorSpec extends Specification {
         "x.delete()",
         "package org.modelcatalogue.core.util",
         "import org.modelcatalogue.core.util.SecuredRuleExecutor",
-        "y"
+        "y",
+        "x.unitOfMeasure = null"
+
     ]
 
     def "Evaluation expression throws no error: #exp"() {

@@ -36,14 +36,13 @@ class ValueDomainSpec extends Specification {
 
         validates | args
         false | [name: "e", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
-        false | [name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
-        false | [name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "x" * 2001, dataType: new DataType(name: "Float")]
-        false | [name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "x" * 501, description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        false | [name: "ground_speed", unitOfMeasure: "x" * 256, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
+        false | [name: "ground_speed1", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
+        false | [name: "ground_speed2", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "x" * 2001, dataType: new DataType(name: "Float")]
+        false | [name: "ground_speed3", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "x" * 501, description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
+        false | [name: "ground_speed4", unitOfMeasure: "x" * 256, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         false | [name: "x" * 256, unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        false | [name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        true  | [name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        true  | [name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])]
+        true  | [name: "ground_speed6", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
+        true  | [name: "ground_speed7", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])]
 
     }
 
@@ -63,8 +62,6 @@ class ValueDomainSpec extends Specification {
 
         valueDomainInstance.hasErrors()
         // the third argument is the real error message passed from the validator
-        valueDomainInstance.errors.getFieldError("regexDef").arguments[3] == "Unclosed group near index 5\n(blah\n     ^"
-
     }
 
 
@@ -76,6 +73,30 @@ class ValueDomainSpec extends Specification {
         then:
         a.toString() == "ValueDomain[id: 1, name: ground_speed]"
 
+    }
+
+    def "can covert regexp to rule"() {
+        ValueDomain domain = new ValueDomain(regexDef: regexp)
+
+        expect:
+        domain.rule == rule
+        domain.regexDef == regexp
+        domain.validateRule(matches)
+
+
+        where:
+        regexp         | rule                   | matches
+        "(?i)google"   | "x ==~ /(?i)google/"   | "gOOgle"
+
+    }
+
+    def "validates rule"() {
+        expect:
+        new ValueDomain(rule: rule).validateRule(x)
+
+        where:
+        rule        | x
+        "x > 10"    | 20
     }
 
 //    def "check  EqualsAndHashCode works"() {

@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
-import java.util.regex.Pattern
-import java.util.regex.PatternSyntaxException
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 /*
 * subjects, isbn, rating
@@ -31,36 +30,32 @@ class ValueDomain extends CatalogueElement  {
 
     static searchable = {
         name boost:5
-        regexDef index:'no'
         dataType component:true
         unitOfMeasure component:true
         incomingRelationships component: true
         outgoingRelationships component: true
         incomingMappings component: true
         outgoingMappings component: true
-        except = ['includedIn', 'instantiates']
+        except = ['includedIn', 'instantiates', 'regexDef']
     }
 
     //FIXME valueDomain needs to be unique within a conceptual domain
 
 	MeasurementUnit unitOfMeasure
-	String regexDef
+	String rule
 	DataType dataType
 
     static hasMany  = [ outgoingMappings: Mapping,  incomingMappings: Mapping ]
     static mappedBy = [ outgoingMappings: 'source', incomingMappings: 'destination']
+    static transients = ['regexDef']
 
     static constraints = {
 		description nullable:true, maxSize: 2000
 		unitOfMeasure nullable:true, maxSize: 255
-		regexDef nullable:true, maxSize: 500, validator: { val,obj ->
+		rule nullable:true, maxSize: 200, validator: { val,obj ->
             if(!val){return true}
-            try{
-                Pattern.compile(val)
-            }catch(PatternSyntaxException e){
-                return ['wontCompile', e.message]
-            }
-            return true
+            SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(x: null, domain: obj).validate(val)
+            result ? true : ['wontCompile', result.compilationFailedMessage]
         }
     }
 
@@ -68,6 +63,27 @@ class ValueDomain extends CatalogueElement  {
     static relationships = [
         incoming: [inclusion: 'includedIn', instantiation: 'instantiates']
     ]
+
+    void setRegexDef(String regex) {
+        if (!regex) {
+            rule = null
+        } else {
+            rule = "x ==~ /$regex/"
+        }
+    }
+
+    String getRegexDef() {
+        def match = rule =~ "x ==~ /(.+)/"
+        if (match) {
+            return match[0][1]
+        }
+        null
+    }
+
+    boolean validateRule(Object x) {
+        new SecuredRuleExecutor(x: x, domain: this).execute(rule)
+    }
+
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
