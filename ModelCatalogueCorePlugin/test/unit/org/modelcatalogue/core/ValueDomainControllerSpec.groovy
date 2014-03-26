@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
+import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.marshalling.*
 import spock.lang.Unroll
 
@@ -123,6 +124,8 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
         then:
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
+        json.listType == Mappings.name
+        json.itemType == Mapping.name
 
         when:
         def item  = json.list[0]
@@ -141,7 +144,7 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
 
 
     @Unroll
-    def "get xml mapping: #no where max: #max offset: #offset\""() {
+    def "get xml mapping: #no where max: #max offset: #offset"() {
         fillWithDummyEntities(15)
         ValueDomain first = ValueDomain.get(1)
         mapToDummyEntities(first)

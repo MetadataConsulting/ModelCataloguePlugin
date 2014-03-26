@@ -4,6 +4,7 @@
 #= require catalogueElementView
 #= require decoratedListTable
 #= require propertiesPane
+#= require columns
 
 angular.module('mc.core.ui.bs', [
   # depends on
@@ -13,4 +14,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.decoratedListTable'
   'mc.core.ui.bs.catalogueElementView'
   'mc.core.ui.bs.propertiesPane'
+  'mc.core.ui.bs.columns'
 ])

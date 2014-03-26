@@ -52,7 +52,7 @@ class DataType extends CatalogueElement {
     private final static defaultRelationshipTypesDefinitions = [
             [name: "String", description: "java.lang.String"],
             [name: "Integer", description: "java.lang.Integer"],
-            [name: "Double", description: "java.lang.String"],
+            [name: "Double", description: "java.lang.Double"],
             [name: "Boolean", description: "java.lang.Boolean"],
             [name: "Date", description: "java.util.Date"],
             [name: "Time", description: "java.sql.Time"],

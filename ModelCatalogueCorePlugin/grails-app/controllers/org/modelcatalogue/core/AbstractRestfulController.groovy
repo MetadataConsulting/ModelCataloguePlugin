@@ -35,7 +35,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                     previous: links.previous,
                     next: links.next,
                     offset: params.int('offset') ?: 0,
-                    page: params.int('max') ?: 10
+                    page: params.int('max') ?: 10,
+                    itemType: resource.name
             )
 
     }
@@ -52,7 +53,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0
+                page: params.int('max') ?: 0,
+                itemType: resource.name
         )
     }
 

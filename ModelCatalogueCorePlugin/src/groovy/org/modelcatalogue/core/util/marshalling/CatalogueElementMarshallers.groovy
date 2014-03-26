@@ -4,6 +4,7 @@ import grails.converters.XML
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Relationship
 
 /**
  * Created by ladin on 14.02.14.
@@ -24,8 +25,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 elementType: el.class.name,
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
-                outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"],
-                incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"]
+                outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"],
+                incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"]
         ]
 
         def relationships   = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
@@ -41,11 +42,11 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         xml.build {
             name el.name
             description el.description
-            outgoingRelationships count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"
-            incomingRelationships count: el.incomingRelationships ? el.incomingRelationships.size() : 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"
+            outgoingRelationships count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"
+            incomingRelationships count: el.incomingRelationships ? el.incomingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"
         }
 
-        def relationships   = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
+        def relationships = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
 
         relationships.incoming?.each addRelationsXml('incoming', el, xml)
         relationships.outgoing?.each addRelationsXml('outgoing', el, xml)
@@ -59,16 +60,16 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }
 
-    private Closure addRelationsJson(String incomingOrOutgoing, CatalogueElement el, Map ret) {
+    private static Closure addRelationsJson(String incomingOrOutgoing, CatalogueElement el, Map ret) {
         { String relationshipType, String name ->
-            ret[name] = [count: el."count${name.capitalize()}"(), link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
+            ret[name] = [count: el."count${name.capitalize()}"(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
         }
     }
 
-    private Closure addRelationsXml(String incomingOrOutgoing, CatalogueElement el, XML xml) {
+    private static Closure addRelationsXml(String incomingOrOutgoing, CatalogueElement el, XML xml) {
         { String relationshipType, String name ->
             xml. build {
-                "${name}" count: el."count${name.capitalize()}"(), link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"
+                "${name}" count: el."count${name.capitalize()}"(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"
             }
         }
     }

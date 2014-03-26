@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.XML
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.ValueDomain
 
 class ValueDomainMarshaller extends CatalogueElementMarshallers {
@@ -16,7 +17,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
         ret.putAll unitOfMeasure: el.unitOfMeasure,
                 regexDef: el.regexDef,
                 dataType: el.dataType,
-                mappings: [count: el.outgoingMappings?.size() ?: 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"]
+                mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"]
         ret
     }
 
@@ -26,7 +27,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
             unitOfMeasure el.unitOfMeasure
             regexDef el.regexDef
             dataType el.dataType
-            mappings count: el.outgoingMappings?.size() ?: 0, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"
+            mappings count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"
         }
     }
 }

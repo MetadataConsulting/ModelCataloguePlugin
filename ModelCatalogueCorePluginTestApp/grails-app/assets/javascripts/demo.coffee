@@ -12,7 +12,7 @@ angular.module('demo', [
   'mc.core.ui.bs'
   'ui.bootstrap'
 
-]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q)->
+]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns)->
   emptyList =
     list: []
     next: {size: 0}
@@ -29,33 +29,6 @@ angular.module('demo', [
   $scope.outgoing         = """resource("dataElement").list() >>> $r.list[0].outgoingRelationships()"""
   $scope.indicator        = """resource("dataElement").search("NHS_NUMBER_STATUS_INDICATOR_CODE") >>> $r.list[0]"""
 
-  $scope.valueDomainColumns = () -> [
-    {header: 'Code', value: 'code', classes: 'col-md-2', show: true}
-    {header: 'Name', value: 'name', classes: 'col-md-4', show: true}
-    {header: 'Description', value: 'description', classes: 'col-md-6'}
-  ]
-
-  $scope.idAndNameColumns = () -> [
-
-    {header: 'Type', value: 'elementTypeName', classes: 'col-md-5'}
-    {header: 'ID', value: 'id', classes: 'col-md-2', show: true}
-    {header: 'Name', value: 'name', classes: 'col-md-5', show: true}
-  ]
-
-  $scope.relationshipTypeColumns = () -> [
-    {header: 'Name', value: 'name', classes: 'col-md-2', show: true}
-    {header: 'Source to Destination', value: 'sourceToDestination', classes: 'col-md-2'}
-    {header: 'Destination to Source', value: 'destinationToSource', classes: 'col-md-2'}
-    {header: 'Source Class', value: 'sourceClass', classes: 'col-md-3'}
-    {header: 'Destination Class', value: 'destinationClass', classes: 'col-md-3'}
-  ]
-
-  $scope.relationshipsColumns = () -> [
-
-    {header: 'Relation',    value: 'type[direction]', classes: 'col-md-6'}
-    {header: 'Destinaiton', value: 'relation.name', classes: 'col-md-6', show: 'relation.show()'}
-  ]
-
   $scope.resource         = catalogueElementResource
   $scope.search           = modelCatalogueSearch
   $scope.expression       = $scope.indicator
@@ -65,6 +38,7 @@ angular.module('demo', [
     if $scope.expression.indexOf('>>>') == -1
       $q.when($scope.$eval($scope.expression)).then (result) ->
         if result?.size?
+          $scope.columns = columns(result.itemType)
           $scope.list = result
           $scope.element = null
         if result?.elementType?
@@ -85,6 +59,7 @@ angular.module('demo', [
         $log.info 'expression in chain {{', lastPart, '}} resolved to ', result
         if result?.size?
           $scope.list = result
+          $scope.columns = columns(result.itemType)
           $scope.element = null
         if result?.elementType?
           $scope.list = emptyList
@@ -95,7 +70,7 @@ angular.module('demo', [
 
   $scope.selection = []
 
-  $scope.columns = $scope.relationshipsColumns()
+  $scope.columns = columns()
 
   $scope.removeColumn = (index) ->
     return if $scope.columns.length <= 1

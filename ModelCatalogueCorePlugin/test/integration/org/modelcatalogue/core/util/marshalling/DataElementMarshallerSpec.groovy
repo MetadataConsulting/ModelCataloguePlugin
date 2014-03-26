@@ -2,10 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.context.ServletContextHolder
-import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.RelationshipService
-import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.*
 import org.springframework.web.context.support.WebApplicationContextUtils
 import spock.lang.Shared
 
@@ -58,7 +55,7 @@ class DataElementMarshallerSpec extends AbstractIntegrationSpec{
         json
         json.id == de1.id
         json.name == de1.name
-        json.outgoingRelationships == ["count":1, "link":"/dataElement/${de1.id}/outgoing"]
+        json.outgoingRelationships == ["count":1, "link":"/dataElement/${de1.id}/outgoing", itemType: Relationship.name]
 
         when:
 
