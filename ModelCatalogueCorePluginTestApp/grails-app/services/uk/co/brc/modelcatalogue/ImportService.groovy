@@ -15,22 +15,47 @@ class ImportService {
     ]
 
     def importData() {
+        DataType.initDefaultDataTypes()
+        RelationshipType.initDefaultRelationshipTypes()
+        getNhicFiles().each { filename -> singleImport(filename) }
+    }
+//
+//    private grantUserPermissions(objectOrList) {
+//        if (objectOrList instanceof java.util.Collection) {
+//            for (thing in objectOrList) {
+//                grantUserPermissions(thing)
+//            }
+//        } else {
+//            aclUtilService.addPermission objectOrList, 'ROLE_ADMIN', BasePermission.ADMINISTRATION
+//            aclUtilService.addPermission objectOrList, 'ROLE_USER', BasePermission.READ
+//        }
+//    }
+//
+//    /**
+//     * Get the list of available files for import
+//     * @return the list of available files for import
+//     */
+    def getNhicFiles() {
+        return fileFunctions.keySet()
+    }
+//
+//    /**
+//     * Carry out an import for a single file in the NHIC dataset
+//     * @param filename The filename. Must exist in the collection returned by <code>getNhicFiles</code>
+//     */
+    def singleImport(String filename) {
 
         DataType.initDefaultDataTypes()
-
+        RelationshipType.initDefaultRelationshipTypes()
         def applicationContext = grailsApplication.mainContext
         String basePath = applicationContext.getResource("/").getFile().toString()
 
-        functions.keySet().each { filename ->
-            new File("${basePath}" + "/WEB-INF/bootstrap-data" + filename).toCsvReader([charset: 'UTF-8', skipLines: 1]).eachLine { tokens ->
-                functions[filename](tokens);
-            }
+        new File("${basePath}" + "/WEB-INF/bootstrap-data" + filename).toCsvReader([charset: 'UTF-8', skipLines: 1]).eachLine { tokens ->
+            fileFunctions[filename](tokens);
         }
     }
 
-
-    private static functions = [
-
+    private fileFunctions = [
             '/CAN_CUH.csv':
                     { tokens ->
                         def categories = ["NHIC Datasets", "Ovarian Cancer", "CUH", "Round 1", tokens[1], tokens[2]]
@@ -45,14 +70,14 @@ class ImportService {
                                 dataType: dataType,
                                 description: tokens[5]).save(failOnError: true);
 
-                        assert vd.addToIncludedIn(cd)
+                        vd.addToIncludedIn(cd)
 
                         def de = new DataElement(name: tokens[3],
                                 description: tokens[4], code: tokens[0])
                         //dataElementConcept: models,
                         //extension: ext).save(failOnError: true)
 
-                        de.save(failOnError: true)
+                        de.save()
 
                         de.ext.put("NHIC_Identifier:", tokens[0].take(255));
                         de.ext.put("Link_to_existing definition:", tokens[6].take(255));
@@ -69,10 +94,8 @@ class ImportService {
                         de.ext.put("E2", tokens[17].take(255))
 
 
-                        assert de.addToInstantiatedBy(vd)
-
-                        de.save(failOnError: true)
-                        vd.save(failOnError: true)
+                        de.addToInstantiatedBy(vd)
+                        de.addToContainedIn(models)
 
                         //de.addToDataElementValueDomains(vd);
                         //de.save();
@@ -85,6 +108,8 @@ class ImportService {
         //categories look something like ["Animals", "Mammals", "Dogs"]
         //where animal is a parent of mammals which is a parent of dogs......
 
+        def modelToReturn
+
         categories.inject { parentName, childName ->
 
             //if there isn't a name for the child return the parentName
@@ -95,23 +120,29 @@ class ImportService {
             //def matches = Model.findAllWhere("name" : name, "parentName" : models)
 
             //see if there are any models with this name
-            def matches
+            Model match
             def namedChildren = Model.findAllWhere("name": childName)
 
             //see if there are any models with this name that have the same parentName
-            if (namedChildren) {
-                matches = namedChildren.childOf.contains(parentName)
+            if (namedChildren.size()>0) {
+                namedChildren.each{ Model childModel ->
+                    if(childModel.childOf.collect{it.name}.contains(parentName)){
+                        match = childModel
+                    }
+                }
             }
 
             //if there isn't a matching model with the same name and parentName
-            if (!matches) {
+            if (!match) {
                 //new Model('name': name, 'parentName': parentName).save()
-                def child
-                def parent
+                Model child
+                Model parent
 
                 //create the child model
                 child = new Model('name': childName).save()
                 child.addToHasContextOf(conceptualDomain)
+
+                modelToReturn = child
 
                 //see if the parent model exists
                 parent = Model.findWhere("name": parentName)
@@ -133,9 +164,12 @@ class ImportService {
                 //add the parent child relationship between models
 
             } else {
-                matches.first();
+                modelToReturn = match
+                match.name
             }
         }
+
+        modelToReturn
     }
 
     private static importDataTypes(name, dataType) {
