@@ -38,6 +38,8 @@ class ModelCatalogueSearchService {
             searchResults.put("errors" , searchParams.errors)
             return searchResults
         }
+        searchParams.put("indices", "org.modelcatalogue.core")
+        searchParams.put("types", ["org.modelcatalogue.core.DataElement", "org.modelcatalogue.core.ValueDomain", "org.modelcatalogue.core.ConceptualDomain", "org.modelcatalogue.core.DataType", "org.modelcatalogue.core.EnumeratedType", "org.modelcatalogue.core.MeasurementUnit", "org.modelcatalogue.core.Model"])
         try{
             searchResults = elasticSearchService.search(searchParams){
                 bool {

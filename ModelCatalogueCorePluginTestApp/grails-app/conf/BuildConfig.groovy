@@ -23,7 +23,7 @@ grails.project.fork = [
 
 
 grails.plugin.location.'ModelCatalogueCorePlugin' = "../ModelCatalogueCorePlugin"
-// grails.plugin.location.'ModelCatalogueElasticSearchPlugin' = "../ModelCatalogueElasticSearchPlugin"
+grails.plugin.location.'ModelCatalogueElasticSearchPlugin' = "../ModelCatalogueElasticSearchPlugin"
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
