@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.plugins.web.mimes.MimeTypesFactoryBean
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.util.DefaultResultRecorder
+import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ResultRecorder
 import org.modelcatalogue.core.util.marshalling.AbstractMarshallers
 import org.modelcatalogue.core.util.marshalling.ElementsMarshaller
@@ -112,8 +113,8 @@ abstract class AbstractRestfulControllerSpec<T> extends Specification implements
         json.list.size() == size
         json.next == next
         json.previous == previous
-        json.listType == "elements"
-        json.itemType == resourceName
+        json.listType == Elements.name
+        json.itemType == resource.name
 
 
 

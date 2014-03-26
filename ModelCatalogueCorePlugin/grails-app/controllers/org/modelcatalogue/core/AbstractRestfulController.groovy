@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import grails.transaction.Transactional
-import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.Elements
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -37,7 +36,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                     next: links.next,
                     offset: params.int('offset') ?: 0,
                     page: params.int('max') ?: 10,
-                    itemType: GrailsNameUtils.getPropertyName(resource)
+                    itemType: resource.name
             )
 
     }
@@ -55,7 +54,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 next: links.next,
                 offset: params.int('offset') ?: 0,
                 page: params.int('max') ?: 0,
-                itemType: GrailsNameUtils.getPropertyName(resource)
+                itemType: resource.name
         )
     }
 

@@ -6,6 +6,7 @@ import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
+import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.marshalling.ElementsMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
@@ -383,8 +384,8 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
 
 
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
-        assert json.listType == "relationships"
-        assert json.itemType == "relationship"
+        assert json.listType == Relationships.name
+        assert json.itemType == Relationship.name
 
         def item = json.list[0]
 
@@ -640,10 +641,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
         checkProperty(xml.incomingRelationships.@count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingRelationships")
         checkProperty(xml.incomingRelationships.@link, "/${resourceName}/${item.id}/incoming", "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@itemType, "relationship", "itemType")
+        checkProperty(xml.incomingRelationships.@itemType, Relationship.name, "itemType")
         checkProperty(xml.outgoingRelationships.@count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingRelationships")
         checkProperty(xml.outgoingRelationships.@link, "/${resourceName}/${item.id}/outgoing", "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@itemType, "relationship", "itemType")
+        checkProperty(xml.outgoingRelationships.@itemType, Relationship.name, "itemType")
 
         return true
     }
@@ -657,10 +658,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(inputItem.class.simpleName), "elementTypeName")
         checkProperty(xml.incomingRelationships.@count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingRelationships")
         checkProperty(xml.incomingRelationships.@link, "/${resourceName}/${outputItem.id}/incoming", "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@itemType, "relationship", "itemType")
+        checkProperty(xml.incomingRelationships.@itemType, Relationship.name, "itemType")
         checkProperty(xml.outgoingRelationships.@count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingRelationships")
         checkProperty(xml.outgoingRelationships.@link, "/${resourceName}/${outputItem.id}/outgoing", "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@itemType, "relationship", "itemType")
+        checkProperty(xml.outgoingRelationships.@itemType, Relationship.name, "itemType")
 
         return true
     }
@@ -675,10 +676,10 @@ abstract class CatalogueElementRestfulControllerSpec<T> extends AbstractRestfulC
         checkProperty(json.elementTypeName , GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
         checkProperty(json.outgoingRelationships.count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingCount")
         checkProperty(json.outgoingRelationships.link, "/${resourceName}/${item.id}/outgoing", "outgoingLink")
-        checkProperty(json.outgoingRelationships.itemType, "relationship", "outgoingItemType")
+        checkProperty(json.outgoingRelationships.itemType, Relationship.name, "outgoingItemType")
         checkProperty(json.incomingRelationships.count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingCount")
         checkProperty(json.incomingRelationships.link, "/${resourceName}/${item.id}/incoming", "incomingLink")
-        checkProperty(json.incomingRelationships.itemType, "relationship", "incomingItemType")
+        checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
         return true
     }
 

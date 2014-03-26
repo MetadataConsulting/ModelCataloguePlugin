@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.XML
-import grails.util.GrailsNameUtils
 
 abstract class ListWrapperMarshaller extends AbstractMarshallers {
 
@@ -13,7 +12,7 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
     protected Map<String, Object> prepareJsonMap(Object elements) {
         [
                 itemType: elements.itemType,
-                listType: GrailsNameUtils.getPropertyName(type),
+                listType: type.name,
                 success: true,
                 total: elements.total,
                 offset: elements.offset,
