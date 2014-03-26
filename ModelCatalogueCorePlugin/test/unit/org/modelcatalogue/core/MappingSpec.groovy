@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.test.mixin.TestFor
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 import spock.lang.Specification
 
 /**
@@ -17,7 +18,7 @@ class MappingSpec extends Specification {
 
         then:
         mapFunctionString == """[1:"one", 2:"two", 3:"three"][x]"""
-        new GroovyShell(new Binding(x: 2)).evaluate(mapFunctionString) == "two"
+        new SecuredRuleExecutor(x: 2).execute(mapFunctionString) == "two"
     }
 
 
