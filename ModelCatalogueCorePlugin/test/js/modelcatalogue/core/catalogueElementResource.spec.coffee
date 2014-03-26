@@ -132,7 +132,7 @@ describe "mc.core.catalogueElementResource", ->
               expect(status).toBe(204)
 
             it "has update method", ->
-              expectedPayload = {"dataType":{"id":1},"description":"the ground speed of the moving vehicle","name":"ground_speed","regexDef":"[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?","unitOfMeasure":{"id":1},"version":1}
+              expectedPayload = {"dataType":{"id":1},"description":"the ground speed of the moving vehicle","name":"ground_speed","rule": "x ==~ /[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?/","unitOfMeasure":{"id":1},"version":1}
 
               result.version = 1
 
@@ -153,7 +153,7 @@ describe "mc.core.catalogueElementResource", ->
               expect(updated).toBeDefined()
 
             it "has validate method", ->
-              expectedPayload = {"dataType":{"id":1},"description":"the ground speed of the moving vehicle","name":"ground_speed","regexDef":"[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?","unitOfMeasure":{"id":1},"version":1}
+              expectedPayload = {"dataType":{"id":1},"description":"the ground speed of the moving vehicle","name":"ground_speed","rule": "x ==~ /[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?/","unitOfMeasure":{"id":1},"version":1}
 
               result.version = 1
 
