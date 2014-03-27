@@ -21,7 +21,7 @@ class NoCustomLogicSpec extends Specification {
         cls                         | superclass                     | numberOfVirtualMethods
         ConceptualDomainController  | CatalogueElementController     | MeasurementUnitController.declaredMethods.findAll { !it.synthetic } .size()
         DataElementController       | CatalogueElementController     | MeasurementUnitController.declaredMethods.findAll { !it.synthetic } .size()
-        DataTypeController          | CatalogueElementController     | MeasurementUnitController.declaredMethods.findAll { !it.synthetic } .size()
+        //DataTypeController          | CatalogueElementController     | MeasurementUnitController.declaredMethods.findAll { !it.synthetic } .size()
         // EnumeratedTypeController    | CatalogueElementController     | MeasurementUnitController.declaredMethods.findAll { !it.synthetic } .size() + customAndTestedMethodsCount
         ModelController             | CatalogueElementController     | MeasurementUnitController.declaredMethods.findAll { !it.synthetic } .size()
         // RelationshipTypeController  | AbstractRestfulController      | MeasurementUnitController.declaredMethods.findAll { !it.synthetic } .size() + customAndTestedMethodsCount

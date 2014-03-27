@@ -16,7 +16,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
         def ret = super.prepareJsonMap(el)
         ret.putAll unitOfMeasure: el.unitOfMeasure,
                 rule: el.rule,
-                dataType: el.dataType,
+                dataType: el.dataType
                 mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"]
         ret
     }

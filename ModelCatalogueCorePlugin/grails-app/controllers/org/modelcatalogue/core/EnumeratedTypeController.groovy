@@ -6,7 +6,7 @@ import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 import static org.springframework.http.HttpStatus.OK
 
-class EnumeratedTypeController extends CatalogueElementController<EnumeratedType> {
+class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 
     EnumeratedTypeController() {
         super(EnumeratedType)

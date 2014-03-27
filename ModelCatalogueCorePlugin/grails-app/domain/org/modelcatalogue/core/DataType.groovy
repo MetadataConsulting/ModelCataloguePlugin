@@ -15,6 +15,8 @@ class DataType extends CatalogueElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
+    static hasMany  = [valueDomains: ValueDomain]
+
     static searchable = {
         name boost:5
         incomingRelationships component: true

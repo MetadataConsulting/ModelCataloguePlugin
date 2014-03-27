@@ -10,7 +10,7 @@ import spock.lang.Unroll
  * describe the data element within the context of a conceptual domain
  * value domains are invluded in conceptual domains
  */
-@Mock([ValueDomain, DataElement])
+@Mock([ValueDomain, DataElement, MeasurementUnit, DataType, EnumeratedType])
 class ValueDomainSpec extends Specification {
 
     def fixtureLoader
@@ -42,7 +42,37 @@ class ValueDomainSpec extends Specification {
         false | [name: "ground_speed4", unitOfMeasure: "x" * 256, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         false | [name: "x" * 256, unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         true  | [name: "ground_speed6", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        true  | [name: "ground_speed7", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])]
+        true  | [name: "ground_speed7", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown'])]
+
+    }
+
+    def "check one to many relationship exits between data type and value domain"(){
+
+        when:
+
+        def mu = new MeasurementUnit(name: "MPH").save()
+        def dt = new DataType(name: "Float").save()
+        def valueDomain = new ValueDomain(name: "ground_speed6", unitOfMeasure: mu, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: dt).save()
+
+        then:
+
+        !valueDomain.hasErrors()
+        dt.valueDomains.contains(valueDomain)
+
+    }
+
+    def "check one to many relationship exits between enumerated type= and value domain"(){
+
+        when:
+
+        def mu = new MeasurementUnit(name: "MPH").save()
+        def et = new EnumeratedType(name: 'test', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown']).save()
+        def valueDomain = new ValueDomain(name: "ground_speed6", unitOfMeasure: mu, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save()
+
+        then:
+
+        !valueDomain.hasErrors()
+        et.valueDomains.contains(valueDomain)
 
     }
 

@@ -13,7 +13,7 @@ class EnumeratedTypeMarshaller extends DataTypeMarshaller {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
         ret.putAll enumerations: element.enumerations
-        return ret
+        ret
     }
 
 

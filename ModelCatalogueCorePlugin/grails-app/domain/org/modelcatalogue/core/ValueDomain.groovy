@@ -43,8 +43,7 @@ class ValueDomain extends CatalogueElement  {
 
 	MeasurementUnit unitOfMeasure
 	String rule
-	DataType dataType
-
+    static belongsTo = [dataType: DataType]
     static hasMany  = [ outgoingMappings: Mapping,  incomingMappings: Mapping ]
     static mappedBy = [ outgoingMappings: 'source', incomingMappings: 'destination']
     static transients = ['regexDef']
