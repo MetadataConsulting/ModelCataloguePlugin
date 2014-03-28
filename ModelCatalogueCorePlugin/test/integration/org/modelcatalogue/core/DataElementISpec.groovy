@@ -13,9 +13,9 @@ class DataElementISpec extends AbstractIntegrationSpec{
 
     def setupSpec(){
         loadFixtures()
-        auth1 = fixtures.DE_author1
-        auth2 = fixtures.DE_author2
-        auth3 = fixtures.DE_author3
+        auth1 = DataElement.findByName("DE_author1")
+        auth2 = DataElement.findByName("AUTHOR")
+        auth3 = DataElement.findByName("auth")
     }
 
     def cleanupSpec(){

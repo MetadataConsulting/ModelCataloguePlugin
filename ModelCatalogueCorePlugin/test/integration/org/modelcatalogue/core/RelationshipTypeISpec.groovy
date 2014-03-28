@@ -220,8 +220,8 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         course.removeFromInstantiatedBy(subjects)
 
         then:
-        !course.instantiatedBy
-        !subjects.instantiates
+        !course.instantiatedBy.contains(subjects)
+        !subjects.instantiates.contains(course)
 
         when:
         subjects.addToInstantiates(course)
