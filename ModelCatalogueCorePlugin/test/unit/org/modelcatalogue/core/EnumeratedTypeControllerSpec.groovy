@@ -32,8 +32,6 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
         assert (propertiesToEdit = [description: "edited description ", enumerations: ["T1": 'test1', "T2": 'test2', "T3": 'test3']])
         //assert (propertiesToCheck = ['name', 'description', 'enumerations'])
 
-        new ValueDomainsMarshaller().register()
-
     }
 
     def cleanup() {
@@ -95,7 +93,7 @@ class EnumeratedTypeControllerSpec extends CatalogueElementRestfulControllerSpec
 
     @Override
     List<AbstractMarshallers> getMarshallers() {
-        [new EnumeratedTypeMarshaller()]
+        [new EnumeratedTypeMarshaller(), new ValueDomainsMarshaller()]
     }
 
     def createValueDomainsUsingEnumeratedType(EnumeratedType enumeratedType, Integer max){

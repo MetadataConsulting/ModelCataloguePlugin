@@ -24,8 +24,6 @@ class ValueDomainControllerSpec extends CatalogueElementRestfulControllerSpec {
         controller.relationshipService = new RelationshipService()
         controller.mappingService = new MappingService()
         fixturesLoader.load('measurementUnits/MU_kph', 'dataElements/DE_author', 'measurementUnits/MU_milesPerHour', 'dataTypes/DT_integer', 'relationshipTypes/RT_relationship')
-
-        new ValueDomainMarshaller().register()
         assert (type = fixturesLoader.RT_relationship.save())
         assert (mph = fixturesLoader.MU_milesPerHour.save())
         assert (kph = fixturesLoader.MU_kph.save())

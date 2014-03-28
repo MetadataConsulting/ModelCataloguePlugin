@@ -31,9 +31,6 @@ class DataTypeControllerSpec extends CatalogueElementRestfulControllerSpec {
         assert (newInstance = fixturesLoader.DT_string)
         assert (badInstance = new DataType(name: "", description: "asdf"))
         assert (propertiesToEdit = [description: "edited description "])
-
-        new ValueDomainsMarshaller().register()
-
     }
 
     def cleanup() {
@@ -42,7 +39,7 @@ class DataTypeControllerSpec extends CatalogueElementRestfulControllerSpec {
 
     @Override
     List<AbstractMarshallers> getMarshallers() {
-        [new DataTypeMarshaller()]
+        [new DataTypeMarshaller(), new ValueDomainsMarshaller()]
     }
 
 
