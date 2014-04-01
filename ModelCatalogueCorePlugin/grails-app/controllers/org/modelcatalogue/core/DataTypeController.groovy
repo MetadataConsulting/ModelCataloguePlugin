@@ -21,8 +21,8 @@ class DataTypeController<T> extends CatalogueElementController<DataType> {
             return
         }
 
-        int total = dataType.valueDomains.size()
-        def list = sortOffsetMaxMinList(dataType.valueDomains, params)
+        int total = dataType.relatedValueDomains.size()
+        def list = sortOffsetMaxMinList(dataType.relatedValueDomains, params)
         def links = nextAndPreviousLinks("/${resourceName}/${params.id}/valueDomain", total)
 
         respond new ValueDomains(
@@ -51,6 +51,7 @@ class DataTypeController<T> extends CatalogueElementController<DataType> {
         if(params.offset || params.max){
             Integer offset = (params.offset)? params.offset.toInteger() : 0
             Integer max = valueDomains.size()
+            if(offset >= max -1){offset = max - 2}
             if(params.max){
                 if((params.max + offset) < max){
                     max = params.max + offset -1

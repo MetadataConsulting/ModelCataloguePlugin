@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
+import org.codehaus.groovy.grails.web.context.ServletContextHolder
+import org.springframework.web.context.support.WebApplicationContextUtils
 import spock.lang.Shared
 
 /**
@@ -11,10 +13,16 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     @Shared
     def fixtureLoader, fixtures
 
+    def loadMarshallers() {
+        def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
+        springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
+    }
+
     def loadFixtures(){
         if(CatalogueElement.count()==0){
             fixtures = fixtureLoader.load("dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "dataElements/*", "conceptualDomains/*", "models/*", "relationshipTypes/*").load("valueDomains/*", "extensions/*")
         }
+        RelationshipType.initDefaultRelationshipTypes()
     }
 
 }

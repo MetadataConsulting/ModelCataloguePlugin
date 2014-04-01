@@ -18,7 +18,7 @@ class SearchController {
 
             def total = (results.total)?results.total.intValue():0
             def links = nextAndPreviousLinks("/search/", total)
-            respond new Elements(
+        Elements elements =  new Elements(
                     total: total,
                     items: results.searchResults,
                     previous: links.previous,
@@ -26,6 +26,8 @@ class SearchController {
                     offset: params.int('offset') ?: 0,
                     page: params.int('max') ?: 10
             )
+
+        respond elements
 
     }
 

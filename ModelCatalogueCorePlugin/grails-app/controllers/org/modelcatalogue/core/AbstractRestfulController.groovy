@@ -29,7 +29,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         def total = (results.total)?results.total.intValue():0
         def links = nextAndPreviousLinks("/${resourceName}/search", total)
-            respond new Elements(
+        Elements elements = new Elements(
                     total: total,
                     items: results.searchResults,
                     previous: links.previous,
@@ -39,6 +39,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                     itemType: resource.name
             )
 
+        respond elements
     }
 
     @Override

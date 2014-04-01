@@ -57,7 +57,7 @@ class ValueDomainSpec extends Specification {
         then:
 
         !valueDomain.hasErrors()
-        dt.valueDomains.contains(valueDomain)
+        dt.relatedValueDomains.contains(valueDomain)
 
     }
 
@@ -72,7 +72,7 @@ class ValueDomainSpec extends Specification {
         then:
 
         !valueDomain.hasErrors()
-        et.valueDomains.contains(valueDomain)
+        et.relatedValueDomains.contains(valueDomain)
 
     }
 

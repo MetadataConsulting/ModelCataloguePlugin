@@ -18,7 +18,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
     def setupSpec(){
 
         loadFixtures()
-        RelationshipType.initDefaultRelationshipTypes()
 
         cd1 =  ConceptualDomain.findByName("public libraries")
         md1 = Model.findByName("book")
@@ -26,21 +25,12 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         de2 = DataElement.findByName("title")
         dt = DataType.findByName("string")
         ms = MeasurementUnit.findByName("Miles per hour")
-        reltype = RelationshipType.findByName("BroaderTerm")
+        reltype = RelationshipType.findByName("Synonym")
         vd1 = ValueDomain.findByName("school subject")
     }
 
-    /*def cleanupSpec(){
-
-        cd1.delete()
-        de1.delete()
-        de2.delete()
-        dt.delete()
-        ms.delete()
-        md1.delete()
-        reltype.delete()
-        vd1.delete()
-    }*/
+    def cleanupSpec(){
+    }
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {

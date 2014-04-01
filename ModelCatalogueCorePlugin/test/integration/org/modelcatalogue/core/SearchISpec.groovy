@@ -15,26 +15,29 @@ class SearchISpec extends AbstractIntegrationSpec{
  //runs ok in integration test (test-app :integration), fails as part of test-app (Grails Bug) - uncomment to run
 //RE: http://jira.grails.org/browse/GRAILS-11047?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel
 
-
     @Shared
-    def grailsApplication
+    RelationshipService relationshipService
+    @Shared
+    def grailsApplication, de, vd, cd, mod
+
 
     def setupSpec(){
         loadFixtures()
-        RelationshipType.initDefaultRelationshipTypes()
-        def de = DataElement.findByName("DE_author1")
-        def vd = ValueDomain.findByName("value domain Celsius")
-        def cd = ConceptualDomain.findByName("public libraries")
-        def mod = Model.findByName("book")
-
-        RelationshipService relationshipService = new RelationshipService()
+        de = DataElement.findByName("DE_author1")
+        vd = ValueDomain.findByName("value domain Celsius")
+        cd = ConceptualDomain.findByName("public libraries")
+        mod = Model.findByName("book")
+        relationshipService = new RelationshipService()
 
         relationshipService.link(cd, mod, RelationshipType.findByName("context"))
         relationshipService.link(de, vd, RelationshipType.findByName("instantiation"))
         relationshipService.link(mod, de, RelationshipType.findByName("containment"))
     }
 
-    def cleanup(){
+    def cleanupSpec() {
+        relationshipService.unlink(cd, mod, RelationshipType.findByName("context"))
+        relationshipService.unlink(de, vd, RelationshipType.findByName("instantiation"))
+        relationshipService.unlink(mod, de, RelationshipType.findByName("containment"))
     }
 
 
@@ -46,8 +49,6 @@ class SearchISpec extends AbstractIntegrationSpec{
                 "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
                 className[0].toLowerCase() + className.substring(1)
         )
-
-
         JSONElement json
         GPathResult xml
 
@@ -59,9 +60,7 @@ class SearchISpec extends AbstractIntegrationSpec{
         controller.response.format = response
         controller.params.search = searchString
         controller.search()
-
         String recordName = "searchElement${no}"
-
         if(response=="json"){
             json = controller.response.json
             recorder.recordResult recordName, json
@@ -69,8 +68,8 @@ class SearchISpec extends AbstractIntegrationSpec{
             xml = controller.response.xml
             recorder.recordResult recordName, xml
         }
-        then:
 
+        then:
         if(json){
             assert json
             assert json.total == total
@@ -130,28 +129,19 @@ class SearchISpec extends AbstractIntegrationSpec{
                 "search"
         )
 
-
         when:
-
-
         controller.response.format = "json"
         controller.params.max = max
         controller.params.offset = offset
         controller.params.search = searchString
         controller.params.sort = sort
         controller.params.order = order
-
         controller.index()
         JSONElement json = controller.response.json
-
         String list = "list${no}"
-
-
-
         recorder.recordResult list, json
 
         then:
-
         json.success
         json.total == total
         json.offset == offset
@@ -160,8 +150,6 @@ class SearchISpec extends AbstractIntegrationSpec{
         json.list.size() == size
         json.next == next
         json.previous == previous
-
-
 
         where:
         [no, size, max, offset, total, next, previous, searchString, sort, order] << getPaginationParameters()
@@ -173,14 +161,14 @@ class SearchISpec extends AbstractIntegrationSpec{
 
     protected static getPaginationParameters() {
         [
-                // no,size, max , off. tot. next, previous, search, sort, order
-                [1, 7, 10, 0, 7, "",                                                    "",                                                     "domain"],
-                [2, 5, 5, 0, 7, "/search/domain?max=5&sort=name&order=ASC&offset=5",    "",                                                     "domain", "name",   "ASC"],
-                [3, 2, 2, 5, 7, "",                                                     "/search/domain?max=2&sort=name&order=ASC&offset=3",    "domain", "name",   "ASC"],
-                [4, 4, 4, 1, 7, "/search/domain?max=4&sort=name&order=ASC&offset=5",    "",                                                     "domain", "name",   "ASC"],
-                [5, 2, 2, 2, 7, "/search/domain?max=2&sort=name&order=ASC&offset=4",    "/search/domain?max=2&sort=name&order=ASC&offset=0",    "domain", "name",   "ASC"],
-                [6, 2, 2, 4, 7, "/search/domain?max=2&sort=name&offset=6",              "/search/domain?max=2&sort=name&offset=2",              "domain", "name",   ""],
-                [7, 2, 2, 4, 7, "/search/domain?max=2&offset=6",                        "/search/domain?max=2&offset=2",                        "domain", null,     null]
+                // no, size, max, offset, total, next, previous, searchString, sort, order
+                [1, 8, 10, 0, 8, "",                                                    "",                                                     "domain"],
+                [2, 5, 5, 0, 8, "/search/domain?max=5&sort=name&order=ASC&offset=5",    "",                                                     "domain", "name",   "ASC"],
+                [3, 2, 2, 6, 8, "",                                                     "/search/domain?max=2&sort=name&order=ASC&offset=4",    "domain", "name",   "ASC"],
+                [4, 4, 4, 1, 8, "/search/domain?max=4&sort=name&order=ASC&offset=5",    "",                                                     "domain", "name",   "ASC"],
+                [5, 2, 2, 2, 8, "/search/domain?max=2&sort=name&order=ASC&offset=4",    "/search/domain?max=2&sort=name&order=ASC&offset=0",    "domain", "name",   "ASC"],
+                [6, 2, 2, 4, 8, "/search/domain?max=2&sort=name&offset=6",              "/search/domain?max=2&sort=name&offset=2",              "domain", "name",   ""],
+                [7, 2, 2, 4, 8, "/search/domain?max=2&offset=6",                        "/search/domain?max=2&offset=2",                        "domain", null,     null]
         ]
     }
 

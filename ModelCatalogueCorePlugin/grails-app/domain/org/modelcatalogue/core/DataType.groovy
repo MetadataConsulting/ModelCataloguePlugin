@@ -15,7 +15,7 @@ class DataType extends CatalogueElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
-    static hasMany  = [valueDomains: ValueDomain]
+    static hasMany  = [relatedValueDomains: ValueDomain]
 
     static searchable = {
         name boost:5
@@ -25,6 +25,10 @@ class DataType extends CatalogueElement {
 
     static constraints = {
         name unique: true, size: 2..255
+    }
+
+    static mapping = {
+        relatedValueDomains cascade: "all-delete-orphan"
     }
 
     String toString() {

@@ -68,8 +68,6 @@ class DataElementISpec extends AbstractIntegrationSpec{
 
     def "get all relations"() {
 
-        RelationshipType.initDefaultRelationshipTypes()
-
         auth1 = DataElement.findByName("DE_author1")
         auth2 = DataElement.findByName("AUTHOR")
         auth3 = DataElement.findByName("auth")
