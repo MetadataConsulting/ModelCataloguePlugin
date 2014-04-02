@@ -11,7 +11,7 @@ import spock.lang.Unroll
  * Models are like xml complex types
  * They contain data elements
  */
-@TestFor(Model)
+
 @Mock([Model, ExtensionValue])
 class ModelSpec extends Specification {
 

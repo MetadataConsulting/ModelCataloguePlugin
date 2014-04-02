@@ -61,7 +61,7 @@ class RelationshipType {
 
     static mapping = {
         // this makes entities immutable
-        cache usage: 'read-only'
+        // cache usage: 'read-only'
     }
 
     boolean validateSourceDestination(CatalogueElement source, CatalogueElement destination) {

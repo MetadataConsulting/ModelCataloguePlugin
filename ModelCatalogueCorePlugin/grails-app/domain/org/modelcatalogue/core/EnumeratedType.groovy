@@ -30,7 +30,7 @@ class EnumeratedType extends DataType {
         enumAsString nullable: false, unique:true, maxSize: 10000, validator: { encodedVal, obj ->
             Map<String, String> val = stringToMap(encodedVal)
             if (!val) return true
-            if (val.size() < 2) return false
+            if (val.size() < 1) return false
             return true
         }
     }

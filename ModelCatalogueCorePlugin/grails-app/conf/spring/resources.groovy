@@ -11,9 +11,12 @@ beans = {
                             new EnumeratedTypeMarshaller(),
                             new MeasurementUnitMarshallers(),
                             new ModelMarshaller(),
+                            new RelationshipTypeMarshaller(),
                             new RelationshipMarshallers(),
                             new RelationshipsMarshaller(),
-                            new ValueDomainMarshaller()
+                            new ValueDomainMarshaller(),
+                            new MappingMarshallers(),
+                            new MappingsMarshaller()
                 ]
     }
 }

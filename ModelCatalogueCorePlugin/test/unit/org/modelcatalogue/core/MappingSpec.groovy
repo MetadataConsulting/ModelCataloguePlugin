@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 import spock.lang.Specification
@@ -7,7 +8,7 @@ import spock.lang.Specification
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
-@TestFor(Mapping)
+@Mock(Mapping)
 class MappingSpec extends Specification {
 
     void "map to function"() {
