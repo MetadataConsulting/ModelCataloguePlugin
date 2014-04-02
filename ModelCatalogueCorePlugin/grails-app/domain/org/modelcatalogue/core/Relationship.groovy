@@ -13,8 +13,6 @@ package org.modelcatalogue.core
         | ConceptualDomain | [inclusion]      | ValueDomain |  "includes"            | "included in"        |
         | Model            | [containment]    | DataElement |  "contains"            |  "contained in"      |
         | DataElement      | [instantiation]  | ValueDomain | "instantiated by"      | "instantiates"       |
-        | ValueDomain      | [usance]         | DataType    | "uses"                 | "usedBy"             |
-        | DataType         | [mapping]        | DataType    | "mapsTo"               |  "mapsTo"            |
         | Model            | [heirachical]    | Model       | "parentOf"             | "ChildOf"            |
         | DataElement      | [supersession]   | DataElement | "supercedes"           | "supercededBy"       |
 

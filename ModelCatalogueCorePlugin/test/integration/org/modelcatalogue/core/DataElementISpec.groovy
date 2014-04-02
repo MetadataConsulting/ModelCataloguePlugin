@@ -9,7 +9,7 @@ import spock.lang.Shared
 class DataElementISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def auth1, auth3, auth2
+    def auth1, auth3, auth2, initCatalogueService
 
     def setupSpec(){
         loadFixtures()
@@ -68,7 +68,7 @@ class DataElementISpec extends AbstractIntegrationSpec{
 
     def "get all relations"() {
 
-        RelationshipType.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
 
         auth1 = DataElement.findByName("DE_author1")
         auth2 = DataElement.findByName("AUTHOR")

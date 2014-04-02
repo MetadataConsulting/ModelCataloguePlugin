@@ -11,14 +11,12 @@ import spock.lang.Unroll
 class RelationshipISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def cd1, md1, de1, vd1, de2, reltype, dt, ms
-
-    @Shared RelationshipService relationshipService
+    def cd1, md1, de1, vd1, de2, reltype, dt, ms, initCatalogueService, relationshipService
 
     def setupSpec(){
 
         loadFixtures()
-        RelationshipType.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
 
         cd1 =  ConceptualDomain.findByName("public libraries")
         md1 = Model.findByName("book")

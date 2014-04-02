@@ -15,6 +15,8 @@ class DataType extends CatalogueElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
+    def grailsApplication
+
     static hasMany  = [valueDomains: ValueDomain]
 
     static searchable = {
@@ -48,27 +50,7 @@ class DataType extends CatalogueElement {
         return new HashCodeBuilder()
                 .append(name)
                 .toHashCode();
-    }
-
-
-    private final static defaultRelationshipTypesDefinitions = [
-            [name: "String", description: "java.lang.String"],
-            [name: "Integer", description: "java.lang.Integer"],
-            [name: "Double", description: "java.lang.Double"],
-            [name: "Boolean", description: "java.lang.Boolean"],
-            [name: "Date", description: "java.util.Date"],
-            [name: "Time", description: "java.sql.Time"],
-            [name: "Currency", description: "java.util.Currency"]
-    ]
-
-    static initDefaultDataTypes() {
-        for (definition in defaultRelationshipTypesDefinitions) {
-            DataType existing = DataType.findByName(definition.name)
-            if (!existing) {
-                new DataType(definition).save()
-            }
-        }
-    }
+       }
 
 
 }

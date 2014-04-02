@@ -6,11 +6,11 @@ class DomainModellerService {
 
     static transactional = true
 
-    def grailsApplication
+    def grailsApplication, initCatalogueService
 
     def modelDomains() {
-        RelationshipType.initDefaultRelationshipTypes()
-        DataType.initDefaultDataTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultDataTypes()
         def conceptualDomain = new ConceptualDomain(name:"uk.co.mc.core", description: "Model Catalogue Conceptual Domain").save()
         def domainClasses =  grailsApplication.domainClasses
 

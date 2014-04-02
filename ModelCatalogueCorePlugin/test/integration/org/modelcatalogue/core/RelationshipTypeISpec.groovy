@@ -8,11 +8,11 @@ import spock.lang.Shared
 class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     @Shared
-    def md1, de1, cd1, md2, vd
+    def md1, de1, cd1, md2, vd, initCatalogueService
 
     def setupSpec(){
         loadFixtures()
-        RelationshipType.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         md1 = Model.findByName("book")
         md2 = Model.findByName("chapter1")
         de1 = DataElement.findByName("DE_author1")
