@@ -6,6 +6,7 @@ describe "mc.core.ui.catalogueElementView", ->
   it "element get compiled",  inject ($compile, $rootScope, enhance) ->
 
     catEl = enhance angular.copy(fixtures.valueDomain.showOne)
+    catEl.description = "Hello World!"
 
     $rootScope.element = catEl
 
@@ -16,7 +17,7 @@ describe "mc.core.ui.catalogueElementView", ->
     $rootScope.$digest()
 
 
-    # console.log(element)
+    #console.log(element.description)
 
     expect(element.prop('tagName').toLowerCase()).toBe('div')
     expect(element.find('h3.ce-name').text()).toBe("#{catEl.name} (#{catEl.elementTypeName}: #{catEl.id})")

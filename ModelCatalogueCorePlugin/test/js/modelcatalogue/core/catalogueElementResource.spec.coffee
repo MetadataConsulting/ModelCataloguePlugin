@@ -30,14 +30,17 @@ describe "mc.core.catalogueElementResource", ->
     describe "with methods for CRUD operations", ->
 
       describe "can get single resource", ->
+
+        testElementId = fixtures.valueDomain.showOne.id
+
         it "will respond with expected resource if exists", ->
           $httpBackend
-          .when("GET", "#{modelCatalogueApiRoot}/valueDomain/1")
+          .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}")
           .respond(fixtures.valueDomain.showOne)
 
           result = null
           error  = null
-          valueDomains.get(1).then( (_result_) ->
+          valueDomains.get(testElementId).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error = _error_
@@ -51,16 +54,16 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(result).toBeDefined()
           expect(error).toBeNull()
-          expect(result.id).toBe(1)
-          expect(result.name).toBe("ground_speed")
+          expect(result.id).toBe(testElementId)
+          expect(result.name).toBe("value domain Celsius")
           expect(result.description).toBeDefined()
-          expect(result.version).toBe(0)
+          expect(result.version).toBe(1)
 
 
           describe "fetched instance is enhanced", ->
             it "outgoing and incoming relationships are functions", ->
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/1/incoming")
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/incoming")
               .respond(fixtures.valueDomain.incoming1)
 
               expect(angular.isFunction(result.incomingRelationships)).toBeTruthy()
@@ -78,12 +81,12 @@ describe "mc.core.catalogueElementResource", ->
 
 
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/1/outgoing")
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/outgoing")
               .respond(fixtures.valueDomain.outgoing1)
 
               expect(angular.isFunction(result.outgoingRelationships)).toBeTruthy()
 
-              expect(result.outgoingRelationships.total).toBe(1)
+              expect(result.outgoingRelationships.total).toBe(0)
 
               outgoing = null
 
@@ -97,7 +100,7 @@ describe "mc.core.catalogueElementResource", ->
 
 
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/1/mapping")
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/mapping")
               .respond(fixtures.valueDomain.mapping1)
 
               expect(angular.isFunction(result.mappings)).toBeTruthy()
@@ -116,7 +119,7 @@ describe "mc.core.catalogueElementResource", ->
 
             it "has delete method", ->
               $httpBackend
-              .when("DELETE", "#{modelCatalogueApiRoot}/valueDomain/1")
+              .when("DELETE", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}")
               .respond(204)
 
               expect(angular.isFunction(result.delete)).toBeTruthy()
@@ -132,12 +135,10 @@ describe "mc.core.catalogueElementResource", ->
               expect(status).toBe(204)
 
             it "has update method", ->
-              expectedPayload = {"dataType":{"id":1},"description":"the ground speed of the moving vehicle","name":"ground_speed","rule": "x ==~ /[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?/","unitOfMeasure":{"id":1},"version":1}
-
               result.version = 1
 
               $httpBackend
-              .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1", expectedPayload)
+              .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}" )
               .respond(fixtures.valueDomain.updateOk)
 
               expect(angular.isFunction(result.update)).toBeTruthy()
@@ -152,13 +153,12 @@ describe "mc.core.catalogueElementResource", ->
 
               expect(updated).toBeDefined()
 
-            it "has validate method", ->
-              expectedPayload = {"dataType":{"id":1},"description":"the ground speed of the moving vehicle","name":"ground_speed","rule": "x ==~ /[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?/","unitOfMeasure":{"id":1},"version":1}
 
+            it "has validate method", ->
               result.version = 1
 
               $httpBackend
-              .when("POST", "#{modelCatalogueApiRoot}/valueDomain/1/validate", expectedPayload)
+              .when("POST", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/validate")
               .respond(fixtures.valueDomain.updateOk)
 
               expect(angular.isFunction(result.validate)).toBeTruthy()
@@ -282,10 +282,10 @@ describe "mc.core.catalogueElementResource", ->
       describe "can update entity", ->
         it "updates ok if entity exists", ->
           payloadWithId = angular.extend({}, fixtures.valueDomain.updateInput)
-          payloadWithId.id = 1
+          payloadWithId.id = 74
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1", fixtures.valueDomain.updateInput)
+          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{payloadWithId.id}", fixtures.valueDomain.updateInput)
           .respond(fixtures.valueDomain.updateOk)
 
           result = null
@@ -304,8 +304,8 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(1)
-          expect(result.version).toBe(1)
+          expect(result.id).toBe(74)
+          expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
 
@@ -330,8 +330,8 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(1)
-          expect(result.version).toBe(1)
+          expect(result.id).toBe(74)
+          expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
 

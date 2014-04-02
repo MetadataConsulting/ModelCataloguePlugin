@@ -13,10 +13,10 @@ class ModelCatalogueElasticSearchPluginGrailsPlugin {
 
     // TODO Fill in these fields
     def title = "Model Catalogue Elastic Search Plugin Plugin" // Headline display name of the plugin
-    def author = "Your name"
-    def authorEmail = ""
+    def author = "Adam Milward"
+    def authorEmail = "adam@metadataconsulting.co.uk"
     def description = '''\
-Brief summary/description of the plugin.
+This plugin overrides the default search service in the model catalogue core plugin with a search service that uses the grails elastic search plugin
 '''
 
     // URL to the plugin's documentation

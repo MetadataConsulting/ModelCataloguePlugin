@@ -21,12 +21,12 @@ describe "mc.core.modelCatalogueSearch", ->
     $httpBackend.flush()
 
     expect(result).toBeDefined()
-    expect(result.total).toBe(3)
+    expect(result.total).toBe(22)
     expect(result.page).toBe(10)
-    expect(result.size).toBe(3)
+    expect(result.size).toBe(10)
     expect(result.offset).toBe(0)
     expect(result.list).toBeDefined()
-    expect(result.list.length).toBe(3)
+    expect(result.list.length).toBe(10)
 
   it "search with params", inject ($httpBackend, modelCatalogueSearch, modelCatalogueApiRoot) ->
     $httpBackend
@@ -47,9 +47,9 @@ describe "mc.core.modelCatalogueSearch", ->
     $httpBackend.flush()
 
     expect(result).toBeDefined()
-    expect(result.total).toBe(3)
+    expect(result.total).toBe(22)
     expect(result.page).toBe(10)
-    expect(result.size).toBe(3)
+    expect(result.size).toBe(10)
     expect(result.offset).toBe(0)
     expect(result.list).toBeDefined()
-    expect(result.list.length).toBe(3)
+    expect(result.list.length).toBe(10)

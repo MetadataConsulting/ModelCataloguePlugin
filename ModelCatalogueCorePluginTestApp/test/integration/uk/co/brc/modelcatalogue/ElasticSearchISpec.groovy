@@ -3,22 +3,7 @@ package uk.co.brc.modelcatalogue
 import grails.test.spock.IntegrationSpec
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
-import org.modelcatalogue.core.ConceptualDomain
-import org.modelcatalogue.core.ConceptualDomainController
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataElementController
-import org.modelcatalogue.core.DataTypeController
-import org.modelcatalogue.core.EnumeratedTypeController
-import org.modelcatalogue.core.MeasurementUnitController
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.ModelController
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipService
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.RelationshipTypeController
-import org.modelcatalogue.core.SearchController
-import org.modelcatalogue.core.ValueDomain
-import org.modelcatalogue.core.ValueDomainController
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 import org.modelcatalogue.fixtures.FixturesLoader
@@ -104,12 +89,10 @@ class ElasticSearchISpec extends IntegrationSpec{
         }else if(xml){
             assert xml
             assert xml.@success.text() == "true"
-            assert xml.@size == total
             assert xml.@total == total
             assert xml.@offset.text() == "0"
             assert xml.@page.text() ==  "10"
             assert xml.element
-            assert xml.element.size() ==  total
             assert xml.depthFirst().find {  it.name == expectedResult.name }
         }else{
             throw new AssertionError("no result returned")
@@ -124,8 +107,8 @@ class ElasticSearchISpec extends IntegrationSpec{
         4 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "xml"     | "boolean"                 | 1
         5 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "json"    | "DE_author1"              | 1
         6 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "xml"     | "DE_author1"              | 1
-        7 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "json"    | "public libraries"        | 3
-        8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 3
+        7 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "json"    | "public libraries"        | 12
+        8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 12
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1
         10 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "xml"     | "sub1"                    | 1
         11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees of Celsius"      | 1
@@ -194,12 +177,12 @@ class ElasticSearchISpec extends IntegrationSpec{
     protected static getPaginationParameters() {
         [
         //      no, size, max , off. tot. next, previous, search, previous, sort, order
-                [1,  3, 10, 0, 3, "", "",  "domain"],
-                [2, 2, 2, 0, 3, "/search/domain?max=2&sort=name&order=ASC&offset=2", "", "domain", "name", "ASC"],
-                [3, 1, 2, 2, 3, "", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
-                [4, 1, 1, 1, 3, "/search/domain?max=1&sort=name&order=ASC&offset=2", "/search/domain?max=1&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
-                [5, 1, 2, 2, 3, "", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
-                [6, 1, 1, 1, 3, "/search/domain?max=1&sort=name&offset=2", "/search/domain?max=1&sort=name&offset=0", "domain", "name", ""]
+                [1, 10, 10, 0, 12, "/search/domain?max=10&offset=10", "",  "domain"],
+                [2, 2, 2,  0, 12, "/search/domain?max=2&sort=name&order=ASC&offset=2", "", "domain", "name", "ASC"],
+                [3, 2, 2,  2, 12, "/search/domain?max=2&sort=name&order=ASC&offset=4", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
+                [4, 1, 1,  1, 12, "/search/domain?max=1&sort=name&order=ASC&offset=2", "/search/domain?max=1&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
+                [5, 2, 2,  2, 12, "/search/domain?max=2&sort=name&order=ASC&offset=4", "/search/domain?max=2&sort=name&order=ASC&offset=0", "domain", "name", "ASC"],
+                [6, 1, 1,  1, 12, "/search/domain?max=1&sort=name&offset=2", "/search/domain?max=1&sort=name&offset=0", "domain", "name", ""]
         ]
     }
 

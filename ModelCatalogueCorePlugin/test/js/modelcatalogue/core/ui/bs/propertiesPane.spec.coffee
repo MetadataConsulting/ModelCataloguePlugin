@@ -14,6 +14,7 @@ describe "mc.core.ui.propertiesPane", ->
     ]
 
     $rootScope.element = enhance angular.copy(fixtures.valueDomain.showOne)
+    $rootScope.element.description = "Hello World!"
 
     element = $compile('''
     <properties-pane item="element" properties="paneProperties"></properties-pane>
@@ -42,10 +43,10 @@ describe "mc.core.ui.propertiesPane", ->
     expect(element.find('tbody tr:nth-child(3) th.pp-table-property-label').text()).toBe('Description')
     expect(element.find('tbody tr:nth-child(4) th.pp-table-property-label').text()).toBe('Data Type')
 
-    expect(element.find('tbody tr:nth-child(1) td.pp-table-property-value').text()).toBe("#{fixtures.valueDomain.showOne.id}")
-    expect(element.find('tbody tr:nth-child(2) td.pp-table-property-value').text()).toBe("#{fixtures.valueDomain.showOne.name}")
-    expect(element.find('tbody tr:nth-child(3) td.pp-table-property-value').text()).toBe("#{fixtures.valueDomain.showOne.description}")
-    expect(element.find('tbody tr:nth-child(4) td.pp-table-property-value').text()).toBe("#{fixtures.valueDomain.showOne.dataType.name}")
+    expect(element.find('tbody tr:nth-child(1) td.pp-table-property-value').text()).toBe("#{$rootScope.element.id}")
+    expect(element.find('tbody tr:nth-child(2) td.pp-table-property-value').text()).toBe("#{$rootScope.element.name}")
+    expect(element.find('tbody tr:nth-child(3) td.pp-table-property-value').text()).toBe("#{$rootScope.element.description}")
+    expect(element.find('tbody tr:nth-child(4) td.pp-table-property-value').text()).toBe("#{$rootScope.element.dataType.name}")
 
     shown = null
 
