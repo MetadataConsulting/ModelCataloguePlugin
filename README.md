@@ -22,3 +22,9 @@ plugins{
         	compile "org.modelcatalogue.plugins:grails-model-catalogue-elastic-search-plugin:0.1"
 	}
 ```
+
+documentation is available:
+
+```
+https://metadata.ci.cloudbees.com/job/ModelCatalogueCorePluginDevelop/javadoc/
+```
