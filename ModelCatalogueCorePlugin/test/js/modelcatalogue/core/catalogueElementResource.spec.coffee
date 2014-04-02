@@ -51,16 +51,16 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(result).toBeDefined()
           expect(error).toBeNull()
-          expect(result.id).toBe(1)
-          expect(result.name).toBe("ground_speed")
+          expect(result.id).toBe(74)
+          expect(result.name).toBe("value domain Celsius")
           expect(result.description).toBeDefined()
-          expect(result.version).toBe(0)
+          expect(result.version).toBe(1)
 
 
           describe "fetched instance is enhanced", ->
             it "outgoing and incoming relationships are functions", ->
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/1/incoming")
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/74/incoming")
               .respond(fixtures.valueDomain.incoming1)
 
               expect(angular.isFunction(result.incomingRelationships)).toBeTruthy()
@@ -83,7 +83,7 @@ describe "mc.core.catalogueElementResource", ->
 
               expect(angular.isFunction(result.outgoingRelationships)).toBeTruthy()
 
-              expect(result.outgoingRelationships.total).toBe(1)
+              expect(result.outgoingRelationships.total).toBe(0)
 
               outgoing = null
 
@@ -97,7 +97,7 @@ describe "mc.core.catalogueElementResource", ->
 
 
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/1/mapping")
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/74/mapping")
               .respond(fixtures.valueDomain.mapping1)
 
               expect(angular.isFunction(result.mappings)).toBeTruthy()
@@ -282,10 +282,10 @@ describe "mc.core.catalogueElementResource", ->
       describe "can update entity", ->
         it "updates ok if entity exists", ->
           payloadWithId = angular.extend({}, fixtures.valueDomain.updateInput)
-          payloadWithId.id = 1
+          payloadWithId.id = 74
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1", fixtures.valueDomain.updateInput)
+          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/74", fixtures.valueDomain.updateInput)
           .respond(fixtures.valueDomain.updateOk)
 
           result = null
@@ -304,8 +304,8 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(1)
-          expect(result.version).toBe(1)
+          expect(result.id).toBe(74)
+          expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
 
@@ -330,8 +330,8 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(1)
-          expect(result.version).toBe(1)
+          expect(result.id).toBe(74)
+          expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
 
