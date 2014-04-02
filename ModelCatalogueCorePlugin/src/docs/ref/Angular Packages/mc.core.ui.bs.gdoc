@@ -1,0 +1,26 @@
+h1. mc.core.ui.bs
+
+BootStrap UI Core package provides default templates for directive and services in [mc.core.ui|Angular Packages]
+communication. If you want to use default templates and settings you will probably want to include this
+package as dependency for you JavaScript code.
+
+h2. Modules
+This package groups following modules for easier use:
+
+{table}
+Name                               | Description
+mc.core.ui.bs.catalogueElementView | provides default template for [catalogue-element-view|Angular Directives] directive
+mc.core.ui.bs.columns              | configures [columns|Angular Services] for known catalogue elements
+mc.core.ui.bs.decoratedListTable   | provides default template for [decorated-list|Angular Directives] directive
+mc.core.ui.bs.propertiesPane       | provides default template for [properties-pane|Angular Directives] directive showing properties in table
+{table}
+
+h2. Include
+Require using asset pipeline plugin in your asset file
+{code:javascript}
+//= require modelcatalogue/core/ui/bs/index
+{code}
+or link directly in JSP
+{code:xml}
+<asset:javascript src="/modelcatalogue/core/ui/bs/index.js"/>
+{code}
