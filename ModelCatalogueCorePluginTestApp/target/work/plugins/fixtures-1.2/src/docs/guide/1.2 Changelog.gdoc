@@ -1,0 +1,82 @@
+h4. 0.5
+
+* Loading of inline and file fixtures
+* Distribution of fixtures in the WAR
+
+h4. 0.6
+
+* Loading a fixture returns a Fixture object, which holds the loaded objects
+* Fixture files now use a @fixtures@ closure, instead of the normal @beans@ method
+
+h4. 0.7
+
+* Much improved support for bi-directional relationships
+* Improved error reporting when an object fails to save (due to constraint violations)
+
+h4. 0.8
+
+* Support for "partial" fixture files (i.e. being able to combine fixture files to create one fixture)
+* Improved support for one to many relationships
+
+h4. 0.9
+
+* Loaded objects are now autowired
+* The post processor now has extensive logging to help track down dependency issues
+* Support a post creation callback in fixture files via @post(Closure callback)@
+* Support for loading fixture files via Ant path matching patterns
+* Support including fixture files inside fixture files
+* Support pre creation callback in fixture files via @pre(Closure callback)@
+* Support for named fixtures
+
+h4. 1.0
+
+* Much improved error reporting
+* Improved post processing logging (each bean gets it's own log namespace)
+* Added support for @require()@ checks in fixture files to ensure that a bean has been defined previously
+* Support for inner fixtures in files (i.e. loading multiple fixtures in one file)
+* pre/post processors can now access any application beans (including fixture beans in post)
+* Support for accessing bean instances in fixture definitions (e.g. for password encoding)
+* Smart handling of bi-directionals (either side can be set and the plugin will translate)
+* Introduced build-test-data plugin integration
+* Utilise Grails' 1.2's @failOnError@ to give better error messages on failure
+* More fixes for complex bidirectional relationships
+
+h4. 1.0.1
+
+* Fixed compile issues on older versions of Grails
+
+h4. 1.0.2
+
+* Workaround for GRAILS-6714
+* Fixes for List types on the owned side of the relationship
+* Don't try and copy the fixtures dir to the war if it doesn't exist
+
+h4. 1.0.3
+
+* Fixed issue where objects weren't being saved if they had an optional owner that wasn't specified
+
+h4. 1.0.4 
+
+* Fixed bad dependency declarations that were leaking into client applications
+* Update to use @failOnError@ everywhere that @save()@ is called to get better error messages and to fail-fast
+
+h4. 1.0.5
+
+* Fixture files now have an implicit logger available
+
+h4. 1.0.6
+
+* Removed dependency on hibernate to be compatible with other GORM implementations 
+
+h4. 1.0.7
+
+* Fixes for Groovy 1.8 compatibility
+
+h4. 1.1
+
+* Add support for using abstract bean definitions
+
+h4. 1.2
+
+* Made the plugin compatible with Grails 2.2
+* Added support for nested domain instances in fixtures, making it much easier to populate 1-to-m associations

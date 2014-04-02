@@ -1,0 +1,26 @@
+--Output from 1 - text search for resource --
+--Output from 2 - text search for resource --
+--Output from 3 - text search for resource --
+--Output from 4 - text search for resource --
+--Output from 5 - text search for resource --
+--Output from 6 - text search for resource --
+--Output from 7 - text search for resource --
+--Output from 8 - text search for resource --
+--Output from 9 - text search for resource --
+--Output from 10 - text search for resource --
+--Output from 11 - text search for resource --
+--Output from 12 - text search for resource --
+--Output from 13 - text search for resource --
+--Output from 14 - text search for resource --
+--Output from 17 - text search for resource --
+--Output from 18 - text search for resource --
+--Output from 20 - text search for resource --
+--Output from 21 - text search for resource --
+--Output from 1 -  search model catalogue - paginate results--
+--Output from 2 -  search model catalogue - paginate results--
+--Output from 3 -  search model catalogue - paginate results--
+--Output from 4 -  search model catalogue - paginate results--
+--Output from 5 -  search model catalogue - paginate results--
+--Output from 6 -  search model catalogue - paginate results--
+--Output from 1 - bad search params--
+--Output from 2 - bad search params--

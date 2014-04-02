@@ -1,0 +1,12 @@
+<plugin name='model-catalogue-elastic-search-plugin' version='0.1' grailsVersion='2.3 &gt; *'>
+  <author>Adam Milward</author>
+  <authorEmail>adam@metadataconsulting.co.uk</authorEmail>
+  <title>Model Catalogue Elastic Search Plugin Plugin</title>
+  <description>This plugin overrides the default search service in the model catalogue core plugin with a search service that uses the grails elastic search plugin
+</description>
+  <documentation>http://grails.org/plugin/model-catalogue-elastic-search-plugin</documentation>
+  <type>ModelCatalogueElasticSearchPluginGrailsPlugin</type>
+  <resources>
+    <resource>org.modelcatalogue.core.elasticsearch.ModelCatalogueSearchService</resource>
+  </resources>
+</plugin>
