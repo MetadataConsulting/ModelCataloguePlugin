@@ -1,0 +1,61 @@
+# .gitignore for Grails 1.2 and 1.3
+
+# web application files
+/web-app/WEB-INF
+
+# IDE support files
+*.classpath
+/.launch
+*.project
+/.settings
+/*.launch
+/*.tmproj
+/ivy*
+/eclipse
+/idea*
+/out*
+*.idea
+*.iml
+#bower
+
+grails-app/assets/bower_components/*
+
+# default HSQL database files for production mode
+/prodDb.*
+
+# general HSQL database files
+*Db.properties
+*Db.script
+
+# logs
+/stacktrace.log
+/test/reports
+/logs
+
+# project release file
+/*.war
+
+# plugin release file
+/*.zip
+/*.zip.sha1
+
+# older plugin install locations
+/plugins
+/web-app/plugins
+/web-app/WEB-INF/classes
+
+# "temporary" build files
+/target
+
+# elasticsearch index
+/data
+
+
+# other
+*.iws
+*.ipr
+**.gen.fixture.js
+**.gen.xml
+/plugin.xml
+/grails-model-catalogue-core-plugin-0.0.1/**
+

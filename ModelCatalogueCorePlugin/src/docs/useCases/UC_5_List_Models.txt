@@ -1,0 +1,34 @@
+ID: 	UC_5
+Title: 	List Data Elements
+Description: 	User accesses the system to view a list of models that are included in the conceptual domain of a hospitalX
+Primary Actor: 	User
+Preconditions: 	None 
+Postconditions: None
+
+Main
+Success Scenario: 
+1. User select list models from the menu
+2. System displays list of models
+3. User clicks on the filter by conceptualDomain
+4. User is presented with a list of conceptualDomains to filter on 
+5. User chooses the conceptualDomain to filter by
+6. System displays a list of the models included in the conceptual domain of a hospitalX (including: name, description, link)
+
+Extensions: 	
+2a. No models are displayed
+— 2a1. System displays error message saying there are no models available.
+4a. No conceptualDomains are included in the filter list
+- 4a1 the filter by conceptualDomains button will return an error saying there are no conceptualDomains to filter on
+4b. User searches for the conceptualDomain rather than simply selecting it 
+- 4b1 the list of conceptualDomains will return the conceptualDomains that match the search query
+5a. User selects multiple conceptualDomains to filter on
+- 5a1 the models will be filtered by multiple conceptualDomains
+
+N.B. Filters should be "saved". i.e. if a user navigates to a particular model and returns to the page they would expect the list would have the same filter in place
+
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: High
+
+

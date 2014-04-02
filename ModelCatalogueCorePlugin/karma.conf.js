@@ -5,9 +5,9 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
 
         browsers: [
-            'Chrome',
-            'Firefox', // Firefox is slow!
-            'Safari'
+            'Chrome'
+            // 'Firefox', // Firefox is slow!
+            // 'Safari',  // Safari keeps old tabs open causing testing multiple times
         ],
         reporters: ['progress', 'junit', 'coverage', 'osx'],
         singleRun: false,
@@ -25,8 +25,9 @@ module.exports = function(config) {
 
         files: [
             // Required libraries
-            'grails-app/assets/bower_components/jquery/jquery.js',
+            'grails-app/assets/bower_components/jquery/dist/jquery.js',
             'grails-app/assets/bower_components/angular/angular.js',
+            'grails-app/assets/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
 
             // App under test
             'grails-app/assets/javascripts/**/*.coffee',
@@ -47,9 +48,9 @@ module.exports = function(config) {
             'karma-coverage',
             'karma-jasmine',
             'karma-chrome-launcher',
-            'karma-firefox-launcher',
             'karma-safari-launcher',
             'karma-junit-reporter',
+            'karma-osx-reporter',
             'karma-coffee-preprocessor'
         ],
 
@@ -61,7 +62,7 @@ module.exports = function(config) {
             // options passed to the coffee compiler
             options: {
                 bare: true,
-                sourceMap: false
+                sourceMap: true
             },
             // transforming the filenames
             transformPath: function(path) {

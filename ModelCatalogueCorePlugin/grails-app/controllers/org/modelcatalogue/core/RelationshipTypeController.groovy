@@ -1,0 +1,125 @@
+package org.modelcatalogue.core
+
+import grails.transaction.Transactional
+import groovy.util.slurpersupport.GPathResult
+import org.codehaus.groovy.grails.web.servlet.HttpHeaders
+
+import static org.springframework.http.HttpStatus.OK
+
+class RelationshipTypeController extends AbstractRestfulController<RelationshipType>{
+
+    RelationshipTypeController() {
+        super(RelationshipType)
+    }
+
+    @Override
+    protected RelationshipType createResource(Map params) {
+
+        def json = request.getJSON()
+        if(json){
+            def src = (json?.sourceClass)?this.class.classLoader.loadClass(json.sourceClass):null
+            def dest = (json?.destinationClass)?this.class.classLoader.loadClass(json.destinationClass):null
+            def instance = new RelationshipType(name: json?.name, sourceClass: src, destinationClass: dest, sourceToDestination: json?.sourceToDestination, destinationToSource: json?.destinationToSource)
+            return instance
+        }
+
+        def xml = request.getXML()
+        if(xml){
+            def src = (xml?.sourceClass.toString())?this.class.classLoader.loadClass(xml.sourceClass.toString()):null
+            def dest = (xml?.destinationClass.toString())?this.class.classLoader.loadClass(xml.destinationClass.toString()):null
+            def instance = new RelationshipType(name: xml?.name.toString(), sourceClass: src, destinationClass: dest, sourceToDestination: xml?.sourceToDestination.toString(), destinationToSource: xml?.destinationToSource.toString())
+            return instance
+        }
+
+    }
+
+    /**
+     * Updates a resource for the given id
+     * @param id
+     */
+    @Override
+    @Transactional
+    def update() {
+        if(handleReadOnly()) {
+            return
+        }
+
+        RelationshipType instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        if(request.format == "json"){
+            def json = request.getJSON()
+            Map props = json
+            def src = json?.sourceClass.toString()
+            if(src){
+                try{
+                    props.sourceClass = this.class.classLoader.loadClass(src)
+                }catch(ClassNotFoundException e){
+                    instance.errors.rejectValue("sourceClass", "org.modelcatalogue.core.RelationshipType.sourceClass.domainNotFound")
+                }
+            }
+            def dest = json?.destinationClass.toString()
+            if(dest){
+                try{
+                    props.destinationClass = this.class.classLoader.loadClass(dest)
+                }catch(ClassNotFoundException e){
+                    instance.errors.rejectValue("destinationClass", "org.modelcatalogue.core.RelationshipType.destinationClass.domainNotFound")
+                }
+            }
+            instance.properties = props
+        }else if(request.format == "xml"){
+            GPathResult xml = request.getXML()
+            Map props = [:]
+            def name = xml.getProperty("name").toString()
+            if(name){props.put("name", name)}
+            def sourceToDestination = xml.getProperty("sourceToDestination").toString()
+            if(sourceToDestination){props.put("sourceToDestination", sourceToDestination)}
+            def destinationToSource = xml.getProperty("destinationToSource").toString()
+            if(destinationToSource){props.put("destinationToSource", destinationToSource)}
+            def src = xml.getProperty("sourceClass").toString()
+            if(src){
+                try{
+                    props.sourceClass = this.class.classLoader.loadClass(src)
+                }catch(ClassNotFoundException e){
+                    instance.errors.rejectValue("sourceClass", "org.modelcatalogue.core.RelationshipType.sourceClass.domainNotFound")
+                }
+            }
+            def dest = xml.getProperty("destinationClass").toString()
+            if(dest){
+                try{
+                    props.destinationClass = this.class.classLoader.loadClass(dest)
+                }catch(ClassNotFoundException e){
+                    instance.errors.rejectValue("destinationClass", "org.modelcatalogue.core.RelationshipType.destinationClass.domainNotFound")
+                }
+            }
+            instance.properties = props
+        }else{
+            instance.properties = getParametersToBind()
+        }
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        instance.save flush:true
+        request.withFormat {
+            form {
+                flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
+                redirect instance
+            }
+            '*'{
+                response.addHeader(HttpHeaders.LOCATION,
+                        g.createLink(
+                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
+                                namespace: hasProperty('namespace') ? this.namespace : null ))
+                respond instance, [status: OK]
+            }
+        }
+    }
+
+
+}

@@ -1,0 +1,20 @@
+ID: 	UC_10
+Title: 	View Model Basket
+Description: 	User views the data elements they have added to the model basket
+Primary Actor: 	User
+Preconditions: 	user has added data elements to the model basket (UC_4)
+Postconditions: none
+
+Main
+Success Scenario: 
+1. User clicks link for the model basket
+2. User is presented with the list of data elements that have been added to the model basket and a subset of information about them i.e. name, unitOfMeasure, dataType/enumeratedType
+3. User is presented with a choice of conceptual domain to apply to the model basket
+4. Data Elements that do not have value domains that belong to the given conceptual domain are highlighted
+
+Extensions: 	
+None
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: High

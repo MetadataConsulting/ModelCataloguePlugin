@@ -1,0 +1,21 @@
+ID: 	UC_6
+Title: 	Show Model as Tree
+Description: 	User selects a model and views as tree
+Primary Actor: 	User
+Preconditions: 	None
+Postconditions: None
+
+Main
+Success Scenario: 
+1. User selects model from list (see UC_5)
+2. System displays the model in an expandable tree i.e. a hierarchical view that expands to show sub models and data elements and identifies them with different icons
+3. Use explores tree
+
+Extensions: 	
+3a. User searches for model/data element by name within the tree
+3a1 - the tree expands to show the relevant sub models or data elements within the tree
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: High
+

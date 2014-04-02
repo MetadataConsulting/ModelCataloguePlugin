@@ -1,3 +1,7 @@
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
+import org.modelcatalogue.core.util.marshalling.*
+
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
     def version = "0.1"
@@ -5,24 +9,27 @@ class ModelCatalogueCorePluginGrailsPlugin {
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-            "grails-app/views/error.gsp"
+            "grails-app/views/index.gsp",
+            "grails-app/assets/javascripts/demo.coffee"
     ]
 
     // TODO Fill in these fields
-    def title = "uk.co.mc.core.Model Catalogue Core Plugin Plugin" // Headline display name of the plugin
-    def author = "Your name"
-    def authorEmail = ""
+    def title = "Model Catalogue Core Plugin " // Headline display name of the plugin
+    def author = "Adam Milward, Vladimír Oraný"
+    def authorEmail = "adam.milward@outlook.com, vladimir@orany.cz"
     def description = '''\
-Brief summary/description of the plugin.
+Model catalogue core plugin (metadata registry)
 '''
 
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/model-catalogue-core-plugin"
 
+    //def packaging = "binary"
+
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = "APACHE"
+    def license = "MIT"
 
     // Details of company behind the plugin (if there is one)
 //    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
@@ -40,16 +47,47 @@ Brief summary/description of the plugin.
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
+
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
+
+
+        modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
+            marshallers = [
+                    new ConceptualDomainMarshaller(),
+                    new DataElementMarshaller(),
+                    new DataTypeMarshaller(),
+                    new ElementsMarshaller(),
+                    new ValueDomainsMarshaller(),
+                    new EnumeratedTypeMarshaller(),
+                    new MeasurementUnitMarshallers(),
+                    new ModelMarshaller(),
+                    new RelationshipTypeMarshaller(),
+                    new RelationshipMarshallers(),
+                    new RelationshipsMarshaller(),
+                    new ValueDomainMarshaller(),
+                    new MappingMarshallers(),
+                    new MappingsMarshaller()
+            ]
+        }
+
     }
 
     def doWithDynamicMethods = { ctx ->
         // TODO Implement registering dynamic methods to classes (optional)
+        ctx.grailsApplication.domainClasses.each {
+            if (CatalogueElement.isAssignableFrom(it.clazz)) {
+                CatalogueElementDynamicHelper.addShortcuts(it.clazz)
+            }
+        }
     }
 
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
+        //register custom json Marshallers
+        //ctx.domainModellerService.modelDomains()
+        ctx.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
+
     }
 
     def onChange = { event ->

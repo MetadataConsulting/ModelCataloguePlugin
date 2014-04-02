@@ -1,0 +1,18 @@
+h4. Installing the plugin
+
+First you need to install the plugin into a Grails application:
+using the recommended way, configure it as a dependency in @BuildConfig.groovy@:
+{code}
+plugins {
+    runtime ':ModelCataloguePlugins:<plugin version>'
+}
+{code}
+
+h4. Requirements
+
+* a Servlet container to run the Web application
+
+
+h4. Sample usage
+
+There is a sample/minimal test webapp (under test/webapp) with some examples on how to use the plugin, see sources.

@@ -1,0 +1,26 @@
+{
+  "name": "ModelCatalogue",
+  "version": "1.0.0",
+  "description": "Model Catalogue",
+  "dependencies": {
+    "bower": "~1.2.8"
+  },
+  "devDependencies": {
+    "karma": "~0.10",
+    "karma-coffee-preprocessor": "~0.1",
+    "karma-coverage": "~0.1.5",
+    "karma-safari-launcher": "~0.1.1",
+    "karma-junit-reporter": "~0.2.1",
+    "karma-ng-html2js-preprocessor": "~0.1.0",
+    "karma-osx-reporter": "0.0.4"
+  },
+  "keywords": [
+    "metadata"
+  ],
+  "author": "Ryan Brooks",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ModelCatalogue/modelcatalogue/issues"
+  },
+  "homepage": "https://github.com/ModelCatalogue/modelcatalogue"
+}

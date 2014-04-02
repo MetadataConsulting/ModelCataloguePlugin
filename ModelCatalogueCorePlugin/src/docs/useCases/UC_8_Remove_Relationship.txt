@@ -1,0 +1,19 @@
+ID: 	UC_8
+Title: 	Remove Relationship
+Description: 	User removes link from catalogue element to a catalogue element
+Primary Actor: 	User
+Preconditions: 	catalogue element is linked to the catalogue element
+Postconditions: catalogue element is "unlinked" from the catalogue element
+
+Main
+Success Scenario: 
+1. User clicks remove relation from the edit catalogue element screen (see UC_3)
+2. Relationship is removed
+
+
+Extensions: 	
+None
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: High

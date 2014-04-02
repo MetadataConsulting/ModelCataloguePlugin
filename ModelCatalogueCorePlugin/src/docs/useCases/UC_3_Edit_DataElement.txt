@@ -1,0 +1,44 @@
+ID: 	UC_3
+Title: 	Edit Data Element
+Description: 	User selects a data element from the list data element screen (see UC_1) to edit data element attributes
+Primary Actor: 	Data Architect
+Preconditions: 	None
+Postconditions: Edited information is persisted
+
+Main
+Success Scenario: 
+1. User selects data element from list (see UC_1)
+2. System displays the data element information including:
+ - DataElement attributes (name, description etc.)
+ - DataElement extensions
+ - DataElement Models (name, description, link)
+ - DataElement ValueDomains (name, unitOfMeasure, dataType/enumeratedType, link)
+ - Other Relationships (relationship type, direction, relation type(class), relation name, link)
+3. User clicks on the element name (i.e. xeditable type link) and is presented with an editable text box
+4. User changes the name
+5. System persists this information
+
+
+Extensions: 	
+3a. User edits extensions
+ 3a1 - User is presented with editable fields for the extension key and extension value
+ N.B. How deep we can make extensions?
+3b. User removes link from data element to a model
+ 3b1 - see UC_8
+3c. User adds links between data elements and model
+ 3c1 - see UC_11
+3d. User removes link from data element to a valueDomain
+ 3d1 - see UC_8 
+3e. User adds links between data elements and valueDomain
+ 3e1 - see UC_11
+3f. User removes relationship
+ 3f1 - see UC_8 
+3g. User adds relationship
+ 3g1 - see UC_9
+
+5a. System does not persist the information
+ 5a1 - return an error saying that you are not authorised to perform the operation, change the information back to it's original state
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: Medium

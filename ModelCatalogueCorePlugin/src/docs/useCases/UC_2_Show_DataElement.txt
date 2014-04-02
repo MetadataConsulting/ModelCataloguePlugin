@@ -1,0 +1,24 @@
+ID: 	UC_2
+Title: 	Show Data Element
+Description: 	User selects a data element from the list data element screen (see UC_1) to view relevant information
+Primary Actor: 	User
+Preconditions: 	None
+Postconditions: None
+
+Main
+Success Scenario: 
+1. User selects data element from list (see UC_1)
+2. System displays the data element information including:
+ - DataElement attributes (name, description etc.)
+ - DataElement extensions
+ - DataElement Models (name, description, link)
+ - DataElement ValueDomains (name, unitOfMeasure, dataType/enumeratedType, link)
+ - Other Relationships (relationship type, direction, relation type(class), relation name, link to relation)
+
+
+Extensions: 	
+None
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: High

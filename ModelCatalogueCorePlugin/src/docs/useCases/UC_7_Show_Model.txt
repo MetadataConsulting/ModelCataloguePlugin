@@ -1,0 +1,24 @@
+ID: 	UC_7
+Title: 	Show Model
+Description: 	User selects a model from list and views information
+Primary Actor: 	User
+Preconditions: 	None
+Postconditions: None
+
+Main
+Success Scenario: 
+1. User selects model from list (see UC_5)
+2. System displays the data element information including:
+ - Model attributes (name, description etc.)
+ - Model extensions
+ - Model DataElements (name, description, link)
+ - Model ConceptualDomains (name, description, link)
+ - Other Relationships (relationship type, direction, relation type(class), relation name, link to relation)
+
+
+Extensions: 	
+None
+
+Status: Pending
+Owner: 	Adam Milward (adam.milward@outlook.com)
+Priority: High
