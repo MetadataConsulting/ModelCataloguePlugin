@@ -1,5 +1,4 @@
 # FormsPlugin
 /ModelCatalogueFormsPlugin
 *.iml
-*/fixtures/*
 */web-app/*
