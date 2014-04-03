@@ -1,0 +1,18 @@
+h1. names
+
+Object containing utility functions for name related string conversions.
+Declared in @mc.util.names@ module inside [mc.util|Angular Packages] package.
+
+h2. Usage
+
+You can inject the object in any construct in the run phase (service, factory, controller, etc.). It
+currently is provides only one method @getNaturalName(camelCased)@ which accepts camel cased name of the property
+or resource and converts it to natural human readable name.
+
+{code}
+angular
+.module('foo', ['mc.util.names'])
+.factory('bar', function(names) {
+   names.getNaturalName('camelCase') == 'Camel Case" // true
+});
+{code}

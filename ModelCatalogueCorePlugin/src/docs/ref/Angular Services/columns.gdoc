@@ -1,0 +1,21 @@
+h1. columns
+
+Function which returns copy of columns definition for given item type registered with [columnsProvider|Angular Providers],
+supplied user defaults or the default columns set in [columnsProvider|Angular Providers]. Columns definition is designed
+to be used in [decorated-list|Angular Directives] directive as columns attribute.
+Declared in @mc.core.ui.columns@ module inside [mc.core.ui|Angular Packages] package.
+
+
+h2. Usage
+
+Call the @columns@ function with item type to retrieve predefined columns.
+
+{code}
+angular
+.module('foo', ['mc.core.ui.columns'])
+.factory('bar', function(columns) {
+    var valueDomainColumns = columns('org.modelcatalogue.core.ValueDomain');
+    var vdOrUserDefaults   = columns('org.modelcatalogue.core.ValueDomain', [...]);
+    var defaultColumns     = columns();
+});
+{code}

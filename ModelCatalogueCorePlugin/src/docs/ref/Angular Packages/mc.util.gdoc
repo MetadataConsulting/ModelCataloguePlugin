@@ -14,7 +14,7 @@ mc.util.rest    | provides [rest|Angular Services] service similar to @$http@ wi
 
 h2. Include
 Require using asset pipeline plugin in your asset file
-{code:javascript}
+{code}
 //= require modelcatalogue/util/index
 {code}
 or link directly in JSP

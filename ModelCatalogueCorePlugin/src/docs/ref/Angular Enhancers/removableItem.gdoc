@@ -1,0 +1,28 @@
+h1. removableItem
+
+@removableItem@ enhancer add @remove()@ method to any object having @removeLink@ property.
+Calling the method will return promise which resolves to 204 if the item is removed gracefully.
+
+h2. Condition
+
+This enhancer is used if the object has own property of name @removeLink@.
+
+h2. Usage
+
+You usually get objects enhanced by this enhancer when accessing resource using [catalogueElementResource|Angular Services]
+or [modelCatalogueSearch|Angular Services].
+
+{code}
+angular
+.module('foo', ['mc.core.catalogueElementResource', 'mc.core.listReferenceEnhancer'])
+.factory('bar', function(catalogueElementResource) {
+    var valueDomains = catalogueElementResource('valueDomain')
+    valueDomains.get(1).then(function(domain){
+        domain.incomingRelationships().then(function(relationshipsList) {
+           relationshipsList.list[0].remove().then(function(result) {
+               alert('First item deleted successfully')
+           });
+        });
+    });
+});
+{code}

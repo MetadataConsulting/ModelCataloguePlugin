@@ -1,0 +1,47 @@
+h1. enhance
+
+Function which enhances given object with additional functionality if particular conditions are met. Function
+might or might not return different object than the one supplied. You should always re-assign the value with
+the returned object. Objects and arrays are deep enhanced breadth-first.
+See [enhanceProvider|Angular Providers] how to configure the enhancement mechanism.
+Declared in @mc.core.enhance@ module inside [mc.core|Angular Packages] package.
+
+
+h2. Usage
+
+Call given function with the object you want to enhance as the parameter. Following example showing
+how [listReference|Angular Enhancers] works. It turns object with expected properties into function
+returning the promise for the list response. If object to be enhanced is promise, the result of the promise
+is enhanced instead of the promise object.
+
+{code}
+angular
+.module('foo', ['mc.core.enhance'])
+.factory('bar', function(enhance) {
+    var listReference = enhance({
+        count:      0,
+        itemType:   "org.modelcatalogue.core.Relationship",
+        link:       "/conceptualDomain/55/outgoing"
+    })
+    listReference().then(function(list) {
+        // do something with the list
+    });
+
+    var enhancersNames    = enhance.getAvailableEnhancers()             // for sanity checks
+    var listEnhancer      = enhance.getEnhancer('list')                 // for testing purposes
+    var isEnhancedList    = enhance.isEnhancedBy(listReference, 'list') // false, the name is 'listReference'
+    var isEnhancedSomehow = enhance.isEnhanced(listReference)           // true, it's enhanced by 'listReference'
+
+});
+{code}
+
+There are also several useful methods bound to enhance function so you can find out which enhancers are already
+registered, obtain enhancer by name or check if the object has been already enhanced.
+
+{table}
+Method Signature           | Description
+getAvailableEnhancers()    | returns the array containing names of registered enhancers
+getEnhancer(name)          | gets enhancer by name returning the fully initialized function
+isEnhancedBy(object, name) | checks if the object is enhanced by enhancer of given name
+isEnhanced(object)         | checks if the object is enhanced by any enhancer
+{table}

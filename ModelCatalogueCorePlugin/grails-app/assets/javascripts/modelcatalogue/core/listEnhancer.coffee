@@ -77,7 +77,6 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
       previous: {size: 0}
       total: 0
       empty: true
-      source: 'catalogue-element-view'
       itemType: itemType
     }
 

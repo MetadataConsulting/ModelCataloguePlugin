@@ -1,0 +1,32 @@
+h1. listReference
+
+@listReference@ enhancer changes list references represented by objects with link, total and itemType to
+method to fetch the actual list references. For example @incomingRelationships@ are represented this way.
+Calling the method returns a promise to the resource list. You can still access the original non-enhanced object properties
+on the method as @total@ (was @count@), @link@ and @itemType@ (if available) properties.
+
+h2. Condition
+
+This enhancer is used if the object has own properties of name @count@ and @link@.
+
+h2. Usage
+
+You usually get objects enhanced by this enhancer when accessing resource using [catalogueElementResource|Angular Services]
+or [modelCatalogueSearch|Angular Services].
+
+{code}
+angular
+.module('foo', ['mc.core.catalogueElementResource', 'mc.core.listReferenceEnhancer'])
+.factory('bar', function(catalogueElementResource) {
+    var valueDomains = catalogueElementResource('valueDomain')
+    valueDomains.get(1).then(function(domain){
+        domain.incomingRelationships.total     // total number of items
+        domain.incomingRelationships.itemType  // org.metadatacatalogue.core.Relationship
+        domain.incomingRelationships.link      // /valueDomain/1/incoming
+        domain.incomingRelationships().then(function(relationshipsList) {
+            // do something with the relationship list
+
+        });
+    });
+});
+{code}

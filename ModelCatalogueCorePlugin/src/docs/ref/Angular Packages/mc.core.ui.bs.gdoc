@@ -17,7 +17,7 @@ mc.core.ui.bs.propertiesPane       | provides default template for [properties-p
 
 h2. Include
 Require using asset pipeline plugin in your asset file
-{code:javascript}
+{code}
 //= require modelcatalogue/core/ui/bs/index
 {code}
 or link directly in JSP

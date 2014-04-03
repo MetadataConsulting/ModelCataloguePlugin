@@ -1,0 +1,21 @@
+h1. columnsProvider
+
+Configures the [columns|Angular Services] service. You can register new columns definition using @registerColumns(type, columns)@
+method or set the default columns using @setDefaultColumns(columns)@ method.
+Declared in @mc.core.ui.columns@ module inside [mc.core.ui|Angular Packages] package.
+
+h2. Usage
+
+Register new column definition or set the new defaults using the config method of your module.
+
+{code}
+angular
+.module('foo', ['mc.core.enhance'])
+.config(function(columnsProvider) {
+    columnsProvider.setDefaultColumns([{header: 'ID', show: true, value: 'id'}]);
+    columnsProvider.registerColumns('com.example.test.Class', [
+        {header: 'ID', show: true, value: 'id'},
+        {header: 'Name', show: true, value: 'name'}
+    ]);
+});
+{code}

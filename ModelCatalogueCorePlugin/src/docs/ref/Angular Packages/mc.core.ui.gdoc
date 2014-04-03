@@ -15,7 +15,7 @@ mc.core.ui.propertiesPane       | provides [properties-pane|Angular Directives] 
 
 h2. Include
 Require using asset pipeline plugin in your asset file
-{code:javascript}
+{code}
 //= require modelcatalogue/core/ui/index
 {code}
 or link directly in JSP
