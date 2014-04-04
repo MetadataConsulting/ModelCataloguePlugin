@@ -35,26 +35,6 @@ class DataType extends CatalogueElement {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof DataType)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        DataType ce = (DataType) obj;
-        return new EqualsBuilder()
-                .append(name, ce.name)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .toHashCode();
-    }
-
-
     private final static defaultRelationshipTypesDefinitions = [
             [name: "String", description: "java.lang.String"],
             [name: "Integer", description: "java.lang.Integer"],

@@ -8,11 +8,10 @@ import spock.lang.Shared
 class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     @Shared
-    def md1, de1, cd1, md2, vd, initCatalogueService
+    def md1, de1, cd1, md2, vd
 
     def setupSpec(){
         loadFixtures()
-        initCatalogueService.initDefaultRelationshipTypes()
         md1 = Model.findByName("book")
         md2 = Model.findByName("chapter1")
         de1 = DataElement.findByName("DE_author1")
@@ -21,23 +20,24 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     }
 
-    def "read by name returns read only instance"() {
-
-        RelationshipType containment = RelationshipType.readByName("containment")
-
-        expect:
-        containment
-
-        when:
-        containment.name = "foo"
-        containment.save()
-
-        then:
-        IllegalStateException e = thrown(IllegalStateException)
-        e
-        e.message == "Cannot make an immutable entity modifiable."
-
-    }
+    //TODO: should we make some relationship types read-only and some editable
+//    def "read by name returns read only instance"() {
+//
+//        RelationshipType containment = RelationshipType.readByName("containment")
+//
+//        expect:
+//        containment
+//
+//        when:
+//        containment.name = "foo"
+//        containment.save()
+//
+//        then:
+//        IllegalStateException e = thrown(IllegalStateException)
+//        e
+//        e.message == "Cannot make an immutable entity modifiable."
+//
+//    }
 
     def "data elements can be contained in models, models can contain data elements"(){
 

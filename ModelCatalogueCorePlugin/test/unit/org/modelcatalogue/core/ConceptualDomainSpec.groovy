@@ -39,20 +39,6 @@ class ConceptualDomainSpec extends Specification {
 
     }
 
-    def "check  EqualsAndHashCode works"(){
-
-        when:
-        def a = new ConceptualDomain(name:"test concept", description: "test concept description")
-        def b = new ConceptualDomain(name:"test concept", description: "test concept description")
-        def c = new ConceptualDomain(name:"test conceptasdsfdfsad", description: "test concept description").save()
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-
-    }
-
     def "check toString works"(){
 
         when:

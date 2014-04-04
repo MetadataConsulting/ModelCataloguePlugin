@@ -70,14 +70,6 @@ modelcatalogue.defaults.measurementunits = [
 ]
 
 
-
-
-
-
-
-
-
-
 modelcatalogue.defaults.relationshiptypes =  [
         [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],

@@ -96,28 +96,4 @@ class EnumeratedTypeSpec extends Specification {
 
     }
 
-
-
-    def "check  EqualsAndHashCode works"(){
-
-        when:
-        def a = new EnumeratedType(name: "number", enumerations: [one: 'one', two: 'two', three: 'three']).save()
-        def b = new EnumeratedType(name: "number", enumerations: [one: 'one', two: 'two', three: 'three']).save()
-        def c = new EnumeratedType(name: "number1", enumerations: [one: 'one', two: 'two', three: 'three']).save()
-        def d = new EnumeratedType(name: "number", enumerations: [one: 'one', two: 'two2', three: 'three']).save()
-        def e = new EnumeratedType(name: "something", enumerations: [foo: 'one function', bar: 'two twins ', barbar: 'three little piglets']).save()
-
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-        !a.equals(d)
-        !a.equals(e)
-
-
-    }
-
-
-
 }

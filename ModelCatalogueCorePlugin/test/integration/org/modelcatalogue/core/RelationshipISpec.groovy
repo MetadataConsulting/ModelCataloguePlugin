@@ -11,12 +11,11 @@ import spock.lang.Unroll
 class RelationshipISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def cd1, md1, de1, vd1, de2, reltype, dt, ms, initCatalogueService, relationshipService
+    def cd1, md1, de1, vd1, de2, reltype, dt, ms, relationshipService
 
     def setupSpec(){
 
         loadFixtures()
-        initCatalogueService.initDefaultRelationshipTypes()
 
         cd1 =  ConceptualDomain.findByName("public libraries")
         md1 = Model.findByName("book")
@@ -24,7 +23,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         de2 = DataElement.findByName("title")
         dt = DataType.findByName("string")
         ms = MeasurementUnit.findByName("Miles per hour")
-        reltype = RelationshipType.findByName("BroaderTerm")
+        reltype = RelationshipType.findByName("relationship")
         vd1 = ValueDomain.findByName("school subject")
     }
 
@@ -142,7 +141,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         10 | true  | [source: cd1, destination: vd1, relationshipType: RelationshipType.inclusionType]
         11 | false | [source: new ConceptualDomain(name: 'element1'), destination: md1, relationshipType: RelationshipType.instantiationType]
         12 | true  | [source: de1, destination: vd1, relationshipType: RelationshipType.instantiationType]
-        13 | false | [source: new ConceptualDomain(name: 'element1'), destination: md1, relationshipType: reltype]
+        13 | false | [source: new ConceptualDomain(name: 'element1'), destination: md1, relationshipType: RelationshipType.instantiationType]
         14 | true  | [source: de1, destination: de2, relationshipType: reltype]
         15 | false | [source: cd1, destination: md1, relationshipType: RelationshipType.supersessionType]
         16 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType]

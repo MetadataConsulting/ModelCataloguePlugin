@@ -130,29 +130,4 @@ class EnumeratedType extends DataType {
         ret
     }
 
-
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof EnumeratedType)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        EnumeratedType ce = (EnumeratedType) obj;
-        return new EqualsBuilder()
-                .append(name, ce.name)
-                .append(enumAsString, ce.enumAsString)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(enumAsString)
-                .toHashCode();
-    }
-
-
-
 }

@@ -126,26 +126,6 @@ class RelationshipType {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof RelationshipType)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        RelationshipType de = (RelationshipType) obj;
-        return new EqualsBuilder()
-                .append(name, de.name)
-                .isEquals()
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .toHashCode()
-    }
-
-
     Map<String, Object> getInfo() {
         [
                 id: id,

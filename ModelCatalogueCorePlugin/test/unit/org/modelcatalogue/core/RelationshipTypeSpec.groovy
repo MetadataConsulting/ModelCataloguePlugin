@@ -45,21 +45,4 @@ class RelationshipTypeSpec extends Specification {
         true     | "source.class == destination.class"
     }
 
-
-
-    def "check  EqualsAndHashCode works"(){
-
-        when:
-        def rt = new RelationshipType(name:'relationship1', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: CatalogueElement,destinationClass: CatalogueElement).save()
-        def rt2 = new RelationshipType(name:'relationship1', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: CatalogueElement,destinationClass: CatalogueElement).save()
-        def rt3 = new RelationshipType(name:'relationship2', sourceToDestination:'parent', destinationToSource: 'child', sourceClass: CatalogueElement,destinationClass: CatalogueElement).save()
-
-        then:
-        rt.equals(rt2)
-        rt2.equals(rt)
-        !rt.equals(rt3)
-
-    }
-
-
 }

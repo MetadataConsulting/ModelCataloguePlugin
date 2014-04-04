@@ -2,14 +2,15 @@ package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.test.spock.IntegrationSpec
 import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(InitCatalogueService)
-@Mock([DataType, MeasurementUnit, RelationshipType, Model, DataElement])
-class InitserviceSpec extends Specification {
+class InitCatalogueServiceSpec extends IntegrationSpec {
+
+    def initCatalogueService
 
     def setup() {
     }
@@ -21,10 +22,10 @@ class InitserviceSpec extends Specification {
     def "init default measurement units"() {
 
         when:
-        service.initDefaultMeasurementUnits()
-        MeasurementUnit dt1 = MeasurementUnit.findByName("Celsius")
-        MeasurementUnit dt2 = MeasurementUnit.findByName("Fahrenheit")
-        MeasurementUnit dt3 = MeasurementUnit.findByName("Newtons")
+        initCatalogueService.initDefaultMeasurementUnits()
+        MeasurementUnit dt1 = MeasurementUnit.findByName("celsius")
+        MeasurementUnit dt2 = MeasurementUnit.findByName("fahrenheit")
+        MeasurementUnit dt3 = MeasurementUnit.findByName("newtons")
 
         then:
         dt1
@@ -37,7 +38,7 @@ class InitserviceSpec extends Specification {
     def "init default relationship types"() {
 
         when:
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType dt1 = RelationshipType.findByName("containment")
         RelationshipType dt2 = RelationshipType.findByName("context")
         RelationshipType dt3 = RelationshipType.findByName("supersession")
@@ -56,18 +57,16 @@ class InitserviceSpec extends Specification {
 
 
     def "you can init default types without duplicates"() {
-        expect:
-        RelationshipType.count() == 0
 
         when: "the init method is run for the first type"
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         int defaultTypesCount = RelationshipType.count()
 
         then: "there are some default types"
         defaultTypesCount
 
         when: "the init method again"
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
 
         then: "no types are added again"
         defaultTypesCount == RelationshipType.count()
@@ -75,7 +74,7 @@ class InitserviceSpec extends Specification {
 
     def "The containment is present withing default relations types"(){
         when:
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.containmentType
 
         then:
@@ -90,7 +89,7 @@ class InitserviceSpec extends Specification {
 
     def "The context is present withing default relations types"(){
         when:
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.contextType
 
         then:
@@ -105,7 +104,7 @@ class InitserviceSpec extends Specification {
 
     def "The hierarchy is present withing default relations types"(){
         when:
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.hierarchyType
 
         then:
@@ -120,7 +119,7 @@ class InitserviceSpec extends Specification {
 
     def "The inclusion is present withing default relations types"(){
         when:
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.inclusionType
 
         then:
@@ -135,7 +134,7 @@ class InitserviceSpec extends Specification {
 
     def "The instantiation is present withing default relations types"(){
         when:
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.instantiationType
 
         then:
@@ -150,7 +149,7 @@ class InitserviceSpec extends Specification {
 
     def "The supersession is present withing default relations types"(){
         when:
-        service.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.supersessionType
 
         then:
@@ -167,10 +166,9 @@ class InitserviceSpec extends Specification {
     }
 
     def "check initDataTypes works"(){
-        service.initDefaultDataTypes()
+        initCatalogueService.initDefaultDataTypes()
 
         expect:
-        DataType.count() == 7
         DataType.findByName("String")
         DataType.findByName("Integer")
         DataType.findByName("Double")

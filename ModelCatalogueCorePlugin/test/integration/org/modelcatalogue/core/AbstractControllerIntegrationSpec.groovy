@@ -20,12 +20,11 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     @Shared
     ResultRecorder recorder
     @Shared
-    def totalCount
+    def totalCount, initCatalogueService
 
     def setupSpec(){
         loadMarshallers()
         loadFixtures()
-        RelationshipType.initDefaultRelationshipTypes()
         recorder = DefaultResultRecorder.create(
                 "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
                 "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",

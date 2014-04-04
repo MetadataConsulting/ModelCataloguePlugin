@@ -38,26 +38,4 @@ class ConceptualDomain extends CatalogueElement {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ConceptualDomain)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        ConceptualDomain cd = (ConceptualDomain) obj;
-        return new EqualsBuilder()
-                .append(name, cd.name)
-                .append(id, cd.id)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(id)
-                .toHashCode();
-    }
-
-
 }
