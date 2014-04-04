@@ -1,0 +1,82 @@
+h2. Introduction
+
+This plugin provides set of AngularJS directives and services for easier work with the API on the front-end side. See
+Angular related topics in the Quick Reference panel on the right side.
+
+h2. Including AngularJS services and directives in you application
+
+If you use asset pipeline plugin, your application main script should require following assets
+
+{code}
+//= require jquery/dist/jquery
+//= require bootstrap/dist/js/bootstrap
+//= require angular/angular
+//= require modelcatalogue/util/index
+//= require modelcatalogue/core/index
+//= require modelcatalogue/core/ui/index
+//= require modelcatalogue/core/ui/bs/index
+{code}
+
+h2. Configuration
+
+You should configure the [modelCatalogueApiRoot|Angular Values] on each page where you want to take advantage of
+the AngularJS support.
+
+{code:html}
+<script type="text/javascript">
+    angular
+    .module('demo.config', ['mc.core.modelCatalogueApiRoot'])
+    .value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core');
+</script>
+{code}
+
+When catalogue element is requested to be shown, [showCatalogueElement|Angular Events] is broadcast. You should
+respond to that event accordingly showing the request catalogue element e.g. by changing the current location hash.
+
+{code}
+$scope.on('showCatalogueElement', function(event, element) {
+    // display the element by e.g. changing the current route
+})
+{code}
+
+h2. AngularJS Services
+
+There is several services provided out of the box for this plugin. The most important services are [modelCatalogueSearch|Angular Services]
+and [catalogueElementResource|Angular Services].
+
+Considering you have injected these two services into your controller you can write code like following one:
+
+{code}
+var valueDomains = catalogueElementResource('valueDomain')
+valueDomains.list().then(function(list) {
+    $scope.list = list;
+});
+valueDomain.get(15).then(function(element) {
+    $scope.element = element
+});
+
+// or
+modelCatalogueSearch('patient').then(function(list) {
+   $scope.list = list;
+});
+{code}
+
+h2. AngularJS Directives
+
+A few directives are provides as well. The most important one is [catalogue-element-view|Angular Directives]
+which simply takes the catalogue element and displays it in convenient way.
+
+{code}
+ <catalogue-element-view element="element"></catalogue-element-view>
+{code}
+
+For displaying list responses [decorated-list|Angular Directives] directive is very useful. It takes the lists
+passed by methods from [modelCatalogueSearch|Angular Services] and [catalogueElementResource|Angular Services]
+and shows them in paginated table.
+{code}
+<decorated-list list="list"></decorated-list>
+{code}
+
+h2. Further reading
+
+See the Quick Reference documentation on the left side for more examples.

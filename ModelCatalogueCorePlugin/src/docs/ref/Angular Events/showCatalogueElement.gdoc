@@ -1,0 +1,16 @@
+h1. showCatalogueElement
+
+Event broadcast on the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope] when
+ [catalogueElement|Angular Enhancers] show method is called. It passes the element
+ to show as the second argument to handler function.
+
+
+h2. Usage
+Register the handler on the current scope or the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope]
+to listen to show request.
+
+{code}
+$scope.on('showCatalogueElement', function(event, element) {
+    // display the element by e.g. changing the current route
+})
+{code}

@@ -1,0 +1,26 @@
+h1. catalogueElement
+
+@catalogueElement@ enhancer wraps the catalogue elements usually returned by the backend as JSON and adds
+following methods @delete@, @update@, @validate@, @show@. First three can be considered shortcuts
+to the methods of the same name in [catalogueElementResource|Angular Services]. The @show@ method
+triggers [showCatalogueElement|Angular Events] event allowing you to plug in custom display logic.
+
+h2. Condition
+
+This enhancer is used if the object has own properties of name @elementType@ and @link@.
+
+h2. Usage
+
+You usually get objects enhanced by this enhancer when accessing resource using [catalogueElementResource|Angular Services]
+or [modelCatalogueSearch|Angular Services].
+
+{code}
+angular
+.module('foo', ['mc.core.catalogueElementResource', 'mc.core.catalogueElementEnhancer'])
+.factory('bar', function(catalogueElementResource) {
+    var valueDomains = catalogueElementResource('valueDomain')
+    valueDomains.get(1).then(function(domain){
+        domain.show(); // triggers the showCatalogueElement event
+    });
+});
+{code}

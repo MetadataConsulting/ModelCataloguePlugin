@@ -1,0 +1,24 @@
+h1. mc.core.ui
+
+UI Core package provides directives and services for rendering catalogue elements.
+
+h2. Modules
+This package groups following modules for easier use:
+
+{table}
+Name                            | Description
+mc.core.ui.catalogueElementView | provides [catalogue-element-view|Angular Directives] directive for displaying catalogue elements
+mc.core.ui.columns              | provides [columns|Angular Services] service to define default columns to display when catalogue element is rendered
+mc.core.ui.decoratedList        | provides [decorated-list|Angular Directives] directive for rendering enhanced list data structures
+mc.core.ui.propertiesPane       | provides [properties-pane|Angular Directives] directive to displaying JavaScript object properties
+{table}
+
+h2. Include
+Require using asset pipeline plugin in your asset file
+{code}
+//= require modelcatalogue/core/ui/index
+{code}
+or link directly in JSP
+{code:xml}
+<asset:javascript src="/modelcatalogue/core/ui/index.js"/>
+{code}
