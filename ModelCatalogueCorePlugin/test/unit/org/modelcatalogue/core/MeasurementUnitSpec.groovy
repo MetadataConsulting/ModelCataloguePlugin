@@ -41,18 +41,4 @@ class MeasurementUnitSpec extends Specification {
 
     }
 
-
-    def "check  EqualsAndHashCode works"(){
-
-        when:
-        def a = new MeasurementUnit(name: "MPH", description: "Miles per Hour")
-        def b = new MeasurementUnit(name:"MPH", description: "test meausre description")
-        def c = new MeasurementUnit(name:"KPH", description: "test measure description")
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-
-    }
 }

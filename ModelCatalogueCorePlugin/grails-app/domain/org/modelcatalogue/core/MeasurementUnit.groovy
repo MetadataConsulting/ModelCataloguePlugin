@@ -30,23 +30,4 @@ class MeasurementUnit extends CatalogueElement {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof MeasurementUnit)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        MeasurementUnit ce = (MeasurementUnit) obj;
-        return new EqualsBuilder()
-                .append(name, ce.name)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .toHashCode();
-    }
-
 }

@@ -85,29 +85,4 @@ class DataElementSpec extends Specification {
 
     }
 
-
-    def "check  EqualsAndHashCode works"() {
-
-        when:
-        def a = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
-        def b = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
-        def c = new DataElement(name: "test conceptasdsfdfsad", description: "test concept description", versionNumber: 0.1)
-        def d = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
-        def e = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
-        def f = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.2)
-        def ext = new ExtensionValue(name: "xxx", extensionValue: "x", element: d).save()
-        d.addToExtensions(ext)
-        e.addToExtensions(ext)
-        assert (!d.save().hasErrors())
-        assert (!e.save().hasErrors())
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-        !a.equals(d)
-        !a.equals(f)
-        d.equals(e)
-
-    }
 }

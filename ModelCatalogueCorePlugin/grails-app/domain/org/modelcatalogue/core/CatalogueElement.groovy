@@ -133,27 +133,6 @@ abstract class CatalogueElement {
         ]
     }
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CatalogueElement)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        CatalogueElement ce = (CatalogueElement) obj;
-        return new EqualsBuilder()
-                .append(name, ce.name)
-                .append(id, ce.id)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(id)
-                .toHashCode();
-    }
-
     def beforeDelete(){
         outgoingRelationships.each{ relationship->
             relationship.beforeDelete()

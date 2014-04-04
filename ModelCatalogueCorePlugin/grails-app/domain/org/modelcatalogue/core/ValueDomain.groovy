@@ -88,27 +88,5 @@ class ValueDomain extends CatalogueElement  {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
-//    public boolean equals(Object obj) {
-//        if (!(obj instanceof ValueDomain)) {
-//            return false;
-//        }
-//        if (this.is(obj)) {
-//            return true;
-//        }
-//        ValueDomain cd = (ValueDomain) obj;
-//        return new EqualsBuilder()
-//                .append(name, cd.name)
-//                .append(unitOfMeasure, cd.unitOfMeasure)
-//                .append(dataType, cd.dataType)
-//                .isEquals();
-//    }
-//
-//    public int hashCode() {
-//        return new HashCodeBuilder()
-//                .append(name)
-//                .append(unitOfMeasure)
-//                .append(dataType)
-//                .toHashCode();
-//    }
 
 }

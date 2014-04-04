@@ -94,25 +94,6 @@ class RelationshipType {
     }
 
 
-    static defaultRelationshipTypesDefinitions = [
-            [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement],
-            [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
-            [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
-            [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
-            [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
-            [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class"]
-
-    ]
-
-    static initDefaultRelationshipTypes() {
-        for (definition in defaultRelationshipTypesDefinitions) {
-            RelationshipType existing = findByName(definition.name)
-            if (!existing) {
-                new RelationshipType(definition).save()
-            }
-        }
-    }
-
     static getContainmentType() {
         readByName("containment")
     }
@@ -144,26 +125,6 @@ class RelationshipType {
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof RelationshipType)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        RelationshipType de = (RelationshipType) obj;
-        return new EqualsBuilder()
-                .append(name, de.name)
-                .isEquals()
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .toHashCode()
-    }
-
 
     Map<String, Object> getInfo() {
         [

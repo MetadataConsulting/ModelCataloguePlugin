@@ -11,7 +11,7 @@ import spock.lang.Shared
 abstract class AbstractIntegrationSpec extends IntegrationSpec {
 
     @Shared
-    def fixtureLoader, fixtures
+    def fixtureLoader, fixtures, initCatalogueService
 
     def loadMarshallers() {
         def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
@@ -22,7 +22,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         if(CatalogueElement.count()==0){
             fixtures = fixtureLoader.load("dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "dataElements/*", "conceptualDomains/*", "models/*", "relationshipTypes/*").load("valueDomains/*", "extensions/*")
         }
-        RelationshipType.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
     }
 
 }

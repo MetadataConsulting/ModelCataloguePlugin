@@ -52,18 +52,4 @@ class ExtensionValueSpec extends Specification {
     }
 
 
-    def "check  EqualsAndHashCode works"() {
-
-        when:
-        def a = new ExtensionValue(name: "xxx", extensionValue: "x", element: de).save()
-        def b = new ExtensionValue(name: "xxx", extensionValue: "x", element: de).save()
-        def c = new ExtensionValue(name: "xxx1", extensionValue: "x", element: de).save()
-
-        then:
-
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-
-    }
 }

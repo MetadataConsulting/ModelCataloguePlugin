@@ -37,33 +37,4 @@ class DataTypeSpec extends Specification{
 
     }
 
-
-    def "check  EqualsAndHashCode works"(){
-
-        when:
-        def a = new DataType(name:"test", description: "test concept description")
-        def b = new DataType(name:"test", description: "test concept description")
-        def c = new DataType(name:"test conceptasdsfdfsad", description: "test concept description")
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-
-    }
-
-    def "check initDataTypes works"(){
-        DataType.initDefaultDataTypes()
-
-        expect:
-        DataType.count() == 7
-        DataType.findByName("String")
-        DataType.findByName("Integer")
-        DataType.findByName("Double")
-        DataType.findByName("Boolean")
-        DataType.findByName("Date")
-        DataType.findByName("Time")
-        DataType.findByName("Currency")
-    }
-
 }

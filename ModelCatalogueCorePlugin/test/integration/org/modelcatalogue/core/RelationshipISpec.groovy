@@ -11,9 +11,7 @@ import spock.lang.Unroll
 class RelationshipISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def cd1, md1, de1, vd1, de2, reltype, dt, ms
-
-    @Shared RelationshipService relationshipService
+    def cd1, md1, de1, vd1, de2, reltype, dt, ms, relationshipService
 
     def setupSpec(){
 
@@ -25,12 +23,21 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         de2 = DataElement.findByName("title")
         dt = DataType.findByName("string")
         ms = MeasurementUnit.findByName("Miles per hour")
-        reltype = RelationshipType.findByName("Synonym")
+        reltype = RelationshipType.findByName("relationship")
         vd1 = ValueDomain.findByName("school subject")
     }
 
-    def cleanupSpec(){
-    }
+    /*def cleanupSpec(){
+
+        cd1.delete()
+        de1.delete()
+        de2.delete()
+        dt.delete()
+        ms.delete()
+        md1.delete()
+        reltype.delete()
+        vd1.delete()
+    }*/
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
@@ -134,7 +141,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         10 | true  | [source: cd1, destination: vd1, relationshipType: RelationshipType.inclusionType]
         11 | false | [source: new ConceptualDomain(name: 'element1'), destination: md1, relationshipType: RelationshipType.instantiationType]
         12 | true  | [source: de1, destination: vd1, relationshipType: RelationshipType.instantiationType]
-        13 | false | [source: new ConceptualDomain(name: 'element1'), destination: md1, relationshipType: reltype]
+        13 | false | [source: new ConceptualDomain(name: 'element1'), destination: md1, relationshipType: RelationshipType.instantiationType]
         14 | true  | [source: de1, destination: de2, relationshipType: reltype]
         15 | false | [source: cd1, destination: md1, relationshipType: RelationshipType.supersessionType]
         16 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType]

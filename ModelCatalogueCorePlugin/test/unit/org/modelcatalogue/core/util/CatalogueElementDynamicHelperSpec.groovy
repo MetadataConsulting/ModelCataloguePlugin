@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.util
 
 import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType
@@ -9,6 +11,7 @@ import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
 
+@TestFor(InitCatalogueService)
 @Mock([RelationshipType, TestCatalogueElement1, TestCatalogueElement2, Relationship])
 class CatalogueElementDynamicHelperSpec extends Specification {
 
@@ -29,7 +32,8 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 
     @Unroll @ConfineMetaClassChanges([TestCatalogueElement1, TestCatalogueElement2])
     def "Relationship #prop is added to #clazz"() {
-        RelationshipType.initDefaultRelationshipTypes()
+
+        service.initDefaultRelationshipTypes()
 
         CatalogueElementDynamicHelper.addShortcuts(clazz)
 

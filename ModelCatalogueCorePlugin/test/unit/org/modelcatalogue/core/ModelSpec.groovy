@@ -83,32 +83,5 @@ class ModelSpec extends Specification {
         modelInstance.info.link == "/model/${modelInstance.id}"
     }
 
-
-    def "check  EqualsAndHashCode works"() {
-
-        when:
-        def a = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
-        def b = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
-        def c = new Model(name: "test conceptasdsfdfsad", description: "test concept description", versionNumber: 0.1)
-        def d = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
-        def e = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
-        def f = new Model(name: "test concept", description: "test concept description", versionNumber: 0.2)
-        def ext = new ExtensionValue(name: "xxx", extensionValue: "x", element: d).save()
-        d.addToExtensions(ext)
-        e.addToExtensions(ext)
-        assert (!d.save().hasErrors())
-        assert (!e.save().hasErrors())
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-        !a.equals(d)
-        !a.equals(f)
-        d.equals(e)
-
-    }
-
-
 }
 
