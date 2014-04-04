@@ -1,0 +1,22 @@
+h1. modelCatalogueSearch
+
+Function which searches through every catalogue element type.
+Declared in @mc.core.modelCatalogueSearch@ module inside [mc.core|Angular Packages] package.
+
+h2. Usage
+
+You can inject the function in any construct in the run phase (service, factory, controller, etc.). It is accepting
+one string parameter which is the query string. You can also pass pagination parameters as the second argument.
+
+{code}
+angular
+.module('foo', ['mc.core.modelCatalogueSearch'])
+.factory('bar', function(modelCatalogueSearch) {
+    modelCatalogueSearch('patient').then(function(list) {
+        // do something with the search list
+    });
+    modelCatalogueSearch('foo', {offset: 10, max: 5}).then(function(list) {
+        // do something with another search list
+    });
+});
+{code}

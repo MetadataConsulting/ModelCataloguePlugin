@@ -19,7 +19,7 @@ mc.core.removableItemEnhancer    | enables [removableItem|Angular Enhancers] enh
 
 h2. Include
 Require using asset pipeline plugin in your asset file
-{code:javascript}
+{code}
 //= require modelcatalogue/core/index
 {code}
 or link directly in JSP

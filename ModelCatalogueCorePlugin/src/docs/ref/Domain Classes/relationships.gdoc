@@ -1,0 +1,26 @@
+h1. relationships
+
+You can use static map @relationships@ to create shortcuts in the domain class. In this plugin @Relationship@ is
+lightweight way how to express relation between two @CatalogueElement@ entities which is extremly powerful but
+sometimes you may want to express the relationships in developer friendlier way.
+
+@relationship@ map can contains up to two keys - @incoming@ and @outgoing@ - each having another map as a value.
+Keys for these maps are the unique @RelationshipType@ names and the values are the property names to be used for the shortcuts.
+
+If we have following declaration in our domain class
+
+{code}
+    static relationships = [
+        incoming: [context: 'hasContextOf', hierarchy: 'childOf'],
+        outgoing: [containment: 'contains', hierarchy: 'parentOf']
+    ]
+{code}
+
+@context@, @containment@, @hierarchy@ are the names of the @RelationshipType@. @hasContextOf@,
+@childOf@, @contains@ and @parentOf@ getters are added to the domain class pointing to filtered collection
+of all incoming or outgoing relationships. Three more methods are also added for each shortcut: @countShortcutName@,
+@addToShortcutName@ and @removeFromShortcutName@ where @ShortcutName@ is replaced with the actual capitalized name of the shortcut
+e.g. @countChildOf@, @addToChildOf@, @removeFromChildOf@. First one accepts no parameters, the other two accepts the
+catalogue element to be added or removed.
+
+

@@ -1,0 +1,61 @@
+h1. properties-pane
+
+Generic element directive for rendering properties of the JavaScript Object. Default template defined in
+module @mc.core.ui.bs.propertiesPane@ renders the properties in the table. You need to supply two
+attributes @item@ which is the root object from which the properties will be evaluated and @properties@ is array of
+objects defining the properties. Each item in properties array must have @label@ and @value@ definition.
+@label@ is just plain string shown as the label for the property. @value@ is either a function which gets
+the item as single parameter and returns the desired value or an expression which will be evaluated using
+AngularJS [$eval|http://docs.angularjs.org/api/ng/type/$rootScope.Scope] function with the
+root object supplied as @locals@ parameter. If the result of the
+value evaluation is object instead of string, its property @name@ is displayed in the row if present. If
+the object has also @show()@ method it will be displayed as a link calling the that @show()@ method on click.
+
+h2. Usage
+Considering you have following code in you controller:
+
+{code}
+$scope.paneProperties = [
+  {label: 'ID', value: 'id'},
+  {label: 'Name', value: function(element) { return element.name; }},
+  {label: 'Description', value: 'description' },
+  {label: 'Data Type', value: 'dataType' },
+]
+$scope.element = {
+    id: 10,
+    name: 'Element',
+    description: 'This is an element',
+    dataType: {name: 'The Type', show: function(){ alert('Data Type SHOW!'); }}
+}
+{code}
+
+And following HTML snippet in your page:
+{code}
+<properties-pane item="element" properties="paneProperties"></properties-pane>
+{code}
+
+Than the table with four rows will be rendered. Clicking on "The Type" will show an alert window.
+{table}
+|
+| *ID*          | 10
+| *Name*        | Element
+| *Description* | This is an element
+| *Data Type*   | The Type
+{table}
+
+
+h2. Customization
+You can override the @modelcatalogue/core/ui/propertiesPane.html@ template to plug your own either using
+@text/ng-template@ script definition, creating the template on the appropriate location in your server
+or using the [$templateCache|http://docs.angularjs.org/api/ng/service/$templateCache].
+
+Following variables and methods are added by the directive controller:
+
+{table}
+Name                        | Description
+item                        | The item two-ways bound to the outer scope
+properties                  | The properties definition two-ways bound to the outer scope
+canShow(value, item)        | Check if the value supports showing itself
+evaluateValue(value, item)  | Evaluates the value using the value definition from the properties and the item
+propertyClick(value, item)  | Handles the click event on the property value (calls @show()@ method if available)
+{table}

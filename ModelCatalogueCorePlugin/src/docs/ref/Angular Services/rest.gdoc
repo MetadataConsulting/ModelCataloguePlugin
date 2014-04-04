@@ -1,0 +1,20 @@
+h1. rest
+
+Opaque facade to AngularJS [$http|http://docs.angularjs.org/api/ng/service/$http] service. The only difference in usage is that it resolves to data or status
+if no error occurs and on the other hand it rejects if data object has errors property.
+Declared in @mc.util.rest@ module inside [mc.util|Angular Packages] package.
+
+h2. Usage
+
+You can inject the function in any construct in the run phase (service, factory, controller, etc.).
+The config object is similar to AngularJS [$http|http://docs.angularjs.org/api/ng/service/$http] service.
+
+{code}
+angular
+.module('foo', ['mc.util.rest'])
+.factory('bar', function(rest) {
+   rest({method: 'GET', url: '/foo/bar'}).then(function(data) {
+    // do something with the data (instead of response returned from $http
+   });
+});
+{code}
