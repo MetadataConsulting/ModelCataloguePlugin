@@ -80,12 +80,6 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
         {header: 'Descripton', value: 'description', classes: 'col-md-8'}
       ]
 
-      $scope.itemClick ?= (item) ->
-        if item.show? and angular.isFunction(item.show)
-          item.show()
-        else
-          item._selected = !item._selected
-
 
       $scope.list ?= emptyList
 

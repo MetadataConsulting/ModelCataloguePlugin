@@ -1,0 +1,86 @@
+h1. decorated-list
+
+Generic element directive for showing items enhanced by [list|Angular Enhancers] enhancer. Default template defined in
+@mc.core.ui.bs.decoratedListTable@ is showing each item of the list as table row with pagination at the bottom of the table.
+The directive accepts three two-ways bound attributes @list@, @columns@ and @selection@. Only the @list@ attribute is mandatory and
+represents the list structure which should match the expected input
+
+{code}
+{
+      list: [],
+      next: function(){...},
+      previous: function(){...},
+      goto: function(page) {...},
+      total: 12,
+      offset: 10,
+      size: 2,
+      page: 10,
+      itemType: 'com.example.Type'
+}
+{code}
+
+@columns@ defines which columns should be present in the table in an array of following structures:
+
+{note}
+Instead of managing the columns definition in your business code, you should use [columns|Angular Services] service
+to manage columns definition in one place.
+{note}
+
+{table}
+Key     | Value
+header  | string to be rendered in the table's header row
+value   | value to be shown defined either as function called with current row item as single parameter or string expression which is evaluated in the context of current row element
+classes | classes to be added to value cell defined either as function called with current row item as single parameter or object declaring the classes and it's condition expressions
+show    | recipe how to show the item in the row if possible, either @true@ which is equivalent to @show()@ or function called with current row item as single parameter on click or string expression which is evaluated in the context of current row element and should perform the show action
+{table}
+
+
+If @selection@ attribute is present the table will show the selection check boxes in the first column and the @selection@
+value is populated with the items from the checked rows.
+
+h2. Usage
+
+Considering you have following code in you controller with injected [catalogueElementResource|Angular Services],
+[columns|Angular Services] and [enhance|Angular Services] services:
+
+{code}
+var itemType = 'com.modelcatalogue.core.ValueDomain'
+// first declare an empty list before the values are loaded
+$scope.list     = enhance.getEnhancer('list').createEmptyList(type)
+// also get the appropriate columns definitions
+$scope.columns  = columns(type)
+catalogueElementResource('valueDomain').list().then(function(list) {
+    $scope.list = list;
+});
+{code}
+
+And following HTML snippet in your page:
+{code}
+<decorated-list list="list" columns="columns"></decorated-list>
+{code}
+
+Than you get first ten value domain objects rendered in the table with pagination using the default columns definitions.
+
+h2. Customization
+You can override the @modelcatalogue/core/ui/decoratedList.html@ template to plug your own either using
+@text/ng-template@ script definition, creating the template on the appropriate location in your server
+or using the [$templateCache|http://docs.angularjs.org/api/ng/service/$templateCache].
+
+Following variables and methods are added by the directive controller (besides @list@, @columns@ and @selection@):
+
+{table}
+Name                            | Description
+hasSelection()                  | Returns @true@ if selecting rows is enabled for this directive
+allSelected                     | Is set to @true@ if all the rows should be selected
+updateSelectAll(val)            | Sets the new value for @allSelected@ variable and updates the @selection@ appropriately
+updateSelection()               | Updates the @selection@ appropriately
+goto(page)                      | Goes to page of given number
+hasNext()                       | Weather there is yet another page of items available
+next()                          | Proceeds to the next page
+hasPrevious()                   | Weather there is yet another page of items available before current one
+previous()                      | Proceeds to the previous page
+showEnabled(showDefinition)     | Check if the value supports showing itself
+evaluateValue(value, item)      | Evaluates the value using the value definition from the columns and the item
+evaluateClasses(value, item)    | Evaluates the classes using the value and the item
+showItem(value, item)           | Shows the item if possible
+{table}
