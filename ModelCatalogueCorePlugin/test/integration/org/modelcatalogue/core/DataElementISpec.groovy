@@ -9,7 +9,7 @@ import spock.lang.Shared
 class DataElementISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def auth1, auth3, auth2, initCatalogueService
+    def auth1, auth3, auth2
 
     def setupSpec(){
         loadFixtures()
