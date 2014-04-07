@@ -9,9 +9,10 @@ import spock.lang.Specification
 class ImportServiceSpec extends Specification {
 
     def importService
+    def initCatalogueService
 
     def setupSpec() {
-        RelationshipType.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
     }
 
 

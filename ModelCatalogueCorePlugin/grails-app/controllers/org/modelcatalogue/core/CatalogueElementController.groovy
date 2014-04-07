@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse
 
 abstract class CatalogueElementController<T> extends AbstractRestfulController<T> {
 
-    static responseFormats = ['json', 'xml']
+    static responseFormats = ['json', 'xml', 'csv']
     static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE"]
 
     def relationshipService
