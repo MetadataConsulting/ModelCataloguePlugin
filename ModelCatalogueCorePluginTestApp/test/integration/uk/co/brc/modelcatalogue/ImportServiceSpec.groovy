@@ -11,15 +11,12 @@ class ImportServiceSpec extends Specification {
     def importService
     def initCatalogueService
 
-    def setupSpec() {
-        initCatalogueService.initDefaultRelationshipTypes()
-    }
-
 
     def
     "import nhic spreadsheet"() {
 
         when:
+        initCatalogueService.initDefaultRelationshipTypes()
         importService.importData()
 
         then:
