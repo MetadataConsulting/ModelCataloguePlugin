@@ -57,7 +57,6 @@ describe "mc.core.catalogueElementResource", ->
           expect(result.id).toBe(testElementId)
           expect(result.name).toBe("value domain Celsius")
           expect(result.description).toBeDefined()
-          expect(result.version).toBe(1)
 
 
           describe "fetched instance is enhanced", ->
@@ -282,7 +281,7 @@ describe "mc.core.catalogueElementResource", ->
       describe "can update entity", ->
         it "updates ok if entity exists", ->
           payloadWithId = angular.extend({}, fixtures.valueDomain.updateInput)
-          payloadWithId.id = 74
+          payloadWithId.id = fixtures.valueDomain.showOne.id
 
           $httpBackend
           .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{payloadWithId.id}", fixtures.valueDomain.updateInput)
@@ -304,7 +303,7 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(74)
+          expect(result.id).toBe(payloadWithId.id)
           expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
@@ -330,7 +329,6 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(74)
           expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
