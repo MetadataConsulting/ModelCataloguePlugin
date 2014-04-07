@@ -9,16 +9,14 @@ import spock.lang.Specification
 class ImportServiceSpec extends Specification {
 
     def importService
-
-    def setupSpec() {
-        RelationshipType.initDefaultRelationshipTypes()
-    }
+    def initCatalogueService
 
 
     def
     "import nhic spreadsheet"() {
 
         when:
+        initCatalogueService.initDefaultRelationshipTypes()
         importService.importData()
 
         then:

@@ -11,7 +11,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
-    static responseFormats = ['json', 'xml']
+    static responseFormats = ['json', 'xml', 'csv']
     def modelCatalogueSearchService
 
     AbstractRestfulController(Class<T> resource) {
