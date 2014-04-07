@@ -23,4 +23,8 @@ of all incoming or outgoing relationships. Three more methods are also added for
 e.g. @countChildOf@, @addToChildOf@, @removeFromChildOf@. First one accepts no parameters, the other two accepts the
 catalogue element to be added or removed.
 
+h2. Usage
+
+see [dataElement|DomainClasses], [valueDomain|DomainClasses], [model|DomainClasses], [conceptualDomain|DomainClasses]
+
 

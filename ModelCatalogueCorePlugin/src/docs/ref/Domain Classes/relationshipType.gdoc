@@ -1,0 +1,39 @@
+h1. RelationshipType
+
+the model catalogue core plugin includes the following relationship types as a default:
+
+{table}
+
+         RelationshipType | Source           | Destination  | Source->Destination    |  Destination<-Source
+         [context]        | ConceptualDomain | Model        | "provides context for" | "has context of"
+         [inclusion]      | ConceptualDomain | ValueDomain  |  "includes"            | "included in"
+         [containment]    | Model            | DataElement  |  "contains"            |  "contained in"
+         [instantiation]  | DataElement      | ValueDomain  | "instantiated by"      | "instantiates"
+         [heirachical]    | Model            | Model        | "parentOf"             | "ChildOf"
+         [supersession]   | DataElement      | DataElement  | "supercedes"           | "supercededBy"
+
+{table}
+
+These relationship types can be used to create [relationship|DomainClasses]s between [catalogueElement|DomainClasses]s
+
+{warning}
+containment, context, hierarchy, inclusion, instantiation and supersession relationship types should not be removed from the registry
+{warning}
+
+Additional relationshipTypes can be configured by adding to the following list in @Config.groovy@
+
+{code}
+modelcatalogue.defaults.relationshiptypes =  [
+[name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement],
+[name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
+[name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
+[name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
+[name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
+[name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement,
+rule: "source.class == destination.class"]
+]
+{code}
+
+
+
+

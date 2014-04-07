@@ -1,0 +1,11 @@
+h1. Published Element
+
+Extends [catalogueElement|Domain Classes]
+Extended by [extendibleElement|Domain Classes]
+
+Abstract class extended to add publishable behaviour.
+* to be completed in future release
+Once a data element is finalized it cannot be further changed, instead a new version will be created that supersedes the original
+
+
+
