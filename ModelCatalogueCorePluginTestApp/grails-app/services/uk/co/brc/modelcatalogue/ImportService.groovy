@@ -6,6 +6,7 @@ class ImportService {
 
     static transactional = true
     def grailsApplication
+    def initCatalogueService
 
     private static final QUOTED_CHARS = [
             "\\": "&#92;",
@@ -15,8 +16,9 @@ class ImportService {
     ]
 
     def importData() {
-        DataType.initDefaultDataTypes()
-        RelationshipType.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultDataTypes()
+        initCatalogueService.initDefaultMeasurementUnits()
         getNhicFiles().each { filename -> singleImport(filename) }
     }
 //
@@ -46,7 +48,7 @@ class ImportService {
     def singleImport(String filename) {
 
         DataType.initDefaultDataTypes()
-        RelationshipType.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
         def applicationContext = grailsApplication.mainContext
         String basePath = applicationContext.getResource("/").getFile().toString()
 
