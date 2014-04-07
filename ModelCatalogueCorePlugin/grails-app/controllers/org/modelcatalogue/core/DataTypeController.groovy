@@ -14,7 +14,7 @@ class DataTypeController<T> extends CatalogueElementController<DataType> {
 
 
     def valueDomains(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        setSafeMax(max)
         DataType dataType = queryForResource(params.id)
         if (!dataType) {
             notFound()

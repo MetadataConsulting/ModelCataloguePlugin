@@ -11,7 +11,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
-    static responseFormats = ['json', 'xml', 'csv']
+    static responseFormats = ['json', 'xml', 'xlsx']
     def modelCatalogueSearchService
 
     AbstractRestfulController(Class<T> resource) {
@@ -19,7 +19,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     def search(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        setSafeMax(max)
         def results =  modelCatalogueSearchService.search(resource, params)
 
         if(results.errors){
@@ -42,9 +42,24 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         respond elements
     }
 
+    protected setSafeMax(Integer max) {
+        withFormat {
+            json {
+                params.max = Math.min(max ?: 10, 100)
+            }
+            xml {
+                params.max = Math.min(max ?: 10, 100)
+            }
+            xlsx {
+                params.max = Math.min(max ?: 10000, 10000)
+            }
+        }
+
+    }
+
     @Override
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        setSafeMax(max)
         def total = countResources()
         def list = listAllResources(params)
         def links = nextAndPreviousLinks("/${resourceName}/", total)

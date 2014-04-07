@@ -1,8 +1,4 @@
-import org.modelcatalogue.core.ConceptualDomain
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.*
 
 // configuration for plugin testing - will not be included in the plugin zip
 
@@ -29,7 +25,8 @@ log4j = {
 
 grails.mime.types = [
         json:          ['application/json', 'text/json'],
-        xml:           ['text/xml', 'application/xml']
+        xml:           ['text/xml', 'application/xml'],
+        xlsx:          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 ]
 
 grails.doc.images = new File("src/docs/images")
