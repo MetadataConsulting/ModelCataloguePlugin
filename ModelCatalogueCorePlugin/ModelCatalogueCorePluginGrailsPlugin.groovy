@@ -1,6 +1,10 @@
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.marshalling.*
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXElementsRenderer
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXMappingsRenderer
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXRelationshipsRenderer
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXValueDomainsRenderer
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
@@ -50,6 +54,11 @@ Model catalogue core plugin (metadata registry)
 
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
+
+        xlsxElementsRenderer(XLSXElementsRenderer)
+        xlsxMappingsRenderer(XLSXMappingsRenderer)
+        xlsxRelationshipsRenderer(XLSXRelationshipsRenderer)
+        xlsxValueDomainsRenderer(XLSXValueDomainsRenderer)
 
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {

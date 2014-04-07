@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse
 
 abstract class CatalogueElementController<T> extends AbstractRestfulController<T> {
 
-    static responseFormats = ['json', 'xml', 'csv']
+    static responseFormats = ['json', 'xml', 'xlsx']
     static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE"]
 
     def relationshipService
@@ -128,7 +128,7 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
     }
 
     private relationships(Integer max, String typeParam, String sourceOrDestination, String incomingOrOutgoing) {
-        params.max = Math.min(max ?: 10, 100)
+        setSafeMax(max)
 
         CatalogueElement element = queryForResource(params.id)
         if (!element) {

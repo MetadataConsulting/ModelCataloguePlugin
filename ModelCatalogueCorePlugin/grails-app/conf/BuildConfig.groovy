@@ -54,11 +54,13 @@ grails.project.dependency.resolution = {
         compile ":less-asset-pipeline:1.5.0"
         compile ":hibernate:3.6.10.7"
 
+        compile ":excel-export:0.2.0"
+
         test ':build-test-data:1.1.1'
         test ':fixtures:1.2'
 
         // codenarc static analysis
-        provided ":codenarc:0.20"
+        build ":codenarc:0.20"
 
         // test coverage
         test ":code-coverage:1.2.7"

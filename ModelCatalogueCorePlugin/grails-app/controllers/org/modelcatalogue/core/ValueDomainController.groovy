@@ -15,7 +15,7 @@ class ValueDomainController extends CatalogueElementController<ValueDomain> {
     }
 
     def mappings(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        setSafeMax(max)
         ValueDomain domain = queryForResource(params.id)
         if (!domain) {
             notFound()
