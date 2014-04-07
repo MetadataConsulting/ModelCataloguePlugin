@@ -1,0 +1,79 @@
+h1. Extendible Element
+
+Abstract Class extended to allow addition of metadata in the form of an a key-value pair (see [extensionValue|Domain Classes]).
+This can be achieved using the @.ext@ notation.
+
+Extended by [model|Domain Classes] and [dataElement|Domain Classes].
+
+h2. Usage
+
+You can add key value extensions using the following notation:
+
+@.ext.*@
+{code}
+element.ext.collectionQuality = "high"
+{code}
+
+
+@.ext.put(key, value) @
+{code}
+element.ext.put('collectionQuality', "low")
+{code}
+
+
+@.ext.putAll(key:value, key:value, *)@
+{code}
+element.ext.putAll(collectionQuality: "medium", source: "systemA")
+{code}
+
+You can remove the metadata using the following notation:
+
+@.ext.remove(key)@
+{code}
+element.ext.remove("collectionQuality")
+{code}
+
+@.ext.clear@
+{code}
+element.ext.clear()
+{code}
+
+
+You can use the following methods to access the metadata:
+
+
+@.ext.get(key)@
+{code}
+assert element.ext.get("collectionQuality") == 'medium'
+{code}
+
+@.ext.ext.containsKey(key)@
+{code}
+assert element.ext.containsKey('collectionQuality')
+{code}
+
+@.ext.containsValue(value)@
+{code}
+assert element.ext.containsValue('medium')
+{code}
+
+@.ext.keySet()@
+{code}
+assert element.ext.keySet() == ['collectionQuality'] as Set
+{code}
+
+@.ext.values()@
+{code}
+assert element.ext.values()?.contains('medium')
+{code}
+
+@.ext.entrySet()@
+{code}
+assert element.ext.entrySet() == [collectionQuality: 'medium'].entrySet()
+{code}
+
+
+
+
+
+

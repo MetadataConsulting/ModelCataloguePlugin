@@ -32,6 +32,17 @@ grails.mime.types = [
         xml:           ['text/xml', 'application/xml']
 ]
 
+grails.doc.images = new File("src/docs/images")
+grails.doc.title = 'Model Catalogue Core Plugin' // The title of the documentation
+grails.doc.subtitle = 'Documentation' // The subtitle of the documentation
+grails.doc.authors = 'Adam Milward, Vladimír Oraný, David Milward'// The authors of the documentation
+grails.doc.license = 'MIT'// The license of the software
+grails.doc.copyright = ''// The copyright message to display
+grails.doc.footer = ''// The footer to use
+
+
+
+//configured data types, measurement units, relationship types
 
 modelcatalogue.defaults.datatypes = [
         [name: "String", description: "java.lang.String"],

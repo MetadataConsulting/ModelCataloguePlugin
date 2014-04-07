@@ -1,0 +1,49 @@
+h1. Data Element
+
+Extends [extendibleElement|Domain Classes]
+Extends [publishedElement|Domain Classes]
+
+Uses the static map @relationships@ to create the following shortcuts:
+
+{code}
+    static relationships = [
+            incoming: [containment: 'containedIn'],
+            outgoing: [instantiation: 'instantiatedBy']
+    ]
+{code}
+
+h2. Usage
+
+@.addToContainedIn@
+{code}
+DataElement subject = new DataElement(name:"subject", description: "subject for the book", code: "SUB001")
+Model book = Model.findByName("book")
+author.addToContainedIn(book)
+{code}
+
+@.addToInstantiatedBy@
+{code}
+EnumeratedType schoolSubjects = EnumeratedType.findByName("schoolSubjects")
+ValueDomain subjects = new ValueDomain(name: "school subjects", dataType: v)
+author.addToInstantiatedBy(subjects)
+{code}
+
+@.containedIn@
+{code}
+author.containedIn == book
+{code}
+
+@.instantiatedBy@
+{code}
+author.instantiatedBy == subjects
+{code}
+
+@.removeFromContainedIn@
+{code}
+author.removeFromContainedIn(book)
+{code}
+
+@.removeFromInstantiatedBy@
+{code}
+ author.removeFromInstantiatedBy(subjects)
+{code}
