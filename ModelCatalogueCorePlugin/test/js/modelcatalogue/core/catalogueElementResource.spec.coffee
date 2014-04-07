@@ -304,7 +304,6 @@ describe "mc.core.catalogueElementResource", ->
           expect(error).toBeNull()
           expect(result).toBeDefined()
           expect(result.id).toBe(payloadWithId.id)
-          expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
 
@@ -329,7 +328,6 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
 
