@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive 'decoratedList',  [-> {
+angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.columns']).directive 'decoratedList',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -8,7 +8,9 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
-    controller: ['$scope' , ($scope) ->
+    controller: ['$scope', 'columns' , ($scope, columns) ->
+      columnsDefined = $scope.columns?
+
       emptyList =
         list: []
         next: {size: 0}
@@ -17,7 +19,9 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
         empty: true
         source: 'directive'
 
-      updatePages = (list) ->
+      onListChange = (list) ->
+        if !columnsDefined
+          $scope.columns = columns(list.itemType)
         if list.total is 0
           $scope.pages = []
           $scope.hasMorePrevPages = false
@@ -75,16 +79,14 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
       $scope.hasPrevious    = -> hasNextOrPrev($scope.list.previous)
       $scope.hasNext        = -> hasNextOrPrev($scope.list.next)
 
-      $scope.columns ?= [
-        {header: 'Name', value: 'name', classes: 'col-md-4', show: true}
-        {header: 'Descripton', value: 'description', classes: 'col-md-8'}
-      ]
 
 
       $scope.list ?= emptyList
 
+      if !columnsDefined
+        $scope.columns = columns($scope.list.itemType)
 
-      $scope.$watch 'list', updatePages
+      $scope.$watch 'list', onListChange
 
       $scope.evaluateClasses = (classes, element) ->
         if angular.isFunction(classes) then classes(element) else classes
