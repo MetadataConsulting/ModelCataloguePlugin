@@ -2,11 +2,13 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import groovy.util.slurpersupport.GPathResult
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ResultRecorder
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXRenderer
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -20,7 +22,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     @Shared
     ResultRecorder recorder
     @Shared
-    def totalCount, initCatalogueService
+    def totalCount
 
     def setupSpec(){
         loadMarshallers()
@@ -101,6 +103,19 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
         where:
         [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/")
+    }
+
+    def "Export items to excel test"() {
+        controller.response.format = "xlsx"
+        controller.index()
+
+        XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(controller.response.contentAsByteArray))
+
+        expect:
+        controller.response.contentType == XLSXRenderer.EXCEL.name
+        workbook
+        workbook.getSheetAt(workbook.getActiveSheetIndex()).getLastRowNum() == totalCount
+        // TODO: read the config and test the right number of columns as well
     }
 
     def "Show single existing item as JSON"() {

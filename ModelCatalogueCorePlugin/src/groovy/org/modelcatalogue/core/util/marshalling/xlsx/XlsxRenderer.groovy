@@ -18,10 +18,11 @@ abstract class XLSXRenderer<T> extends AbstractRenderer<T> {
 
     @Autowired GrailsApplication grailsApplication
 
-    static final MimeType XLSX = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
+    static final MimeType XLSX  = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
+    static final MimeType EXCEL = new MimeType('application/vnd.ms-excel', 'xlsx')
 
     XLSXRenderer(Class<T> type) {
-        super(type, XLSX)
+        super(type, EXCEL, XLSX)
     }
 
 

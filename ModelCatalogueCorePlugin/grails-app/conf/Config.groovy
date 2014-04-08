@@ -26,7 +26,7 @@ log4j = {
 grails.mime.types = [
         json:          ['application/json', 'text/json'],
         xml:           ['text/xml', 'application/xml'],
-        xlsx:          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        xlsx:          ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 ]
 
 grails.doc.images = new File("src/docs/images")
