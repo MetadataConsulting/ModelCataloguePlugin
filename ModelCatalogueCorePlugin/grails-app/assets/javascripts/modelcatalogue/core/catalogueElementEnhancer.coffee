@@ -26,6 +26,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['mc.util.rest', 'mc.util.enh
             unless name in @defaultExcludes
               @updatableProperties.push(name)
 
+
           self = @
 
           self['delete']      = () -> enhance rest method: 'DELETE', url: "#{modelCatalogueApiRoot}#{self.link}"
