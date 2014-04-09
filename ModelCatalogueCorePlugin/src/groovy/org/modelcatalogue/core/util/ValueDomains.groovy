@@ -5,9 +5,9 @@ import org.modelcatalogue.core.ValueDomain
 /**
  * Created by ladin on 25.02.14.
  */
-class ValueDomains extends ListWrapper {
+class ValueDomains extends ListWrapper<ValueDomain> {
 
     ValueDomains() {
-        itemType = ValueDomain.name
+        itemType = ValueDomain
     }
 }

@@ -1,10 +1,12 @@
+import grails.rest.render.RenderContext
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
+import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.marshalling.*
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXElementsRenderer
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXMappingsRenderer
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXRelationshipsRenderer
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXValueDomainsRenderer
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
@@ -55,10 +57,7 @@ Model catalogue core plugin (metadata registry)
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
 
-        xlsxElementsRenderer(XLSXElementsRenderer)
-        xlsxMappingsRenderer(XLSXMappingsRenderer)
-        xlsxRelationshipsRenderer(XLSXRelationshipsRenderer)
-        xlsxValueDomainsRenderer(XLSXValueDomainsRenderer)
+        xlsxListRenderer(XLSXListRenderer)
 
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
@@ -96,6 +95,35 @@ Model catalogue core plugin (metadata registry)
         //register custom json Marshallers
         //ctx.domainModellerService.modelDomains()
         ctx.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
+
+        XLSXListRenderer xlsxListRenderer = ctx.getBean('xlsxListRenderer')
+
+        xlsxListRenderer.registerRowWriter {
+            headers 'ID', 'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null, 'index', 'search'] && CatalogueElement.isAssignableFrom(container.itemType)
+            } then { CatalogueElement element ->
+                [[element.id, element.name, element.description]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter {
+            headers 'Name', 'Source to Destination', 'Destination to Source'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null, 'index', 'search'] && RelationshipType.isAssignableFrom(container.itemType)
+            } then { RelationshipType type ->
+                [[type.name, type.sourceToDestination, type.destinationToSource]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter {
+            headers 'Type', 'Source', 'Destination'
+            when { container, context ->
+                container instanceof Relationships
+            } then { Relationship r ->
+                [[r.relationshipType, r.source.name, r.destination.name]]
+            }
+        }
 
     }
 

@@ -8,7 +8,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ResultRecorder
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXRenderer
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -112,7 +112,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(controller.response.contentAsByteArray))
 
         expect:
-        controller.response.contentType == XLSXRenderer.EXCEL.name
+        controller.response.contentType == XLSXListRenderer.EXCEL.name
         workbook
         workbook.getSheetAt(workbook.getActiveSheetIndex()).getLastRowNum() == totalCount
         // TODO: read the config and test the right number of columns as well
