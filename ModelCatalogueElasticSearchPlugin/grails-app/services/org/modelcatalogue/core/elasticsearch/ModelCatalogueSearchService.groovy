@@ -3,7 +3,7 @@ package org.modelcatalogue.core.elasticsearch
 import grails.transaction.Transactional
 
 @Transactional
-class ModelCatalogueSearchService {
+class ModelCatalogueSearchService{
 
     def elasticSearchService
 

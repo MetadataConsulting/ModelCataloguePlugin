@@ -15,7 +15,6 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
     def setupSpec(){
         //domainModellerService.modelDomains()
         loadFixtures()
-        RelationshipType.initDefaultRelationshipTypes()
         de1 = DataElement.findByName("DE_author")
         de2 = DataElement.findByName("DE_author1")
         de3 = DataElement.findByName("AUTHOR")
@@ -42,5 +41,16 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
 
     }
 
+
+    def "find data elements without particular extension key"(){
+        when:
+        def dataElements = dataArchitectService.metadataKeyCheck("metadata")
+
+        then:
+        !dataElements.contains(de2)
+        dataElements.contains(de1)
+        dataElements.contains(de3)
+
+    }
 
 }

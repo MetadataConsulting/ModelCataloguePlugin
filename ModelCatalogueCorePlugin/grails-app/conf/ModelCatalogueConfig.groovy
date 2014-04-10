@@ -48,7 +48,8 @@ modelcatalogue.defaults.datatypes = [
         [name: "Boolean", description: "java.lang.Boolean"],
         [name: "Date", description: "java.util.Date"],
         [name: "Time", description: "java.sql.Time"],
-        [name: "Currency", description: "java.util.Currency"]
+        [name: "Currency", description: "java.util.Currency"],
+        [name: "Text", description: "a text field"]
 ]
 
 

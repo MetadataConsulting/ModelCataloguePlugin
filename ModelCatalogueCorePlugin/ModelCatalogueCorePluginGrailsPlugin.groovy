@@ -1,3 +1,4 @@
+import grails.util.Environment
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.marshalling.*
@@ -54,6 +55,8 @@ Model catalogue core plugin (metadata registry)
 
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
+
+        mergeConfig(application)
 
         xlsxElementsRenderer(XLSXElementsRenderer)
         xlsxMappingsRenderer(XLSXMappingsRenderer)
@@ -112,5 +115,17 @@ Model catalogue core plugin (metadata registry)
 
     def onShutdown = { event ->
         // TODO Implement code that is executed when the application shuts down (optional)
+    }
+
+    def doWithConfig = { config ->
+
+    }
+
+    protected mergeConfig(application){
+        application.config.merge(loadConfig(application))
+    }
+
+    protected loadConfig(application){
+        new ConfigSlurper(Environment.current.name).parse(application.classLoader.loadClass("ModelCatalogueConfig"))
     }
 }

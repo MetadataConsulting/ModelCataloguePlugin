@@ -20,7 +20,18 @@ class DataArchitectService {
         return uninstantiatedDataElements
     }
 
-    Collection<DataElement> dataElementsWithExtensions(){
+    Collection<DataElement> metadataKeyCheck(String key){
 
+        def c = DataElement.createCriteria()
+
+        def missingMetadataKey = c.list {
+            createAlias('extensions', 'extensions', Criteria.LEFT_JOIN)
+            or{
+                isEmpty("extensions")
+                ne('extensions.name', key)
+            }
+
+        }
+        return missingMetadataKey
     }
 }

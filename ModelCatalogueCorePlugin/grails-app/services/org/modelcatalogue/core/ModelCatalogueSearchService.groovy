@@ -4,7 +4,7 @@ package org.modelcatalogue.core
  * Poor man's search service searching in name and description
  * , you should use search service designed for particular search plugin
  */
-class ModelCatalogueSearchService {
+class ModelCatalogueSearchService{
 
     def search(Class resource, Map params) {
         if (!params.search) {
