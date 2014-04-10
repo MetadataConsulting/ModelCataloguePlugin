@@ -1,4 +1,5 @@
 import grails.rest.render.RenderContext
+import grails.util.Environment
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
@@ -57,8 +58,9 @@ Model catalogue core plugin (metadata registry)
     def doWithSpring = {
         // TODO Implement runtime spring config (optional)
 
-        xlsxListRenderer(XLSXListRenderer)
+        mergeConfig(application)
 
+        xlsxListRenderer(XLSXListRenderer)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
@@ -140,5 +142,13 @@ Model catalogue core plugin (metadata registry)
 
     def onShutdown = { event ->
         // TODO Implement code that is executed when the application shuts down (optional)
+    }
+
+    protected mergeConfig(application){
+        application.config.merge(loadConfig(application))
+    }
+
+    protected loadConfig(application){
+        new ConfigSlurper(Environment.current.name).parse(application.classLoader.loadClass("ModelCatalogueConfig"))
     }
 }

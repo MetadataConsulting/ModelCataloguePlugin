@@ -6,30 +6,55 @@ class DataArchitectController {
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
-    def modelCatalogueSearchService
+    def dataArchitectService
 
-    def index(Integer max){
+    def index(){}
+
+    def uninstantiatedDataElements(Integer max){
         setSafeMax(max)
-        def results =  modelCatalogueSearchService.search(params)
+        def results =  dataArchitectService.uninstantiatedDataElements(params)
         if(results.errors){
             respond results
             return
         }
 
-        def total = (results.total)?results.total.intValue():0
-        def links = nextAndPreviousLinks("/search/", total)
+        def total = (results.results.totalCount)?results.results.totalCount.intValue():0
+        def links = nextAndPreviousLinks("dataArchitect/uninstantiatedDataElements", total)
         Elements elements =  new Elements(
-                    total: total,
-                    items: results.searchResults,
-                    previous: links.previous,
-                    next: links.next,
-                    offset: params.int('offset') ?: 0,
-                    page: params.int('max') ?: 10
+                total: total,
+                items: results.results,
+                previous: links.previous,
+                next: links.next,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 10
         )
 
         respond elements
-
     }
+
+
+    def metadataKeyCheck(Integer max){
+        setSafeMax(max)
+        def results =  dataArchitectService.uninstantiatedDataElements(params)
+        if(results.errors){
+            respond results
+            return
+        }
+
+        def total = (results.results.totalCount)?results.results.totalCount.intValue():0
+        def links = nextAndPreviousLinks("dataArchitect/metadataKeyCheck", total)
+        Elements elements =  new Elements(
+                total: total,
+                items: results.results,
+                previous: links.previous,
+                next: links.next,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 10
+        )
+
+        respond elements
+    }
+
 
     protected setSafeMax(Integer max) {
         withFormat {
@@ -49,7 +74,7 @@ class DataArchitectController {
 
 //copied and pasted
     protected Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
-        def link = "${baseLink}${params.search}?"
+        def link = "${baseLink}?"
         if (params.max) {
             link += "max=${params.max}"
         }
@@ -58,6 +83,9 @@ class DataArchitectController {
         }
         if (params.order) {
             link += "&order=${params.order}"
+        }
+        if (params.key) {
+            link += "&key=${params.key}"
         }
         def nextLink = ""
         def previousLink = ""

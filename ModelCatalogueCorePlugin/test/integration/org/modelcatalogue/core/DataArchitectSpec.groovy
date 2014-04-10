@@ -9,7 +9,7 @@ import spock.lang.Shared
 
 class DataArchitectSpec extends AbstractIntegrationSpec{
     @Shared
-    def dataArchitectService, relationshipService, de1, de2, de3, vd, md
+    def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, vd, md
 
 
     def setupSpec(){
@@ -18,6 +18,8 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
         de1 = DataElement.findByName("DE_author")
         de2 = DataElement.findByName("DE_author1")
         de3 = DataElement.findByName("AUTHOR")
+        de4 = DataElement.findByName("auth4")
+        de5 = DataElement.findByName("auth5")
         vd = ValueDomain.findByName("value domain Celsius")
         md = Model.findByName("book")
         de1.addToContainedIn(md)
@@ -30,27 +32,34 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
         de2.removeFromInstantiatedBy(vd)
     }
 
-    def "marshall domain models"(){
-        when:
-        def dataElements = dataArchitectService.uninstantiatedDataElements()
-
-        then:
-        !dataElements.contains(de2)
-        dataElements.contains(de1)
-        dataElements.contains(de3)
-
-    }
-
-
     def "find data elements without particular extension key"(){
         when:
-        def dataElements = dataArchitectService.metadataKeyCheck("metadata")
+        Map params = [:]
+        params.put("max", 12)
+        params.put("key", "metadata")
+        def dataElements = dataArchitectService.metadataKeyCheck(params)
 
         then:
-        !dataElements.contains(de2)
-        dataElements.contains(de1)
-        dataElements.contains(de3)
+        !dataElements.results.contains(de2)
+        dataElements.results.contains(de4)
+        dataElements.results.contains(de5)
 
     }
+
+    def "find uninstantiatedDataElements"(){
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        def dataElements = dataArchitectService.uninstantiatedDataElements(params)
+
+        then:
+        !dataElements.results.contains(DataElement.get(de2.id))
+        dataElements.results.contains(DataElement.get(de1.id))
+        dataElements.results.contains(DataElement.get(de3.id))
+
+    }
+
+
+
 
 }
