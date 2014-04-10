@@ -42,6 +42,7 @@ class EnumeratedType extends DataType {
         enumAsString converter: EnumAsStringConverter
         incomingRelationships component: true
         outgoingRelationships component: true
+        except = ['relatedValueDomains']
     }
 
 

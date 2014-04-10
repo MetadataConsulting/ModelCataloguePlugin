@@ -21,6 +21,7 @@ class DataType extends CatalogueElement {
         name boost:5
         incomingRelationships component: true
         outgoingRelationships component: true
+        except = ['relatedValueDomains']
     }
 
     static constraints = {
