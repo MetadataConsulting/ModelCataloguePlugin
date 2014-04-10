@@ -52,11 +52,11 @@ describe "mc.core.ui.decoratedListTable", ->
     expect(element.find('thead tr th.dl-table-header-cell:nth-child(2)').hasClass('col-md-8')).toBeTruthy()
 
     expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(2)
-    expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(1)').text()).toBe('73')
+    expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(1)').text()).toBeDefined()
     expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(2)').text()).toBe('value domain Fahrenheit')
 
     expect(element.find('tbody tr:last-child td.dl-table-item-cell').length).toBe(2)
-    expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(1)').text()).toBe('77')
+    expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(1)').text()).toBeDefined()
     expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(2)').text()).toBe('value domain test2')
 
     # next and previous links
@@ -91,9 +91,9 @@ describe "mc.core.ui.decoratedListTable", ->
     ''')($rootScope)
     $rootScope.$digest()
 
-    expect(element.find('thead tr th.dl-table-header-cell').length).toBe(2)
-    expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(2)
-    expect(element.find('thead tr th.dl-table-header-cell:first-child').text()).toBe('Name')
+    expect(element.find('thead tr th.dl-table-header-cell').length).toBe(3)
+    expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(3)
+    expect(element.find('thead tr th.dl-table-header-cell:first-child').text()).toBe('ID')
 
 
     $rootScope.selection = []

@@ -1,0 +1,21 @@
+h2. Custom Excel Exports
+
+You can create custom excel exports from actions returning lists such as @index@  or @search@ by creating
+custom [row writer|api:org.modelcatalogue.core.util.marshalling.xlsx.XLSXRowWriter]. The easiest way is to use
+@registerWriter@ method on [xlsxListRenderer|api:org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer]
+bean available in the application context and available through the standard dependency injection. The configuration
+closure is delegate to [XLSXRowWriterBuilder|api:org.modelcatalogue.core.util.marshalling.xlsx.XLSXRowWriterBuilder].
+
+{code}
+xlsxListRenderer.registerRowWriter('custom') {
+    headers 'Type', 'Source', 'Destination'
+    file 'customFileName'
+    when { container, context ->
+        container instanceof Relationships
+    } then { Relationship r ->
+        [[r.relationshipType, r.source.name, r.destination.name]]
+    }
+}
+{code}
+
+To use named row writer you need to supply @report@ parameter in the URL.

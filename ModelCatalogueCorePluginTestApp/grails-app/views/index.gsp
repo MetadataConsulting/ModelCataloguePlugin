@@ -49,6 +49,8 @@
     <div>
         <form class="form" role="form" ng-submit="show()">
             <div class="form-group">
+                <label for="search">Search</label>
+                <input type="text" id="search" ng-model="element" catalogue-element-picker>
                 <label for="expression">Expression</label>
                 <input type="text" class="form-control" id="expression" ng-model="expression"
                        placeholder="Expression returning list promise">
@@ -112,6 +114,7 @@
         <pre>{{columns | json}}</pre>
 
     </div>
+
 </div>
 </body>
 </html>

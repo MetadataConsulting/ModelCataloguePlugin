@@ -84,8 +84,8 @@ class ElasticSearchISpec extends IntegrationSpec{
         if(json){
             assert json
              assert json.total == total
-            assert json.list.get(0).id == expectedResult.id
-            assert json.list.get(0).name == expectedResult.name
+            assert json.list.any { it.id   == expectedResult.id }
+            assert json.list.any { it.name == expectedResult.name }
         }else if(xml){
             assert xml
             assert xml.@success.text() == "true"
@@ -111,8 +111,8 @@ class ElasticSearchISpec extends IntegrationSpec{
         8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 12
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1
         10 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "xml"     | "sub1"                    | 1
-        11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees of Celsius"      | 1
-        12 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "xml"     | "Degrees of Celsius"      | 1
+        11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees of Celsius"      | 2
+        12 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "xml"     | "Degrees of Celsius"      | 2
         13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1
         14 | "Model"             | new ModelController()               | "Jabberwocky"                   | "xml"     | "chapter1"                | 1
    //     15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 4
