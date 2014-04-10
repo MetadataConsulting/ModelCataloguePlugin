@@ -1,6 +1,7 @@
 #= require_self
 #= require rest
 #= require enhance
+#= require recursiveCompile
 #= require names
 
 angular.module 'mc.util', [
@@ -8,4 +9,5 @@ angular.module 'mc.util', [
   'mc.util.enhance'
   'mc.util.rest'
   'mc.util.names'
+  'mc.util.recursiveCompile'
 ]

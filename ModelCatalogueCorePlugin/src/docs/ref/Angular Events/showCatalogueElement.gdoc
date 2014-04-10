@@ -10,7 +10,7 @@ Register the handler on the current scope or the [$rootScope|http://docs.angular
 to listen to show request.
 
 {code}
-$scope.on('showCatalogueElement', function(event, element) {
+$scope.$on('showCatalogueElement', function(event, element) {
     // display the element by e.g. changing the current route
 })
 {code}

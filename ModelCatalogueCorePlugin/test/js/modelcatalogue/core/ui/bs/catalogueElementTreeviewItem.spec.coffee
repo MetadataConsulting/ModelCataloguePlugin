@@ -1,0 +1,31 @@
+describe "mc.core.ui.catalogueElementTreeviewItem", ->
+
+  beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
+
+  it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->
+
+    catEl = enhance angular.copy(fixtures.valueDomain.showOne.dataType)
+    catEl.description = "Hello World!"
+
+    $rootScope.element = catEl
+    $rootScope.descend = ['valueDomains']
+
+    element = $compile('''
+      <catalogue-element-treeview-item element="element" descend="descend"></catalogue-element-treeview-item>
+    ''')($rootScope)
+
+    $rootScope.$digest()
+
+    expect(element.prop('tagName').toLowerCase()).toBe('li')
+    expect(element.find('span.catalogue-element-treeview-name').text()).toBe(catEl.name)
+    expect(element.find('span.badge').text()).toBe("#{catEl.valueDomains.total}")
+
+
+    valueDomains = angular.copy(fixtures.dataType.valueDomains1)
+
+    $httpBackend.expect('GET', catEl.valueDomains.link).respond(valueDomains)
+
+    element.find('a').click()
+
+    $httpBackend.flush()
+
