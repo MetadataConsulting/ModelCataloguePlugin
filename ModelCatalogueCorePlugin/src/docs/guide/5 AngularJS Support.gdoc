@@ -5,7 +5,7 @@ Angular related topics in the Quick Reference panel on the right side.
 
 h2. Including AngularJS services and directives in you application
 
-If you use asset pipeline plugin, your application main script should require following assets
+If you use asset pipeline plugin, your application main script should require following javascript assets
 
 {code}
 //= require jquery/dist/jquery
@@ -15,6 +15,14 @@ If you use asset pipeline plugin, your application main script should require fo
 //= require modelcatalogue/core/index
 //= require modelcatalogue/core/ui/index
 //= require modelcatalogue/core/ui/bs/index
+{code}
+
+and following stylesheets
+{code}
+/*
+ *= require bootstrap/dist/css/bootstrap
+ *= require modelcatalogue/core/ui/bs/directives
+ */
 {code}
 
 h2. Configuration

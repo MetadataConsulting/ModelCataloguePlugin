@@ -12,7 +12,7 @@ angular.module('demo', [
   'mc.core.ui.bs'
   'ui.bootstrap'
 
-]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns)->
+]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', '$rootScope', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns, $rootScope)->
   emptyList =
     list: []
     next: {size: 0}
@@ -72,6 +72,11 @@ angular.module('demo', [
 
   $scope.columns = columns()
 
+  $scope.actions = [
+    {type: 'primary', title: 'Test', icon: 'info-sign', action: (element) -> alert(element.name)}
+    #{title: 'Test 2', action: (element) -> alert(element.name)}
+  ]
+
   $scope.removeColumn = (index) ->
     return if $scope.columns.length <= 1
     $scope.columns.splice(index, 1)
@@ -84,4 +89,19 @@ angular.module('demo', [
 
   $scope.$on 'showCatalogueElement', (event, element) ->
     $scope.element = element
+
+  $scope.$on 'treeviewElementSelected', (event, element) ->
+    $scope.selectedInTreeview = element
+
+  onDescendPathChange = (path) ->
+    $scope.descend = path.split(/\s*,\s*/)
+
+  $scope.descendPath = 'includes, instantiates'
+  $scope.selectedInTreeview = null
+
+  $scope.$watch 'descendPath', onDescendPathChange
+  $scope.$watch 'selectedInTreeview', (selectedInTreeview) ->
+    $rootScope.$broadcast 'treeviewElementSelected', selectedInTreeview
+
+  onDescendPathChange $scope.descendPath
 ])

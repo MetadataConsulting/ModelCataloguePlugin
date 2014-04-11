@@ -2,7 +2,7 @@ h1. decorated-list
 
 Generic element directive for showing items enhanced by [list|Angular Enhancers] enhancer. Default template defined in
 @mc.core.ui.bs.decoratedListTable@ is showing each item of the list as table row with pagination at the bottom of the table.
-The directive accepts three two-ways bound attributes @list@, @columns@ and @selection@. Only the @list@ attribute is mandatory and
+The directive accepts four two-ways bound attributes @list@, @columns@, @selection@ and @actions@. Only the @list@ attribute is mandatory and
 represents the list structure which should match the expected input
 
 {code}
@@ -33,6 +33,17 @@ value   | value to be shown defined either as function called with current row i
 classes | classes to be added to value cell defined either as function called with current row item as single parameter or object declaring the classes and it's condition expressions
 show    | recipe how to show the item in the row if possible, either @true@ which is equivalent to @show()@ or function called with current row item as single parameter on click or string expression which is evaluated in the context of current row element and should perform the show action
 {table}
+
+@actions@ defines actions for particular rows in the table in an array of following structures
+
+{table}
+Key     | Value
+title   | the title shown in the action button
+action  | action to be performed on click represented as function taking single argument - the current row item
+icon    | glyphicon icon name such as @info-sign@
+type    | type of the button: @default@, @primary@, @success@, @info@, @warning@, @danger@, @link@, optionally followed by the size @btn-lg@, @btn-sm@ or @btn-xs@
+{table}
+
 
 
 If @selection@ attribute is present the table will show the selection check boxes in the first column and the @selection@

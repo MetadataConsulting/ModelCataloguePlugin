@@ -5,6 +5,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
       list: '='
       columns: '=?'
       selection: '=?'
+      actions: '=?'
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
@@ -100,6 +101,21 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
       $scope.showEnabled = (show) ->
         show?
+
+      $scope.getColumnsCount = () ->
+        count = $scope.columns.length
+        if $scope.hasSelection()
+          count++
+        if $scope.actions? and $scope.actions.length > 0
+          count++
+        count
+
+      $scope.getActionsClass = () ->
+        ' col-md-1'
+
+      $scope.getActionClass = (action) ->
+        return "btn-#{action.type}" if action.type?
+        "btn-primary"
 
     ]
   }

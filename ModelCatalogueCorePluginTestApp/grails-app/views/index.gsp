@@ -67,13 +67,13 @@
         </form>
     </div>
 
-    <div ng-show="element">
+    <div ng-show="element.elementType">
         <catalogue-element-view element="element"></catalogue-element-view>
     </div>
 
     <div ng-show="!list.empty">
         <h2>Decorated List Widget</h2>
-        <decorated-list list="list" columns="columns" selection="selection"></decorated-list>
+        <decorated-list list="list" columns="columns" selection="selection" actions="actions"></decorated-list>
     </div>
 
     <div ng-show="!list.empty">
@@ -110,9 +110,23 @@
                 </td>
             </tr>
         </table>
+    </div>
 
-        <pre>{{columns | json}}</pre>
-
+    <div ng-show="element.elementType">
+        <h2>Tree View</h2>
+        <div>
+            <form class="form" role="form">
+                <div class="form-group">
+                    <label for="descendPath">Descend Path</label>
+                    <input type="text" id="descendPath" ng-model="descendPath" class="form-control">
+                    <label for="selectedInTreeview">Selection</label>
+                    <input type="text" id="selectedInTreeview" ng-model="selectedInTreeview" catalogue-element-picker>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-8">
+            <catalogue-element-treeview element="element" descend="descend"></catalogue-element-treeview>
+        </div>
     </div>
 
 </div>

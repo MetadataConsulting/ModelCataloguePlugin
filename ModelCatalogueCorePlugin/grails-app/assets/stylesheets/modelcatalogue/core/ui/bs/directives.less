@@ -1,0 +1,39 @@
+// preserve new lines in blockquotes
+blockquote, .dl-table-item-cell, .pp-table-property-value {
+  white-space: pre-line;
+}
+// angularjs bootstrap ui suggests this
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+.catalogue-element-treeview-list {
+  list-style-type: none;
+  padding-left: 15px;
+  &:first-child {
+    height: 400px;
+  }
+  &:nth-child(2) {
+    max-height: 340px;
+    overflow-y: auto;
+  }
+}
+
+.catalogue-element-treeview-item {
+  .badge {
+    margin: 7px;
+  }
+}
+
+.catalogue-element-treeview-labels {
+  display: block;
+  &:hover, &.active {
+    background-color: #eeeeee;
+  }
+
+  border-radius: 4px;
+}
+
+.catalogue-element-treeview-list-root {
+  border: solid #d3d3d3 1px;
+  padding: 10px;
+  border-radius: 8px;
+}
