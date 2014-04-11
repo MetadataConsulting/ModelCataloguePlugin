@@ -8,28 +8,30 @@ class DataArchitectService {
 
     def uninstantiatedDataElements(Map params){
         def results = [:]
-        def uninstantiatedDataElements
+        def uninstantiatedDataElements, totalCount
         def instantiation = RelationshipType.findByName("instantiation")
         def searchParams = getParams(params)
-        def c = DataElement.createCriteria()
         //TODO change this query to an hql query to enable pagination with distinctness
         try {
-            uninstantiatedDataElements = c.listDistinct(/*offset: searchParams.offset, max: searchParams.max*/) {
-                createAlias('outgoingRelationships', 'outgoingRelationships', Criteria.LEFT_JOIN)
-                or {
-                    isEmpty("outgoingRelationships")
-                    ne('outgoingRelationships.relationshipType', instantiation)
-                }
-                order(searchParams.sort, searchParams.order)
-            }
-            //FIXME this is a hack to enable pagination
-            results.put("totalCount", uninstantiatedDataElements.size())
-            def start, end
-            start = (searchParams.offset)?:0
-            end = (searchParams.max)?searchParams.max + start-1:10
-            end = (end > uninstantiatedDataElements.size()-1)? uninstantiatedDataElements.size()-1 :end
-            uninstantiatedDataElements = uninstantiatedDataElements[start..end]
+
+            totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
+                    "WHERE a.outgoingRelationships IS EMPTY " +
+                    "OR a NOT IN " +
+                    "(SELECT a2 from DataElement a2 " +
+                    "JOIN a2.outgoingRelationships e2 " +
+                    "WHERE e2.relationshipType = ?)", [instantiation], [cache:true]
+            )
+
+            uninstantiatedDataElements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                    "WHERE a.outgoingRelationships IS EMPTY " +
+                    "OR a NOT IN " +
+                    "(SELECT a2 from DataElement a2 " +
+                    "JOIN a2.outgoingRelationships e2 " +
+                    "WHERE e2.relationshipType = ?)", [instantiation], [max: searchParams.max, offset: searchParams.offset]
+            )
+            results.put("totalCount", totalCount.get(0).toInteger())
             results.put("results", uninstantiatedDataElements)
+
         }catch(Exception e){
             results.put("errors", e)
         }
@@ -39,28 +41,28 @@ class DataArchitectService {
 
     def metadataKeyCheck(Map params){
 
-        def missingMetadataKey
+        def missingMetadataKey, totalCount
         def results = [:]
         def searchParams = getParams(params)
-        def key = searchParams.key
-        def c = DataElement.createCriteria()
-        //TODO change this query to an hql query to enable pagination with distinctness
         try {
-            missingMetadataKey = c.listDistinct(/*offset :searchParams.offset, max: searchParams.max*/){
-                createAlias('extensions', 'extensions', Criteria.LEFT_JOIN)
-                or{
-                    isEmpty("extensions")
-                    ne('extensions.name', key)
-                }
-                order (searchParams.sort, searchParams.order)
-            }
-            //FIXME this is a hack to enable pagination
-            results.put("totalCount", missingMetadataKey.size())
-            def start, end
-            start = (searchParams.offset)?:0
-            end = (searchParams.max)?searchParams.max + start-1:10
-            end = (end > missingMetadataKey.size()-1)? missingMetadataKey.size()-1 :end
-            missingMetadataKey = missingMetadataKey[start..end]
+
+            totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
+                    "WHERE a.extensions IS EMPTY " +
+                    "OR a NOT IN " +
+                    "(SELECT a2 from DataElement a2 " +
+                    "JOIN a2.extensions e2 " +
+                    "WHERE e2.name = ?)", [searchParams.key], [cache:true]
+            )
+
+            missingMetadataKey = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                    "WHERE a.extensions IS EMPTY " +
+                    "OR a NOT IN " +
+                    "(SELECT a2 from DataElement a2 " +
+                    "JOIN a2.extensions e2 " +
+                    "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
+            )
+
+            results.put("totalCount", totalCount.get(0).toInteger())
             results.put("results", missingMetadataKey)
         }catch(Exception e){
             results.put("errors", e)
@@ -74,8 +76,8 @@ class DataArchitectService {
         def searchParams = [:]
         if(params.key){searchParams.put("key" , params.key)}
         if(params.max){searchParams.put("max" , params.max.toInteger())}else{searchParams.put("max" , 10)}
-        if(params.sort){searchParams.put("sort" , "$params.sort")}else{searchParams.put("sort" , "name")}
-        if(params.order){searchParams.put("order" , params.order.toLowerCase())}else{searchParams.put("order" , "asc")}
+       // if(params.sort){searchParams.put("sort" , "$params.sort")}else{searchParams.put("sort" , "name")}
+       // if(params.order){searchParams.put("order" , params.order.toLowerCase())}else{searchParams.put("order" , "asc")}
         if(params.offset){searchParams.put("offset" , params.offset.toInteger())}else{searchParams.put("offset" , 0)}
         return searchParams
     }

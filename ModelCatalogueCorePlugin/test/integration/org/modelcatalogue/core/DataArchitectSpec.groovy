@@ -25,6 +25,11 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
         de1.addToContainedIn(md)
         de2.addToInstantiatedBy(vd)
         relationshipService.link(de3, de2, RelationshipType.findByName("supersession"))
+        de1.ext.put("localIdentifier", "test")
+        de4.ext.put("test2", "test2")
+        de4.ext.put("metadata", "test2")
+        de4.ext.put("test3", "test2")
+        de4.ext.put("test4", "test2")
     }
 
     def cleanupSpec(){
@@ -41,7 +46,8 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
 
         then:
         !dataElements.results.contains(de2)
-        dataElements.results.contains(de4)
+        !dataElements.results.contains(de4)
+        dataElements.results.contains(de1)
         dataElements.results.contains(de5)
 
     }

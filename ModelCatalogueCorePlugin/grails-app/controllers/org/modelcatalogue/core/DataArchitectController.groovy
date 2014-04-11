@@ -18,7 +18,7 @@ class DataArchitectController {
             return
         }
 
-        def total = (results.totalCount)?results.totalCount.intValue():0
+        def total = (results.totalCount)?results.totalCount:0
         def links = nextAndPreviousLinks("/dataArchitect/uninstantiatedDataElements", total)
         Elements elements =  new Elements(
                 total: total,
@@ -41,7 +41,7 @@ class DataArchitectController {
             return
         }
 
-        def total = (results.totalCount)?results.totalCount.intValue():0
+        def total = (results.totalCount)?results.totalCount:0
         def links = nextAndPreviousLinks("/dataArchitect/metadataKeyCheck", total)
         Elements elements =  new Elements(
                 total: total,
