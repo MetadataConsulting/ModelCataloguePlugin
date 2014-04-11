@@ -119,7 +119,7 @@
                 <div class="form-group">
                     <label for="descendPath">Descend Path</label>
                     <input type="text" id="descendPath" ng-model="descendPath" class="form-control">
-                    <label for="selectedInTreeview">Search</label>
+                    <label for="selectedInTreeview">Selection</label>
                     <input type="text" id="selectedInTreeview" ng-model="selectedInTreeview" catalogue-element-picker>
                 </div>
             </form>
