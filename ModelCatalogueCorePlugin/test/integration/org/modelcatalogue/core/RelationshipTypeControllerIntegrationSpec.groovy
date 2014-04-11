@@ -2,12 +2,38 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.util.CatalogueElementFinder
 
 /**
  * Created by adammilward on 27/02/2014.
  */
 class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegrationSpec {
 
+
+    def "return list of catalogue element classes in json"() {
+        controller.response.format = 'json'
+
+        controller.elementClasses()
+        def json = controller.response.json
+
+        expect:
+        json.size() == CatalogueElementFinder.catalogueElementClasses.size()
+
+    }
+
+
+    def "return list of catalogue element classes in xml"() {
+        controller.response.format = 'xml'
+
+        controller.elementClasses()
+        def xml = controller.response.xml
+
+        println controller.response.text
+
+        expect:
+        xml.string.size() == CatalogueElementFinder.catalogueElementClasses.size()
+
+    }
     @Override
     Map getPropertiesToEdit(){
         [name: "changedName", sourceClass: PublishedElement, destinationClass: PublishedElement]
