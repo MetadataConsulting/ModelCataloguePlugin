@@ -73,7 +73,7 @@
 
     <div ng-show="!list.empty">
         <h2>Decorated List Widget</h2>
-        <decorated-list list="list" columns="columns" selection="selection"></decorated-list>
+        <decorated-list list="list" columns="columns" selection="selection" actions="actions"></decorated-list>
     </div>
 
     <div ng-show="!list.empty">

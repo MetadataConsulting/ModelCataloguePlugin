@@ -72,6 +72,11 @@ angular.module('demo', [
 
   $scope.columns = columns()
 
+  $scope.actions = [
+    {type: 'primary', title: 'Test', icon: 'info-sign', action: (element) -> alert(element.name)}
+    #{title: 'Test 2', action: (element) -> alert(element.name)}
+  ]
+
   $scope.removeColumn = (index) ->
     return if $scope.columns.length <= 1
     $scope.columns.splice(index, 1)

@@ -7,6 +7,9 @@ angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList'])
               <input type="checkbox" ng-change="updateSelectAll(allSelected)" ng-model="allSelected">
             </th>
             <th class="dl-table-header-cell" ng-repeat="column in columns" ng-class="evaluateClasses(column.classes)">{{column.header}}</th>
+            <th ng-if="actions" class="getActionsClass()">
+              &nbsp;
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -15,11 +18,14 @@ angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList'])
                 <input type="checkbox" ng-change="updateSelection()" ng-model="element._selected">
               </td>
               <td class="dl-table-item-cell" ng-class="evaluateClasses(column.classes, evaluateValue(column.value, element), element)" ng-repeat="column in columns" ng-switch="showEnabled(column.show)"><a ng-click="showItem(column.show, element)" ng-switch-when="true">{{evaluateValue(column.value, element)}}</a><span ng-switch-when="false">{{evaluateValue(column.value, element)}}</span></td>
+              <td class="dl-table-actions-item-cell" ng-if="actions">
+                <a ng-repeat="action in actions" class="btn" ng-class="getActionClass(action)" ng-click="action.action(element)"><span ng-if="action.icon" class="glyphicon" ng-class="'glyphicon-' + action.icon"></span><span ng-if="action.icon &amp;&amp; action.title">&nbsp;&nbsp;</span>{{action.title}}</a>
+              </td>
             </tr>
         </tbody>
         <tfoot>
           <tr ng-hide="list.total <= list.page">
-            <td colspan="{{hasSelection() ? columns.length + 1 : columns.length}}" class="text-center">
+            <td colspan="{{getColumnsCount()}}" class="text-center">
               <ul class="pagination">
                 <li class="previous dl-table-prev" ng-class="{disabled: !hasPrevious()}"><a ng-click="previous()">Previous</a></li>
                 <li ng-show="hasMorePrevPages"><a ng-click="goto(pages[0] - 1)" class>...</a></li>
