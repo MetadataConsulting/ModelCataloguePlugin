@@ -21,7 +21,7 @@ describe "mc.core.modelCatalogueSearch", ->
     $httpBackend.flush()
 
     expect(result).toBeDefined()
-    expect(result.total).toBe(22)
+    expect(result.total).toBe(12)
     expect(result.page).toBe(10)
     expect(result.size).toBe(10)
     expect(result.offset).toBe(0)
@@ -47,7 +47,7 @@ describe "mc.core.modelCatalogueSearch", ->
     $httpBackend.flush()
 
     expect(result).toBeDefined()
-    expect(result.total).toBe(22)
+    expect(result.total).toBe(12)
     expect(result.page).toBe(10)
     expect(result.size).toBe(10)
     expect(result.offset).toBe(0)

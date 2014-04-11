@@ -58,8 +58,17 @@ class ModelCatalogueCorePluginUrlMappings {
             action = [GET: "index"]
         }
 
-        
-        "/"(view:"index")
+        group "/api/modelCatalogue/core/dataArchitect", {
+            "/uninstantiatedDataElements" (controller:"dataArchitect"){
+                action = [GET: "uninstantiatedDataElements"]
+            }
+            "/metadataKeyCheck/$key?" (controller:"dataArchitect"){
+                action = [GET: "metadataKeyCheck"]
+            }
+        }
+
+
+         "/"(view:"index")
 
 
 	}

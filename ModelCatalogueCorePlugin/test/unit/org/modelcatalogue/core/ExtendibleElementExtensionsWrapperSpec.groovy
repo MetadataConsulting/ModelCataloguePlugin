@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 import grails.test.mixin.Mock
 import spock.lang.Specification
 
+import java.security.cert.Extension
+
 @Mock([DataElement, ExtensionValue, ExtendibleElement])
 class ExtendibleElementExtensionsWrapperSpec extends Specification {
 
@@ -39,6 +41,7 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         when:
 
         String oldVal = element.ext.put('foo', "barbar")
+        ExtensionValue ex = ExtensionValue.findByName("foo")
 
         then:
         element.extensions
@@ -48,6 +51,9 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         !element.ext.containsValue('bar')
         element.ext.size() == 1
         oldVal == "bar"
+        ex
+        ex.element == element
+
 
         when:
         element.ext."" = "something"

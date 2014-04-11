@@ -18,8 +18,8 @@ class DataArchitectController {
             return
         }
 
-        def total = (results.results.totalCount)?results.results.totalCount.intValue():0
-        def links = nextAndPreviousLinks("dataArchitect/uninstantiatedDataElements", total)
+        def total = (results.totalCount)?results.totalCount.intValue():0
+        def links = nextAndPreviousLinks("/dataArchitect/uninstantiatedDataElements", total)
         Elements elements =  new Elements(
                 total: total,
                 items: results.results,
@@ -35,14 +35,14 @@ class DataArchitectController {
 
     def metadataKeyCheck(Integer max){
         setSafeMax(max)
-        def results =  dataArchitectService.uninstantiatedDataElements(params)
+        def results =  dataArchitectService.metadataKeyCheck(params)
         if(results.errors){
             respond results
             return
         }
 
-        def total = (results.results.totalCount)?results.results.totalCount.intValue():0
-        def links = nextAndPreviousLinks("dataArchitect/metadataKeyCheck", total)
+        def total = (results.totalCount)?results.totalCount.intValue():0
+        def links = nextAndPreviousLinks("/dataArchitect/metadataKeyCheck", total)
         Elements elements =  new Elements(
                 total: total,
                 items: results.results,
