@@ -4,7 +4,8 @@ Element directive for showing catalogue element and its list references in the f
 It accepts a catalogue element as @element@ attribute and the descend path in @descend@ attribute. The descend path
 is array with the names of [listReference|Angular Enhancers] references in the catalogue element and its children.  The
 first item is the name of reference in the element passed into the directive, the second one if passed in will be applied
-to root element's children and third one for their children and so on.
+to root element's children and third one for their children and so on. By default the height of the widget is
+constrained to 400 pixels
 
 h2. Usage
 
@@ -24,3 +25,15 @@ And following HTML snippet in your page:
 {code}
 
 Than the value domain will be displayed in the tree view with all outgoing relationships as the children of it.
+
+h2. Customization
+
+You can customize appearance of the directive customizing the styles for following classes
+
+{table}
+Class                                   | Description
+catalogue-element-treeview-list-root    | Top level tree view list element (list containing the root element)
+catalogue-element-treeview-list         | Tree view list element (expanded children)
+catalogue-element-treeview-item         | Tree view nodes
+catalogue-element-treeview-labels       | Labels inside the tree view including the icon and the badge with number of children
+{table}
