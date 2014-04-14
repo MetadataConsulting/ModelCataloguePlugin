@@ -6,11 +6,12 @@ h2. Modules
 This package groups following modules for easier use:
 
 {table}
-Name               | Description
-mc.util.enhance    | provides [enhance|Angular Services] service for enhancing JavaScript objects with additional functionality
-mc.util.messages   | provides [messages|Angular Services] for displaying feedback to the user
-mc.util.names      | provides [names|Angular Services] service for naming related string conversion
-mc.util.rest       | provides [rest|Angular Services] service similar to @$http@ with sensible error handling
+Name                        | Description
+mc.util.enhance             | provides [enhance|Angular Services] service for enhancing JavaScript objects with additional functionality
+mc.util.messages            | provides [messages|Angular Services] for displaying feedback to the user
+mc.util.names               | provides [names|Angular Services] service for naming related string conversion
+mc.util.recursiveCompile    | provides [recursiveCompile|http://stackoverflow.com/questions/11854514/is-it-possible-to-make-a-tree-view-with-angular] service enabling recursion in directives
+mc.util.rest                | provides [rest|Angular Services] service similar to @$http@ with sensible error handling
 {table}
 
 h2. Include

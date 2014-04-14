@@ -1,11 +1,11 @@
 h1. messages-panel
 
-Element directive for rendering messages stored by [messages|Angular Services]. Default template defined in
+Element directive for rendering messages stored by [messages|Angular Services] service. Default template defined in
 module @mc.core.ui.bs.messagesPanel@ renders the messages using Bootstrap alerts.
 You can supply @max@ attribute to constraint the maximum number of messages shown (defaults to 5).
 
 h2. Usage
-See [messages|Angular Directives] to find out how to create new messages.
+See [messages|Angular Services] to find out how to create new messages.
 
 Place following snippet in the place where you want to render the messages:
 {code}

@@ -13,7 +13,8 @@ You can use same dependency injection mechanism for these factory methods as you
 angular
 .module('foo', ['mc.util.messages'])
 .config(function(messagesProvider) {
-    messagesProvider.setConfirmFactory(['dependency1', 'dependency2', function(dependency1, dependency2ayx) {
+    messagesProvider.setConfirmFactory(function(dependency1, dependency2) {
         return function(title, body) {...}
-    }])
+    })
 })
+{code}
