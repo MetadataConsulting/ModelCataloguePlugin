@@ -13,6 +13,9 @@ mc.core.ui.bs.catalogueElementView      | provides default template for [catalog
 mc.core.ui.bs.catalogueElementTreeView  | provides default template for [catalogue-element-treeview|Angular Directives] directive
 mc.core.ui.bs.columns                   | configures [columns|Angular Services] for known catalogue elements
 mc.core.ui.bs.decoratedListTable        | provides default template for [decorated-list|Angular Directives] directive
+mc.core.ui.bs.messagesPanel             | provides modal confirm dialog for [messages-panel|Angular Directives] directive
+mc.core.ui.bs.modalConfirm              | provides modal confirm dialog for [messagesProvider|Angular Providers] provider
+mc.core.ui.bs.modalConfirm              | provides modal prompt dialog for [messagesProvider|Angular Providers] provider
 mc.core.ui.bs.propertiesPane            | provides default template for [properties-pane|Angular Directives] directive showing properties in table
 {table}
 

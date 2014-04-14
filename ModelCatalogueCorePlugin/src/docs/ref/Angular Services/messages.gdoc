@@ -13,6 +13,10 @@ Declared in @mc.core.messages@ module inside [mc.util|Angular Packages] package.
 
 h2. Usage
 
+{note}
+It is very convenient to use [messages-panel] directive to render the current messages.
+{note}
+
 Inject the @messages@ service using the dependency mechanism and send messages to the user.
 
 {code}

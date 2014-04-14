@@ -6,6 +6,7 @@
 #= require catalogueElementTreeview
 #= require catalogueElementPicker
 #= require propertiesPane
+#= require messagesPanel
 #= require columns
 
 angular.module('mc.core.ui', [
@@ -18,5 +19,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.catalogueElementTreeview'
   'mc.core.ui.catalogueElementPicker'
   'mc.core.ui.propertiesPane'
+  'mc.core.ui.messagesPanel'
   'mc.core.ui.columns'
 ])

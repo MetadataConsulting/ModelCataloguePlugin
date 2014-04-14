@@ -39,6 +39,10 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
     messages = {}
 
     addMessage = (title, body, type) ->
+      # if you pass only first argument it will became the body
+      if not body?
+        body  = title
+        title = null
       msg =
         title:      title
         body:       body

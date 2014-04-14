@@ -128,6 +128,21 @@
             <catalogue-element-treeview element="element" descend="descend"></catalogue-element-treeview>
         </div>
     </div>
+    <div>
+        <h2>Messages Demo</h2>
+        <messages-panel max="3"></messages-panel>
+        <form class="form" role="form" ng-submit="addMessage(messageText, messageType)">
+            <div class="form-group">
+                <label for="messageText">Message Text</label>
+                <input type="text" id="messageText" ng-model="messageText" class="form-control">
+                <label for="messageType">Message Type</label>
+                <select id="messageType" ng-model="messageType" class="form-control" ng-options="value for value in messagesTypes"></select>
+                <br/>
+                <a ng-click="showConfirm()" class="btn btn-default">Show Confirm Dialog</a>
+                <a ng-click="showPrompt()" class="btn btn-default">Show Prompt Dialog</a>
+            </div>
+        </form>
+    </div>
 
 </div>
 </body>

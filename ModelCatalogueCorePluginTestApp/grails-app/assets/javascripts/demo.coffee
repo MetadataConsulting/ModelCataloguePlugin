@@ -12,7 +12,7 @@ angular.module('demo', [
   'mc.core.ui.bs'
   'ui.bootstrap'
 
-]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', '$rootScope', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns, $rootScope)->
+]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', '$rootScope', 'messages', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns, $rootScope, messages)->
   emptyList =
     list: []
     next: {size: 0}
@@ -102,6 +102,28 @@ angular.module('demo', [
   $scope.$watch 'descendPath', onDescendPathChange
   $scope.$watch 'selectedInTreeview', (selectedInTreeview) ->
     $rootScope.$broadcast 'treeviewElementSelected', selectedInTreeview
+
+  $scope.messages       = messages
+  $scope.messageText    = 'Try me!'
+  $scope.messageType    = 'success'
+  $scope.messagesTypes  = ['info', 'success', 'warning', 'error']
+  $scope.addMessage     = (text, type) ->
+    messages[type](text)
+
+  $scope.showConfirm    = () ->
+    messages.confirm('Confirm Dialog', $scope.messageText).then (result) ->
+      if result
+        messages.success('Confirmed')
+      else
+        messages.error('Rejected')
+
+  $scope.showPrompt    = () ->
+    messages.prompt('Prompt Dialog', $scope.messageText).then (result) ->
+      messages.success('Returned: ' + result)
+    , () ->
+      messages.error('Rejected')
+
+
 
   onDescendPathChange $scope.descendPath
 ])
