@@ -1,0 +1,19 @@
+h1. messagesProvider
+
+Provider for [messages|Angular Services] service. Allows to configure the @confirm@ and @prompt@ method
+using @setConfirmFactory@ and @setPromptFactory@ methods.
+Declared in @mc.util.messages@ module inside [mc.util|Angular Packages] package.
+
+h2. Usage
+
+Override the @confirm@ or @prompt@ function using @setConfirmFactory@ and @setPromptFactory@ methods.
+You can use same dependency injection mechanism for these factory methods as you use for other AngularJS components.
+
+{code}
+angular
+.module('foo', ['mc.util.messages'])
+.config(function(messagesProvider) {
+    messagesProvider.setConfirmFactory(['dependency1', 'dependency2', function(dependency1, dependency2ayx) {
+        return function(title, body) {...}
+    }])
+})

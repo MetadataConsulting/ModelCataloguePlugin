@@ -1,0 +1,36 @@
+h1. messages
+
+Messages service provides several useful function to display feedback messages to users.
+There are four method for displaying messages categorized by the servility of the given information: @info@, @success@,
+@warning@, @error@. Each of these methods accepts the message title and body. There are two methods for retrieving
+additional feedback from the user: @prompt@ and @confirm@. @confirm@ method accepts question title and body and returns
+promise to boolean value which is @true@ if user confirms the dialog or @false@ otherwise. Basic implementation of
+@prompt@ method also accepts question title and body and returns promise which is resolved to the string supplied by
+the user or rejected if the user cancels the prompt. The @prompt@ method also accepts the third argument which is @type@
+of the prompt which is ignored by default implementations but you own supply your own prompt function which will
+take advantage of it. See [messagesProvider|Angular Providers] how to configure the @prompt@ and @confirm@ functions.
+Declared in @mc.core.messages@ module inside [mc.util|Angular Packages] package.
+
+h2. Usage
+
+Inject the @messages@ service using the dependency mechanism and send messages to the user.
+
+{code}
+angular
+.module('foo', ['mc.util.messages'])
+.factory('bar', function(messages, catalogueElementResource) {
+    var deleteDomain = function(domainId) {
+        messages.confirm('Element Deletion', 'Do you really want to delete this value domain?').then(function(response) {
+            if (response) {
+                var domains = catalogueElementResource('valueDomain');
+                domains.delete({id: domainId}).then(function(status) {
+                    messages.success('Element deleted successfully', 'Value domain with id ' + domainId + ' was successfully deleted');
+                }, function(errors) {
+                    messages.success('Element deletion failed', 'Value domain with id ' + domainId + ' cannot be deleted');
+                });
+            }
+        });
+    }
+});
+{code}
+
