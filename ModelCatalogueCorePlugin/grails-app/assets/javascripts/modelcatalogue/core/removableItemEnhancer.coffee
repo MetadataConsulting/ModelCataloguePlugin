@@ -4,8 +4,10 @@ angular.module('mc.core.removableItemEnhancer', ['mc.util.rest', 'mc.util.enhanc
     (element, enhance = @enhance) ->
       link = "#{modelCatalogueApiRoot}#{element.removeLink}"
       element.remove = () ->
-        enhance(rest(method: 'DELETE', url: link, data: element)).then ()->
+        enhance(rest(method: 'DELETE', url: link, data: element)).then (result)->
           $rootScope.$broadcast 'catalogueElementDeleted', element
+          result
+
       element
 
   ]

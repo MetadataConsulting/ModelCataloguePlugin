@@ -42,8 +42,8 @@ describe "mc.util.messages", ->
 
   it "returns true from confirm", inject (messages, $rootScope) ->
     value = null
-    messages.confirm('the title', 'the body').then (val)->
-      value  = val
+    messages.confirm('the title', 'the body').then ()->
+      value = true
 
     expect(value).toBeNull()
 

@@ -17,8 +17,9 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
         if not payload?
           payload = tail
           tail = null
-        enhance(rest(method: 'DELETE', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload)).then ()->
+        enhance(rest(method: 'DELETE', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload)).then (result)->
           $rootScope.$broadcast 'catalogueElementDeleted', payload
+          result
       query
   ]
 
