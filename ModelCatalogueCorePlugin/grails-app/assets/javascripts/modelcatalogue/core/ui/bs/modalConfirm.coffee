@@ -20,9 +20,9 @@ angular.module('mc.core.ui.bs.modalConfirm', ['mc.util.messages']).config ['mess
 
       deferred = $q.defer()
       dialog.result.then () ->
-        deferred.resolve(true)
+        deferred.resolve()
       , () ->
-        deferred.resolve(false)
+        deferred.reject()
 
       deferred.promise
  ]

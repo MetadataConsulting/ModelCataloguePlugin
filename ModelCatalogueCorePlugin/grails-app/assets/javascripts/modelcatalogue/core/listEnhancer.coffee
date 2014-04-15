@@ -1,10 +1,24 @@
 angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
   condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
-  factory   = ['$q', 'modelCatalogueApiRoot', 'rest', ($q, modelCatalogueApiRoot, rest) ->
+  factory   = ['$q', 'modelCatalogueApiRoot', 'rest', '$rootScope', ($q, modelCatalogueApiRoot, rest, $rootScope) ->
     listEnhancer = (list, enhance = @enhance) ->
       class ListDecorator
         constructor: (list) ->
           angular.extend(@, list)
+
+          self = @
+
+          $rootScope.$on 'catalogueElementDeleted', (event, element) ->
+            indexesToRemove = []
+            for item, i in self.list when item.id == element.id and item.elementType == element.elementType
+              indexesToRemove.push i
+
+            for index, i in indexesToRemove
+              self.list.splice index - i, 1
+              self.total--
+              self.size--
+
+
 
           if @next
             nextUrl = @next
@@ -54,16 +68,16 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
           @currentPage = Math.floor(@offset / @page) + 1
 
           @goto = (page) ->
-            return $q.when(@) if @total == 0
+            return $q.when(@) if @total == 0 or @total <= @page
             theOffset = (page - 1) * @page
             theLink   = "#{modelCatalogueApiRoot}#{@previous.url ? @next.url}"
 
             if theLink.indexOf('offset=') >= 0
               theLink = theLink.replace /offset=(\d+)/, () => "offset=#{theOffset}"
             else if theLink.indexOf('?') >= 0
-              theLink = "theLink&offset=#{theOffset}"
+              theLink = "#{theLink}&offset=#{theOffset}"
             else
-              theLink = "theLink?offset=#{theOffset}"
+              theLink = "#{theLink}?offset=#{theOffset}"
 
             enhance rest method: 'GET', url: theLink
 

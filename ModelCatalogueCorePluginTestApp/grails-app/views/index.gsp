@@ -45,7 +45,7 @@
 
 <div class="container">
     <h1>Model Catalogue Core Demo Page</h1>
-
+    <messages-panel max="3"></messages-panel>
     <div>
         <form class="form" role="form" ng-submit="show()">
             <div class="form-group">
@@ -113,6 +113,8 @@
     </div>
 
     <div ng-show="element.elementType">
+        <div class="row">
+
         <h2>Tree View</h2>
         <div>
             <form class="form" role="form">
@@ -127,10 +129,10 @@
         <div class="col-md-8">
             <catalogue-element-treeview element="element" descend="descend"></catalogue-element-treeview>
         </div>
+        </div>
     </div>
     <div>
         <h2>Messages Demo</h2>
-        <messages-panel max="3"></messages-panel>
         <form class="form" role="form" ng-submit="addMessage(messageText, messageType)">
             <div class="form-group">
                 <label for="messageText">Message Text</label>

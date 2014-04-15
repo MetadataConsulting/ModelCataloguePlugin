@@ -16,7 +16,15 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
   @$get = [ '$injector', '$q', '$window', ($injector, $q, $window) ->
     confirm        = null
     prompt         = null
-    defaultConfirm = (title, body) -> $q.when($window.confirm("#{title}\n#{body}"))
+
+    defaultConfirm = (title, body) ->
+      deferred = $q.defer()
+      if $window.confirm("#{title}\n#{body}")
+        deferred.resolve()
+      else
+        deferred.reject()
+      deferred.promise
+
     defaultPrompt  = (title, body) ->
       deferred = $q.defer()
       result = $window.prompt("#{title}\n#{body}")

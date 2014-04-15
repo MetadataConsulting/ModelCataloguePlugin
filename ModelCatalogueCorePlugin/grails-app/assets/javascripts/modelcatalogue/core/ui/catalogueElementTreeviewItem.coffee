@@ -64,6 +64,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.core.catalogueEle
       $rootScope.$on 'treeviewElementSelected', (event, element) ->
         $scope.active = isEqual($scope.element, element)
 
+      $rootScope.$on 'catalogueElementDeleted', (event, element) ->
+        indexesToRemove = []
+        for item, i in $scope.children when element.relation and item.id == element.relation.id and item.elementType == element.relation.elementType
+          indexesToRemove.push i
+
+
+        for index, i in indexesToRemove
+          $scope.children.splice index - i, 1
+          $scope.numberOfChildren--
+
       $scope.collapseOrExpand = ->
         return if loadingChildren
         if $scope.collapsed

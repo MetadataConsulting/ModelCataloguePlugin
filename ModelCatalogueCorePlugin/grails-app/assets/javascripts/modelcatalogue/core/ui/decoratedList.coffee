@@ -9,7 +9,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
-    controller: ['$scope', 'columns' , ($scope, columns) ->
+    controller: ['$scope', 'columns', '$q' , ($scope, columns, $q) ->
       columnsDefined = $scope.columns?
 
       emptyList =
@@ -116,6 +116,14 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
       $scope.getActionClass = (action) ->
         return "btn-#{action.type}" if action.type?
         "btn-primary"
+
+      $scope.performAction = (fn, element, list) ->
+        $q.when(fn(element, list)).then (result) ->
+          # only boolan value is the one we expect
+          if result == true
+            $scope.goto($scope.list.currentPage)
+
+
 
     ]
   }

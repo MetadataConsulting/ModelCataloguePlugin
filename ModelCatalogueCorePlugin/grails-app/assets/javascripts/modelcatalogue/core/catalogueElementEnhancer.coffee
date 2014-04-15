@@ -29,7 +29,10 @@ angular.module('mc.core.catalogueElementEnhancer', ['mc.util.rest', 'mc.util.enh
 
           self = @
 
-          self['delete']      = () -> enhance rest method: 'DELETE', url: "#{modelCatalogueApiRoot}#{self.link}"
+          self['delete']      = () ->
+            enhance(rest(method: 'DELETE', url: "#{modelCatalogueApiRoot}#{self.link}")).then ()->
+              $rootScope.$broadcast 'catalogueElementDeleted', self
+
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
           self.update         = () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload()
           self.show           = () -> $rootScope.$broadcast('showCatalogueElement', self) ; self

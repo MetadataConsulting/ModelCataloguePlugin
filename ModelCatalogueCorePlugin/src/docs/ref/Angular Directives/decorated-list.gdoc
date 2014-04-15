@@ -36,10 +36,14 @@ show    | recipe how to show the item in the row if possible, either @true@ whic
 
 @actions@ defines actions for particular rows in the table in an array of following structures
 
+{note}
+If you want to reload the current page in the table after the action is preformed return @true@ or promise which resolves to @rue@ from the @action@ function.
+{note}
+
 {table}
 Key     | Value
 title   | the title shown in the action button
-action  | action to be performed on click represented as function taking single argument - the current row item
+action  | action to be performed on click represented as function taking up to two arguments - current item and the list object
 icon    | glyphicon icon name such as @info-sign@
 type    | type of the button: @default@, @primary@, @success@, @info@, @warning@, @danger@, @link@, optionally followed by the size @btn-lg@, @btn-sm@ or @btn-xs@
 {table}

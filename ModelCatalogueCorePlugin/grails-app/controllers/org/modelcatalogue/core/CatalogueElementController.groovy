@@ -49,7 +49,7 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
             notFound()
             return
         }
-        RelationshipType relationshipType = RelationshipType.findByName(type)
+        RelationshipType relationshipType = RelationshipType.findByName(otherSide.type ? otherSide.type.name : type)
         if (!relationshipType) {
             notFound()
             return
@@ -57,20 +57,24 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
         }
         Class otherSideType
         try {
-            otherSideType = Class.forName otherSide.elementType
+            otherSideType = Class.forName (otherSide.relation ? otherSide.relation.elementType : otherSide.elementType)
         } catch (ClassNotFoundException ignored) {
             notFound()
             return
         }
 
-        CatalogueElement destination = otherSideType.get(otherSide.id)
+        CatalogueElement destination = otherSideType.get(otherSide.relation ? otherSide.relation.id : otherSide.id )
         if (!destination) {
             notFound()
             return
         }
         Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType) :  relationshipService.unlink(destination, source, relationshipType)
-        response.status = old ? HttpServletResponse.SC_NO_CONTENT : HttpServletResponse.SC_NOT_FOUND
-
+        if (!old) {
+            notFound()
+            return
+        }
+        response.status = HttpServletResponse.SC_NO_CONTENT
+        render "DELETED"
     }
 
     private addRelation(Long id, String type, boolean outgoing) {

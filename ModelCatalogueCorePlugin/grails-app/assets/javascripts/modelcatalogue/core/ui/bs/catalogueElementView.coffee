@@ -7,7 +7,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
         <tab heading="{{tab.heading}}" disabled="tab.disabled" ng-repeat="tab in tabs" active="tab.active" select="doLoad(tab)">
             <div ng-switch="tab.type">
               <properties-pane item="tab.value" properties="tab.properties" ng-switch-when="properties-pane"></properties-pane>
-              <decorated-list list="tab.value" columns="tab.columns"  ng-switch-when="decorated-list"></decorated-list>
+              <decorated-list list="tab.value" columns="tab.columns" actions="tab.actions" ng-switch-when="decorated-list"></decorated-list>
             </div>
         </tab>
       </tabset>

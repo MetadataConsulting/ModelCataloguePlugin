@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.core.ui.columns']).directive 'catalogueElementView',  [-> {
+angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns']).directive 'catalogueElementView',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -6,7 +6,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', 'enhance', 'names', 'columns' , ($scope, $log, $filter, enhance, names, columns) ->
+    controller: ['$scope', '$log', '$filter', '$q', 'enhance', 'names', 'columns', 'messages' , ($scope, $log, $filter, $q, enhance, names, columns, messages) ->
       propExludes     = ['version', 'name', 'description']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -29,6 +29,31 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             loader:   fn
             type:     'decorated-list'
             columns:   columns(fn.itemType)
+            actions:  []
+
+          if fn.itemType == 'org.modelcatalogue.core.Relationship'
+            tabDefintion.actions.push {
+              title:  'Remove'
+              icon:   'remove'
+              type:   'danger'
+              action: (rel) ->
+                deferred = $q.defer()
+                messages.confirm('Removing Relationship', "Do you really want to remove relation '#{element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
+                    rel.remove().then ->
+                      messages.success('Relationship removed!', "#{rel.relation.name} is no longer related to #{element.name}")
+                      # reloads the table
+                      deferred.resolve(true)
+                    , (response) ->
+                      if response.status == 404
+                        messages.error('Error removing relationship', 'Relationship cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
+                        deferred.resolve(true)
+                      else
+                        messages.error('Error removing relationship', 'Relationship cannot be removed, see application logs for details')
+
+                deferred.promise
+
+
+            }
 
           tabs.push tabDefintion
 

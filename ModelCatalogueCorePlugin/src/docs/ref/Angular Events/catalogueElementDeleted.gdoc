@@ -1,0 +1,15 @@
+h1. catalogueElementDeleted
+
+Event broadcast on the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope] when
+ [catalogueElement|Angular Enhancers] is deleted.
+
+
+h2. Usage
+Register the handler on the current scope or the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope]
+to listen to show request.
+
+{code}
+$scope.$on('catalogueElementDeleted', function(event, element) {
+    // hide the element
+})
+{code}
