@@ -8,7 +8,7 @@ angular.module('mc.core.ui.bs.modalPrompt', ['mc.util.messages']).config ['messa
             <h4>''' + title + '''</h4>
         </div>
         <div class="modal-body">
-            <form role="form">
+            <form role="form" ng-submit="$close(value)">
             <div class="form-group">
                 <label for="value">''' + body + '''</label>
                 <input type="''' + (type ? 'text') + '''" id="value" ng-model="value" class="form-control">
