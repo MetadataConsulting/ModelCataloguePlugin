@@ -22,7 +22,7 @@ describe "mc.core.catalogueElementResource", ->
 
 
   it "creates catalogue element resource", ->
-    valueDomains = catalogueElementResource('valueDomain')
+    valueDomains = catalogueElementResource('com.modelcatalogue.core.ValueDomain')
     valueDomainsRootPath = "/api/modelCatalogue/core/valueDomain"
 
     expect(valueDomains.getIndexPath()).toBe(valueDomainsRootPath)
