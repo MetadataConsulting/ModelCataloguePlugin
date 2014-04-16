@@ -14,8 +14,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     static responseFormats = ['json', 'xml', 'xlsx']
     def modelCatalogueSearchService
 
-    AbstractRestfulController(Class<T> resource) {
-        super(resource)
+    AbstractRestfulController(Class<T> resource, boolean readOnly = false) {
+        super(resource, readOnly)
     }
 
     def search(Integer max){

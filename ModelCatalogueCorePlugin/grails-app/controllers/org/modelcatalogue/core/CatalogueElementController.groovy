@@ -11,8 +11,8 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
 
     def relationshipService
 
-    CatalogueElementController(Class<T> resource) {
-        super(resource)
+    CatalogueElementController(Class<T> resource, boolean readOnly = false) {
+        super(resource, readOnly)
     }
 
     def incoming(Integer max, String type) {
