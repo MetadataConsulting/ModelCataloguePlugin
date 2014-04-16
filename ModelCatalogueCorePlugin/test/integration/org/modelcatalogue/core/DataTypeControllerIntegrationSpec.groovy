@@ -157,6 +157,15 @@ class DataTypeControllerIntegrationSpec extends CatalogueElementControllerIntegr
             ]
     }
 
+    def getMappingPaginationParameters(baseLink){
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 2, 10, 0, 11, "${baseLink}?max=10&offset=10", ""],
+                [2, 2, 5, 0, 11, "${baseLink}?max=5&offset=5", ""],
+        ]
+
+    }
+
 
     private createValueDomainsUsingDataType(DataType DataType, Integer max){
         max.times {new ValueDomain(name: "dataTypeValueDomain${it}", description: "the ground speed of the moving vehicle", dataType: DataType).save()}

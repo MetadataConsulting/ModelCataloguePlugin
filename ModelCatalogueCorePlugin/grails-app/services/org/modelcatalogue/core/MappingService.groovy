@@ -5,7 +5,7 @@ class MappingService {
 
     static transactional = true
 
-    Mapping map(ValueDomain source, ValueDomain destination, String mapping) {
+    Mapping map(CatalogueElement source, CatalogueElement destination, String mapping) {
         if (!source || !source.id || !destination || !destination.id || !mapping) return null
         Mapping existing = Mapping.findBySourceAndDestination(source, destination)
         if (existing) {
@@ -18,12 +18,12 @@ class MappingService {
         newOne
     }
 
-    Mapping map(ValueDomain source, ValueDomain destination, Map mapping) {
+    Mapping map(CatalogueElement source, CatalogueElement destination, Map mapping) {
         map(source, destination, createMappingFunctionFromMap(mapping))
     }
 
 
-    Mapping unmap(ValueDomain source, ValueDomain destination) {
+    Mapping unmap(CatalogueElement source, CatalogueElement destination) {
         Mapping old = Mapping.findBySourceAndDestination(source, destination)
         if (!old) return null
         source.removeFromOutgoingMappings(old)

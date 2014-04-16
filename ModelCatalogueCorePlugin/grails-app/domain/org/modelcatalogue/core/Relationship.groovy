@@ -74,7 +74,7 @@ class Relationship {
     }
 
     def beforeDelete(){
-        if (source && destination) {
+        if (source || destination) {
             destination?.removeFromIncomingRelationships(this)
             source?.removeFromOutgoingRelationships(this)
         }

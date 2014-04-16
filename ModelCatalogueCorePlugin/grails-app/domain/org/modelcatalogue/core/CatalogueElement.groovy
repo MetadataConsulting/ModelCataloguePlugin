@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -20,7 +18,7 @@ abstract class CatalogueElement {
 
     static transients = ['relations', 'info']
 
-    static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship]
+    static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
     static constraints = {
         name size: 1..255
@@ -31,15 +29,15 @@ abstract class CatalogueElement {
 
     static searchable = {
         name boost:5
-        except = ['incomingRelationships', 'outgoingRelationships']
+        incomingMappings component: true
+        except = ['incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
     }
 
     static mapping = {
         description type: "text"
     }
 
-
-    static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination']
+    static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
 
     /**
      * Functions for specifying relationships between catalogue elements using the
@@ -87,7 +85,7 @@ abstract class CatalogueElement {
         if (this.isAttached()) {
             Relationship.countByDestinationAndRelationshipType(this, type)
         }else{
-            Relationship.countByDestinationAndRelationshipType(CatalogueElement.get(this.id), type)
+            Relationship.countByDestinationAndRelationshipType(get(this.id), type)
         }
 
     }
@@ -96,7 +94,7 @@ abstract class CatalogueElement {
         if (this.isAttached()) {
             Relationship.countBySourceAndRelationshipType(this, type)
         }else{
-            Relationship.countBySourceAndRelationshipType(CatalogueElement.get(this.id), type)
+            Relationship.countBySourceAndRelationshipType(get(this.id), type)
         }
     }
 
@@ -141,6 +139,14 @@ abstract class CatalogueElement {
         incomingRelationships.each{ relationship ->
             relationship.beforeDelete()
             relationship.delete(flush:true)
+        }
+        outgoingMappings.each{ mapping ->
+            mapping.beforeDelete()
+            mapping.delete(flush:true)
+        }
+        incomingMappings.each{ mapping ->
+            mapping.beforeDelete()
+            mapping.delete(flush:true)
         }
     }
 }

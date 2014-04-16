@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.Relationships
 
 import javax.servlet.http.HttpServletResponse
@@ -7,9 +8,10 @@ import javax.servlet.http.HttpServletResponse
 abstract class CatalogueElementController<T> extends AbstractRestfulController<T> {
 
     static responseFormats = ['json', 'xml', 'xlsx']
-    static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE"]
+    static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE", mappings: "GET", removeMapping: "DELETE", addMapping: "POST"]
 
     def relationshipService
+    def mappingService
 
     CatalogueElementController(Class<T> resource, boolean readOnly = false) {
         super(resource, readOnly)
@@ -160,6 +162,80 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
                 offset: params.int('offset') ?: 0,
                 page: params.int('max') ?: 0
         )
+    }
+
+
+    def mappings(Integer max){
+        setSafeMax(max)
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        int total = element.outgoingMappings.size()
+        def list = Mapping.findAllBySource(element, params)
+        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/mapping", total)
+
+        respond new Mappings(
+                items: list,
+                previous: links.previous,
+                next: links.next,
+                total: total,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 0
+        )
+    }
+
+    def removeMapping() {
+        addOrRemoveMapping(false)
+    }
+
+    def addMapping() {
+        addOrRemoveMapping(true)
+    }
+
+    private addOrRemoveMapping(boolean add) {
+        if (!params.destination || !params.id) {
+            notFound()
+            return
+        }
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        CatalogueElement destination = queryForResource(params.destination)
+        if (!destination) {
+            notFound()
+            return
+        }
+        if (add) {
+            String mappingString = null
+            withFormat {
+                xml {
+                    mappingString = request.getXML().text()
+                }
+                json {
+                    mappingString = request.getJSON().mapping
+                }
+            }
+            Mapping mapping = mappingService.map(element, destination, mappingString)
+            if (mapping.hasErrors()) {
+                respond mapping.errors
+                return
+            }
+            response.status = HttpServletResponse.SC_CREATED
+            respond mapping
+            return
+        }
+        Mapping old = mappingService.unmap(element, destination)
+        if (old) {
+            response.status = HttpServletResponse.SC_NO_CONTENT
+        } else {
+            notFound()
+        }
     }
 
 }

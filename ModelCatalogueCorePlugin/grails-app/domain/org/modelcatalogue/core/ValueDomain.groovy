@@ -34,8 +34,6 @@ class ValueDomain extends CatalogueElement  {
         unitOfMeasure component:true
         incomingRelationships component: true
         outgoingRelationships component: true
-        incomingMappings component: true
-        outgoingMappings component: true
         except = ['includedIn', 'instantiates', 'regexDef']
     }
 
@@ -44,8 +42,6 @@ class ValueDomain extends CatalogueElement  {
 	MeasurementUnit unitOfMeasure
 	String rule
     static belongsTo = [dataType: DataType]
-    static hasMany  = [ outgoingMappings: Mapping,  incomingMappings: Mapping ]
-    static mappedBy = [ outgoingMappings: 'source', incomingMappings: 'destination']
     static transients = ['regexDef']
 
     static constraints = {
