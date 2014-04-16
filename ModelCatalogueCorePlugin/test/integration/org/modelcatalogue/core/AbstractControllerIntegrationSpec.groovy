@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.rest.RestfulController
+import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.codehaus.groovy.grails.web.json.JSONElement
@@ -129,7 +130,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
         then:
         json
-        json.link == "/${resourceName}/${loadItem.id}"
+        json.link == "/${GrailsNameUtils.getPropertyName(loadItem.class)}/${loadItem.id}"
         customJsonPropertyCheck loadItem, json
         resource.count() == totalCount
 
@@ -148,7 +149,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         then:
         xml
         xml.@link
-        xml.@link.text() == "/${resourceName}/${loadItem.id}"
+        xml.@link.text() == "/${GrailsNameUtils.getPropertyName(loadItem.class)}/${loadItem.id}"
         xmlCustomPropertyCheck xml, loadItem
         resource.count() == totalCount
 
@@ -157,6 +158,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
     @Unroll
     def "Do not #action new instance from JSON with bad json name"() {
+        if (controller.readOnly) return
 
         expect:
         !resource.findByName(badInstance.name)
@@ -183,6 +185,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Create new instance from JSON"() {
+        if (controller.readOnly) return
+
         expect:
         !resource.findByName(newInstance.name)
 
@@ -204,8 +208,9 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resource.count() == totalCount
     }
 
-
     def "Create new instance from XML"() {
+        if (controller.readOnly) return
+
         expect:
         !resource.findByName(newInstance.name)
 
@@ -231,6 +236,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "edit instance description from JSON"() {
+        if (controller.readOnly) return
 
         def json = propertiesToEdit
         def properties = new HashMap()
@@ -260,6 +266,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "edit instance from XML"() {
+        if (controller.readOnly) return
 
         def properties = new HashMap()
         properties.putAll(loadItem.properties)
@@ -288,6 +295,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Do not create new instance with bad XML"() {
+        if (controller.readOnly) return
+
         expect:
         !resource.findByName("")
 
@@ -312,6 +321,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "edit instance with bad JSON name"() {
+        if (controller.readOnly) return
+
         def instance = resource.findByName(loadItem.name)
 
         expect:
@@ -336,6 +347,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "edit instance with bad XML"() {
+        if (controller.readOnly) return
+
         def instance = resource.findByName(loadItem.name)
 
         expect:
@@ -381,6 +394,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Return 404 for non-existing item as JSON on delete"() {
+        if (controller.readOnly) return
+
         controller.response.format = "json"
         controller.params.id = "1000000"
         controller.delete()
@@ -392,6 +407,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Return 404 for non-existing item as XML on delete"() {
+        if (controller.readOnly) return
+
         controller.response.format = "xml"
         controller.params.id = "1000000"
         controller.params.id = "1000000"
@@ -405,6 +422,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
 
     def "Return 204 for existing item as JSON on delete"() {
+        if (controller.readOnly) return
+
         def elementToDelete = resource.newInstance(newInstance).save()
         controller.response.format = "json"
         controller.params.id = elementToDelete.id
@@ -418,6 +437,8 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Return 204 for existing item as XML on delete"() {
+        if (controller.readOnly) return
+
         def elementToDelete = resource.newInstance(newInstance).save()
         controller.response.format = "xml"
         controller.params.id = elementToDelete.id

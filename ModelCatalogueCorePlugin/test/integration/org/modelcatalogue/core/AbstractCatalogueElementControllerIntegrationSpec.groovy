@@ -180,7 +180,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     @Unroll
     def "#action with non-existing one to #direction endpoint with #format result"(){
         controller.response.format = format.toLowerCase()
-        def item = resource.newInstance()
+        def item = newResourceInstance()
         item.id = 1000000
         def input = item."encodeAs$format"()
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
@@ -207,6 +207,10 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         "remove" | "JSON" | "outgoing"
         "remove" | "XML"  | "incoming"
         "remove" | "JSON" | "incoming"
+    }
+
+    protected CatalogueElement newResourceInstance() {
+        resource.newInstance()
     }
 
     @Unroll
@@ -282,7 +286,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert item.relation
         assert item.relation.@id
         assert item.relation.@elementType
-        assert item.@removeLink.text() ==  "/${resourceName}/${first.id}/${incomingOrOutgoing}/relationship"
+        assert item.@removeLink.text() ==  "/${GrailsNameUtils.getPropertyName(first.class)}/${first.id}/${incomingOrOutgoing}/relationship"
         def relation = Class.forName(item.relation.@elementType.text()).get(item.relation.@id.text() as Long)
         assert item.relation.name == relation.name
         assert item.relation.@id == "${relation.id}"
@@ -607,7 +611,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert item.relation
         assert item.relation.id
         assert item.relation.elementType
-        assert item.removeLink == "/${resourceName}/${first.id}/${incomingOrOutgoing}/relationship"
+        assert item.removeLink == "/${GrailsNameUtils.getPropertyName(first.class)}/${first.id}/${incomingOrOutgoing}/relationship"
         def relation = Class.forName(item.relation.elementType).get(item.relation.id)
         assert item.relation.name == relation.name
         assert item.relation.id == relation.id
@@ -635,10 +639,10 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(xml.@elementType, item.class.name, "elementType")
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
         checkProperty(xml.incomingRelationships.@count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@link, "/${resourceName}/${item.id}/incoming", "incomingRelationships")
+        checkProperty(xml.incomingRelationships.@link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/incoming", "incomingRelationships")
         checkProperty(xml.incomingRelationships.@itemType, Relationship.name, "itemType")
         checkProperty(xml.outgoingRelationships.@count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@link, "/${resourceName}/${item.id}/outgoing", "outgoingRelationships")
+        checkProperty(xml.outgoingRelationships.@link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/outgoing", "outgoingRelationships")
         checkProperty(xml.outgoingRelationships.@itemType, Relationship.name, "itemType")
         return true
     }
@@ -651,10 +655,10 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(xml.@elementType, outputItem.class.name, "elementType")
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(outputItem.class.simpleName), "elementTypeName")
         checkProperty(xml.incomingRelationships.@count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@link, "/${resourceName}/${outputItem.id}/incoming", "incomingRelationships")
+        checkProperty(xml.incomingRelationships.@link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/incoming", "incomingRelationships")
         checkProperty(xml.incomingRelationships.@itemType, Relationship.name, "itemType")
         checkProperty(xml.outgoingRelationships.@count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@link, "/${resourceName}/${outputItem.id}/outgoing", "outgoingRelationships")
+        checkProperty(xml.outgoingRelationships.@link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/outgoing", "outgoingRelationships")
         checkProperty(xml.outgoingRelationships.@itemType, Relationship.name, "itemType")
         return true
     }
@@ -667,10 +671,10 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.elementType , item.class.name, "elementType")
         checkProperty(json.elementTypeName , GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
         checkProperty(json.outgoingRelationships.count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingCount")
-        checkProperty(json.outgoingRelationships.link, "/${resourceName}/${item.id}/outgoing", "outgoingLink")
+        checkProperty(json.outgoingRelationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/outgoing", "outgoingLink")
         checkProperty(json.outgoingRelationships.itemType, Relationship.name, "outgoingItemType")
         checkProperty(json.incomingRelationships.count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingCount")
-        checkProperty(json.incomingRelationships.link, "/${resourceName}/${item.id}/incoming", "incomingLink")
+        checkProperty(json.incomingRelationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/incoming", "incomingLink")
         checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
         return true
     }
@@ -683,9 +687,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.elementType , outputItem.class.name, "elementType")
         checkProperty(json.elementTypeName , GrailsNameUtils.getNaturalName(outputItem.class.simpleName), "elementTypeName")
         checkProperty(json.outgoingRelationships.count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingCount")
-        checkProperty(json.outgoingRelationships.link, "/${resourceName}/${outputItem.id}/outgoing", "outgoingLink")
+        checkProperty(json.outgoingRelationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/outgoing", "outgoingLink")
         checkProperty(json.incomingRelationships.count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingCount")
-        checkProperty(json.incomingRelationships.link, "/${resourceName}/${outputItem.id}/incoming", "incomingLink")
+        checkProperty(json.incomingRelationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/incoming", "incomingLink")
         return true
     }
 
@@ -914,7 +918,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     protected mapToDummyEntities(CatalogueElement toBeLinked) {
-        for (domain in resource.list()) {
+        for (domain in toBeLinked.class.list()) {
             if (domain != toBeLinked) {
                 controller.mappingService.map(toBeLinked, domain, "x")
                 if (toBeLinked.outgoingMappings.size() == 11) {
