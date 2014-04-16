@@ -5,7 +5,7 @@ import org.modelcatalogue.core.util.Relationships
 
 import javax.servlet.http.HttpServletResponse
 
-abstract class CatalogueElementController<T> extends AbstractRestfulController<T> {
+abstract class AbstractCatalogueElementController<T> extends AbstractRestfulController<T> {
 
     static responseFormats = ['json', 'xml', 'xlsx']
     static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE", mappings: "GET", removeMapping: "DELETE", addMapping: "POST"]
@@ -13,8 +13,12 @@ abstract class CatalogueElementController<T> extends AbstractRestfulController<T
     def relationshipService
     def mappingService
 
-    CatalogueElementController(Class<T> resource, boolean readOnly = false) {
+    AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
         super(resource, readOnly)
+    }
+
+    AbstractCatalogueElementController(Class<T> resource) {
+        super(resource, false)
     }
 
     def incoming(Integer max, String type) {

@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class DataElementControllerIntegrationSpec extends CatalogueElementControllerIntegrationSpec {
+class DataElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){
@@ -34,7 +34,7 @@ class DataElementControllerIntegrationSpec extends CatalogueElementControllerInt
     }
 
     @Override
-    CatalogueElementController getController() {
+    AbstractCatalogueElementController getController() {
         new DataElementController()
     }
 

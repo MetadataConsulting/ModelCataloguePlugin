@@ -7,7 +7,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class DataTypeControllerIntegrationSpec extends CatalogueElementControllerIntegrationSpec {
+class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     def setupSpec(){
         totalCount = 24
@@ -113,7 +113,7 @@ class DataTypeControllerIntegrationSpec extends CatalogueElementControllerIntegr
     }
 
     @Override
-    CatalogueElementController getController() {
+    AbstractCatalogueElementController getController() {
         new DataTypeController()
     }
 

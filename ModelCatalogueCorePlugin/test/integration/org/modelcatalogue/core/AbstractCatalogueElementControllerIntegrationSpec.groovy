@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse
 /**
  * Created by adammilward on 27/02/2014.
  */
-abstract class CatalogueElementControllerIntegrationSpec<T> extends AbstractControllerIntegrationSpec implements ResultRecorder{
+abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends AbstractControllerIntegrationSpec implements ResultRecorder{
 
 
     @Unroll
