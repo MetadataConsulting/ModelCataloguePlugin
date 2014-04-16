@@ -1,9 +1,6 @@
 package org.modelcatalogue.core
 
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
-class ExtensionValue extends CatalogueElement {
+class ExtensionValue {
 
     /* the name property from catalogue element is a key for the extension */
 
@@ -11,16 +8,16 @@ class ExtensionValue extends CatalogueElement {
 
     static searchable = {
         name boost:5
-        incomingRelationships component: true
-        outgoingRelationships component: true
         except = ['element']
     }
 
+    String name
     String extensionValue
 
     static belongsTo = [element: ExtendibleElement]
 
     static constraints = {
+        name size: 1..255
         extensionValue maxSize: 1000, nullable: true
     }
 
