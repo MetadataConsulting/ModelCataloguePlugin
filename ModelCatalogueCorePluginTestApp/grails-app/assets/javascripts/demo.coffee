@@ -94,7 +94,10 @@ angular.module('demo', [
     $scope.selectedInTreeview = element
 
   onDescendPathChange = (path) ->
-    $scope.descend = path.split(/\s*,\s*/)
+    if path.indexOf(',') > -1
+      $scope.descend = path.split(/\s*,\s*/)
+    else
+      $scope.descend = path
 
   $scope.descendPath = 'includes, instantiates'
   $scope.selectedInTreeview = null

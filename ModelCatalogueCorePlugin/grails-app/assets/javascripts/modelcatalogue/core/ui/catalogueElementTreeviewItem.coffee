@@ -42,9 +42,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.core.catalogueEle
               $scope.nextDescend = $scope.descend.slice(1)
         else
           $scope.currentDescend = $scope.descend
-          $scope.nextDescend    = []
+          $scope.nextDescend    = $scope.descend
 
-        if element?  and element[$scope.currentDescend]
+        if element? and element[$scope.currentDescend]
           $scope.numberOfChildren = $scope.element[$scope.currentDescend].total
         else
           $scope.numberOfChildren = 0
