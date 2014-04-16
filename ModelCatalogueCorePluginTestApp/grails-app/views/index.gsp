@@ -68,12 +68,12 @@
     </div>
 
     <div ng-show="element.elementType">
-        <catalogue-element-view element="element"></catalogue-element-view>
+        <catalogue-element-view element="element" id="main-view"></catalogue-element-view>
     </div>
 
     <div ng-show="!list.empty">
         <h2>Decorated List Widget</h2>
-        <decorated-list list="list" columns="columns" selection="selection" actions="actions"></decorated-list>
+        <decorated-list list="list" columns="columns" selection="selection" actions="actions" id="main-list"></decorated-list>
     </div>
 
     <div ng-show="!list.empty">

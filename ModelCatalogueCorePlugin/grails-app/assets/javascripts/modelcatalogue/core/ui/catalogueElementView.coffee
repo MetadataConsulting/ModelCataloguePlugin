@@ -3,6 +3,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     replace: true
     scope:
       element: '='
+      id: '@'
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
@@ -30,6 +31,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             type:     'decorated-list'
             columns:   columns(fn.itemType)
             actions:  []
+            name:     name
 
           if fn.itemType == 'org.modelcatalogue.core.Relationship'
             tabDefintion.actions.push {

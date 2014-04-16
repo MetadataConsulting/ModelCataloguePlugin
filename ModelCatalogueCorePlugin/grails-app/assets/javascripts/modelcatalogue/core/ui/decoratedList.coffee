@@ -6,10 +6,13 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
       columns: '=?'
       selection: '=?'
       actions: '=?'
+      id: '@'
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
     controller: ['$scope', 'columns', '$q', '$rootScope' , ($scope, columns, $q, $rootScope) ->
+      $scope.id = null if !$scope.id
+
       columnsDefined = $scope.columns?
 
       emptyList =
@@ -43,6 +46,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
           $scope.hasMorePrevPages = lowerTen != 0
           $scope.hasMoreNextPages = (Math.floor(list.total / list.page) + 1) >= upperTen
           $scope.pages = pages
+        $rootScope.$broadcast 'decoratedListChanged', list, $scope.id
 
       $scope.hasSelection = () -> $scope.selection?
 

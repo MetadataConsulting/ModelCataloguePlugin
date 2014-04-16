@@ -93,6 +93,9 @@ angular.module('demo', [
   $scope.$on 'treeviewElementSelected', (event, element) ->
     $scope.selectedInTreeview = element
 
+  $scope.$on 'decoratedListChanged', (event, list, id) ->
+    $log.info "list #{id} changed:", list
+
   onDescendPathChange = (path) ->
     if path.indexOf(',') > -1
       $scope.descend = path.split(/\s*,\s*/)
