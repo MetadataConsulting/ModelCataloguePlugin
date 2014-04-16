@@ -9,7 +9,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
-    controller: ['$scope', 'columns', '$q' , ($scope, columns, $q) ->
+    controller: ['$scope', 'columns', '$q', '$rootScope' , ($scope, columns, $q, $rootScope) ->
       columnsDefined = $scope.columns?
 
       emptyList =

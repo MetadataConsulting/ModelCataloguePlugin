@@ -127,7 +127,7 @@
             </form>
         </div>
         <div class="col-md-8">
-            <catalogue-element-treeview element="element" descend="descend"></catalogue-element-treeview>
+            <catalogue-element-treeview element="element" descend="descend" id="tree-widget"></catalogue-element-treeview>
         </div>
         </div>
     </div>

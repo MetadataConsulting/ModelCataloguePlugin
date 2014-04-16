@@ -4,6 +4,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.core.catalogueEle
     scope:
       element:  '='
       descend:  '='
+      rootId:   '='
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeviewItem.html'
 
@@ -56,12 +57,13 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.core.catalogueEle
 
 
       $scope.select = (element) ->
-        $rootScope.$broadcast 'treeviewElementSelected', element
+        $rootScope.$broadcast 'treeviewElementSelected', element, $scope.rootId
 
       $rootScope.$on 'showCatalogueElement', (event, element) ->
         $scope.active = isEqual($scope.element, element)
 
-      $rootScope.$on 'treeviewElementSelected', (event, element) ->
+      $rootScope.$on 'treeviewElementSelected', (event, element, id) ->
+        return if id and $scope.rootId and id != $scope.rootId
         $scope.active = isEqual($scope.element, element)
 
       $rootScope.$on 'catalogueElementDeleted', (event, element) ->

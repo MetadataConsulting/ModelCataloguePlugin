@@ -22,10 +22,11 @@ catalogueElementResource('valueDomain').get(1).then(function(element) {
 
 And following HTML snippet in your page:
 {code}
- <catalogue-element-treeview element="element" descend="descend"></catalogue-element-treeview>
+ <catalogue-element-treeview element="element" descend="descend" id="tree-widget"></catalogue-element-treeview>
 {code}
 
 Than the value domain will be displayed in the tree view with all outgoing relationships as the children of it.
+If @id@ attribute is specified it can be used to narrow the selection of [treeviewElementSelected|Angular Events] event.
 
 h2. Customization
 

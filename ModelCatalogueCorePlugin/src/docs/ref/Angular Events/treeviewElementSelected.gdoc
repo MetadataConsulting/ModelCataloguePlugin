@@ -11,14 +11,14 @@ Register the handler on the current scope or the [$rootScope|http://docs.angular
 to listen to tree view selection request.
 
 {code}
-$scope.$on('treeviewElementSelected', function(event, element) {
+$scope.$on('treeviewElementSelected', function(event, element, id) {
     // display the element by e.g. changing the current route
 })
 {code}
 
 Broadcast the event on the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope] to get the element
-selected in the tree view.
+selected in the tree view. @id@ parameter is optional and if specified only tree view matching given id will be selected
 
 {code}
-$rootScope.$broadcast 'treeviewElementSelected', element
+$rootScope.$broadcast 'treeviewElementSelected', element, id
 {code}

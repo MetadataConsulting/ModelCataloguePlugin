@@ -12,10 +12,11 @@ describe "mc.core.ui.catalogueElementTreeview", ->
     $rootScope.descend = ['valueDomains']
 
     element = $compile('''
-      <catalogue-element-treeview element="element" descend="descend"></catalogue-element-treeview>
+      <catalogue-element-treeview element="element" descend="descend" id="tree-widget"></catalogue-element-treeview>
     ''')($rootScope)
 
     $rootScope.$digest()
 
     expect(element.prop('tagName').toLowerCase()).toBe('ul')
+    expect(element.prop('id').toLowerCase()).toBe('tree-widget')
 

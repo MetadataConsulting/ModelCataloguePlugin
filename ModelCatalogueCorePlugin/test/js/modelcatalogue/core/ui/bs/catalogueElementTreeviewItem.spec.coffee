@@ -11,7 +11,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     $rootScope.descend = ['valueDomains']
 
     element = $compile('''
-      <catalogue-element-treeview-item element="element" descend="descend"></catalogue-element-treeview-item>
+      <catalogue-element-treeview-item element="element" descend="descend" root-id="'treewidget'"></catalogue-element-treeview-item>
     ''')($rootScope)
 
     $rootScope.$digest()
