@@ -16,5 +16,4 @@ class ImportRow {
     String containingModelCode
     String measurementUnitName
     Map metadata
-
 }

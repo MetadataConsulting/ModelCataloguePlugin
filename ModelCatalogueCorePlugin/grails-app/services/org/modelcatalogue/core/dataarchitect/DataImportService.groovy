@@ -61,49 +61,11 @@ class DataImportService {
             if(parentModel){parentModels.add(parentModel)}
             if(model){parentModels.add(model)}
 
-            validateRow(newImport, conceptualDomain, conceptualDomainDescription, parentModels, name, valueDomainInfo, description, metadataColumns)
+            newImport.validateRow(importRow)
             //importLine(conceptualDomain, conceptualDomainDescription, parentModels, name, valueDomainInfo, description, metadataColumns)
         }
 
         return newImport
-    }
-
-
-    @Transactional
-    protected void validateRow(Import newImport, String conceptualDomain, String conceptualDomainDescription, ArrayList categories, String name, valueDomainInfo, String description, Map metadataColumns) {
-
-        if (name.isEmpty()) {
-            messages.put(metadataColumns.get("NHIC_Identifier"), "no name for the given data element: ${metadataColumns.get("NHIC_Identifier")}")
-        } else if (conceptualDomain.isEmpty()) {
-            valid = false
-            messages.put(metadataColumns.get("NHIC_Identifier"), "no name for the given data element: ${metadataColumns.get("NHIC_Identifier")}")
-        } else if (categories.isEmpty()) {
-            valid = false
-            messages.put(metadataColumns.get("NHIC_Identifier"), "no models specified for the given data element: ${metadataColumns.get("NHIC_Identifier")}")
-        }
-
-
-        def dataType
-        def cd = findOrCreateConceptualDomain(conceptualDomain, conceptualDomainDescription)
-        def models = importModels(categories, cd)
-
-        if (description) { description = description.take(2000) }
-        if (valueDomainInfo != null && !valueDomainInfo.isEmpty()) { dataType = findOrCreateDataType(name, [valueDomainInfo]) }
-
-        def valid = true
-
-        if (valid) {
-            def de, vd
-
-            de = createDataElement([name: name, description: description], metadataColumns, models)
-            if (valueDomainInfo != null && dataType != null) {vd = createValueDomain(name, valueDomainInfo,dataType, cd, de)}
-            println "importing: " + name + categories.last()
-
-        } else {
-
-            println("invalid data item")
-
-        }
     }
 
 
