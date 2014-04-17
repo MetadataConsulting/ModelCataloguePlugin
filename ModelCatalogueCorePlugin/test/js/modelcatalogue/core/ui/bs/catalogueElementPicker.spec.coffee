@@ -23,13 +23,13 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $httpBackend.flush()
 
 
-  it "element type can be hidden",  inject ($compile, $rootScope, enhance) ->
+  it "label can be customized",  inject ($compile, $rootScope, enhance) ->
     catEl = enhance angular.copy(fixtures.valueDomain.showOne)
 
     $rootScope.element = catEl
 
     element = $compile('''
-        <input ng-model="element" catalogue-element-picker hide-element-type="true">
+        <input ng-model="element" catalogue-element-picker label="el.name">
       ''')($rootScope)
 
     $rootScope.$digest()

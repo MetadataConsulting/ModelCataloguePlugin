@@ -1,0 +1,19 @@
+h1. catalogueElementCreated
+
+Event broadcast on the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope] when
+ [catalogueElement|Angular Enhancers] is created.
+
+{warning}
+This event is currently implemented only for adding items to the lists (such as relationships).
+{warning}
+
+h2. Usage
+Register the handler on the current scope or the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope]
+to listen to create request.
+
+
+{code}
+$scope.$on('catalogueElementCreated', function(event, element) {
+    // add the element
+})
+{code}

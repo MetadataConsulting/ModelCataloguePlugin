@@ -12,7 +12,9 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
         if not payload?
           payload = tail
           tail = null
-        enhance rest method: 'POST', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload
+        enhance(rest(method: 'POST', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload)).then (result)->
+          $rootScope.$broadcast 'catalogueElementCreated', payload
+          result
       query.remove = (tail, payload) ->
         if not payload?
           payload = tail

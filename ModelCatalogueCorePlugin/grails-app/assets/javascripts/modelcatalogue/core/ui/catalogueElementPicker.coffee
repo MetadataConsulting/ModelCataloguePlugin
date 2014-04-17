@@ -23,8 +23,8 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
   ]
 
   compile: (element, attrs) ->
-    label = if attrs.hideElementType == 'true' then "el.name" else "(el.name + ' (' + el.elementTypeName + ': ' + el.id + ')')"
-    element.attr('typeahead', "el as #{label} for el in searchForElement($viewValue, '" + (attrs.catalogueElementPicker ? '') + "', '" + (attrs.resource ? '') + "')" )
+    label = if attrs.label then attrs.label else "(el.name + ' (' + el.elementTypeName + ': ' + el.id + ')')"
+    element.attr('typeahead', "el as (#{label}) for el in searchForElement($viewValue, '" + (attrs.catalogueElementPicker ? '') + "', '" + (attrs.resource ? '') + "')" )
     element.removeAttr('catalogue-element-picker')
     element.removeAttr('catalogueElementPicker')
     element.removeAttr('data-catalogue-element-picker')
