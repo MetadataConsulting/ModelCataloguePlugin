@@ -5,10 +5,10 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+class PublishedElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     def setupSpec(){
-        totalCount = 84
+        totalCount = 24
     }
 
     @Override
@@ -34,12 +34,12 @@ class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElement
 
     @Override
     Class getResource() {
-        CatalogueElement
+        PublishedElement
     }
 
     @Override
     AbstractCatalogueElementController getController() {
-        new CatalogueElementController()
+        new PublishedElementController()
     }
 
     @Override
@@ -48,17 +48,17 @@ class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElement
     }
 
     @Override
-    MeasurementUnit getLoadItem() {
-        MeasurementUnit.findByName("Degrees of Celsius")
+    Model getLoadItem() {
+        Model.findByName("book")
     }
 
     @Override
-    MeasurementUnit getAnotherLoadItem() {
-        MeasurementUnit.findByName("Kilometers per hour")
+    Model getAnotherLoadItem() {
+        Model.findByName("chapter1")
     }
 
     protected CatalogueElement newResourceInstance() {
-        return new MeasurementUnit()
+        return new Model()
     }
 
     def getPaginationParameters(String baseLink) {

@@ -8,6 +8,7 @@
 #= require propertiesPane
 #= require messagesPanel
 #= require columns
+#= require columnsConfiguration
 
 angular.module('mc.core.ui', [
   # depends on
@@ -21,4 +22,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.propertiesPane'
   'mc.core.ui.messagesPanel'
   'mc.core.ui.columns'
+  'mc.core.ui.columnsConfiguration'
 ])

@@ -77,14 +77,6 @@ angular.module('demo', [
     #{title: 'Test 2', action: (element) -> alert(element.name)}
   ]
 
-  $scope.removeColumn = (index) ->
-    return if $scope.columns.length <= 1
-    $scope.columns.splice(index, 1)
-
-  $scope.addColumn = (index, column = {header: 'ID', value: 'id', classes: 'col-md-2'}) ->
-    $scope.columns.splice(index + 1, 0, angular.copy(column))
-
-
   $scope.show()
 
   $scope.$on 'showCatalogueElement', (event, element) ->

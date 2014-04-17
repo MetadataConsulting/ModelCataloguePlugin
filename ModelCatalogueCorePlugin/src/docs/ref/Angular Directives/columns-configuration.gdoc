@@ -1,0 +1,28 @@
+h1. columns-configuration
+
+Element directive for rendering configuring columns for [decorated-list|Angular Directive] directive. Default template defined in
+module @mc.core.ui.bs.columnsConfiguration@ provides configuration widget in table layout.
+
+h2. Usage
+Place following snippet in the place where you want to render the messages:
+{code}
+<decorated-list list="list" columns="columns" selection="selection" actions="actions" id="main-list"></decorated-list>
+<columns-configuration max="columns"></columns-configuration>
+{code}
+
+Considering having @columns@ variable in current scope you can configure the columns for @main-list@ decorated list
+table using the @columns-configuration@ directive.
+
+h2. Customization
+You can override the @modelcatalogue/core/ui/columnsConfiguration.html@ template to plug your own either using
+@text/ng-template@ script definition, creating the template on the appropriate location in your server
+or using the [$templateCache|http://docs.angularjs.org/api/ng/service/$templateCache].
+
+Following variables and methods are added by the directive controller:
+
+{table}
+Name                        | Description
+addColumn(index, column)    | Adds the new column as defined in the @column@ argument to the given index.
+removeColumn(index)         | Removes column at the given index.
+{table}
+

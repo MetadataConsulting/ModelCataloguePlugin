@@ -7,7 +7,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class EnumeratedTypeControllerIntegrationSpec extends CatalogueElementControllerIntegrationSpec {
+class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
 
     @Unroll
@@ -108,7 +108,7 @@ class EnumeratedTypeControllerIntegrationSpec extends CatalogueElementController
     }
 
     @Override
-    CatalogueElementController getController() {
+    AbstractCatalogueElementController getController() {
         new EnumeratedTypeController()
     }
 

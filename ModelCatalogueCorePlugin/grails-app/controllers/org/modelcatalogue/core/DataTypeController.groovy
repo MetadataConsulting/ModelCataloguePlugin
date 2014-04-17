@@ -2,13 +2,13 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ValueDomains
 
-class DataTypeController<T> extends CatalogueElementController<DataType> {
+class DataTypeController<T> extends AbstractCatalogueElementController<DataType> {
 
     DataTypeController() {
         super(DataType)
     }
 
-    DataTypeController(Class<T> resource) {
+    DataTypeController(Class<? extends DataType> resource) {
         super(resource)
     }
 

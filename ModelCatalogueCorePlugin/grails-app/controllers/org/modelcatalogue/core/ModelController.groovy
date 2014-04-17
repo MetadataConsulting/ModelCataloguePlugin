@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-class ModelController extends CatalogueElementController<Model> {
+class ModelController extends AbstractCatalogueElementController<Model> {
 
     ModelController() {
         super(Model)

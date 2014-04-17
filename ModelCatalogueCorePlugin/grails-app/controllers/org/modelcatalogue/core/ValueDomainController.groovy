@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-class ValueDomainController extends CatalogueElementController<ValueDomain> {
+class ValueDomainController extends AbstractCatalogueElementController<ValueDomain> {
 
     ValueDomainController() {
         super(ValueDomain)

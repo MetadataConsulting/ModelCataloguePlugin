@@ -1,10 +1,10 @@
-angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRoot', 'mc.util.rest', 'mc.util.enhance']).provider 'catalogueElementResource', [ ->
+angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRoot', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names']).provider 'catalogueElementResource', [ ->
   # Method for instantiating
-  @$get = ['modelCatalogueApiRoot', 'rest', 'enhance', (modelCatalogueApiRoot, rest, enhance) ->
+  @$get = ['modelCatalogueApiRoot', 'rest', 'enhance', 'names', (modelCatalogueApiRoot, rest, enhance, names) ->
     class CatalogueElementResource
       constructor: (pathName) ->
         throw "Resource pathname must be defined" if not pathName?
-        @pathName = pathName
+        @pathName = names.getPropertyNameFromType(pathName)
 
       getIndexPath: () ->
         "#{modelCatalogueApiRoot}/#{@pathName}"

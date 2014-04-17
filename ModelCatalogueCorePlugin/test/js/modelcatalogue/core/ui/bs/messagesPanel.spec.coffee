@@ -1,51 +1,41 @@
-describe "mc.core.ui.bs.messagesPanel", ->
+describe "mc.core.ui.catalogueElementPicker", ->
+  beforeEach module 'mc.core.ui.catalogueElementPicker'
 
-  beforeEach module 'mc.core.ui.bs.messagesPanel'
+  it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
+    catEl = enhance angular.copy(fixtures.valueDomain.showOne)
 
-  it "element is compiled", inject (messages, $rootScope, $compile) ->
+    $rootScope.element = catEl
+
     element = $compile('''
-    <messages-panel max="2"></messages-panel>
-    ''')($rootScope)
+        <input ng-model="element" catalogue-element-picker>
+      ''')($rootScope)
 
     $rootScope.$digest()
 
-    expect(element.find('.alert').length).toBe(0)
+    expect(element.prop('tagName')).toBe('INPUT')
+    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
 
-    messages.info('Test 1', 'Test 1 Body')
+    $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
-    $rootScope.$digest()
+    element.val('test')
+    element.change()
 
-    expect(element.find('.alert').length).toBe(1)
-    expect(element.find('.alert.alert-info').length).toBe(1)
 
-    messages.error('This should not happen!')
+  it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
+    catEl = enhance angular.copy(fixtures.valueDomain.showOne)
 
-    $rootScope.$digest()
+    $rootScope.element = catEl
 
-    expect(element.find('.alert').length).toBe(2)
-    expect(element.find('.alert.alert-info').length).toBe(1)
-    expect(element.find('.alert.alert-danger').length).toBe(1)
-
-    messages.warning('Warn you!')
-
-    $rootScope.$digest()
-
-    expect(element.find('.alert').length).toBe(2)
-    expect(element.find('.alert.alert-info').length).toBe(0)
-    expect(element.find('.alert.alert-danger').length).toBe(1)
-    expect(element.find('.alert.alert-warning').length).toBe(1)
-
-    element.find('.close').click()
+    element = $compile('''
+          <input ng-model="element" catalogue-element-picker="valueDomain">
+        ''')($rootScope)
 
     $rootScope.$digest()
 
-    expect(element.find('.alert').length).toBe(1)
-    expect(messages.getMessages().length).toBe(1)
+    expect(element.prop('tagName')).toBe('INPUT')
+    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
 
-    element.find('.close').click()
+    $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
-    $rootScope.$digest()
-
-    expect(element.find('.alert').length).toBe(0)
-    expect(messages.getMessages().length).toBe(0)
-
+    element.val('test')
+    element.change()

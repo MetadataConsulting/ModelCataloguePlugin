@@ -7,6 +7,7 @@
 #= require decoratedListTable
 #= require propertiesPane
 #= require columns
+#= require columnsConfiguration
 #= require messagesPanel
 #= require modalConfirm
 #= require modalPrompt
@@ -23,6 +24,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.catalogueElementTreeviewItem'
   'mc.core.ui.bs.propertiesPane'
   'mc.core.ui.bs.columns'
+  'mc.core.ui.bs.columnsConfiguration'
   'mc.core.ui.bs.messagesPanel'
   'mc.core.ui.bs.modalConfirm'
   'mc.core.ui.bs.modalPrompt'

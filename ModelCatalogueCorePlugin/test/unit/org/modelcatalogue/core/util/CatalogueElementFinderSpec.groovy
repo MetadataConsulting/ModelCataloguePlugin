@@ -12,7 +12,6 @@ class CatalogueElementFinderSpec extends Specification {
         ConceptualDomain.name   in candidatesClasses
         DataElement.name        in candidatesClasses
         DataType.name           in candidatesClasses
-        EnumeratedType.name     in candidatesClasses
         ExtensionValue.name     in candidatesClasses
         MeasurementUnit.name    in candidatesClasses
         Model.name              in candidatesClasses

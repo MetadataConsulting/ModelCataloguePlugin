@@ -26,7 +26,6 @@ class BootStrap {
             }
         }
 
-
         environments {
             development {
                 importService.importData()
