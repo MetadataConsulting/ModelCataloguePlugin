@@ -19,26 +19,27 @@ class ModelSpec extends Specification {
     def "Model creation for #args results in #validates"() {
 
         expect:
-
         Model.list().isEmpty()
 
         when:
-
         Model modelInstance = new Model(args)
-
         modelInstance.save()
 
         then:
-
         !modelInstance.hasErrors() == validates
+        modelInstance.versionNumber == 1
+        modelInstance.list().size() == size
+        modelInstance.modelCatalogueId == modelCatalogueId
 
         where:
 
-        validates | args
-        false     | [name: "", description: "test model description"]
-        false     | [name: "t" * 256, description: "test model description"]
-        false     | [name: "test model", description: "t" * 2001]
-        true      | [name: "test model", description: "test model description"]
+        no | validates | size | args | modelCatalogueId
+        1 | false      | 0    | [name: "", description: "test model description"] | null
+        2 | false      | 0    | [name: "t" * 256, description: "test model description"] | null
+        3 | false      | 0    | [name: "test model", description: "t" * 2001] | null
+        4 | false      | 0    | [name: "test model", description: "test model description", modelCatalogueId: "MC_12asd_3"] | "MC_12asd_3"
+        5 | true       | 1    | [name: "test model", description: "test model description"] | "MC_1_1"
+        6 | true       | 1    | [name: "test model2", description: "test model description", modelCatalogueId: "MC_12_3"] | "MC_12_3"
 
     }
 

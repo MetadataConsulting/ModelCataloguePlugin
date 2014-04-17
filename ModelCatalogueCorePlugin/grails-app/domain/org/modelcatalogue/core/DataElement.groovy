@@ -12,18 +12,14 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class DataElement extends ExtendibleElement {
 
-    String code
-
-    static constraints = {
-        code nullable:true, unique:true, maxSize: 255
-    }
+    static constraints = {}
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
+        modelCatalogueId boost:10
         name boost:5
         extensions component:true
-        code boost:5
         incomingRelationships component: true
         outgoingRelationships component: true
         except =  ['containedIn', 'instantiatedBy']
@@ -35,7 +31,7 @@ class DataElement extends ExtendibleElement {
     ]
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, code: ${code}, version: ${version}, status: ${status}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
     }
 
 }

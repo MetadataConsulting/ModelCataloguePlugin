@@ -9,6 +9,7 @@ class Model extends ExtendibleElement  {
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
+        modelCatalogueId boost:10
         name boost:5
         extensions component:true
         incomingRelationships component: true
