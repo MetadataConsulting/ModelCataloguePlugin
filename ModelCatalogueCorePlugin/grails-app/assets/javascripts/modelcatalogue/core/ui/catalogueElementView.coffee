@@ -126,6 +126,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
 
+      $scope.createRelationship = () ->
+        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element}).then (result) ->
+          $log.info('Got following from Create Relationship dialog', result)
+
       # watches
       $scope.$watch 'element', onElementUpdate
 

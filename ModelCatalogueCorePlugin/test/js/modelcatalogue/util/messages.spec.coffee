@@ -62,6 +62,22 @@ describe "mc.util.messages", ->
 
     expect(value).toBe("hello")
 
+  it "can create local messages object", inject (messages) ->
+    messages.info "title", "body"
+    messages.info "title 2", "body 2"
+
+    expect(messages.getMessages().length).toBe(2)
+
+    localMessages = messages.createNewMessages()
+
+    expect(localMessages.getMessages().length).toBe(0)
+
+    localMessages.info 'new title', 'new body'
+
+    expect(messages.getMessages().length).toBe(2)
+    expect(localMessages.getMessages().length).toBe(1)
+
+
 
 
 

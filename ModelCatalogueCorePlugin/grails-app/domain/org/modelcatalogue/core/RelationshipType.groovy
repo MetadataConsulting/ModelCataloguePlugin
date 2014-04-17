@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class RelationshipType {
@@ -64,21 +62,21 @@ class RelationshipType {
         // cache usage: 'read-only'
     }
 
-    boolean validateSourceDestination(CatalogueElement source, CatalogueElement destination) {
+    String validateSourceDestination(CatalogueElement source, CatalogueElement destination) {
 
         if (!sourceClass.isInstance(source)) {
-            return false
+            return 'source.not.instance.of'
         }
 
         if (!destinationClass.isInstance(destination)) {
-            return false
+            return 'destination.not.instance.of'
         }
 
         if (rule && rule.trim() && !validateRule(source, destination)) {
-            return false
+            return 'rule.did.not.pass'
         }
 
-        return true
+        return null
     }
 
     boolean validateRule(CatalogueElement source, CatalogueElement destination) {

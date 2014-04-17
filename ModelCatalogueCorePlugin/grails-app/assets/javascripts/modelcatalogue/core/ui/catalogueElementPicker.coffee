@@ -4,16 +4,18 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
   terminal: true
   priority: 10000
 
+
   controller: ['$scope', '$q', '$attrs', ($scope, $q, $attrs) ->
-    value = $attrs.catalogueElementPicker
-    searchFun = () -> $.when({list: []})
+    $scope.searchForElement = (query, pickerValue, resourceAttr) ->
+      searchFun     = null
+      resource      = if resourceAttr then $scope.$eval($attrs.resource) else undefined
+      value         = if pickerValue then pickerValue else resource
 
-    if (value)
-      searchFun = (query) -> catalogueElementResource(value).search(query)
-    else
-      searchFun = (query) -> modelCatalogueSearch(query)
+      if (value)
+        searchFun = (query) -> catalogueElementResource(value).search(query)
+      else
+        searchFun = (query) -> modelCatalogueSearch(query)
 
-    $scope.searchForElement = (query) ->
       deferred = $q.defer()
       searchFun(query).then (result) ->
         deferred.resolve(result.list)
@@ -21,7 +23,8 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
   ]
 
   compile: (element, attrs) ->
-    element.attr('typeahead', "el as (el.name + ' (' + el.elementTypeName + ': ' + el.id + ')') for el in searchForElement($viewValue)" )
+    label = if attrs.hideElementType == 'true' then "el.name" else "(el.name + ' (' + el.elementTypeName + ': ' + el.id + ')')"
+    element.attr('typeahead', "el as #{label} for el in searchForElement($viewValue, '" + (attrs.catalogueElementPicker ? '') + "', '" + (attrs.resource ? '') + "')" )
     element.removeAttr('catalogue-element-picker')
     element.removeAttr('catalogueElementPicker')
     element.removeAttr('data-catalogue-element-picker')

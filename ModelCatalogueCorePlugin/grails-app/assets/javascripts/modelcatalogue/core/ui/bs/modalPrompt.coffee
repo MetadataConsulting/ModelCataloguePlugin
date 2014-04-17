@@ -1,6 +1,6 @@
 angular.module('mc.core.ui.bs.modalPrompt', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setPromptFactory [ '$modal', '$q', ($modal, $q) ->
-   (title, body, type) ->
+ messagesProvider.setDefaultPromptFactory [ '$modal', '$q', ($modal, $q) ->
+   (title, body, args) ->
       dialog = $modal.open {
         windowClass: 'messages-modal-prompt'
         template: '''
@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.modalPrompt', ['mc.util.messages']).config ['messa
             <form role="form" ng-submit="$close(value)">
             <div class="form-group">
                 <label for="value">''' + body + '''</label>
-                <input type="''' + (type ? 'text') + '''" id="value" ng-model="value" class="form-control">
+                <input type="''' + (args?.type ? 'text') + '''" id="value" ng-model="value" class="form-control">
             </form>
         </div>
         <div class="modal-footer">

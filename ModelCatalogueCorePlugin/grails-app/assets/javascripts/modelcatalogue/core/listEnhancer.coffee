@@ -1,7 +1,7 @@
 angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
   condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
-  factory   = ['$q', 'modelCatalogueApiRoot', 'rest', '$rootScope', ($q, modelCatalogueApiRoot, rest, $rootScope) ->
-    listEnhancer = (list, enhance = @enhance) ->
+  factory   = ['$q', 'modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', ($q, modelCatalogueApiRoot, rest, $rootScope, enhance) ->
+    listEnhancer = (list) ->
       class ListDecorator
         constructor: (list) ->
           angular.extend(@, list)

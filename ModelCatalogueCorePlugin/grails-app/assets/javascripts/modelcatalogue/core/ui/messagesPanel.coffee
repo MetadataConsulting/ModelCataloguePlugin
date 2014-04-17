@@ -6,10 +6,13 @@ angular.module('mc.core.ui.messagesPanel', ['mc.util.messages']).directive 'mess
 
   scope:
     max: '=?'
+    messages: '=?'
 
   controller: ['$scope', 'messages', ($scope, messages) ->
     $scope.max ?= 5
+    $scope.messages ?= messages
+
     $scope.getMessages = () ->
-      messages.getMessages().slice(-$scope.max)
+      $scope.messages.getMessages().slice(-$scope.max)
   ]
 }]
