@@ -1,7 +1,9 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
 import org.hibernate.Criteria
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.RelationshipType
 
 @Transactional
 class DataArchitectService {

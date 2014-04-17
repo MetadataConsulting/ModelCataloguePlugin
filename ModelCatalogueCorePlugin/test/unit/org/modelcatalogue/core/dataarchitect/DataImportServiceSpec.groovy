@@ -1,14 +1,13 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.dataarchitect
 
 import grails.test.mixin.TestFor
-import org.modelcatalogue.core.dataarchitect.DataArchitectService
 import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(DataArchitectService)
-class DataArchitectServiceSpec extends Specification {
+@TestFor(DataImportService)
+class DataImportServiceSpec extends Specification {
 
     def setup() {
     }

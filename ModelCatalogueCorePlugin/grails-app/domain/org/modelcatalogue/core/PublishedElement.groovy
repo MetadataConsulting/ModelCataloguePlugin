@@ -4,7 +4,8 @@ abstract class PublishedElement extends CatalogueElement {
 
     //version number - this gets iterated every time a new version is created from a finalized version
 
-    Double versionNumber = 0.1
+    String modelCatalogueId
+    Integer versionNumber = 1
 
     //status: once an object is finalized it cannot be changed
     //it's version number is updated and any subsequent update will
@@ -13,7 +14,7 @@ abstract class PublishedElement extends CatalogueElement {
     PublishedElementStatus status = PublishedElementStatus.DRAFT
 
     static constraints = {
-
+        modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: 'MC_\\d+_\\d+'
         status validator: { val , obj->
             if(!val){ return true}
             def oldStatus = null
@@ -23,7 +24,6 @@ abstract class PublishedElement extends CatalogueElement {
             }
             return true
          }
-
     }
 
 
@@ -80,5 +80,10 @@ abstract class PublishedElement extends CatalogueElement {
         "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
     }
 
+    def afterInsert(){
+        if(!modelCatalogueId){
+            modelCatalogueId = "MC_" + id + "_" + versionNumber
+        }
+    }
 
 }
