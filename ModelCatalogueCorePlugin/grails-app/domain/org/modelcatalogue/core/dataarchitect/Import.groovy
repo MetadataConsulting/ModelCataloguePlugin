@@ -2,12 +2,12 @@ package org.modelcatalogue.core.dataarchitect
 
 class Import {
 
-    private Collection<ImportRow> errorRows
-    private Collection<ImportRow> pendingRows
-    private Collection<ImportRow> noUpdateRows
-    private Collection<ImportRow> updateRows
-    private Collection<ImportRow> createRows
-    private Collection<ImportRow> deleteRows
+    Collection<ImportRow> errorRows
+    Collection<ImportRow> pendingRows
+    Collection<ImportRow> noUpdateRows
+    Collection<ImportRow> updateRows
+    Collection<ImportRow> createRows
+    Collection<ImportRow> deleteRows
 
     Boolean imported = false
 
