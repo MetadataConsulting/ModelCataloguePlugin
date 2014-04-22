@@ -19,7 +19,7 @@ class DataImportService {
     def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, ArrayList parentModels) {
         //get indexes of the appropriate sections
 
-        def newImport = new Import()
+        def newImporter = new Importer()
 
         def dataItemNameIndex = headers.indexOf("Data Item Name")
         def dataItemDescriptionIndex = headers.indexOf("Data Item Description")
@@ -58,14 +58,13 @@ class DataImportService {
             }
             importRow.metadata =   (metadataColumns)?metadataColumns:null
 
-            if(parentModel){parentModels.add(parentModel)}
-            if(model){parentModels.add(model)}
+            newImporter.parentModels = parentModels
 
-            newImport.validateRow(importRow)
+            newImporter.importRow(importRow)
             //importLine(conceptualDomain, conceptualDomainDescription, parentModels, name, valueDomainInfo, description, metadataColumns)
         }
 
-        return newImport
+        //newImporter
     }
 
 
