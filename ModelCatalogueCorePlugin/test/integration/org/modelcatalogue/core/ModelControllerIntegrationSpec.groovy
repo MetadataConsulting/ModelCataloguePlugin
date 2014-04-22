@@ -85,4 +85,15 @@ class ModelControllerIntegrationSpec extends AbstractCatalogueElementControllerI
         return true
     }
 
+    @Override
+    protected getTotalRowsExported() { 5 }
+
+    def getPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 5, 10, 0, 5, "", ""],
+                [2, 5, 5, 0, 5, "", ""],
+        ]
+    }
+
 }
