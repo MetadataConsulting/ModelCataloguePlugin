@@ -49,7 +49,7 @@ class DataElementISpec extends AbstractIntegrationSpec{
     def "create writer data elements with the same code dataElement"(){
 
         when:
-        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", code: "XXX_1")
+        def dataElementInstance2 = new DataElement(name: "result2", description: "this is the the result2 description", modelCatalogueId: "XXX_1")
         dataElementInstance2.validate()
 
         then:
