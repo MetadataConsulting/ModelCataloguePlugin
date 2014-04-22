@@ -56,7 +56,7 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
     @Override
     def xmlCustomPropertyCheck(xml, item){
         super.xmlCustomPropertyCheck(xml, item)
-        checkProperty(xml.code, item.code, "code")
+        checkProperty(xml.modelCatalogueId, item.modelCatalogueId, "modelCatalogueId")
         checkProperty(xml.@status, item.status, "status")
         checkProperty(xml.@versionNumber, item.versionNumber, "versionNumber")
         def inputItem = item.getProperty("ext")
@@ -70,7 +70,7 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
     @Override
     def xmlCustomPropertyCheck(inputItem, xml, outputItem){
         super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkProperty(xml.code, inputItem.code, "code")
+        checkProperty(xml.modelCatalogueId, inputItem.modelCatalogueId, "modelCatalogueId")
         checkProperty(xml.@status, outputItem.status, "status")
         checkProperty(xml.@versionNumber, outputItem.versionNumber, "versionNumber")
         outputItem.getProperty("ext").each{ key, value ->
@@ -83,7 +83,7 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
     @Override
     def customJsonPropertyCheck(item, json){
         super.customJsonPropertyCheck(item, json)
-        checkStringProperty(json.code , item.code, "code")
+        checkStringProperty(json.modelCatalogueId , item.modelCatalogueId, "modelCatalogueId")
         checkProperty(json.status , item.status, "status")
         checkProperty(json.ext, item.ext, "extension")
         checkProperty(json.versionNumber , item.versionNumber, "versionNumber")
@@ -93,7 +93,7 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
     @Override
     def customJsonPropertyCheck(inputItem, json, outputItem){
         super.customJsonPropertyCheck(inputItem, json, outputItem)
-        checkProperty(json.code , inputItem.code, "code")
+        checkProperty(json.modelCatalogueId , outputItem.modelCatalogueId, "modelCatalogueId")
         checkProperty(json.status , outputItem.status, "status")
         checkMapProperty(json.ext , inputItem.ext, "extension")
         checkProperty(json.versionNumber , outputItem.versionNumber, "versionNumber")
