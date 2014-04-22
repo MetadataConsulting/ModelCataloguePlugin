@@ -11,6 +11,7 @@
 #= require messagesPanel
 #= require modalConfirm
 #= require modalPrompt
+#= require modalPromptNewRelationship
 
 
 angular.module('mc.core.ui.bs', [
@@ -28,4 +29,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.messagesPanel'
   'mc.core.ui.bs.modalConfirm'
   'mc.core.ui.bs.modalPrompt'
+  'mc.core.ui.bs.modalPromptNewRelationship'
 ])

@@ -6,7 +6,8 @@ Declared in @mc.util.messages@ module inside [mc.util|Angular Packages] package.
 
 h2. Usage
 
-Override the @confirm@ or @prompt@ function using @setConfirmFactory@ and @setPromptFactory@ methods.
+Override the @confirm@ or @prompt@ function using @setConfirmFactory@, @setDefaultPromptFactory@ and @setPromptFactory@ methods.
+@setPromptFactory@ allows you to specify prompt factory for particular type.
 You can use same dependency injection mechanism for these factory methods as you use for other AngularJS components.
 
 {code}

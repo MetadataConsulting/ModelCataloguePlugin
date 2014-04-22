@@ -1,7 +1,7 @@
 angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
   condition = (list) -> list.hasOwnProperty('count') and list.hasOwnProperty('link')
-  factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', (modelCatalogueApiRoot, rest, $rootScope) ->
-    (listReference, enhance = @enhance) ->
+  factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, enhance) ->
+    (listReference) ->
       link = "#{modelCatalogueApiRoot}#{listReference.link}"
       query = (tail = null) ->
         enhance rest method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}"
@@ -12,7 +12,9 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
         if not payload?
           payload = tail
           tail = null
-        enhance rest method: 'POST', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload
+        enhance(rest(method: 'POST', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload)).then (result)->
+          $rootScope.$broadcast 'catalogueElementCreated', payload
+          result
       query.remove = (tail, payload) ->
         if not payload?
           payload = tail

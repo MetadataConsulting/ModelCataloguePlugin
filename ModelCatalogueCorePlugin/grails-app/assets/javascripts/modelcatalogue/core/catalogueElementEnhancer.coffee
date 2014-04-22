@@ -1,7 +1,7 @@
 angular.module('mc.core.catalogueElementEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config [ 'enhanceProvider', (enhanceProvider) ->
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', (modelCatalogueApiRoot, rest, $rootScope) ->
-    (element, enhance = @enhance) ->
+  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, enhance) ->
+    (element) ->
       class CatalogueElement
         constructor: (element) ->
           angular.extend(@, element)
@@ -38,6 +38,19 @@ angular.module('mc.core.catalogueElementEnhancer', ['mc.util.rest', 'mc.util.enh
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
           self.update         = () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload()
           self.show           = () -> $rootScope.$broadcast('showCatalogueElement', self) ; self
+
+          self.isInstanceOf   = (type) ->
+            # TODO create hierarchy service
+            return false  if not type?
+            return false  if type.indexOf('org.modelcatalogue.core.') == -1
+            return false  if self.elementType is 'org.modelcatalogue.core.RelationshipType' and type isnt 'org.modelcatalogue.core.RelationshipType'
+            return false  if self.elementType is 'org.modelcatalogue.core.Relationship'     and type isnt 'org.modelcatalogue.core.Relationship'
+            return false  if self.elementType is 'org.modelcatalogue.core.Mapping'          and type isnt 'org.modelcatalogue.core.Mapping'
+            return true   if type is 'org.modelcatalogue.core.CatalogueElement'
+            return true   if type in ['org.modelcatalogue.core.ExtendibleElement', 'org.modelcatalogue.core.PublishedElement'] and self.elementType in ['org.modelcatalogue.core.Model', 'org.modelcatalogue.core.DataElement']
+            return self.elementType == type
+
+
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)
       # wrap original element

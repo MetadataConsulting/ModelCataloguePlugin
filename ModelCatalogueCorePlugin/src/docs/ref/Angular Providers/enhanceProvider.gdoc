@@ -3,8 +3,8 @@ h1. enhanceProvider
 Configures the [enhance|Angular Services] service. You can register new enhancers using @registerEnhancerFactory(name, condition, enhancerFactory)@.
 The name is the unique identifier used by @enhance.isEnhancedBy(object, name)@ and @enhance.getEnhancer(name)@ methods. the condition
 is function which evaluates to true if the enhancer should be applied. The factory is [injectable|http://docs.angularjs.org/api/auto/service/$injector] function
-which returns another function which accepts object to be enhanced as the first parameter and to prevent circular dependencies the [enhance|Angular Services] function as the
-second parameter.
+which returns another function which accepts object to be enhanced as the first parameter.
+
 Declared in @mc.util.enhance@ module inside [mc.util|Angular Packages] package.
 
 h2. Usage
@@ -20,12 +20,7 @@ angular
         function(object) {
             return object.hasOwnProperty('greeting');
         }, function($log) {
-            // enhance function is injected into each factory object when initialized
-            var injectedEnhanceFun = this.enhance
-            return function (object, enhance) {
-                // allows running with enhance.getEnhancer('greeter')(object)
-                // executing enhance function from the enhancer, e.g enhance(rest({...}))
-                enhance = enhance || injectedEnhanceFun;
+            return function (object) {
                 object.greet = function() {
                     alert(object.greeting)
                 };

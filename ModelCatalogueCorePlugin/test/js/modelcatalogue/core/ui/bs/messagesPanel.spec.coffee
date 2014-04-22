@@ -1,41 +1,75 @@
-describe "mc.core.ui.catalogueElementPicker", ->
-  beforeEach module 'mc.core.ui.catalogueElementPicker'
+describe "mc.core.ui.bs.messagesPanel", ->
 
-  it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
-    catEl = enhance angular.copy(fixtures.valueDomain.showOne)
+  beforeEach module 'mc.core.ui.bs.messagesPanel'
 
-    $rootScope.element = catEl
-
+  it "element is compiled", inject (messages, $rootScope, $compile) ->
     element = $compile('''
-        <input ng-model="element" catalogue-element-picker>
-      ''')($rootScope)
+    <messages-panel max="2"></messages-panel>
+    ''')($rootScope)
 
     $rootScope.$digest()
 
-    expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.find('.alert').length).toBe(0)
 
-    $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/search?search=test").respond(fixtures.valueDomain.searchElement15)
-
-    element.val('test')
-    element.change()
-
-
-  it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
-    catEl = enhance angular.copy(fixtures.valueDomain.showOne)
-
-    $rootScope.element = catEl
-
-    element = $compile('''
-          <input ng-model="element" catalogue-element-picker="valueDomain">
-        ''')($rootScope)
+    messages.info('Test 1', 'Test 1 Body')
 
     $rootScope.$digest()
 
-    expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.find('.alert').length).toBe(1)
+    expect(element.find('.alert.alert-info').length).toBe(1)
 
-    $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
+    messages.error('This should not happen!')
 
-    element.val('test')
-    element.change()
+    $rootScope.$digest()
+
+    expect(element.find('.alert').length).toBe(2)
+    expect(element.find('.alert.alert-info').length).toBe(1)
+    expect(element.find('.alert.alert-danger').length).toBe(1)
+
+    messages.warning('Warn you!')
+
+    $rootScope.$digest()
+
+    expect(element.find('.alert').length).toBe(2)
+    expect(element.find('.alert.alert-info').length).toBe(0)
+    expect(element.find('.alert.alert-danger').length).toBe(1)
+    expect(element.find('.alert.alert-warning').length).toBe(1)
+
+    element.find('.close').click()
+
+    $rootScope.$digest()
+
+    expect(element.find('.alert').length).toBe(1)
+    expect(messages.getMessages().length).toBe(1)
+
+    element.find('.close').click()
+
+    $rootScope.$digest()
+
+    expect(element.find('.alert').length).toBe(0)
+    expect(messages.getMessages().length).toBe(0)
+
+  it "element can use custom messages", inject (messages, $rootScope, $compile) ->
+    $rootScope.localMessages = messages.createNewMessages()
+
+    element = $compile('''
+    <messages-panel max="2" messages="localMessages"></messages-panel>
+    ''')($rootScope)
+
+    $rootScope.$digest()
+
+    expect(element.find('.alert').length).toBe(0)
+
+    messages.info('Test 1', 'Test 1 Body')
+
+    $rootScope.$digest()
+
+    expect(element.find('.alert').length).toBe(0)
+
+    $rootScope.localMessages.info('Test local', 'Body local')
+
+    $rootScope.$digest()
+
+    expect(element.find('.alert').length).toBe(1)
+
+

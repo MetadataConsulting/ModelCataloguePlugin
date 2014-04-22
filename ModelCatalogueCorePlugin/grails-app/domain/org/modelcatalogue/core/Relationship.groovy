@@ -47,8 +47,10 @@ class Relationship {
         relationshipType unique: ['source', 'destination'], validator: { val, obj ->
 
             if (!val) return true;
-            if (!val.validateSourceDestination(obj.source, obj.destination)) {
-                return false;
+
+            String errorMessage = val.validateSourceDestination(obj.source, obj.destination)
+            if (errorMessage) {
+                return errorMessage;
             }
             return true;
 

@@ -1,129 +1,153 @@
 angular.module('mc.util.messages', []).provider 'messages', [ ->
 
-  confirmFactory = null
-  promptFactory  = null
+  confirmFactory        = null
+  defaultPromptFactory  = null
+
+  promptFactories = {}
 
   nextId        = 1
-  messagesStack = []
 
   @setConfirmFactory = (customConfirm) ->
     confirmFactory = customConfirm
 
-  @setPromptFactory = (customPrompt) ->
-    promptFactory = customPrompt
+  @setDefaultPromptFactory = (customPrompt) ->
+    defaultPromptFactory = customPrompt
+
+  @setPromptFactory = (type, customPromptFactory) ->
+    promptFactories[type] = customPromptFactory
 
   # factory method
-  @$get = [ '$injector', '$q', '$window', ($injector, $q, $window) ->
-    confirm        = null
-    prompt         = null
+  @$get = [ '$injector', '$q', '$log', '$window', ($injector, $q, $log, $window) ->
+    createNewMessages = () ->
+      messagesStack = []
 
-    defaultConfirm = (title, body) ->
-      deferred = $q.defer()
-      if $window.confirm("#{title}\n#{body}")
-        deferred.resolve()
+      messages = {}
+
+      confirm        = null
+      prompt         = null
+      promptByTypes  = {}
+
+      defaultConfirm = (title, body) ->
+        deferred = $q.defer()
+        if $window.confirm("#{title}\n#{body}")
+          deferred.resolve()
+        else
+          deferred.reject()
+        deferred.promise
+
+      defaultPrompt  = (title, body) ->
+        deferred = $q.defer()
+        result = $window.prompt("#{title}\n#{body}")
+        if result
+          deferred.resolve result
+        else
+          deferred.reject result
+        deferred.promise
+
+      if confirmFactory?
+        confirm = $injector.invoke(confirmFactory, undefined, {messages: messages})
       else
-        deferred.reject()
-      deferred.promise
+        confirm = defaultConfirm
 
-    defaultPrompt  = (title, body) ->
-      deferred = $q.defer()
-      result = $window.prompt("#{title}\n#{body}")
-      if result
-        deferred.resolve result
+      if defaultPromptFactory?
+        prompt = $injector.invoke(defaultPromptFactory, undefined, {messages: messages})
       else
-        deferred.reject result
-      deferred.promise
+        prompt = defaultPrompt
 
-    if confirmFactory?
-      confirm = $injector.invoke(confirmFactory)
-    else
-      confirm = defaultConfirm
+      for type, factory of promptFactories
+        promptByTypes[type] = $injector.invoke(factory, undefined, {messages: messages})
 
-    if promptFactory?
-      prompt = $injector.invoke(promptFactory)
-    else
-      prompt = defaultPrompt
+      addMessage = (title, body, type) ->
+        # if you pass only first argument it will became the body
+        if not body?
+          body  = title
+          title = null
+        msg =
+          title:      title
+          body:       body
+          type:       type
+          messageId:  nextId++
 
-    messages = {}
+        msg.remove = () -> messages.removeMessage(msg)
 
-    addMessage = (title, body, type) ->
-      # if you pass only first argument it will became the body
-      if not body?
-        body  = title
-        title = null
-      msg =
-        title:      title
-        body:       body
-        type:       type
-        messageId:  nextId++
+        messagesStack.push msg
+        msg
 
-      msg.remove = () -> messages.removeMessage(msg)
+      ###
+        Shows the info message to the user. Returns the message instance.
+      ###
+      messages.info     = (title, body) ->
+        addMessage(title, body, 'info')
 
-      messagesStack.push msg
-      msg
+      ###
+        Shows the success message to the user. Returns the message instance.
+      ###
+      messages.success  = (title, body) ->
+        addMessage(title, body, 'success')
 
-    ###
-      Shows the info message to the user. Returns the message instance.
-    ###
-    messages.info     = (title, body) ->
-      addMessage(title, body, 'info')
+      ###
+        Shows the warning message to the user. Returns the message instance.
+      ###
+      messages.warning  = (title, body) ->
+        addMessage(title, body, 'warning')
 
-    ###
-      Shows the success message to the user. Returns the message instance.
-    ###
-    messages.success  = (title, body) ->
-      addMessage(title, body, 'success')
+      ###
+        Shows the error message to the user. Returns the message instance.
+      ###
+      messages.error    = (title, body) ->
+        addMessage(title, body, 'danger')
 
-    ###
-      Shows the warning message to the user. Returns the message instance.
-    ###
-    messages.warning  = (title, body) ->
-      addMessage(title, body, 'warning')
+      ###
+        Shows the confirm dialog and returns a promise which is always resolved to boolean value which
+        will be true if user confirms the dialog or false if the user rejectes.
+      ###
+      messages.confirm  = (title, body) -> confirm(title, body)
 
-    ###
-      Shows the error message to the user. Returns the message instance.
-    ###
-    messages.error    = (title, body) ->
-      addMessage(title, body, 'danger')
+      ###
+        Prompts users for input. The method returns promise which is resolved if the user submits the value
+        and rejected if the user cancels the input. The type is optional type of input which doesn't have to be
+        supported by all the implementations.
+      ###
+      messages.prompt   = (title, body, args) ->
+        return prompt(title, body, args) if not args?.type?
+        customPrompt = promptByTypes[args.type]
 
-    ###
-      Shows the confirm dialog and returns a promise which is always resolved to boolean value which
-      will be true if user confirms the dialog or false if the user rejectes.
-    ###
-    messages.confirm  = (title, body) -> confirm(title, body)
+        if not customPrompt?
+          $log.warn("Prompt for type #type is not registered, using default instead")
+          return prompt(title, body, args)
 
-    ###
-      Prompts users for input. The method returns promise which is resolved if the user submits the value
-      and rejected if the user cancels the input. The type is optional type of input which doesn't have to be
-      supported by all the implementations.
-    ###
-    messages.prompt   = (title, body, type) -> prompt(title, body, type)
-
-    ###
-      Array of currently displayed messages if stacking of messages is supported.
-      The messages are stored as objects with type, title and body messages.
-    ###
-    messages.getMessages = () -> messagesStack
+        customPrompt title, body, args
 
 
-    messages.clearAllMessages = () -> messagesStack = []
+      ###
+        Array of currently displayed messages if stacking of messages is supported.
+        The messages are stored as objects with type, title and body messages.
+      ###
+      messages.getMessages = () -> messagesStack
 
-    messages.removeMessage = (messageToRemove) ->
-      index = -1
-      for msg, i in messagesStack
-        if msg.messageId == messageToRemove.messageId
-          index = i
-          break
 
-      removed = null
+      messages.clearAllMessages = () -> messagesStack = []
 
-      if index >= 0
-        removed = messagesStack[index]
-        messagesStack.splice(index, 1)
+      messages.removeMessage = (messageToRemove) ->
+        index = -1
+        for msg, i in messagesStack
+          if msg.messageId == messageToRemove.messageId
+            index = i
+            break
 
-      removed
+        removed = null
 
-    messages
+        if index >= 0
+          removed = messagesStack[index]
+          messagesStack.splice(index, 1)
+
+        removed
+
+      messages.createNewMessages = -> createNewMessages()
+
+      messages
+
+    createNewMessages()
   ]
 
   # Always return this from CoffeeScript AngularJS factory functions!
