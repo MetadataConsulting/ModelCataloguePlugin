@@ -2,8 +2,8 @@ package org.modelcatalogue.core.dataarchitect
 
 class Import {
 
-    Collection<ImportRow, RowAction> errorRows
-    Collection<ImportRow, RowAction> pendingRows
+    Map<ImportRow, RowAction> errorRows
+    Map<ImportRow, RowAction> pendingRows
     Collection<ImportRow> noUpdateRows
     Collection<ImportRow> updateRows
     Collection<ImportRow> createRows
