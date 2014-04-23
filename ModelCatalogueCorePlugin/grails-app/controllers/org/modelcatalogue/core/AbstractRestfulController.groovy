@@ -123,7 +123,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         render status: NO_CONTENT // NO CONTENT STATUS CODE
     }
 
-    protected Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
+    protected Map<String, String> nextAndPreviousLinks(String baseLink, Long total) {
         def link = "${baseLink}?"
         if (params.max) {
             link += "max=${params.max}"

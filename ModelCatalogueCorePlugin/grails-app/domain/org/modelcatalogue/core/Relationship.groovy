@@ -41,6 +41,8 @@ class Relationship {
     Integer destinationMinOccurs
     Integer destinationMaxOccurs
 
+    Boolean archived = false
+
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 
     static constraints = {

@@ -16,7 +16,7 @@ abstract class CatalogueElement {
     String name
     String description
 
-    static transients = ['relations', 'info']
+    static transients = ['relations', 'info', 'archived']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
@@ -130,6 +130,8 @@ abstract class CatalogueElement {
                 link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
         ]
     }
+
+    boolean isArchived() { false }
 
     def beforeDelete(){
         outgoingRelationships.each{ relationship->
