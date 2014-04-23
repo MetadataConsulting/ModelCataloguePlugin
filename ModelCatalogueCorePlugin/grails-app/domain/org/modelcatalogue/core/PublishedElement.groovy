@@ -13,6 +13,8 @@ abstract class PublishedElement extends CatalogueElement {
     //to do this
     PublishedElementStatus status = PublishedElementStatus.DRAFT
 
+    static searchable = true
+
     @Override
     boolean isArchived() {
         status != PublishedElementStatus.FINALIZED
