@@ -1,10 +1,20 @@
 package org.modelcatalogue.core
 
+import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.RelationshipDirection
+
 class RelationshipService {
 
     static transactional = true
 
-    static Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
+    ListAndCount getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type)
+        new ListAndCount(list: criteria.list(params), count: criteria.count())
+    }
+
+
+    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
             if (relationshipInstance) { return relationshipInstance }
@@ -21,7 +31,7 @@ class RelationshipService {
     }
 
 
-    static Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
+    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
             if (relationshipInstance && source && destination) {

@@ -27,7 +27,7 @@ angular.module('demo', [
   $scope.searchSomething  = """search("patient")"""
   $scope.searchModel      = """resource("model").search("patient")"""
   $scope.outgoing         = """resource("dataElement").list() >>> $r.list[0].outgoingRelationships()"""
-  $scope.indicator        = """resource("dataElement").search("NHS_NUMBER_STATUS_INDICATOR_CODE") >>> $r.list[0]"""
+  $scope.indicator        = """resource("dataElement").search("NHS NUMBER STATUS INDICATOR CODE") >>> $r.list[0]"""
 
   $scope.resource         = catalogueElementResource
   $scope.search           = modelCatalogueSearch
