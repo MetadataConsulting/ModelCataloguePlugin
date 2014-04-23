@@ -45,7 +45,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     def "list json items test: #no where max: #max offset: #offset"() {
 
         expect:
-        resource.count() == total
+        resource.count() == totalCount
 
         when:
         controller.response.format = "json"
@@ -115,8 +115,12 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         expect:
         controller.response.contentType == XLSXListRenderer.EXCEL.name
         workbook
-        workbook.getSheetAt(workbook.getActiveSheetIndex()).getLastRowNum() == totalCount
+        workbook.getSheetAt(workbook.getActiveSheetIndex()).getLastRowNum() == totalRowsExported
         // TODO: read the config and test the right number of columns as well
+    }
+
+    protected getTotalRowsExported() {
+        totalCount
     }
 
     def "Show single existing item as JSON"() {

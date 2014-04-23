@@ -93,11 +93,22 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
     @Override
     def customJsonPropertyCheck(inputItem, json, outputItem){
         super.customJsonPropertyCheck(inputItem, json, outputItem)
-        checkProperty(json.modelCatalogueId , outputItem.modelCatalogueId, "modelCatalogueId")
         checkProperty(json.status , outputItem.status, "status")
         checkMapProperty(json.ext , inputItem.ext, "extension")
         checkProperty(json.versionNumber , outputItem.versionNumber, "versionNumber")
         return true
+    }
+
+    @Override
+    protected getTotalRowsExported() { 7 }
+
+    def getPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 7, 10, 0, 7, "", ""],
+                [2, 5, 5, 0, 7, "${baseLink}?max=5&offset=5", ""],
+                [3, 2, 5, 5, 7, "", "${baseLink}?max=5&offset=0"],
+        ]
     }
 
 }

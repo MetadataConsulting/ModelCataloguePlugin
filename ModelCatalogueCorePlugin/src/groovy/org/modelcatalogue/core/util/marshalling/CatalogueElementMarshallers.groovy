@@ -25,8 +25,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 elementType: el.class.name,
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
-                outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"],
-                incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"]
+                relationships: [count: (el.outgoingRelationships ? el.outgoingRelationships.size() : 0) + (el.incomingRelationships ? el.incomingRelationships.size() : 0), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
         ]
 
         def relationships   = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
@@ -42,8 +41,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         xml.build {
             name el.name
             description el.description
-            outgoingRelationships count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"
-            incomingRelationships count: el.incomingRelationships ? el.incomingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"
+            relationships count: (el.outgoingRelationships ? el.outgoingRelationships.size() : 0) + (el.incomingRelationships ? el.incomingRelationships.size() : 0), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"
         }
 
         def relationships = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]

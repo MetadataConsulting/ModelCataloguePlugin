@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.Mappings
+import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.Relationships
 
 import javax.servlet.http.HttpServletResponse
@@ -22,11 +24,15 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     }
 
     def incoming(Integer max, String type) {
-        relationships(max, type, "Destination", "incoming")
+        relationshipsInternal(max, type, RelationshipDirection.INCOMING)
     }
 
     def outgoing(Integer max, String type) {
-        relationships(max, type, "Source", "outgoing")
+        relationshipsInternal(max, type, RelationshipDirection.OUTGOING)
+    }
+
+    def relationships(Integer max, String type) {
+        relationshipsInternal(max, type, RelationshipDirection.BOTH)
     }
 
     def addOutgoing(Long id, String type) {
@@ -137,7 +143,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         otherSide
     }
 
-    private relationships(Integer max, String typeParam, String sourceOrDestination, String incomingOrOutgoing) {
+    private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
         setSafeMax(max)
 
         CatalogueElement element = queryForResource(params.id)
@@ -152,17 +158,17 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        int total = type ? Relationship."countBy${sourceOrDestination}AndRelationshipType"(element, type) : (element."${incomingOrOutgoing}Relationships".size() ?: 0)
-        def list = type ? Relationship."findAllBy${sourceOrDestination}AndRelationshipType"(element, type, params) : Relationship."findAllBy${sourceOrDestination}"(element, params)
-        def direction = sourceOrDestination == "Source" ? "sourceToDestination" : "destinationToSource"
-        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/${incomingOrOutgoing}" + (typeParam ? "/${typeParam}" : ""), total)
+        ListAndCount listAndCount = relationshipService.getRelationships(params, direction, element, type)
+
+        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), listAndCount.count)
 
         respond new Relationships(
-                items: list,
+                owner: element,
+                items: listAndCount.list,
                 previous: links.previous,
                 next: links.next,
                 direction: direction,
-                total: total,
+                total: listAndCount.count,
                 offset: params.int('offset') ?: 0,
                 page: params.int('max') ?: 0
         )

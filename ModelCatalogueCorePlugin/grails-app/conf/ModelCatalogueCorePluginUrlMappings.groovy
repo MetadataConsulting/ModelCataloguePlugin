@@ -24,6 +24,9 @@ class ModelCatalogueCorePluginUrlMappings {
             "/$controller/$id/outgoing" {
                 action = [GET: "outgoing"]
             }
+            "/$controller/$id/relationships" {
+                action = [GET: "relationships"]
+            }
             "/$controller/$id/outgoing/$type" {
                 action = [GET: "outgoing", POST: "addOutgoing", DELETE: "removeOutgoing"]
             }
