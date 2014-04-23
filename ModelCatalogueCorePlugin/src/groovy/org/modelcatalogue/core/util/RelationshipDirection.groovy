@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.util
 
 import grails.gorm.DetachedCriteria
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 
 enum RelationshipDirection {
 
@@ -9,7 +11,7 @@ enum RelationshipDirection {
 
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element instanceof PublishedElement && element.status != PublishedElementStatus.FINALIZED) {
+            if (!element.archived) {
                 if (type) {
                     return Relationship.where {
                         destination == element && relationshipType == type
@@ -48,7 +50,7 @@ enum RelationshipDirection {
 
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element instanceof PublishedElement && element.status != PublishedElementStatus.FINALIZED) {
+            if (!element.archived) {
                 if (type) {
                     return Relationship.where {
                         source == element && relationshipType == type
@@ -87,7 +89,7 @@ enum RelationshipDirection {
     BOTH {
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element instanceof PublishedElement && element.status != PublishedElementStatus.FINALIZED) {
+            if (!element.archived) {
                 if (type) {
                     return Relationship.where {
                         (source == element || destination == element) && relationshipType == type

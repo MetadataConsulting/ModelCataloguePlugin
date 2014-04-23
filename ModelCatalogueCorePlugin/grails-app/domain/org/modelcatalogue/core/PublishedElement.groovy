@@ -13,6 +13,10 @@ abstract class PublishedElement extends CatalogueElement {
     //to do this
     PublishedElementStatus status = PublishedElementStatus.DRAFT
 
+    @Override
+    boolean isArchived() {
+        status != PublishedElementStatus.FINALIZED
+    }
     static constraints = {
         modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: 'MC_\\d+_\\d+'
         status validator: { val , obj->
