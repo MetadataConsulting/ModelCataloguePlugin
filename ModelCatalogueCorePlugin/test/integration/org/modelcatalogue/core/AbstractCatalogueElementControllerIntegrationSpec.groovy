@@ -246,15 +246,19 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     def checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def method = incomingOrOutgoing
+        if (incomingOrOutgoing == 'relationships') {
+            incomingOrOutgoing = 'incoming'
+        }
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
         controller.response.format = "json"
         controller.params.offset = offset
         controller.params.id = first.id
         RelationshipType type2 = new RelationshipType(name: "xyz", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "xyz", destinationToSource: "zyx")
         assert type2.save()
-        controller."${incomingOrOutgoing}"(max, type2.name)
+        controller."${method}"(max, type2.name)
         JSONObject json = controller.response.json
-        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", json
+        recordResult "${method}WithNonExistingType${no}", json
         assert json.success
         assert !json.list
         assert json.total == 0
@@ -266,13 +270,17 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def checkXmlRelationsInternal(typeParam, no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def method = incomingOrOutgoing
+        if (incomingOrOutgoing == 'relationships') {
+            incomingOrOutgoing = 'incoming'
+        }
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
         controller.response.format = "xml"
         controller.params.offset = offset
         controller.params.id = first.id
-        controller."${incomingOrOutgoing}"(max, typeParam)
+        controller."${method}"(max, typeParam)
         GPathResult result = controller.response.xml
-        recordResult "${incomingOrOutgoing}${no}", result
+        recordResult "${method}${no}", result
         assert result
         checkXmlCorrectListValues(result, total, size, offset, max, next, previous)
         assert result.relationship
@@ -314,15 +322,19 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def method = incomingOrOutgoing
+        if (incomingOrOutgoing == 'relationships') {
+            incomingOrOutgoing = 'incoming'
+        }
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
         controller.response.format = "xml"
         controller.params.offset = offset
         controller.params.id = first.id
         RelationshipType type2 = new RelationshipType(name: "xyz", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "xyz", destinationToSource: "zyx")
         assert type2.save()
-        controller."${incomingOrOutgoing}"(max, type2.name)
+        controller."${method}"(max, type2.name)
         GPathResult result = controller.response.xml
-        recordResult "${incomingOrOutgoing}WithNonExistingType${no}", result
+        recordResult "${method}WithNonExistingType${no}", result
         assert result
         assert result.@success.text() == "true"
         assert result.@total.text() == "0"
@@ -356,6 +368,29 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
     }
 
+
+    def "Return 404 for non-existing item as JSON for combined relationships queried by type"() {
+        controller.response.format = "json"
+        controller.params.id = "1"
+        controller.relationships(10, "no-such-type")
+
+        expect:
+        controller.response.text == ""
+        controller.response.status == HttpServletResponse.SC_NOT_FOUND
+        resource.count() == totalCount
+    }
+
+    def "Return 404 for non-existing item as XML for combined relationships queried by type"() {
+        controller.response.format = "xml"
+        controller.params.id = "1"
+        controller.relationships(10, "no-such-type")
+
+        expect:
+        controller.response.text == ""
+        controller.response.status == HttpServletResponse.SC_NOT_FOUND
+        resource.count() == totalCount
+    }
+
     def "Return 404 for non-existing item as JSON for outgoing relationships queried by type"() {
         controller.response.format = "json"
         controller.params.id = "1"
@@ -378,6 +413,27 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
     }
 
+    def "Return 404 for non-existing item as JSON for combined relationships"() {
+        controller.response.format = "json"
+        controller.params.id = "1000000"
+        controller.relationships(10, null)
+
+        expect:
+        controller.response.text == ""
+        controller.response.status == HttpServletResponse.SC_NOT_FOUND
+        resource.count() == totalCount
+    }
+
+    def "Return 404 for non-existing item as XML for combined relationships"() {
+        controller.response.format = "xml"
+        controller.params.id = "1000000"
+        controller.relationships(10, null)
+
+        expect:
+        controller.response.text == ""
+        controller.response.status == HttpServletResponse.SC_NOT_FOUND
+        resource.count() == totalCount
+    }
 
     def "Return 404 for non-existing item as JSON for incoming relationships"() {
         controller.response.format = "json"
@@ -447,6 +503,17 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     @Unroll
+    def "get json combined relationships pagination: #no where max: #max offset: #offset"() {
+        checkJsonRelations(no, size, max, offset, total, next, previous, "relationships")
+
+        expect:
+        resource.count() == totalCount
+
+        where:
+        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships")
+    }
+
+    @Unroll
     def "get json outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
 
@@ -466,6 +533,17 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         where:
         [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/relationship")
+    }
+
+    @Unroll
+    def "get json combined relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "relationships")
+
+        expect:
+        resource.count() == totalCount
+
+        where:
+        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relationship")
     }
 
 
@@ -491,6 +569,18 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/xyz")
     }
 
+
+    @Unroll
+    def "get json combined relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "relationships")
+
+        expect:
+        resource.count() == totalCount
+
+        where:
+        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/xyz")
+    }
+
     @Unroll
     def "get xml outgoing relationships pagination: #no where max: #max offset: #offset"() {
         checkXmlRelations(no, size, max, offset, total, next, previous, "outgoing")
@@ -511,6 +601,18 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         where:
         [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming")
+    }
+
+
+    @Unroll
+    def "get xml combined relationships pagination: #no where max: #max offset: #offset"() {
+        checkXmlRelations(no, size, max, offset, total, next, previous, "relationships")
+
+        expect:
+        resource.count() == totalCount
+
+        where:
+        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships")
     }
 
 
@@ -538,6 +640,18 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     @Unroll
+    def "get xml comibined relationships pagination with type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "relationships")
+
+        expect:
+        resource.count() == totalCount
+
+        where:
+        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relationship")
+    }
+
+
+    @Unroll
     def "get xml outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
         checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
 
@@ -559,6 +673,17 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/xyz")
     }
 
+
+    @Unroll
+    def "get xml combined relationships pagination with wrong type: #no where max: #max offset: #offset"() {
+        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "relationships")
+
+        expect:
+        resource.count() == totalCount
+
+        where:
+        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/xyz")
+    }
 
 
     abstract Object getAnotherLoadItem()
@@ -592,13 +717,17 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     private checkJsonRelationsInternal(typeParam, no, size, max, offset, total, next, previous, incomingOrOutgoing) {
+        def method = incomingOrOutgoing
+        if (incomingOrOutgoing == 'relationships') {
+            incomingOrOutgoing = 'incoming'
+        }
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
         controller.response.format = "json"
         controller.params.offset = offset
         controller.params.id = first.id
-        controller."${incomingOrOutgoing}"(max, typeParam)
+        controller."${method}"(max, typeParam)
         JSONElement json = controller.response.json
-        recordResult "${incomingOrOutgoing}${no}", json
+        recordResult "${method}${no}", json
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
         assert json.listType == Relationships.name
         assert json.itemType == Relationship.name
@@ -638,12 +767,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(xml.description, item.description, "description")
         checkProperty(xml.@elementType, item.class.name, "elementType")
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
-        checkProperty(xml.incomingRelationships.@count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/incoming", "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@itemType, Relationship.name, "itemType")
-        checkProperty(xml.outgoingRelationships.@count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/outgoing", "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@itemType, Relationship.name, "itemType")
+        checkProperty(xml.relationships.@count, (item?.incomingRelationships ? item.incomingRelationships.size(): 0) + (item?.outgoingRelationships ? item.outgoingRelationships.size(): 0), "relationships")
+        checkProperty(xml.relationships.@link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/relationships", "relationships")
+        checkProperty(xml.relationships.@itemType, Relationship.name, "itemType")
         return true
     }
 
@@ -654,12 +780,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(xml.description, inputItem.description, "description")
         checkProperty(xml.@elementType, outputItem.class.name, "elementType")
         checkProperty(xml.@elementTypeName, GrailsNameUtils.getNaturalName(outputItem.class.simpleName), "elementTypeName")
-        checkProperty(xml.incomingRelationships.@count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/incoming", "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@itemType, Relationship.name, "itemType")
-        checkProperty(xml.outgoingRelationships.@count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/outgoing", "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@itemType, Relationship.name, "itemType")
+        checkProperty(xml.relationships.@count, (outputItem?.incomingRelationships ? outputItem.incomingRelationships.size(): 0) + (outputItem?.outgoingRelationships ? outputItem.outgoingRelationships.size(): 0), "relationships")
+        checkProperty(xml.relationships.@link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/relationships", "relationships")
+        checkProperty(xml.relationships.@itemType, Relationship.name, "itemType")
         return true
     }
 
@@ -670,12 +793,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.description , item.description, "description")
         checkProperty(json.elementType , item.class.name, "elementType")
         checkProperty(json.elementTypeName , GrailsNameUtils.getNaturalName(item.class.simpleName), "elementTypeName")
-        checkProperty(json.outgoingRelationships.count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingCount")
-        checkProperty(json.outgoingRelationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/outgoing", "outgoingLink")
-        checkProperty(json.outgoingRelationships.itemType, Relationship.name, "outgoingItemType")
-        checkProperty(json.incomingRelationships.count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingCount")
-        checkProperty(json.incomingRelationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/incoming", "incomingLink")
-        checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
+        checkProperty(json.relationships.count, (item?.incomingRelationships ? item.incomingRelationships.size(): 0) + (item?.outgoingRelationships ? item.outgoingRelationships.size(): 0), "relationshipsCount")
+        checkProperty(json.relationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/relationships", "relationshipsLink")
+        checkProperty(json.relationships.itemType, Relationship.name, "relationshipsItemType")
         return true
     }
 
@@ -686,14 +806,12 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.description , inputItem.description, "description")
         checkProperty(json.elementType , outputItem.class.name, "elementType")
         checkProperty(json.elementTypeName , GrailsNameUtils.getNaturalName(outputItem.class.simpleName), "elementTypeName")
-        checkProperty(json.outgoingRelationships.count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingCount")
-        checkProperty(json.outgoingRelationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/outgoing", "outgoingLink")
-        checkProperty(json.incomingRelationships.count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingCount")
-        checkProperty(json.incomingRelationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/incoming", "incomingLink")
+        checkProperty(json.relationships.count, (outputItem?.incomingRelationships ? outputItem.incomingRelationships.size(): 0) + (outputItem?.outgoingRelationships ? outputItem.outgoingRelationships.size(): 0), "relationshipsCount")
+        checkProperty(json.relationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/relationships", "relationshipsLink")
+        checkProperty(json.relationships.itemType, Relationship.name, "relationshipsItemType")
         return true
     }
 
-    @Override
     def getRelationshipPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
