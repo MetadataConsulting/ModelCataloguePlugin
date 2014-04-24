@@ -1,9 +1,11 @@
 package org.modelcatalogue.core.elasticsearch
 
 import grails.transaction.Transactional
+import org.grails.datastore.mapping.engine.event.SaveOrUpdateEvent
+import org.springframework.context.ApplicationListener
 
 @Transactional
-class ModelCatalogueSearchService{
+class ModelCatalogueSearchService implements ApplicationListener<SaveOrUpdateEvent> {
 
     def elasticSearchService
 
@@ -70,4 +72,10 @@ class ModelCatalogueSearchService{
         return searchParams
     }
 
+    @Override
+    void onApplicationEvent(SaveOrUpdateEvent event) {
+
+        event.entity
+
+    }
 }

@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
     controller: ['$scope', '$log', '$filter', '$q', 'enhance', 'names', 'columns', 'messages' , ($scope, $log, $filter, $q, enhance, names, columns, messages) ->
-      propExludes     = ['version', 'name', 'description']
+      propExludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -23,6 +23,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         tabs = []
 
         for name, fn of element when enhance.isEnhancedBy(fn, 'listReference')
+          if name in propExludes
+            continue
           tabDefintion =
             heading:  names.getNaturalName(name)
             value:    listEnhancer.createEmptyList(fn.itemType)

@@ -11,6 +11,8 @@ class BootStrap {
     def importService
     def domainModellerService
     def initCatalogueService
+    def publishedElementService
+
     XLSXListRenderer xlsxListRenderer
 
     def init = { servletContext ->
@@ -34,10 +36,19 @@ class BootStrap {
                 def de = new DataElement(name: "testera", description:"test data architect").save()
                 de.ext.metadata = "test metadata"
 
+
                 PublishedElement.list().each {
                     it.status = PublishedElementStatus.FINALIZED
                     it.save()
                 }
+
+                def withHistory = DataElement.findByName("NHS NUMBER STATUS INDICATOR CODE")
+
+                10.times {
+                    log.info "Creating archived version #${it}"
+                    publishedElementService.archiveAndIncreaseVersion(withHistory)
+                }
+
                 //domainModellerService.modelDomains()
             }
         }

@@ -41,10 +41,11 @@ class DataElementSpec extends Specification {
 
         DataElement dataElementInstance = new DataElement(args)
 
-        dataElementInstance.save()
+        dataElementInstance.save(flush: true)
+
 
         then:
-
+        dataElementInstance.id != null == validates
         !dataElementInstance.hasErrors() == validates
         dataElementInstance.versionNumber == 1
         DataElement.list().size() == size
