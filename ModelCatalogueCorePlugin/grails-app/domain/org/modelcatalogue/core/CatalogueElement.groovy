@@ -130,14 +130,14 @@ abstract class CatalogueElement {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+        "${getClass().simpleName}[id: ${getId()}, name: ${getName()}]"
     }
 
     Map<String, Object> getInfo() {
         [
-                id: id,
+                id: getId(),
                 name: name,
-                link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
+                link: "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}"
         ]
     }
 

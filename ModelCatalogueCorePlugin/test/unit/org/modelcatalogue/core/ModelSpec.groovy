@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -73,10 +72,11 @@ class ModelSpec extends Specification {
     def "Get link info"() {
 
 
-        Model modelInstance = new Model(name: "result1", description: "this is the the result description").save()
+        Model modelInstance = new Model(name: "result1", description: "this is the the result description").save(flush: true)
 
         expect:
         modelInstance
+        modelInstance.id
 
         modelInstance.info
         modelInstance.info.name == modelInstance.name

@@ -2,11 +2,7 @@ package org.modelcatalogue.core.util
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.InitCatalogueService
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipService
-import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.*
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
@@ -25,8 +21,8 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 
         where:
         clazz                   | transients
-        TestCatalogueElement1   | ['relations', 'info', 'hasContextOf', 'parentOf', 'childOf']
-        TestCatalogueElement2   | ['relations', 'info', 'hasContextOf', 'parentOf', 'childOf', 'b', 'd']
+        TestCatalogueElement1   | ['relations', 'info', 'archived', 'hasContextOf', 'parentOf', 'childOf']
+        TestCatalogueElement2   | ['relations', 'info', 'archived', 'hasContextOf', 'parentOf', 'childOf', 'b', 'd']
 
     }
 

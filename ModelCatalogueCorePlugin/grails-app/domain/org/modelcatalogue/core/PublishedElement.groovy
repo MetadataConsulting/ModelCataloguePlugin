@@ -45,19 +45,20 @@ abstract class PublishedElement extends CatalogueElement {
     }
 
     def afterInsert(){
-        if(!modelCatalogueId){
+        if(!getModelCatalogueId()){
             updateModelCatalogueId()
         }
     }
 
-
     def beforeUpdate() {
-        updateModelCatalogueId()
+        if (getVersionNumber() in  dirtyPropertiesNames) {
+            updateModelCatalogueId()
+        }
     }
 
     def updateModelCatalogueId() {
-        if (!id) { throw new IllegalStateException("Cannot assign the model catalogue id before the entity is persisted. Please, persist the entity first.") }
-        modelCatalogueId = "MC_" + id + "_" + versionNumber
+        if (!getId()) { throw new IllegalStateException("Cannot assign the model catalogue id before the entity is persisted. Please, persist the entity first.") }
+        modelCatalogueId = "MC_" + getId() + "_" + getVersionNumber()
     }
 
 }

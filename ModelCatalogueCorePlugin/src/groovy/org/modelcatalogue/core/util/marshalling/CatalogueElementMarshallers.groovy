@@ -26,6 +26,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 relationships: [count: (el.outgoingRelationships ? el.outgoingRelationships.size() : 0) + (el.incomingRelationships ? el.incomingRelationships.size() : 0), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
+                outgoingRelationships: [count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"],
+                incomingRelationships: [count: el.incomingRelationships ? el.incomingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"]
         ]
 
         Map<String, Map<String, String>> relationships = getRelationshipConfiguration(type)
@@ -55,6 +57,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
             name el.name
             description el.description
             relationships count: (el.outgoingRelationships ? el.outgoingRelationships.size() : 0) + (el.incomingRelationships ? el.incomingRelationships.size() : 0), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"
+            outgoingRelationships count: el.outgoingRelationships ? el.outgoingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"
+            incomingRelationships count: el.incomingRelationships ? el.incomingRelationships.size() : 0, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"
         }
 
         def relationships = getRelationshipConfiguration(type)

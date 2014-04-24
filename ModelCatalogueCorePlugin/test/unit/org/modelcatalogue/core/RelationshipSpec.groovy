@@ -38,9 +38,9 @@ class RelationshipSpec extends Specification{
         def loadItem1, loadItem2, type, rel
         fixturesLoader.load('dataElements/DE_author', 'dataElements/DE_author1', 'dataElements/DE_author2', 'relationshipTypes/RT_relationship')
 
-        assert (loadItem1 = fixturesLoader.DE_author.save())
-        assert (loadItem2 = fixturesLoader.DE_author1.save())
-        assert (type = fixturesLoader.RT_relationship.save())
+        assert (loadItem1 = fixturesLoader.DE_author.save(flush: true))
+        assert (loadItem2 = fixturesLoader.DE_author1.save(flush: true))
+        assert (type = fixturesLoader.RT_relationship.save(flush: true))
 
         def item1Id = loadItem1.id
 
