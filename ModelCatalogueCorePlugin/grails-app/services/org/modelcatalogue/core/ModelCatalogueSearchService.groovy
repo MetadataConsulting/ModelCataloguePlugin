@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import grails.gorm.DetachedCriteria
+
 /**
  * Poor man's search service searching in name and description
  * , you should use search service designed for particular search plugin
@@ -14,7 +16,18 @@ class ModelCatalogueSearchService{
 
         String query = "%$params.search%"
 
-        if (CatalogueElement.isAssignableFrom(resource)) {
+        if (PublishedElement.isAssignableFrom(resource)) {
+            DetachedCriteria criteria = new DetachedCriteria(resource)
+            criteria.and {
+                eq('status', PublishedElementStatus.FINALIZED)
+                or {
+                    ilike('name', query)
+                    ilike('description', query)
+                }
+            }
+            searchResults.searchResults = criteria.list(params)
+            searchResults.total = criteria.count()
+        } else if (CatalogueElement.isAssignableFrom(resource)) {
             searchResults.searchResults = resource.findAllByNameIlikeOrDescriptionIlike(query, query, params)
             searchResults.total = resource.countByNameIlikeOrDescriptionIlike(query, query, params)
         } else if (RelationshipType.isAssignableFrom(resource)) {
