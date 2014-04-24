@@ -15,7 +15,7 @@ angular.module('mc.core.ui.bs.catalogueElementTreeviewItem', ['mc.core.ui.catalo
         <span class="badge pull-right" ng-if="currentDescend">{{numberOfChildren}}</span>
       </span>
       <ul ng-if="children" ng-hide="collapsed" class="catalogue-element-treeview-list">
-        <catalogue-element-treeview-item element="child" descend="nextDescend" ng-repeat="child in children track by $index" root-id="rootId"></catalogue-element-treeview-item>
+        <catalogue-element-treeview-item element="child" descend="nextDescend" repeat="repeat" ng-repeat="child in children track by $index" root-id="rootId"></catalogue-element-treeview-item>
         <li ng-if="hasMore" class="catalogue-element-treeview-item">
           <span class="catalogue-element-treeview-labels" ng-click="showMore()">
             <a ng-click="showMore()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a> <a ng-click="showMore()">Show more</a>
