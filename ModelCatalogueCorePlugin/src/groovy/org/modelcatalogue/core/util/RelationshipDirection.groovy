@@ -11,7 +11,7 @@ enum RelationshipDirection {
 
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (!element.archived) {
+            if (element.archived) {
                 if (type) {
                     return Relationship.where {
                         destination == element && relationshipType == type
@@ -50,7 +50,7 @@ enum RelationshipDirection {
 
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (!element.archived) {
+            if (element.archived) {
                 if (type) {
                     return Relationship.where {
                         source == element && relationshipType == type
@@ -89,7 +89,7 @@ enum RelationshipDirection {
     BOTH {
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (!element.archived) {
+            if (element.archived) {
                 if (type) {
                     return Relationship.where {
                         (source == element || destination == element) && relationshipType == type

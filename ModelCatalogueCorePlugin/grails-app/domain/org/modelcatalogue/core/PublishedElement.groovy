@@ -15,7 +15,8 @@ abstract class PublishedElement extends CatalogueElement {
 
     @Override
     boolean isArchived() {
-        status != PublishedElementStatus.FINALIZED
+        if (!status) return false
+        !status.modificable
     }
     static constraints = {
         modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: 'MC_\\d+_\\d+'
@@ -30,55 +31,12 @@ abstract class PublishedElement extends CatalogueElement {
          }
     }
 
-
-    /******************************************************************************************************************/
-    /******   this method allows you to supercede any catalogue element, cloning it and creating ********
-     ******   new relationships mirroring the old relationships  ******************************************************/
-    /******************************************************************************************************************/
-
-    def supercede(){
+    static relationships = [
+            incoming: [supersession: 'supersedes'],
+            outgoing: [supersession: 'supersededBy']
+    ]
 
 
-       /* def clonedElement = this.getClass().newInstance()
-        def properties = new HashMap(this.properties)
-
-        //remove any relations form the properties map
-        properties.remove('relations')
-        properties.remove('version')
-
-        //copy properties over to new object
-        clonedElement.properties = properties
-
-        //increment versionNumber of new object and reset status to draft
-
-        clonedElement.status = CatalogueElement.PublishedElementStatus.DRAFT
-
-        clonedElement.save(flush:true, failOnError: true)
-
-        def relations = this.relations()
-
-        def relationshipService = new RelationshipService()
-
-        relations.each { relation ->
-            relationshipService.link(clonedElement, relation, relation.relationshipType)
-        }
-
-        def supersession = RelationshipType.findByName("Supersession")
-        relationshipService.link(clonedElement, this, supersession)
-
-
-        // Grant the current user principal administrative permission
-        if(springSecurityService.authentication.name!='admin'){
-            aclUtilService.addPermission clonedElement, springSecurityService.authentication.name, BasePermission.ADMINISTRATION
-        }
-
-        //Grant admin user administrative permissions
-
-        aclUtilService.addPermission clonedElement, 'admin', BasePermission.ADMINISTRATION
-
-        return clonedElement
-*/
-    }
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
@@ -86,8 +44,18 @@ abstract class PublishedElement extends CatalogueElement {
 
     def afterInsert(){
         if(!modelCatalogueId){
-            modelCatalogueId = "MC_" + id + "_" + versionNumber
+            updateModelCatalogueId()
         }
+    }
+
+
+    def beforeUpdate() {
+        updateModelCatalogueId()
+    }
+
+    def updateModelCatalogueId() {
+        if (!id) { throw new IllegalStateException("Cannot assign the model catalogue id before the entity is persisted. Please, persist the entity first.") }
+        modelCatalogueId = "MC_" + id + "_" + versionNumber
     }
 
 }

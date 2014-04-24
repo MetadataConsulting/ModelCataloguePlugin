@@ -28,13 +28,26 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 relationships: [count: (el.outgoingRelationships ? el.outgoingRelationships.size() : 0) + (el.incomingRelationships ? el.incomingRelationships.size() : 0), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
         ]
 
-        def relationships   = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
+        Map<String, Map<String, String>> relationships = getRelationshipConfiguration(type)
 
         relationships.incoming?.each addRelationsJson('incoming', el, ret)
         relationships.outgoing?.each addRelationsJson('outgoing', el, ret)
 
         ret
 
+    }
+
+    static Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {
+        def relationships  = [incoming: [:], outgoing: [:]]
+        if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) {
+            def fromSuperclass = getRelationshipConfiguration(type.superclass)
+            relationships.incoming.putAll(fromSuperclass.incoming ?: [:])
+            relationships.outgoing.putAll(fromSuperclass.outgoing ?: [:])
+        }
+        def fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:]]
+        relationships.incoming.putAll(fromType.incoming ?: [:])
+        relationships.outgoing.putAll(fromType.outgoing ?: [:])
+        relationships
     }
 
     protected void buildXml(el, XML xml) {
@@ -44,7 +57,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
             relationships count: (el.outgoingRelationships ? el.outgoingRelationships.size() : 0) + (el.incomingRelationships ? el.incomingRelationships.size() : 0), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"
         }
 
-        def relationships = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
+        def relationships = getRelationshipConfiguration(type)
 
         relationships.incoming?.each addRelationsXml('incoming', el, xml)
         relationships.outgoing?.each addRelationsXml('outgoing', el, xml)

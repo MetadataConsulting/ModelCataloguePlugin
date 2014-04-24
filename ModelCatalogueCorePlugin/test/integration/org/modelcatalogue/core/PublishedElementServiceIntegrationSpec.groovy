@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.RelationshipDirection
+
 class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setupSpec() {
@@ -7,6 +9,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def publishedElementService
+    def relationshipService
 
     def "return only finalized elements by default"() {
         expect:
@@ -35,6 +38,53 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         publishedElementService.count(Model, status: PublishedElementStatus.DRAFT)              == 7
         publishedElementService.count(DataElement, status: 'DRAFT')                             == 5
         publishedElementService.count(DataElement, status: PublishedElementStatus.DRAFT)        == 5
+    }
+
+
+    def "create new version"() {
+        DataElement author      = DataElement.findByName('DE_author')
+        ValueDomain domain      = ValueDomain.findByName('value domain test1')
+
+        author.addToInstantiatedBy(domain)
+
+        int originalVersion     = author.versionNumber
+        DataElement archived    = publishedElementService.archiveAndIncreaseVersion(author)
+        int archivedVersion     = archived.versionNumber
+        int newVersion          = author.versionNumber
+
+        expect:
+        author != archived
+        author.id != archived.id
+        originalVersion != newVersion
+        originalVersion == newVersion - 1
+        archivedVersion == originalVersion
+
+        author.supersededBy.contains(archived)
+
+        author.instantiatedBy.size()    == 1
+        archived.instantiatedBy.size()  == 1
+        domain.instantiates.size()      == 1
+
+        relationshipService.getRelationships([:], RelationshipDirection.BOTH, author, RelationshipType.instantiationType).list.size() == 1
+        relationshipService.getRelationships([:], RelationshipDirection.BOTH, archived, RelationshipType.instantiationType).list.size() == 1
+        relationshipService.getRelationships([:], RelationshipDirection.BOTH, domain, RelationshipType.instantiationType).list.size() == 1
+
+        when:
+        def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
+
+        then:
+        archived.countSupersededBy()        == 0
+        anotherArchived.countSupersededBy() == 1
+        author.countSupersededBy()          == 1
+
+        author.supersededBy.contains(anotherArchived)
+        anotherArchived.supersededBy.contains(archived)
+
+
+
+
+
+
     }
 
 }
