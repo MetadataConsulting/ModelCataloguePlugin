@@ -49,7 +49,7 @@ class PublishedElementService {
 
         archived.status = PublishedElementStatus.ARCHIVED
 
-        if (!archived.save(flush: true)) {
+        if (!archived.save()) {
             log.error(archived.errors)
             throw new IllegalArgumentException("Cannot create archived version of $element. See application log for errors.")
         }

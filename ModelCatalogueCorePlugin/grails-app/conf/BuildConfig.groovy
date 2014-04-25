@@ -50,9 +50,9 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        compile ":coffee-asset-pipeline:1.5.0"
-        compile ":less-asset-pipeline:1.5.0"
-        compile ":hibernate:3.6.10.7"
+        compile ":coffee-asset-pipeline:1.7.0"
+        compile ":less-asset-pipeline:1.7.0"
+        runtime ':hibernate:3.6.10.13'
 
         compile ":excel-export:0.2.0"
 
@@ -65,7 +65,7 @@ grails.project.dependency.resolution = {
         // test coverage
         test ":code-coverage:1.2.7"
 
-        build ":tomcat:7.0.50"
+        build ':tomcat:7.0.52.1'
 
     }
 }
