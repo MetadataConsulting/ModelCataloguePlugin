@@ -125,8 +125,6 @@ elasticSearch.index.store.type = 'memory' // store local node in memory and not 
 elasticSearch.datastoreImpl = 'hibernateDatastore'
 
 
-grails.assets.includes
-
 modelcatalogue.defaults.datatypes = [
         [name: "String", description: "java.lang.String"],
         [name: "Integer", description: "java.lang.Integer"],
