@@ -14,7 +14,7 @@ class ExtensionValueSpec extends Specification {
     @Shared
     DataElement de = new DataElement(name: "element")
 
-    def setup() { de.save() }
+    def setup() { de.save(flush: true) }
 
     def cleanup() { de.delete() }
 

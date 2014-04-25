@@ -66,13 +66,23 @@ abstract class CatalogueElement {
 
 
     List getIncomingRelationsByType(RelationshipType type) {
-        Relationship.findAllByDestinationAndRelationshipType(this, type).collect {
+        if (archived) {
+            return Relationship.findAllByDestinationAndRelationshipType(this, type).collect {
+                it.source
+            }
+        }
+        Relationship.findAllByDestinationAndRelationshipTypeAndArchived(this, type, false).collect {
             it.source
         }
     }
 
     List getOutgoingRelationsByType(RelationshipType type) {
-        Relationship.findAllBySourceAndRelationshipType(this, type).collect {
+        if (archived) {
+            return Relationship.findAllBySourceAndRelationshipType(this, type).collect {
+                it.destination
+            }
+        }
+        Relationship.findAllBySourceAndRelationshipTypeAndArchived(this, type, false).collect {
             it.destination
         }
     }
@@ -82,20 +92,20 @@ abstract class CatalogueElement {
     }
 
     int countIncomingRelationsByType(RelationshipType type) {
-        if (this.isAttached()) {
-            Relationship.countByDestinationAndRelationshipType(this, type)
-        }else{
-            Relationship.countByDestinationAndRelationshipType(get(this.id), type)
+        CatalogueElement self = this.isAttached() ? this : get(this.id)
+        if (archived) {
+            return Relationship.countByDestinationAndRelationshipType(self, type)
         }
+        Relationship.countByDestinationAndRelationshipTypeAndArchived(self, type, false)
 
     }
 
     int countOutgoingRelationsByType(RelationshipType type) {
-        if (this.isAttached()) {
-            Relationship.countBySourceAndRelationshipType(this, type)
-        }else{
-            Relationship.countBySourceAndRelationshipType(get(this.id), type)
+        CatalogueElement self = this.isAttached() ? this : get(this.id)
+        if (archived) {
+            return Relationship.countBySourceAndRelationshipType(self, type)
         }
+        Relationship.countBySourceAndRelationshipTypeAndArchived(self, type, false)
     }
 
     int countRelationsByType(RelationshipType type) {
@@ -120,14 +130,14 @@ abstract class CatalogueElement {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+        "${getClass().simpleName}[id: ${getId()}, name: ${getName()}]"
     }
 
     Map<String, Object> getInfo() {
         [
-                id: id,
+                id: getId(),
                 name: name,
-                link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
+                link: "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}"
         ]
     }
 

@@ -3,8 +3,6 @@ package org.modelcatalogue.core
 import grails.test.mixin.Mock
 import spock.lang.Specification
 
-import java.security.cert.Extension
-
 @Mock([DataElement, ExtensionValue, ExtendibleElement])
 class ExtendibleElementExtensionsWrapperSpec extends Specification {
 
@@ -14,7 +12,7 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         !ExtensionValue.count()
 
         when:
-        DataElement element = new DataElement(name: "element").save()
+        DataElement element = new DataElement(name: "element").save(flush: true)
 
         then:
         element

@@ -14,7 +14,7 @@ class RelationshipService {
     }
 
 
-    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType) {
+    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, boolean archived = false) {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
             if (relationshipInstance) { return relationshipInstance }
@@ -22,7 +22,8 @@ class RelationshipService {
         Relationship relationshipInstance = new Relationship(
                 source: source?.id ? source : null,
                 destination: destination?.id ? destination : null,
-                relationshipType: relationshipType?.id ? relationshipType : null
+                relationshipType: relationshipType?.id ? relationshipType : null,
+                archived: archived
         )
         source?.addToOutgoingRelationships(relationshipInstance)
         destination?.addToIncomingRelationships(relationshipInstance)

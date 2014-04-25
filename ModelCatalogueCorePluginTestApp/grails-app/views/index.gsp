@@ -96,7 +96,7 @@
             </form>
         </div>
         <div class="col-md-8">
-            <catalogue-element-treeview element="element" descend="descend" id="tree-widget"></catalogue-element-treeview>
+            <catalogue-element-treeview element="element" descend="descend" id="tree-widget" repeat="true"></catalogue-element-treeview>
         </div>
         </div>
     </div>
