@@ -51,9 +51,7 @@ abstract class PublishedElement extends CatalogueElement {
     }
 
     def beforeUpdate() {
-        if (getVersionNumber() in  dirtyPropertiesNames) {
-            updateModelCatalogueId()
-        }
+        updateModelCatalogueId()
     }
 
     def updateModelCatalogueId() {
