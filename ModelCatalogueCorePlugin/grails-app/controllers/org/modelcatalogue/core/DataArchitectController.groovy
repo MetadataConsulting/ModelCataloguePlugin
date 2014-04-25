@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.rest.RestfulController
 import org.modelcatalogue.core.util.Elements
 
 class DataArchitectController {
@@ -24,6 +25,7 @@ class DataArchitectController {
                 total: total,
                 items: results.results,
                 previous: links.previous,
+                itemType: DataElement,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
                 page: params.int('max') ?: 10
