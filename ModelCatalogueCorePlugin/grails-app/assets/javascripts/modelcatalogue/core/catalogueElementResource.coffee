@@ -1,6 +1,6 @@
 angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRoot', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names']).provider 'catalogueElementResource', [ ->
   # Method for instantiating
-  @$get = ['modelCatalogueApiRoot', 'rest', 'enhance', 'names', (modelCatalogueApiRoot, rest, enhance, names) ->
+  @$get = ['$rootScope', 'modelCatalogueApiRoot', 'rest', 'enhance', 'names', ($rootScope, modelCatalogueApiRoot, rest, enhance, names) ->
     class CatalogueElementResource
       constructor: (pathName) ->
         throw "Resource pathname must be defined" if not pathName?
@@ -13,10 +13,15 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
         enhance rest method: 'GET', url: "#{@getIndexPath()}/#{id}"
 
       delete: (id) ->
-        enhance rest method: 'DELETE', url: "#{@getIndexPath()}/#{id}"
+        thePathName = @pathName
+        enhance(rest(method: 'DELETE', url: "#{@getIndexPath()}/#{id}")).then (result)->
+          $rootScope.$broadcast 'catalogueElementDeleted', {link: "/#{thePathName}/#{id}"}
+          result
 
       save: (data) ->
-        enhance rest method: 'POST', url: "#{@getIndexPath()}", data: data
+        enhance(rest(method: 'POST', url: "#{@getIndexPath()}", data: data)).then (result)->
+          $rootScope.$broadcast 'catalogueElementCreated', result
+          result
 
       update: (data) ->
         if !data.id?
