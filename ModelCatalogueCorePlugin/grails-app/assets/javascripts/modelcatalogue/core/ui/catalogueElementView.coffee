@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
     controller: ['$scope', '$log', '$filter', '$q', 'enhance', 'names', 'columns', 'messages' , ($scope, $log, $filter, $q, enhance, names, columns, messages) ->
-      propExludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
+      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -20,12 +20,22 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         size
 
       onElementUpdate = (element) ->
+        activeTabHeading = null
+        activeTabSet     = false
+
+        if $scope.showTabs
+          for tab in $scope.tabs
+            if tab.active
+              activeTabHeading = tab.heading
+              break
+
+
         tabs = []
 
         for name, fn of element when enhance.isEnhancedBy(fn, 'listReference')
-          if name in propExludes
+          if name in propExcludes
             continue
-          tabDefintion =
+          tabDefinition =
             heading:  names.getNaturalName(name)
             value:    listEnhancer.createEmptyList(fn.itemType)
             disabled: fn.total == 0
@@ -36,7 +46,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             name:     name
 
           if fn.itemType == 'org.modelcatalogue.core.Relationship'
-            tabDefintion.actions.push {
+            tabDefinition.actions.push {
               title:  'Remove'
               icon:   'remove'
               type:   'danger'
@@ -59,15 +69,19 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
             }
 
-          tabs.push tabDefintion
+          if tabDefinition.heading == activeTabHeading
+            tabDefinition.active = true
+            activeTabSet = true
+
+          tabs.push tabDefinition
 
 
         for name, obj of element
-          if name in propExludes
+          if name in propExcludes
             continue
           unless angular.isObject(obj) and !angular.isArray(obj) and !enhance.isEnhanced(obj)
             continue
-          tabDefintion =
+          tabDefinition =
             heading:    names.getNaturalName(name)
             value:      obj
             disabled:   obj == undefined or obj == null or getObjectSize(obj) == 0
@@ -76,12 +90,16 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
           for key, value of obj when not angular.isObject(value)
-            tabDefintion.properties.push {
+            tabDefinition.properties.push {
               label: key
               value: getPropertyVal(key)
             }
 
-          tabs.push tabDefintion
+          if tabDefinition.heading == activeTabHeading
+            tabDefinition.active = true
+            activeTabSet = true
+
+          tabs.push tabDefinition
 
 
         tabs = $filter('orderBy')(tabs, 'heading')
@@ -90,7 +108,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           newProperties = []
           for prop in element.getUpdatableProperties()
             obj = element[prop]
-            if prop in propExludes
+            if prop in propExcludes
               continue
             if enhance.isEnhancedBy(obj, 'listReference')
               continue
@@ -109,11 +127,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
         showTabs = false
-        for tab in tabs
-          if not tab.disabled
-            tab.active = true
-            showTabs = true
-            break
+        if not activeTabSet
+          for tab in tabs
+            if not tab.disabled
+              tab.active = true
+              showTabs = true
+              break
+        else
+          showTabs = true
 
         $scope.tabs = tabs
         $scope.showTabs = showTabs
@@ -134,6 +155,15 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       # watches
       $scope.$watch 'element', onElementUpdate
+
+      refreshElement = (element) ->
+        if $scope.element
+          $scope.element.refresh().then (refreshed)->
+            $scope.element = refreshed
+
+      $scope.$on 'catalogueElementCreated', refreshElement
+      $scope.$on 'catalogueElementDeleted', refreshElement
+
 
       # init
       onElementUpdate($scope.element)

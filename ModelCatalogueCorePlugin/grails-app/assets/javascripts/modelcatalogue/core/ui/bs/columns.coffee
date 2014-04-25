@@ -31,7 +31,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Relationship', [
     {header: 'Relation',        value: 'type[direction]',                               classes: 'col-md-3'}
-    {header: 'Destination',     value: "relation.name",                                 classes: 'col-md-6', show: "relation.show()"}
+    {header: 'Destination',     value: "relation.name",                                 classes: 'col-md-4', show: "relation.show()"}
     {header: 'Identification',  value: "relation.elementTypeName + ': ' + relation.id", classes: 'col-md-3', show: "relation.show()"}
   ]
 

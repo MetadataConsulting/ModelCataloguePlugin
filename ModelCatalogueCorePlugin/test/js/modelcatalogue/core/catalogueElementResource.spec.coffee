@@ -152,6 +152,23 @@ describe "mc.core.catalogueElementResource", ->
 
               expect(updated).toBeDefined()
 
+            it "has refresh method", ->
+
+              $httpBackend
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}" )
+              .respond(fixtures.valueDomain.showOne)
+
+              expect(angular.isFunction(result.refresh)).toBeTruthy()
+
+              refreshed = null
+
+              result.update().then((result) -> refreshed = result)
+
+              expect(refreshed).toBeNull()
+
+              $httpBackend.flush()
+
+              expect(refreshed).toBeDefined()
 
             it "has validate method", ->
               result.version = 1
