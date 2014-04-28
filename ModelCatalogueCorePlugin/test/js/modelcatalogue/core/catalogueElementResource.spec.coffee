@@ -152,6 +152,23 @@ describe "mc.core.catalogueElementResource", ->
 
               expect(updated).toBeDefined()
 
+            it "has refresh method", ->
+
+              $httpBackend
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}" )
+              .respond(fixtures.valueDomain.showOne)
+
+              expect(angular.isFunction(result.refresh)).toBeTruthy()
+
+              refreshed = null
+
+              result.update().then((result) -> refreshed = result)
+
+              expect(refreshed).toBeNull()
+
+              $httpBackend.flush()
+
+              expect(refreshed).toBeDefined()
 
             it "has validate method", ->
               result.version = 1
@@ -207,6 +224,11 @@ describe "mc.core.catalogueElementResource", ->
           error  = null
           ok     = null
 
+          fromEvent = null
+
+          $rootScope.$on "catalogueElementDeleted", (event, element)->
+            fromEvent = element
+
           valueDomains.delete(1).then( (_result_) ->
             result = _result_
             ok     = true
@@ -217,12 +239,16 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(result).toBeNull()
           expect(error).toBeNull()
+          expect(fromEvent).toBeNull()
 
           $httpBackend.flush()
+          $rootScope.$digest()
 
           expect(ok).toBeTruthy()
           expect(error).toBeNull()
           expect(result).toBe(204)
+          expect(fromEvent).not.toBeNull()
+          expect(fromEvent.link).toBe('/valueDomain/1')
 
         it "will return 404 if the resource does not exist", ->
           $httpBackend
@@ -398,6 +424,12 @@ describe "mc.core.catalogueElementResource", ->
             symbol:  "MPH"
           }
 
+          resultFromEvent = null
+
+          $rootScope.$on "catalogueElementCreated", (event, element) ->
+            resultFromEvent = element
+
+
           $httpBackend
           .when("POST", "#{modelCatalogueApiRoot}/valueDomain", payload)
           .respond(fixtures.valueDomain.saveOk)
@@ -413,8 +445,10 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(result).toBeNull()
           expect(error).toBeNull()
+          expect(resultFromEvent).toBeNull()
 
           $httpBackend.flush()
+          $rootScope.$digest()
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
@@ -422,6 +456,8 @@ describe "mc.core.catalogueElementResource", ->
           expect(result.version).toBe(fixtures.valueDomain.saveOk.version)
           expect(result.name).toBe(fixtures.valueDomain.saveOk.name)
           expect(result.update).toBeDefined()
+
+          expect(resultFromEvent).toEqual(result)
 
         it "save failed if wrong input", ->
           payload = {symbol: "MPH"}
