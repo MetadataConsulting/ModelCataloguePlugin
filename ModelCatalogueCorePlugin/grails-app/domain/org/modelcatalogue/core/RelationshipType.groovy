@@ -17,6 +17,9 @@ class RelationshipType {
     //name of the relationship type i.e. parentChild  or synonym
     String name
 
+    // system relationship types are not returned from the controller
+    Boolean system = false
+
     //the both sides of the relationship ie. for parentChild this would be parent (for synonym this is synonym, so the same on both sides)
     String sourceToDestination
 

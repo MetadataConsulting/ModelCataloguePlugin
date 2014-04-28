@@ -20,7 +20,7 @@ class ElasticSearchISpec extends IntegrationSpec{
 
 
     @Shared
-    def grailsApplication, elasticSearchService, initCatalogueService
+    def grailsApplication, elasticSearchService, initCatalogueService, relationshipService
 
     def setupSpec(){
         FixturesLoader fixturesLoader = new FixturesLoader("../ModelCatalogueCorePlugin/fixtures")
@@ -37,9 +37,9 @@ class ElasticSearchISpec extends IntegrationSpec{
         def cd = ConceptualDomain.findByName("public libraries")
         def mod = Model.findByName("book")
 
-        RelationshipService.link(cd, mod, RelationshipType.findByName("context"))
+        relationshipService.link(cd, mod, RelationshipType.findByName("context"))
    //     Relationship.link(de, vd, RelationshipType.findByName("instantiation"))
-        RelationshipService.link(mod, de, RelationshipType.findByName("containment"))
+        relationshipService.link(mod, de, RelationshipType.findByName("containment"))
 
         elasticSearchService.index()
     }

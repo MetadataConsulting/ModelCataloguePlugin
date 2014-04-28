@@ -19,6 +19,13 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
         respond CatalogueElementFinder.catalogueElementClasses
     }
 
+    protected List<RelationshipType> listAllResources(Map params) {
+        resource.findAllBySystem(false, params)
+    }
+
+    protected Integer countResources() {
+        resource.countBySystem(false)
+    }
 
     @Override
     protected RelationshipType createResource(Map params) {
