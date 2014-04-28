@@ -40,30 +40,47 @@ class PublishedElementService {
 
         element.versionNumber++
 
+        def newCatalogueId =  element.modelCatalogueId.split("_")
+        newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
+        element.modelCatalogueId = newCatalogueId.join("_")
+
         if (!element.save(flush: true)) {
             log.error(element.errors)
             throw new IllegalArgumentException("Cannot update version of $element. See application log for errors.")
         }
 
-
-
         archived.status = PublishedElementStatus.ARCHIVED
+
 
         if (!archived.save()) {
             log.error(archived.errors)
             throw new IllegalArgumentException("Cannot create archived version of $element. See application log for errors.")
         }
 
-        def supersededBy = element.supersededBy
+        //if the item is a data element contained in a model, update and increase the model version
+        //providing the model isn't pending updates. If the model is pending updates i.e. during an import
+        //we don't want to increase version with every data element change only at the end of all the changes
 
-        def previousSupersededBy = supersededBy ? supersededBy[0] : null
-
-        if (previousSupersededBy) {
-            element.removeFromSupersededBy previousSupersededBy
-            archived.addToSupersededBy previousSupersededBy
+        if(element instanceof DataElement){
+            element.containedIn.each{ Model model ->
+                if(model.status!= PublishedElementStatus.PENDING){
+                    Model archivedModel = archiveAndIncreaseVersion(model)
+                    archivedModel.removeFromContains(element)
+                    archivedModel.addToContains(archived)
+                }
+            }
         }
 
-        element.addToSupersededBy(archived)
+        def supersedes = element.supersedes
+
+        def previousSupersedes = supersedes ? supersedes[0] : null
+
+        if (previousSupersedes) {
+            element.removeFromSupersedes previousSupersedes
+            archived.addToSupersedes previousSupersedes
+        }
+
+        element.addToSupersedes(archived)
 
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue

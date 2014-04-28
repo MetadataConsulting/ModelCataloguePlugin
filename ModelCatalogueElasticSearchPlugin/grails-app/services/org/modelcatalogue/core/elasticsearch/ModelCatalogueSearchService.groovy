@@ -4,7 +4,6 @@ import grails.transaction.Transactional
 import org.grails.datastore.mapping.engine.event.SaveOrUpdateEvent
 import org.springframework.context.ApplicationListener
 
-@Transactional
 class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateEvent> */{
 
     def elasticSearchService

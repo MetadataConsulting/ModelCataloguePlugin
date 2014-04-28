@@ -59,7 +59,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         originalVersion == newVersion - 1
         archivedVersion == originalVersion
 
-        author.supersededBy.contains(archived)
+        author.supersedes.contains(archived)
 
         author.instantiatedBy.size()    == 1
         archived.instantiatedBy.size()  == 1
@@ -73,18 +73,36 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
 
         then:
-        archived.countSupersededBy()        == 0
-        anotherArchived.countSupersededBy() == 1
-        author.countSupersededBy()          == 1
+        archived.countSupersedes()        == 0
+        anotherArchived.countSupersedes() == 1
+        author.countSupersedes()          == 1
 
-        author.supersededBy.contains(anotherArchived)
-        anotherArchived.supersededBy.contains(archived)
-
-
-
-
-
+        author.supersedes.contains(anotherArchived)
+        anotherArchived.supersedes.contains(archived)
 
     }
+
+    def "create new version fo data element updated containing model (not pending)"() {
+        DataElement author      = DataElement.findByName('DE_author')
+        Model book = Model.findByNameAndStatus("book", "FINALIZED")
+        book.addToContains(author)
+
+        when:
+        def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
+        Model newBook = Model.findByNameAndStatus("book", "FINALIZED")
+
+        then:
+
+        author.supersedes.contains(anotherArchived)
+        newBook.supersedes.contains(book)
+        newBook.contains.contains(author)
+        !newBook.contains.contains(anotherArchived)
+        book.contains.contains(anotherArchived)
+
+    }
+
+//    def "create new version of data element doesn't updated containing model whilst pending"() {
+//
+//    }
 
 }

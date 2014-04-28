@@ -39,24 +39,14 @@ abstract class PublishedElement extends CatalogueElement {
     ]
 
 
-
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
     }
 
     def afterInsert(){
         if(!getModelCatalogueId()){
-            updateModelCatalogueId()
+            modelCatalogueId = "MC_" + getId() + "_" + 1
         }
-    }
-
-    def beforeUpdate() {
-        updateModelCatalogueId()
-    }
-
-    def updateModelCatalogueId() {
-        if (!getId()) { throw new IllegalStateException("Cannot assign the model catalogue id before the entity is persisted. Please, persist the entity first.") }
-        modelCatalogueId = "MC_" + getId() + "_" + getVersionNumber()
     }
 
 }
