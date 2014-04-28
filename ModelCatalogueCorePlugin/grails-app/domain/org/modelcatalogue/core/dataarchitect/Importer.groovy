@@ -8,9 +8,12 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElement
+import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.ValueDomain
 
 class Importer {
+
+    def publishedElementService
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
 
@@ -40,11 +43,16 @@ class Importer {
     }
 
     def void ingestImportQueue(){
-        importQueue.each{ ImportRow row ->
-            if(!row.rowActions){
+
+        def queue = importQueue.iterator()
+        while (queue.hasNext()) {
+            ImportRow row = queue.next()
+            if (!row.rowActions) {
                 ingestRow(row)
+                queue.remove()
             }
         }
+
     }
 
 
@@ -264,31 +272,63 @@ class Importer {
     }
 
 
-    protected DataElement importDataElement(Map params){
-        def de = new DataElement(params).save()
-        return de
-    }
+//    protected DataElement importDataElement(Map params){
+//        def de = new DataElement(params).save()
+//        return de
+//    }
+//
+//    protected DataElement importDataElement(Map params, Map metadata){
+//        def de = new DataElement(params).save()
+//
+//        metadata.each { key, value ->
+//            if (key) { key = key.take(255)}
+//            if (value) {value = value.take(255)}
+//            de.ext.put(key, value)
+//        }
+//
+//        return de
+//    }
 
-    protected DataElement importDataElement(Map params, Map metadata){
-        def de = new DataElement(params).save()
 
-        metadata.each { key, value ->
-            if (key) { key = key.take(255)}
-            if (value) {value = value.take(255)}
-            de.ext.put(key, value)
+    protected DataElement updateDataElement(Map params, DataElement dataElement){
+        if(dataElement.name!=params.name || dataElement.description!=params.desription){
+            publishedElementService.archiveAndIncreaseVersion(dataElement)
+            dataElement.name = params.name
+            dataElement.description = params.description
+            dataElement.save()
         }
-
-        return de
+        return dataElement
     }
+
 
     protected DataElement importDataElement(Map params, Map metadata, Model model){
-        def de = new DataElement(params).save()
+
+        //find out if data element exists using unique code
+        DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
+        if(de){ de = updateDataElement(params, de) }
+
+        //find if data element exists using name and containing model
+        if(!de){
+            def nameDE = DataElement.findByName(params.name)
+            if(nameDE && nameDE.containedIn.contains(model)){
+                de = nameDE
+                if(de){ de = updateDataElement(params, de) }
+            }
+        }
+
+
+        if(!de) {
+            params.put('status', PublishedElementStatus.FINALIZED)
+            de = new DataElement(params).save()
+        }
 
         metadata.each { key, value ->
             if (key) { key = key.take(255)}
             if (value) {value = value.take(255)}
             de.ext.put(key, value)
         }
+
+        //TODO check whether already contained and then if it isn't update the model (i.e. update version etc.)
 
         de.addToContainedIn(model)
 

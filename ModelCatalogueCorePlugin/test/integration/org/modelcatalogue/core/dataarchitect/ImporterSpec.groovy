@@ -18,17 +18,19 @@ import spock.lang.Specification
 class ImporterSpec extends AbstractIntegrationSpec {
 
     @Shared
-    ImportRow validImportRow, invalidImportRow
+    ImportRow validImportRow, invalidImportRow, validImportRow2
     Importer importer
-    Collection<ImportRow> rows
+
 
     def setup() {
         loadFixtures()
         validImportRow = new ImportRow()
+        validImportRow2 = new ImportRow()
         invalidImportRow = new ImportRow()
         importer = new Importer()
-        rows = []
 
+
+        //row 1
         validImportRow.dataElementName = "testDataItem"
         validImportRow.parentModelName = "testParentModelCode"
         validImportRow.parentModelCode = "MC_1423_1"
@@ -39,6 +41,21 @@ class ImporterSpec extends AbstractIntegrationSpec {
         validImportRow.measurementUnitName =   "mph"
         validImportRow.conceptualDomainName = "formula one"
         validImportRow.conceptualDomainDescription = " the domain of formula one"
+
+
+        //row 2 -same model as row 1 but different data element
+        validImportRow2.dataElementName = "testDataItem2"
+        validImportRow2.parentModelName = "testParentModelCode"
+        validImportRow2.parentModelCode = "MC_1423_1"
+        validImportRow2.containingModelName = "testModel"
+        validImportRow2.containingModelCode = "MC_123_1"
+        validImportRow2.dataType =   "text"
+        validImportRow2.dataElementDescription =  "test description 2"
+        validImportRow2.measurementUnitName =   "cm3"
+        validImportRow2.conceptualDomainName = "formula one"
+        validImportRow2.conceptualDomainDescription = " the domain of formula one"
+
+        //row 3 -same as row 1 but with updates
 
         invalidImportRow.dataElementName = "testDataItem"
         invalidImportRow.parentModelName = "testParentModelCode"
@@ -51,43 +68,66 @@ class ImporterSpec extends AbstractIntegrationSpec {
         invalidImportRow.conceptualDomainName = "formula one"
         invalidImportRow.conceptualDomainDescription = " the domain of formula one"
 
-        rows.add(validImportRow)
-        rows.add(invalidImportRow)
+
 
     }
 
     def cleanup() {
     }
 
-    void "test ingest valid and invalid rows row"() {
+    void "test ingest importing two different versions "() {
+
+        Collection<ImportRow> rows = []
+        rows.add(validImportRow)
+        rows.add(validImportRow)
 
         when:
         importer.importAll(rows)
 
         then:
         importer.importQueue.contains(validImportRow)
-        importer.pendingAction.contains(invalidImportRow)
 
         when:
         importer.ingestImportQueue()
-        def dataElement = DataElement.findByName("testDataItem")
+        def dataElement1 = DataElement.findByName("testDataItem")
+        def dataElement2 = DataElement.findByName("testDataItem2")
         def parentModel = Model.findByModelCatalogueId("MC_1423_1")
         def containingModel = Model.findByModelCatalogueId("MC_123_1")
-        def measure = MeasurementUnit.findByNameIlike("mph")
+        def measureMPH = MeasurementUnit.findByNameIlike("mph")
         def dataType = DataType.findByNameIlike("text")
         def conceptualDomain = ConceptualDomain.findByName("formula one")
 
 
         then:
 
-        dataElement
+        importer.importQueue.size() == 0
+
+        dataElement1
         parentModel
         containingModel
-        measure
+        measureMPH
         dataType
         conceptualDomain
+
+
     }
 
+
+
+
+
+    void "test ingest invalid row "() {
+
+        Collection<ImportRow> rows = []
+        rows.add(invalidImportRow)
+
+        when:
+        importer.importAll(rows)
+
+        then:
+        importer.pendingAction.contains(invalidImportRow)
+
+    }
 
 
 

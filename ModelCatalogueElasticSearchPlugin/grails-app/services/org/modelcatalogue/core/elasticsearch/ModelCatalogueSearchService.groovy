@@ -5,7 +5,7 @@ import org.grails.datastore.mapping.engine.event.SaveOrUpdateEvent
 import org.springframework.context.ApplicationListener
 
 @Transactional
-class ModelCatalogueSearchService implements ApplicationListener<SaveOrUpdateEvent> {
+class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateEvent> */{
 
     def elasticSearchService
 
@@ -72,10 +72,11 @@ class ModelCatalogueSearchService implements ApplicationListener<SaveOrUpdateEve
         return searchParams
     }
 
-    @Override
-    void onApplicationEvent(SaveOrUpdateEvent event) {
+//    @Override
+//    void onApplicationEvent(SaveOrUpdateEvent event) {
+//
+//        event.entity
+//
+//    }
 
-        event.entity
-
-    }
 }
