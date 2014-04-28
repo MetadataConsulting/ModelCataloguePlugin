@@ -83,26 +83,41 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "create new version fo data element updated containing model (not pending)"() {
-        DataElement author      = DataElement.findByName('DE_author')
+        DataElement author = DataElement.findByName('DE_author')
         Model book = Model.findByNameAndStatus("book", "FINALIZED")
         book.addToContains(author)
 
         when:
         def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
-        Model newBook = Model.findByNameAndStatus("book", "FINALIZED")
+        Model oldBook = Model.findByNameAndStatus("book", "ARCHIVED")
 
         then:
 
         author.supersedes.contains(anotherArchived)
-        newBook.supersedes.contains(book)
-        newBook.contains.contains(author)
-        !newBook.contains.contains(anotherArchived)
-        book.contains.contains(anotherArchived)
+        book.supersedes.contains(oldBook)
+        book.contains.contains(author)
+        !book.contains.contains(anotherArchived)
+        oldBook.contains.contains(anotherArchived)
 
     }
 
-//    def "create new version of data element doesn't updated containing model whilst pending"() {
-//
-//    }
+    def "create new version of data element doesn't updated containing model whilst pending"() {
+        DataElement author = DataElement.findByName('auth')
+        Model book = Model.findByName("chapter1")
+        book.addToContains(author)
+
+        when:
+        book.status = PublishedElementStatus.PENDING
+        book.save(flush:true)
+        def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
+        Model oldBook = Model.findByNameAndStatus("chapter1", "ARCHIVED")
+
+        then:
+
+        !oldBook
+        author.supersedes.contains(anotherArchived)
+        book.contains.contains(author)
+
+    }
 
 }
