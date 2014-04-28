@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class PublishedElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+class PublishedElementControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
     def setupSpec(){
         totalCount = 24

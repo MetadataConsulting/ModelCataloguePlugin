@@ -39,6 +39,7 @@ class PublishedElementService {
         }
 
         element.versionNumber++
+        element.updateModelCatalogueId()
 
         if (!element.save(flush: true)) {
             log.error(element.errors)
@@ -48,6 +49,7 @@ class PublishedElementService {
 
 
         archived.status = PublishedElementStatus.ARCHIVED
+        archived.modelCatalogueId = archived.bareModelCatalogueId + "_" + archived.versionNumber
 
         if (!archived.save()) {
             log.error(archived.errors)

@@ -79,12 +79,6 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         author.supersededBy.contains(anotherArchived)
         anotherArchived.supersededBy.contains(archived)
-
-
-
-
-
-
     }
 
 }
