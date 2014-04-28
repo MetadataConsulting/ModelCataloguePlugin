@@ -23,8 +23,6 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
             fixtures = fixtureLoader.load("dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "dataElements/*", "conceptualDomains/*", "models/*", "relationshipTypes/*").load("valueDomains/*", "extensions/*")
         }
         initCatalogueService.initDefaultRelationshipTypes()
-        initCatalogueService.initDefaultDataTypes()
-        initCatalogueService.initDefaultMeasurementUnits()
     }
 
 }
