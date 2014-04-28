@@ -18,6 +18,8 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
               self.total--
               self.size--
 
+            self.empty = self.size == 0
+
 
 
           if @next

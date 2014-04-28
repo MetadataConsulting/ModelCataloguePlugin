@@ -1,8 +1,10 @@
 h1. catalogueElement
 
 @catalogueElement@ enhancer wraps the catalogue elements usually returned by the backend as JSON and adds
-following methods @delete@, @update@, @validate@, @show@. First three can be considered shortcuts
-to the methods of the same name in [catalogueElementResource|Angular Services]. The @show@ method
+following methods @delete@, @update@, @validate@, @refresh@, @show@. First three can be considered shortcuts
+to the methods of the same name in [catalogueElementResource|Angular Services].
+The @refresh@ method returns promise to latest version of current element fetched again from the backend.
+The @show@ method
 triggers [showCatalogueElement|Angular Events] event allowing you to plug in custom display logic.
 
 h2. Condition
