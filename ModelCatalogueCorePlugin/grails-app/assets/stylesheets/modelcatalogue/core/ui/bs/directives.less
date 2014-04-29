@@ -11,7 +11,7 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   &:first-child {
     height: 400px;
   }
-  &:nth-child(2) {
+  &:not(:first-child) {
     max-height: 340px;
     overflow-y: auto;
   }
@@ -36,4 +36,18 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   border: solid #d3d3d3 1px;
   padding: 10px;
   border-radius: 8px;
+}
+
+.catalogue-element-treeview-labels {
+  white-space: nowrap;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+
+.popover-title {
+  word-break: break-all;
+}
+
+.popover-content {
+  white-space: pre-line;
 }
