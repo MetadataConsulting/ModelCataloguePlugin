@@ -28,7 +28,13 @@ class ModelSpec extends Specification {
         !modelInstance.hasErrors() == validates
         modelInstance.versionNumber == 1
         modelInstance.list().size() == size
-        modelInstance.modelCatalogueId == modelCatalogueId
+        if(modelCatalogueId) {
+            modelInstance.modelCatalogueId == modelCatalogueId
+        }else{
+            modelInstance.modelCatalogueId
+        }
+
+
 
         where:
 
@@ -37,8 +43,8 @@ class ModelSpec extends Specification {
         2 | false      | 0    | [name: "t" * 256, description: "test model description"] | null
         3 | false      | 0    | [name: "test model", description: "t" * 2001] | null
         4 | false      | 0    | [name: "test model", description: "test model description", modelCatalogueId: "MC_12asd_3"] | "MC_12asd_3"
-        5 | true       | 1    | [name: "test model", description: "test model description"] | "MC_1_1"
-        6 | true       | 1    | [name: "test model2", description: "test model description", modelCatalogueId: "MC_12_3"] | "MC_12_3"
+        5 | true       | 1    | [name: "test model", description: "test model description"] | null
+        6 | true       | 1    | [name: "test model2", description: "test model description", modelCatalogueId: "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"] | "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"
 
     }
 

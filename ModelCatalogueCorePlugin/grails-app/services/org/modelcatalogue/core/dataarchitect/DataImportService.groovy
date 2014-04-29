@@ -18,22 +18,22 @@ class DataImportService {
     //Data Item Name, Data Item Description, Parent Section, Section, Measurement Unit, Data type
     //these will allow the import script to identify the rows
 
-    def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, ArrayList parentModels) {
+    def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, ArrayList parentModels, HeadersMap headersMap) {
         //get indexes of the appropriate sections
 
         def newImporter = new Importer(parentModels:parentModels)
 
-        def dataItemNameIndex = headers.indexOf("Data Item Name")
-        def dataItemCodeIndex = headers.indexOf("Data Item Unique Code")
-        def dataItemDescriptionIndex = headers.indexOf("Data Item Description")
-        def parentModelIndex = headers.indexOf("Parent Model")
-        def modelIndex = headers.indexOf("Model")
-        def unitsIndex = headers.indexOf("Measurement Unit")
-        def dataTypeIndex = headers.indexOf("Data type")
-        def metadataStartIndex = headers.indexOf("Metadata") + 1
+        def dataItemNameIndex = headers.indexOf(headersMap.dataElementNameRow)
+        def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCodeRow)
+        def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescriptionRow)
+        def parentModelIndex = headers.indexOf(headersMap.parentModelNameRow)
+        def modelIndex = headers.indexOf(headersMap.containingModelNameRow)
+        def parentModelCodeIndex = headers.indexOf(headersMap.parentModelCodeRow)
+        def modelCodeIndex = headers.indexOf(headersMap.containingModelCodeRow)
+        def unitsIndex = headers.indexOf(headersMap.measurementUnitNameRow)
+        def dataTypeIndex = headers.indexOf(headersMap.dataTypeRow)
+        def metadataStartIndex = headers.indexOf(headersMap.metadataRow) + 1
         def metadataEndIndex = headers.size() - 1
-        def parentModelCodeIndex = headers.indexOf("Parent Model Unique Code")
-        def modelCodeIndex = headers.indexOf("Model Unique Code")
         def elements = []
         if (dataItemNameIndex == -1) throw new Exception("Can not find 'Data Item Name' column")
         //iterate through the rows and import each line

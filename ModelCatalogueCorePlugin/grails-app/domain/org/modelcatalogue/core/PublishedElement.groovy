@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import java.util.UUID
+
 abstract class PublishedElement extends CatalogueElement {
 
     //version number - this gets iterated every time a new version is created from a finalized version
@@ -21,7 +23,9 @@ abstract class PublishedElement extends CatalogueElement {
         !status.modificable
     }
     static constraints = {
-        modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: 'MC_\\d+_\\d+'
+        modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
+
+//TODO we need to think about the way in which published element status changes
 //        status validator: { val , obj->
 //            if(!val){ return true}
 //            def oldStatus = null
@@ -45,7 +49,7 @@ abstract class PublishedElement extends CatalogueElement {
 
     def afterInsert(){
         if(!getModelCatalogueId()){
-            modelCatalogueId = "MC_" + getId() + "_" + 1
+            modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
         }
     }
 

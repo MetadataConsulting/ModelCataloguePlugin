@@ -1,13 +1,11 @@
 package org.modelcatalogue.core.dataarchitect
 
-import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElement
 import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.ValueDomain
 
@@ -15,10 +13,10 @@ class Importer {
 
     def publishedElementService
 
-    private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
+    private static final QUOTED_CHARS = ["\\": "&#92;", ":": "&#58;", "|": "&#124;", "%": "&#37;"]
 
     //TODO replace this with a call to the published element domain class constraint for model catalogue id directly
-    private static final REGEX = 'MC_\\d+_\\d+'
+    private static final REGEX = '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
 
     Collection<ImportRow> pendingAction = []
     Collection<ImportRow> importQueue = []
@@ -27,24 +25,23 @@ class Importer {
     ArrayList parentModels
 
     static constraints = {
-        imported nullable:true
-        pendingAction nullable:true
-        importQueue nullable:true
+        imported nullable: true
+        pendingAction nullable: true
+        importQueue nullable: true
     }
 
-    def void importAll(Collection<ImportRow> rows){
-        rows.each{ ImportRow row ->
+    def void importAll(Collection<ImportRow> rows) {
+        rows.each { ImportRow row ->
             importRow(row)
         }
     }
 
-    def void importRow(ImportRow row){
+    def void importRow(ImportRow row) {
         row = validateRow(row)
-        (row.rowActions)? pendingAction.add(row) : importQueue.add(row)
+        (row.rowActions) ? pendingAction.add(row) : importQueue.add(row)
     }
 
-    def void ingestImportQueue(){
-
+    def void ingestImportQueue() {
         def queue = importQueue.iterator()
         while (queue.hasNext()) {
             ImportRow row = queue.next()
@@ -53,16 +50,15 @@ class Importer {
                 queue.remove()
             }
         }
-
     }
 
-    def void actionPendingModels(){
-        models.unique().each{ Model model->
-            def pendingDataElements = model.contains.findAll{it.status==PublishedElementStatus.PENDING}
-            if(pendingDataElements){
+    def void actionPendingModels() {
+        models.unique().each { Model model ->
+            def pendingDataElements = model.contains.findAll { it.status == PublishedElementStatus.PENDING }
+            if (pendingDataElements) {
                 def archivedModel = publishedElementService.archiveAndIncreaseVersion(model)
                 model.refresh()
-                pendingDataElements.each{ DataElement dataElement ->
+                pendingDataElements.each { DataElement dataElement ->
                     archivedModel.removeFromContains(dataElement)
                     archivedModel.addToContains(dataElement.supersedes.first())
                     archivedModel.save()
@@ -77,38 +73,24 @@ class Importer {
     }
 
 
-    def void ingestRow(ImportRow row){
-        def conceptualDomain, valueDomain, model, dataElement, dataType, measurementUnit
-
-        //IMPORT data type
+    def void ingestRow(ImportRow row) {
+        def conceptualDomain, model, dataType, measurementUnit
         dataType = importDataType(row.dataElementName, row.dataType)
-
-        //IMPORT conceptual domain
         conceptualDomain = importConceptualDomain(row.conceptualDomainName, row.conceptualDomainDescription)
-
-        //IMPORT models/parent models etc.
         model = importModels(row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
-
-        //import measurmentUnits
         measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
-
-        //IMPORT data element
-        if(dataType) {
-            dataElement = importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
-        }else{
-            dataElement = importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model)
+        if (dataType) {
+            importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
+        } else {
+            importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model)
         }
-
     }
 
 
     def importDataType(String name, String data) {
 
-        //default data type to return is the string data type
         def dataTypeReturn
-
-        data.each { line ->
-            String[] lines = line.split("\\r?\\n");
+        String[] lines = data.split("\\r?\\n");
 
 //          if there is more than one line assume that the data type is enumerated and parse enumerations
 //          the script accepts enumerations in the format
@@ -116,48 +98,50 @@ class Importer {
 //          02=recovery only (usrd as a temporary ccu)
 //          03=other ward
 
-            if (lines.size() > 0 && lines[] != null) {
-                Map enumerations = new HashMap()
-                lines.each { enumeratedValues ->
-                    def EV = enumeratedValues.split(":")
-                    if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
-                        def key = EV[0]
-                        def value = EV[1]
-                        if (value.size() > 244) {
-                            value = value[0..244]
-                        }
-                        key = key.trim()
-                        value = value.trim()
-                        if (value.isEmpty()) {
-                            value = "_"
-                        }
-                        enumerations.put(key, value)
+        if (lines.size() > 0 && lines[] != null) {
+            Map enumerations = new HashMap()
+            lines.each { enumeratedValues ->
+                def EV = enumeratedValues.split(":")
+                if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
+                    def key = EV[0]
+                    def value = EV[1]
+                    if (value.size() > 244) {
+                        value = value[0..244]
                     }
-                }
-
-                if (!enumerations.isEmpty()) {
-
-                    String enumString = enumerations.sort() collect { key, val ->
-                        "${this.quote(key)}:${this.quote(val)}"
-                    }.join('|')
-
-                    dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
-                    if (!dataTypeReturn) {
-                        dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
+                    key = key.trim()
+                    value = value.trim()
+                    if (value.isEmpty()) {
+                        value = "_"
                     }
-
+                    enumerations.put(key, value)
                 }
             }
+
+            if (!enumerations.isEmpty()) {
+
+                String enumString = enumerations.sort() collect { key, val ->
+                    "${this.quote(key)}:${this.quote(val)}"
+                }.join('|')
+
+                dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
+                if (!dataTypeReturn) {
+                    dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
+                }
+
+            }
+            //}
         }
 
-        if (!dataTypeReturn) { dataTypeReturn = DataType.findByNameIlike(data) }
+        if (!dataTypeReturn) {
+            dataTypeReturn = DataType.findByNameIlike(data)
+        }
 
         return dataTypeReturn
     }
 
-    def importMeasurementUnit(Map params){
+    def importMeasurementUnit(Map params) {
         MeasurementUnit mu = MeasurementUnit.findByNameIlike(params.name)
-        if(!mu){ mu = new MeasurementUnit(params).save()}
+        if (!mu) { mu = new MeasurementUnit(params).save() }
         return mu
     }
 
@@ -165,23 +149,17 @@ class Importer {
     def importConceptualDomain(String name, String description) {
         name = name.trim()
         ConceptualDomain cd = ConceptualDomain.findByName(name)
-        //Collection<ConceptualDomain> possibleConceptualDomains
-
-        //TODO possible conceptualDomains
-
-        if(!cd){ cd = new ConceptualDomain(name: name, description: description).save() }
-
+        if (!cd) { cd = new ConceptualDomain(name: name, description: description).save() }
         return cd
     }
 
 
-
     def importModels(String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain) {
 
-        if (parentCode) { parentCode = parentCode.trim()}
-        if (modelCode) { modelCode = modelCode.trim()}
-        if (parentName) { parentName = parentName.trim()}
-        if (modelName) { modelName = modelName.trim()}
+        if (parentCode) { parentCode = parentCode.trim() }
+        if (modelCode) { modelCode = modelCode.trim() }
+        if (parentName) { parentName = parentName.trim() }
+        if (modelName) { modelName = modelName.trim() }
 
         Model model = Model.findByModelCatalogueId(modelCode)
         Model parentModel = Model.findByModelCatalogueId(parentCode)
@@ -192,9 +170,9 @@ class Importer {
         modelPath.add(modelName)
         //TODO return a row action
         //if there are no models then try to match the model using the parentChild path to the model and the name of the model
-        if(!model || !parentModel){
-            model = matchOrCreateModel(modelPath, [name: parentName, modelCatalogueId: (parentCode) ? parentCode:null], [name: modelName, modelCatalogueId: (modelCode) ? modelCode:null], conceptualDomain)
-        }else{
+        if (!model || !parentModel) {
+            model = matchOrCreateModel(modelPath, [name: parentName, modelCatalogueId: (parentCode) ? parentCode : null], [name: modelName, modelCatalogueId: (modelCode) ? modelCode : null], conceptualDomain)
+        } else {
             model = addModelToImport(model)
             parentModel = addModelToImport(parentModel)
             model.addToChildOf(parentModel)
@@ -205,8 +183,8 @@ class Importer {
     }
 
 
-    protected Model addModelToImport(Model model){
-        if(!models.contains(model)) {
+    protected Model addModelToImport(Model model) {
+        if (!models.contains(model)) {
             model.status = PublishedElementStatus.PENDING
             model.save()
             models.add(model)
@@ -226,11 +204,15 @@ class Importer {
             def match
 
             //if there isn't a name for the child return the parentName
-            if (!childName) { return parentName }
+            if (!childName) {
+                return parentName
+            }
 
             namedChildren = Model.findAllByName(childName)
             namedChildren.each { Model childModel ->
-                if (childModel.childOf.collect { it.name }.contains(parentName)) { match = childModel }
+                if (childModel.childOf.collect { it.name }.contains(parentName)) {
+                    match = childModel
+                }
             }
 
             //if there isn't a matching model with the same name and parentName
@@ -238,11 +220,11 @@ class Importer {
                 def child, parent
                 //create the child model
                 if (modelParams.name == childName) {
-                    child = new Model(modelParams).save()
+                    child = new Model(modelParams).save(failOnError: true)
                 } else if (parentParams.name == childName) {
-                    child = new Model(parentParams).save()
+                    child = new Model(parentParams).save(failOnError: true)
                 } else {
-                    child = new Model('name': childName).save()
+                    child = new Model('name': childName).save(failOnError: true)
                 }
                 child.addToHasContextOf(conceptualDomain)
                 child = addModelToImport(child)
@@ -276,26 +258,59 @@ class Importer {
 
     }
 
-    //update data element without value domain info
-    protected DataElement updateDataElement(Map params, DataElement dataElement) {
+
+    protected Boolean checkDataElementForChanges(Map params, Map metadata, DataElement dataElement) {
+        Boolean hasDataElementChanged = false
         if (dataElement.name != params.name || dataElement.description != params.description) {
+            return true
+        }
+        metadata.each { key, value ->
+            if (key) {
+                key = key.take(255)
+            }
+            value = (value && value != "") ? value.take(255) : null
+            if (dataElement.ext.get(key) != value) {
+                hasDataElementChanged = true
+            }
+        }
+        return hasDataElementChanged
+    }
+
+    protected DataElement updateMetadata(Map metadata, DataElement dataElement) {
+        metadata.each { key, value ->
+            if (key) {
+                key = key.take(255)
+            }
+            if (value) {
+                value = value.take(255)
+            }
+            dataElement.ext.put(key, value)
+        }
+        dataElement.save()
+        dataElement
+    }
+
+    //update data element without value domain info
+    protected DataElement updateDataElement(Map params, DataElement dataElement, Map metadata) {
+        if (checkDataElementForChanges(params, metadata, dataElement)) {
             publishedElementService.archiveAndIncreaseVersion(dataElement)
             dataElement.name = params.name
             dataElement.description = params.description
             dataElement.save()
+            dataElement = updateMetadata(metadata, dataElement)
         }
         return dataElement
     }
 
     //update data element given value domain info
-    protected DataElement updateDataElement(Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd) {
-        if (dataElement.name != params.name || dataElement.description != params.description) {
+    protected DataElement updateDataElement(Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd, Map metadata) {
+        if (checkDataElementForChanges(params, metadata, dataElement)) {
             publishedElementService.archiveAndIncreaseVersion(dataElement)
             dataElement.refresh()
             dataElement.name = params.name
             dataElement.description = params.description
             dataElement.save()
-
+            dataElement = updateMetadata(metadata, dataElement)
             ArrayList instantiatedBy = dataElement.instantiatedBy.findAll { it.includedIn.contains(cd) }
 
             if (!instantiatedBy) {
@@ -313,79 +328,68 @@ class Importer {
         return dataElement
     }
 
-    protected ValueDomain importValueDomain(Map vdParams, DataElement dataElement, ConceptualDomain cd){
+    protected ValueDomain importValueDomain(Map vdParams, DataElement dataElement, ConceptualDomain cd) {
         ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, vdParams.unitOfMeasure)
-        if(!vd){ vd = new ValueDomain(vdParams).save()}
+        if (!vd) {
+            vd = new ValueDomain(vdParams).save()
+        }
         vd.addToIncludedIn(cd)
         vd.addToInstantiates(dataElement)
         vd.save()
     }
 
-    protected DataElement importDataElement(Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd){
+    protected DataElement importDataElement(Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd) {
 
         //find out if data element exists using unique code
         DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
-        if(de){ de = updateDataElement(params, de, vdParams, cd) }
+        if (de) {
+            de = updateDataElement(params, de, vdParams, cd, metadata)
+        }
 
         //find if data element exists using name and containing model
-        if(!de){
+        if (!de) {
             def nameDE = DataElement.findByName(params.name)
-            if(nameDE && nameDE.containedIn.contains(model)){
+            if (nameDE && nameDE.containedIn.contains(model)) {
                 de = nameDE
-                if(de){ de = updateDataElement(params, de, vdParams, cd) }
+                if (de) { de = updateDataElement(params, de, vdParams, cd, metadata)  }
             }
         }
 
-
-        if(!de) {
+        if (!de) {
             params.put('status', PublishedElementStatus.FINALIZED)
             de = new DataElement(params).save()
-        }
-
-        metadata.each { key, value ->
-            if (key) { key = key.take(255)}
-            if (value) {value = value.take(255)}
-            de.ext.put(key, value)
+            de = updateMetadata(metadata, de)
         }
 
         importValueDomain(vdParams, de, cd)
-
-        //TODO check whether already contained and then if it isn't update the model (i.e. update version etc.)
-
         de.addToContainedIn(model)
 
         return de
     }
 
 
-    protected DataElement importDataElement(Map params, Map metadata, Model model){
+    protected DataElement importDataElement(Map params, Map metadata, Model model) {
 
         //find out if data element exists using unique code
         DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
-        if(de){ de = updateDataElement(params, de) }
+        if (de) { de = updateDataElement(params, de, metadata) }
 
         //find if data element exists using name and containing model
-        if(!de){
+        if (!de) {
             def nameDE = DataElement.findByName(params.name)
-            if(nameDE && nameDE.containedIn.contains(model)){
+            if (nameDE && nameDE.containedIn.contains(model)) {
                 de = nameDE
-                if(de){ de = updateDataElement(params, de) }
+                if (de) {
+                    de = updateDataElement(params, de, metadata)
+                }
             }
         }
 
-
-        if(!de) {
+        if (!de) {
             params.put('status', PublishedElementStatus.FINALIZED)
             de = new DataElement(params).save()
+            de = updateMetadata(metadata, de)
         }
-
-        metadata.each { key, value ->
-            if (key) { key = key.take(255)}
-            if (value) {value = value.take(255)}
-            de.ext.put(key, value)
-        }
-
-        //TODO check whether already contained and then if it isn't update the model (i.e. update version etc.)
 
         de.addToContainedIn(model)
 
@@ -393,50 +397,50 @@ class Importer {
     }
 
 
-    private ImportRow validateRow(ImportRow row){
+    private ImportRow validateRow(ImportRow row) {
 
-        if(!row.dataElementName){
+        if (!row.dataElementName) {
             RowAction action = new RowAction(field: "dataElementName", action: "please enter data element name to import row", actionType: ActionType.RESOLVE_ERROR)
             row.rowActions.add(action)
         }
 
-        if(!row.conceptualDomainName){
+        if (!row.conceptualDomainName) {
             RowAction action = new RowAction(field: "conceptualDomainName", action: "please enter conceptual domain name to import row", actionType: ActionType.RESOLVE_ERROR)
             row.rowActions.add(action)
         }
 
-        if(!row.containingModelName){
+        if (!row.containingModelName) {
             RowAction action = new RowAction(field: "containingModelName", action: "please complete the containing model name to import row", actionType: ActionType.RESOLVE_ERROR)
             row.rowActions.add(action)
         }
 
-        if(row.dataElementCode){
-            if(!row.dataElementCode.matches(REGEX)){
+        if (row.dataElementCode) {
+            if (!row.dataElementCode.matches(REGEX)) {
                 RowAction action = new RowAction(field: "dataElementCode", action: "the model catalogue code for the data element is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
                 row.rowActions.add(action)
             }
         }
 
-        if(row.containingModelCode){
-            if(!row.containingModelCode.matches(REGEX)){
+        if (row.containingModelCode) {
+            if (!row.containingModelCode.matches(REGEX)) {
                 RowAction action = new RowAction(field: "containingModelCode", action: "the model catalogue code for the containing model is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
                 row.rowActions.add(action)
             }
         }
 
-        if(row.parentModelCode){
-            if(!row.parentModelCode.matches(REGEX)){
+        if (row.parentModelCode) {
+            if (!row.parentModelCode.matches(REGEX)) {
                 RowAction action = new RowAction(field: "parentModelCode", action: "the model catalogue code for the parent model is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
                 row.rowActions.add(action)
             }
         }
 
-        if(!row.dataType){
-           RowAction action = new RowAction(field: "dataType", action: "the row does not contain a data type therefore will not be associated with a value domain, is this the expected outcome?", actionType: ActionType.DECISION)
-           row.rowActions.add(action)
+        if (!row.dataType) {
+            RowAction action = new RowAction(field: "dataType", action: "the row does not contain a data type therefore will not be associated with a value domain, is this the expected outcome?", actionType: ActionType.DECISION)
+            row.rowActions.add(action)
         }
 
-       return row
+        return row
     }
 
     protected String quote(String s) {
