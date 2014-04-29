@@ -76,13 +76,12 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         archived.countSupersedes()        == 0
         anotherArchived.countSupersedes() == 1
         author.countSupersedes()          == 1
-
         author.supersedes.contains(anotherArchived)
         anotherArchived.supersedes.contains(archived)
 
     }
 
-    def "create new version fo data element updated containing model (not pending)"() {
+    def "create new version of a data element, as it is contained in a model this updates the containing model (i.e. the model is not pending)"() {
         DataElement author = DataElement.findByName('DE_author')
         Model book = Model.findByNameAndStatus("book", "FINALIZED")
         book.addToContains(author)
@@ -98,10 +97,9 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         book.contains.contains(author)
         !book.contains.contains(anotherArchived)
         oldBook.contains.contains(anotherArchived)
-
     }
 
-    def "create new version of data element doesn't updated containing model whilst pending"() {
+    def "create new version of data element that doesn't updated containing model whilst the model is pending"() {
         DataElement author = DataElement.findByName('auth')
         Model book = Model.findByName("chapter1")
         book.addToContains(author)
@@ -117,6 +115,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         !oldBook
         author.supersedes.contains(anotherArchived)
         book.contains.contains(author)
+        author.status==PublishedElementStatus.PENDING
 
     }
 

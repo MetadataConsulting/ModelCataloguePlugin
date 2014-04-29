@@ -59,15 +59,21 @@ class PublishedElementService {
 
         //if the item is a data element contained in a model, update and increase the model version
         //providing the model isn't pending updates. If the model is pending updates i.e. during an import
-        //we don't want to increase version with every data element change only at the end of all the changes
+        //we don't want to increase version with every data element change, only at the end of all the changes
 
-        if(element instanceof DataElement){
-            element.containedIn.each{ Model model ->
-                if(model.status!= PublishedElementStatus.PENDING){
-                    Model archivedModel = archiveAndIncreaseVersion(model)
-                    archivedModel.removeFromContains(element)
-                    archivedModel.addToContains(archived)
+        if(element instanceof DataElement) {
+            if (element.containedIn.size() > 0) {
+                element.containedIn.each { Model model ->
+                    if (model.status != PublishedElementStatus.PENDING) {
+                        Model archivedModel = archiveAndIncreaseVersion(model)
+                        archivedModel.removeFromContains(element)
+                        archivedModel.addToContains(archived)
+                    }
+
+                    if (model.status == PublishedElementStatus.PENDING) {element.status = PublishedElementStatus.PENDING}
                 }
+
+                element.save()
             }
         }
 
@@ -84,7 +90,6 @@ class PublishedElementService {
 
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
-            r.refresh()
             relationshipService.link(r.source, archived, r.relationshipType, true)
         }
 

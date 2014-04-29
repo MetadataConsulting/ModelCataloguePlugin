@@ -23,7 +23,8 @@ class Importer {
     Collection<ImportRow> pendingAction = []
     Collection<ImportRow> importQueue = []
     Collection<ImportRow> imported = []
-    Map importInfo
+    Collection<Model> models = []
+    ArrayList parentModels
 
     static constraints = {
         imported nullable:true
@@ -55,6 +56,26 @@ class Importer {
 
     }
 
+    def void actionPendingModels(){
+        models.unique().each{ Model model->
+            def pendingDataElements = model.contains.findAll{it.status==PublishedElementStatus.PENDING}
+            if(pendingDataElements){
+                def archivedModel = publishedElementService.archiveAndIncreaseVersion(model)
+                model.refresh()
+                pendingDataElements.each{ DataElement dataElement ->
+                    archivedModel.removeFromContains(dataElement)
+                    archivedModel.addToContains(dataElement.supersedes.first())
+                    archivedModel.save()
+                    model.removeFromContains(dataElement.supersedes.first())
+                    model.save()
+                    dataElement.status = PublishedElementStatus.FINALIZED
+                    dataElement.save()
+                }
+            }
+            model.status = PublishedElementStatus.FINALIZED
+        }
+    }
+
 
     def void ingestRow(ImportRow row){
         def conceptualDomain, valueDomain, model, dataElement, dataType, measurementUnit
@@ -63,21 +84,19 @@ class Importer {
         dataType = importDataType(row.dataElementName, row.dataType)
 
         //IMPORT conceptual domain
-        //TODO handle possible conceptual domains i.e. do a like search and have decision actions returned
         conceptualDomain = importConceptualDomain(row.conceptualDomainName, row.conceptualDomainDescription)
 
         //IMPORT models/parent models etc.
-        model = importModels(row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, row.parentModels, conceptualDomain)
+        model = importModels(row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
 
+        //import measurmentUnits
         measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
 
         //IMPORT data element
-        dataElement = importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model)
-
-        //IMPORT value domain
         if(dataType) {
-            def description = row.dataType.take(2000)
-            valueDomain = importValueDomain([name: row.dataElementName.replaceAll("\\s", "_"), description: description, dataType: dataType, measurementUnit: measurementUnit], conceptualDomain, dataElement)
+            dataElement = importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
+        }else{
+            dataElement = importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model)
         }
 
     }
@@ -157,7 +176,7 @@ class Importer {
 
 
 
-    def importModels(String parentCode, String parentName, String modelCode, String modelName, ArrayList modelPath, ConceptualDomain conceptualDomain) {
+    def importModels(String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain) {
 
         if (parentCode) { parentCode = parentCode.trim()}
         if (modelCode) { modelCode = modelCode.trim()}
@@ -167,14 +186,17 @@ class Importer {
         Model model = Model.findByModelCatalogueId(modelCode)
         Model parentModel = Model.findByModelCatalogueId(parentCode)
 
+        ArrayList modelPath = []
+        modelPath.addAll(parentModels)
+        modelPath.add(parentName)
+        modelPath.add(modelName)
         //TODO return a row action
         //if there are no models then try to match the model using the parentChild path to the model and the name of the model
         if(!model || !parentModel){
-            if(!modelPath){modelPath = []}
-            modelPath.add(parentName)
-            modelPath.add(modelName)
-            model = matchOrCreateModel(modelPath, [name: parentName, modelCatalogueId: (parentCode)?parentCode:null], [name: modelName, modelCatalogueId: (modelCode)?modelCode:null], conceptualDomain)
+            model = matchOrCreateModel(modelPath, [name: parentName, modelCatalogueId: (parentCode) ? parentCode:null], [name: modelName, modelCatalogueId: (modelCode) ? modelCode:null], conceptualDomain)
         }else{
+            model = addModelToImport(model)
+            parentModel = addModelToImport(parentModel)
             model.addToChildOf(parentModel)
         }
 
@@ -182,7 +204,17 @@ class Importer {
 
     }
 
-    protected matchOrCreateModel(ArrayList modelPath, Map parentParams, Map modelParams, ConceptualDomain conceptualDomain){
+
+    protected Model addModelToImport(Model model){
+        if(!models.contains(model)) {
+            model.status = PublishedElementStatus.PENDING
+            model.save()
+            models.add(model)
+        }
+        return model
+    }
+
+    protected matchOrCreateModel(ArrayList modelPath, Map parentParams, Map modelParams, ConceptualDomain conceptualDomain) {
 
         //the final model we want to return i.e. the containing model
         Model modelToReturn
@@ -190,64 +222,53 @@ class Importer {
         //iterate through the model path i.e. ANIMAL - MAMMAL - DOG - POODLE and create models for each of these if they don't exist,
         // otherwise find them and create a parentChild relationship
         modelPath.inject { parentName, childName ->
-            Collection namedChildren
-            Model match
+            def namedChildren = []
+            def match
 
             //if there isn't a name for the child return the parentName
-            if (childName.equals("") || childName == null) { return parentName }
+            if (!childName) { return parentName }
 
-            //see if there are any models with the name of the child
-            namedChildren = Model.findAllWhere("name": childName)
-
-            //see if there are any models with this name that have the same parentName
-            if (namedChildren.size() > 0) {
-                namedChildren.each { Model childModel ->
-                    if (childModel.childOf.collect { it.name }.contains(parentName)) { match = childModel }
-                }
+            namedChildren = Model.findAllByName(childName)
+            namedChildren.each { Model childModel ->
+                if (childModel.childOf.collect { it.name }.contains(parentName)) { match = childModel }
             }
 
             //if there isn't a matching model with the same name and parentName
             if (!match) {
-                //new Model('name': name, 'parentName': parentName).save()
-                Model child
-                Model parent
-
+                def child, parent
                 //create the child model
-                if(modelParams.name == childName){
+                if (modelParams.name == childName) {
                     child = new Model(modelParams).save()
-                }else{
+                } else if (parentParams.name == childName) {
+                    child = new Model(parentParams).save()
+                } else {
                     child = new Model('name': childName).save()
                 }
-
                 child.addToHasContextOf(conceptualDomain)
-
+                child = addModelToImport(child)
                 modelToReturn = child
 
                 //see if the parent model exists
                 parent = Model.findWhere("name": parentName)
-
-                //FIXME we should probably have unique names for models (or codes)
-                // or at least within conceptual domains
-                // or we need to have a way of choosing the model parent to use
-                // at the moment it just uses the first one Model that is returned
-
+                //create the parent model
                 if (!parent) {
-                    if(parentParams.name == parentName){
+                    if (parentParams.name == parentName) {
                         parent = new Model(parentParams).save()
-                    }else{
+                    } else {
                         parent = new Model('name': parentName).save()
                     }
                     parent.addToHasContextOf(conceptualDomain)
                 }
-
                 child.addToChildOf(parent)
-                child.name
+                parent = addModelToImport(parent)
+                return child.name
 
                 //add the parent child relationship between models
 
             } else {
+                match = addModelToImport(match)
                 modelToReturn = match
-                match.name
+                return match.name
             }
         }
 
@@ -255,49 +276,85 @@ class Importer {
 
     }
 
-    protected ValueDomain importValueDomain(Map params, ConceptualDomain cd){
-        def vd = new ValueDomain(params).save(failOnError: true);
-
-        vd.addToIncludedIn(cd)
-        return vd
-    }
-
-    protected ValueDomain importValueDomain(Map params, ConceptualDomain cd, DataElement de){
-        def vd = new ValueDomain(params).save(failOnError: true);
-
-        vd.addToIncludedIn(cd)
-        de.addToInstantiatedBy(vd)
-
-        return vd
-    }
-
-
-//    protected DataElement importDataElement(Map params){
-//        def de = new DataElement(params).save()
-//        return de
-//    }
-//
-//    protected DataElement importDataElement(Map params, Map metadata){
-//        def de = new DataElement(params).save()
-//
-//        metadata.each { key, value ->
-//            if (key) { key = key.take(255)}
-//            if (value) {value = value.take(255)}
-//            de.ext.put(key, value)
-//        }
-//
-//        return de
-//    }
-
-
-    protected DataElement updateDataElement(Map params, DataElement dataElement){
-        if(dataElement.name!=params.name || dataElement.description!=params.desription){
+    //update data element without value domain info
+    protected DataElement updateDataElement(Map params, DataElement dataElement) {
+        if (dataElement.name != params.name || dataElement.description != params.description) {
             publishedElementService.archiveAndIncreaseVersion(dataElement)
             dataElement.name = params.name
             dataElement.description = params.description
             dataElement.save()
         }
         return dataElement
+    }
+
+    //update data element given value domain info
+    protected DataElement updateDataElement(Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd) {
+        if (dataElement.name != params.name || dataElement.description != params.description) {
+            publishedElementService.archiveAndIncreaseVersion(dataElement)
+            dataElement.refresh()
+            dataElement.name = params.name
+            dataElement.description = params.description
+            dataElement.save()
+
+            ArrayList instantiatedBy = dataElement.instantiatedBy.findAll { it.includedIn.contains(cd) }
+
+            if (!instantiatedBy) {
+                importValueDomain(vdParams, dataElement, cd)
+            } else {
+                ValueDomain vd = instantiatedBy.first()
+                if (vd.name != vdParams.name || vd.dataType != vdParams.dataType || vd.unitOfMeasure != vdParams.unitOfMeasure) {
+                    //remove the old one (will still be in the archived one)
+                    vd.removeFromInstantiates(dataElement)
+                    //see if there is one that matches or create a new one
+                    importValueDomain(vdParams, dataElement, cd)
+                }
+            }
+        }
+        return dataElement
+    }
+
+    protected ValueDomain importValueDomain(Map vdParams, DataElement dataElement, ConceptualDomain cd){
+        ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, vdParams.unitOfMeasure)
+        if(!vd){ vd = new ValueDomain(vdParams).save()}
+        vd.addToIncludedIn(cd)
+        vd.addToInstantiates(dataElement)
+        vd.save()
+    }
+
+    protected DataElement importDataElement(Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd){
+
+        //find out if data element exists using unique code
+        DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
+        if(de){ de = updateDataElement(params, de, vdParams, cd) }
+
+        //find if data element exists using name and containing model
+        if(!de){
+            def nameDE = DataElement.findByName(params.name)
+            if(nameDE && nameDE.containedIn.contains(model)){
+                de = nameDE
+                if(de){ de = updateDataElement(params, de, vdParams, cd) }
+            }
+        }
+
+
+        if(!de) {
+            params.put('status', PublishedElementStatus.FINALIZED)
+            de = new DataElement(params).save()
+        }
+
+        metadata.each { key, value ->
+            if (key) { key = key.take(255)}
+            if (value) {value = value.take(255)}
+            de.ext.put(key, value)
+        }
+
+        importValueDomain(vdParams, de, cd)
+
+        //TODO check whether already contained and then if it isn't update the model (i.e. update version etc.)
+
+        de.addToContainedIn(model)
+
+        return de
     }
 
 

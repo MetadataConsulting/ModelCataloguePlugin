@@ -22,15 +22,15 @@ abstract class PublishedElement extends CatalogueElement {
     }
     static constraints = {
         modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: 'MC_\\d+_\\d+'
-        status validator: { val , obj->
-            if(!val){ return true}
-            def oldStatus = null
-            if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
-            if (oldStatus == PublishedElementStatus.FINALIZED && val != PublishedElementStatus.FINALIZED) {
-                return ['validator.finalized']
-            }
-            return true
-         }
+//        status validator: { val , obj->
+//            if(!val){ return true}
+//            def oldStatus = null
+//            if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
+//            if (oldStatus == PublishedElementStatus.FINALIZED && val != PublishedElementStatus.FINALIZED) {
+//                return ['validator.finalized']
+//            }
+//            return true
+//         }
     }
 
     static relationships = [
@@ -40,7 +40,7 @@ abstract class PublishedElement extends CatalogueElement {
 
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
     }
 
     def afterInsert(){

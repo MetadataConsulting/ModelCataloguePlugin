@@ -93,6 +93,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
         when:
         importer.ingestImportQueue()
         def dataElement1 = DataElement.findByName("testDataItem")
+        def valueDomain1 = dataElement1.instantiatedBy
         def dataElement2 = DataElement.findByName("testDataItem2")
         def parentModel = Model.findByModelCatalogueId("MC_1423_1")
         def archivedContainingModel = Model.findByModelCatalogueId("MC_123_1")
@@ -103,7 +104,6 @@ class ImporterSpec extends AbstractIntegrationSpec {
 
 
         then:
-
         importer.importQueue.size() == 0
         dataElement1
         parentModel
@@ -118,24 +118,25 @@ class ImporterSpec extends AbstractIntegrationSpec {
         archivedContainingModel.contains.contains(dataElement1)
         containingModel.supersedes.contains(archivedContainingModel)
         dataElement2.supersedes.contains(dataElement1)
+        dataElement2.instantiatedBy == valueDomain1
 
     }
 
     //void "test ingest importing two of the same versions "() {}
 
 
-    void "test ingest invalid row "() {
-
-        Collection<ImportRow> rows = []
-        rows.add(invalidImportRow)
-
-        when:
-        importer.importAll(rows)
-
-        then:
-        importer.pendingAction.contains(invalidImportRow)
-
-    }
+//    void "test ingest invalid row "() {
+//
+//        Collection<ImportRow> rows = []
+//        rows.add(invalidImportRow)
+//
+//        when:
+//        importer.importAll(rows)
+//
+//        then:
+//        importer.pendingAction.contains(invalidImportRow)
+//
+//    }
 
 
 
