@@ -1,6 +1,5 @@
 #= require_self
 #= require modelcatalogue/core/index
-#= require angular-ui-router/release/angular-ui-router
 #= require decoratedList
 #= require catalogueElementView
 #= require catalogueElementTreeviewItem

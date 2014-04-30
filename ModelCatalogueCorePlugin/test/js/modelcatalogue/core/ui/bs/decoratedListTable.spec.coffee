@@ -1,6 +1,6 @@
 describe "mc.core.ui.decoratedListTable", ->
 
-  beforeEach module 'mc.core.ui.bs.defaultStates'
+  beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.catalogueElementResource'
   beforeEach module 'mc.core.catalogueElementEnhancer'
   beforeEach module 'mc.core.modelCatalogueApiRoot'

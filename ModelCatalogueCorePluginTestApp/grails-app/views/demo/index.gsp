@@ -42,14 +42,14 @@
                     <li class="dropdown" ui-sref-active="active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogue Elements<b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li ui-sref-active="active"><a id="modelLink" ui-sref="mc.resource(resource: 'model')">Models</a></li>
-                            <li ui-sref-active="active"><a id="dataElementLink" ui-sref="mc.resource(resource: 'dataElement')">Data Elements</a></li>
-                            <li ui-sref-active="active"><a id="valueDomainLink" ui-sref="mc.resource(resource: 'valueDomain')">Value Domains</a></li>
-                            <li ui-sref-active="active"><a id="conceptualDomainLink" ui-sref="mc.resource(resource: 'conceptualDomain')">Conceptual Domains</a></li>
-                            <li ui-sref-active="active"><a id="dataTypeLink" ui-sref="mc.resource(resource: 'dataType')">Data Types</a></li>
+                            <li ui-sref-active="active"><a id="modelLink" ui-sref="mc.resource.list({resource: 'model'})">Models</a></li>
+                            <li ui-sref-active="active"><a id="dataElementLink" ui-sref="mc.resource.list({resource: 'dataElement'})">Data Elements</a></li>
+                            <li ui-sref-active="active"><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})">Value Domains</a></li>
+                            <li ui-sref-active="active"><a id="conceptualDomainLink" ui-sref="mc.resource.list({resource: 'conceptualDomain'})">Conceptual Domains</a></li>
+                            <li ui-sref-active="active"><a id="dataTypeLink" ui-sref="mc.resource.list({resource: 'dataType'})">Data Types</a></li>
                         </ul>
                     </li>
-                    <li ui-sref-active="active" ><a id="relationshipTypeLink" ui-sref="mc.resource(resource: 'relationshipType')">Relationship Types</a></li>
+                    <li ui-sref-active="active" ><a id="relationshipTypeLink" ui-sref="mc.resource.list({resource: 'relationshipType'})">Relationship Types</a></li>
                 </ul>
                 <form class="navbar-form navbar-right navbar-input-group" role="search" autocomplete="off" ng-submit="search()" ng-controller="metadataCurator.searchCtrl">
                     <div class="form-group">
@@ -65,7 +65,10 @@
         <div class="row">
             <messages-panel max="3"></messages-panel>
         </div>
-        <div ui-view>
+        <div class="row">
+            <div class="col-md-12">
+                <ui-view></ui-view>
+            </div>
         </div>
     </div>
 </div>

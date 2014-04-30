@@ -1,6 +1,6 @@
 describe "mc.core.catalogueElementEnhancer", ->
 
-  beforeEach module 'mc.core.ui.bs.defaultStates'
+  beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.catalogueElementEnhancer'
 
   it "changes the state on show() method", inject (enhance, $rootScope) ->
