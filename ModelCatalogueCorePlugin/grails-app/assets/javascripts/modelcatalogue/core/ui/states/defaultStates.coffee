@@ -1,15 +1,11 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$log', 'element', ($scope, $stateParams, $log, element) ->
-    $log.info "In ShowCtrl"
-
     $scope.element  = element
     $scope.property = $stateParams.property
 
     @
 ])
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$log', 'list', ($scope, $stateParams, $log, list) ->
-    $log.info "In ListCtrl"
-
     $scope.list = list
 
     @
@@ -19,12 +15,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   $stateProvider.state 'mc', {
     abstract: true
     url: '/catalogue'
-    template: '<p>Ooops, showing <code>mc</code></p>'
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource', {
     abstract: true
     url: '/:resource'
-    template: '<p>Ooops, showing <code>mc.resource</code></p>'
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
     url: '/all'
@@ -62,6 +58,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $rootScope.$stateParams = $stateParams
 ])
 .run(['$templateCache', ($templateCache) ->
+
+  $templateCache.put 'modelcatalogue/core/ui/state/parent.html', '''
+    <ui-view></ui-view>
+  '''
 
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-show="list.total">
