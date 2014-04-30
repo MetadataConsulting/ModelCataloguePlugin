@@ -71,6 +71,22 @@ class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateE
         return searchParams
     }
 
+    //TODO add a few more of these
+
+    def index(Class resource){
+        elasticSearchService.index(resource)
+    }
+
+    def unindex(Object object){
+        elasticSearchService.unindex(object)
+    }
+
+    def unindex(Collection<Object> object){
+        elasticSearchService.unindex(object)
+    }
+
+
+
 //    @Override
 //    void onApplicationEvent(SaveOrUpdateEvent event) {
 //

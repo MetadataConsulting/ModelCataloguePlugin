@@ -1,16 +1,26 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.ExtendibleElement
+import org.modelcatalogue.core.ExtensionValue
+import org.modelcatalogue.core.Mapping
+import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.PublishedElement
+import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
 
 
 class DataImportService {
 
+    def sessionFactory, modelCatalogueSearchService, publishedElementService
     static transactional = true
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
@@ -20,7 +30,7 @@ class DataImportService {
 
     def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, ArrayList parentModels, HeadersMap headersMap) {
         //get indexes of the appropriate sections
-
+        def totalCounter = 0
         def newImporter = new Importer(parentModels:parentModels)
 
         def dataItemNameIndex = headers.indexOf(headersMap.dataElementNameRow)
@@ -62,10 +72,43 @@ class DataImportService {
             }
             importRow.metadata = (metadataColumns)?metadataColumns:null
 
+            if (totalCounter > 40) {
+                sessionFactory.currentSession.flush()
+                sessionFactory.currentSession.clear()
+                counter = 0
+            } else {
+                totalCounter++
+            }
+
             newImporter.ingestRow(importRow)
             //importLine(conceptualDomain, conceptualDomainDescription, parentModels, name, valueDomainInfo, description, metadataColumns)
         }
+
         newImporter.actionPendingModels()
+
+        sessionFactory.currentSession.flush()
+        sessionFactory.currentSession.clear()
+
+        modelCatalogueSearchService.index(ConceptualDomain)
+        modelCatalogueSearchService.index(DataType)
+        modelCatalogueSearchService.index(EnumeratedType)
+        modelCatalogueSearchService.index(ExtensionValue)
+        modelCatalogueSearchService.index(MeasurementUnit)
+        modelCatalogueSearchService.index(ValueDomain)
+        modelCatalogueSearchService.index(CatalogueElement)
+        modelCatalogueSearchService.index(ExtendibleElement)
+        modelCatalogueSearchService.index(PublishedElement)
+        modelCatalogueSearchService.index(DataElement)
+        modelCatalogueSearchService.index(Model)
+        modelCatalogueSearchService.index(RelationshipType)
+        modelCatalogueSearchService.index(Relationship)
+        //TODO: find a better way of unindexing archived elements
+        def params = [:]
+        params.status = PublishedElementStatus.ARCHIVED
+        def archivedElements = publishedElementService.list(params)
+        if(archivedElements){
+            modelCatalogueSearchService.unindex(archivedElements)
+        }
 
     }
 

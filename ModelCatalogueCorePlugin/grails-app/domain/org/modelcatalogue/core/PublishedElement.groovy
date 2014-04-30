@@ -15,7 +15,10 @@ abstract class PublishedElement extends CatalogueElement {
     //to do this
     PublishedElementStatus status = PublishedElementStatus.DRAFT
 
-    static searchable = true
+    static searchable = {
+        modelCatalogueId boost:10
+        except = ['versionNumber']
+    }
 
     @Override
     boolean isArchived() {
