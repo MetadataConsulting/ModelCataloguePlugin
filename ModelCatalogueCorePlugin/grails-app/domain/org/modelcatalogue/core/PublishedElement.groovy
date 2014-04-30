@@ -61,4 +61,8 @@ abstract class PublishedElement extends CatalogueElement {
         (modelCatalogueId =~ /(MC_(.+))_(\d+)/)[0][1]
     }
 
+    def countVersions() {
+        getClass().countByModelCatalogueIdLike "$bareModelCatalogueId%"
+    }
+
 }

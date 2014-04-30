@@ -67,7 +67,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             actions:  []
             name:     name
 
-          if fn.itemType == 'org.modelcatalogue.core.Relationship'
+
+          if tabDefinition.name == 'history'
+            tabDefinition.columns = [
+              {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
+              {header: "Name", value: 'name', class: 'col-md-5', show: true}
+              {header: "Description", value: 'description', class: 'col-md-6'}
+            ]
+          else if fn.itemType == 'org.modelcatalogue.core.Relationship'
             tabDefinition.actions.push {
               title:  'Remove'
               icon:   'remove'
@@ -139,7 +146,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               continue
             newProperties.push(label: names.getNaturalName(prop), value: getPropertyVal(prop))
 
-          tabDefintion =
+          tabDefinition =
             heading:    'Properties'
             name:       'properties'
             value:      element
@@ -151,7 +158,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             tabDefinition.active = true
             activeTabSet = true
 
-          tabs.unshift tabDefintion
+          tabs.unshift tabDefinition
 
 
         showTabs = false
