@@ -21,7 +21,7 @@ class Importer {
     Collection<ImportRow> pendingAction = []
     Collection<ImportRow> importQueue = []
     Collection<ImportRow> imported = []
-    Collection<Model> models = []
+    Collection<Integer> modelIds = []
     ArrayList parentModels
 
     static constraints = {
@@ -53,7 +53,8 @@ class Importer {
     }
 
     def void actionPendingModels() {
-        models.unique().each { Model model ->
+        modelIds.each { modelId ->
+            def model = Model.get(modelId)
             def pendingDataElements = model.contains.findAll { it.status == PublishedElementStatus.PENDING }
             if (pendingDataElements) {
                 def archivedModel = publishedElementService.archiveAndIncreaseVersion(model)
@@ -69,16 +70,18 @@ class Importer {
                 }
             }
             model.status = PublishedElementStatus.FINALIZED
+            model.save(failOnError:true)
         }
     }
 
 
     def void ingestRow(ImportRow row) {
         def conceptualDomain, model, dataType, measurementUnit
-        dataType = importDataType(row.dataElementName, row.dataType)
+        dataType = (row.dataType)?importDataType(row.dataElementName, row.dataType):null
         conceptualDomain = importConceptualDomain(row.conceptualDomainName, row.conceptualDomainDescription)
         model = importModels(row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
         measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
+
         if (dataType) {
             importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
         } else {
@@ -184,10 +187,10 @@ class Importer {
 
 
     protected Model addModelToImport(Model model) {
-        if (!models.contains(model)) {
+        if (!modelIds.contains(model.id)) {
             model.status = PublishedElementStatus.PENDING
             model.save()
-            models.add(model)
+            modelIds.add(model.id)
         }
         return model
     }
