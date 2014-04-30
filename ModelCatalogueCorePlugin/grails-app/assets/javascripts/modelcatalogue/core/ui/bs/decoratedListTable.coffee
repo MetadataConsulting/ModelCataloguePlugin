@@ -24,7 +24,7 @@ angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList'])
             </tr>
         </tbody>
         <tfoot>
-          <tr ng-hide="list.total <= list.page">
+          <tr ng-hide="!list.total || list.total <= list.page">
             <td colspan="{{getColumnsCount()}}" class="text-center">
               <ul class="pagination">
                 <li class="previous dl-table-prev" ng-class="{disabled: !hasPrevious()}"><a ng-click="previous()">Previous</a></li>

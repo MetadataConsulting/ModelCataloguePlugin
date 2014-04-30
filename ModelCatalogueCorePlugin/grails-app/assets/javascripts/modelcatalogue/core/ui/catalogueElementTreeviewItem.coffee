@@ -63,8 +63,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         $rootScope.$broadcast 'treeviewElementSelected', element, $scope.rootId
 
       $rootScope.$on '$stateChangeSuccess', (event, state, params) ->
-        return if state != 'mc.catalogue.show'
-        $scope.active = $scope.element and $scope.element.id == parseInt(params.id ? 0) and names.getPropertyNameFromType($scope.element.elementType) == params.resource
+        return if state.name != 'mc.catalogue.show'
+        $scope.active = $scope.element and $scope.element.id == parseInt(params.id ? 0, 10) and names.getPropertyNameFromType($scope.element.elementType) == params.resource
 
       $rootScope.$on 'treeviewElementSelected', (event, element, id) ->
         return if id and $scope.rootId and id != $scope.rootId

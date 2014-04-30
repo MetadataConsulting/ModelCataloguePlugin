@@ -1,16 +1,19 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
-.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$log', 'element', ($scope, $stateParams, $log, element) ->
+.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
     $scope.element  = element
-    $scope.property = $stateParams.property
-
-    @
 ])
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$log', 'list', ($scope, $stateParams, $log, list) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', ($scope, $stateParams, $state, $log, list, names) ->
     $scope.list = list
+    $scope.title = names.getNaturalName($stateParams.resource)
+    $scope.$watch 'list.currentPage', (newPage) ->
+      newParams = angular.copy $stateParams
+      newParams.page = newPage
+      $state.go 'mc.resource.list', newParams
 
-    @
 ])
 .config(['$stateProvider', ($stateProvider)->
+
+  DEFAULT_ITEMS_PER_PAGE = 10
 
   $stateProvider.state 'mc', {
     abstract: true
@@ -23,13 +26,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all'
+    url: '/all?page'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
     resolve:
         list: ['$stateParams','catalogueElementResource', ($stateParams,catalogueElementResource) ->
-          catalogueElementResource($stateParams.resource).list()
+          page = parseInt($stateParams.page ? 1, 10)
+          catalogueElementResource($stateParams.resource).list(offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE)
         ]
 
     controller: 'mc.core.ui.states.ListCtrl'
@@ -65,13 +69,19 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-show="list.total">
+      <h2>{{title}} List</h2>
       <decorated-list list="list"></decorated-list>
     </div>
   '''
 
   $templateCache.put 'modelcatalogue/core/ui/state/show.html', '''
     <div ng-show="element">
-      <catalogue-element-view element="element" property="property"></catalogue-element-view>
+      <catalogue-element-view element="element"></catalogue-element-view>
     </div>
   '''
+])
+# debug states
+.run(['$rootScope', '$log', ($rootScope, $log) ->
+  $rootScope.$on '$stateChangeSuccess', (event, toState, toParams, fromState, fromParams) ->
+    $log.info "$stateChangeSuccess", toState, toParams, fromState, fromParams
 ])

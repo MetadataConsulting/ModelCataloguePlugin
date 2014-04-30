@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages' , ($scope, $log, $filter, $q, $state, enhance, names, columns, messages) ->
+    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope' , ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -20,7 +20,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           size++
         size
 
-      $scope.property ?= null
+      $scope.property ?= $rootScope?.$stateParams?.property
 
       onPropertyUpdate = (property) ->
         $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: property} if $scope.element
@@ -165,14 +165,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             tab.value = result
 
       $scope.createRelationship = () ->
-        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element}).then (result) ->
+        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
 
       # watches
       $scope.$watch 'element', onElementUpdate
       $scope.$watch 'property', onPropertyUpdate
 
 
-      refreshElement = (element) ->
+      refreshElement = () ->
         if $scope.element
           $scope.element.refresh().then (refreshed)->
             $scope.element = refreshed
@@ -180,8 +180,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.$on 'catalogueElementCreated', refreshElement
       $scope.$on 'catalogueElementDeleted', refreshElement
 
-      $scope.$on '$mc.resource.show.property', (event, state, params) ->
+      $scope.$on '$stateChangeSuccess', (event, state, params) ->
+        return if state.name != 'mc.resource.show.property'
         $scope.property = params.property
+        $log.info "params are", params, "so the property from state is", $scope.property
 
 
       # init
