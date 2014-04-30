@@ -23,16 +23,29 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.property ?= $rootScope?.$stateParams?.property
 
       onPropertyUpdate = (property) ->
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: property} if $scope.element
+        page    = 1
+        isTable = false
         if $scope.showTabs
           if property
             for tab in $scope.tabs
               tab.active = tab.name == property
+              if tab.active
+                isTable = tab.type == 'decorated-list'
+                if isTable and tab.value.total
+                  page = tab.value.currentPage
+
           else
             for tab in $scope.tabs
               if tab.active
                 $scope.property = tab.name
+                isTable = tab.type == 'decorated-list'
+                if isTable and tab.value.total
+                  page = tab.value.currentPage
                 break
+
+        page = undefined if page == 1
+
+        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: property, page: page} if $scope.element
 
       onElementUpdate = (element) ->
         activeTabSet     = false
@@ -183,8 +196,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
         $scope.property = params.property
-        $log.info "params are", params, "so the property from state is", $scope.property
-
 
       # init
       onElementUpdate($scope.element)

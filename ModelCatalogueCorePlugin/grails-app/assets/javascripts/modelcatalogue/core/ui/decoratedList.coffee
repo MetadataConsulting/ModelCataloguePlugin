@@ -10,7 +10,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
-    controller: ['$scope', 'columns', '$q', '$rootScope' , ($scope, columns, $q, $rootScope) ->
+    controller: ['$scope', 'columns', '$q', '$rootScope', '$state', '$stateParams' , ($scope, columns, $q, $rootScope, $state, $stateParams) ->
       $scope.id = null if !$scope.id
 
       columnsDefined = $scope.columns?
@@ -46,7 +46,11 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
           $scope.hasMorePrevPages = lowerTen != 0
           $scope.hasMoreNextPages = (Math.floor(list.total / list.page) + 1) >= upperTen
           $scope.pages = pages
-        $rootScope.$broadcast 'decoratedListChanged', list, $scope.id
+        newParams = angular.copy $stateParams
+        newParams.page = list.currentPage
+        if newParams.page == 1
+          delete newParams.page
+        $state.go '.', newParams
 
       $scope.hasSelection = () -> $scope.selection?
 
@@ -128,7 +132,11 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
             $scope.goto($scope.list.currentPage)
 
 
-
+      $scope.$on '$stateChangeSuccess', (event, state, params) ->
+        return if not $scope.list or not $scope.list.goto
+        page = parseInt(params.page ? 1, 10)
+        if page != $scope.list?.currentPage
+          $scope.goto page
     ]
   }
 ]

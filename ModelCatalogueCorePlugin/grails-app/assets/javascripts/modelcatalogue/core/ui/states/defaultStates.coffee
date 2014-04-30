@@ -5,11 +5,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', ($scope, $stateParams, $state, $log, list, names) ->
     $scope.list = list
     $scope.title = names.getNaturalName($stateParams.resource)
-    $scope.$watch 'list.currentPage', (newPage) ->
-      newParams = angular.copy $stateParams
-      newParams.page = newPage
-      $state.go 'mc.resource.list', newParams
-
 ])
 .config(['$stateProvider', ($stateProvider)->
 
@@ -50,7 +45,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
     controller: 'mc.core.ui.states.ShowCtrl'
   }
-  $stateProvider.state 'mc.resource.show.property', {url: '/:property'}
+  $stateProvider.state 'mc.resource.show.property', {url: '/:property?page'}
 
 ])
 .run(['$rootScope', '$state', '$stateParams', ($rootScope, $state, $stateParams) ->
@@ -81,7 +76,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   '''
 ])
 # debug states
-.run(['$rootScope', '$log', ($rootScope, $log) ->
-  $rootScope.$on '$stateChangeSuccess', (event, toState, toParams, fromState, fromParams) ->
-    $log.info "$stateChangeSuccess", toState, toParams, fromState, fromParams
-])
+#.run(['$rootScope', '$log', ($rootScope, $log) ->
+#  $rootScope.$on '$stateChangeSuccess', (event, toState, toParams, fromState, fromParams) ->
+#    $log.info "$stateChangeSuccess", toState, toParams, fromState, fromParams
+#])

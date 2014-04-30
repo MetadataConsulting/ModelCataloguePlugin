@@ -18,8 +18,6 @@ describe "mc.core.ui.catalogueElementView", ->
     $rootScope.$digest()
 
 
-    #console.log(element.description)
-
     expect(element.prop('tagName').toLowerCase()).toBe('div')
     expect(element.find('h3.ce-name').text()).toBe("#{catEl.name} (#{catEl.elementTypeName}: #{catEl.id})")
     expect(element.find('blockquote.ce-description').text()).toBe(catEl.description)
