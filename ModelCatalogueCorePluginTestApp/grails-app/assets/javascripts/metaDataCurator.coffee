@@ -43,6 +43,7 @@ metadataCurator.controller('metadataCurator.elementTypeList', ['catalogueElement
     $scope.columns.splice(index + 1, 0, angular.copy(column))
 
 
+  # TODO: rewrite to states when finished
   $scope.$on 'showCatalogueElement', (event, element) ->
     $state.go('catalogueElement.show', {elementType: element.elementType.split(".").pop(), elementId: element.id})
 
@@ -155,6 +156,7 @@ metadataCurator.controller('metadataCurator.elementTypeShow', ['catalogueElement
   $scope.element = element
   $scope.columns = columns()
 
+  # TODO: rewrite to states when finished
   $scope.$on 'showCatalogueElement', (event, element) ->
     $state.go('catalogueElement.show', {elementType: element.elementType.split(".").pop(), elementId: element.id})
 

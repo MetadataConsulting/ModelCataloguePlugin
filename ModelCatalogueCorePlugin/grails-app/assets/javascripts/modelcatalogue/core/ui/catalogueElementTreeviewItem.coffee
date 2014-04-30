@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile']).directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', (recursiveCompile) -> {
+angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile']).directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', 'names', (recursiveCompile, names) -> {
     restrict: 'E'
     replace: true
     scope:
@@ -62,8 +62,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.core.catalogueEle
       $scope.select = (element) ->
         $rootScope.$broadcast 'treeviewElementSelected', element, $scope.rootId
 
-      $rootScope.$on 'showCatalogueElement', (event, element) ->
-        $scope.active = isEqual($scope.element, element)
+      $rootScope.$on '$stateChangeSuccess', (event, state, params) ->
+        return if state != 'mc.catalogue.show'
+        $scope.active = $scope.element and $scope.element.id == parseInt(params.id ? 0) and names.getPropertyNameFromType($scope.element.elementType) == params.resource
 
       $rootScope.$on 'treeviewElementSelected', (event, element, id) ->
         return if id and $scope.rootId and id != $scope.rootId

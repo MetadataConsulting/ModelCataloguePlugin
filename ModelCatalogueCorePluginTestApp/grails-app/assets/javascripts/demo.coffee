@@ -79,6 +79,7 @@ angular.module('demo', [
 
   $scope.show()
 
+  # TODO: rewrite to states when finished
   $scope.$on 'showCatalogueElement', (event, element) ->
     $scope.element = element
 

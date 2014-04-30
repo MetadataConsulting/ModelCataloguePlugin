@@ -1,23 +1,26 @@
 describe "mc.core.catalogueElementEnhancer", ->
 
-  beforeEach module 'mc.core.catalogueElementEnhancer'
+  beforeEach module 'mc.core.ui.bs.defaultStates'
   beforeEach module 'mc.core.catalogueElementEnhancer'
 
-  it "broadcasts the showCatalogueElement event on show() method", inject (enhance, $rootScope) ->
+  it "changes the state on show() method", inject (enhance, $rootScope) ->
     enhanced = enhance angular.copy(fixtures.valueDomain.showOne)
 
     event    = null
-    element  = null
+    toState  = null
+    toParams = null
 
-    $rootScope.$on 'showCatalogueElement', (_event_, _element_) ->
-      event   = _event_
-      element = _element_
+    $rootScope.$on '$stateChangeSuccess', (_event_, _toState_, _toParams_) ->
+      event     = _event_
+      toState   = _toState_
+      toParams  = _toParams_
 
     $rootScope.$digest()
 
     expect(enhance.isEnhancedBy(enhanced, 'catalogueElement')).toBeTruthy()
     expect(event).toBeNull()
-    expect(element).toBeNull()
+    expect(toState).toBeNull()
+    expect(toParams).toBeNull()
 
     expect(enhanced.show).toBeFunction()
 
@@ -26,7 +29,9 @@ describe "mc.core.catalogueElementEnhancer", ->
     $rootScope.$digest()
 
     expect(event).not.toBeNull()
-    expect(element).toEqual(enhanced)
+    expect(toState).not.toBeNull()
+    expect(toState.name).toEqual('mc.resource.show')
+    expect(toParams).toEqual({resource: 'valueDomain', id: "#{enhanced.id}"})
     expect(self).toEqual(enhanced)
 
   it "returns expected results for instance of", inject (enhance) ->

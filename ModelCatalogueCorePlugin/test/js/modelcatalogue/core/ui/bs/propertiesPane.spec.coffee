@@ -1,5 +1,6 @@
 describe "mc.core.ui.propertiesPane", ->
 
+  beforeEach module 'mc.core.ui.bs.defaultStates'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
   beforeEach module 'mc.core.catalogueElementEnhancer'
   beforeEach module 'mc.core.ui.bs.propertiesPane'
@@ -50,12 +51,10 @@ describe "mc.core.ui.propertiesPane", ->
 
     shown = null
 
-    $rootScope.$on 'showCatalogueElement', (ignored, el) ->
-      shown = el
+    $rootScope.$on '$stateChangeSuccess', (ignored, ignored2, params) ->
+      shown = params
 
     expect(shown).toBeNull()
-
-    console.log/
 
     link = element.find('tbody tr:nth-child(4) td.pp-table-property-element-value a')
 
