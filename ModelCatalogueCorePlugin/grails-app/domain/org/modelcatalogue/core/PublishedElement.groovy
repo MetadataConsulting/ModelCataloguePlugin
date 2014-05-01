@@ -13,7 +13,10 @@ abstract class PublishedElement extends CatalogueElement {
     //to do this
     PublishedElementStatus status = PublishedElementStatus.DRAFT
 
-    static searchable = true
+    static searchable = {
+        modelCatalogueId boost:10
+        except = ['versionNumber']
+    }
 
     @Override
     boolean isArchived() {
@@ -21,16 +24,17 @@ abstract class PublishedElement extends CatalogueElement {
         !status.modificable
     }
     static constraints = {
-        modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: 'MC_\\d+_\\d+'
-        status validator: { val , obj->
-            if(!val){ return true}
-            def oldStatus = null
-            if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
-            if (oldStatus == PublishedElementStatus.FINALIZED && val != PublishedElementStatus.FINALIZED) {
-                return ['validator.finalized']
-            }
-            return true
-         }
+        modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
+//        TODO we need to think about what restrictions we put on publishing elements
+//        status validator: { val , obj->
+//            if(!val){ return true}
+//            def oldStatus = null
+//            if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
+//            if (oldStatus == PublishedElementStatus.FINALIZED && val != PublishedElementStatus.FINALIZED) {
+//                return ['validator.finalized']
+//            }
+//            return true
+//         }
     }
 
     static relationships = [
@@ -41,7 +45,7 @@ abstract class PublishedElement extends CatalogueElement {
 
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
     }
 
     def afterInsert(){
@@ -51,14 +55,13 @@ abstract class PublishedElement extends CatalogueElement {
     }
 
     def updateModelCatalogueId() {
-        if (!getId()) { throw new IllegalStateException("Cannot assign the model catalogue id before the entity is persisted. Please, persist the entity first.") }
-        modelCatalogueId = "MC_" + getId() + "_" + getVersionNumber()
+        modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
     }
 
 
     def getBareModelCatalogueId() {
         afterInsert()
-        (modelCatalogueId =~ /(MC_(.+))_(\d+)/)[0][1]
+        (modelCatalogueId =~ '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+')
     }
 
 }
