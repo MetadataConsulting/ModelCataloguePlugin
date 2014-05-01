@@ -49,16 +49,22 @@ abstract class PublishedElement extends CatalogueElement {
     }
 
     def afterInsert(){
-        if(!getModelCatalogueId()){
-            modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
-        }
+
+    }
+
+    def createModelCatalogueId(){
+        modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
     }
 
 
     def updateModelCatalogueId() {
-        def newCatalogueId = modelCatalogueId.split("_")
-        newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
-        modelCatalogueId = newCatalogueId.join("_")
+        if(getModelCatalogueId()) {
+            def newCatalogueId = modelCatalogueId.split("_")
+            newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
+            modelCatalogueId = newCatalogueId.join("_")
+        }else{
+            createModelCatalogueId()
+        }
     }
 
 
