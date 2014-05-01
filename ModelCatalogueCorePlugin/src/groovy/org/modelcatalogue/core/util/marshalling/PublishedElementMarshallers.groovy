@@ -18,7 +18,8 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
         ret.putAll(
                 versionNumber: el.versionNumber,
                 status: el.status.toString(),
-                modelCatalogueId: el.modelCatalogueId
+                modelCatalogueId: el.modelCatalogueId,
+                history: true
         )
         ret
     }

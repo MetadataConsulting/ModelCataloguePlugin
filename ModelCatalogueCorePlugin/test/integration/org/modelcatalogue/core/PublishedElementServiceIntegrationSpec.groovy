@@ -59,7 +59,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         originalVersion == newVersion - 1
         archivedVersion == originalVersion
 
-        author.supersedes.contains(archived)
+        author.supersededBy.contains(archived)
 
         author.instantiatedBy.size()    == 1
         archived.instantiatedBy.size()  == 1
@@ -73,50 +73,12 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
 
         then:
-        archived.countSupersedes()        == 0
-        anotherArchived.countSupersedes() == 1
-        author.countSupersedes()          == 1
-        author.supersedes.contains(anotherArchived)
-        anotherArchived.supersedes.contains(archived)
+        archived.countSupersededBy()        == 0
+        anotherArchived.countSupersededBy() == 1
+        author.countSupersededBy()          == 1
 
-    }
-
-    def "create new version of a data element, as it is contained in a model this updates the containing model (i.e. the model is not pending)"() {
-        DataElement author = DataElement.findByName('DE_author')
-        Model book = Model.findByNameAndStatus("book", "FINALIZED")
-        book.addToContains(author)
-
-        when:
-        def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
-        Model oldBook = Model.findByNameAndStatus("book", "ARCHIVED")
-
-        then:
-
-        author.supersedes.contains(anotherArchived)
-        book.supersedes.contains(oldBook)
-        book.contains.contains(author)
-        !book.contains.contains(anotherArchived)
-        oldBook.contains.contains(anotherArchived)
-    }
-
-    def "create new version of data element that doesn't updated containing model whilst the model is pending"() {
-        DataElement author = DataElement.findByName('auth')
-        Model book = Model.findByName("chapter1")
-        book.addToContains(author)
-
-        when:
-        book.status = PublishedElementStatus.PENDING
-        book.save(flush:true)
-        def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
-        Model oldBook = Model.findByNameAndStatus("chapter1", "ARCHIVED")
-
-        then:
-
-        !oldBook
-        author.supersedes.contains(anotherArchived)
-        book.contains.contains(author)
-        author.status==PublishedElementStatus.PENDING
-
+        author.supersededBy.contains(anotherArchived)
+        anotherArchived.supersededBy.contains(archived)
     }
 
 }

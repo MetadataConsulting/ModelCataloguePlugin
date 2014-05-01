@@ -33,12 +33,6 @@ class ModelCatalogueCorePluginUrlMappings {
             "/$controller/$id/incoming/$type" {
                 action = [GET: "incoming", POST: "addIncoming", DELETE: "removeIncoming"]
             }
-            "/$controller/$id/mapping" {
-                action = [GET: "mappings"]
-                constraints {
-                    controller inList: ['valueDomain']
-                }
-            }
             "/$controller/$id/mapping/$destination" {
                 action = [POST: "addMapping", DELETE: "removeMapping"]
                 constraints {
@@ -50,6 +44,13 @@ class ModelCatalogueCorePluginUrlMappings {
                 constraints {
                     controller inList: ['dataType']
                 }
+            }
+            "/$controller/$id/mapping" {
+                action = [GET: "mappings"]
+            }
+
+            "/$controller/$id/history" {
+                action = [GET: "history"]
             }
 
             constraints {

@@ -7,7 +7,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', 'enhance', 'names', 'columns', 'messages' , ($scope, $log, $filter, $q, enhance, names, columns, messages) ->
+    controller: ['$scope', '$log', '$filter', '$q', '$rootScope', 'enhance', 'names', 'columns', 'messages' , ($scope, $log, $filter, $q, $rootScope, enhance, names, columns, messages) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -82,6 +82,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           unless angular.isObject(obj) and !angular.isArray(obj) and !enhance.isEnhanced(obj)
             continue
           tabDefinition =
+            name:       name
             heading:    names.getNaturalName(name)
             value:      obj
             disabled:   obj == undefined or obj == null or getObjectSize(obj) == 0
@@ -116,14 +117,15 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               continue
             newProperties.push(label: names.getNaturalName(prop), value: getPropertyVal(prop))
 
-          tabDefintion =
+          tabDefinition =
+            name:       'properties'
             heading:    'Properties'
             value:      element
             disabled:   getObjectSize(newProperties) == 0
             properties: newProperties
             type:       'properties-pane'
 
-          tabs.unshift tabDefintion
+          tabs.unshift tabDefinition
 
 
         showTabs = false
@@ -140,13 +142,25 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         $scope.showTabs = showTabs
 
       $scope.tabs   = []
-      $scope.doLoad = (tab) ->
+      $scope.select = (tab) ->
+        $rootScope.$broadcast 'viewTabSelected', tab, $scope.id
         return if not tab.loader?
         if !tab.disabled and tab.value.empty
           tab.loader().then (result) ->
             tab.columns = columns(result.itemType)
             tab.value = result
 
+      $rootScope.$on 'viewTabSelected', (event, tab, id) ->
+        return if id and $scope.id and id != $scope.id
+        return if tab.active
+        if tab.active?
+          tab.active = true
+          return
+        for theTab in $scope.tabs
+          if tab.name == theTab.name
+            theTab.active = true
+            $scope.showTabs = true
+            break
 
 
       $scope.createRelationship = () ->

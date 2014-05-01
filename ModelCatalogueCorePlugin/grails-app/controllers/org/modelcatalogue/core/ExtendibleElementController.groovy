@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
 
-class ExtendibleElementController extends AbstractCatalogueElementController<ExtendibleElement> {
+class ExtendibleElementController extends AbstractPublishedElementController<ExtendibleElement> {
 
     ExtendibleElementController() {
         super(ExtendibleElement, true)

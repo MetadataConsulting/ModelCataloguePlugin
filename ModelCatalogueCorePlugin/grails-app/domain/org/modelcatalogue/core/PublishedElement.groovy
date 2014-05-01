@@ -1,7 +1,5 @@
 package org.modelcatalogue.core
 
-import java.util.UUID
-
 abstract class PublishedElement extends CatalogueElement {
 
     //version number - this gets iterated every time a new version is created from a finalized version
@@ -15,10 +13,7 @@ abstract class PublishedElement extends CatalogueElement {
     //to do this
     PublishedElementStatus status = PublishedElementStatus.DRAFT
 
-    static searchable = {
-        modelCatalogueId boost:10
-        except = ['versionNumber']
-    }
+    static searchable = true
 
     @Override
     boolean isArchived() {
@@ -26,18 +21,16 @@ abstract class PublishedElement extends CatalogueElement {
         !status.modificable
     }
     static constraints = {
-        modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
-
-//TODO we need to think about the way in which published element status changes
-//        status validator: { val , obj->
-//            if(!val){ return true}
-//            def oldStatus = null
-//            if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
-//            if (oldStatus == PublishedElementStatus.FINALIZED && val != PublishedElementStatus.FINALIZED) {
-//                return ['validator.finalized']
-//            }
-//            return true
-//         }
+        modelCatalogueId nullable:true, unique:true, maxSize: 255, matches: 'MC_\\d+_\\d+'
+        status validator: { val , obj->
+            if(!val){ return true}
+            def oldStatus = null
+            if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
+            if (oldStatus == PublishedElementStatus.FINALIZED && val != PublishedElementStatus.FINALIZED) {
+                return ['validator.finalized']
+            }
+            return true
+         }
     }
 
     static relationships = [
@@ -46,14 +39,26 @@ abstract class PublishedElement extends CatalogueElement {
     ]
 
 
+
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
     }
 
     def afterInsert(){
         if(!getModelCatalogueId()){
-            modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
+            updateModelCatalogueId()
         }
+    }
+
+    def updateModelCatalogueId() {
+        if (!getId()) { throw new IllegalStateException("Cannot assign the model catalogue id before the entity is persisted. Please, persist the entity first.") }
+        modelCatalogueId = "MC_" + getId() + "_" + getVersionNumber()
+    }
+
+
+    def getBareModelCatalogueId() {
+        afterInsert()
+        (modelCatalogueId =~ /(MC_(.+))_(\d+)/)[0][1]
     }
 
 }

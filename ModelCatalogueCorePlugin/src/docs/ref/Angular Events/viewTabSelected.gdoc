@@ -1,0 +1,25 @@
+h1. viewTabSelected
+
+Event broadcast on the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope] when an tab is selected in
+ [catalogue-element-view|Angular Directives]. It passes the tab definition as the second argument to handler function and
+ optionally the id of the view as the third argument.
+ You can broadcast the event on yourself with element you want to select in the tree view.
+
+
+h2. Usage
+Register the handler on the current scope or the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope]
+to listen to tab selection event.
+
+{code}
+$scope.$on('viewTabSelected', function(event, tab, id) {
+    // e.g. changing the current route
+})
+{code}
+
+Broadcast the event on the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope] to get the tab
+selected in the view. @id@ parameter is optional and if specified only view matching given id will be used.
+You don't have to pass whole tab definition, only name is required.
+
+{code}
+$rootScope.$broadcast 'viewTabSelected', {name: 'properties'}, id
+{code}

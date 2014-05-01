@@ -39,6 +39,7 @@ class PublishedElementService {
         }
 
         element.versionNumber++
+        element.updateModelCatalogueId()
 
         def newCatalogueId =  element.modelCatalogueId.split("_")
         newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
@@ -50,6 +51,7 @@ class PublishedElementService {
         }
 
         archived.status = PublishedElementStatus.ARCHIVED
+        archived.modelCatalogueId = archived.bareModelCatalogueId + "_" + archived.versionNumber
 
 
         if (!archived.save()) {
