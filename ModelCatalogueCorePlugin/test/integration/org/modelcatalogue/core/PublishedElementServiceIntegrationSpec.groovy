@@ -45,6 +45,8 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         DataElement author      = DataElement.findByName('DE_author')
         ValueDomain domain      = ValueDomain.findByName('value domain test1')
 
+
+        author.ext.something = 'anything'
         author.addToInstantiatedBy(domain)
 
         int originalVersion     = author.versionNumber
@@ -58,6 +60,8 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         originalVersion != newVersion
         originalVersion == newVersion - 1
         archivedVersion == originalVersion
+
+        archived.ext.something == 'anything'
 
         author.supersededBy.contains(archived)
 
