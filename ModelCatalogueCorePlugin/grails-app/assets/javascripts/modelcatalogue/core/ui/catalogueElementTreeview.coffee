@@ -28,7 +28,6 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
           $scope.hasMore  = list.total > $scope.children.length
 
       onListChange = (list) ->
-        $log.info "onListChange: ", list
         $scope.children = []
         return if not list
         addItemsFromList(list)
@@ -43,8 +42,5 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
       if $scope.mode == 'list'
         onListChange $scope.list
         $scope.$watch 'list', onListChange
-
-      $log.info 'scope for treeview: ', $scope
-
   }
 ]
