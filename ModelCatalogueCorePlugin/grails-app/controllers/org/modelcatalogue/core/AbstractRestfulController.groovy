@@ -137,6 +137,9 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if (params.search){
             link +=  "&search=${params.search}"
         }
+        if (params.toplevel){
+            link +=  "&toplevel=${params.toplevel}"
+        }
         def nextLink = ""
         def previousLink = ""
         if (params?.max && params.max < total) {

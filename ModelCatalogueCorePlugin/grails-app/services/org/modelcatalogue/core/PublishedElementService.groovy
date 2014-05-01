@@ -81,7 +81,7 @@ class PublishedElementService {
     }
 
 
-    private static PublishedElementStatus getStatusFromParams(params) {
+    static PublishedElementStatus getStatusFromParams(params) {
         if (!params.status) {
             return PublishedElementStatus.FINALIZED
         }
