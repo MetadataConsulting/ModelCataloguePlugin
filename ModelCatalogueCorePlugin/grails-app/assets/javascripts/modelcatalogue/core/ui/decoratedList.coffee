@@ -54,7 +54,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
         if not $state.current.abstract and not $scope.stateless
           newParams = angular.copy $stateParams
           newParams[pageParam] = list.currentPage
-          if newParams[pageParam] == 1
+          if newParams[pageParam] == 1 or isNaN(newParams[pageParam])
             newParams[pageParam] = undefined
           $state.go '.', newParams
 

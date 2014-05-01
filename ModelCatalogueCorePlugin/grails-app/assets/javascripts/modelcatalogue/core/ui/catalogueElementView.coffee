@@ -43,7 +43,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                   page = tab.value.currentPage
                 break
 
-        page = undefined if page == 1
+        page = undefined if page == 1 or isNaN(page)
 
         $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: property, page: page} if $scope.element
 
