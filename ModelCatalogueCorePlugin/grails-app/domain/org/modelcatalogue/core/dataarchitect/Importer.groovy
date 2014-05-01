@@ -83,7 +83,7 @@ class Importer {
         measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
 
         if (dataType) {
-            importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
+            importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
         } else {
             importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model)
         }
@@ -93,46 +93,42 @@ class Importer {
     def importDataType(String name, String data) {
 
         def dataTypeReturn
-        String[] lines = data.split("\\r?\\n");
+        if(!data.contains("|")) {
+            String[] lines = data.split("\\r?\\n");
 
-//          if there is more than one line assume that the data type is enumerated and parse enumerations
-//          the script accepts enumerations in the format
-//          01=theatre and recovery
-//          02=recovery only (usrd as a temporary ccu)
-//          03=other ward
-
-        if (lines.size() > 0 && lines[] != null) {
-            Map enumerations = new HashMap()
-            lines.each { enumeratedValues ->
-                def EV = enumeratedValues.split(":")
-                if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
-                    def key = EV[0]
-                    def value = EV[1]
-                    if (value.size() > 244) {
-                        value = value[0..244]
+            if (lines.size() > 0 && lines[] != null) {
+                Map enumerations = new HashMap()
+                lines.each { enumeratedValues ->
+                    def EV = enumeratedValues.split(":")
+                    if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
+                        def key = EV[0]
+                        def value = EV[1]
+                        if (value.size() > 244) {
+                            value = value[0..244]
+                        }
+                        key = key.trim()
+                        value = value.trim()
+                        if (value.isEmpty()) {
+                            value = "_"
+                        }
+                        enumerations.put(key, value)
                     }
-                    key = key.trim()
-                    value = value.trim()
-                    if (value.isEmpty()) {
-                        value = "_"
+                }
+                if (!enumerations.isEmpty()) {
+                    String enumString = enumerations.sort() collect { key, val ->
+                        "${this.quote(key)}:${this.quote(val)}"
+                    }.join('|')
+                    dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
+                    if (!dataTypeReturn) {
+                        dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
                     }
-                    enumerations.put(key, value)
                 }
             }
-
-            if (!enumerations.isEmpty()) {
-
-                String enumString = enumerations.sort() collect { key, val ->
-                    "${this.quote(key)}:${this.quote(val)}"
-                }.join('|')
-
-                dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
-                if (!dataTypeReturn) {
-                    dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
-                }
-
+        }else{
+            dataTypeReturn = EnumeratedType.findWhere(enumAsString: data)
+            if (!dataTypeReturn) {
+                dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumAsString: data).save()
             }
-            //}
         }
 
         if (!dataTypeReturn) {
@@ -151,9 +147,13 @@ class Importer {
 
     def importConceptualDomain(String name, String description) {
         name = name.trim()
-        ConceptualDomain cd = ConceptualDomain.findByName(name)
-        if (!cd) { cd = new ConceptualDomain(name: name, description: description).save() }
-        return cd
+        ConceptualDomain conceptualDomain = ConceptualDomain.findByName(name)
+        if (!conceptualDomain) { conceptualDomain = new ConceptualDomain(name: name, description: description).save() }
+        //TODO remove this - this is a hack, we need to ensure that there is always a top level model catalogue model
+        //that all the models are children of. This model must be unique and must have the context of all the conceptual domains
+        def modelCatalogueModel = Model.findByName("ModelCatalogue")
+        if(modelCatalogueModel){modelCatalogueModel.addToHasContextOf(conceptualDomain)}
+        return conceptualDomain
     }
 
 
@@ -204,7 +204,7 @@ class Importer {
         // otherwise find them and create a parentChild relationship
         modelPath.inject { String parentName, String childName ->
             def namedChildren = []
-            def match
+            def match = null
 
             //if there isn't a name for the child return the parentName
             if (!childName) { return parentName}
@@ -213,7 +213,7 @@ class Importer {
 
             namedChildren = Model.findAllByName(childName)
             namedChildren.each { Model childModel ->
-                if (childModel.childOf.collect { it.name }.contains(parentName)) {
+                if (childModel.childOf.collect { it.name }.contains(parentName) && childModel.hasContextOf.contains(conceptualDomain)) {
                     match = childModel
                 }
             }
@@ -234,7 +234,13 @@ class Importer {
                 modelToReturn = child
 
                 //see if the parent model exists
-                parent = Model.findWhere("name": parentName)
+                //TODO I'm sure we can clean this up
+                //it would be nice to create methods that allowed you to do a findAllByNameAndContext etc.
+                def namedParents = Model.findAllByName(parentName)
+                namedParents.each{ Model p ->
+                    if(p.hasContextOf.contains(conceptualDomain)) {parent = p}
+                }
+
                 //create the parent model
                 if (!parent) {
                     if (parentParams.name == parentName) {
@@ -269,9 +275,9 @@ class Importer {
         }
         metadata.each { key, value ->
             if (key) {
-                key = key.take(255)
+                key = key.toString().take(255)
             }
-            value = (value && value != "") ? value.take(255) : null
+            value = (value && value != "") ? value.toString().take(255) : null
             if (dataElement.ext.get(key) != value) {
                 hasDataElementChanged = true
             }
@@ -282,10 +288,10 @@ class Importer {
     protected DataElement updateMetadata(Map metadata, DataElement dataElement) {
         metadata.each { key, value ->
             if (key) {
-                key = key.take(255)
+                key = key.toString().take(255)
             }
             if (value) {
-                value = value.take(255)
+                value = value.toString().take(255)
             }
             dataElement.ext.put(key, value)
         }
