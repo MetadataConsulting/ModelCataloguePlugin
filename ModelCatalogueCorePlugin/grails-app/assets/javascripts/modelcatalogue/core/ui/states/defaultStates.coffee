@@ -16,7 +16,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     ]
 
     if $scope.resource == 'model'
-
       for item in list
         item._containedElements_ = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
 
@@ -50,8 +49,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     resolve:
         list: ['$stateParams','catalogueElementResource', ($stateParams,catalogueElementResource) ->
           page = parseInt($stateParams.page ? 1, 10)
+          page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only model controller will respond on it
-          catalogueElementResource($stateParams.resource).list(offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true)
+          params = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
+          catalogueElementResource($stateParams.resource).list(params)
         ]
 
     controller: 'mc.core.ui.states.ListCtrl'
@@ -91,14 +92,16 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       <decorated-list list="list"></decorated-list>
     </div>
     <div ng-if="resource == 'model'">
-      <div class="row" ng-repeat="element in list.list">
-        <div class="col-md-12"><h2>{{element.name}}</h2></div>
+      <div class="row">
+        <div class="col-md-4"><h2>Model Hierarchy</h2></div>
+        <div class="col-md-8"><h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements</h3></div>
+      </div>
+      <div class="row">
         <div class="col-md-4">
-          <catalogue-element-treeview element="element" descend="'parentOf'"></catalogue-element-treeview>
+          <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
         <div class="col-md-8">
-          <h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements</h3>
-          <decorated-list list="containedElements" columns="containedElementsColumns"></decorated-list>
+          <decorated-list list="containedElements" columns="containedElementsColumns" stateless="true"></decorated-list>
         </div>
         <hr/>
       </div>
