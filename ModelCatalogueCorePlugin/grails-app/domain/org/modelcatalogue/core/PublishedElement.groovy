@@ -61,7 +61,7 @@ abstract class PublishedElement extends CatalogueElement {
 
     def getBareModelCatalogueId() {
         afterInsert()
-        (modelCatalogueId =~ '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+')
+        (modelCatalogueId =~ /(?i)(MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}))/)[0][1]
     }
 
 }
