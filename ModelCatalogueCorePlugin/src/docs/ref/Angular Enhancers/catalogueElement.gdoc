@@ -5,7 +5,7 @@ following methods @delete@, @update@, @validate@, @refresh@, @show@. First three
 to the methods of the same name in [catalogueElementResource|Angular Services].
 The @refresh@ method returns promise to latest version of current element fetched again from the backend.
 The @show@ method
-triggers [showCatalogueElement|Angular Events] event allowing you to plug in custom display logic.
+changes ui router state to @mc.resource.show@ with the correct @resource@ and @id@ parameter.
 
 h2. Condition
 

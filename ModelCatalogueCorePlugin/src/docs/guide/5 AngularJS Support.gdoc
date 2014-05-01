@@ -38,15 +38,6 @@ the AngularJS support.
 </script>
 {code}
 
-When catalogue element is requested to be shown, [showCatalogueElement|Angular Events] is broadcast. You should
-respond to that event accordingly showing the request catalogue element e.g. by changing the current location hash.
-
-{code}
-$scope.on('showCatalogueElement', function(event, element) {
-    // display the element by e.g. changing the current route
-})
-{code}
-
 h2. AngularJS Services
 
 There is several services provided out of the box for this plugin. The most important services are [modelCatalogueSearch|Angular Services]

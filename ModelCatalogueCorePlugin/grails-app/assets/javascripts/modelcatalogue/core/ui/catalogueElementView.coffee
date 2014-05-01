@@ -1,13 +1,14 @@
-angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns']).directive 'catalogueElementView',  [-> {
+angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'ui.router']).directive 'catalogueElementView',  [-> {
     restrict: 'E'
     replace: true
     scope:
       element: '='
+      property: '=?'
       id: '@'
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$rootScope', 'enhance', 'names', 'columns', 'messages' , ($scope, $log, $filter, $q, $rootScope, enhance, names, columns, messages) ->
+    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope' , ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -19,16 +20,37 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           size++
         size
 
+      $scope.property ?= $rootScope?.$stateParams?.property
+
+      onPropertyUpdate = (property) ->
+        page    = 1
+        isTable = false
+        if $scope.showTabs
+          if property
+            for tab in $scope.tabs
+              tab.active = tab.name == property
+              if tab.active
+                isTable = tab.type == 'decorated-list'
+                if isTable and tab.value.total
+                  page = tab.value.currentPage
+
+          else
+            for tab in $scope.tabs
+              if tab.active
+                $scope.property = tab.name
+                isTable = tab.type == 'decorated-list'
+                if isTable and tab.value.total
+                  page = tab.value.currentPage
+                break
+
+        page = undefined if page == 1
+
+        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: property, page: page} if $scope.element
+
       onElementUpdate = (element) ->
-        activeTabHeading = null
         activeTabSet     = false
 
-        if $scope.showTabs
-          for tab in $scope.tabs
-            if tab.active
-              activeTabHeading = tab.heading
-              break
-
+        onPropertyUpdate($scope.property)
 
         tabs = []
 
@@ -45,7 +67,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             actions:  []
             name:     name
 
-          if fn.itemType == 'org.modelcatalogue.core.Relationship'
+
+          if tabDefinition.name == 'history'
+            tabDefinition.columns = [
+              {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
+              {header: "Name", value: 'name', class: 'col-md-5', show: true}
+              {header: "Description", value: 'description', class: 'col-md-6'}
+            ]
+          else if fn.itemType == 'org.modelcatalogue.core.Relationship'
             tabDefinition.actions.push {
               title:  'Remove'
               icon:   'remove'
@@ -69,7 +98,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
             }
 
-          if tabDefinition.heading == activeTabHeading
+          if tabDefinition.name == $scope.property
             tabDefinition.active = true
             activeTabSet = true
 
@@ -96,7 +125,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               value: getPropertyVal(key)
             }
 
-          if tabDefinition.heading == activeTabHeading
+          if tabDefinition.name == $scope.property
             tabDefinition.active = true
             activeTabSet = true
 
@@ -118,12 +147,16 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             newProperties.push(label: names.getNaturalName(prop), value: getPropertyVal(prop))
 
           tabDefinition =
-            name:       'properties'
             heading:    'Properties'
+            name:       'properties'
             value:      element
             disabled:   getObjectSize(newProperties) == 0
             properties: newProperties
             type:       'properties-pane'
+
+          if tabDefinition.name == $scope.property
+            tabDefinition.active = true
+            activeTabSet = true
 
           tabs.unshift tabDefinition
 
@@ -133,6 +166,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           for tab in tabs
             if not tab.disabled
               tab.active = true
+              $scope.property = tab.name
               showTabs = true
               break
         else
@@ -143,34 +177,22 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.tabs   = []
       $scope.select = (tab) ->
-        $rootScope.$broadcast 'viewTabSelected', tab, $scope.id
+        $scope.property = tab.name
         return if not tab.loader?
         if !tab.disabled and tab.value.empty
           tab.loader().then (result) ->
             tab.columns = columns(result.itemType)
             tab.value = result
 
-      $rootScope.$on 'viewTabSelected', (event, tab, id) ->
-        return if id and $scope.id and id != $scope.id
-        return if tab.active
-        if tab.active?
-          tab.active = true
-          return
-        for theTab in $scope.tabs
-          if tab.name == theTab.name
-            theTab.active = true
-            $scope.showTabs = true
-            break
-
-
       $scope.createRelationship = () ->
-        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element}).then (result) ->
-          $log.info('Got following from Create Relationship dialog', result)
+        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
 
       # watches
       $scope.$watch 'element', onElementUpdate
+      $scope.$watch 'property', onPropertyUpdate
 
-      refreshElement = (element) ->
+
+      refreshElement = () ->
         if $scope.element
           $scope.element.refresh().then (refreshed)->
             $scope.element = refreshed
@@ -178,6 +200,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.$on 'catalogueElementCreated', refreshElement
       $scope.$on 'catalogueElementDeleted', refreshElement
 
+      $scope.$on '$stateChangeSuccess', (event, state, params) ->
+        return if state.name != 'mc.resource.show.property'
+        $scope.property = params.property
 
       # init
       onElementUpdate($scope.element)

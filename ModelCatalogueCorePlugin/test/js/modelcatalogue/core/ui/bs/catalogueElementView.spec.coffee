@@ -1,5 +1,6 @@
 describe "mc.core.ui.catalogueElementView", ->
 
+  beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.ui.bs.catalogueElementView'
   beforeEach module 'mc.core.ui.bs.decoratedListTable'
 
@@ -16,8 +17,6 @@ describe "mc.core.ui.catalogueElementView", ->
 
     $rootScope.$digest()
 
-
-    #console.log(element.description)
 
     expect(element.prop('tagName').toLowerCase()).toBe('div')
     expect(element.find('h3.ce-name').text()).toBe("#{catEl.name} (#{catEl.elementTypeName}: #{catEl.id})")

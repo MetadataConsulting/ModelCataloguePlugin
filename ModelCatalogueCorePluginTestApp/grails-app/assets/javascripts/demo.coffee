@@ -79,14 +79,12 @@ angular.module('demo', [
 
   $scope.show()
 
+  # TODO: rewrite to states when finished
   $scope.$on 'showCatalogueElement', (event, element) ->
     $scope.element = element
 
   $scope.$on 'treeviewElementSelected', (event, element) ->
     $scope.selectedInTreeview = element
-
-  $scope.$on 'decoratedListChanged', (event, list, id) ->
-    $log.info "list #{id} changed:", list
 
   onDescendPathChange = (path) ->
     if path.indexOf(',') > -1

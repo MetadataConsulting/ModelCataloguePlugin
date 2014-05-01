@@ -12,6 +12,7 @@
 
 angular.module('mc.core.ui', [
   # depends on
+  'ui.router',
   'mc.core'
   # list of modules
   'mc.core.ui.decoratedList'

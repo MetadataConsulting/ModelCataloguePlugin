@@ -1,5 +1,6 @@
 describe "mc.core.ui.decoratedListTable", ->
 
+  beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.catalogueElementResource'
   beforeEach module 'mc.core.catalogueElementEnhancer'
   beforeEach module 'mc.core.modelCatalogueApiRoot'
@@ -128,17 +129,21 @@ describe "mc.core.ui.decoratedListTable", ->
     ''')($rootScope)
     $rootScope.$digest()
 
-    event = null
-    payload = null
-    $rootScope.$on 'showCatalogueElement', (_event_, _payload_) ->
+    event   = null
+    state   = null
+    params  = null
+    $rootScope.$on '$stateChangeSuccess', (_event_, _state_, _params_) ->
       event   = _event_
-      payload = _payload_
+      state   = _state_
+      params  = _params_
+
 
     expect(event).toBeNull()
 
     $rootScope.$digest()
     expect(event).toBeNull()
-    expect(payload).toBeNull()
+    expect(state).toBeNull()
+    expect(params).toBeNull()
 
     link = element.find('tbody tr:first-child td a')
 
@@ -149,8 +154,8 @@ describe "mc.core.ui.decoratedListTable", ->
     $rootScope.$digest()
 
     expect(event).not.toBeNull()
-    expect(payload).not.toBeNull()
-    expect(payload).toEqual($rootScope.muList.list[0])
+    expect(state).not.toBeNull()
+    expect(state.name).toEqual('mc.resource.show')
 
 
 
