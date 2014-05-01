@@ -41,10 +41,6 @@ class PublishedElementService {
         element.versionNumber++
         element.updateModelCatalogueId()
 
-        def newCatalogueId =  element.modelCatalogueId.split("_")
-        newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
-        element.modelCatalogueId = newCatalogueId.join("_")
-
         if (!element.save(flush: true)) {
             log.error(element.errors)
             throw new IllegalArgumentException("Cannot update version of $element. See application log for errors.")
