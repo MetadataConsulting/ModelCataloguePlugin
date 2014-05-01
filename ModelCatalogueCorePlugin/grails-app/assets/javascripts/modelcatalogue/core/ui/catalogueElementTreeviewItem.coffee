@@ -23,7 +23,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       createShowMore  = (list) ->
         ->
-          $scope.hasMore = false
           list.next().then (nextList) ->
             for item in nextList.list
               $scope.children.push(item.relation)

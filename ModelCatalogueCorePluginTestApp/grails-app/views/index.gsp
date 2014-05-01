@@ -81,23 +81,24 @@
         <columns-configuration columns="columns"></columns-configuration>
     </div>
 
-    <div ng-show="element.elementType">
+    <div>
         <div class="row">
-
-        <h2>Tree View</h2>
-        <div>
-            <form class="form" role="form">
-                <div class="form-group">
-                    <label for="descendPath">Descend Path</label>
-                    <input type="text" id="descendPath" ng-model="descendPath" class="form-control">
-                    <label for="selectedInTreeview">Selection</label>
-                    <input type="text" id="selectedInTreeview" ng-model="selectedInTreeview" catalogue-element-picker>
+            <div class="col-md-12">
+                <h2>Tree View</h2>
+                <div>
+                    <form class="form" role="form">
+                        <div class="form-group">
+                            <label for="descendPath">Descend Path</label>
+                            <input type="text" id="descendPath" ng-model="descendPath" class="form-control">
+                            <label for="selectedInTreeview">Selection</label>
+                            <input type="text" id="selectedInTreeview" ng-model="selectedInTreeview" catalogue-element-picker>
+                        </div>
+                    </form>
                 </div>
-            </form>
-        </div>
-        <div class="col-md-8">
-            <catalogue-element-treeview element="element" descend="descend" id="tree-widget" repeat="true"></catalogue-element-treeview>
-        </div>
+                <div class="col-md-8">
+                    <catalogue-element-treeview list="list" descend="descend" id="tree-widget" repeat="true"></catalogue-element-treeview>
+                </div>
+            </div>
         </div>
     </div>
     <div>
