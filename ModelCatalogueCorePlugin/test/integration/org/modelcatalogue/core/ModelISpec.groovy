@@ -20,37 +20,6 @@ class ModelISpec extends AbstractIntegrationSpec{
         book.delete()
     }
 */
-    def "create a new model, finalize it and then try to change it"(){
-
-        when:
-
-        Model modelInstance = Model.get(book.id)
-        modelInstance.save()
-
-        then:
-
-        !modelInstance.hasErrors()
-
-        when:
-
-        modelInstance.status = PublishedElementStatus.FINALIZED
-        modelInstance.save(flush:true)
-
-        then:
-
-        !modelInstance.hasErrors()
-
-        when:
-
-        modelInstance.status = PublishedElementStatus.PENDING
-        modelInstance.save()
-
-        then:
-
-        modelInstance.hasErrors()
-        modelInstance.errors.getFieldError("status")?.code =='validator.finalized'
-
-    }
 
 
 }

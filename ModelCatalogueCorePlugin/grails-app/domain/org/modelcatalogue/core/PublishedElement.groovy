@@ -49,7 +49,9 @@ abstract class PublishedElement extends CatalogueElement {
     }
 
     def afterInsert(){
-
+        if(!getModelCatalogueId()) {
+            createModelCatalogueId()
+        }
     }
 
     def createModelCatalogueId(){
