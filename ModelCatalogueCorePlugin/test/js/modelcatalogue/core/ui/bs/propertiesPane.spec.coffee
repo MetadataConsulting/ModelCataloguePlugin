@@ -5,7 +5,7 @@ describe "mc.core.ui.propertiesPane", ->
   beforeEach module 'mc.core.catalogueElementEnhancer'
   beforeEach module 'mc.core.ui.bs.propertiesPane'
 
-  it "element get compiled",  inject ($compile, $rootScope, enhance) ->
+  it "element get compiled",  inject ($compile, $rootScope, enhance, $httpBackend) ->
 
     $rootScope.paneProperties = [
       {label: 'ID', value: 'id'}
@@ -51,6 +51,8 @@ describe "mc.core.ui.propertiesPane", ->
 
     shown = null
 
+    $httpBackend.expect('GET', /\/api\/modelCatalogue\/core\/dataType\/\d+/).respond({ok: true})
+
     $rootScope.$on '$stateChangeSuccess', (ignored, ignored2, params) ->
       shown = params
 
@@ -63,6 +65,7 @@ describe "mc.core.ui.propertiesPane", ->
     link.click()
 
     $rootScope.$digest()
+    $httpBackend.flush()
 
     expect(shown).not.toBeNull()
 

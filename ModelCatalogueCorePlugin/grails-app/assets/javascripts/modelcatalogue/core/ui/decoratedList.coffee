@@ -50,7 +50,9 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
         newParams.page = list.currentPage
         if newParams.page == 1
           newParams.page = undefined
-        $state.go '.', newParams
+
+        unless $state.current.abstract
+          $state.go '.', newParams
 
       $scope.hasSelection = () -> $scope.selection?
 

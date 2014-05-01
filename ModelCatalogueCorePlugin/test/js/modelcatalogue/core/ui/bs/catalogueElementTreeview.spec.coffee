@@ -3,7 +3,7 @@ describe "mc.core.ui.catalogueElementTreeview", ->
   beforeEach module 'mc.core.ui.bs.catalogueElementTreeview'
   beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
 
-  it "element get compiled",  inject ($compile, $rootScope, enhance) ->
+  it "treeview with single element",  inject ($compile, $rootScope, enhance) ->
 
     catEl = enhance angular.copy(fixtures.valueDomain.showOne.dataType)
     catEl.description = "Hello World!"
@@ -20,3 +20,20 @@ describe "mc.core.ui.catalogueElementTreeview", ->
     expect(element.prop('tagName').toLowerCase()).toBe('ul')
     expect(element.prop('id').toLowerCase()).toBe('tree-widget')
 
+
+  it "treeview with list",  inject ($compile, $rootScope, enhance) ->
+
+    catEl = enhance angular.copy(fixtures.valueDomain.showOne.dataType)
+    catEl.description = "Hello World!"
+
+    $rootScope.element = catEl
+    $rootScope.descend = ['valueDomains']
+
+    element = $compile('''
+      <catalogue-element-treeview element="element" descend="descend" id="tree-widget"></catalogue-element-treeview>
+    ''')($rootScope)
+
+    $rootScope.$digest()
+
+    expect(element.prop('tagName').toLowerCase()).toBe('ul')
+    expect(element.prop('id').toLowerCase()).toBe('tree-widget')

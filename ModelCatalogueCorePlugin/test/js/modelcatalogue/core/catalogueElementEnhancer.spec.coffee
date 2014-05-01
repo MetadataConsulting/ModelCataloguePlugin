@@ -3,7 +3,11 @@ describe "mc.core.catalogueElementEnhancer", ->
   beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.catalogueElementEnhancer'
 
-  it "changes the state on show() method", inject (enhance, $rootScope) ->
+  it "changes the state on show() method", inject (enhance, $rootScope, $httpBackend, modelCatalogueApiRoot) ->
+    $httpBackend
+    .when('GET', "#{modelCatalogueApiRoot}#{fixtures.valueDomain.showOne.link}")
+    .respond(angular.copy(fixtures.valueDomain.showOne))
+
     enhanced = enhance angular.copy(fixtures.valueDomain.showOne)
 
     event    = null
@@ -27,6 +31,7 @@ describe "mc.core.catalogueElementEnhancer", ->
     self = enhanced.show()
 
     $rootScope.$digest()
+    $httpBackend.flush()
 
     expect(event).not.toBeNull()
     expect(toState).not.toBeNull()
