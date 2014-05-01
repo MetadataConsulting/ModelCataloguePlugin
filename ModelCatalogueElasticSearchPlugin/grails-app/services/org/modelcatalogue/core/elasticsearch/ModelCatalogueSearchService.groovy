@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationListener
 
 class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateEvent> */{
 
-    def elasticSearchService
+    def elasticSearchService, elasticSearchAdminService
 
     def search(Class resource, Map params) {
         def searchResults = [:]
@@ -75,6 +75,12 @@ class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateE
 
     def index(Class resource){
         elasticSearchService.index(resource)
+        elasticSearchAdminService.refresh()
+    }
+
+    def index(Collection<Class> resource){
+        elasticSearchService.index(resource)
+        elasticSearchAdminService.refresh()
     }
 
     def unindex(Object object){
@@ -84,14 +90,4 @@ class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateE
     def unindex(Collection<Object> object){
         elasticSearchService.unindex(object)
     }
-
-
-
-//    @Override
-//    void onApplicationEvent(SaveOrUpdateEvent event) {
-//
-//        event.entity
-//
-//    }
-
 }

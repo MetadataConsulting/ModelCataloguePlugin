@@ -182,77 +182,77 @@ class DataImportServiceSpec extends IntegrationSpec {
 //    }
 
 
-    void "Test loading NHIC spreadsheet"(){
-        when:"loading the dataElements"
-        def inputStream = new FileInputStream("test/integration/resources/CAN_CUH.xlsx")
-        ExcelLoader parser = new ExcelLoader(inputStream)
-        def (headers, rows) = parser.parse()
-
-        HeadersMap headersMap = new HeadersMap()
-        headersMap.dataElementCodeRow = "Data Item Unique Code"
-        headersMap.dataElementNameRow = "Data Item Name"
-        headersMap.dataElementDescriptionRow = "Data Item Description"
-        headersMap.dataTypeRow = "Data type"
-        headersMap.parentModelNameRow = "Parent Model"
-        headersMap.parentModelCodeRow = "Parent Model Unique Code"
-        headersMap.containingModelNameRow = "Model"
-        headersMap.containingModelCodeRow = "Model Unique Code"
-        headersMap.measurementUnitNameRow = "Measurement Unit"
-        headersMap.metadataRow = "Metadata"
-
-        dataImportService.importData(headers, rows, "NHIC : CAN", "NHIC CAN conceptual domain for cancer", ["NHIC Datasets", "CAN", "CAN_CUH", "Round 1"], headersMap)
-        DataElement nhsNumberIndicator = DataElement.findByModelCatalogueId("MC_acc7732d-edc4-4d00-9a11-00e79035df8e_1")
-        DataElement organisationCode = DataElement.findByModelCatalogueId("MC_cf53034f-ebe5-4e83-bed0-d7b14e6d5ea9_1")
-        DataElement siteCode = DataElement.findByModelCatalogueId("MC_512421cb-3803-4d46-a066-216e4fb0c84a_1")
-        DataElement procedureDAte = DataElement.findByModelCatalogueId("MC_f36bd267-4f9e-4be2-a848-6239181deddf_1")
-        Model core = Model.findByModelCatalogueId("MC_3fc0bbcc-7107-4045-aa6f-286e1ae6f679_1")
-        Model patientIdentity = Model.findByModelCatalogueId("MC_39b45bed-f3f6-4ed1-a7d6-3f44f2433b0e_1")
-        Model imaging = Model.findByModelCatalogueId("MC_3b270190-3ce7-4abd-98fe-e041f2608c1a_1")
-
-
-        then:"the dataElement should have name"
-        nhsNumberIndicator
-        organisationCode
-        siteCode
-        procedureDAte
-        core
-        imaging
-        patientIdentity
-        core.parentOf.contains(imaging)
-        core.parentOf.contains(patientIdentity)
-        imaging.contains.contains(procedureDAte)
-        imaging.contains.contains(siteCode)
-        patientIdentity.contains.contains(organisationCode)
-        patientIdentity.contains.contains(nhsNumberIndicator)
-
-        when:"loading the dataElements"
-        def inputStream2 = new FileInputStream("test/integration/resources/CAN_CUH_with_change.xlsx")
-        ExcelLoader parser2 = new ExcelLoader(inputStream2)
-        (headers, rows) = parser2.parse()
-
-        dataImportService.importData(headers, rows, "NHIC : CAN", "NHIC CAN conceptual domain for cancer", ["NHIC Datasets", "CAN", "CAN_CUH", "Round 1"], headersMap)
-        DataElement nhsNumberIndicatorOld = DataElement.findByModelCatalogueId("MC_acc7732d-edc4-4d00-9a11-00e79035df8e_1")
-        nhsNumberIndicator.refresh()
-        Model patientIdentityOld = Model.findByModelCatalogueId("MC_39b45bed-f3f6-4ed1-a7d6-3f44f2433b0e_1")
-        patientIdentity.refresh()
-        imaging.refresh()
-
-        then:"the dataElement should have name"
-        nhsNumberIndicator
-        nhsNumberIndicator.supersedes.contains(nhsNumberIndicatorOld)
-        organisationCode
-        siteCode
-        procedureDAte
-        core
-        !imaging.supersedes
-        patientIdentity.supersedes.contains(patientIdentityOld)
-        core.parentOf.contains(imaging)
-        core.parentOf.contains(patientIdentity)
-        imaging.contains.contains(procedureDAte)
-        imaging.contains.contains(siteCode)
-        patientIdentity.contains.contains(organisationCode)
-        patientIdentity.contains.contains(nhsNumberIndicator)
-
-    }
+//    void "Test loading NHIC spreadsheet"(){
+//        when:"loading the dataElements"
+//        def inputStream = new FileInputStream("test/integration/resources/CAN_CUH.xlsx")
+//        ExcelLoader parser = new ExcelLoader(inputStream)
+//        def (headers, rows) = parser.parse()
+//
+//        HeadersMap headersMap = new HeadersMap()
+//        headersMap.dataElementCodeRow = "Data Item Unique Code"
+//        headersMap.dataElementNameRow = "Data Item Name"
+//        headersMap.dataElementDescriptionRow = "Data Item Description"
+//        headersMap.dataTypeRow = "Data type"
+//        headersMap.parentModelNameRow = "Parent Model"
+//        headersMap.parentModelCodeRow = "Parent Model Unique Code"
+//        headersMap.containingModelNameRow = "Model"
+//        headersMap.containingModelCodeRow = "Model Unique Code"
+//        headersMap.measurementUnitNameRow = "Measurement Unit"
+//        headersMap.metadataRow = "Metadata"
+//
+//        dataImportService.importData(headers, rows, "NHIC : CAN", "NHIC CAN conceptual domain for cancer", ["NHIC Datasets", "CAN", "CAN_CUH", "Round 1"], headersMap)
+//        DataElement nhsNumberIndicator = DataElement.findByModelCatalogueId("MC_acc7732d-edc4-4d00-9a11-00e79035df8e_1")
+//        DataElement organisationCode = DataElement.findByModelCatalogueId("MC_cf53034f-ebe5-4e83-bed0-d7b14e6d5ea9_1")
+//        DataElement siteCode = DataElement.findByModelCatalogueId("MC_512421cb-3803-4d46-a066-216e4fb0c84a_1")
+//        DataElement procedureDAte = DataElement.findByModelCatalogueId("MC_f36bd267-4f9e-4be2-a848-6239181deddf_1")
+//        Model core = Model.findByModelCatalogueId("MC_3fc0bbcc-7107-4045-aa6f-286e1ae6f679_1")
+//        Model patientIdentity = Model.findByModelCatalogueId("MC_39b45bed-f3f6-4ed1-a7d6-3f44f2433b0e_1")
+//        Model imaging = Model.findByModelCatalogueId("MC_3b270190-3ce7-4abd-98fe-e041f2608c1a_1")
+//
+//
+//        then:"the dataElement should have name"
+//        nhsNumberIndicator
+//        organisationCode
+//        siteCode
+//        procedureDAte
+//        core
+//        imaging
+//        patientIdentity
+//        core.parentOf.contains(imaging)
+//        core.parentOf.contains(patientIdentity)
+//        imaging.contains.contains(procedureDAte)
+//        imaging.contains.contains(siteCode)
+//        patientIdentity.contains.contains(organisationCode)
+//        patientIdentity.contains.contains(nhsNumberIndicator)
+//
+//        when:"loading the dataElements"
+//        def inputStream2 = new FileInputStream("test/integration/resources/CAN_CUH_with_change.xlsx")
+//        ExcelLoader parser2 = new ExcelLoader(inputStream2)
+//        (headers, rows) = parser2.parse()
+//
+//        dataImportService.importData(headers, rows, "NHIC : CAN", "NHIC CAN conceptual domain for cancer", ["NHIC Datasets", "CAN", "CAN_CUH", "Round 1"], headersMap)
+//        DataElement nhsNumberIndicatorOld = DataElement.findByModelCatalogueId("MC_acc7732d-edc4-4d00-9a11-00e79035df8e_1")
+//        nhsNumberIndicator.refresh()
+//        Model patientIdentityOld = Model.findByModelCatalogueId("MC_39b45bed-f3f6-4ed1-a7d6-3f44f2433b0e_1")
+//        patientIdentity.refresh()
+//        imaging.refresh()
+//
+//        then:"the dataElement should have name"
+//        nhsNumberIndicator
+//        nhsNumberIndicator.supersedes.contains(nhsNumberIndicatorOld)
+//        organisationCode
+//        siteCode
+//        procedureDAte
+//        core
+//        !imaging.supersedes
+//        patientIdentity.supersedes.contains(patientIdentityOld)
+//        core.parentOf.contains(imaging)
+//        core.parentOf.contains(patientIdentity)
+//        imaging.contains.contains(procedureDAte)
+//        imaging.contains.contains(siteCode)
+//        patientIdentity.contains.contains(organisationCode)
+//        patientIdentity.contains.contains(nhsNumberIndicator)
+//
+//    }
 
 }

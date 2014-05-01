@@ -20,7 +20,7 @@ import org.modelcatalogue.core.ValueDomain
 
 class DataImportService {
 
-    def sessionFactory, modelCatalogueSearchService, publishedElementService
+    def sessionFactory, dataArchitectService
     static transactional = true
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
@@ -81,34 +81,13 @@ class DataImportService {
             }
 
             newImporter.ingestRow(importRow)
-            //importLine(conceptualDomain, conceptualDomainDescription, parentModels, name, valueDomainInfo, description, metadataColumns)
         }
 
         newImporter.actionPendingModels()
-
         sessionFactory.currentSession.flush()
         sessionFactory.currentSession.clear()
 
-        modelCatalogueSearchService.index(ConceptualDomain)
-        modelCatalogueSearchService.index(DataType)
-        modelCatalogueSearchService.index(EnumeratedType)
-        modelCatalogueSearchService.index(ExtensionValue)
-        modelCatalogueSearchService.index(MeasurementUnit)
-        modelCatalogueSearchService.index(ValueDomain)
-        modelCatalogueSearchService.index(CatalogueElement)
-        modelCatalogueSearchService.index(ExtendibleElement)
-        modelCatalogueSearchService.index(PublishedElement)
-        modelCatalogueSearchService.index(DataElement)
-        modelCatalogueSearchService.index(Model)
-        modelCatalogueSearchService.index(RelationshipType)
-        modelCatalogueSearchService.index(Relationship)
-        //TODO: find a better way of unindexing archived elements
-        def params = [:]
-        params.status = PublishedElementStatus.ARCHIVED
-        def archivedElements = publishedElementService.list(params)
-        if(archivedElements){
-            modelCatalogueSearchService.unindex(archivedElements)
-        }
+        dataArchitectService.indexAll()
 
     }
 

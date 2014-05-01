@@ -202,14 +202,14 @@ class Importer {
 
         //iterate through the model path i.e. ANIMAL - MAMMAL - DOG - POODLE and create models for each of these if they don't exist,
         // otherwise find them and create a parentChild relationship
-        modelPath.inject { parentName, childName ->
+        modelPath.inject { String parentName, String childName ->
             def namedChildren = []
             def match
 
             //if there isn't a name for the child return the parentName
-            if (!childName) {
-                return parentName
-            }
+            if (!childName) { return parentName}
+            parentName = parentName.trim()
+            childName = childName.trim()
 
             namedChildren = Model.findAllByName(childName)
             namedChildren.each { Model childModel ->

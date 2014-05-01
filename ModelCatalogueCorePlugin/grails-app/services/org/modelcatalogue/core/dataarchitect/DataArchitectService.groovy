@@ -2,11 +2,25 @@ package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
 import org.hibernate.Criteria
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.ExtendibleElement
+import org.modelcatalogue.core.ExtensionValue
+import org.modelcatalogue.core.MeasurementUnit
+import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.PublishedElement
+import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.ValueDomain
 
 @Transactional
 class DataArchitectService {
+
+    def modelCatalogueSearchService, publishedElementService
 
     def uninstantiatedDataElements(Map params){
         def results = [:]
@@ -73,6 +87,27 @@ class DataArchitectService {
         return results
     }
 
+    def indexAll(){
+        modelCatalogueSearchService.index(ConceptualDomain.list())
+        modelCatalogueSearchService.index(DataType.list())
+        modelCatalogueSearchService.index(EnumeratedType.list())
+        modelCatalogueSearchService.index(ExtensionValue.list())
+        modelCatalogueSearchService.index(MeasurementUnit.list())
+        modelCatalogueSearchService.index(ValueDomain.list())
+        modelCatalogueSearchService.index(DataElement.list())
+        modelCatalogueSearchService.index(Model.list())
+        modelCatalogueSearchService.index(CatalogueElement)
+        modelCatalogueSearchService.index(ExtendibleElement)
+        modelCatalogueSearchService.index(PublishedElement)
+        modelCatalogueSearchService.index(RelationshipType)
+        modelCatalogueSearchService.index(Relationship)
+        //TODO: find a better way of unindexing archived elements
+        def params = [:]
+        params.status = PublishedElementStatus.ARCHIVED
+        def archivedElements = publishedElementService.list(params)
+        if(archivedElements){ modelCatalogueSearchService.unindex(archivedElements) }
+    }
+
 
     private static Map getParams(Map params){
         def searchParams = [:]
@@ -83,6 +118,8 @@ class DataArchitectService {
         if(params.offset){searchParams.put("offset" , params.offset.toInteger())}else{searchParams.put("offset" , 0)}
         return searchParams
     }
+
+
 
 
 
