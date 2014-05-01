@@ -23,9 +23,9 @@ class ModelServiceIntegrationSpec extends IntegrationSpec {
             assert it.save()
         }
 
-        parent1.addToChildOf child1
-        parent2.addToChildOf child2
-        child1.addToChildOf grandChild
+        parent1.addToParentOf child1
+        parent2.addToParentOf child2
+        child1.addToParentOf grandChild
 
         ListAndCount topLevel = modelService.getTopLevelModels([:])
 
@@ -34,8 +34,12 @@ class ModelServiceIntegrationSpec extends IntegrationSpec {
         topLevel.count          >= 2
         topLevel.list.size()    == topLevel.count
         topLevel.list.each {
-            assert !it.parentOf
+            assert !it.childOf
         }
+
+        topLevel.list.count {
+            it.name.contains 'Parent'
+        } >= 2
 
         cleanup:
         [parent1, parent2, child1, child2, grandChild].each {

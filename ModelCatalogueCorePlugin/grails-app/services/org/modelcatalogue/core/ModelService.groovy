@@ -14,13 +14,13 @@ class ModelService {
         List<Model> list = Model.executeQuery("""
             select distinct m
             from Model m
-            where m.status = :status and m.id not in (select distinct r.source.id from Relationship r where r.relationshipType = :type)
+            where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
         """, [type: hierarchy, status: status], params)
 
         Long count = Model.executeQuery("""
             select count(m.id)
             from Model m
-            where m.status = :status and m.id not in (select distinct r.source.id from Relationship r where r.relationshipType = :type)
+            where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
         """, [type: hierarchy, status: status])[0]
 
         new ListAndCount(count: count, list: list)
