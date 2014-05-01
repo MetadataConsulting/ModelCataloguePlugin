@@ -1,21 +1,26 @@
 angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsProvider)->
-  nameAndDescription = () -> [
+  nameAndDescription = -> [
     {header: "Name",        value: 'name',        class: 'col-md-4', show: true}
     {header: "Description", value: 'description', class: 'col-md-6'}
+  ]
+
+  publishedElementColumns = -> [
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true }
+    { header: "Name", value: "name", classes: "col-md-3", show: true }
+    { header: "Description", value: "description" }
   ]
 
   # default
   columnsProvider.registerColumns 'org.modelcatalogue.core.ConceptualDomain', nameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', nameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', nameAndDescription()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', nameAndDescription()
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.PublishedElement', publishedElementColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.ExtendibleElement', publishedElementColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', publishedElementColumns()
 
   # special
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
-    { header: "Code", value: "code", classes: "col-md-1", show: true }
-    { header: "Name", value: "name", classes: "col-md-3", show: true }
-    { header: "Description", value: "description" }
-  ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Mapping', [
     {header: 'Destination',     value: "destination.name",                                    classes: 'col-md-4', show: 'destination.show()'}
