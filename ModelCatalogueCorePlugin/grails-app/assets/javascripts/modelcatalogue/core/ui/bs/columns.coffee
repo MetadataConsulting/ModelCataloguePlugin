@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
   # special
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
-    { header: "Code", value: "code", classes: "col-md-1", show: true }
+    { header: "NHIC ID", value: "ext.NHIC_Identifier", classes: "col-md-1", show: true }
     { header: "Name", value: "name", classes: "col-md-3", show: true }
     { header: "Description", value: "description" }
   ]
