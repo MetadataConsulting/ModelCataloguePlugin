@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWrapper
 
 class ModelController extends AbstractPublishedElementController<Model> {
 
@@ -20,7 +21,7 @@ class ModelController extends AbstractPublishedElementController<Model> {
 
         ListAndCount topLevel = modelService.getTopLevelModels(params)
 
-        def links = nextAndPreviousLinks("/${resourceName}/${params.status ? params.status : ''}", topLevel.count)
+        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.status ? params.status : ''}", topLevel.count)
         respond new Elements(
                 total: topLevel.count,
                 items: topLevel.list,

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.ValueDomains
 
 class DataTypeController<T> extends AbstractCatalogueElementController<DataType> {
@@ -23,7 +24,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
         int total = dataType.relatedValueDomains.size()
         def list = sortOffsetMaxMinList(dataType.relatedValueDomains, params)
-        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/valueDomain", total)
+        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/valueDomain", total)
 
         respond new ValueDomains(
                 items: list,
@@ -36,7 +37,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
     }
 
 
-    protected List<ValueDomain> sortOffsetMaxMinList(Collection<ValueDomain> valueDomains, Map params){
+    protected static List<ValueDomain> sortOffsetMaxMinList(Collection<ValueDomain> valueDomains, Map params){
 
         valueDomains = valueDomains.toList()
 

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.ListWrapper
 
 class ExtendibleElementController extends AbstractPublishedElementController<ExtendibleElement> {
 
@@ -15,7 +16,7 @@ class ExtendibleElementController extends AbstractPublishedElementController<Ext
         setSafeMax(max)
         Integer total = publishedElementService.count(params, ExtendibleElement)
         def list = publishedElementService.list(params, ExtendibleElement)
-        def links = nextAndPreviousLinks("/${resourceName}/${params.status ? params.status : ''}", total)
+        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.status ? params.status : ''}", total)
         respond new Elements(
                 total: total,
                 items: list,
