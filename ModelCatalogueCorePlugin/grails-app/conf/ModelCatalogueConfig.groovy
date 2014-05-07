@@ -49,7 +49,23 @@ modelcatalogue.defaults.datatypes = [
         [name: "Date", description: "java.util.Date"],
         [name: "Time", description: "java.sql.Time"],
         [name: "Currency", description: "java.util.Currency"],
-        [name: "Text", description: "a text field"]
+        [name: "Text", description: "a text field"],
+        [name: "xs:string", description: "xml string"],
+        [name: "xs:normalizedString", description: "A string that does not contain line feeds, carriage returns, or tabs"],
+        [name: "xs:date", description: "Defines a date value"],
+        [name: "xs:time", description: "Defines a time interval"],
+        [name: "xs:dateTime", description: "Defines a date and time value"],
+        [name: "xs:duration", description: "Defines a time interval"],
+        [name: "xs:gDay", description: "Defines a part of a date - the day (DD)"],
+        [name: "xs:gMonth", description: "Defines a part of a date - the month (MM)"],
+        [name: "xs:gMonthDay", description: "Defines a part of a date - the month and day (MM-DD)"],
+        [name: "xs:gYear", description: "Defines a part of a date - the year (YYYY)"],
+        [name: "xs:gYearMonth", description: "Defines a part of a date - the year and month (YYYY-MM)"],
+        [name: "xs:byte" , description: "A signed 8-bit integer"],
+        [name: "xs:decimal" , description: "A decimal value"],
+        [name: "xs:int", description: "A signed 32-bit integer"],
+        [name: "xs:integer", description: "An integer value"],
+        [name: "xs:long", description: "A signed 64-bit integer"]
 ]
 
 

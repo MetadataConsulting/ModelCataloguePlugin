@@ -52,7 +52,7 @@ grails.project.dependency.resolution = {
 
         compile ":coffee-asset-pipeline:1.5.0"
         compile ":less-asset-pipeline:1.5.0"
-        compile ":hibernate:3.6.10.7"
+        compile ":hibernate:3.6.10.8"
 
         compile ":excel-export:0.2.0"
 

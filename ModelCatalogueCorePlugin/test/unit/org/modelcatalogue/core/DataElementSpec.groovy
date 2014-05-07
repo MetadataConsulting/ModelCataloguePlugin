@@ -49,7 +49,11 @@ class DataElementSpec extends Specification {
         !dataElementInstance.hasErrors() == validates
         dataElementInstance.versionNumber == 1
         DataElement.list().size() == size
-        dataElementInstance.modelCatalogueId == modelCatalogueId
+        if(modelCatalogueId) {
+            dataElementInstance.modelCatalogueId == modelCatalogueId
+        }else{
+            dataElementInstance.modelCatalogueId
+        }
 
 
         where:
@@ -58,8 +62,8 @@ class DataElementSpec extends Specification {
         1 | false     | 0    | [name: "x" * 256, description: "this is the the result description"] | null
         2 | false     | 0    | [name: "x", description: "x" * 2001] | null
         3 | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "x" * 256] | "x" * 256
-        4 | true      | 1    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_123_3"] | "MC_123_3"
-        5 | true      | 1    | [name: "result2", description: "this is the the result description"] | "MC_1_1"
+        4 | true      | 1    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"] | "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"
+        5 | true      | 1    | [name: "result2", description: "this is the the result description"] | null
         6 | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_12asd33_3"] | "MC_12asd33_3"
     }
 

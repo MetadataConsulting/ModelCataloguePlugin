@@ -45,4 +45,8 @@ class ModelCatalogueSearchService{
         search CatalogueElement, params
     }
 
+    def index(Class resource){}
+    def unindex(Object object){}
+    def unindex(Collection<Object> object){}
+
 }

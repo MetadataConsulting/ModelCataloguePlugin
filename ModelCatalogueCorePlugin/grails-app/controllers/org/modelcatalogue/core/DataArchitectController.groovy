@@ -24,8 +24,8 @@ class DataArchitectController {
         Elements elements =  new Elements(
                 total: total,
                 items: results.results,
-                previous: links.previous,
                 itemType: DataElement,
+                previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
                 page: params.int('max') ?: 10
@@ -48,6 +48,7 @@ class DataArchitectController {
         Elements elements =  new Elements(
                 total: total,
                 items: results.results,
+                itemType: DataElement,
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,

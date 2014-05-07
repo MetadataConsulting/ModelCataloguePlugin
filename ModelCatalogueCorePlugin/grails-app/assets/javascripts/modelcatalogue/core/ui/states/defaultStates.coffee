@@ -69,7 +69,85 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
     controller: 'mc.core.ui.states.ShowCtrl'
   }
+
   $stateProvider.state 'mc.resource.show.property', {url: '/:property?page'}
+
+  $stateProvider.state('mc.search', {
+      url: "/search/{searchString}",
+      templateUrl: 'modelcatalogue/core/ui/state/list.html'
+      resolve: {
+        list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
+          page = parseInt($stateParams.page ? 1, 10)
+          $stateParams.resource = "dataElement"
+          return modelCatalogueSearch($stateParams.searchString)
+        ]
+      },
+      controller: 'mc.core.ui.states.ListCtrl'
+  })
+
+
+  $stateProvider.state('mc.dataArchitect', {
+      abstract: true,
+      url: "/dataArchitect"
+      templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  })
+
+  $stateProvider.state 'mc.dataArchitect.uninstantiatedDataElements', {
+    url: "/uninstantiatedDataElements",
+    templateUrl: 'modelcatalogue/core/ui/state/list.html'
+    resolve:
+      list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        page = parseInt($stateParams.page ? 1, 10)
+        $stateParams.resource = "dataElement"
+        # it's safe to call top level for each controller, only model controller will respond on it
+        modelCatalogueDataArchitect.uninstantiatedDataElements()
+      ]
+
+    controller: 'mc.core.ui.states.ListCtrl'
+  }
+
+  $stateProvider.state 'mc.dataArchitect.metadataKey', {
+    url: "/metadataKeyCheck",
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+    controller: ['$state','$modal',($state, $modal)->
+      dialog = $modal.open {
+        windowClass: 'messages-modal-prompt'
+        template: '''
+         <div class="modal-header">
+            <h4>please enter metadata key</h4>
+        </div>
+        <div class="modal-body">
+            <form role="form" ng-submit="$close(value)">
+            <div class="form-group">
+                <label for="value">metadata key</label>
+                <input type="text" id="value" ng-model="value" class="form-control">
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" ng-click="$close(value)">OK</button>
+            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+        </div>
+        '''
+      }
+      dialog.result.then (result) ->
+        $state.go('mc.dataArchitect.metadataKeyCheck', {'metadata':result})
+
+    ]
+  }
+
+  $stateProvider.state 'mc.dataArchitect.metadataKeyCheck', {
+    url: "/metadataKey/{metadata}",
+    templateUrl: 'modelcatalogue/core/ui/state/list.html'
+    resolve:
+      list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        page = parseInt($stateParams.page ? 1, 10)
+        $stateParams.resource = "dataElement"
+        # it's safe to call top level for each controller, only model controller will respond on it
+        return modelCatalogueDataArchitect.metadataKeyCheck($stateParams.metadata)
+      ]
+
+    controller: 'mc.core.ui.states.ListCtrl'
+  }
 
 ])
 .run(['$rootScope', '$state', '$stateParams', ($rootScope, $state, $stateParams) ->

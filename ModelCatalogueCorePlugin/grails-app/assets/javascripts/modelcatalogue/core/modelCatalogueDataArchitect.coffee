@@ -9,8 +9,5 @@ angular.module("mc.core.modelCatalogueDataArchitect", ['mc.util.rest', 'mc.util.
     params = angular.extend({key: query}, additionalParams)
     enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/metadataKeyCheck", params: params
 
-
-
-
   modelCatalogueDataArchitect
 ]

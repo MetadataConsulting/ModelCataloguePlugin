@@ -16,7 +16,6 @@ class ImportRow {
     String containingModelCode
     String measurementUnitName
     String measurementSymbol
-    ArrayList parentModels
     Map metadata
     Collection<RowAction> rowActions = []
 }

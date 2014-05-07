@@ -4,10 +4,9 @@ import grails.transaction.Transactional
 import org.grails.datastore.mapping.engine.event.SaveOrUpdateEvent
 import org.springframework.context.ApplicationListener
 
-@Transactional
-class ModelCatalogueSearchService implements ApplicationListener<SaveOrUpdateEvent> {
+class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateEvent> */{
 
-    def elasticSearchService
+    def elasticSearchService, elasticSearchAdminService
 
     def search(Class resource, Map params) {
         def searchResults = [:]
@@ -72,10 +71,23 @@ class ModelCatalogueSearchService implements ApplicationListener<SaveOrUpdateEve
         return searchParams
     }
 
-    @Override
-    void onApplicationEvent(SaveOrUpdateEvent event) {
+    //TODO add a few more of these
 
-        event.entity
+    def index(Class resource){
+        elasticSearchService.index(resource)
+        elasticSearchAdminService.refresh()
+    }
 
+    def index(Collection<Class> resource){
+        elasticSearchService.index(resource)
+        elasticSearchAdminService.refresh()
+    }
+
+    def unindex(Object object){
+        elasticSearchService.unindex(object)
+    }
+
+    def unindex(Collection<Object> object){
+        elasticSearchService.unindex(object)
     }
 }

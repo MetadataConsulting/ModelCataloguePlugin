@@ -20,7 +20,11 @@ class EnumeratedTypeMarshaller extends DataTypeMarshaller {
     protected void buildXml(element, XML xml) {
         super.buildXml(element, xml)
         xml.build {
-            enumerations element.enumerations
+            enumerations {
+                for (e in element.enumerations) {
+                    enumeration key: e.key, e.value
+                }
+            }
         }
     }
 

@@ -12,7 +12,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
     @Unroll
     def "get json history: #no where max: #max offset: #offset\""() {
-        CatalogueElement first = loadItem
+        CatalogueElement first = CatalogueElement.get(loadItem.id)
         createArchiveVersions(first)
 
         when:
@@ -40,7 +40,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
     @Unroll
     def "get xml history: #no where max: #max offset: #offset"() {
-        CatalogueElement first = loadItem
+        CatalogueElement first = CatalogueElement.get(loadItem.id)
         createArchiveVersions(first)
 
         when:
