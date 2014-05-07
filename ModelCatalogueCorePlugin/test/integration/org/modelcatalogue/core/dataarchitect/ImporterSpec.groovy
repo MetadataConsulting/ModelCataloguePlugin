@@ -18,76 +18,139 @@ import spock.lang.Specification
 class ImporterSpec extends AbstractIntegrationSpec {
 
     @Shared
-    ImportRow validImportRow, invalidImportRow
+    ImportRow validImportRow, invalidImportRow, validImportRow2
+    @Shared
     Importer importer
-    Collection<ImportRow> rows
 
-    def setup() {
-        loadFixtures()
-        validImportRow = new ImportRow()
-        invalidImportRow = new ImportRow()
+    def void "placeholder test"(){}
+
+    def setupSpec(){
         importer = new Importer()
-        rows = []
-
-        validImportRow.dataElementName = "testDataItem"
-        validImportRow.parentModelName = "testParentModelCode"
-        validImportRow.parentModelCode = "MC_1423_1"
-        validImportRow.containingModelName = "testModel"
-        validImportRow.containingModelCode = "MC_123_1"
-        validImportRow.dataType =   "text"
-        validImportRow.dataElementDescription =  "test description"
-        validImportRow.measurementUnitName =   "mph"
-        validImportRow.conceptualDomainName = "formula one"
-        validImportRow.conceptualDomainDescription = " the domain of formula one"
-
-        invalidImportRow.dataElementName = "testDataItem"
-        invalidImportRow.parentModelName = "testParentModelCode"
-        invalidImportRow.parentModelCode = "asd"
-        invalidImportRow.containingModelName = "testModel"
-        invalidImportRow.containingModelCode = "asd"
-        invalidImportRow.dataType =   "text"
-        invalidImportRow.dataElementDescription =  "test description"
-        invalidImportRow.measurementUnitName =   "mph"
-        invalidImportRow.conceptualDomainName = "formula one"
-        invalidImportRow.conceptualDomainDescription = " the domain of formula one"
-
-        rows.add(validImportRow)
-        rows.add(invalidImportRow)
-
     }
 
-    def cleanup() {
-    }
-
-    void "test ingest valid and invalid rows row"() {
-
-        when:
-        importer.importAll(rows)
-
-        then:
-        importer.importQueue.contains(validImportRow)
-        importer.pendingAction.contains(invalidImportRow)
-
-        when:
-        importer.ingestImportQueue()
-        def dataElement = DataElement.findByName("testDataItem")
-        def parentModel = Model.findByModelCatalogueId("MC_1423_1")
-        def containingModel = Model.findByModelCatalogueId("MC_123_1")
-        def measure = MeasurementUnit.findByNameIlike("mph")
-        def dataType = DataType.findByNameIlike("text")
-        def conceptualDomain = ConceptualDomain.findByName("formula one")
+//    def ""(){
+//
+//    }
 
 
-        then:
 
-        dataElement
-        parentModel
-        containingModel
-        measure
-        dataType
-        conceptualDomain
-    }
+//
+//
+//    def setup() {
+//        loadFixtures()
+//        validImportRow = new ImportRow()
+//        validImportRow2 = new ImportRow()
+//        invalidImportRow = new ImportRow()
+//
+//
+//
+//        //row 1
+//        validImportRow.dataElementName = "testDataItem"
+//        validImportRow.dataElementCode = "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1"
+//        validImportRow.parentModelName = "testParentModelCode"
+//        validImportRow.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1"
+//        validImportRow.containingModelName = "testModel"
+//        validImportRow.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1"
+//        validImportRow.dataType =   "String"
+//        validImportRow.dataElementDescription =  "test description"
+//        validImportRow.measurementUnitName =   "mph"
+//        validImportRow.conceptualDomainName = "formula one"
+//        validImportRow.conceptualDomainDescription = " the domain of formula one"
+//
+//
+//        //row 2 -same model as row 1 but different data element
+//        validImportRow2.dataElementName = "testDataItem2"
+//        validImportRow2.dataElementCode = "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1"
+//        validImportRow2.parentModelName = "testParentModelCode"
+//        validImportRow2.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1"
+//        validImportRow2.containingModelName = "testModel"
+//        validImportRow2.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1"
+//        validImportRow2.dataType =   "String"
+//        validImportRow2.dataElementDescription =  "test description 2"
+//        validImportRow2.measurementUnitName =   "cm3"
+//        validImportRow2.conceptualDomainName = "formula one"
+//        validImportRow2.conceptualDomainDescription = " the domain of formula one"
+//
+//        //row 3 -same as row 1 but with updates
+//
+//        invalidImportRow.dataElementName = "testDataItem"
+//        invalidImportRow.parentModelName = "testParentModelCode"
+//        invalidImportRow.parentModelCode = "asd"
+//        invalidImportRow.containingModelName = "testModel"
+//        invalidImportRow.containingModelCode = "asd"
+//        invalidImportRow.dataType =   "String"
+//        invalidImportRow.dataElementDescription =  "test description"
+//        invalidImportRow.measurementUnitName =   "mph"
+//        invalidImportRow.conceptualDomainName = "formula one"
+//        invalidImportRow.conceptualDomainDescription = " the domain of formula one"
+//
+//
+//
+//    }
+//
+//    def cleanup() {
+//    }
+//
+//    void "test ingest importing two different versions "() {
+//
+//        Collection<ImportRow> rows = []
+//        rows.add(validImportRow)
+//        rows.add(validImportRow2)
+//
+//
+//        when:
+//        importer.importAll(rows)
+//
+//        then:
+//        importer.importQueue.contains(validImportRow)
+//
+//        when:
+//        importer.ingestImportQueue()
+//        def dataElement1 = DataElement.findByName("testDataItem")
+//        def valueDomain1 = dataElement1.instantiatedBy
+//        def dataElement2 = DataElement.findByName("testDataItem2")
+//        def parentModel = Model.findByModelCatalogueId("MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1")
+//        def archivedContainingModel = Model.findByModelCatalogueId("MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1")
+//        def containingModel = Model.findByModelCatalogueId("MC_037e6162-5b6f-4ae4-a171-2570b64dff10_2")
+//        def measureMPH = MeasurementUnit.findByNameIlike("mph")
+//        def dataType = DataType.findByNameIlike("String")
+//        def conceptualDomain = ConceptualDomain.findByName("formula one")
+//
+//
+//        then:
+//        importer.importQueue.size() == 0
+//        dataElement1
+//        parentModel
+//        containingModel
+//        measureMPH
+//        dataType
+//        conceptualDomain
+//        dataElement2
+//
+//        parentModel.parentOf.contains(containingModel)
+//        containingModel.contains.contains(dataElement2)
+//        archivedContainingModel.contains.contains(dataElement1)
+//        containingModel.supersedes.contains(archivedContainingModel)
+//        dataElement2.supersedes.contains(dataElement1)
+//        dataElement2.instantiatedBy == valueDomain1
+//
+//    }
 
+    //void "test ingest importing two of the same versions "() {}
+
+
+//    void "test ingest invalid row "() {
+//
+//        Collection<ImportRow> rows = []
+//        rows.add(invalidImportRow)
+//
+//        when:
+//        importer.importAll(rows)
+//
+//        then:
+//        importer.pendingAction.contains(invalidImportRow)
+//
+//    }
 
 
 

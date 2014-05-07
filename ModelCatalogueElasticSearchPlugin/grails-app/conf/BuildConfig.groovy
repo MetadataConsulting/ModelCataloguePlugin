@@ -47,7 +47,7 @@ grails.project.dependency.resolution = {
         }
 
         //elastic search
-        compile ":elasticsearch-gorm:0.0.2.3"
+        compile ":elasticsearch:0.0.2.5"
 
     }
 }

@@ -63,7 +63,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         archived.ext.something == 'anything'
 
-        author.supersededBy.contains(archived)
+        author.supersedes.contains(archived)
 
         author.instantiatedBy.size()    == 1
         archived.instantiatedBy.size()  == 1
@@ -77,12 +77,12 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
 
         then:
-        archived.countSupersededBy()        == 0
-        anotherArchived.countSupersededBy() == 1
-        author.countSupersededBy()          == 1
+        archived.countSupersedes()        == 0
+        anotherArchived.countSupersedes() == 1
+        author.countSupersedes()          == 1
 
-        author.supersededBy.contains(anotherArchived)
-        anotherArchived.supersededBy.contains(archived)
+        author.supersedes.contains(anotherArchived)
+        anotherArchived.supersedes.contains(archived)
     }
 
 }

@@ -132,8 +132,9 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
         super.xmlCustomPropertyCheck(xml, item)
         def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
         if (xmlProp) {
-            xmlProp = xmlProp.attributes()
-            checkPropertyMapMapString(xmlProp, item.getProperty("enumerations"), "enumerations")
+            def propMap = [:]
+            xmlProp.enumeration.each{ propMap.put(it.@key.toString(), it.text()) }
+            checkPropertyMapMapString(propMap, item.getProperty("enumerations"), "enumerations")
         }
         return true
     }
@@ -143,8 +144,9 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
         super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
         def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
         if (xmlProp) {
-            xmlProp = xmlProp.attributes()
-            checkProperty(xmlProp, outputItem.getProperty("enumerations"), "enumerations")
+            def propMap = [:]
+            xmlProp.enumeration.each{ propMap.put(it.@key.toString(), it.text()) }
+            checkPropertyMapMapString(propMap, outputItem.getProperty("enumerations"), "enumerations")
         }
         return true
     }
