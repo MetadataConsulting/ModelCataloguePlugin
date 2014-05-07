@@ -4,7 +4,7 @@ describe "mc.core.modelCatalogueDataArchitect", ->
 
   it "can find the uninstantiated data elements", inject ($httpBackend, modelCatalogueDataArchitect, modelCatalogueApiRoot) ->
     $httpBackend
-    .when("GET", "#{modelCatalogueApiRoot}/dataArchitect/uninstantiatedDataElements")
+    .when("GET", "#{modelCatalogueApiRoot}/dataArchitect/uninstantiatedDataElements?")
     .respond(fixtures.dataArchitect.metadata_uninstantiated)
 
     result = null
