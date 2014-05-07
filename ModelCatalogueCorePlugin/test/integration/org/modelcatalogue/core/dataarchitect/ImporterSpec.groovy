@@ -19,6 +19,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
 
     @Shared
     ImportRow validImportRow, invalidImportRow, validImportRow2
+    @Shared
     Importer importer
 
     def void "placeholder test"(){}
@@ -26,8 +27,6 @@ class ImporterSpec extends AbstractIntegrationSpec {
     def setupSpec(){
         importer = new Importer()
     }
-
-
 
 //    def ""(){
 //

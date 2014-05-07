@@ -572,7 +572,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def checkPropertyMapMapString(Map property, Map value, String propertyName) {
-        if (property != value && (property!="" && value!=null)) {
+        if (property!= value && (property!="" && value!=null)) {
             throw new AssertionError("error: property to check: ${propertyName}  where property: ${property} !=  item: ${value}")
         }
     }

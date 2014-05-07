@@ -6,7 +6,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
-* Enumerated Types are used by Value Domains (please see ValueDomain and Usance)
+* Enumerated Types are used by Value Domains (please see ValueDomain)
 * i.e. ValueDomain subjects uses EnumeratedType enumerations ['politics', 'history', 'science']
 * */
 
