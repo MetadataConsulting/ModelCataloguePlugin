@@ -96,6 +96,11 @@ class PublishedElementService {
             relationshipService.link(archived, r.destination, r.relationshipType, true)
         }
 
+        if (element instanceof ExtendibleElement) {
+            // TODO: this should be more generic
+            archived.ext.putAll element.ext
+        }
+
         archived
     }
 

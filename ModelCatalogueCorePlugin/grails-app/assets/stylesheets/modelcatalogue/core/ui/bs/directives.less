@@ -8,18 +8,31 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
 .catalogue-element-treeview-list {
   list-style-type: none;
   padding-left: 15px;
-  &:first-child {
-    height: 400px;
-  }
-  &:not(:first-child) {
-    max-height: 340px;
-    overflow-y: auto;
-  }
+}
+
+.catalogue-element-treeview-list-container {
+  border: solid #d3d3d3 1px;
+  border-radius: 8px;
+  height: 440px;
+  padding-top: 15px;
+  padding-right: 15px;
+}
+
+.catalogue-element-treeview-list-root {
+  height: 400px;
+  overflow-y: auto;
 }
 
 .catalogue-element-treeview-item {
   .badge {
     margin: 7px;
+  }
+}
+
+.catalogue-element-treeview-text-content {
+  &:hover, &.active {
+    background-color: #eeeeee;
+    border-radius: 5px;
   }
 }
 
@@ -30,12 +43,6 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   }
 
   border-radius: 4px;
-}
-
-.catalogue-element-treeview-list-root {
-  border: solid #d3d3d3 1px;
-  padding: 10px;
-  border-radius: 8px;
 }
 
 .catalogue-element-treeview-labels {

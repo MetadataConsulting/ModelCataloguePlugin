@@ -71,6 +71,7 @@ angular.module('demo', [
   $scope.selection = []
 
   $scope.columns = columns()
+  $scope.list    = emptyList
 
   $scope.actions = [
     {type: 'primary', title: 'Test', icon: 'info-sign', action: (element) -> alert(element.name)}

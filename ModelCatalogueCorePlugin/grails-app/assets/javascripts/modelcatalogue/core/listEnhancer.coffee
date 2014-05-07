@@ -87,12 +87,32 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
             # return new list decorator
       new ListDecorator(list)
 
-    listEnhancer.createEmptyList = (itemType = null) -> {
+    listEnhancer.createEmptyList = (itemType = null) -> listEnhancer {
       list: []
-      next: {size: 0}
-      previous: {size: 0}
+      size: 0
+      next: ''
+      previous: ''
       total: 0
       empty: true
+      itemType: itemType
+
+    }
+
+    listEnhancer.createSingletonList = (item) -> listEnhancer {
+      list: [item]
+      size: 1
+      next: ''
+      previous: ''
+      total: 1
+      itemType: item?.elementType
+    }
+
+    listEnhancer.createArrayList = (array, itemType = null) -> listEnhancer {
+      list: array
+      size: array.length
+      next: ''
+      previous: ''
+      total: array.length
       itemType: itemType
     }
 

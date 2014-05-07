@@ -45,6 +45,8 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         DataElement author      = DataElement.findByName('DE_author')
         ValueDomain domain      = ValueDomain.findByName('value domain test1')
 
+
+        author.ext.something = 'anything'
         author.addToInstantiatedBy(domain)
 
         int originalVersion     = author.versionNumber
@@ -59,7 +61,9 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         originalVersion == newVersion - 1
         archivedVersion == originalVersion
 
-        author.supersedes.contains(archived)
+        archived.ext.something == 'anything'
+
+        author.supersededBy.contains(archived)
 
         author.instantiatedBy.size()    == 1
         archived.instantiatedBy.size()  == 1
@@ -73,12 +77,12 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
 
         then:
-        archived.countSupersedes()        == 0
-        anotherArchived.countSupersedes() == 1
-        author.countSupersedes()          == 1
+        archived.countSupersededBy()        == 0
+        anotherArchived.countSupersededBy() == 1
+        author.countSupersededBy()          == 1
 
-        author.supersedes.contains(anotherArchived)
-        anotherArchived.supersedes.contains(archived)
+        author.supersededBy.contains(anotherArchived)
+        anotherArchived.supersededBy.contains(archived)
     }
 
 }
