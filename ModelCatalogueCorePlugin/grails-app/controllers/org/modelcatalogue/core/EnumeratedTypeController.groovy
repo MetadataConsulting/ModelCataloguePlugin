@@ -6,6 +6,9 @@ import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 import static org.springframework.http.HttpStatus.OK
 
+//TODO implement custom resource binding for xml enumerated type
+//at present we clear the errors
+
 class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 
     EnumeratedTypeController() {
