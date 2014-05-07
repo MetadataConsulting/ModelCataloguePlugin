@@ -17,12 +17,24 @@ import spock.lang.Specification
 
 class ImporterSpec extends AbstractIntegrationSpec {
 
+    @Shared
+    ImportRow validImportRow, invalidImportRow, validImportRow2
+    Importer importer
 
     def void "placeholder test"(){}
 
-//    @Shared
-//    ImportRow validImportRow, invalidImportRow, validImportRow2
-//    Importer importer
+    def setupSpec(){
+        importer = new Importer()
+    }
+
+
+
+//    def ""(){
+//
+//    }
+
+
+
 //
 //
 //    def setup() {
@@ -30,7 +42,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
 //        validImportRow = new ImportRow()
 //        validImportRow2 = new ImportRow()
 //        invalidImportRow = new ImportRow()
-//        importer = new Importer()
+//
 //
 //
 //        //row 1

@@ -8,6 +8,7 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.util.marshalling.EnumeratedTypeMarshaller
 
 class Importer {
 
@@ -30,13 +31,13 @@ class Importer {
         importQueue nullable: true
     }
 
-    def void importAll(Collection<ImportRow> rows) {
+    def void addAll(Collection<ImportRow> rows) {
         rows.each { ImportRow row ->
-            importRow(row)
+            addRow(row)
         }
     }
 
-    def void importRow(ImportRow row) {
+    def void addRow(ImportRow row) {
         row = validateRow(row)
         (row.rowActions) ? pendingAction.add(row) : importQueue.add(row)
     }
@@ -81,7 +82,6 @@ class Importer {
         conceptualDomain = importConceptualDomain(row.conceptualDomainName, row.conceptualDomainDescription)
         model = importModels(row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
         measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
-
         if (dataType) {
             importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
         } else {
@@ -91,11 +91,9 @@ class Importer {
 
 
     def importDataType(String name, String data) {
-
         def dataTypeReturn
         if(!data.contains("|")) {
-            String[] lines = data.split("\\r?\\n");
-
+            String[] lines = data.split("\\r?\\n")
             if (lines.size() > 0 && lines[] != null) {
                 Map enumerations = new HashMap()
                 lines.each { enumeratedValues ->
@@ -126,15 +124,10 @@ class Importer {
             }
         }else{
             dataTypeReturn = EnumeratedType.findWhere(enumAsString: data)
-            if (!dataTypeReturn) {
-                dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumAsString: data).save()
-            }
+            if (!dataTypeReturn) { dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumAsString: data).save() }
         }
 
-        if (!dataTypeReturn) {
-            dataTypeReturn = DataType.findByNameIlike(data)
-        }
-
+        if (!dataTypeReturn) { dataTypeReturn = DataType.findByNameIlike(data) }
         return dataTypeReturn
     }
 
@@ -158,17 +151,14 @@ class Importer {
 
 
     def importModels(String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain) {
-
         if (parentCode) { parentCode = parentCode.trim() }
         if (modelCode) { modelCode = modelCode.trim() }
         if (parentName) { parentName = parentName.trim() }
         if (modelName) { modelName = modelName.trim() }
-
         Model model = Model.findByModelCatalogueId(modelCode)
         Model parentModel = Model.findByModelCatalogueId(parentCode)
-
         ArrayList modelPath = []
-        modelPath.addAll(parentModels)
+        if(parentModels){modelPath.addAll(parentModels)}
         modelPath.add(parentName)
         modelPath.add(modelName)
         //TODO return a row action
@@ -180,9 +170,7 @@ class Importer {
             parentModel = addModelToImport(parentModel)
             model.addToChildOf(parentModel)
         }
-
         return model
-
     }
 
 
@@ -205,12 +193,10 @@ class Importer {
         modelPath.inject { String parentName, String childName ->
             def namedChildren = []
             def match = null
-
             //if there isn't a name for the child return the parentName
             if (!childName) { return parentName}
-            parentName = parentName.trim()
-            childName = childName.trim()
-
+            if(parentName){ parentName = parentName.trim()}
+            if(childName){ childName = childName.trim() }
             namedChildren = Model.findAllByName(childName)
             namedChildren.each { Model childModel ->
                 if (childModel.childOf.collect { it.name }.contains(parentName) && childModel.hasContextOf.contains(conceptualDomain)) {
@@ -253,9 +239,6 @@ class Importer {
                 child.addToChildOf(parent)
                 parent = addModelToImport(parent)
                 return child.name
-
-                //add the parent child relationship between models
-
             } else {
                 match = addModelToImport(match)
                 modelToReturn = match
@@ -267,32 +250,10 @@ class Importer {
 
     }
 
-
-    protected Boolean checkDataElementForChanges(Map params, Map metadata, DataElement dataElement) {
-        Boolean hasDataElementChanged = false
-        if (dataElement.name != params.name || dataElement.description != params.description) {
-            return true
-        }
-        metadata.each { key, value ->
-            if (key) {
-                key = key.toString().take(255)
-            }
-            value = (value && value != "") ? value.toString().take(255) : null
-            if (dataElement.ext.get(key) != value) {
-                hasDataElementChanged = true
-            }
-        }
-        return hasDataElementChanged
-    }
-
     protected DataElement updateMetadata(Map metadata, DataElement dataElement) {
         metadata.each { key, value ->
-            if (key) {
-                key = key.toString().take(255)
-            }
-            if (value) {
-                value = value.toString().take(255)
-            }
+            if (key) { key = key.toString().take(255) }
+            if (value) { value = value.toString().take(255) }
             dataElement.ext.put(key, value)
         }
         dataElement.save()
@@ -311,27 +272,55 @@ class Importer {
         return dataElement
     }
 
+    protected Boolean checkDataElementForChanges(Map params, Map metadata, DataElement dataElement) {
+        Boolean hasDataElementChanged = false
+        if (dataElement.name != params.name || dataElement.description != params.description) { return true }
+        metadata.each { key, value ->
+            if (key) { key = key.toString().take(255) }
+            value = (value && value != "") ? value.toString().take(255) : null
+            if (dataElement.ext.get(key) != value) { hasDataElementChanged = true}
+        }
+        return hasDataElementChanged
+    }
+
+
+    protected Boolean checkValueDomainForChanges(Map params, ValueDomain valueDomain, ConceptualDomain cd){
+        //ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, params.unitOfMeasure)
+        if(valueDomain) {
+            if (!valueDomain.includedIn.contains(cd)) { return true }
+            if (valueDomain.unitOfMeasure != params.unitOfMeasure) { return true }
+            if (params.dataType instanceof EnumeratedType) {
+                if (valueDomain.dataType.enumAsString != params.dataType.enumAsString) { return true }
+            } else if (valueDomain.dataType != params.dataType) { return true }
+        }else{
+            if(params.dataType||params.measurementUnit){return true}
+        }
+        return false
+    }
+
+
     //update data element given value domain info
     protected DataElement updateDataElement(Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd, Map metadata) {
-        if (checkDataElementForChanges(params, metadata, dataElement)) {
+        Boolean dataElementChanged = checkDataElementForChanges(params, metadata, dataElement)
+        ValueDomain vd = dataElement.instantiatedBy.find { it.includedIn.contains(cd) }
+        Boolean valueDomainChanged = checkValueDomainForChanges(vdParams, vd, cd)
+
+        if (dataElementChanged || valueDomainChanged) {
             publishedElementService.archiveAndIncreaseVersion(dataElement)
             dataElement.refresh()
-            dataElement.name = params.name
-            dataElement.description = params.description
-            dataElement.save()
-            dataElement = updateMetadata(metadata, dataElement)
-            ArrayList instantiatedBy = dataElement.instantiatedBy.findAll { it.includedIn.contains(cd) }
 
-            if (!instantiatedBy) {
+            if(dataElementChanged) {
+                dataElement.name = params.name
+                dataElement.description = params.description
+                dataElement.save()
+                dataElement = updateMetadata(metadata, dataElement)
+            }
+
+            if (valueDomainChanged) {
+                //remove the old one (will still be in the archived one)
+                if (vd) { vd.removeFromInstantiates(dataElement) }
+                //see if there is one that matches or create a new one
                 importValueDomain(vdParams, dataElement, cd)
-            } else {
-                ValueDomain vd = instantiatedBy.first()
-                if (vd.name != vdParams.name || vd.dataType != vdParams.dataType || vd.unitOfMeasure != vdParams.unitOfMeasure) {
-                    //remove the old one (will still be in the archived one)
-                    vd.removeFromInstantiates(dataElement)
-                    //see if there is one that matches or create a new one
-                    importValueDomain(vdParams, dataElement, cd)
-                }
             }
         }
         return dataElement
@@ -339,9 +328,7 @@ class Importer {
 
     protected ValueDomain importValueDomain(Map vdParams, DataElement dataElement, ConceptualDomain cd) {
         ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, vdParams.unitOfMeasure)
-        if (!vd) {
-            vd = new ValueDomain(vdParams).save()
-        }
+        if (!vd) { vd = new ValueDomain(vdParams).save() }
         vd.addToIncludedIn(cd)
         vd.addToInstantiates(dataElement)
         vd.save()
@@ -351,9 +338,7 @@ class Importer {
 
         //find out if data element exists using unique code
         DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
-        if (de) {
-            de = updateDataElement(params, de, vdParams, cd, metadata)
-        }
+        if (de) { de = updateDataElement(params, de, vdParams, cd, metadata) }
 
         //find if data element exists using name and containing model
         if (!de) {
@@ -388,9 +373,7 @@ class Importer {
             def nameDE = DataElement.findByName(params.name)
             if (nameDE && nameDE.containedIn.contains(model)) {
                 de = nameDE
-                if (de) {
-                    de = updateDataElement(params, de, metadata)
-                }
+                if (de) { de = updateDataElement(params, de, metadata) }
             }
         }
 
@@ -401,7 +384,6 @@ class Importer {
         }
 
         de.addToContainedIn(model)
-
         return de
     }
 
