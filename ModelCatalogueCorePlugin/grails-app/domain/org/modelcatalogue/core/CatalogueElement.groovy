@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -67,23 +69,15 @@ abstract class CatalogueElement {
 
 
     List getIncomingRelationsByType(RelationshipType type) {
-        if (archived) {
-            return Relationship.findAllByDestinationAndRelationshipType(this, type).collect {
-                it.source
-            }
-        }
-        Relationship.findAllByDestinationAndRelationshipTypeAndArchived(this, type, false).collect {
+        ListAndCount<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type)
+        relationships.list.collect {
             it.source
         }
     }
 
     List getOutgoingRelationsByType(RelationshipType type) {
-        if (archived) {
-            return Relationship.findAllBySourceAndRelationshipType(this, type).collect {
-                it.destination
-            }
-        }
-        Relationship.findAllBySourceAndRelationshipTypeAndArchived(this, type, false).collect {
+        ListAndCount<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type)
+        relationships.list.collect {
             it.destination
         }
     }
