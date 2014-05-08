@@ -22,13 +22,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.property ?= $rootScope?.$stateParams?.property
 
-      onPropertyUpdate = (property) ->
+      onPropertyUpdate = (newProperty, oldProperty) ->
         page    = 1
+        options = {}
         isTable = false
         if $scope.showTabs
-          if property
+          if newProperty
             for tab in $scope.tabs
-              tab.active = tab.name == property
+              tab.active = tab.name == newProperty
               if tab.active
                 isTable = tab.type == 'decorated-list'
                 if isTable and tab.value.total
@@ -44,13 +45,13 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 break
 
         page = undefined if page == 1 or isNaN(page)
-
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: property, page: page} if $scope.element
+        options.location = "replace" if newProperty and not oldProperty
+        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page}, options if $scope.element
 
       onElementUpdate = (element) ->
         activeTabSet     = false
 
-        onPropertyUpdate($scope.property)
+        onPropertyUpdate($scope.property, $rootScope?.$stateParams?.property)
 
         tabs = []
 
