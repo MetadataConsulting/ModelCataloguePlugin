@@ -8,6 +8,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
       actions: '=?'
       id: '@'
       stateless: '=?'
+      reports: '=?'
       pageParam: '@'
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
@@ -50,6 +51,8 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
           $scope.hasMorePrevPages = lowerTen != 0
           $scope.hasMoreNextPages = (Math.floor(list.total / list.page) + 1) >= upperTen
           $scope.pages = pages
+
+        $scope.reports = list.availableReports
 
         if not $state.current.abstract and not $scope.stateless
           newParams = angular.copy $stateParams

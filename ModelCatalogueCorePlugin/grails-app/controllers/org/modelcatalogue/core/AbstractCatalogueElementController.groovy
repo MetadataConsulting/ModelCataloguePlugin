@@ -159,7 +159,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
         def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), listAndCount.count)
 
-        respond new Relationships(
+        respondWithReports new Relationships(
                 owner: element,
                 items: listAndCount.list,
                 previous: links.previous,
@@ -184,7 +184,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         def list = Mapping.findAllBySource(element, params)
         def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/mapping", total)
 
-        respond new Mappings(
+        respondWithReports new Mappings(
                 items: list,
                 previous: links.previous,
                 next: links.next,

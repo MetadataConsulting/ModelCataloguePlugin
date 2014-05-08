@@ -4,6 +4,7 @@ import grails.rest.render.AbstractRenderer
 import grails.rest.render.RenderContext
 import grails.util.GrailsWebUtil
 import org.codehaus.groovy.grails.web.mime.MimeType
+import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.modelcatalogue.core.util.ListWrapper
 import pl.touk.excel.export.WebXlsxExporter
@@ -89,6 +90,25 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
         XLSXRowWriterBuilder builder = XLSXRowWriterBuilder.writer(name)
         builder.with definition
         registerRowWriter(builder.build())
+    }
+
+
+    ListWrapper fillListWithReports(ListWrapper list, GrailsWebRequest webRequest) {
+        ServletRenderContext context = new ServletRenderContext(webRequest)
+        writers.each { name, writersList ->
+            if (writersList.any {
+                if (it == DEFAULT_WRITER) return false
+                it.isApplicableOn(list, context)
+            }) {
+                if (name) {
+                    list.availableReports << [name: name, url: context.resourcePath.contains('?') ? (context.resourcePath + '&format=xlsx&report=' + name) :  (context.resourcePath + '?format=xlsx&report=' + name)]
+                } else {
+                    list.availableReports << [name: name, url: context.resourcePath.contains('?') ? (context.resourcePath + '&format=xlsx') :  (context.resourcePath + '?format=xlsx')]
+
+                }
+            }
+        }
+        list
     }
 
 }

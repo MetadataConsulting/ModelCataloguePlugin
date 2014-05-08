@@ -4,6 +4,7 @@ import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
 
 import javax.servlet.http.HttpServletResponse
@@ -14,6 +15,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     static responseFormats = ['json', 'xml', 'xlsx']
     def modelCatalogueSearchService
+    XLSXListRenderer xlsxListRenderer
 
 
     AbstractRestfulController(Class<T> resource, boolean readOnly) {
@@ -44,8 +46,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                     page: params.int('max') ?: 10,
                     itemType: resource
             )
-
-        respond elements
+        respondWithReports elements
     }
 
     protected setSafeMax(Integer max) {
@@ -69,7 +70,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         def total = countResources()
         def list = listAllResources(params)
         def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/", total)
-        respond new Elements(
+        respondWithReports new Elements(
                 total: total,
                 items: list,
                 previous: links.previous,
@@ -122,6 +123,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         render status: NO_CONTENT // NO CONTENT STATUS CODE
+    }
+
+
+    protected void respondWithReports(ListWrapper listWrapper) {
+        respond xlsxListRenderer.fillListWithReports(listWrapper, webRequest)
     }
 
 }

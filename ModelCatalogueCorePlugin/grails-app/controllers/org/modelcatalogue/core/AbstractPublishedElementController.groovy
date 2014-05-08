@@ -17,7 +17,7 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         Integer total = publishedElementService.count(params, resource)
         def list = publishedElementService.list(params, resource)
         def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.status ? params.status : ''}", total)
-        respond new Elements(
+        respondWithReports new Elements(
                 total: total,
                 items: list,
                 previous: links.previous,
@@ -45,7 +45,7 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         def list = resource.findAllByModelCatalogueIdLike "$element.bareModelCatalogueId%", customParams
         def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/history", total)
 
-        respond new Elements(
+        respondWithReports new Elements(
                 items: list,
                 previous: links.previous,
                 next: links.next,

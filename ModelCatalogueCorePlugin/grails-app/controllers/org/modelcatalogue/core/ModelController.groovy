@@ -22,7 +22,7 @@ class ModelController extends AbstractPublishedElementController<Model> {
         ListAndCount topLevel = modelService.getTopLevelModels(params)
 
         def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.status ? params.status : ''}", topLevel.count)
-        respond new Elements(
+        respondWithReports new Elements(
                 total: topLevel.count,
                 items: topLevel.list,
                 previous: links.previous,

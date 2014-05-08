@@ -27,6 +27,15 @@ class BootStrap {
             }
         }
 
+        xlsxListRenderer.registerRowWriter {
+            headers 'Type', 'Source', 'Destination'
+            when { ListWrapper container, RenderContext context ->
+                Relationship.isAssignableFrom(container.itemType)
+            } then { Relationship rel ->
+                [[rel.relationshipType.name, rel.source.name, rel.destination.name]]
+            }
+        }
+
         environments {
             development {
                 importService.importData()

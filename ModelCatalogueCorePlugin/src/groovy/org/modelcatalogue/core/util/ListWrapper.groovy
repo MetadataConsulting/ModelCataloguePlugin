@@ -10,6 +10,7 @@ abstract class ListWrapper<T> {
     int page
     int offset
     List<T> items
+    List<Map<String, String>> availableReports = []
 
 
     static Map<String, String> nextAndPreviousLinks(Map params, String baseLink, Long total) {

@@ -21,6 +21,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         size
 
       $scope.property ?= $rootScope?.$stateParams?.property
+      $scope.reports  = []
 
       onPropertyUpdate = (newProperty, oldProperty) ->
         page    = 1
@@ -67,6 +68,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             columns:   columns(fn.itemType)
             actions:  []
             name:     name
+            reports:  []
 
 
           if tabDefinition.name == 'history'
@@ -182,11 +184,15 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return if not tab.loader?
         if !tab.disabled and tab.value.empty
           tab.loader().then (result) ->
-            tab.columns = columns(result.itemType)
-            tab.value = result
+            tab.columns     = columns(result.itemType)
+            tab.value       = result
+            $scope.reports  = result.availableReports
+        else
+          $scope.reports    = tab.value?.availableReports
 
       $scope.createRelationship = () ->
         messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
+
 
       # watches
       $scope.$watch 'element', onElementUpdate

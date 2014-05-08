@@ -7,6 +7,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
     $scope.list                     = list
     $scope.title                    = names.getNaturalName($stateParams.resource)
+    $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
     $scope.containedElements        = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
     $scope.selectedElement          = if list.size > 0 then list.list[0] else {name: 'No Selection'}
@@ -166,6 +167,16 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-if="list.total &amp;&amp; resource != 'model'">
+      <span class="pull-right">
+        <div class="btn-group btn-group-sm">
+          <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="list.availableReports &amp;&amp; list.availableReports.length == 0">
+            <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in list.availableReports">{{natural(report.name)}}</a></li>
+          </ul>
+        </div>
+      </span>
       <h2>{{title}} List</h2>
       <decorated-list list="list"></decorated-list>
     </div>

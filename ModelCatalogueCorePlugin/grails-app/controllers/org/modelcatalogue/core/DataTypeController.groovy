@@ -26,7 +26,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
         def list = sortOffsetMaxMinList(dataType.relatedValueDomains, params)
         def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/valueDomain", total)
 
-        respond new ValueDomains(
+        respondWithReports new ValueDomains(
                 items: list,
                 previous: links.previous,
                 next: links.next,
