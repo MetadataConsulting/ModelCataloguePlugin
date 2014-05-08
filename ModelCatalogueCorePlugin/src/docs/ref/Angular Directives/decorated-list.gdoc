@@ -2,8 +2,11 @@ h1. decorated-list
 
 Generic element directive for showing items enhanced by [list|Angular Enhancers] enhancer. Default template defined in
 @mc.core.ui.bs.decoratedListTable@ is showing each item of the list as table row with pagination at the bottom of the table.
-The directive accepts four two-ways bound attributes @list@, @columns@, @selection@ and @actions@. Only the @list@ attribute is mandatory and
-represents the list structure which should match the expected input
+The directive accepts following two-ways bound attributes @list@, @columns@, @selection@ and @actions@.
+Only the @list@ attribute is mandatory and represents the list structure which should match the expected input.
+You can customize the state changes from this directive by setting attribute @stateless@ to @true@
+(the directive won't change the state of the app at all) or customizing the name of th @page@ parameter using
+@pageParam@ attribute (the directive will change the parameter of given name in the URL when tha page changes).
 
 {code}
 {
