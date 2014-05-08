@@ -18,7 +18,7 @@ class SearchController {
         }
 
         def total = (results.total)?results.total.intValue():0
-        def links = ListWrapper.nextAndPreviousLinks(params, "/search/", total)
+        def links = ListWrapper.nextAndPreviousLinks(params, "/search/${params.search}", total)
         Elements elements =  new Elements(
                     total: total,
                     items: results.searchResults,
