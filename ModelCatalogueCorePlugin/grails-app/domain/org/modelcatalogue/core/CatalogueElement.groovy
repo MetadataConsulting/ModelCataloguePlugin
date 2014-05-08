@@ -34,6 +34,7 @@ abstract class CatalogueElement {
     }
 
     static mapping = {
+        sort "name"
         description type: "text"
     }
 

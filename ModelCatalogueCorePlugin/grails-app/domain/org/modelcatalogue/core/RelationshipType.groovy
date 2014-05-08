@@ -63,6 +63,7 @@ class RelationshipType {
     static mapping = {
         // this makes entities immutable
         // cache usage: 'read-only'
+        sort "name"
     }
 
     String validateSourceDestination(CatalogueElement source, CatalogueElement destination) {
