@@ -56,11 +56,11 @@ describe "mc.core.ui.decoratedListTable", ->
 
     expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(2)
     expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(1)').text()).toBeDefined()
-    expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(2)').text()).toBe('value domain Fahrenheit')
+    expect(element.find('tbody tr:first-child td.dl-table-item-cell:nth-child(2)').text()).toBe(fixtures.valueDomain.list1.list[0].name)
 
     expect(element.find('tbody tr:last-child td.dl-table-item-cell').length).toBe(2)
     expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(1)').text()).toBeDefined()
-    expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(2)').text()).toBe('value domain test2')
+    expect(element.find('tbody tr:last-child td.dl-table-item-cell:nth-child(2)').text()).toBe(fixtures.valueDomain.list1.list[4].name)
 
     # next and previous links
     expect(element.find('li.dl-table-prev.disabled').length).toBe(1)
