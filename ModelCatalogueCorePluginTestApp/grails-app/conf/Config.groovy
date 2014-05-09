@@ -105,6 +105,7 @@ log4j = {
     //}
 
     debug 'org.modelcatalogue'
+//    debug 'org.grails.plugins.elasticsearch'
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP

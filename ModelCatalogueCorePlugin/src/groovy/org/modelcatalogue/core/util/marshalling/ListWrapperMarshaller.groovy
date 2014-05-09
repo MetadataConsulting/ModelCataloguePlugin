@@ -54,6 +54,6 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         addXmlAttribute(elements.offset, "offset", xml)
         addXmlAttribute(elements.items.size(), "size", xml)
         addXmlAttribute("true", "success", xml)
-        addXmlAttribute(elements.availableReports.toList()-join(','), "availableReports", xml)
+        addXmlAttribute(elements.availableReports.toList().join(','), "availableReports", xml)
     }
 }

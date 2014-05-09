@@ -57,6 +57,10 @@ class ElasticSearchISpec extends IntegrationSpec{
                 className[0].toLowerCase() + className.substring(1)
         )
 
+        DataElement.list().each {
+            it.status = PublishedElementStatus.FINALIZED
+            it.save()
+        }
 
         JSONElement json
         GPathResult xml
@@ -91,7 +95,7 @@ class ElasticSearchISpec extends IntegrationSpec{
             assert xml.@success.text() == "true"
             assert xml.@total == total
             assert xml.@offset.text() == "0"
-            assert xml.@page.text() ==  "10"
+            assert xml.@page.text() ==  "10000"
             assert xml.element
             assert xml.depthFirst().find {  it.name == expectedResult.name }
         }else{
@@ -105,8 +109,8 @@ class ElasticSearchISpec extends IntegrationSpec{
         2 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "json"    | "boolean"                 | 1
         3 | "DataType"          | new DataTypeController()            | "boolean"                       | "xml"     | "boolean"                 | 2
         4 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "xml"     | "boolean"                 | 1
-        5 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "json"    | "DE_author1"              | 1
-        6 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "xml"     | "DE_author1"              | 1
+        5 | "DataElement"       | new DataElementController()         | "DE_author1"                    | "json"    | "DE_author1"              | 1
+        6 | "DataElement"       | new DataElementController()         | "DE_author1"                    | "xml"     | "DE_author1"              | 1
         7 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "json"    | "public libraries"        | 12
         8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 12
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1
