@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.rest.RestfulController
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWrapper
 
 class DataArchitectController {
 
@@ -23,11 +24,9 @@ class DataArchitectController {
             return
         }
 
-        def links = nextAndPreviousLinks("/dataArchitect/uninstantiatedDataElements", total)
-=======
         def total = (results.totalCount)?results.totalCount:0
         def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/uninstantiatedDataElements", total)
->>>>>>> e6d1570d48dafbe86993b0734522012d18694fea
+
         Elements elements =  new Elements(
                 total: results.count,
                 items: results.list,
@@ -53,11 +52,9 @@ class DataArchitectController {
             return
         }
 
-        def links = nextAndPreviousLinks("/dataArchitect/metadataKeyCheck", total)
-=======
         def total = (results.totalCount)?results.totalCount:0
         def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/metadataKeyCheck", total)
->>>>>>> e6d1570d48dafbe86993b0734522012d18694fea
+
         Elements elements =  new Elements(
                 total: results.count,
                 items: results.list,
