@@ -1,9 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.ListAndCount
-import org.modelcatalogue.core.util.Mappings
-import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.*
 
 import javax.servlet.http.HttpServletResponse
 
@@ -160,9 +157,9 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
         ListAndCount listAndCount = relationshipService.getRelationships(params, direction, element, type)
 
-        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), listAndCount.count)
+        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), listAndCount.count)
 
-        respond new Relationships(
+        respondWithReports new Relationships(
                 owner: element,
                 items: listAndCount.list,
                 previous: links.previous,
@@ -185,9 +182,9 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
         int total = element.outgoingMappings.size()
         def list = Mapping.findAllBySource(element, params)
-        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/mapping", total)
+        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/mapping", total)
 
-        respond new Mappings(
+        respondWithReports new Mappings(
                 items: list,
                 previous: links.previous,
                 next: links.next,

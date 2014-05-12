@@ -21,14 +21,16 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         size
 
       $scope.property ?= $rootScope?.$stateParams?.property
+      $scope.reports  = []
 
-      onPropertyUpdate = (property) ->
+      onPropertyUpdate = (newProperty, oldProperty) ->
         page    = 1
+        options = {}
         isTable = false
         if $scope.showTabs
-          if property
+          if newProperty
             for tab in $scope.tabs
-              tab.active = tab.name == property
+              tab.active = tab.name == newProperty
               if tab.active
                 isTable = tab.type == 'decorated-list'
                 if isTable and tab.value.total
@@ -44,13 +46,13 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 break
 
         page = undefined if page == 1 or isNaN(page)
-
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: property, page: page} if $scope.element
+        options.location = "replace" if newProperty and not oldProperty
+        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page}, options if $scope.element
 
       onElementUpdate = (element) ->
         activeTabSet     = false
 
-        onPropertyUpdate($scope.property)
+        onPropertyUpdate($scope.property, $rootScope?.$stateParams?.property)
 
         tabs = []
 
@@ -66,6 +68,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             columns:   columns(fn.itemType)
             actions:  []
             name:     name
+            reports:  []
 
 
           if tabDefinition.name == 'history'
@@ -181,11 +184,15 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return if not tab.loader?
         if !tab.disabled and tab.value.empty
           tab.loader().then (result) ->
-            tab.columns = columns(result.itemType)
-            tab.value = result
+            tab.columns     = columns(result.itemType)
+            tab.value       = result
+            $scope.reports  = result.availableReports
+        else
+          $scope.reports    = tab.value?.availableReports
 
       $scope.createRelationship = () ->
         messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
+
 
       # watches
       $scope.$watch 'element', onElementUpdate

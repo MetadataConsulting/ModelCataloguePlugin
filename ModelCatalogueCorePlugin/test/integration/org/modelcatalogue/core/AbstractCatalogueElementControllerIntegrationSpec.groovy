@@ -265,6 +265,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert json.size == 0
         assert json.offset == offset
         assert json.page == max
+        assert json.availableReports != null
         type2.delete()
         resource.count() == totalCount
     }

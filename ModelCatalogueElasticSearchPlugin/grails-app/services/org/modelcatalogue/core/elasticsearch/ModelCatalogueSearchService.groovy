@@ -1,9 +1,5 @@
 package org.modelcatalogue.core.elasticsearch
 
-import grails.transaction.Transactional
-import org.grails.datastore.mapping.engine.event.SaveOrUpdateEvent
-import org.springframework.context.ApplicationListener
-
 class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateEvent> */{
 
     def elasticSearchService, elasticSearchAdminService
@@ -20,6 +16,9 @@ class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateE
                 bool {
                     must {
                         query_string(query: params.search)
+                    }
+                    must_not {
+                        terms status: ['archived', 'draft', 'pending', 'removed'], system: ['true']
                     }
                 }
             }
@@ -46,6 +45,9 @@ class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateE
                 bool {
                     must {
                         query_string(query: params.search)
+                    }
+                    must_not {
+                        terms status: ['archived', 'draft', 'pending', 'removed']
                     }
                 }
             }

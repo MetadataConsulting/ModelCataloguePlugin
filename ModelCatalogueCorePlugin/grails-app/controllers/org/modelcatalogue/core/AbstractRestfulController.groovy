@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
 
 import javax.servlet.http.HttpServletResponse
@@ -13,6 +15,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     static responseFormats = ['json', 'xml', 'xlsx']
     def modelCatalogueSearchService
+    XLSXListRenderer xlsxListRenderer
 
 
     AbstractRestfulController(Class<T> resource, boolean readOnly) {
@@ -33,7 +36,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         def total = (results.total)?results.total.intValue():0
-        def links = nextAndPreviousLinks("/${resourceName}/search", total)
+        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/search", total)
         Elements elements = new Elements(
                     total: total,
                     items: results.searchResults,
@@ -43,17 +46,16 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                     page: params.int('max') ?: 10,
                     itemType: resource
             )
-
-        respond elements
+        respondWithReports elements
     }
 
     protected setSafeMax(Integer max) {
         withFormat {
             json {
-                params.max = Math.min(max ?: 10, 10000)
+                params.max = Math.min(max ?: 10, 100)
             }
             xml {
-                params.max = Math.min(max ?: 10, 10000)
+                params.max = Math.min(max ?: 10000, 10000)
             }
             xlsx {
                 params.max = Math.min(max ?: 10000, 10000)
@@ -67,8 +69,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         setSafeMax(max)
         def total = countResources()
         def list = listAllResources(params)
-        def links = nextAndPreviousLinks("/${resourceName}/", total)
-        respond new Elements(
+        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/", total)
+        respondWithReports new Elements(
                 total: total,
                 items: list,
                 previous: links.previous,
@@ -123,40 +125,9 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         render status: NO_CONTENT // NO CONTENT STATUS CODE
     }
 
-    protected Map<String, String> nextAndPreviousLinks(String baseLink, Long total) {
-        def link = "${baseLink}?"
-        if (params.max) {
-            link += "max=${params.max}"
-        }
-        if (params.sort) {
-            link += "&sort=${params.sort}"
-        }
-        if (params.order) {
-            link += "&order=${params.order}"
-        }
-        if (params.search){
-            link +=  "&search=${params.search}"
-        }
-        if (params.toplevel){
-            link +=  "&toplevel=${params.toplevel}"
-        }
-        def nextLink = ""
-        def previousLink = ""
-        if (params?.max && params.max < total) {
-            def offset = (params?.offset) ? params?.offset?.toInteger() : 0
-            def prev = offset - params?.max
-            def next = offset + params?.max
-            if (next < total) {
-                nextLink = "${link}&offset=${next}"
-            }
-            if (prev >= 0) {
-                previousLink = "${link}&offset=${prev}"
-            }
-        }
-        [
-                next: nextLink,
-                previous: previousLink
-        ]
+
+    protected void respondWithReports(ListWrapper listWrapper) {
+        respond xlsxListRenderer.fillListWithReports(listWrapper, webRequest)
     }
 
 }

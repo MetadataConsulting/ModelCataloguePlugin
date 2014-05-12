@@ -56,8 +56,6 @@ Model catalogue core plugin (metadata registry)
 
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
-
         mergeConfig(application)
 
         xlsxListRenderer(XLSXListRenderer)
@@ -84,7 +82,6 @@ Model catalogue core plugin (metadata registry)
     }
 
     def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
         ctx.grailsApplication.domainClasses.each {
             if (CatalogueElement.isAssignableFrom(it.clazz)) {
                 CatalogueElementDynamicHelper.addShortcuts(it.clazz)
@@ -93,7 +90,6 @@ Model catalogue core plugin (metadata registry)
     }
 
     def doWithApplicationContext = { ctx ->
-        // TODO Implement post initialization spring config (optional)
         //register custom json Marshallers
         //ctx.domainModellerService.modelDomains()
         ctx.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
