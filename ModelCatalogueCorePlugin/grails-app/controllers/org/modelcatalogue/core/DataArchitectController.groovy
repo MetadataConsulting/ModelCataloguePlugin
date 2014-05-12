@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.ListAndCount
 
 class DataArchitectController {
 
@@ -13,17 +14,19 @@ class DataArchitectController {
 
     def uninstantiatedDataElements(Integer max){
         setSafeMax(max)
-        def results =  dataArchitectService.uninstantiatedDataElements(params)
-        if(results.errors){
-            respond results
+        ListAndCount results
+
+        try{
+            results = dataArchitectService.uninstantiatedDataElements(params)
+        }catch(Exception e){
+            println(e)
             return
         }
 
-        def total = (results.totalCount)?results.totalCount:0
         def links = nextAndPreviousLinks("/dataArchitect/uninstantiatedDataElements", total)
         Elements elements =  new Elements(
-                total: total,
-                items: results.results,
+                total: results.count,
+                items: results.list,
                 itemType: DataElement,
                 previous: links.previous,
                 next: links.next,
@@ -37,17 +40,19 @@ class DataArchitectController {
 
     def metadataKeyCheck(Integer max){
         setSafeMax(max)
-        def results =  dataArchitectService.metadataKeyCheck(params)
-        if(results.errors){
-            respond results
+        ListAndCount results
+
+        try{
+            results = dataArchitectService.metadataKeyCheck(params)
+        }catch(Exception e){
+            println(e)
             return
         }
 
-        def total = (results.totalCount)?results.totalCount:0
         def links = nextAndPreviousLinks("/dataArchitect/metadataKeyCheck", total)
         Elements elements =  new Elements(
-                total: total,
-                items: results.results,
+                total: results.count,
+                items: results.list,
                 itemType: DataElement,
                 previous: links.previous,
                 next: links.next,
@@ -62,10 +67,10 @@ class DataArchitectController {
     protected setSafeMax(Integer max) {
         withFormat {
             json {
-                params.max = Math.min(max ?: 10, 100)
+                params.max = Math.min(max ?: 10, 10000)
             }
             xml {
-                params.max = Math.min(max ?: 10, 100)
+                params.max = Math.min(max ?: 10, 10000)
             }
             xlsx {
                 params.max = Math.min(max ?: 10000, 10000)

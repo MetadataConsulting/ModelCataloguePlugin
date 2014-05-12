@@ -5,22 +5,22 @@ import org.apache.poi.ss.util.CellReference
 
 class ExcelLoader {
 
-    private static InputStream
+    private static InputStream stream
 
 
     public ExcelLoader(String path)
     {
-        InputStream = new FileInputStream(path)
+        stream = new FileInputStream(path)
     }
 
     public ExcelLoader(InputStream inputStream)
     {
-        InputStream  = inputStream
+        stream  = inputStream
     }
 
 
 	def parse(path) {
-		Workbook wb = WorkbookFactory.create(InputStream);
+		Workbook wb = WorkbookFactory.create(stream);
         if(!wb)
             return [[],[]]
 		Sheet sheet = wb.getSheetAt(0);

@@ -31,13 +31,7 @@ class DataImportService {
     def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, ArrayList parentModels, HeadersMap headersMap) {
         //get indexes of the appropriate sections
         def totalCounter = 0
-
-        //TODO remove - this is a hack to ensure that all the models are put under the heading of model catalogue
-        //we will need to remove this in the future
-
-        parentModels.add(0, "ModelCatalogue")
         def newImporter = new Importer(parentModels:parentModels)
-
         def dataItemNameIndex = headers.indexOf(headersMap.dataElementNameRow)
         def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCodeRow)
         def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescriptionRow)

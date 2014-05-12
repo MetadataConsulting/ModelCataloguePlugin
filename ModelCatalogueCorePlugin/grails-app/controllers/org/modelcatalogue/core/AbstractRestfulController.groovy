@@ -50,10 +50,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected setSafeMax(Integer max) {
         withFormat {
             json {
-                params.max = Math.min(max ?: 10, 100)
+                params.max = Math.min(max ?: 10, 10000)
             }
             xml {
-                params.max = Math.min(max ?: 10, 100)
+                params.max = Math.min(max ?: 10, 10000)
             }
             xlsx {
                 params.max = Math.min(max ?: 10000, 10000)
