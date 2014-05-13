@@ -19,7 +19,7 @@ import spock.lang.Specification
 class ImporterSpec extends AbstractIntegrationSpec {
 
     @Shared
-    ImportRow validImportRow, invalidImportRow, validImportRow2
+    ImportRow validImportRow, invalidImportRow, validImportRow2, modelOnlyImportRow
     @Shared
     Importer importer
 
@@ -28,6 +28,63 @@ class ImporterSpec extends AbstractIntegrationSpec {
     def setupSpec(){
         importer = new Importer()
         loadFixtures()
+        validImportRow = new ImportRow()
+        validImportRow2 = new ImportRow()
+        modelOnlyImportRow = new ImportRow()
+        invalidImportRow = new ImportRow()
+
+
+        modelOnlyImportRow.dataElementName = ""
+        modelOnlyImportRow.dataElementCode = ""
+        modelOnlyImportRow.parentModelName = "testParentModelCode"
+        modelOnlyImportRow.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dfq10_1"
+        modelOnlyImportRow.containingModelName = "testJustModel"
+        modelOnlyImportRow.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64daf10_1"
+        modelOnlyImportRow.dataType =   ""
+        modelOnlyImportRow.dataElementDescription =  ""
+        modelOnlyImportRow.measurementUnitName =   ""
+        modelOnlyImportRow.conceptualDomainName = "formula one"
+        modelOnlyImportRow.conceptualDomainDescription = " the domain of formula one"
+
+//        //row 1
+        validImportRow.dataElementName = "testDataItem"
+        validImportRow.dataElementCode = "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1"
+        validImportRow.parentModelName = "testParentModelCode"
+        validImportRow.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1"
+        validImportRow.containingModelName = "testModel"
+        validImportRow.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1"
+        validImportRow.dataType =   "String"
+        validImportRow.dataElementDescription =  "test description"
+        validImportRow.measurementUnitName =   "mph"
+        validImportRow.conceptualDomainName = "formula one"
+        validImportRow.conceptualDomainDescription = " the domain of formula one"
+//
+//
+//        //row 2 -same model as row 1 but different data element
+        validImportRow2.dataElementName = "testDataItem2"
+        validImportRow2.dataElementCode = "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1"
+        validImportRow2.parentModelName = "testParentModelCode"
+        validImportRow2.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1"
+        validImportRow2.containingModelName = "testModel"
+        validImportRow2.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1"
+        validImportRow2.dataType =   "String"
+        validImportRow2.dataElementDescription =  "test description 2"
+        validImportRow2.measurementUnitName =   "cm3"
+        validImportRow2.conceptualDomainName = "formula one"
+        validImportRow2.conceptualDomainDescription = " the domain of formula one"
+//
+//        //row 3 -same as row 1 but with updates
+//
+        invalidImportRow.dataElementName = "testDataItem"
+        invalidImportRow.parentModelName = "testParentModelCode"
+        invalidImportRow.parentModelCode = "asd"
+        invalidImportRow.containingModelName = "testModel"
+        invalidImportRow.containingModelCode = "asd"
+        invalidImportRow.dataType =   "String"
+        invalidImportRow.dataElementDescription =  "test description"
+        invalidImportRow.measurementUnitName =   "mph"
+        invalidImportRow.conceptualDomainName = "formula one"
+        invalidImportRow.conceptualDomainDescription = " the domain of formula one"
     }
 
     def "test import new enumerated data type"(){
@@ -173,7 +230,6 @@ class ImporterSpec extends AbstractIntegrationSpec {
         book.parentOf.contains(chapter1)
 
         when:
-        //(String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain)
         def model = importer.importModels(chapter2.modelCatalogueId, chapter2.name, "", "testModel", cd)
 
         then:
@@ -183,6 +239,55 @@ class ImporterSpec extends AbstractIntegrationSpec {
         cleanup:
         book.removeFromParentOf(chapter1)
         chapter1.removeFromParentOf(chapter2)
+        chapter2.removeFromParentOf(model)
+        model.delete()
+
+    }
+
+    def "test importModels 2"(){
+
+        def book = Model.findByName("book")
+        def chapter1 = Model.findByName("chapter1")
+        def chapter2 = Model.findByName("chapter2")
+        def cd = ConceptualDomain.findByName("public libraries")
+
+        setup:
+        book.addToParentOf(chapter1)
+        chapter1.addToParentOf(chapter2)
+
+        expect:
+        chapter1.parentOf.contains(chapter2)
+        book.parentOf.contains(chapter1)
+
+        when:
+        def model = importer.importModels("", "", "", "testModels", cd)
+
+        then:
+        model
+        !model.childOf.contains(chapter2)
+
+        cleanup:
+        book.removeFromParentOf(chapter1)
+        chapter1.removeFromParentOf(chapter2)
+        model.delete()
+
+    }
+
+    //importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
+
+    def "test import data element"(){
+
+        def book = Model.findByName("book")
+        def dataType = DataType.findByName("String")
+        def cd = ConceptualDomain.findByName("public libraries")
+
+
+        when:
+        def de = importer.importDataElement([name: "testDataElement", description: "asdf asdffsda", modelCatalogueId: ""], ['1a':"as", '2a':"adsf"], book, [name: "values", description: "blabh albh",  dataType: dataType, measurementUnit: null], cd)
+
+        then:
+        de
+        de.containedIn.contains(book)
 
     }
 
@@ -212,60 +317,24 @@ class ImporterSpec extends AbstractIntegrationSpec {
 //    }
 
 
+//modelOnlyImportRow
 
-//
-//    def setup() {
-//        loadFixtures()
-//        validImportRow = new ImportRow()
-//        validImportRow2 = new ImportRow()
-//        invalidImportRow = new ImportRow()
-//
-//
-//
-//        //row 1
-//        validImportRow.dataElementName = "testDataItem"
-//        validImportRow.dataElementCode = "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1"
-//        validImportRow.parentModelName = "testParentModelCode"
-//        validImportRow.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1"
-//        validImportRow.containingModelName = "testModel"
-//        validImportRow.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1"
-//        validImportRow.dataType =   "String"
-//        validImportRow.dataElementDescription =  "test description"
-//        validImportRow.measurementUnitName =   "mph"
-//        validImportRow.conceptualDomainName = "formula one"
-//        validImportRow.conceptualDomainDescription = " the domain of formula one"
-//
-//
-//        //row 2 -same model as row 1 but different data element
-//        validImportRow2.dataElementName = "testDataItem2"
-//        validImportRow2.dataElementCode = "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1"
-//        validImportRow2.parentModelName = "testParentModelCode"
-//        validImportRow2.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1"
-//        validImportRow2.containingModelName = "testModel"
-//        validImportRow2.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1"
-//        validImportRow2.dataType =   "String"
-//        validImportRow2.dataElementDescription =  "test description 2"
-//        validImportRow2.measurementUnitName =   "cm3"
-//        validImportRow2.conceptualDomainName = "formula one"
-//        validImportRow2.conceptualDomainDescription = " the domain of formula one"
-//
-//        //row 3 -same as row 1 but with updates
-//
-//        invalidImportRow.dataElementName = "testDataItem"
-//        invalidImportRow.parentModelName = "testParentModelCode"
-//        invalidImportRow.parentModelCode = "asd"
-//        invalidImportRow.containingModelName = "testModel"
-//        invalidImportRow.containingModelCode = "asd"
-//        invalidImportRow.dataType =   "String"
-//        invalidImportRow.dataElementDescription =  "test description"
-//        invalidImportRow.measurementUnitName =   "mph"
-//        invalidImportRow.conceptualDomainName = "formula one"
-//        invalidImportRow.conceptualDomainDescription = " the domain of formula one"
-//
-//
-//
-//    }
-//
+    def "test row with model only"(){
+
+        when:
+        importer.ingestRow(modelOnlyImportRow)
+        def parentModel = Model.findByModelCatalogueId("MC_037e6162-3b6f-4ae4-a171-2570b64dfq10_1")
+        def containingModel = Model.findByModelCatalogueId("MC_037e6162-5b6f-4ae4-a171-2570b64daf10_1")
+        def conceptualDomain = ConceptualDomain.findByName("formula one")
+
+        then:
+        parentModel
+        containingModel
+        conceptualDomain
+
+    }
+
+
 //    def cleanup() {
 //    }
 //
@@ -277,7 +346,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
 //
 //
 //        when:
-//        importer.importAll(rows)
+//        importer.addAll(rows)
 //
 //        then:
 //        importer.importQueue.contains(validImportRow)
@@ -323,7 +392,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
 //        rows.add(invalidImportRow)
 //
 //        when:
-//        importer.importAll(rows)
+//        importer.addAll(rows)
 //
 //        then:
 //        importer.pendingAction.contains(invalidImportRow)
