@@ -32,7 +32,6 @@ class DataImportService {
         //get indexes of the appropriate sections
         def totalCounter = 0
         def newImporter = new Importer(parentModels:parentModels)
-
         def dataItemNameIndex = headers.indexOf(headersMap.dataElementNameRow)
         def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCodeRow)
         def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescriptionRow)

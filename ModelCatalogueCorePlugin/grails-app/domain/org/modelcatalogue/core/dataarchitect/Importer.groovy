@@ -228,8 +228,8 @@ class Importer {
             def namedChildren = []
             def match = null
             //if there isn't a name for the child return the parentName
-            if (!childName) { return parentName}
-            if(parentName){ parentName = parentName.trim()}
+            if (!childName) { return parentName }
+            if(parentName){ parentName = parentName.trim() }
             if(childName){ childName = childName.trim() }
             namedChildren = Model.findAllByName(childName)
             namedChildren.each { Model childModel ->
@@ -242,41 +242,44 @@ class Importer {
             if (!match) {
                 def child, parent
                 //create the child model
-                if (modelParams.name == childName) {
-                    child = new Model(modelParams).save(failOnError: true)
-                } else if (parentParams.name == childName) {
-                    child = new Model(parentParams).save(failOnError: true)
-                } else {
-                    child = new Model('name': childName).save(failOnError: true)
+                if (modelParams.name == childName) { child = new Model(modelParams).save(failOnError: true) }
+                else if (parentParams.name == childName) { child = new Model(parentParams).save(failOnError: true) }
+                else { child = new Model('name': childName).save(failOnError: true) }
+
+                if(child) {
+                    child.addToHasContextOf(conceptualDomain)
+                    child = addModelToImport(child)
+                    modelToReturn = child
                 }
-                child.addToHasContextOf(conceptualDomain)
-                child = addModelToImport(child)
-                modelToReturn = child
 
                 //see if the parent model exists
                 //TODO I'm sure we can clean this up
                 //it would be nice to create methods that allowed you to do a findAllByNameAndContext etc.
                 def namedParents = Model.findAllByName(parentName)
                 namedParents.each{ Model p ->
-                    if(p.hasContextOf.contains(conceptualDomain)) {parent = p}
+                    if(p.hasContextOf.contains(conceptualDomain)) { parent = p }
                 }
 
                 //create the parent model
-                if (!parent) {
-                    if (parentParams.name == parentName) {
-                        parent = new Model(parentParams).save()
-                    } else {
-                        parent = new Model('name': parentName).save()
-                    }
-                    parent.addToHasContextOf(conceptualDomain)
+                if (!parent && parentName) {
+                    if (parentParams.name == parentName) { parent = new Model(parentParams).save() }
+                    else { parent = new Model('name': parentName).save() }
                 }
-                child.addToChildOf(parent)
-                parent = addModelToImport(parent)
+
+                if(parent) {
+                    parent.addToHasContextOf(conceptualDomain)
+                    child.addToChildOf(parent)
+                    parent = addModelToImport(parent)
+                }
+
                 return child.name
+
             } else {
+
                 match = addModelToImport(match)
                 modelToReturn = match
                 return match.name
+
             }
         }
 

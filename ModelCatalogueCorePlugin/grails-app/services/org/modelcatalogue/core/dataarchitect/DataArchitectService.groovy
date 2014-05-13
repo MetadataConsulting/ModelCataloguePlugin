@@ -16,6 +16,7 @@ import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.util.ListAndCount
 
 @Transactional
 class DataArchitectService {
@@ -23,12 +24,10 @@ class DataArchitectService {
     def modelCatalogueSearchService, publishedElementService
 
     def uninstantiatedDataElements(Map params){
-        def results = [:]
+        ListAndCount results = new ListAndCount()
         def uninstantiatedDataElements, totalCount
         def instantiation = RelationshipType.findByName("instantiation")
         def searchParams = getParams(params)
-        //TODO change this query to an hql query to enable pagination with distinctness
-        try {
 
             totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
                     "WHERE a.outgoingRelationships IS EMPTY " +
@@ -45,12 +44,10 @@ class DataArchitectService {
                     "JOIN a2.outgoingRelationships e2 " +
                     "WHERE e2.relationshipType = ?)", [instantiation], [max: searchParams.max, offset: searchParams.offset]
             )
-            results.put("totalCount", totalCount.get(0).toInteger())
-            results.put("results", uninstantiatedDataElements)
 
-        }catch(Exception e){
-            results.put("errors", e)
-        }
+        results.count = (totalCount.get(0))?totalCount.get(0):0
+        results.list = uninstantiatedDataElements
+
 
         return results
     }
@@ -58,9 +55,8 @@ class DataArchitectService {
     def metadataKeyCheck(Map params){
 
         def missingMetadataKey, totalCount
-        def results = [:]
+        ListAndCount results = new ListAndCount()
         def searchParams = getParams(params)
-        try {
 
             totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
                     "WHERE a.extensions IS EMPTY " +
@@ -78,11 +74,9 @@ class DataArchitectService {
                     "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
             )
 
-            results.put("totalCount", totalCount.get(0).toInteger())
-            results.put("results", missingMetadataKey)
-        }catch(Exception e){
-            results.put("errors", e)
-        }
+            results.count = (totalCount.get(0))?totalCount.get(0):0
+            results.list = missingMetadataKey
+
 
         return results
     }

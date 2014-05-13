@@ -47,7 +47,7 @@ class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateE
                         query_string(query: params.search)
                     }
                     must_not {
-                        terms status: ['archived', 'draft', 'pending', 'removed'], system: ['true']
+                        terms status: ['archived', 'draft', 'pending', 'removed']
                     }
                 }
             }
