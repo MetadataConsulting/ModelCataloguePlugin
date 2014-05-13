@@ -99,7 +99,7 @@ Model catalogue core plugin (metadata registry)
         xlsxListRenderer.registerRowWriter {
             headers 'ID', 'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search'] && CatalogueElement.isAssignableFrom(container.itemType)
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && CatalogueElement.isAssignableFrom(container.itemType)
             } then { CatalogueElement element ->
                 [[element.id, element.name, element.description]]
             }

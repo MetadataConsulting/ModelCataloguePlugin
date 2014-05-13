@@ -6,6 +6,7 @@ import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import spock.lang.Shared
@@ -22,19 +23,196 @@ class ImporterSpec extends AbstractIntegrationSpec {
     @Shared
     Importer importer
 
-    def void "placeholder test"(){}
+//    def void "placeholder test"(){}
 
     def setupSpec(){
         importer = new Importer()
+        loadFixtures()
     }
 
-//    def ""(){
+    def "test import new enumerated data type"(){
+        when:
+        def dataType = importer.importDataType('testEnum', "t:test|t1:testONe")
+        def testDataType =  DataType.findByName("testEnum")
+
+        then:
+        dataType
+        testDataType
+        testDataType==dataType
+
+        cleanup:
+        dataType.delete()
+
+    }
+
+    def "test import existing data type"(){
+        when:
+        def dataType = importer.importDataType('string', 'string')
+
+        then:
+        dataType.name == "String"
+
+    }
+
+    def "test import existing data type with :"(){
+        when:
+        def dataType = importer.importDataType('asd', 'xs:string')
+
+        then:
+        dataType.name == "xs:string"
+
+    }
+
+
+//
+    def "test import existing enumerated data type"(){
+        when:
+        def dataType = importer.importDataType('xxxxx', 'm:male|f:female|u:unknown|ns:not specified')
+
+        then:
+        dataType.name == "gender"
+    }
+//
+    def "import invalid data type"(){
+        when:
+        def dataType = importer.importDataType('blah', 'blah')
+
+        then:
+        !dataType
+    }
+
+
+    def "test import invalid enumerated data type"(){
+        when:
+        def dataType = importer.importDataType('test', 'a:|asdasd|asdad:ads')
+        then:
+        !dataType
+    }
+
+    def "test import existing measurement unit"(){
+
+        def params = [:]
+        params.name = "Degrees Celsius"
+        params.symbol = "°C"
+
+        when:
+        def mu = importer.importMeasurementUnit(params)
+
+        then:
+        mu.name == "Degrees Celsius"
+        mu.symbol == "°C"
+    }
+
+    def "test import existing measurement unit just name"(){
+
+        def params = [:]
+        params.name = "Degrees Celsius"
+
+        when:
+        def mu = importer.importMeasurementUnit(params)
+
+        then:
+        mu.name == "Degrees Celsius"
+        mu.symbol == "°C"
+    }
+
+    def "test import existing measurement unit just symbol"(){
+
+        def params = [:]
+        params.symbol = "°C"
+
+        when:
+        def mu = importer.importMeasurementUnit(params)
+
+        then:
+        mu.name == "Degrees Celsius"
+        mu.symbol == "°C"
+    }
+
+
+    //name: "public libraries"
+
+
+    def "test import existing conceptualDomain"(){
+        when:
+        def cd = importer.importConceptualDomain("public libraries", "")
+
+        then:
+        cd.name == "public libraries"
+        cd.description== "this is a container for the domain for public libraries"
+
+    }
+
+    def "test create conceptualDomain"(){
+        when:
+        def cd = importer.importConceptualDomain("test", "testConceptualDomain")
+
+        then:
+        cd
+        cd.name == "test"
+        cd.description== "testConceptualDomain"
+
+        cleanup:
+        cd.delete()
+
+    }
+
+    def "test importModels"(){
+
+        def book = Model.findByName("book")
+        def chapter1 = Model.findByName("chapter1")
+        def chapter2 = Model.findByName("chapter2")
+        def cd = ConceptualDomain.findByName("public libraries")
+
+        setup:
+        book.addToParentOf(chapter1)
+        chapter1.addToParentOf(chapter2)
+
+        expect:
+        chapter1.parentOf.contains(chapter2)
+        book.parentOf.contains(chapter1)
+
+        when:
+        //(String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain)
+        def model = importer.importModels(chapter2.modelCatalogueId, chapter2.name, "", "testModel", cd)
+
+        then:
+        model
+        model.childOf.contains(chapter2)
+
+        cleanup:
+        book.removeFromParentOf(chapter1)
+        chapter1.removeFromParentOf(chapter2)
+
+    }
+
+
+//
+//    def "test import data element"(){
+//
+//        setup:
+//        DataElement de = DataElement.findByName("DE_author")
+//        Model book = Model.findByName("book")
+//        Model chapter1 = Model.findByName("chapter1")
+//        book.addToParentOf(chapter1)
+//        chapter1.addToContains(de)
+//
+//        expect:
+//        chapter1.contains.contain(de)
+//        book.parentOf.contains(chapter1)
+//
+//        when:
+//
+//
+//
+//        then:
+//
+//        cleanup:
 //
 //    }
 
 
 
-//
 //
 //    def setup() {
 //        loadFixtures()

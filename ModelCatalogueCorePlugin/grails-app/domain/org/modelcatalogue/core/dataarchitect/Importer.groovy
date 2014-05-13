@@ -91,49 +91,83 @@ class Importer {
 
 
     def importDataType(String name, String data) {
-        def dataTypeReturn
-        if(!data.contains("|")) {
-            String[] lines = data.split("\\r?\\n")
-            if (lines.size() > 0 && lines[] != null) {
-                Map enumerations = new HashMap()
-                lines.each { enumeratedValues ->
-                    def EV = enumeratedValues.split(":")
-                    if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
-                        def key = EV[0]
-                        def value = EV[1]
-                        if (value.size() > 244) {
-                            value = value[0..244]
-                        }
-                        key = key.trim()
-                        value = value.trim()
-                        if (value.isEmpty()) {
-                            value = "_"
-                        }
-                        enumerations.put(key, value)
-                    }
+
+
+        def dataTypeReturn = DataType.findByName(data)
+        //TODO: create action: do you want to use name similar
+        if(!dataTypeReturn){
+            dataTypeReturn = DataType.findByNameIlike(data)
+        }
+        if (!dataTypeReturn) {
+            if (data.contains("|")) {
+                try {
+                    data = sortEnumAsString(data)
+                } catch (Exception e) {
+                    return null
                 }
-                if (!enumerations.isEmpty()) {
-                    String enumString = enumerations.sort() collect { key, val ->
-                        "${this.quote(key)}:${this.quote(val)}"
-                    }.join('|')
-                    dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
-                    if (!dataTypeReturn) {
-                        dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
+                dataTypeReturn = EnumeratedType.findWhere(enumAsString: data)
+                if (!dataTypeReturn) {
+                    //TODO: create action: do you want to create enum
+                    dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumAsString: data).save()
+                }
+            } else if (data.contains("\\n") || data.contains("\\r")) {
+                String[] lines = data.split("\\r?\\n")
+                if (lines.size() > 0 && lines[] != null) {
+                    Map enumerations = new HashMap()
+                    lines.each { enumeratedValues ->
+                        def EV = enumeratedValues.split(":")
+                        if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
+                            def key = EV[0]
+                            def value = EV[1]
+                            if (value.size() > 244) {
+                                value = value[0..244]
+                            }
+                            key = key.trim()
+                            value = value.trim()
+                            if (value.isEmpty()) {
+                                value = "_"
+                            }
+                            enumerations.put(key, value)
+                        }
+                    }
+                    if (!enumerations.isEmpty()) {
+                        String enumString = enumerations.sort() collect { key, val ->
+                            "${this.quote(key)}:${this.quote(val)}"
+                        }.join('|')
+                        dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
+                        if (!dataTypeReturn) {
+                            //TODO: create action: do you want to create enum
+                            dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
+                        }
                     }
                 }
             }
-        }else{
-            dataTypeReturn = EnumeratedType.findWhere(enumAsString: data)
-            if (!dataTypeReturn) { dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumAsString: data).save() }
+
         }
 
-        if (!dataTypeReturn) { dataTypeReturn = DataType.findByNameIlike(data) }
+        //TODO: action do you want to create a new data type
+//        if (!dataTypeReturn) { dataTypeReturn = new DataType(data).save() }
+
         return dataTypeReturn
     }
 
     def importMeasurementUnit(Map params) {
-        MeasurementUnit mu = MeasurementUnit.findByNameIlike(params.name)
-        if (!mu) { mu = new MeasurementUnit(params).save() }
+        MeasurementUnit mu
+        if(params.name && params.symbol) {
+            mu = MeasurementUnit.findByNameAndSymbol(params.name, params.symbol)
+        }else {
+            if (!mu) {
+                //TODO: need to create an action i.e. is this the unit?
+                mu = MeasurementUnit.findBySymbol(params.symbol)
+            }
+            if (!mu) {
+                //TODO: need to create an action i.e. is this the unit?
+                mu = MeasurementUnit.findByNameIlike(params.name)
+            }
+        }
+//TODO: do you want to create a new measurement unit?
+//        if (!mu) { mu = new MeasurementUnit(params).save() }
+
         return mu
     }
 
@@ -141,11 +175,11 @@ class Importer {
     def importConceptualDomain(String name, String description) {
         name = name.trim()
         ConceptualDomain conceptualDomain = ConceptualDomain.findByName(name)
+        //TODO: is this the conceptual domain you want to use
+        //if (!conceptualDomain) { conceptualDomain = ConceptualDomain.findByNameIlike(name)}
+
+        //TODO: do you want to create a new conceptual domain
         if (!conceptualDomain) { conceptualDomain = new ConceptualDomain(name: name, description: description).save() }
-        //TODO remove this - this is a hack, we need to ensure that there is always a top level model catalogue model
-        //that all the models are children of. This model must be unique and must have the context of all the conceptual domains
-        def modelCatalogueModel = Model.findByName("ModelCatalogue")
-        if(modelCatalogueModel){modelCatalogueModel.addToHasContextOf(conceptualDomain)}
         return conceptualDomain
     }
 
@@ -434,11 +468,35 @@ class Importer {
         return row
     }
 
-    protected String quote(String s) {
+    protected static String sortEnumAsString(String s) {
+            if (s == null) return null
+            Map<String, String> ret = [:]
+            s.split(/\|/).each { String part ->
+                if (!part) return
+                String[] pair = part.split(/:/)
+                if (pair.length != 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
+                ret[unquote(pair[0])] = unquote(pair[1])
+            }
+            s = ret.sort() collect { key, val ->
+                "${quote(key)}:${quote(val)}"
+            }.join('|')
+        s
+    }
+
+    protected static String quote(String s) {
         if (s == null) return null
         String ret = s
         QUOTED_CHARS.each { original, replacement ->
             ret = ret.replace(original, replacement)
+        }
+        ret
+    }
+
+    protected static String unquote(String s) {
+        if (s == null) return null
+        String ret = s
+        QUOTED_CHARS.reverseEach { original, pattern ->
+            ret = ret.replace(pattern, original)
         }
         ret
     }
