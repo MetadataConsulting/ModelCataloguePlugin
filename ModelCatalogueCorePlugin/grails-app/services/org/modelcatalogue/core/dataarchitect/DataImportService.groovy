@@ -78,7 +78,7 @@ class DataImportService {
             } else {
                 totalCounter++
             }
-            println(importRow.dataElementName)
+            //println(importRow.dataElementName)
             newImporter.ingestRow(importRow)
         }
 

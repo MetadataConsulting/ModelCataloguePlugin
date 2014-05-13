@@ -244,7 +244,7 @@ class Importer {
                 //create the child model
                 if (modelParams.name == childName) { child = new Model(modelParams).save(failOnError: true) }
                 else if (parentParams.name == childName) { child = new Model(parentParams).save(failOnError: true) }
-                else { child = new Model('name': childName).save(failOnError: true) }
+                else if (childName){ child = new Model('name': childName).save(failOnError: true) }
 
                 if(child) {
                     child.addToHasContextOf(conceptualDomain)
@@ -253,13 +253,15 @@ class Importer {
                 }
 
                 //see if the parent model exists
-                //TODO I'm sure we can clean this up
-                //it would be nice to create methods that allowed you to do a findAllByNameAndContext etc.
-                def namedParents = Model.findAllByName(parentName)
-                namedParents.each{ Model p ->
-                    if(p.hasContextOf.contains(conceptualDomain)) { parent = p }
+                parent = Model.findByModelCatalogueId(parentParams.modelCatalogueId)
+                if(!parent) {
+                    def namedParents = Model.findAllByName(parentName)
+                    namedParents.each { Model p ->
+                        if (p.hasContextOf.contains(conceptualDomain)) {
+                            parent = p
+                        }
+                    }
                 }
-
                 //create the parent model
                 if (!parent && parentName) {
                     if (parentParams.name == parentName) { parent = new Model(parentParams).save() }

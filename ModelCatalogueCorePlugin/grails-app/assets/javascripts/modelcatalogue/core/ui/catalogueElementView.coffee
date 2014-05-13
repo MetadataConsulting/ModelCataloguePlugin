@@ -77,6 +77,12 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               {header: "Name", value: 'name', class: 'col-md-5', show: true}
               {header: "Description", value: 'description', class: 'col-md-6'}
             ]
+#          else if tabDefinition.name == 'history'
+#            tabDefinition.columns = [
+#              {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
+#              {header: "Name", value: 'name', class: 'col-md-5', show: true}
+#              {header: "Description", value: 'description', class: 'col-md-6'}
+#            ]
           else if fn.itemType == 'org.modelcatalogue.core.Relationship'
             tabDefinition.actions.push {
               title:  'Remove'
