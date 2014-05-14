@@ -26,8 +26,8 @@ class DataElement extends ExtendibleElement {
     }
 
     static relationships = [
-            incoming: [containment: 'containedIn'],
-            outgoing: [instantiation: 'instantiatedBy']
+            incoming: [containment: 'containedIn', synonymy: 'synonymousWith'],
+            outgoing: [instantiation: 'instantiatedBy', synonymy: 'synonymousWith']
     ]
 
     String toString() {

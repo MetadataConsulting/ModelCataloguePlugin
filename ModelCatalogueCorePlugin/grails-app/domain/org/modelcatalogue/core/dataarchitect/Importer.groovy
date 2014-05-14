@@ -231,19 +231,23 @@ class Importer {
             if (!childName) { return parentName }
             if(parentName){ parentName = parentName.trim() }
             if(childName){ childName = childName.trim() }
-            namedChildren = Model.findAllByName(childName)
-            namedChildren.each { Model childModel ->
-                if (childModel.childOf.collect { it.name }.contains(parentName) && childModel.hasContextOf.contains(conceptualDomain)) {
-                    match = childModel
+            match = Model.findByModelCatalogueId(modelParams.modelCatalogueId)
+            if(!match) {
+                namedChildren = Model.findAllByName(childName)
+                namedChildren.each { Model childModel ->
+                    if (childModel.childOf.collect {
+                        it.name
+                    }.contains(parentName) && childModel.hasContextOf.contains(conceptualDomain)) {
+                        match = childModel
+                    }
                 }
             }
-
             //if there isn't a matching model with the same name and parentName
             if (!match) {
                 def child, parent
                 //create the child model
                 if (modelParams.name == childName) { child = new Model(modelParams).save(failOnError: true) }
-                else if (parentParams.name == childName) { child = new Model(parentParams).save(failOnError: true) }
+                //else if (parentParams.name == childName) { child = new Model(parentParams).save(failOnError: true) }
                 else if (childName){ child = new Model('name': childName).save(failOnError: true) }
 
                 if(child) {
@@ -408,7 +412,7 @@ class Importer {
         if (de) { de = updateDataElement(params, de, metadata) }
 
         //find if data element exists using name and containing model
-        if (!de) {
+        if (!de && params.name) {
             def nameDE = DataElement.findByName(params.name)
             if (nameDE && nameDE.containedIn.contains(model)) {
                 de = nameDE
@@ -416,13 +420,13 @@ class Importer {
             }
         }
 
-        if (!de) {
+        if (!de && params.name) {
             params.put('status', PublishedElementStatus.FINALIZED)
             de = new DataElement(params).save()
             de = updateMetadata(metadata, de)
         }
 
-        de.addToContainedIn(model)
+        if(de){de.addToContainedIn(model)}
         return de
     }
 
