@@ -23,12 +23,16 @@ class Importer {
     Collection<ImportRow> importQueue = []
     Collection<ImportRow> imported = []
     Collection<Integer> modelIds = []
-    ArrayList parentModels
+    ArrayList<Model> parentModels
 
     static constraints = {
         imported nullable: true
         pendingAction nullable: true
         importQueue nullable: true
+    }
+
+    def void addParentModels(){
+
     }
 
     def void addAll(Collection<ImportRow> rows) {
@@ -217,33 +221,100 @@ class Importer {
         return model
     }
 
+    protected matchModelByPathAndConceptualDomain(Model model, ArrayList path, ConceptualDomain conceptualDomain){
+        def match = false
+        for(parentName in path.reverse()){
+            model = model.childOf.collect { it.name }.contains(parentName)
+            if(model && model.hasContextOf.contains(conceptualDomain)){
+                match = true
+            }else{
+                match = false
+                break
+            }
+        }
+        return match
+    }
+
+    protected findModelByNameAndPathAndConceptualDomain(String modelName, ArrayList path, ConceptualDomain conceptualDomain){
+        def match, namedChildren, parentName, matchPath
+        namedChildren  = Model.findAllByName(modelName)
+        if(path.size()>0 && namedChildren.size()>0) {
+            namedChildren.each { Model childModel ->
+                if (matchModelByPathAndConceptualDomain(childModel, path, conceptualDomain) && childModel.hasContextOf.contains(conceptualDomain)) {
+                    match = childModel
+                }
+            }
+
+        }else if(path.size==0 && namedChildren.size()>0){
+            //this applies to top level models i.e. there is no path for them
+            namedChildren.each { Model childModel ->
+                if (childModel.hasContextOf.contains(conceptualDomain)) {
+                    match = childModel
+                }
+            }
+        }
+        return match
+    }
+
     protected matchOrCreateModel(ArrayList modelPath, Map parentParams, Map modelParams, ConceptualDomain conceptualDomain) {
 
         //the final model we want to return i.e. the containing model
         Model modelToReturn
 
+        def matchChild = null
+        def matchParent = null
+
+        //try to match the parent model using catalogue id
+        matchParent = Model.findByModelCatalogueId(parentParams.modelCatalogueId)
+        //try to match model using name and parent name
+        if(!matchParent){ matchParent = findModelByNameAndPathAndConceptualDomain(parentParams.name, modelPath, conceptualDomain) }
+
+        if(!matchParent && parentParams.name){
+
+        }
+
+        matchChild = Model.findByModelCatalogueId(modelParams.modelCatalogueId)
+
+
+//        if(!matchChild){
+//            //either there is a child and we have to find it by the parent or the path to the parent
+//            if(!matchParent){
+//
+//            }else{
+//
+//            }
+//
+//            //or there is no child so we need to create one
+//
+//
+//        }else{
+//
+//
+//
+//        }
+
+
         //iterate through the model path i.e. ANIMAL - MAMMAL - DOG - POODLE and create models for each of these if they don't exist,
         // otherwise find them and create a parentChild relationship
         modelPath.inject { String parentName, String childName ->
             def namedChildren = []
-            def match = null
+
             //if there isn't a name for the child return the parentName
-            if (!childName) { return parentName }
             if(parentName){ parentName = parentName.trim() }
             if(childName){ childName = childName.trim() }
-            match = Model.findByModelCatalogueId(modelParams.modelCatalogueId)
-            if(!match) {
+            matchChild = Model.findByModelCatalogueId(modelParams.modelCatalogueId)
+            if(!matchChild) {
                 namedChildren = Model.findAllByName(childName)
                 namedChildren.each { Model childModel ->
                     if (childModel.childOf.collect {
                         it.name
                     }.contains(parentName) && childModel.hasContextOf.contains(conceptualDomain)) {
-                        match = childModel
+                        matchChild = childModel
                     }
                 }
             }
             //if there isn't a matching model with the same name and parentName
-            if (!match) {
+            if (!matchChild) {
                 def child, parent
                 //create the child model
                 if (modelParams.name == childName) { child = new Model(modelParams).save(failOnError: true) }
@@ -282,9 +353,9 @@ class Importer {
 
             } else {
 
-                match = addModelToImport(match)
-                modelToReturn = match
-                return match.name
+                matchChild = addModelToImport(matchChild)
+                modelToReturn = matchChild
+                return matchChild.name
 
             }
         }
