@@ -31,7 +31,17 @@ class Importer {
         importQueue nullable: true
     }
 
-    def void addParentModels(){
+    def void addParentModels(ArrayList modelPath, ConceptualDomain conceptualDomain){
+
+        // or with a loop
+        modelPath = modelPath.reverse()
+        def i = modelPath.iterator()
+        while (i.hasNext()) {
+            println(i)
+            i.remove()
+            println(i)
+            println(modelPath)
+        }
 
     }
 
@@ -260,7 +270,6 @@ class Importer {
 
         //the final model we want to return i.e. the containing model
         Model modelToReturn
-
         def matchChild = null
         def matchParent = null
 

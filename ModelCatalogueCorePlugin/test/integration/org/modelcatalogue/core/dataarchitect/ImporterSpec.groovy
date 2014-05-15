@@ -317,6 +317,17 @@ class ImporterSpec extends AbstractIntegrationSpec {
 //    }
 
 
+    def "add parent models"(){
+
+        when:
+        importer.addParentModels(["test", "testchild1", "testchild2"], ConceptualDomain.findByName("formula one"))
+
+        then:
+        importer.parentModels.size()>0
+
+    }
+
+
 //modelOnlyImportRow
 
     def "test row with model only"(){
