@@ -52,7 +52,6 @@ class DataArchitectController {
             return
         }
 
-        def total = results.count
         def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/metadataKeyCheck", results.count)
 
         Elements elements =  new Elements(
