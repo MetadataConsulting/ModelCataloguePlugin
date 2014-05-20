@@ -107,6 +107,31 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ListCtrl'
   }
 
+#  $stateProvider.state 'mc.dataArchitect.findSynonym', {
+#    url: "/findSynonymWithKeyValue",
+#    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+#    controller: ['$state','$modal',($state, $modal)->
+#      $state.go('mc.dataArchitect.findSynonymWithKeyValue', {"Data item No.","Optional_Local_Identifier"})
+#
+#    ]
+#  }
+
+  $stateProvider.state 'mc.dataArchitect.createCOSDSynonymRelationships', {
+    url: "/createCOSDSynonymRelationships/{metadata}",
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+    resolve:
+      list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        page = parseInt($stateParams.page ? 1, 10)
+        $stateParams.resource = "dataElement"
+        return modelCatalogueDataArchitect.createCOSDSynonymRelationships("Data item No.","Optional_Local_Identifier")
+      ]
+
+#    controller: 'mc.core.ui.states.ListCtrl'
+#    controller: ['$state','$modal',($state, $modal)->
+#    ]
+  }
+
+
   $stateProvider.state 'mc.dataArchitect.metadataKey', {
     url: "/metadataKeyCheck",
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'

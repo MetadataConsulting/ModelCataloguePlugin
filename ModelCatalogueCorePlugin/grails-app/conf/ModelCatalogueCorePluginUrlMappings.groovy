@@ -66,8 +66,11 @@ class ModelCatalogueCorePluginUrlMappings {
             "/uninstantiatedDataElements" (controller:"dataArchitect"){
                 action = [GET: "uninstantiatedDataElements"]
             }
-            "/metadataKeyCheck/$key?" (controller:"dataArchitect"){
+            "/metadataKeyCheck/$key?" (controller:"dataArchitect") {
                 action = [GET: "metadataKeyCheck"]
+            }
+            "/createCOSDSynonymRelationships/$key?" (controller:"dataArchitect"){
+                action = [GET: "createCOSDSynonymRelationships"]
             }
         }
 

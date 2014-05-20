@@ -58,27 +58,54 @@ class DataArchitectService {
         ListAndCount results = new ListAndCount()
         def searchParams = getParams(params)
 
-            totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
-                    "WHERE a.extensions IS EMPTY " +
-                    "OR a NOT IN " +
-                    "(SELECT a2 from DataElement a2 " +
-                    "JOIN a2.extensions e2 " +
-                    "WHERE e2.name = ?)", [searchParams.key], [cache:true]
-            )
+        totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
+                "WHERE a.extensions IS EMPTY " +
+                "OR a NOT IN " +
+                "(SELECT a2 from DataElement a2 " +
+                "JOIN a2.extensions e2 " +
+                "WHERE e2.name = ?)", [searchParams.key], [cache:true]
+        )
 
-            missingMetadataKey = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-                    "WHERE a.extensions IS EMPTY " +
-                    "OR a NOT IN " +
-                    "(SELECT a2 from DataElement a2 " +
-                    "JOIN a2.extensions e2 " +
-                    "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
-            )
+        missingMetadataKey = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                "WHERE a.extensions IS EMPTY " +
+                "OR a NOT IN " +
+                "(SELECT a2 from DataElement a2 " +
+                "JOIN a2.extensions e2 " +
+                "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
+        )
 
-            results.count = (totalCount.get(0))?totalCount.get(0):0
-            results.list = missingMetadataKey
+        results.count = (totalCount.get(0))?totalCount.get(0):0
+        results.list = missingMetadataKey
 
 
         return results
+    }
+
+    def createCOSDSynonymRelationships(Map params){
+
+        def searchParams = getParams(params)
+        def synonymDataElements = []
+        def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                "inner join a.extensions e " +
+                "WHERE e.name = ?)", [searchParams.keyOne])//, [max: searchParams.max, offset: searchParams.offset])
+
+        key1Elements.eachWithIndex{ DataElement dataElement, int dataElementIndex ->
+            def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf{it.name==searchParams.keyOne}].extensionValue
+            def key2Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                    "inner join a.extensions e " +
+                    "WHERE e.name = ? and e.extensionValue = ?) ", [searchParams.keyTwo, extensionName])
+
+            // Create a Map
+            key2Elements.each {
+                //check if the relationship exists already
+              //  Relationship.
+                //Add
+                def newSynonymDataElement = [dataElement.modelCatalogueId, "synonymity", it.modelCatalogueId]
+                synonymDataElements << newSynonymDataElement
+            }
+        }
+
+        return synonymDataElements
     }
 
     def indexAll(){
@@ -106,6 +133,8 @@ class DataArchitectService {
     private static Map getParams(Map params){
         def searchParams = [:]
         if(params.key){searchParams.put("key" , params.key)}
+        if(params.keyOne){searchParams.put("keyOne" , params.keyOne)}
+        if(params.keyTwo){searchParams.put("keyTwo" , params.keyTwo)}
         if(params.max){searchParams.put("max" , params.max.toInteger())}else{searchParams.put("max" , 10)}
        // if(params.sort){searchParams.put("sort" , "$params.sort")}else{searchParams.put("sort" , "name")}
        // if(params.order){searchParams.put("order" , params.order.toLowerCase())}else{searchParams.put("order" , "asc")}
