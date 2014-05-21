@@ -164,7 +164,40 @@ modelcatalogue.defaults.measurementunits = [
 
 
 modelcatalogue.defaults.relationshiptypes =  [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metedataHints: "Source Min. Occurs, Source Max. Occurs, Destination Min. Occurs, Destination Max. Occurs"],
+        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metedataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
+            Integer sourceMinOccurs = ext['Source Min Occurs'] as Integer
+            Integer sourceMaxOccurs = ext['Source Max Occurs'] as Integer
+            Integer destinationMinOccurs = ext['Destination Min Occurs'] as Integer
+            Integer destinationMaxOccurs = ext['Destination Max Occurs'] as Integer
+
+            if (sourceMinOccurs != null) {
+                if (sourceMinOccurs < 0) {
+                    return false
+                }
+                if (sourceMaxOccurs != null && sourceMaxOccurs < sourceMinOccurs) {
+                    return false
+                }
+            } else {
+                if (sourceMaxOccurs != null && sourceMaxOccurs < 1) {
+                    return false
+                }
+            }
+
+            if (destinationMinOccurs != null) {
+                if (destinationMinOccurs < 0) {
+                    return false
+                }
+                if (destinationMaxOccurs != null && destinationMaxOccurs < destinationMinOccurs) {
+                    return false
+                }
+            } else {
+                if (destinationMaxOccurs != null && destinationMaxOccurs < 1) {
+                    return false
+                }
+            }
+
+            return true
+        '''],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],

@@ -41,7 +41,7 @@ class RelationshipType {
      * destination
      * type
      *
-     * Type stands for current type evaluated
+     * Type stands for current type evaluated.
      *
      * For the beginning there are no constraints for the scripts so use them carefully.
      *
@@ -59,8 +59,8 @@ class RelationshipType {
         destinationToSource maxSize: 255
         sourceClass validator: classValidator
         destinationClass validator: classValidator
-        metadataHints nullable: true, maxSize: 1000
-        rule nullable: true, maxSize: 1000
+        metadataHints nullable: true, maxSize: 10000
+        rule nullable: true, maxSize: 10000
     }
 
 
@@ -70,7 +70,7 @@ class RelationshipType {
         sort "name"
     }
 
-    String validateSourceDestination(CatalogueElement source, CatalogueElement destination) {
+    String validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
 
         if (!sourceClass.isInstance(source)) {
             return 'source.not.instance.of'
@@ -80,14 +80,33 @@ class RelationshipType {
             return 'destination.not.instance.of'
         }
 
-        if (rule && rule.trim() && !validateRule(source, destination)) {
-            return 'rule.did.not.pass'
+        if (rule && rule.trim()) {
+            def result = validateRule(source, destination, ext)
+            if (result instanceof CharSequence) {
+                return result
+            }
+            if (result instanceof Boolean && !result) {
+                return 'rule.did.not.pass'
+            }
+
+            if ((result instanceof Boolean && result) || result == null) {
+                return null
+            }
+
+            if (result instanceof Throwable) {
+                log.info("Rule thrown an exception. This is slightly discouraged!", result)
+                return result.message
+            }
+
+            if (result) {
+                log.warn("Rule returned value which is not String or Boolean, this is very likely a bug. Result: $result")
+            }
         }
 
         return null
     }
 
-    boolean validateRule(CatalogueElement source, CatalogueElement destination) {
+    def validateRule(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
         if (!rule || !rule.trim()) {
             return true
         }
@@ -95,7 +114,8 @@ class RelationshipType {
         new SecuredRuleExecutor(
                 source: source,
                 destination: destination,
-                type: this
+                type: this,
+                ext: ext
         ).execute(rule)
     }
 

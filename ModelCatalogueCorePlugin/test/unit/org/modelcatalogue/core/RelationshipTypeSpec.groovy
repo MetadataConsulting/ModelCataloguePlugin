@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
-import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -35,7 +34,7 @@ class RelationshipTypeSpec extends Specification {
         RelationshipType type = new RelationshipType(rule: rule)
 
         expect:
-        type.validateRule(new DataElement(), new DataElement()) == expected
+        type.validateRule(new DataElement(), new DataElement(), [test: "true"]) == expected
 
 
         where:
@@ -43,6 +42,7 @@ class RelationshipTypeSpec extends Specification {
         true     | "true"
         false    | "false"
         true     | "source.class == destination.class"
+        true     | "ext.test as Boolean"
     }
 
 }

@@ -48,12 +48,6 @@ class Relationship implements Extendible {
         this.ext.putAll(ext)
     }
 
-    // cardinality
-    Integer sourceMinOccurs
-    Integer sourceMaxOccurs
-    Integer destinationMinOccurs
-    Integer destinationMaxOccurs
-
     Boolean archived = false
 
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
@@ -63,27 +57,13 @@ class Relationship implements Extendible {
 
             if (!val) return true;
 
-            String errorMessage = val.validateSourceDestination(obj.source, obj.destination)
+            String errorMessage = val.validateSourceDestination(obj.source, obj.destination, obj.ext)
             if (errorMessage) {
                 return errorMessage;
             }
             return true;
 
         }
-        sourceMinOccurs nullable: true, min: 0, validator: { val, obj ->
-            if (!val) return true
-            if (!obj.sourceMaxOccurs) return true
-            if (val > obj.sourceMaxOccurs) return false
-            return true
-        }
-        sourceMaxOccurs nullable: true, min: 1
-        destinationMinOccurs nullable: true, min: 0, validator: { val, obj ->
-            if (!val) return true
-            if (!obj.destinationMaxOccurs) return true
-            if (val > obj.destinationMaxOccurs) return false
-            return true
-        }
-        destinationMaxOccurs nullable: true, min: 1
     }
 
     String toString() {

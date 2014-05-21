@@ -1,9 +1,6 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import grails.test.spock.IntegrationSpec
-import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
@@ -160,8 +157,8 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         loaded.destinationToSource == "supersedes"
         loaded.name == "supersession"
 
-        !loaded.validateRule(new Model(), new DataElement())
-        loaded.validateRule(new DataElement(), new DataElement())
+        !loaded.validateRule(new Model(), new DataElement(), [:])
+        loaded.validateRule(new DataElement(), new DataElement(), [:])
 
     }
 

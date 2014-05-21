@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
 import grails.transaction.Transactional
 
 @Transactional
@@ -15,7 +14,12 @@ class InitCatalogueService {
        for (definition in defaultDataTypes) {
            DataType existing = DataType.findByName(definition.name)
            if (!existing) {
-              new DataType(definition).save()
+             DataType type = new DataType(definition)
+             type.save()
+
+             if (type.hasErrors()) {
+                 log.error("Cannot create data type $definition.name. $type.errors")
+             }
            }
        }
     }
@@ -28,7 +32,12 @@ class InitCatalogueService {
         for (definition in defaultDataTypes) {
             MeasurementUnit existing = MeasurementUnit.findByName(definition.name)
             if (!existing) {
-                new MeasurementUnit(definition).save()
+                MeasurementUnit unit = new MeasurementUnit(definition)
+                unit.save()
+
+                if (unit.hasErrors()) {
+                    log.error("Cannot create measurement unit $definition.name. $unit.errors")
+                }
             }
         }
     }
@@ -40,7 +49,12 @@ class InitCatalogueService {
         for (definition in defaultDataTypes) {
             RelationshipType existing = RelationshipType.findByName(definition.name)
             if (!existing) {
-                new RelationshipType(definition).save()
+                RelationshipType type = new RelationshipType(definition)
+                type.save()
+
+                if (type.hasErrors()) {
+                    log.error("Cannot create relationship type $definition.name. $type.errors")
+                }
             }
         }
     }
