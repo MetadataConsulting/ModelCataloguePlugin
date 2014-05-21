@@ -43,6 +43,11 @@ class Relationship implements Extendible {
 
     Map<String, String> ext = new ExtensionsWrapper(this)
 
+    void setExt(Map<String, String> ext) {
+        this.ext.clear()
+        this.ext.putAll(ext)
+    }
+
     // cardinality
     Integer sourceMinOccurs
     Integer sourceMaxOccurs
