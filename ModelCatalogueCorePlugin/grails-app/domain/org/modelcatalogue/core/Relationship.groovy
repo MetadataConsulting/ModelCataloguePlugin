@@ -1,4 +1,7 @@
 package org.modelcatalogue.core
+
+import org.modelcatalogue.core.util.ExtensionsWrapper
+
 /*
 * Users can create relationships between all catalogue elements. They include
 * DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
@@ -21,12 +24,12 @@ package org.modelcatalogue.core
 *
 */
 
-class Relationship {
+class Relationship implements Extendible {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
-        except = ['source', 'destination']
+        except = ['source', 'destination', 'ext']
         relationshipType component:true
     }
 
@@ -34,6 +37,11 @@ class Relationship {
     CatalogueElement destination
 
     RelationshipType relationshipType
+
+    static hasMany = [extensions: RelationshipMetadata]
+    static transients = ['ext']
+
+    Map<String, String> ext = new ExtensionsWrapper(this)
 
     // cardinality
     Integer sourceMinOccurs
@@ -81,6 +89,30 @@ class Relationship {
         if (source || destination) {
             destination?.removeFromIncomingRelationships(this)
             source?.removeFromOutgoingRelationships(this)
+        }
+    }
+
+    @Override
+    Set<Extension> listExtensions() {
+        extensions
+    }
+
+    @Override
+    Extension addExtension(String name, String value) {
+        RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
+        newOne.save()
+        assert !newOne.errors.hasErrors()
+        addToExtensions(newOne)
+        newOne
+    }
+
+    @Override
+    void removeExtension(Extension extension) {
+        if (extension instanceof RelationshipMetadata) {
+            extension.delete(flush: true)
+            removeFromExtensions(extension)
+        } else {
+            throw new IllegalArgumentException("Only instances of RelationshipMetadata are supported")
         }
     }
 

@@ -11,7 +11,7 @@ class RelationshipType {
         name boost: 5
         sourceClass converter: RelationshipTypeClassConverter
         destinationClass converter: RelationshipTypeClassConverter
-        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions']
+        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions', 'ext']
     }
 
     //name of the relationship type i.e. parentChild  or synonym
@@ -31,6 +31,9 @@ class RelationshipType {
 
     // you can constrain the relationship type
     Class destinationClass
+
+    // comma separated list of metadata hints
+    String metadataHints
 
     /**
      * This is a script which will be evaluated with following binding:
@@ -56,6 +59,7 @@ class RelationshipType {
         destinationToSource maxSize: 255
         sourceClass validator: classValidator
         destinationClass validator: classValidator
+        metadataHints nullable: true, maxSize: 1000
         rule nullable: true, maxSize: 1000
     }
 
