@@ -94,8 +94,8 @@ class Relationship implements Extendible {
     @Override
     void removeExtension(Extension extension) {
         if (extension instanceof RelationshipMetadata) {
-            extension.delete(flush: true)
             removeFromExtensions(extension)
+            extension.delete(flush: true)
         } else {
             throw new IllegalArgumentException("Only instances of RelationshipMetadata are supported")
         }

@@ -48,8 +48,8 @@ abstract class ExtendibleElement extends PublishedElement implements Extendible 
     @Override
     void removeExtension(Extension extension) {
         if (extension instanceof ExtensionValue) {
-            extension.delete(flush: true)
             removeFromExtensions(extension)
+            extension.delete(flush: true)
         } else {
             throw new IllegalArgumentException("Only instances of ExtensionValue are supported")
         }
