@@ -18,4 +18,18 @@ class ImportRow {
     String measurementSymbol
     Map metadata
     Collection<RowAction> rowActions = []
+
+    def resolveAction(String field, ActionType actionType){
+        RowAction actionToResolve = rowActions.find{it.field == field && it.actionType==actionType}
+        if(actionToResolve){
+            rowActions.remove(actionToResolve)
+        }
+    }
+
+    def resolveAll(){
+        def errors = rowActions.find{it.actionType==ActionType.RESOLVE_ERROR}
+        if(!errors) {
+            rowActions = []
+        }
+    }
 }

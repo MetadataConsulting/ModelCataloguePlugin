@@ -6,8 +6,7 @@ class PublishedElementService {
 
     static transactional = true
 
-    def grailsApplication
-    def relationshipService
+    def grailsApplication, relationshipService, modelCatalogueSearchService
 
     List<PublishedElement> list(params = [:]) {
         PublishedElement.findAllByStatus(getStatusFromParams(params), params)
@@ -62,7 +61,7 @@ class PublishedElementService {
         if(element instanceof DataElement) {
             if (element.containedIn.size() > 0) {
                 element.containedIn.each { Model model ->
-                    if (model.status != PublishedElementStatus.PENDING) {
+                    if (model.status != PublishedElementStatus.PENDING && model.status != PublishedElementStatus.UPDATED) {
                         Model archivedModel = archiveAndIncreaseVersion(model)
                         archivedModel.removeFromContains(element)
                         archivedModel.addToContains(archived)
@@ -100,6 +99,8 @@ class PublishedElementService {
             // TODO: this should be more generic
             archived.ext.putAll element.ext
         }
+
+        modelCatalogueSearchService.unindex(archived)
 
         archived
     }
