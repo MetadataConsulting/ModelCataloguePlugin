@@ -6,8 +6,8 @@
 #= require listReferenceEnhancer
 #= require modelCatalogueApiRoot
 #= require removableItemEnhancer
-#= require modelcatalogueSearch
-#= require modelcatalogueDataArchitect
+#= require modelCatalogueSearch
+#= require modelCatalogueDataArchitect
 
 
 angular.module 'mc.core', [

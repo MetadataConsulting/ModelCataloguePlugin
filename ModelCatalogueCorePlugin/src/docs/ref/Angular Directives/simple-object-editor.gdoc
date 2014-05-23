@@ -1,0 +1,53 @@
+h1. simple-object-editor
+
+Generic element directive for editing simple properties of the JavaScript Object. Default template defined in
+module @mc.core.ui.bs.simpleObjectEditor@ renders the properties in the table with text inputs.
+You only need to supply one attribute @object@ which is the root object which the properties are going to be edited.
+You can also define hints in string array @hints@ attribute. One row with hint as key will be genereated
+for each hint missing in the object. All the values in the object are plain strings.
+
+
+To [$watch|http://docs.angularjs.org/api/ng/type/$rootScope.Scope] for changes don't forget
+to set @objectEquality@ parameter to @true@.
+
+h2. Usage
+Considering you have following code in you controller:
+
+{code}
+$rootScope.object = {
+      one:    "first",
+      two:    "second",
+      three:  "third",
+      nested: { prop: "val" }
+}
+
+$scope.hints = ['four', 'five']
+{code}
+
+And following HTML snippet in your page:
+{code}
+<simple-object-editor object="object" hints="hints"></simple-object-editor>
+{code}
+
+Than the table with five editable rows will be rendered. If any of values is changed, the value in original
+object changes as well. Any non-primitive properties such as @nested@ from the example are not rendered. Each missing
+hint is represented as row with preset key and missing value.
+
+
+
+h2. Customization
+You can override the @modelcatalogue/core/ui/simpleObjectEditor.html@ template to plug your own either using
+@text/ng-template@ script definition, creating the template on the appropriate location in your server
+or using the [$templateCache|http://docs.angularjs.org/api/ng/service/$templateCache].
+
+Following variables and methods are added by the directive controller:
+
+{table}
+Name                        | Description
+editableProperties          | Array of all editable properties, each item has @key@, @value@ property and may have @originalValue@ assigned as well if exists
+removeProperty(index)       | Removes property at specified index
+addProperty(index, newOne)  | Adds new property at given index
+keyChanged(property)        | Method to notify controller when the property key has changed
+valueChanged(property)      | Method to notify controller when the property value has changed
+isKeyUnique(key)            | Returns @true@ if there is only one property with given key in @editableProperties@ array
+{table}
