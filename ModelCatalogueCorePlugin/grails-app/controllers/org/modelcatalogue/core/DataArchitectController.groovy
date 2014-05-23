@@ -9,7 +9,7 @@ class DataArchitectController {
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
-    def dataArchitectService
+    def dataArchitectService, modelService
 
     def index(){}
 
@@ -65,6 +65,14 @@ class DataArchitectController {
         )
 
         respond elements
+    }
+
+    def allDataElementsUnderModel(){
+        if(params?.modelId){
+            Model model = Model.get(params.modelId)
+            def subModels = modelService.getSubModels(model)
+            def dataElements = modelService.getDataElementsFromModels(subModels)
+        }
     }
 
 
