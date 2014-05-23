@@ -126,6 +126,15 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
 
+    protected Map getParametersToBind() {
+        Map ret = params
+        if (response.format == 'json') {
+            ret = request.getJSON()
+        }
+        ret
+    }
+
+
     protected void respondWithReports(ListWrapper listWrapper) {
         respond xlsxListRenderer.fillListWithReports(listWrapper, webRequest)
     }

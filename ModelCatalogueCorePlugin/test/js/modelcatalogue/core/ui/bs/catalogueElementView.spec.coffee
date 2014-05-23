@@ -4,6 +4,7 @@ describe "mc.core.ui.catalogueElementView", ->
   beforeEach module 'mc.core.ui.bs.catalogueElementView'
   beforeEach module 'mc.core.ui.bs.decoratedListTable'
   beforeEach module 'mc.core.ui.bs.propertiesPane'
+  beforeEach module 'mc.core.ui.bs.simpleObjectEditor'
 
   it "element get compiled",  inject ($compile, $rootScope, enhance,  $httpBackend) ->
     $httpBackend.when('GET', /.*/).respond({ok: true})

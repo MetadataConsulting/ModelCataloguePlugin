@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 
-class ExtendibleElementController extends AbstractPublishedElementController<ExtendibleElement> {
+class ExtendibleElementController extends AbstractExtendibleElementController<ExtendibleElement> {
 
     ExtendibleElementController() {
         super(ExtendibleElement, true)
