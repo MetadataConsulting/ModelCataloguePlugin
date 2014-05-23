@@ -120,6 +120,12 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
+        def metadata = parametersToBind.metadata
+
+        if (metadata != null) {
+            rel.setExt(metadata)
+        }
+
         response.status = HttpServletResponse.SC_CREATED
         respond rel
     }

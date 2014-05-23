@@ -23,7 +23,7 @@ class RelationshipTypeMarshaller extends AbstractMarshallers {
                 sourceClass: el.sourceClass,
                 destinationClass: el.destinationClass,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
-                metadataHints: el.metadataHints?.split(/\s*,\s*/)?.grep()
+                metadataHints: el.metadataHints?.split(/\s*,\s*/)?.grep() ?: []
         ]
     }
 

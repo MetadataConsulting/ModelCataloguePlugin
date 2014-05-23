@@ -27,13 +27,13 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             return
         }
 
-        instance.properties = getParametersToBind()
+        def paramsToBind = getParametersToBind()
 
-        if (response.format == 'json') {
-            def paramsToBind = request.getJSON()
-            if (paramsToBind.ext) {
-                instance.setExt(paramsToBind.ext)
-            }
+        instance.properties = paramsToBind
+
+        def ext = paramsToBind.ext
+        if (ext != null) {
+            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
 

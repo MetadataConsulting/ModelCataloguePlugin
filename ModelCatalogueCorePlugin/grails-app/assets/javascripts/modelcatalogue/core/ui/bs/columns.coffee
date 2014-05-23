@@ -34,10 +34,19 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: "Description", value: 'description', class: 'col-md-6'}
   ]
 
+  printMetadata = (relationship) ->
+    result  = ''
+    ext     = relationship.ext ? {}
+    for key, value of ext
+      result += "#{key}: #{value ? ''}\n"
+    result
+
+
   columnsProvider.registerColumns 'org.modelcatalogue.core.Relationship', [
     {header: 'Relation',        value: 'type[direction]',                               classes: 'col-md-3'}
-    {header: 'Destination',     value: "relation.name",                                 classes: 'col-md-4', show: "relation.show()"}
-    {header: 'Identification',  value: "relation.elementTypeName + ': ' + relation.id", classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Destination',     value: "relation.name",                                 classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Metadata',        value: printMetadata,                                   classes: 'col-md-5'}
+    #{header: 'Identification',  value: "relation.elementTypeName + ': ' + relation.id", classes: 'col-md-3', show: "relation.show()"}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.RelationshipType', [
