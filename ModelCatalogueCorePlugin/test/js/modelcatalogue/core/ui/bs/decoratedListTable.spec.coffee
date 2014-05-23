@@ -94,8 +94,8 @@ describe "mc.core.ui.decoratedListTable", ->
     ''')($rootScope)
     $rootScope.$digest()
 
-    expect(element.find('thead tr th.dl-table-header-cell').length).toBe(3)
-    expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(3)
+    expect(element.find('thead tr th.dl-table-header-cell').length).toBe(4)
+    expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(4)
     expect(element.find('thead tr th.dl-table-header-cell:first-child').text()).toBe('ID')
 
 

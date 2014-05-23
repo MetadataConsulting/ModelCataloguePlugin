@@ -22,7 +22,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
     @Shared
     Importer importer
     @Shared
-    ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2
+    ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2, modelOnlyImportRow3
 
     def setupSpec() {
         importer = new Importer()
@@ -31,6 +31,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
         validImportRow2 = new ImportRow()
         modelOnlyImportRow = new ImportRow()
         modelOnlyImportRow2 = new ImportRow()
+        modelOnlyImportRow3 = new ImportRow()
         invalidImportRow = new ImportRow()
 
         //model only import row
@@ -58,6 +59,19 @@ class ImporterSpec extends AbstractIntegrationSpec {
         modelOnlyImportRow2.measurementUnitName = ""
         modelOnlyImportRow2.conceptualDomainName = "formula one"
         modelOnlyImportRow2.conceptualDomainDescription = " the domain of formula one"
+
+        //model only import row
+        modelOnlyImportRow3.dataElementName = ""
+        modelOnlyImportRow3.dataElementCode = ""
+        modelOnlyImportRow3.parentModelName = "testParentModelCode"
+        modelOnlyImportRow3.parentModelCode = "MC_037e6962-3b6f-9ae4-a171-2570b64dfq10_1"
+        modelOnlyImportRow3.containingModelName = "testJustModel"
+        modelOnlyImportRow3.containingModelCode = "MC_037e6162-2b9f-4ae4-a171-2570b64daf10_1"
+        modelOnlyImportRow3.dataType = ""
+        modelOnlyImportRow3.dataElementDescription = ""
+        modelOnlyImportRow3.measurementUnitName = ""
+        modelOnlyImportRow3.conceptualDomainName = "formula one"
+        modelOnlyImportRow3.conceptualDomainDescription = " the domain of formula one"
 
         //row 1
         validImportRow.dataElementName = "testDataItem"
@@ -148,31 +162,37 @@ class ImporterSpec extends AbstractIntegrationSpec {
         importer.importQueue.remove(modelOnlyImportRow)
         importer.importQueue.remove(validImportRow2)
         importer.importQueue.remove(validImportRow)
+        importer.delete()
+
 
     }
 
     def "add model only Rows to importer, action those rows and then ingest"() {
 
+        setup:
+        importer = new Importer()
+
         when:
-        importer.addRow(modelOnlyImportRow)
+        importer.addRow(modelOnlyImportRow3)
         importer.addRow(modelOnlyImportRow2)
 
         then:
-        importer.pendingAction.contains(modelOnlyImportRow)
+        importer.pendingAction.contains(modelOnlyImportRow3)
         importer.pendingAction.contains(modelOnlyImportRow2)
 
         when:
-        importer.resolveImportRowPendingAction(modelOnlyImportRow, "dataElementName", ActionType.MODEL_ONLY_ROW)
+
+        importer.resolveImportRowPendingAction(modelOnlyImportRow3, "dataElementName", ActionType.MODEL_ONLY_ROW)
         importer.resolveImportRowPendingAction(modelOnlyImportRow2, "dataElementName", ActionType.MODEL_ONLY_ROW)
 
         then:
-        importer.importQueue.contains(modelOnlyImportRow)
+        importer.importQueue.contains(modelOnlyImportRow3)
         importer.importQueue.contains(modelOnlyImportRow2)
 
         when:
         importer.ingestImportQueue()
-        Model parentModel = Model.findByModelCatalogueId("MC_037e6162-3b6f-4ae4-a171-2570b64dfq10_1")
-        Model childModel = Model.findByModelCatalogueId("MC_037e6162-5b6f-4ae4-a171-2570b64daf10_1")
+        Model parentModel = Model.findByModelCatalogueId("MC_037e6962-3b6f-9ae4-a171-2570b64dfq10_1")
+        Model childModel = Model.findByModelCatalogueId("MC_037e6162-2b9f-4ae4-a171-2570b64daf10_1")
 
         then:
         parentModel
@@ -181,9 +201,13 @@ class ImporterSpec extends AbstractIntegrationSpec {
         importer.models.contains(parentModel)
         importer.models.size()==2
 
+        cleanup:
+        importer.delete()
+
     }
 
     def "test import new enumerated data type"(){
+
         when:
         def dataType = importer.importDataType('testEnum', "t:test|t1:testONe")
         def testDataType =  DataType.findByName("testEnum")
@@ -196,18 +220,24 @@ class ImporterSpec extends AbstractIntegrationSpec {
         cleanup:
         dataType.delete()
 
+
     }
 
     def "test import existing data type"(){
+
+
         when:
         def dataType = importer.importDataType('string', 'string')
 
         then:
         dataType.name == "String"
 
+
     }
 
     def "test import existing data type with :"(){
+
+
         when:
         def dataType = importer.importDataType('asd', 'xs:string')
 
@@ -324,6 +354,9 @@ class ImporterSpec extends AbstractIntegrationSpec {
 
     def "test ingest importing two different versions"() {
 
+        setup:
+        importer = new Importer()
+
         when:
         importer.addRow(validImportRow)
         importer.addRow(validImportRow2)
@@ -361,6 +394,9 @@ class ImporterSpec extends AbstractIntegrationSpec {
         containingModel.supersedes.contains(archivedContainingModel)
         dataElement2.supersedes.contains(dataElement1)
         dataElement2.instantiatedBy == valueDomain1
+
+        cleanup:
+        importer.delete()
     }
 
 

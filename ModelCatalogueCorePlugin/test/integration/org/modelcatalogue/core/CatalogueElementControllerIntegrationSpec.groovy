@@ -49,7 +49,7 @@ class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElement
 
     @Override
     MeasurementUnit getLoadItem() {
-        MeasurementUnit.findByName("Degrees of Celsius")
+        MeasurementUnit.findByName("Degrees Celsius")
     }
 
     @Override
