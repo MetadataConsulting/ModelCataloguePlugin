@@ -88,7 +88,7 @@ modelcatalogue.defaults.measurementunits = [
         [name:'mass density',description:'kilogram per cubic meter', symbol:'kg/m3'],
         [name:'specific volume',description:'cubic meter per kilogram', symbol:'m3/kg'],
         [name:'current density',description:'ampere per square meter', symbol:'A/m2'],
-        [name:'magnetic field strength  ',description:'ampere per meter', symbol:'A/m'],
+        [name:'magnetic field strength',description:'ampere per meter', symbol:'A/m'],
         [name:'amount-of-substance concentration',description:'mole per cubic meter', symbol:'mol/m3'],
         [name:'luminance',description:'candela per square meter', symbol:'cd/m2'],
         [name:'mass fraction',description:'kilogram per kilogram', symbol:'kg/kg = 1']
@@ -134,7 +134,8 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
         [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
-        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true]
+        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
+        [name: "synonymy", sourceToDestination: "synonymous with", destinationToSource: "synonymous with", sourceClass: DataElement, destinationClass: DataElement]
 ]
 
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements

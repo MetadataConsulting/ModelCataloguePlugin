@@ -13,8 +13,6 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   # default
   columnsProvider.registerColumns 'org.modelcatalogue.core.ConceptualDomain', nameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', nameAndDescription()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', nameAndDescription()
-
   columnsProvider.registerColumns 'org.modelcatalogue.core.PublishedElement', publishedElementColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.ExtendibleElement', publishedElementColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
@@ -63,5 +61,9 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: 'Data Type',   value: 'dataType.name', classes: 'col-md-4', show: 'dataType.show()'}
   ]
 
+  columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', [
+    {header: "Name",        value: 'name',        class: 'col-md-4', show: true}
+    {header: "Enumerations", value: 'enumerations', class: 'col-md-6'}
+  ]
 
 ]
