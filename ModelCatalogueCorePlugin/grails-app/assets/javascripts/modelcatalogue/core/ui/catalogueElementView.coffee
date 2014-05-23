@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope' , ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope) ->
+    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource' , ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -50,6 +50,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page}, options if $scope.element
 
       onElementUpdate = (element) ->
+        resource = catalogueElementResource(element.elementType) if element
+
         activeTabSet     = false
 
         onPropertyUpdate($scope.property, $rootScope?.$stateParams?.property)
@@ -75,7 +77,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             tabDefinition.columns = [
               {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
               {header: "Name", value: 'name', class: 'col-md-5', show: true}
-              {header: "Description", value: 'description', class: 'col-md-6'}
+              {header: "Model Catalogue Id", value: 'modelCatalogueId', class: 'col-md-6'}
             ]
           else if fn.itemType == 'org.modelcatalogue.core.Relationship'
             tabDefinition.actions.push {
@@ -117,9 +119,24 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             name:       name
             heading:    names.getNaturalName(name)
             value:      obj
+            original:   angular.copy(obj)
             disabled:   obj == undefined or obj == null or getObjectSize(obj) == 0
             properties: []
-            type:       'properties-pane'
+            type:       'simple-object-editor'
+            isDirty:    () -> angular.equals(@original, @value)
+            reset:      () -> @value = angular.copy @original
+            update:     () ->
+              payload = {
+                id: element.id
+              }
+              payload[@name] = angular.copy(@value)
+              self = @
+              resource.update(payload).then (updated) ->
+                $scope.element = updated
+                messages.success("Property #{names.getNaturalName(self.name)} of #{element.name} successfully updated")
+                updated
+              , () ->
+                messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
 
 
           for key, value of obj when not angular.isObject(value)
@@ -184,7 +201,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return if not tab.loader?
         if !tab.disabled and tab.value.empty
           tab.loader().then (result) ->
-            tab.columns     = columns(result.itemType)
             tab.value       = result
             $scope.reports  = result.availableReports
         else

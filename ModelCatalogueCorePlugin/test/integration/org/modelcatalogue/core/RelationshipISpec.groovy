@@ -119,8 +119,15 @@ class RelationshipISpec extends AbstractIntegrationSpec{
     def "testNumber #testNumber org.modelcatalogue.core.Relationship creation for #args results #validates"() {
 
         when:
+        Map<String, String> ext = args.remove('ext')
         Relationship rel = new Relationship(args);
         rel.save()
+
+        if (ext) {
+            assert rel.errors.errorCount == 0
+            rel.ext = ext
+            rel.validate()
+        }
 
         then:
         (rel.errors.errorCount == 0) == validates
@@ -147,20 +154,20 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         14 | true  | [source: de1, destination: de2, relationshipType: reltype]
         15 | false | [source: cd1, destination: md1, relationshipType: RelationshipType.supersessionType]
         16 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType]
-        17 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: -1]
-        18 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMaxOccurs: -1]
-        19 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: 0]
-        20 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: 3, sourceMaxOccurs: 5]
-        21 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: 5, sourceMaxOccurs: 5]
-        22 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMinOccurs: 6, sourceMaxOccurs: 5]
-        23 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, sourceMaxOccurs: 0]
-        24 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: -1]
-        25 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMaxOccurs: -1]
-        26 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: 0]
-        27 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: 3, destinationMaxOccurs: 5]
-        28 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: 5, destinationMaxOccurs: 5]
-        29 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMinOccurs: 6, destinationMaxOccurs: 5]
-        30 | false | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType, destinationMaxOccurs: 0]
+        17 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Source Min Occurs': -1]]
+        18 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Source Max Occurs': -1]]
+        19 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Source Min Occurs': 0]]
+        20 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Source Min Occurs': 3, 'Source Max Occurs': 5]]
+        21 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Source Min Occurs': 5, 'Source Max Occurs': 5]]
+        22 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Source Min Occurs': 6, 'Source Max Occurs': 5]]
+        23 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Source Max Occurs': 0]]
+        24 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Destination Min Occurs': -1]]
+        25 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Destination Min Occurs': -1]]
+        26 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Destination Min Occurs': 0]]
+        27 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Destination Min Occurs': 3, 'Destination Max Occurs': 5]]
+        28 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Destination Min Occurs': 5, 'Destination Max Occurs': 5]]
+        29 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Destination Min Occurs': 6, 'Destination Max Occurs': 5]]
+        30 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Destination Max Occurs': 0]]
 
 
     }

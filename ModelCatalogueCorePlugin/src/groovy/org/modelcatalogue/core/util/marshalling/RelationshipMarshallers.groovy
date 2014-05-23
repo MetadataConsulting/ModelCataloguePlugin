@@ -18,7 +18,8 @@ class RelationshipMarshallers extends AbstractMarshallers {
                 id: rel.id,
                 source: rel.source.info,
                 destination: rel.destination.info,
-                type: rel.relationshipType.info
+                type: rel.relationshipType.info,
+                ext: rel.ext
         ]
     }
 
@@ -28,6 +29,15 @@ class RelationshipMarshallers extends AbstractMarshallers {
             renderInfo('source', rel.source.info, xml)
             renderInfo('destination', rel.destination.info, xml)
             renderInfo('type', rel.relationshipType.info, xml)
+        }
+        if (rel.ext) {
+            xml.build {
+                extensions {
+                    for (e in rel.ext.entrySet()) {
+                        extension key: e.key, e.value
+                    }
+                }
+            }
         }
     }
 

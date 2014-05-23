@@ -4,7 +4,7 @@ import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWrapper
 
-class ModelController extends AbstractPublishedElementController<Model> {
+class ModelController extends AbstractExtendibleElementController<Model> {
 
     def modelService
 

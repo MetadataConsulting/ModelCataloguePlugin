@@ -18,7 +18,6 @@ grails.project.groupId = appName // change this to alter the default package nam
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [ // the first one is the default format
-    all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
     atom:          'application/atom+xml',
     css:           'text/css',
     csv:           'text/csv',
@@ -31,7 +30,8 @@ grails.mime.types = [ // the first one is the default format
     text:          'text/plain',
     hal:           ['application/hal+json','application/hal+xml'],
     xml:           ['text/xml', 'application/xml'],
-    xlsx:          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    xlsx:          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000
@@ -164,7 +164,40 @@ modelcatalogue.defaults.measurementunits = [
 
 
 modelcatalogue.defaults.relationshiptypes =  [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement],
+        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metedataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
+            Integer sourceMinOccurs = ext['Source Min Occurs'] as Integer
+            Integer sourceMaxOccurs = ext['Source Max Occurs'] as Integer
+            Integer destinationMinOccurs = ext['Destination Min Occurs'] as Integer
+            Integer destinationMaxOccurs = ext['Destination Max Occurs'] as Integer
+
+            if (sourceMinOccurs != null) {
+                if (sourceMinOccurs < 0) {
+                    return false
+                }
+                if (sourceMaxOccurs != null && sourceMaxOccurs < sourceMinOccurs) {
+                    return false
+                }
+            } else {
+                if (sourceMaxOccurs != null && sourceMaxOccurs < 1) {
+                    return false
+                }
+            }
+
+            if (destinationMinOccurs != null) {
+                if (destinationMinOccurs < 0) {
+                    return false
+                }
+                if (destinationMaxOccurs != null && destinationMaxOccurs < destinationMinOccurs) {
+                    return false
+                }
+            } else {
+                if (destinationMaxOccurs != null && destinationMaxOccurs < 1) {
+                    return false
+                }
+            }
+
+            return true
+        '''],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],

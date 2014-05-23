@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-class ExtensionValue implements Extension {
+class RelationshipMetadata implements Extension {
 
     /* the name property from catalogue element is a key for the extension */
 
@@ -8,13 +8,13 @@ class ExtensionValue implements Extension {
 
     static searchable = {
         name boost:5
-        except = ['element']
+        except = ['relationship']
     }
 
     String name
     String extensionValue
 
-    static belongsTo = [element: ExtendibleElement]
+    static belongsTo = [relationship: Relationship]
 
     static constraints = {
         name size: 1..255
@@ -24,7 +24,7 @@ class ExtensionValue implements Extension {
 
     @Override
     public String toString() {
-        return "extension for ${element} (${name}=${extensionValue})"
+        return "metadata for ${relationship} (${name}=${extensionValue})"
     }
 
 

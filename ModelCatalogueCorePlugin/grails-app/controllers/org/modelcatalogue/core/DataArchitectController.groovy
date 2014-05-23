@@ -24,6 +24,7 @@ class DataArchitectController {
             return
         }
 
+
         def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/uninstantiatedDataElements", results.count)
 
         Elements elements =  new Elements(

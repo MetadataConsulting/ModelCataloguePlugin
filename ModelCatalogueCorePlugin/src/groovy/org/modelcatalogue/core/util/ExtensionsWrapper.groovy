@@ -1,23 +1,23 @@
 package org.modelcatalogue.core.util
 
 import org.codehaus.groovy.runtime.DefaultGroovyMethods
-import org.modelcatalogue.core.ExtendibleElement
-import org.modelcatalogue.core.ExtensionValue
+import org.modelcatalogue.core.Extendible
+import org.modelcatalogue.core.Extension
 
 /**
  * Created by ladin on 12.02.14.
  */
-class ExtendibleElementExtensionsWrapper implements Map<String, String> {
+class ExtensionsWrapper implements Map<String, String> {
 
-    final ExtendibleElement element
+    final Extendible element
 
-    ExtendibleElementExtensionsWrapper(ExtendibleElement element) {
+    ExtensionsWrapper(Extendible element) {
         this.element = element
     }
 
     @Override
     int size() {
-        element.extensions?.size() ?: 0
+        element.listExtensions()?.size() ?: 0
     }
 
     @Override
@@ -86,40 +86,37 @@ class ExtendibleElementExtensionsWrapper implements Map<String, String> {
         DefaultGroovyMethods.toMapString(this)
     }
 
-    private ExtensionValue findExtensionValueByName(key) {
+    private Extension findExtensionValueByName(key) {
         if (!key) return null
-        element.extensions?.find { it.name == key }
+        element.listExtensions()?.find { it.name == key }
     }
 
     private Map<String, String> asReadOnlyMap() {
-        if (!element.extensions) return Collections.emptyMap()
-        Collections.unmodifiableMap(element.extensions.collectEntries {
+        if (!element.listExtensions()) return Collections.emptyMap()
+        Collections.unmodifiableMap(element.listExtensions().collectEntries {
             [it.name, it.extensionValue]
         })
     }
 
     private String createOrUpdate(String name, String value) {
-        ExtensionValue existing = findExtensionValueByName(name)
+        Extension existing = findExtensionValueByName(name)
         if (existing) {
             String old = existing.extensionValue
             existing.extensionValue = value?.toString()
-            existing.save()
-            assert existing.errors.errorCount == 0
-            return old
+            if (existing.save()) {
+                return old
+            }
         }
-        ExtensionValue newOne = new ExtensionValue(name: name?.toString(), extensionValue: value?.toString(), element: element)
-        element.addToExtensions(newOne)
-        newOne.save()
-        assert newOne.errors.errorCount == 0
+
+        element.addExtension(name?.toString(), value?.toString())
         return null
 
     }
 
     private String deleteIfPresent(Object key) {
-        ExtensionValue existing = findExtensionValueByName(key?.toString())
+        Extension existing = findExtensionValueByName(key?.toString())
         if (!existing) return null
-        element.removeFromExtensions(existing)
-        existing.delete(flush: true)
+        element.removeExtension(existing)
         existing.extensionValue
     }
 }

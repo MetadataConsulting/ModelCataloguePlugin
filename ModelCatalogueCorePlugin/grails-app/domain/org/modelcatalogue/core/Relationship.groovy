@@ -1,4 +1,7 @@
 package org.modelcatalogue.core
+
+import org.modelcatalogue.core.util.ExtensionsWrapper
+
 /*
 * Users can create relationships between all catalogue elements. They include
 * DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
@@ -21,12 +24,12 @@ package org.modelcatalogue.core
 *
 */
 
-class Relationship {
+class Relationship implements Extendible {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
-        except = ['source', 'destination']
+        except = ['source', 'destination', 'ext']
         relationshipType component:true
     }
 
@@ -35,11 +38,15 @@ class Relationship {
 
     RelationshipType relationshipType
 
-    // cardinality
-    Integer sourceMinOccurs
-    Integer sourceMaxOccurs
-    Integer destinationMinOccurs
-    Integer destinationMaxOccurs
+    static hasMany = [extensions: RelationshipMetadata]
+    static transients = ['ext']
+
+    Map<String, String> ext = new ExtensionsWrapper(this)
+
+    void setExt(Map<String, String> ext) {
+        this.ext.clear()
+        this.ext.putAll(ext)
+    }
 
     Boolean archived = false
 
@@ -50,27 +57,13 @@ class Relationship {
 
             if (!val) return true;
 
-            String errorMessage = val.validateSourceDestination(obj.source, obj.destination)
+            String errorMessage = val.validateSourceDestination(obj.source, obj.destination, obj.ext)
             if (errorMessage) {
                 return errorMessage;
             }
             return true;
 
         }
-        sourceMinOccurs nullable: true, min: 0, validator: { val, obj ->
-            if (!val) return true
-            if (!obj.sourceMaxOccurs) return true
-            if (val > obj.sourceMaxOccurs) return false
-            return true
-        }
-        sourceMaxOccurs nullable: true, min: 1
-        destinationMinOccurs nullable: true, min: 0, validator: { val, obj ->
-            if (!val) return true
-            if (!obj.destinationMaxOccurs) return true
-            if (val > obj.destinationMaxOccurs) return false
-            return true
-        }
-        destinationMaxOccurs nullable: true, min: 1
     }
 
     String toString() {
@@ -81,6 +74,30 @@ class Relationship {
         if (source || destination) {
             destination?.removeFromIncomingRelationships(this)
             source?.removeFromOutgoingRelationships(this)
+        }
+    }
+
+    @Override
+    Set<Extension> listExtensions() {
+        extensions
+    }
+
+    @Override
+    Extension addExtension(String name, String value) {
+        RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
+        newOne.save()
+        assert !newOne.errors.hasErrors()
+        addToExtensions(newOne)
+        newOne
+    }
+
+    @Override
+    void removeExtension(Extension extension) {
+        if (extension instanceof RelationshipMetadata) {
+            removeFromExtensions(extension)
+            extension.delete(flush: true)
+        } else {
+            throw new IllegalArgumentException("Only instances of RelationshipMetadata are supported")
         }
     }
 

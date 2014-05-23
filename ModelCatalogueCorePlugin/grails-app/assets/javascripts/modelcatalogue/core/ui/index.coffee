@@ -10,6 +10,7 @@
 #= require messagesPanel
 #= require columns
 #= require columnsConfiguration
+#= require simpleObjectEditor
 
 angular.module('mc.core.ui', [
   # depends on
@@ -25,4 +26,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.messagesPanel'
   'mc.core.ui.columns'
   'mc.core.ui.columnsConfiguration'
+  'mc.core.ui.simpleObjectEditor'
 ])
