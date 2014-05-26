@@ -1,6 +1,9 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.*
+import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.Mappings
+import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.Relationships
 
 import javax.servlet.http.HttpServletResponse
 
@@ -162,18 +165,12 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         }
 
         ListAndCount listAndCount = relationshipService.getRelationships(params, direction, element, type)
-
-        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), listAndCount.count)
-
         respondWithReports new Relationships(
+                base: "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""),
                 owner: element,
                 items: listAndCount.list,
-                previous: links.previous,
-                next: links.next,
                 direction: direction,
                 total: listAndCount.count,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0
         )
     }
 
@@ -188,15 +185,11 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
         int total = element.outgoingMappings.size()
         def list = Mapping.findAllBySource(element, params)
-        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/mapping", total)
 
         respondWithReports new Mappings(
+                base: "/${resourceName}/${params.id}/mapping",
                 items: list,
-                previous: links.previous,
-                next: links.next,
-                total: total,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0
+                total: total
         )
     }
 
@@ -250,5 +243,8 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             notFound()
         }
     }
+
+    protected getDefaultSort()  { actionName == 'index' ? 'name'  : null}
+    protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
 }
