@@ -146,6 +146,34 @@ describe "mc.core.listEnhancer", ->
     expect(gotoResult.list).toBeDefined()
     expect(gotoResult.list.length).toBe(2)
 
+
+    $httpBackend
+    .when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=10&offset=10&order=asc&sort=name")
+    .respond(nextList)
+
+    reloadResult = null
+    error  = null
+    gotoResult.reload(sort: 'name', order: 'asc').then( (_result_) ->
+      reloadResult = _result_
+    , (_error_) ->
+      error = _error_
+    )
+
+    expect(reloadResult).toBeNull()
+
+    $httpBackend.flush()
+
+    expect(reloadResult).toBeDefined()
+    expect(reloadResult.total).toBe(12)
+    expect(reloadResult.page).toBe(10)
+    expect(reloadResult.size).toBe(2)
+    expect(reloadResult.offset).toBe(10)
+    expect(reloadResult.currentPage).toBe(2)
+    expect(reloadResult.list).toBeDefined()
+    expect(reloadResult.list.length).toBe(2)
+
+
+
     listEnhancer = enhance.getEnhancer('list')
 
     emptyList = listEnhancer.createEmptyList('relationships')

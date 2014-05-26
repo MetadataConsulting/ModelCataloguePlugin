@@ -10,11 +10,15 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
       stateless: '=?'
       reports: '=?'
       pageParam: '@'
+      sortParam: '@'
+      orderParam: '@'
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
     controller: ['$scope', 'columns', '$q', '$rootScope', '$state', '$stateParams' , ($scope, columns, $q, $rootScope, $state, $stateParams) ->
       pageParam = $scope.pageParam ? 'page'
+      sortParam = $scope.sortParam ? 'sort'
+      orderParam = $scope.orderParam ? 'order'
 
       $scope.id = null if !$scope.id
 
@@ -59,6 +63,15 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
           newParams[pageParam] = list.currentPage
           if newParams[pageParam] == 1 or isNaN(newParams[pageParam])
             newParams[pageParam] = undefined
+          newParams[sortParam]  = list.sort  if list.sort
+          newParams[orderParam] = list.order if list.order
+
+          if newParams[sortParam] =='name'
+            newParams[sortParam] = undefined
+
+          if newParams[orderParam] =='asc'
+            newParams[orderParam] = undefined
+
           $state.go '.', newParams
 
       $scope.hasSelection = () -> $scope.selection?
@@ -98,7 +111,6 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
       $scope.hasNext        = -> hasNextOrPrev($scope.list.next)
 
 
-
       $scope.list ?= emptyList
 
       if !columnsDefined
@@ -136,9 +148,26 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
       $scope.performAction = (fn, element, list) ->
         $q.when(fn(element, list)).then (result) ->
-          # only boolan value is the one we expect
+          # only boolean value is the one we expect
           if result == true
             $scope.goto($scope.list.currentPage)
+
+      $scope.sortBy = (column) ->
+        return if $scope.loading
+        $scope.loading = true
+        $scope.list.reload({
+          sort: column.sort.property,
+          order: if $scope.list.order == 'asc' then 'desc' else 'asc'
+        }).then (result) ->
+          $scope.loading = false
+          $scope.list = result
+
+      $scope.getSortClass = (column) ->
+        return 'glyphicon-sort' if column.sort.property != $scope.list.sort
+        ret = "glyphicon-sort-by-#{if column.sort.type then column.sort.type else 'attributes'}"
+
+        return ret if $scope.list.order == 'asc'
+        ret + '-alt'
 
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
