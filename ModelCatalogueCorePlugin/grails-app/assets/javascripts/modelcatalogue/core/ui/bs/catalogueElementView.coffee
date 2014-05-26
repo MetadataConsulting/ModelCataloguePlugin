@@ -2,6 +2,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView.html', '''
     <div>
       <span class="pull-right">
+
         <div class="btn-group btn-group-sm">
           <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="reports &amp;&amp; reports.length == 0">
             <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
@@ -10,6 +11,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
             <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in reports">{{report.name || 'Export'}}</a></li>
           </ul>
         </div>
+        <a class="btn btn-primary btn-sm" ng-click="edit()" ng-show="canEdit()"><span class="glyphicon glyphicon-edit"></span> Edit</a>
         <a class="btn btn-success btn-sm" ng-click="createRelationship()"><span class="glyphicon glyphicon-link"></span> Create Relationship</a>
       </span>
       <h3 class="ce-name">{{element.name}} <small ng-show="element.elementTypeName">({{element.elementTypeName}}: {{element.id}})</small></h3>

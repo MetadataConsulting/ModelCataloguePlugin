@@ -126,11 +126,3 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
       deferred.promise
   ]
 ]
-
-# <div class="form-group">
-# <label for="type">Relationship Type</label>
-# <input id="type" type="text"  class="form-control" ng-model="relationshipType" catalogue-element-picker="relationshipType" hide-element-type="true" typeahead-on-select="updateDirections(relationshipType)">
-# <label for="direction" ng-show="directions">Direction</label>
-# <select id="direction" ng-show="directions" ng-model="direction" ng-options="d.label for d in directions" class="form-control" ng-change="updateRelationPicker()"></select>
-# <label for="relation" ng-show="direction">{{direction.relationLabel}}</label>
-# </div>

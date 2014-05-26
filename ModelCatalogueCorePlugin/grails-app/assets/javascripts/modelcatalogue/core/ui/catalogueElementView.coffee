@@ -208,6 +208,12 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.createRelationship = () ->
         messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
 
+      $scope.canEdit = ->
+        messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
+
+      $scope.edit = ->
+        messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
+          $scope.element = updated
 
       # watches
       $scope.$watch 'element', onElementUpdate
