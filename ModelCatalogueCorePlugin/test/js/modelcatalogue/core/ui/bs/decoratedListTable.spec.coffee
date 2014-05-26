@@ -49,8 +49,8 @@ describe "mc.core.ui.decoratedListTable", ->
 
     # appropriate cells with expected classes and content
     expect(element.find('thead tr th.dl-table-header-cell').length).toBe(2)
-    expect(element.find('thead tr th.dl-table-header-cell:nth-child(1)').text()).toBe('ID')
-    expect(element.find('thead tr th.dl-table-header-cell:nth-child(2)').text()).toBe('Name')
+    expect(element.find('thead tr th.dl-table-header-cell:nth-child(1)').text().trim()).toBe('ID')
+    expect(element.find('thead tr th.dl-table-header-cell:nth-child(2)').text().trim()).toBe('Name')
     expect(element.find('thead tr th.dl-table-header-cell:nth-child(1)').hasClass('col-md-4')).toBeTruthy()
     expect(element.find('thead tr th.dl-table-header-cell:nth-child(2)').hasClass('col-md-8')).toBeTruthy()
 
@@ -96,7 +96,7 @@ describe "mc.core.ui.decoratedListTable", ->
 
     expect(element.find('thead tr th.dl-table-header-cell').length).toBe(4)
     expect(element.find('tbody tr:first-child td.dl-table-item-cell').length).toBe(4)
-    expect(element.find('thead tr th.dl-table-header-cell:first-child').text()).toBe('ID')
+    expect(element.find('thead tr th.dl-table-header-cell:first-child').text().trim()).toBe('ID')
 
 
     $rootScope.selection = []
