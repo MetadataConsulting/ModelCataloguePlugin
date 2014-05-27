@@ -11,38 +11,34 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setupSpec(){
         loadFixtures()
-        parent1 = new Model(name: 'First Parent')
-        parent2 = new Model(name: 'Second Parent')
-        child1 = new Model(name: 'Child 1')
-        child2 = new Model(name: 'Child 2')
-        grandChild = new Model(name: 'Grand Child')
-        de1 = DataElement.findByName("DE_author1")
-        de2 = DataElement.findByName("AUTHOR")
-        de3 = DataElement.findByName("auth")
-
-        [parent1, parent2, child1, child2, grandChild].each {
-            it.status = PublishedElementStatus.FINALIZED
-            assert it.save()
-        }
-
+        parent1 = Model.findByName('book')
+        parent2 = Model.findByName('chapter1')
+        child1 = Model.findByName('chapter2')
+        child2 = Model.findByName('mTest1')
+        grandChild = Model.findByName('mTest2')
         parent1.addToParentOf child1
         parent2.addToParentOf child2
         child1.addToParentOf grandChild
-        parent1.addToContains(de1)
-        child1.addToContains(de2)
-        grandChild.addToContains(de3)
-
     }
 
     def cleanupSpec() {
-
-        [parent1.refresh(), parent2.refresh(), child1.refresh(), child2.refresh(), grandChild.refresh()].each {
-            it.delete()
-        }
+       parent1 = Model.findByName('book')
+       parent2 = Model.findByName('chapter1')
+       child1 = Model.findByName('chapter2')
+       child2 = Model.findByName('mTest1')
+       grandChild = Model.findByName('mTest2')
+       parent1.removeFromParentOf child1
+       parent2.removeFromParentOf child2
+       child1.removeFromParentOf grandChild
     }
 
     def "get top level elements"() {
 
+        parent1 = Model.findByName('book')
+        parent2 = Model.findByName('chapter1')
+        child1 = Model.findByName('chapter2')
+        child2 = Model.findByName('mTest1')
+        grandChild = Model.findByName('mTest2')
         ListAndCount topLevel = modelService.getTopLevelModels([:])
 
         expect:
@@ -53,20 +49,16 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
             assert !it.childOf
         }
 
-        topLevel.list.count {
-            it.name.contains 'Parent'
-        } >= 2
-
     }
 
     def "get subModels"() {
-
-        parent1.refresh()
-        child1.refresh()
-        grandChild.refresh()
-
+        parent1 = Model.findByName('book')
+        parent2 = Model.findByName('chapter1')
+        child1 = Model.findByName('chapter2')
+        child2 = Model.findByName('mTest1')
+        grandChild = Model.findByName('mTest2')
         when:
-        ListAndCount subModels = modelService.getSubModels(parent1, [:])
+        ListAndCount subModels = modelService.getSubModels(parent1)
 
         then:
         subModels.count ==3
@@ -78,10 +70,18 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
     def "get data elements from multiple models"() {
-
+        parent1 = Model.findByName('book')
+        parent2 = Model.findByName('chapter1')
+        child1 = Model.findByName('chapter2')
+        child2 = Model.findByName('mTest1')
+        grandChild = Model.findByName('mTest2')
         de1 = DataElement.findByName("DE_author1")
         de2 = DataElement.findByName("AUTHOR")
         de3 = DataElement.findByName("auth")
+
+        parent1.addToContains(de1)
+        child1.addToContains(de2)
+        grandChild.addToContains(de3)
 
         when:
         ListAndCount dataElements = modelService.getDataElementsFromModels([parent1, child1, grandChild])
@@ -92,17 +92,26 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         dataElements.list.contains(de2)
         dataElements.list.contains(de3)
 
+        cleanup:
+
+        parent1.removeFromContains(de1)
+        child1.removeFromContains(de2)
+        grandChild.removeFromContains(de3)
+
+
     }
 
     def "test infinite recursion"(){
         setup:
-        parent1.refresh()
-        child1.refresh()
-        grandChild.refresh()
+        parent1 = Model.findByName('book')
+        parent2 = Model.findByName('chapter1')
+        child1 = Model.findByName('chapter2')
+        child2 = Model.findByName('mTest1')
+        grandChild = Model.findByName('mTest2')
         grandChild.addToParentOf parent1
 
         when:
-        ListAndCount subModels = modelService.getSubModels(parent1, [:])
+        ListAndCount subModels = modelService.getSubModels(parent1)
 
         then:
         subModels.count ==3

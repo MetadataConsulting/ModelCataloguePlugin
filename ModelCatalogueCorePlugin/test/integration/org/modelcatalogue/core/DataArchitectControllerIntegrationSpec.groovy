@@ -40,7 +40,9 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
 
     def cleanupSpec(){
         de1.removeFromContainedIn(md)
+        de3.removeFromContainedIn(md2)
         de2.removeFromInstantiatedBy(vd)
+        md.removeFromParentOf(md2)
     }
 
     def "json get sub model elements"(){

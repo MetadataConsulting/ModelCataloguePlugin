@@ -16,10 +16,10 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         publishedElementService.list().size()               == 12
         publishedElementService.list(max: 10).size()        == 10
         publishedElementService.list(DataElement).size()    == 7
-        publishedElementService.list(Model).size()          == 5
+        publishedElementService.list(Model).size()          == 10
         publishedElementService.count()                     == 12
         publishedElementService.count(DataElement)          == 7
-        publishedElementService.count(Model)                == 5
+        publishedElementService.count(Model)                == 10
     }
 
     def "can supply status as parameter"() {

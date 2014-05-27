@@ -71,9 +71,11 @@ class Relationship implements Extendible {
     }
 
     def beforeDelete(){
-        if (source || destination) {
-            destination?.removeFromIncomingRelationships(this)
+        if (source) {
             source?.removeFromOutgoingRelationships(this)
+        }
+        if(destination){
+            destination?.removeFromIncomingRelationships(this)
         }
     }
 

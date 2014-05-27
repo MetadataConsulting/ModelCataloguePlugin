@@ -77,6 +77,7 @@ class PublishedElementControllerIntegrationSpec extends AbstractPublishedElement
         ]
     }
 
+    @Override
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
