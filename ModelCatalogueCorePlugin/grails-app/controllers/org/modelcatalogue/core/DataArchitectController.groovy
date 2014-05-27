@@ -25,8 +25,8 @@ class DataArchitectController {
             return
         }
 
-        def total = (results.totalCount)?results.totalCount:0
-        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/uninstantiatedDataElements", total)
+
+        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/uninstantiatedDataElements", results.count)
 
         Elements elements =  new Elements(
                 total: results.count,
@@ -53,8 +53,7 @@ class DataArchitectController {
             return
         }
 
-        def total = (results.totalCount)?results.totalCount:0
-        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/metadataKeyCheck", total)
+        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/metadataKeyCheck", results.count)
 
         Elements elements =  new Elements(
                 total: results.count,
