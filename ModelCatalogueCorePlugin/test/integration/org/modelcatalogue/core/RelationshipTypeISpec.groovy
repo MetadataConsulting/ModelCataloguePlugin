@@ -57,8 +57,8 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         model.removeFromContains(element)
 
         then:
-        !model.contains
-        !element.containedIn
+        !model.contains.contains(element)
+        !element.containedIn.contains(model)
 
         when:
         element.addToContainedIn(model)

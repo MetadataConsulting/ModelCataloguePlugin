@@ -20,7 +20,6 @@ import org.modelcatalogue.core.ValueDomain
 
 class DataImportService {
 
-    def dataArchitectService
     static transactional = false
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
@@ -73,8 +72,6 @@ class DataImportService {
         }
         newImporter.resolveAllPendingRows()
         newImporter.ingestImportQueue()
-        //dataArchitectService.indexAll()
-
     }
 
 }
