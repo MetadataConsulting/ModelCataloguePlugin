@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource' , ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource) ->
+    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'modelCatalogueApiRoot', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, modelCatalogueApiRoot) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -177,6 +177,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
             activeTabSet = true
+            if element.elementTypeName == 'Model'
+              $scope.reports = [{name: "exportAll", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx"}]
 
           tabs.unshift tabDefinition
 

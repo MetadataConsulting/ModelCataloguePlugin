@@ -26,7 +26,7 @@ class ModelService {
         new ListAndCount(count: count, list: list)
     }
 
-    ListAndCount getSubModels(Model model, Map params) {
+    ListAndCount getSubModels(Model model) {
 
         List<Model> models = listChildren(model)
         new ListAndCount(count: models.size(), list: models)

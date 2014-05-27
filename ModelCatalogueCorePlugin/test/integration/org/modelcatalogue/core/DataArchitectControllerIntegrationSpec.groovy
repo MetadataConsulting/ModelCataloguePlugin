@@ -17,7 +17,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
 
 
     @Shared
-    def relationshipService, de1, de2, de3, de4, de5, vd, md
+    def relationshipService, de1, de2, de3, de4, de5, vd, md,md2
 
 
     def setupSpec(){
@@ -30,14 +30,72 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         de5 = DataElement.findByName("auth5")
         vd = ValueDomain.findByName("value domain Celsius")
         md = Model.findByName("book")
+        md2 = Model.findByName("chapter1")
         de1.addToContainedIn(md)
+        de3.addToContainedIn(md2)
         de2.addToInstantiatedBy(vd)
         relationshipService.link(de3, de2, RelationshipType.findByName("supersession"))
+        md.addToParentOf(md2)
     }
 
     def cleanupSpec(){
         de1.removeFromContainedIn(md)
         de2.removeFromInstantiatedBy(vd)
+    }
+
+    def "json get sub model elements"(){
+        def controller = new DataArchitectController()
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "dataArchitect"
+        )
+
+        when:
+        controller.params.put("modelId", md.id)
+        controller.response.format = "json"
+        controller.getSubModelElements()
+        JSONElement json = controller.response.json
+        String list = "sub_model_elements"
+        recorder.recordResult list, json
+
+        then:
+        json.success
+        json.total == 2
+        json.offset == 0
+        json.page == 10
+        json.list
+        json.list.size() == 2
+        json.next == ""
+        json.previous == ""
+    }
+
+    def "xml get sub model elements"(){
+        def controller = new DataArchitectController()
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "dataArchitect"
+        )
+
+        when:
+        controller.params.put("modelId", md.id)
+        controller.response.format = "xml"
+        controller.getSubModelElements()
+        GPathResult xml = controller.response.xml
+        String list = "sub_model_elements"
+        recorder.recordResult list, xml
+
+        then:
+
+        xml.@success.text() == "true"
+        xml.@total.text() == "2"
+        xml.@offset.text() == "0"
+        xml.@page.text() =="10"
+        xml.element
+        xml.element.size() == 2
+        xml.next.text() == ""
+        xml.previous.text() == ""
     }
 
 

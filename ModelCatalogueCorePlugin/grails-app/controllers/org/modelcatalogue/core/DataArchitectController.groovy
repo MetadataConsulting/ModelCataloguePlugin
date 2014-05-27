@@ -11,8 +11,6 @@ class DataArchitectController {
 
     def dataArchitectService, modelService
 
-    def index(){}
-
     def uninstantiatedDataElements(Integer max){
         setSafeMax(max)
         ListAndCount results
@@ -23,7 +21,6 @@ class DataArchitectController {
             println(e)
             return
         }
-
 
         def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/uninstantiatedDataElements", results.count)
 
@@ -67,12 +64,28 @@ class DataArchitectController {
         respond elements
     }
 
-    def allDataElementsUnderModel(){
+    def getSubModelElements(){
+        def dataElements = new ListAndCount(count: 0, list: [])
         if(params?.modelId){
             Model model = Model.get(params.modelId)
             def subModels = modelService.getSubModels(model)
-            def dataElements = modelService.getDataElementsFromModels(subModels)
+            dataElements = modelService.getDataElementsFromModels(subModels.list)
         }
+
+        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/getSubModelElements", dataElements.count)
+
+        Elements elements =  new Elements(
+                total: dataElements.count,
+                items: dataElements.list,
+                itemType: DataElement,
+                previous: links.previous,
+                next: links.next,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 10
+        )
+
+        respond elements
+
     }
 
 
