@@ -43,7 +43,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all?page'
+    url: '/all?page&order&sort'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
@@ -53,6 +53,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only model controller will respond on it
           params = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
+          params.order = $stateParams.order ? 'asc'
+          params.sort  = $stateParams.sort ? 'name'
           catalogueElementResource($stateParams.resource).list(params)
         ]
 

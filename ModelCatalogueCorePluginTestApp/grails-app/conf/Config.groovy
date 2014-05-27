@@ -164,7 +164,7 @@ modelcatalogue.defaults.measurementunits = [
 
 
 modelcatalogue.defaults.relationshiptypes =  [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metedataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
+        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
             Integer sourceMinOccurs = ext['Source Min Occurs'] as Integer
             Integer sourceMaxOccurs = ext['Source Max Occurs'] as Integer
             Integer destinationMinOccurs = ext['Destination Min Occurs'] as Integer

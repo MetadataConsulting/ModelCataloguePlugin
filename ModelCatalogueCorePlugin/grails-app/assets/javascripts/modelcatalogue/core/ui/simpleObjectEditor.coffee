@@ -4,6 +4,7 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
     scope:
       object:             '='
       hints:              '=?'
+      title:              '@?'
     templateUrl: 'modelcatalogue/core/ui/simpleObjectEditor.html'
 
     controller: ['$scope', '$filter', ($scope, $filter) ->
@@ -11,32 +12,35 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
       $scope.editableProperties = []
 
       $scope.removeProperty = (index) ->
-        return if $scope.editableProperties.length <= 1
-        current = $scope.editableProperties[index]
-        unique  = $scope.isKeyUnique(current.key)
-        $scope.editableProperties.splice(index, 1)
-        if unique
-          $scope.object[current.key] = undefined
-        else
-          for property in $scope.editableProperties
-            if property.key == current.key
-              $scope.object[property.key] = property.value
+          current = $scope.editableProperties[index]
+          unique  = $scope.isKeyUnique(current.key)
+          $scope.editableProperties.splice(index, 1)
+          if unique
+            delete $scope.object[current.key]
+          else
+            for property in $scope.editableProperties
+              if property.key == current.key
+                $scope.object[property.key] = property.value
+          if $scope.editableProperties.length == 0
+            $scope.editableProperties.push key: ''
 
       $scope.addProperty = (index, property = {key: 'Key', value: 'Value'}) ->
         newProperty = angular.copy(property)
-        newProperty.originalKey = undefined
+        delete newProperty.originalKey
         $scope.editableProperties.splice(index + 1, 0, newProperty)
 
       $scope.keyChanged = (property) ->
-        $scope.object[property.originalKey] = undefined
+        delete $scope.object[property.originalKey]
+        return if not property.key
         property.originalKey = property.key
-        $scope.object[property.key] = property.value
+        $scope.object[property.key] = if property.value then property.value else null
 
       $scope.valueChanged = (property) ->
+        return if not property.key
         $scope.object[property.key] = if property.value then property.value else null
 
       $scope.isKeyUnique = (key) ->
-        return false if not key
+        return false if not key and $scope.editableProperties.length > 1
         firstFound = false
         for property in $scope.editableProperties
           if property.key == key
@@ -53,16 +57,18 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
         editableProperties = []
         currentHints       = angular.copy(hints ? [])
 
-        for key, value of object when !(angular.isFunction(value) or angular.isObject(value))
+        for key, value of object when key and !(angular.isFunction(value) or angular.isObject(value))
           editableProperties.push key: key, value: value, originalKey: key
           remove currentHints, key
 
-        for hint in currentHints
-          editableProperties.push key: hint
+        # editableProperties = $filter('orderBy')(editableProperties, 'key')
 
-        editableProperties.push key: '', value: '' unless editableProperties
+        for hint in currentHints by -1
+          editableProperties.unshift key: hint
 
-        $scope.editableProperties = $filter('orderBy')(editableProperties, 'key')
+        editableProperties.push key: '' if editableProperties.length == 0
+
+        $scope.editableProperties = editableProperties
 
 
       onObjectOrHintsChanged($scope.object, $scope.hints ? [])

@@ -7,6 +7,8 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
   nextId        = 1
 
+  messagesProvider = @
+
   @setConfirmFactory = (customConfirm) ->
     confirmFactory = customConfirm
 
@@ -15,6 +17,9 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
   @setPromptFactory = (type, customPromptFactory) ->
     promptFactories[type] = customPromptFactory
+
+  @hasPromptFactory = (type) ->
+    promptFactories[type]?
 
   # factory method
   @$get = [ '$injector', '$q', '$log', '$window', ($injector, $q, $log, $window) ->
@@ -144,6 +149,9 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
         removed
 
       messages.createNewMessages = -> createNewMessages()
+
+      messages.hasPromptFactory  = (type) ->
+        messagesProvider.hasPromptFactory(type)
 
       messages
 

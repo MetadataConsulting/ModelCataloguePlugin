@@ -118,9 +118,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           tabDefinition =
             name:       name
             heading:    names.getNaturalName(name)
-            value:      obj
-            original:   angular.copy(obj)
-            disabled:   obj == undefined or obj == null or getObjectSize(obj) == 0
+            value:      obj ? {}
+            original:   angular.copy(obj ? {})
             properties: []
             type:       'simple-object-editor'
             isDirty:    () -> angular.equals(@original, @value)
@@ -135,7 +134,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 $scope.element = updated
                 messages.success("Property #{names.getNaturalName(self.name)} of #{element.name} successfully updated")
                 updated
-              , () ->
+              ,  ->
                 messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
 
 
@@ -211,6 +210,12 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.createRelationship = () ->
         messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
 
+      $scope.canEdit = ->
+        messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
+
+      $scope.edit = ->
+        messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
+          $scope.element = updated
 
       # watches
       $scope.$watch 'element', onElementUpdate

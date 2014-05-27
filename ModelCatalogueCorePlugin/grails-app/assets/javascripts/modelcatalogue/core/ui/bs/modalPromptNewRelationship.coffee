@@ -32,6 +32,9 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                   </tr>
                 </tbody>
               </table>
+              <div class="new-relationship-modal-prompt-metadata">
+                <simple-object-editor object="metadata" title="Metadata" hints="relationshipTypeInfo.type.metadataHints"></simple-object-editor>
+              </div>
             </form>
         </div>
         <div class="modal-footer">
@@ -83,6 +86,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
           $scope.messages = messages.createNewMessages()
 
+          $scope.metadata = {}
+
           $scope.createRelation = ->
             $scope.messages.clearAllMessages()
             if not $scope.relationshipType
@@ -97,6 +102,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
               $scope.messages.error 'Missing Relation', 'Please select the relation'
               return
 
+            # this is ignored by binding and handled separately
+            $scope.relation.metadata = $scope.metadata
 
             args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, $scope.relation).then (result) ->
               messages.success('Relationship Created', "You have added new relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{$scope.relation.name} in the catalogue.")
@@ -119,11 +126,3 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
       deferred.promise
   ]
 ]
-
-# <div class="form-group">
-# <label for="type">Relationship Type</label>
-# <input id="type" type="text"  class="form-control" ng-model="relationshipType" catalogue-element-picker="relationshipType" hide-element-type="true" typeahead-on-select="updateDirections(relationshipType)">
-# <label for="direction" ng-show="directions">Direction</label>
-# <select id="direction" ng-show="directions" ng-model="direction" ng-options="d.label for d in directions" class="form-control" ng-change="updateRelationPicker()"></select>
-# <label for="relation" ng-show="direction">{{direction.relationLabel}}</label>
-# </div>

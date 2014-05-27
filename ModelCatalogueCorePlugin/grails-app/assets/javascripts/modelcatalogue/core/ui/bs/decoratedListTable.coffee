@@ -6,7 +6,13 @@ angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList'])
             <th class="dl-table-select-all-cell col-md-1" ng-switch-when="true">
               <input type="checkbox" ng-change="updateSelectAll(allSelected)" ng-model="allSelected">
             </th>
-            <th class="dl-table-header-cell" ng-repeat="column in columns" ng-class="evaluateClasses(column.classes)">{{column.header}}</th>
+            <th class="dl-table-header-cell" ng-repeat="column in columns" ng-class="evaluateClasses(column.classes)">
+              <span ng-if="!column.sort">{{column.header}}</span>
+              <a class="dl-table-header-sortable" ng-click="sortBy(column)" ng-if="column.sort">
+                <span class="glyphicon" ng-class="getSortClass(column)"></span>
+                {{column.header}}
+              </a>
+            </th>
             <th ng-if="actions" ng-class="getActionsClass()">
               &nbsp;
             </th>
