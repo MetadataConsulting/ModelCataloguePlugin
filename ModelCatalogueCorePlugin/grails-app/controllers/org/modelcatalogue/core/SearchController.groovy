@@ -18,14 +18,18 @@ class SearchController {
         }
 
         def total = (results.total)?results.total.intValue():0
-        def links = ListWrapper.nextAndPreviousLinks(params, "/search/${params.search}", total)
+        def baseLink = "/search/${params.search}"
+        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, total)
         Elements elements =  new Elements(
-                    total: total,
-                    items: results.searchResults,
-                    previous: links.previous,
-                    next: links.next,
-                    offset: params.int('offset') ?: 0,
-                    page: params.int('max') ?: 10
+                base: baseLink,
+                total: total,
+                items: results.searchResults,
+                previous: links.previous,
+                next: links.next,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 10,
+                sort: params.sort,
+                order: params.order
         )
 
         respond elements

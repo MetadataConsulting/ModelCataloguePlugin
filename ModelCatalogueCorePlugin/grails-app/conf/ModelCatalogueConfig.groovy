@@ -88,7 +88,7 @@ modelcatalogue.defaults.measurementunits = [
         [name:'mass density',description:'kilogram per cubic meter', symbol:'kg/m3'],
         [name:'specific volume',description:'cubic meter per kilogram', symbol:'m3/kg'],
         [name:'current density',description:'ampere per square meter', symbol:'A/m2'],
-        [name:'magnetic field strength  ',description:'ampere per meter', symbol:'A/m'],
+        [name:'magnetic field strength',description:'ampere per meter', symbol:'A/m'],
         [name:'amount-of-substance concentration',description:'mole per cubic meter', symbol:'mol/m3'],
         [name:'luminance',description:'candela per square meter', symbol:'cd/m2'],
         [name:'mass fraction',description:'kilogram per kilogram', symbol:'kg/kg = 1']
@@ -96,12 +96,46 @@ modelcatalogue.defaults.measurementunits = [
 
 
 modelcatalogue.defaults.relationshiptypes =  [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement],
+        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
+            Integer sourceMinOccurs = ext['Source Min Occurs'] as Integer
+            Integer sourceMaxOccurs = ext['Source Max Occurs'] as Integer
+            Integer destinationMinOccurs = ext['Destination Min Occurs'] as Integer
+            Integer destinationMaxOccurs = ext['Destination Max Occurs'] as Integer
+            
+            if (sourceMinOccurs != null) {
+                if (sourceMinOccurs < 0) {
+                    return false
+                }
+                if (sourceMaxOccurs != null && sourceMaxOccurs < sourceMinOccurs) {
+                    return false
+                }
+            } else {
+                if (sourceMaxOccurs != null && sourceMaxOccurs < 1) {
+                    return false
+                }
+            }
+
+            if (destinationMinOccurs != null) {
+                if (destinationMinOccurs < 0) {
+                    return false
+                }
+                if (destinationMaxOccurs != null && destinationMaxOccurs < destinationMinOccurs) {
+                    return false
+                }
+            } else {
+                if (destinationMaxOccurs != null && destinationMaxOccurs < 1) {
+                    return false
+                }
+            }
+
+            return true
+        '''],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
         [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
-        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true]
+        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
+        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement]
 ]
 
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements

@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.elasticsearch
 
-class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateEvent> */{
+import org.modelcatalogue.core.SearchCatalogue
+
+class ModelCatalogueSearchService implements SearchCatalogue{
 
     def elasticSearchService, elasticSearchAdminService
 
@@ -77,12 +79,10 @@ class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateE
 
     def index(Class resource){
         elasticSearchService.index(resource)
-        elasticSearchAdminService.refresh()
     }
 
     def index(Collection<Class> resource){
         elasticSearchService.index(resource)
-        elasticSearchAdminService.refresh()
     }
 
     def unindex(Object object){
@@ -92,4 +92,10 @@ class ModelCatalogueSearchService /*implements ApplicationListener<SaveOrUpdateE
     def unindex(Collection<Object> object){
         elasticSearchService.unindex(object)
     }
+
+    def refresh(){
+        elasticSearchAdminService.refresh()
+    }
+
+
 }

@@ -6,7 +6,7 @@ import grails.gorm.DetachedCriteria
  * Poor man's search service searching in name and description
  * , you should use search service designed for particular search plugin
  */
-class ModelCatalogueSearchService{
+class ModelCatalogueSearchService implements SearchCatalogue{
 
     def search(Class resource, Map params) {
         if (!params.search) {
@@ -46,7 +46,9 @@ class ModelCatalogueSearchService{
     }
 
     def index(Class resource){}
+    def index(Collection<Class> resource){}
     def unindex(Object object){}
     def unindex(Collection<Object> object){}
+    def refresh(){}
 
 }

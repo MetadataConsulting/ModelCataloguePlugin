@@ -28,7 +28,7 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
           throw "Missing ID, use save instead"
         props = angular.copy(data)
         delete props.id
-        enhance rest method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props
+        enhance rest method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, params: {format: 'json'}
 
       validate: (data) ->
         enhance rest method: 'POST', url: "#{@getIndexPath()}/validate", data: data

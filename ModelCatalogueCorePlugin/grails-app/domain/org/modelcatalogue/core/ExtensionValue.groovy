@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-class ExtensionValue {
+class ExtensionValue implements Extension {
 
     /* the name property from catalogue element is a key for the extension */
 
@@ -24,7 +24,7 @@ class ExtensionValue {
 
     @Override
     public String toString() {
-        return "extension for ${element} (${name}=${extensionValue})";
+        return "extension for ${element} (${name}=${extensionValue})"
     }
 
 

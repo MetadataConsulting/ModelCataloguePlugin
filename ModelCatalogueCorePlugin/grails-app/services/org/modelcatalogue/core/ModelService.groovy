@@ -26,4 +26,31 @@ class ModelService {
         new ListAndCount(count: count, list: list)
     }
 
+    ListAndCount getSubModels(Model model) {
+
+        List<Model> models = listChildren(model)
+        new ListAndCount(count: models.size(), list: models)
+
+    }
+
+    ListAndCount getDataElementsFromModels(List<Model> models){
+        def results = []
+        models.each{ model ->
+            results.addAll(model.contains)
+        }
+        new ListAndCount(count: results.size(), list: results)
+    }
+
+
+    protected List<Model> listChildren(Model model, results = []){
+            if (model && !results.contains(model)) {
+                    results += model
+                    model.parentOf?.each { child ->
+                        results += listChildren(child, results)
+                    }
+            }
+            results.unique()
+    }
+
+
 }

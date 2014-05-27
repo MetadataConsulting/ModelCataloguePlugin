@@ -69,6 +69,9 @@ class ModelCatalogueCorePluginUrlMappings {
             "/metadataKeyCheck/$key?" (controller:"dataArchitect"){
                 action = [GET: "metadataKeyCheck"]
             }
+            "/getSubModelElements/$modelId?" (controller:"dataArchitect"){
+                action = [GET: "getSubModelElements"]
+            }
         }
 
 

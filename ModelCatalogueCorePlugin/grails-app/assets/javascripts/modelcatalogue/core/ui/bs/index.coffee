@@ -12,6 +12,10 @@
 #= require modalConfirm
 #= require modalPrompt
 #= require modalPromptNewRelationship
+#= require simpleObjectEditor
+#= require modalPromptBasicEdit
+#= require modalPromptMeasurementUnitEdit
+#= require modalPromptValueDomainEdit
 
 
 angular.module('mc.core.ui.bs', [
@@ -30,4 +34,8 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalConfirm'
   'mc.core.ui.bs.modalPrompt'
   'mc.core.ui.bs.modalPromptNewRelationship'
+  'mc.core.ui.bs.simpleObjectEditor'
+  'mc.core.ui.bs.modalPromptBasicEdit'
+  'mc.core.ui.bs.modalPromptMeasurementUnitEdit'
+  'mc.core.ui.bs.modalPromptValueDomainEdit'
 ])

@@ -2,21 +2,24 @@ package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
 import spock.lang.Specification
+import spock.lang.Unroll
 
-@Mock([DataElement, ExtensionValue, ExtendibleElement])
+@Mock([DataElement, ExtensionValue, ExtendibleElement, Relationship, Model,  RelationshipType, RelationshipMetadata])
 class ExtendibleElementExtensionsWrapperSpec extends Specification {
 
 
-    def "Extendible elements have live map to extension values"() {
+    @Unroll
+    def "Extendible elements have live map to extension values for #extensionClass"() {
         expect:
-        !ExtensionValue.count()
+        !extensionClass.count()
 
         when:
-        DataElement element = new DataElement(name: "element").save(flush: true)
+        def element = newElementFactory.call().save(flush: true)
+
 
         then:
         element
-        !element.extensions
+        !element[extensionProperty]
         element.ext != null
         element.ext.size() == 0
         element.ext.isEmpty()
@@ -25,13 +28,13 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         element.ext.foo = "bar"
 
         then:
-        element.extensions
-        element.extensions.size() == 1
-        ExtensionValue.count() == 1
+        element[extensionProperty]
+        element[extensionProperty].size() == 1
+        extensionClass.count() == 1
         element.ext.keySet() == ['foo'] as Set
         element.ext.values()?.contains('bar')
         element.ext.entrySet() == [foo: 'bar'].entrySet()
-        // ExtensionValue.findByElementAndName(element, 'foo')
+        // extensionClass.findByElementAndName(element, 'foo')
         element.ext.containsKey('foo')
         element.ext.containsValue('bar')
         element.ext.size() == 1
@@ -39,18 +42,18 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         when:
 
         String oldVal = element.ext.put('foo', "barbar")
-        ExtensionValue ex = ExtensionValue.findByName("foo")
+        def ex = extensionClass.findByName("foo")
 
         then:
-        element.extensions
-        element.extensions.size() == 1
+        element[extensionProperty]
+        element[extensionProperty].size() == 1
         element.ext.containsKey('foo')
         element.ext.containsValue('barbar')
         !element.ext.containsValue('bar')
         element.ext.size() == 1
         oldVal == "bar"
         ex
-        ex.element == element
+        ex[ownerProperty] == element
 
 
         when:
@@ -65,7 +68,7 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         element.ext.putAll(one: "1", two: "2")
 
         then:
-        element.extensions.size() == 3
+        element[extensionProperty].size() == 3
         element.ext.containsKey("one")
         element.ext.containsKey("two")
         element.ext.size() == 3
@@ -75,25 +78,53 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         element.ext.remove("one")
 
         then:
-        element.extensions.size() == 2
+        element[extensionProperty].size() == 2
         !element.ext.containsKey("one")
         element.ext.containsKey("two")
         element.ext.size() == 2
 
         when:
         def x =  element.ext
-        def xt = element.extensions
+        def xt = element[extensionProperty]
         element.ext.clear()
         x =  element.ext
-        xt = element.extensions
+        xt = element[extensionProperty]
 
 
         then:
-        !element.extensions
+        !element[extensionProperty]
         !element.ext.containsKey("one")
         !element.ext.containsKey("two")
         !element.ext.size()
 
+
+        where:
+        extensionClass          | extensionProperty     | ownerProperty     | newElementFactory
+        ExtensionValue          | "extensions"          | 'element'         | this.&createDataElement
+        RelationshipMetadata    | "extensions"          | 'relationship'    | this.&createRelationship
+    }
+
+    private DataElement createDataElement() {
+        new DataElement(name: "element")
+    }
+
+    private Relationship createRelationship() {
+        Model source = new Model(name: "source")
+        assert source.save()
+
+        Model target = new Model(name: "target")
+        assert target.save()
+
+        RelationshipType type = new RelationshipType(sourceToDestination: "src to dest", destinationToSource: "dest to src", sourceClass: CatalogueElement, destinationClass: CatalogueElement, name: "type")
+        assert type.save()
+
+        RelationshipService relationshipService = new RelationshipService()
+
+        Relationship rel = relationshipService.link(source, target, type)
+
+        assert !rel.errors.hasErrors()
+
+        rel
     }
 
 

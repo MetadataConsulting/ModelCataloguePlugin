@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.ExtendibleElementExtensionsWrapper
+import org.modelcatalogue.core.util.ExtensionsWrapper
 
 /*
 *
@@ -8,7 +8,7 @@ import org.modelcatalogue.core.util.ExtendibleElementExtensionsWrapper
 *
 * */
 
-abstract class ExtendibleElement extends PublishedElement {
+abstract class ExtendibleElement extends PublishedElement implements Extendible {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
@@ -20,11 +20,38 @@ abstract class ExtendibleElement extends PublishedElement {
     static hasMany = [extensions: ExtensionValue]
     static transients = ['ext']
 
-    Map<String, String> ext = new ExtendibleElementExtensionsWrapper(this)
+    Map<String, String> ext = new ExtensionsWrapper(this)
+
+    void setExt(Map<String, String> ext) {
+        this.ext.clear()
+        this.ext.putAll(ext)
+    }
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, extensions: ${extensions}]"
     }
 
+    @Override
+    Set<Extension> listExtensions() {
+        extensions
+    }
 
+    @Override
+    Extension addExtension(String name, String value) {
+        ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
+        newOne.save()
+        assert !newOne.errors.hasErrors()
+        addToExtensions(newOne)
+        newOne
+    }
+
+    @Override
+    void removeExtension(Extension extension) {
+        if (extension instanceof ExtensionValue) {
+            removeFromExtensions(extension)
+            extension.delete(flush: true)
+        } else {
+            throw new IllegalArgumentException("Only instances of ExtensionValue are supported")
+        }
+    }
 }

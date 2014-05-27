@@ -1,12 +1,88 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.test.spock.IntegrationSpec
+import org.modelcatalogue.core.AbstractIntegrationSpec
+import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
+import spock.lang.Shared
+import spock.lang.Unroll
 
-class DataImportServiceSpec extends IntegrationSpec {
+class DataImportServiceSpec extends AbstractIntegrationSpec {
 
-    def void "placeholder test"(){}
+
+    @Shared dataImportService
+    @Shared
+    ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2
+
+    def setupSpec() {
+        dataImportService = new Importer()
+        loadFixtures()
+        validImportRow = new ImportRow()
+        validImportRow2 = new ImportRow()
+        modelOnlyImportRow = new ImportRow()
+        modelOnlyImportRow2 = new ImportRow()
+        invalidImportRow = new ImportRow()
+
+        //model only import row
+        modelOnlyImportRow.dataElementName = ""
+        modelOnlyImportRow.dataElementCode = ""
+        modelOnlyImportRow.parentModelName = "testParentModelCode"
+        modelOnlyImportRow.parentModelCode = "MC_037e6962-3b6f-4ae4-a171-2570b64dfq10_1"
+        modelOnlyImportRow.containingModelName = "testJustModel"
+        modelOnlyImportRow.containingModelCode = "MC_037e6162-2b6f-4ae4-a171-2570b64daf10_1"
+        modelOnlyImportRow.dataType = ""
+        modelOnlyImportRow.dataElementDescription = ""
+        modelOnlyImportRow.measurementUnitName = ""
+        modelOnlyImportRow.conceptualDomainName = "formula one"
+        modelOnlyImportRow.conceptualDomainDescription = " the domain of formula one"
+
+        //model only import row
+        modelOnlyImportRow2.dataElementName = ""
+        modelOnlyImportRow2.dataElementCode = ""
+        modelOnlyImportRow2.parentModelName = ""
+        modelOnlyImportRow2.parentModelCode = ""
+        modelOnlyImportRow2.containingModelName = "testParentModelCode"
+        modelOnlyImportRow2.containingModelCode = "MC_037e6962-3b6f-4ae4-a171-2570b64dfq10_1"
+        modelOnlyImportRow2.dataType = ""
+        modelOnlyImportRow2.dataElementDescription = ""
+        modelOnlyImportRow2.measurementUnitName = ""
+        modelOnlyImportRow2.conceptualDomainName = "formula one"
+        modelOnlyImportRow2.conceptualDomainDescription = " the domain of formula one"
+
+        //row 1
+        validImportRow.dataElementName = "testDataItem"
+        validImportRow.dataElementCode = "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1"
+        validImportRow.parentModelName = "testParentModelCode"
+        validImportRow.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1"
+        validImportRow.containingModelName = "testModel"
+        validImportRow.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1"
+        validImportRow.dataType = "String"
+        validImportRow.dataElementDescription = "test description"
+        validImportRow.measurementUnitName = "Degrees of Fahrenheit"
+        validImportRow.conceptualDomainName = "formula one"
+        validImportRow.conceptualDomainDescription = " the domain of formula one"
+
+        //row 2 -same model as row 1 but different data element
+        validImportRow2.dataElementName = "testDataItem2"
+        validImportRow2.dataElementCode = "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1"
+        validImportRow2.parentModelName = "testParentModelCode"
+        validImportRow2.parentModelCode = "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1"
+        validImportRow2.containingModelName = "testModel"
+        validImportRow2.containingModelCode = "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1"
+        validImportRow2.dataType = "String"
+        validImportRow2.dataElementDescription = "test description 2"
+        validImportRow2.measurementUnitName = "Degrees Celsius"
+        validImportRow2.conceptualDomainName = "formula one"
+        validImportRow2.conceptualDomainDescription = " the domain of formula one"
+    }
+
+
+
+
+
 
 //    def fileName= "test/integration/resources/DataTemplate.xls"
 //    def fileName2= "test/integration/resources/DataTemplateChangeDataItemName.xls"
@@ -256,5 +332,7 @@ class DataImportServiceSpec extends IntegrationSpec {
 //        patientIdentity.contains.contains(nhsNumberIndicator)
 //
 //    }
+
+
 
 }

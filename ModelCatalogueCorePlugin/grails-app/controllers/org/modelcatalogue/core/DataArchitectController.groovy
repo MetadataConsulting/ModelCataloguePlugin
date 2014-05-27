@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.rest.RestfulController
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWrapper
@@ -9,7 +8,7 @@ class DataArchitectController {
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
-    def dataArchitectService
+    def dataArchitectService, modelService
 
     def index(){}
 
@@ -24,17 +23,20 @@ class DataArchitectController {
             return
         }
 
-
-        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/uninstantiatedDataElements", results.count)
+        def baseLink = "/dataArchitect/uninstantiatedDataElements"
+        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
         Elements elements =  new Elements(
+                base: baseLink,
                 total: results.count,
                 items: results.list,
                 itemType: DataElement,
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10
+                page: params.int('max') ?: 10,
+                sort: params.sort,
+                order: params.order
         )
 
         respond elements
@@ -52,20 +54,54 @@ class DataArchitectController {
             return
         }
 
-        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/metadataKeyCheck", results.count)
+
+        def baseLink = "/dataArchitect/metadataKeyCheck"
+        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
         Elements elements =  new Elements(
+                base: baseLink,
                 total: results.count,
                 items: results.list,
                 itemType: DataElement,
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10
+                page: params.int('max') ?: 10,
+                sort: params.sort,
+                order: params.order
         )
 
         respond elements
     }
+
+    def getSubModelElements(){
+
+        def results = new ListAndCount(count: 0, list: [])
+        if(params?.modelId){
+            Model model = Model.get(params.modelId)
+            def subModels = modelService.getSubModels(model)
+            results = modelService.getDataElementsFromModels(subModels.list)
+        }
+
+        def baseLink = "/dataArchitect/getSubModelElements"
+        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
+
+        Elements elements =  new Elements(
+                base: baseLink,
+                total: results.count,
+                items: results.list,
+                itemType: DataElement,
+                previous: links.previous,
+                next: links.next,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 10,
+                sort: params.sort,
+                order: params.order
+        )
+
+        respond elements
+    }
+
 
 
     protected setSafeMax(Integer max) {
