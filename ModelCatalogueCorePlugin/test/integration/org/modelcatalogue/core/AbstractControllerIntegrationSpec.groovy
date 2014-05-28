@@ -36,10 +36,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         totalCount = 12
     }
 
-    def cleanupSpec(){
-
-    }
-
 
     @Unroll
     def "list json items test: #no where max: #max offset: #offset"() {

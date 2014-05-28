@@ -8,7 +8,7 @@ class DataArchitectController {
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
-    def dataArchitectService
+    def dataArchitectService, modelService
 
     def index(){}
 
@@ -73,6 +73,35 @@ class DataArchitectController {
 
         respond elements
     }
+
+    def getSubModelElements(){
+
+        def results = new ListAndCount(count: 0, list: [])
+        if(params?.modelId){
+            Model model = Model.get(params.modelId)
+            def subModels = modelService.getSubModels(model)
+            results = modelService.getDataElementsFromModels(subModels.list)
+        }
+
+        def baseLink = "/dataArchitect/getSubModelElements"
+        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
+
+        Elements elements =  new Elements(
+                base: baseLink,
+                total: results.count,
+                items: results.list,
+                itemType: DataElement,
+                previous: links.previous,
+                next: links.next,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 10,
+                sort: params.sort,
+                order: params.order
+        )
+
+        respond elements
+    }
+
 
 
     protected setSafeMax(Integer max) {
