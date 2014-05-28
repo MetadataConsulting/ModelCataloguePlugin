@@ -11,7 +11,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
     compile: recursiveCompile.compile
 
-    controller: ['$scope', '$rootScope', ($scope, $rootScope) ->
+    controller: ['$scope', '$rootScope', '$log', ($scope, $rootScope, $log) ->
       $scope.loadingChildren = false
 
       isEqual = (a, b) ->
@@ -23,9 +23,12 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       createShowMore  = (list) ->
         ->
+          $log.info "this is ", this
           list.next().then (nextList) ->
+            $log.info "adding items to children ", $scope.children, " from ", nextList
             for item in nextList.list
               $scope.children.push(item.relation)
+            $log.info "new children are", $scope.children
             $scope.hasMore  = $scope.numberOfChildren > $scope.children.length
             $scope.showMore = createShowMore(nextList)
 

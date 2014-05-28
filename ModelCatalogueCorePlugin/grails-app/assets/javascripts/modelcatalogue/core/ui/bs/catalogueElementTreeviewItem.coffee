@@ -13,7 +13,7 @@ angular.module('mc.core.ui.bs.catalogueElementTreeviewItem', ['mc.core.ui.catalo
           <a ng-if="!currentDescend &amp;&amp; element.elementType" class="btn btn-link">
             <span class="glyphicon glyphicon-file"></span>
           </a>
-          <span class="catalogue-element-treeview-name" ng-click="select(element)">{{element.name}}</span>
+          <span class="catalogue-element-treeview-name" ng-click="select(element)">{{element.name}} ({{element.id}})</span>
           <a ng-click="element.show()" class="btn btn-link btn-xs" title="Show" ng-if="element.elementType"><span class="glyphicon glyphicon-link"></span></a>
         </span>
       </div>
@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.catalogueElementTreeviewItem', ['mc.core.ui.catalo
         <catalogue-element-treeview-item element="child" descend="nextDescend" repeat="repeat" ng-repeat="child in children track by $index" root-id="rootId"></catalogue-element-treeview-item>
         <li ng-if="hasMore" class="catalogue-element-treeview-item">
           <span class="catalogue-element-treeview-labels" ng-click="showMore()">
-            <a ng-click="showMore()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a> <a ng-click="showMore()">Show more</a>
+            <a class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a> <a>Show more</a>
           </span>
         </li>
       </ul>

@@ -43,13 +43,13 @@ class BootStrap {
                 de.ext.metadata = "test metadata"
 
                 15.times {
-                    new Model(name: "Another root #${it}").save()
+                    new Model(name: "Another root #${String.format('%03d', it)}").save()
                 }
 
-                def parentModel1 = Model.findByName("Another root #1")
+                def parentModel1 = Model.findByName("Another root #001")
 
                 15.times{
-                    def child = new Model(name: "Another root #${it}").save()
+                    def child = new Model(name: "Another root #${String.format('%03d', it)}").save()
                     parentModel1.addToParentOf(child)
                 }
 
