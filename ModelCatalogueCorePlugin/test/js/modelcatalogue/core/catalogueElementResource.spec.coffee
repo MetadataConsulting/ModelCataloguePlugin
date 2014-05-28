@@ -310,7 +310,7 @@ describe "mc.core.catalogueElementResource", ->
           payloadWithId.id = fixtures.valueDomain.showOne.id
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{payloadWithId.id}", fixtures.valueDomain.updateInput)
+          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{payloadWithId.id}?format=json", fixtures.valueDomain.updateInput)
           .respond(fixtures.valueDomain.updateOk)
 
           result = null
@@ -362,7 +362,7 @@ describe "mc.core.catalogueElementResource", ->
           payloadWithId.id = 1000000
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1000000", fixtures.valueDomain.updateInput)
+          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1000000?format=json", fixtures.valueDomain.updateInput)
           .respond(404)
 
           result = null
@@ -392,7 +392,7 @@ describe "mc.core.catalogueElementResource", ->
           delete payloadWithoutId.id
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1", payloadWithoutId)
+          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1?format=json", payloadWithoutId)
           .respond(fixtures.valueDomain.updateErrors)
 
           result = null

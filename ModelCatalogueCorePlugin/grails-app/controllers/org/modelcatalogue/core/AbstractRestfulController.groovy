@@ -36,15 +36,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         def total = (results.total)?results.total.intValue():0
-        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/search", total)
+
         Elements elements = new Elements(
-                    total: total,
-                    items: results.searchResults,
-                    previous: links.previous,
-                    next: links.next,
-                    offset: params.int('offset') ?: 0,
-                    page: params.int('max') ?: 10,
-                    itemType: resource
+                base: "/${resourceName}/search",
+                total: total,
+                items: results.searchResults
             )
         respondWithReports elements
     }
@@ -69,17 +65,16 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         setSafeMax(max)
         def total = countResources()
         def list = listAllResources(params)
-        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/", total)
+
         respondWithReports new Elements(
+                base: "/${resourceName}/",
                 total: total,
-                items: list,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0,
-                itemType: resource
+                items: list
         )
     }
+
+    protected getDefaultSort()  { null }
+    protected getDefaultOrder() { null }
 
 
     def validate() {
@@ -126,7 +121,28 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
 
-    protected void respondWithReports(ListWrapper listWrapper) {
+    protected Map getParametersToBind() {
+        Map ret = params
+        if (response.format == 'json') {
+            ret = request.getJSON()
+        }
+        ret
+    }
+
+
+
+
+    protected void respondWithReports(Class itemType = resource, ListWrapper listWrapper) {
+        def links = ListWrapper.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
+        listWrapper.previous    = links.previous
+        listWrapper.next        = links.next
+        listWrapper.offset      = params.int('offset') ?: 0
+        listWrapper.page        = params.int('max') ?: 0
+        listWrapper.sort        = params.sort ?: defaultSort
+        listWrapper.order       = params.order ?: defaultOrder
+        if (!listWrapper.itemType) {
+            listWrapper.itemType = itemType
+        }
         respond xlsxListRenderer.fillListWithReports(listWrapper, webRequest)
     }
 

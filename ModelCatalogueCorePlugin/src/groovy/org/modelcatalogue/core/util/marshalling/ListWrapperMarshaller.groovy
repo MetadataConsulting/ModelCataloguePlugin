@@ -11,6 +11,7 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
     @Override
     protected Map<String, Object> prepareJsonMap(Object elements) {
         [
+                base: elements.base,
                 itemType: elements.itemType?.name,
                 listType: type.name,
                 success: true,
@@ -21,7 +22,9 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
                 list: elements.items,
                 previous: elements.previous,
                 next: elements.next,
-                availableReports: elements.availableReports
+                availableReports: elements.availableReports,
+                sort: elements.sort,
+                order: elements.order
         ]
     }
 

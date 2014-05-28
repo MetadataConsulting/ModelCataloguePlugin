@@ -1,5 +1,5 @@
 angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
-  condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
+  condition = (list) -> list.hasOwnProperty('base')
   factory   = ['$q', 'modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', ($q, modelCatalogueApiRoot, rest, $rootScope, enhance) ->
     listEnhancer = (list) ->
       class ListDecorator
@@ -83,8 +83,22 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
 
             enhance rest method: 'GET', url: theLink
 
+          @reload = (config = {}) ->
+            params = {
+              offset: @offset
+              max:    @page
+              sort:   @sort
+              order:  @order
+            }
 
-            # return new list decorator
+            angular.extend(params, config)
+
+            theLink = "#{modelCatalogueApiRoot}#{@base}"
+
+            enhance rest method: 'GET', url: theLink, params: params
+
+
+      # return new list decorator
       new ListDecorator(list)
 
     listEnhancer.createEmptyList = (itemType = null) -> listEnhancer {

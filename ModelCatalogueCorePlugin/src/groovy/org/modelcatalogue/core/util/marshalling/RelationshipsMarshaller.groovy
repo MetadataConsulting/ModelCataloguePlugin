@@ -14,7 +14,7 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
     protected Map<String, Object> prepareJsonMap(Object relationsList) {
         def ret = super.prepareJsonMap(relationsList)
         ret.list = relationsList.items.collect {
-            [id: it.id, type: it.relationshipType, relation: relationsList.direction.getRelation(relationsList.owner, it), direction: relationsList.direction.getDirection(relationsList.owner, it), removeLink: getDeleteLink(relationsList.owner, it)]
+            [id: it.id, type: it.relationshipType, ext: it.ext, relation: relationsList.direction.getRelation(relationsList.owner, it), direction: relationsList.direction.getDirection(relationsList.owner, it), removeLink: getDeleteLink(relationsList.owner, it)]
         }
         ret
     }
@@ -27,6 +27,13 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
                     type rel.relationshipType
                     direction relationsList.direction.getDirection(relationsList.owner, rel)
                     relation(relationsList.direction.getRelation(relationsList.owner, rel))
+                    if (rel.ext) {
+                        extensions {
+                            for (e in rel.ext.entrySet()) {
+                                extension key: e.key, e.value
+                            }
+                        }
+                    }
                 }
             }
         }

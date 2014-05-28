@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.rest.RestfulController
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWrapper
@@ -9,8 +8,7 @@ class DataArchitectController {
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
-    def dataArchitectService
-    def relationshipImporterService
+    def dataArchitectService, modelService
 
     def index(){}
 
@@ -25,17 +23,20 @@ class DataArchitectController {
             return
         }
 
-
-        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/uninstantiatedDataElements", results.count)
+        def baseLink = "/dataArchitect/uninstantiatedDataElements"
+        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
         Elements elements =  new Elements(
+                base: baseLink,
                 total: results.count,
                 items: results.list,
                 itemType: DataElement,
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10
+                page: params.int('max') ?: 10,
+                sort: params.sort,
+                order: params.order
         )
 
         respond elements
@@ -53,83 +54,103 @@ class DataArchitectController {
             return
         }
 
-        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/metadataKeyCheck", results.count)
+
+        def baseLink = "/dataArchitect/metadataKeyCheck"
+        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
         Elements elements =  new Elements(
+                base: baseLink,
                 total: results.count,
                 items: results.list,
                 itemType: DataElement,
                 previous: links.previous,
                 next: links.next,
                 offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10
+                page: params.int('max') ?: 10,
+                sort: params.sort,
+                order: params.order
         )
 
         respond elements
     }
 
-    def createCOSDSynonymRelationships(Integer max){
-//        setSafeMax(max)
-//        ListAndCount results
+    def getSubModelElements(){
 
-        def rows=[]
-        try{
-            rows = dataArchitectService.createCOSDSynonymRelationships(params)
-        }catch(Exception e){
-            println(e)
-            return
-        }
-        def headers = ["Source ModelCatalogueId","Relationship", "Destination ModelCatalogueId"]
-        try {
-            def errors = relationshipImporterService.importRelationships(headers, rows)
-        }
-        catch(Exception ex)
-        {
-            //log.error("Exception in handling excel file: "+ ex.message)
-            log.error("Exception in handling excel file")
-            flash.message ="Error while creating relationships`.";
+        def results = new ListAndCount(count: 0, list: [])
+        if(params?.modelId){
+            Model model = Model.get(params.modelId)
+            def subModels = modelService.getSubModels(model)
+            results = modelService.getDataElementsFromModels(subModels.list)
         }
 
-//        def total = (results)?results.count:0
-//        def links = ListWrapper.nextAndPreviousLinks(params, "/dataArchitect/createCOSDSynonymRelationships", total)
+        def baseLink = "/dataArchitect/getSubModelElements"
+        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
-//        Elements elements =  new Elements(
-//                total: results.count,
-//                items: results.list,
-//                itemType: DataElement,
-//                previous: links.previous,
-//                next: links.next,
-//                offset: params.int('offset') ?: 0,
-//                page: params.int('max') ?: 10
-//        )
-//
-//        respond elements
+        Elements elements =  new Elements(
+                base: baseLink,
+                total: results.count,
+                items: results.list,
+                itemType: DataElement,
+                previous: links.previous,
+                next: links.next,
+                offset: params.int('offset') ?: 0,
+                page: params.int('max') ?: 10,
+                sort: params.sort,
+                order: params.order
+        )
+
+        respond elements
     }
-//    def createCOSDSynonymRelationships(Integer max){
-//
-//        def rows
-//
-//        try{
-//            rows = dataArchitectService.createCOSDSynonymRelationships(params)
-//        }catch(Exception e){
-//            println(e)
-//            return
-//        }
-//        // Llamar al servicio to make the relationships
-//        def headers = ["Source ModelCatalogueId","Relationship", "Destination ModelCatalogueId"]
-//        try {
-//            def errors = relationshipImporterService.importRelationships(headers, rows)
-//            flash.message = "DataElements have been created.\n with {$errors.size()} errors ( ${errors.toString()} )"
-//        }
-//        catch(Exception ex)
-//        {
-//            //log.error("Exception in handling excel file: "+ ex.message)
-//            log.error("Exception in handling excel file")
-//            flash.message ="Error in importing the excel file.";
-//        }
-//
-//    }
-//
+
+    def findRelationsByMetadataKeys(Integer max){
+        def results
+        def keyOne = params.keyOne
+        def keyTwo = params.keyTwo
+        if(keyOne && keyTwo) {
+            try {
+                results = dataArchitectService.findRelationsByMetadataKeys(keyOne, keyTwo, params)
+            } catch (Exception e) {
+                println(e)
+                return
+            }
+
+            def baseLink = "/dataArchitect/findRelationsByMetadataKeys"
+            def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
+
+            Elements elements =  new Elements(
+                    base: baseLink,
+                    total: results.count,
+                    items: results.list,
+                    itemType: DataElement,
+                    previous: links.previous,
+                    next: links.next,
+                    offset: params.int('offset') ?: 0,
+                    page: params.int('max') ?: 10,
+                    sort: params.sort,
+                    order: params.order
+            )
+
+            //FIXME: We need to abstract this out to another method in the future
+            //when we develop the ui further
+
+            try {
+                def errors = dataArchitectService.createRelationshipByType(results.list, "relatedTo")
+            }
+            catch (Exception ex) {
+                //log.error("Exception in handling excel file: "+ ex.message)
+                log.error("Exception in handling excel file")
+                flash.message = "Error while creating relationships`.";
+            }
+
+            respond elements
+
+
+        }else{
+            respond "please enter keys"
+        }
+       //respond elements
+    }
+
 
     protected setSafeMax(Integer max) {
         withFormat {

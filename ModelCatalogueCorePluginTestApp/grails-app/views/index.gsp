@@ -42,14 +42,15 @@
                     <li class="dropdown" ui-sref-active="active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogue Elements<b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li ui-sref-active="active"><a id="modelLink" ui-sref="mc.resource.list({resource: 'model'})">Models</a></li>
-                            <li ui-sref-active="active"><a id="dataElementLink" ui-sref="mc.resource.list({resource: 'dataElement'})">Data Elements</a></li>
-                            <li ui-sref-active="active"><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})">Value Domains</a></li>
-                            <li ui-sref-active="active"><a id="conceptualDomainLink" ui-sref="mc.resource.list({resource: 'conceptualDomain'})">Conceptual Domains</a></li>
-                            <li ui-sref-active="active"><a id="dataTypeLink" ui-sref="mc.resource.list({resource: 'dataType'})">Data Types</a></li>
+                            <li ui-sref-active="active"><a id="modelLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Models</a></li>
+                            <li ui-sref-active="active"><a id="dataElementLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Data Elements</a></li>
+                            <li ui-sref-active="active"><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}">Value Domains</a></li>
+                            <li ui-sref-active="active"><a id="conceptualDomainLink" ui-sref="mc.resource.list({resource: 'conceptualDomain'})" ui-sref-opts="{inherit: false}">Conceptual Domains</a></li>
+                            <li ui-sref-active="active"><a id="dataTypeLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Data Types</a></li>
+                            <li ui-sref-active="active"><a id="measurementUnitLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Measurement Unit</a></li>
                         </ul>
                     </li>
-                    <li ui-sref-active="active" ><a id="relationshipTypeLink" ui-sref="mc.resource.list({resource: 'relationshipType'})">Relationship Types</a></li>
+                    <li ui-sref-active="active" ><a id="relationshipTypeLink" ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}">Relationship Types</a></li>
                 </ul>
                 <form class="navbar-form navbar-right navbar-input-group" role="search" autocomplete="off" ng-submit="search()" ng-controller="metadataCurator.searchCtrl">
                     <div class="form-group">

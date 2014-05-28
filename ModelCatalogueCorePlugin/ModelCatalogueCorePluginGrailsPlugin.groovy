@@ -11,7 +11,7 @@ import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.3"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3.7 > *"
     // resources that are excluded from plugin packaging
@@ -99,7 +99,7 @@ Model catalogue core plugin (metadata registry)
         xlsxListRenderer.registerRowWriter {
             headers 'ID', 'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search'] && CatalogueElement.isAssignableFrom(container.itemType)
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && CatalogueElement.isAssignableFrom(container.itemType)
             } then { CatalogueElement element ->
                 [[element.id, element.name, element.description]]
             }

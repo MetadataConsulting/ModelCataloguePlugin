@@ -18,34 +18,6 @@ class DataElementISpec extends AbstractIntegrationSpec{
     def cleanupSpec(){
     }
 
-//    def "create a new data element, finalize it and then try to change it"(){
-//
-//        when:
-//        def dataElementInstance = new DataElement(name: "result1", description: "this is the the result description")
-//        dataElementInstance.save()
-//
-//        then:
-//
-//        !dataElementInstance.hasErrors()
-//
-//        when:
-//        dataElementInstance.status = PublishedElementStatus.FINALIZED
-//        dataElementInstance.save(flush:true)
-//
-//        then:
-//        !dataElementInstance.hasErrors()
-//
-//        when:
-//        dataElementInstance.status = PublishedElementStatus.PENDING
-//        dataElementInstance.save()
-//
-//        then:
-//        dataElementInstance.hasErrors()
-//        dataElementInstance.errors.getFieldError("status")?.code =='validator.finalized'
-//        dataElementInstance.delete()
-//
-//    }
-
     def "create writer data elements with the same code dataElement"(){
 
         when:

@@ -9,9 +9,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.title                    = names.getNaturalName($stateParams.resource)
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
-    $scope.containedElements        = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
+    $scope.contained                = {}
+    $scope.contained.elements       = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
     $scope.selectedElement          = if list.size > 0 then list.list[0] else {name: 'No Selection'}
-    $scope.containedElementsColumns = [
+    $scope.contained.columns        = [
       {header: 'Name',          value: "relation.name",        classes: 'col-md-6', show: "relation.show()"}
       {header: 'Description',   value: "relation.description", classes: 'col-md-6'}
     ]
@@ -24,9 +25,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         unless element._containedElements_?.empty
           element.contains().then (contained)->
             element._containedElements_ = contained
-            $scope.containedElements    = contained
+            $scope.contained.elements   = contained
         $scope.selectedElement          = element
-        $scope.containedElements        = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
+        $scope.contained.elements       = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
 ])
 .config(['$stateProvider', ($stateProvider) ->
 
@@ -43,7 +44,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all?page'
+    url: '/all?page&order&sort'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
@@ -53,6 +54,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only model controller will respond on it
           params = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
+          params.order = $stateParams.order ? 'asc'
+          params.sort  = $stateParams.sort ? 'name'
           catalogueElementResource($stateParams.resource).list(params)
         ]
 
@@ -78,7 +81,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       templateUrl: 'modelcatalogue/core/ui/state/list.html'
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
-          page = parseInt($stateParams.page ? 1, 10)
           $stateParams.resource = "dataElement"
           return modelCatalogueSearch($stateParams.searchString)
         ]
@@ -98,7 +100,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
     resolve:
       list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        page = parseInt($stateParams.page ? 1, 10)
         $stateParams.resource = "dataElement"
         # it's safe to call top level for each controller, only model controller will respond on it
         modelCatalogueDataArchitect.uninstantiatedDataElements()
@@ -116,14 +117,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 #    ]
 #  }
 
-  $stateProvider.state 'mc.dataArchitect.createCOSDSynonymRelationships', {
-    url: "/createCOSDSynonymRelationships/{metadata}",
+  $stateProvider.state 'mc.dataArchitect.findRelationsByMetadataKeys', {
+    url: "/findRelationsByMetadataKeys/{metadata}",
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
     resolve:
       list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
         page = parseInt($stateParams.page ? 1, 10)
         $stateParams.resource = "dataElement"
-        return modelCatalogueDataArchitect.createCOSDSynonymRelationships("Data item No.","Optional_Local_Identifier")
+        return modelCatalogueDataArchitect.findRelationsByMetadataKeys("Data item No.","Optional_Local_Identifier")
       ]
 
 #    controller: 'mc.core.ui.states.ListCtrl'
@@ -166,7 +167,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
     resolve:
       list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        page = parseInt($stateParams.page ? 1, 10)
         $stateParams.resource = "dataElement"
         # it's safe to call top level for each controller, only model controller will respond on it
         return modelCatalogueDataArchitect.metadataKeyCheck($stateParams.metadata)
@@ -215,7 +215,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
         <div class="col-md-8">
-          <decorated-list list="containedElements" columns="containedElementsColumns" stateless="true"></decorated-list>
+          <decorated-list list="contained.elements" columns="contained.columns" stateless="true"></decorated-list>
         </div>
         <hr/>
       </div>

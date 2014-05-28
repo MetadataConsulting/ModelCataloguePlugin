@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
-import org.modelcatalogue.core.util.ListWrapper
 
 class AbstractPublishedElementController<T> extends AbstractCatalogueElementController<T> {
 
@@ -16,15 +15,11 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         setSafeMax(max)
         Integer total = publishedElementService.count(params, resource)
         def list = publishedElementService.list(params, resource)
-        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.status ? params.status : ''}", total)
+
         respondWithReports new Elements(
+                base: "/${resourceName}/${params.status ? params.status : ''}",
                 total: total,
-                items: list,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0,
-                itemType: resource
+                items: list
         )
     }
 
@@ -43,16 +38,11 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
 
         int total = resource.countByModelCatalogueIdLike "$element.bareModelCatalogueId%"
         def list = resource.findAllByModelCatalogueIdLike "$element.bareModelCatalogueId%", customParams
-        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.id}/history", total)
 
         respondWithReports new Elements(
+                base: "/${resourceName}/${params.id}/history",
                 items: list,
-                previous: links.previous,
-                next: links.next,
-                total: total,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0,
-                itemType: resource
+                total: total
         )
     }
 

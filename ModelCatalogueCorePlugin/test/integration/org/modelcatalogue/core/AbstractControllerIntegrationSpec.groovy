@@ -36,10 +36,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         totalCount = 12
     }
 
-    def cleanupSpec(){
-
-    }
-
 
     @Unroll
     def "list json items test: #no where max: #max offset: #offset"() {
@@ -127,7 +123,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
         when:
         controller.response.format = "json"
-        controller. params.id = "${loadItem.id}"
+        controller.params.id = "${loadItem.id}"
         controller.show()
         JSONObject json = controller.response.json
         recordResult 'showOne', json

@@ -9,9 +9,9 @@ angular.module("mc.core.modelCatalogueDataArchitect", ['mc.util.rest', 'mc.util.
     params = angular.extend({key: query}, additionalParams)
     enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/metadataKeyCheck", params: params
 
-  modelCatalogueDataArchitect.createCOSDSynonymRelationships = (query, query2, additionalParams = {}) ->
+  modelCatalogueDataArchitect.findRelationsByMetadataKeys = (query, query2, additionalParams = {}) ->
     params = angular.extend({keyOne: query}, {keyTwo: query2}, additionalParams)
-    enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/createCOSDSynonymRelationships", params: params
+    enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/findRelationsByMetadataKeys", params: params
 
   modelCatalogueDataArchitect
 ]

@@ -21,7 +21,7 @@ import org.modelcatalogue.core.util.ListAndCount
 @Transactional
 class DataArchitectService {
 
-    def modelCatalogueSearchService, publishedElementService
+    def modelCatalogueSearchService, publishedElementService, relationshipService
 
     def uninstantiatedDataElements(Map params){
         ListAndCount results = new ListAndCount()
@@ -81,31 +81,59 @@ class DataArchitectService {
         return results
     }
 
-    def createCOSDSynonymRelationships(Map params){
+    def findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
+        ListAndCount results = new ListAndCount()
         def searchParams = getParams(params)
         def synonymDataElements = []
+
         def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
                 "inner join a.extensions e " +
-                "WHERE e.name = ?)", [searchParams.keyOne])//, [max: searchParams.max, offset: searchParams.offset])
+                "WHERE e.name = ?)", [keyOne])//, [max: searchParams.max, offset: searchParams.offset])
 
-        key1Elements.eachWithIndex{ DataElement dataElement, int dataElementIndex ->
-            def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf{it.name==searchParams.keyOne}].extensionValue
+        key1Elements.eachWithIndex { DataElement dataElement, int dataElementIndex ->
+            def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf {
+                it.name == keyOne
+            }].extensionValue
             def key2Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
                     "inner join a.extensions e " +
-                    "WHERE e.name = ? and e.extensionValue = ?) ", [searchParams.keyTwo, extensionName])
+                    "WHERE e.name = ? and e.extensionValue = ?) ", [keyTwo, extensionName], [max: searchParams.max, offset: searchParams.offset])
 
             // Create a Map
             key2Elements.each {
-                //check if the relationship exists already
-              //  Relationship.
-                //Add
-                def newSynonymDataElement = [dataElement.modelCatalogueId, "synonymity", it.modelCatalogueId]
+                def newSynonymDataElement = [dataElement, it]
                 synonymDataElements << newSynonymDataElement
             }
         }
 
-        return synonymDataElements
+        results.list = synonymDataElements
+        results.count = synonymDataElements.size()
+        return results
+    }
+
+    def createRelationshipByType(ArrayList rows, String relType){
+        def relationshipType = RelationshipType.findByName(relType)
+        def errorMessages = []
+        rows.each { def row ->
+            def source =row[0]
+            def destination =row[1]
+            if (source && relationshipType && destination) {
+                try {
+                    if(relationshipType.validateSourceDestination(source, destination, [:])==null) {
+                        relationshipService.link(source, destination, relationshipType)
+                    }else{
+                        errorMessages.add("could not create relationship between ${source} and ${destination} with relationship type: ${relationshipType} ")
+                    }
+                } catch (Exception e) {
+                    errorMessages.add("could not create relationship between ${source} and ${destination} with relationship type: ${relationshipType} ")
+                }
+            }else{
+                if(!source){errorMessages.add("could not find source element: ${row[0]}")}
+                if(!destination){errorMessages.add("could not find destination element: ${row[1]}")}
+                if(!relationshipType){errorMessages.add("could not find relationship type: ${relType}")}
+            }
+        }
+        return errorMessages
     }
 
     def indexAll(){

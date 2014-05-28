@@ -2,9 +2,8 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
-import org.modelcatalogue.core.util.ListWrapper
 
-class ModelController extends AbstractPublishedElementController<Model> {
+class ModelController extends AbstractExtendibleElementController<Model> {
 
     def modelService
 
@@ -21,15 +20,10 @@ class ModelController extends AbstractPublishedElementController<Model> {
 
         ListAndCount topLevel = modelService.getTopLevelModels(params)
 
-        def links = ListWrapper.nextAndPreviousLinks(params, "/${resourceName}/${params.status ? params.status : ''}", topLevel.count)
         respondWithReports new Elements(
+                base: "/${resourceName}/${params.status ? params.status : ''}",
                 total: topLevel.count,
-                items: topLevel.list,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0,
-                itemType: resource
+                items: topLevel.list
         )
     }
 
