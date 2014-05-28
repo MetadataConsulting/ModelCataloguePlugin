@@ -50,7 +50,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page}, options if $scope.element
 
       onElementUpdate = (element) ->
-        resource = catalogueElementResource(element.elementType) if element
+        resource = catalogueElementResource(element.elementType) if element and element.elementType
 
         activeTabSet     = false
 
@@ -125,6 +125,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             isDirty:    () -> angular.equals(@original, @value)
             reset:      () -> @value = angular.copy @original
             update:     () ->
+              if not resource
+                messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
+                return
+
               payload = {
                 id: element.id
               }
@@ -211,9 +215,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
 
       $scope.canEdit = ->
+        return false if not $scope.element
         messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
 
       $scope.edit = ->
+        return if not $scope.element
         messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
           $scope.element = updated
 
