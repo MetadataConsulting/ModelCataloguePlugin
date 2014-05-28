@@ -42,15 +42,15 @@
                     <li class="dropdown" ui-sref-active="active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogue Elements<b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li ui-sref-active="active"><a id="modelLink" ui-sref="mc.resource.list({resource: 'model', sort: 'name'})">Models</a></li>
-                            <li ui-sref-active="active"><a id="dataElementLink" ui-sref="mc.resource.list({resource: 'dataElement', sort: 'name'})">Data Elements</a></li>
-                            <li ui-sref-active="active"><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', sort: 'name'})">Value Domains</a></li>
-                            <li ui-sref-active="active"><a id="conceptualDomainLink" ui-sref="mc.resource.list({resource: 'conceptualDomain', sort: 'name'})">Conceptual Domains</a></li>
-                            <li ui-sref-active="active"><a id="dataTypeLink" ui-sref="mc.resource.list({resource: 'dataType', sort: 'name'})">Data Types</a></li>
-                            <li ui-sref-active="active"><a id="measurementUnitLink" ui-sref="mc.resource.list({resource: 'measurementUnit', sort: 'name'})">Measurement Unit</a></li>
+                            <li ui-sref-active="active"><a id="modelLink" ui-sref="mc.resource.list({resource: 'model', sort: undefined, page: undefined})">Models</a></li>
+                            <li ui-sref-active="active"><a id="dataElementLink" ui-sref="mc.resource.list({resource: 'dataElement', sort: undefined, page: undefined})">Data Elements</a></li>
+                            <li ui-sref-active="active"><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', sort: undefined, page: undefined})">Value Domains</a></li>
+                            <li ui-sref-active="active"><a id="conceptualDomainLink" ui-sref="mc.resource.list({resource: 'conceptualDomain', sort: undefined, page: undefined})">Conceptual Domains</a></li>
+                            <li ui-sref-active="active"><a id="dataTypeLink" ui-sref="mc.resource.list({resource: 'dataType', sort: undefined, page: undefined})">Data Types</a></li>
+                            <li ui-sref-active="active"><a id="measurementUnitLink" ui-sref="mc.resource.list({resource: 'measurementUnit', sort: undefined, page: undefined})">Measurement Unit</a></li>
                         </ul>
                     </li>
-                    <li ui-sref-active="active" ><a id="relationshipTypeLink" ui-sref="mc.resource.list({resource: 'relationshipType', sort: 'name'})">Relationship Types</a></li>
+                    <li ui-sref-active="active" ><a id="relationshipTypeLink" ui-sref="mc.resource.list({resource: 'relationshipType', sort: undefined, page: undefined})">Relationship Types</a></li>
                 </ul>
                 <form class="navbar-form navbar-right navbar-input-group" role="search" autocomplete="off" ng-submit="search()" ng-controller="metadataCurator.searchCtrl">
                     <div class="form-group">
