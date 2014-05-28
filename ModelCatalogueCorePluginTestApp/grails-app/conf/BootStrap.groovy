@@ -45,6 +45,10 @@ class BootStrap {
                 Model anotherRoot = new Model(name: "Another root")
                 anotherRoot.save()
 
+                for (DataElement element in DataElement.list()) {
+                    anotherRoot.addToContains element
+                }
+
 
                 PublishedElement.list().each {
                     it.status = PublishedElementStatus.FINALIZED
