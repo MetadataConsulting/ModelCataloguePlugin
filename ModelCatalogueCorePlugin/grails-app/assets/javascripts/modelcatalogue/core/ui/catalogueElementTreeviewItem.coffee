@@ -11,8 +11,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
     compile: recursiveCompile.compile
 
-    controller: ['$scope', '$rootScope', ($scope, $rootScope) ->
-      loadingChildren = false
+    controller: ['$scope', '$rootScope', '$log', ($scope, $rootScope, $log) ->
+      $scope.loadingChildren = false
 
       isEqual = (a, b) ->
         return false if not a? or not b?
@@ -23,9 +23,12 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       createShowMore  = (list) ->
         ->
+          $log.info "this is ", this
           list.next().then (nextList) ->
+            $log.info "adding items to children ", $scope.children, " from ", nextList
             for item in nextList.list
               $scope.children.push(item.relation)
+            $log.info "new children are", $scope.children
             $scope.hasMore  = $scope.numberOfChildren > $scope.children.length
             $scope.showMore = createShowMore(nextList)
 
@@ -80,10 +83,10 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.numberOfChildren--
 
       $scope.collapseOrExpand = ->
-        return if loadingChildren
+        return if $scope.loadingChildren
         if $scope.collapsed
           if $scope.children.length == 0 and $scope.numberOfChildren > 0
-            loadingChildren = true
+            $scope.loadingChildren = true
             fun = $scope.element[$scope.currentDescend]
             if angular.isFunction(fun)
               fun().then (list) ->
@@ -99,9 +102,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
                   $scope.showMore = createShowMore(list)
                 else
                   $scope.showMore = ->
-                loadingChildren   = false
+                $scope.loadingChildren = false
             else
-              loadingChildren = false
+              $scope.loadingChildren = false
           else
             $scope.collapsed = false
         else

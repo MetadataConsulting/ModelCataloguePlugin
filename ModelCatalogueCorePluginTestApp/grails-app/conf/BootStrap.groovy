@@ -42,11 +42,20 @@ class BootStrap {
                 def de = new DataElement(name: "testera", description:"test data architect").save()
                 de.ext.metadata = "test metadata"
 
-                Model anotherRoot = new Model(name: "Another root")
-                anotherRoot.save()
+                15.times {
+                    new Model(name: "Another root #${String.format('%03d', it)}").save()
+                }
+
+                def parentModel1 = Model.findByName("Another root #001")
+
+                15.times{
+                    def child = new Model(name: "Another root #${String.format('%03d', it)}").save()
+                    parentModel1.addToParentOf(child)
+                }
+
 
                 for (DataElement element in DataElement.list()) {
-                    anotherRoot.addToContains element
+                    parentModel1.addToContains element
                 }
 
 
