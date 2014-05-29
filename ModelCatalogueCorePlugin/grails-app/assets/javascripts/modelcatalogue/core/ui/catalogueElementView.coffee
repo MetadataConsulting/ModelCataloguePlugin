@@ -181,7 +181,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             tabDefinition.active = true
             activeTabSet = true
             if element.elementTypeName == 'Model'
-              $scope.reports = [{name: "exportAll COSD", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx&report=COSD"}, {name: "exportAll NHIC", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx&report=NHIC"}]
+              $scope.reports = [{name: "exportAll COSD", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx&report=COSD"}, {name: "exportAll XML", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx&report=NHIC"},{name: "exportAll NHIC", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xml"}]
 
           tabs.unshift tabDefinition
 

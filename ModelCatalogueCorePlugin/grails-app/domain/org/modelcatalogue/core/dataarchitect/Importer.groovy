@@ -401,7 +401,7 @@ class Importer {
                 } catch (Exception e) { return null }
                 dataTypeReturn = EnumeratedType.findWhere(enumAsString: data)
                 if (!dataTypeReturn) { dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumAsString: data).save() }
-            } else if (data.contains("\\n") || data.contains("\\r")) {
+            } else if (data.contains("\n") || data.contains("\r")) {
                 String[] lines = data.split("\\r?\\n")
                 if (lines.size() > 0 && lines[] != null) {
                     Map enumerations = new HashMap()
