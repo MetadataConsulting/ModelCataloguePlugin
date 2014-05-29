@@ -102,7 +102,66 @@ class DataArchitectController {
         respond elements
     }
 
+    def findRelationsByMetadataKeys(Integer max){
+        setSafeMax(max)
+        def results
+        def keyOne = params.keyOne
+        def keyTwo = params.keyTwo
+        if(keyOne && keyTwo) {
+            try {
+                results = dataArchitectService.findRelationsByMetadataKeys(keyOne, keyTwo, params)
+            } catch (Exception e) {
+                println(e)
+                return
+            }
 
+            //FIXME we need new method to do this and integrate it with the ui
+            try {
+                dataArchitectService.actionRelationshipList(results.list)
+            } catch (Exception e) {
+                println(e)
+                return
+            }
+
+            def baseLink = "/dataArchitect/findRelationsByMetadataKeys"
+            def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
+
+            Elements elements =  new Elements(
+                    base: baseLink,
+                    total: results.count,
+                    items: results.list,
+                    itemType: Relationship,
+                    previous: links.previous,
+                    next: links.next,
+                    offset: params.int('offset') ?: 0,
+                    page: params.int('max') ?: 10,
+                    sort: params.sort,
+                    order: params.order
+            )
+
+            respond elements
+
+        }else{
+            respond "please enter keys"
+        }
+
+    }
+
+
+//    def actionRelationships(){
+//
+//        def relations = params.relatedElements
+//
+//        try {
+//            def errors = dataArchitectService.createRelationshipByType(relations, "relatedTo")
+//        }
+//        catch (Exception ex) {
+//            //log.error("Exception in handling excel file: "+ ex.message)
+//            log.error("Exception in handling excel file")
+//            flash.message = "Error while creating relationships`.";
+//        }
+//
+//    }
 
     protected setSafeMax(Integer max) {
         withFormat {

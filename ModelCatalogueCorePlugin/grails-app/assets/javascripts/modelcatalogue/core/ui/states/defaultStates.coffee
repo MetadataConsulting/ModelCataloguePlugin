@@ -28,7 +28,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
             $scope.contained.elements   = contained
         $scope.selectedElement          = element
         $scope.contained.elements       = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
-])
+
+    else if $scope.resource == 'newRelationships'
+      $scope.columns = [
+        {header: "source",          value: 'source.name',          class: 'col-md-6' }
+        {header: "destination",        value: 'destination.name',        class: 'col-md-6' }
+      ]
+
+  ])
 .config(['$stateProvider', ($stateProvider) ->
 
   DEFAULT_ITEMS_PER_PAGE = 10
@@ -108,6 +115,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ListCtrl'
   }
 
+
   $stateProvider.state 'mc.dataArchitect.metadataKey', {
     url: "/metadataKeyCheck",
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
@@ -150,6 +158,50 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ListCtrl'
   }
 
+  $stateProvider.state 'mc.dataArchitect.findRelationsByMetadataKeys', {
+    url: "/findRelationsByMetadataKeys",
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html',
+    controller: ['$scope','$state','$modal',($scope, $state, $modal)->
+      dialog = $modal.open {
+        windowClass: 'messages-modal-prompt'
+        template: '''
+       <div class="modal-header">
+          <h4>please enter metadata key</h4>
+      </div>
+      <div class="modal-body">
+          <form role="form">
+          <div class="form-group">
+              <label for="keyOne">metadata key one</label>
+              <input type="text" id="keyOne" ng-model="result.keyOne" class="form-control">
+              <label for="keyTwo">metadata key two</label>
+              <input type="text" id="keyTwo" ng-model="result.keyTwo" class="form-control">
+          </form>
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary" ng-click="$close(result)">OK</button>
+          <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+      </div>
+      '''
+      }
+
+      dialog.result.then (result) ->
+        $state.go('mc.dataArchitect.showMetadataRelations', {'keyOne':result.keyOne, 'keyTwo':result.keyTwo})
+    ]
+  }
+
+  $stateProvider.state 'mc.dataArchitect.showMetadataRelations', {
+    url: "/showMetadataRelations/{keyOne}/{keyTwo}",
+    templateUrl: 'modelcatalogue/core/ui/state/list.html'
+    resolve:
+      list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        $stateParams.resource = "newRelationships"
+        # it's safe to call top level for each controller, only model controller will respond on it
+        return modelCatalogueDataArchitect.findRelationsByMetadataKeys($stateParams.keyOne, $stateParams.keyTwo)
+      ]
+
+    controller: 'mc.core.ui.states.ListCtrl'
+  }
+
 ])
 .run(['$rootScope', '$state', '$stateParams', ($rootScope, $state, $stateParams) ->
     # It's very handy to add references to $state and $stateParams to the $rootScope
@@ -178,7 +230,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         </div>
       </span>
       <h2>{{title}} List</h2>
-      <decorated-list list="list"></decorated-list>
+      <decorated-list list="list" columns="columns"></decorated-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">

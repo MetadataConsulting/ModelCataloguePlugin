@@ -36,6 +36,9 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         de2.addToInstantiatedBy(vd)
         relationshipService.link(de3, de2, RelationshipType.findByName("supersession"))
         md.addToParentOf(md2)
+
+        de1.ext.put("Data item No.", "C1031")
+        de2.ext.put("Optional_Local_Identifier", "C1031")
     }
 
     def cleanupSpec(){
@@ -218,5 +221,66 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
         xml.previous.text() == ""
     }
+
+    @Unroll
+    def "json -  create dataElement relationships"(){
+
+        def controller = new DataArchitectController()
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "dataArchitect"
+        )
+        when:
+        controller.response.format = "json"
+        controller.params.put("keyOne", "Data item No.")
+        controller.params.put("keyTwo", "Optional_Local_Identifier")
+        controller.findRelationsByMetadataKeys()
+        JSONElement json = controller.response.json
+        String list = "dataElement_Relationships"
+        recorder.recordResult list, json
+
+        then:
+
+        json.success
+        json.total == 1
+        json.offset == 0
+        json.page == 10
+        json.list
+        json.list.size() == 1
+        //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
+        json.previous == ""
+
+    }
+    @Unroll
+    def "xml -  create dataElement relationships"(){
+        def controller = new DataArchitectController()
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "dataArchitect"
+        )
+
+        when:
+        controller.response.format = "xml"
+        controller.params.put("keyOne", "Data item No.")
+        controller.params.put("keyTwo", "Optional_Local_Identifier")
+        controller.findRelationsByMetadataKeys()
+        GPathResult xml = controller.response.xml
+        String list = "dataElement_Relationships"
+        recorder.recordResult list, xml
+
+        then:
+
+        xml.@success.text() == "true"
+        xml.@total.text() == "1"
+        xml.@offset.text() == "0"
+        xml.@page.text() =="10"
+        xml.element
+        xml.element.size() == 1
+        //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
+        xml.previous.text() == ""
+    }
+
 
 }
