@@ -30,6 +30,15 @@ abstract class ListWrapper<T> {
         if (params.key) {
             link += "&key=${params.key}"
         }
+        if (params.keyOne) {
+            link += "&keyOne=${params.keyOne}"
+        }
+        if (params.keyTwo) {
+            link += "&keyTwo=${params.keyTwo}"
+        }
+        if (params.toplevel) {
+            link += "&toplevel=${params.toplevel}"
+        }
         def nextLink = ""
         def previousLink = ""
         if (params?.max && params.max < total) {

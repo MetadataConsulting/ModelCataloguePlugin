@@ -9,9 +9,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.title                    = names.getNaturalName($stateParams.resource)
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
-    $scope.containedElements        = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
+    $scope.contained                = {}
+    $scope.contained.elements       = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
     $scope.selectedElement          = if list.size > 0 then list.list[0] else {name: 'No Selection'}
-    $scope.containedElementsColumns = [
+    $scope.contained.columns        = [
       {header: 'Name',          value: "relation.name",        classes: 'col-md-6', show: "relation.show()"}
       {header: 'Description',   value: "relation.description", classes: 'col-md-6'}
     ]
@@ -24,10 +25,17 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         unless element._containedElements_?.empty
           element.contains().then (contained)->
             element._containedElements_ = contained
-            $scope.containedElements    = contained
+            $scope.contained.elements   = contained
         $scope.selectedElement          = element
-        $scope.containedElements        = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
-])
+        $scope.contained.elements       = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
+
+    else if $scope.resource == 'newRelationships'
+      $scope.columns = [
+        {header: "source",          value: 'source.name',          class: 'col-md-6' }
+        {header: "destination",        value: 'destination.name',        class: 'col-md-6' }
+      ]
+
+  ])
 .config(['$stateProvider', ($stateProvider) ->
 
   DEFAULT_ITEMS_PER_PAGE = 10
@@ -80,7 +88,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       templateUrl: 'modelcatalogue/core/ui/state/list.html'
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
-          page = parseInt($stateParams.page ? 1, 10)
           $stateParams.resource = "dataElement"
           return modelCatalogueSearch($stateParams.searchString)
         ]
@@ -100,7 +107,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
     resolve:
       list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        page = parseInt($stateParams.page ? 1, 10)
         $stateParams.resource = "dataElement"
         # it's safe to call top level for each controller, only model controller will respond on it
         modelCatalogueDataArchitect.uninstantiatedDataElements()
@@ -108,6 +114,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
     controller: 'mc.core.ui.states.ListCtrl'
   }
+
 
   $stateProvider.state 'mc.dataArchitect.metadataKey', {
     url: "/metadataKeyCheck",
@@ -143,10 +150,53 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
     resolve:
       list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        page = parseInt($stateParams.page ? 1, 10)
         $stateParams.resource = "dataElement"
         # it's safe to call top level for each controller, only model controller will respond on it
         return modelCatalogueDataArchitect.metadataKeyCheck($stateParams.metadata)
+      ]
+
+    controller: 'mc.core.ui.states.ListCtrl'
+  }
+
+  $stateProvider.state 'mc.dataArchitect.findRelationsByMetadataKeys', {
+    url: "/findRelationsByMetadataKeys",
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html',
+    controller: ['$scope','$state','$modal',($scope, $state, $modal)->
+      dialog = $modal.open {
+        windowClass: 'messages-modal-prompt'
+        template: '''
+       <div class="modal-header">
+          <h4>please enter metadata key</h4>
+      </div>
+      <div class="modal-body">
+          <form role="form">
+          <div class="form-group">
+              <label for="keyOne">metadata key one</label>
+              <input type="text" id="keyOne" ng-model="result.keyOne" class="form-control">
+              <label for="keyTwo">metadata key two</label>
+              <input type="text" id="keyTwo" ng-model="result.keyTwo" class="form-control">
+          </form>
+      </div>
+      <div class="modal-footer">
+          <button class="btn btn-primary" ng-click="$close(result)">OK</button>
+          <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+      </div>
+      '''
+      }
+
+      dialog.result.then (result) ->
+        $state.go('mc.dataArchitect.showMetadataRelations', {'keyOne':result.keyOne, 'keyTwo':result.keyTwo})
+    ]
+  }
+
+  $stateProvider.state 'mc.dataArchitect.showMetadataRelations', {
+    url: "/showMetadataRelations/{keyOne}/{keyTwo}",
+    templateUrl: 'modelcatalogue/core/ui/state/list.html'
+    resolve:
+      list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        $stateParams.resource = "newRelationships"
+        # it's safe to call top level for each controller, only model controller will respond on it
+        return modelCatalogueDataArchitect.findRelationsByMetadataKeys($stateParams.keyOne, $stateParams.keyTwo)
       ]
 
     controller: 'mc.core.ui.states.ListCtrl'
@@ -180,7 +230,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         </div>
       </span>
       <h2>{{title}} List</h2>
-      <decorated-list list="list"></decorated-list>
+      <decorated-list list="list" columns="columns"></decorated-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">
@@ -192,7 +242,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
         <div class="col-md-8">
-          <decorated-list list="containedElements" columns="containedElementsColumns" stateless="true"></decorated-list>
+          <decorated-list list="contained.elements" columns="contained.columns" stateless="true"></decorated-list>
         </div>
         <hr/>
       </div>

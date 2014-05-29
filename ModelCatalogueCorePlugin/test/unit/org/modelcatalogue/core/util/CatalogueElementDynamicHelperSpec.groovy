@@ -21,8 +21,8 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 
         where:
         clazz                   | transients
-        TestCatalogueElement1   | ['relations', 'info', 'archived', 'hasContextOf', 'parentOf', 'childOf']
-        TestCatalogueElement2   | ['relations', 'info', 'archived', 'hasContextOf', 'parentOf', 'childOf', 'b', 'd']
+        TestCatalogueElement1   | ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'hasContextOf', 'parentOf', 'childOf']
+        TestCatalogueElement2   | ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'hasContextOf', 'parentOf', 'childOf', 'b', 'd']
 
     }
 

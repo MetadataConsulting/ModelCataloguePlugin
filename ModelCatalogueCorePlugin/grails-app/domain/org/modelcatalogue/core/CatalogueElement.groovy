@@ -18,7 +18,7 @@ abstract class CatalogueElement {
     String name
     String description
 
-    static transients = ['relations', 'info', 'archived']
+    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
@@ -50,21 +50,29 @@ abstract class CatalogueElement {
 
     List getRelations() {
         return [
-                (outgoingRelationships ?: []).collect { it.destination },
-                (incomingRelationships ?: []).collect { it.source }
+                outgoingRelations,
+                incomingRelations
         ].flatten()
     }
 
     List getIncomingRelations() {
-        return [
-                (incomingRelationships ?: []).collect { it.source }
-        ].flatten()
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).list.collect { it.source }
     }
 
     List getOutgoingRelations() {
-        return [
-                (outgoingRelationships ?: []).collect { it.destination }
-        ].flatten()
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).list.collect { it.destination }
+    }
+
+    Long countIncomingRelations() {
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, getClass().get(this.id)).count
+    }
+
+    Long countOutgoingRelations() {
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, getClass().get(this.id)).count
+    }
+
+    Long countRelations() {
+        relationshipService.getRelationships([:], RelationshipDirection.BOTH, getClass().get(this.id)).count
     }
 
 

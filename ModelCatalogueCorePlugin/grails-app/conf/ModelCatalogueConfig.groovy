@@ -38,6 +38,7 @@ grails.doc.copyright = ''// The copyright message to display
 grails.doc.footer = ''// The footer to use
 
 
+grails.assets.minifyJs = false
 
 //configured data types, measurement units, relationship types
 
@@ -135,7 +136,7 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
         [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
-        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement]
+        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: DataElement, destinationClass: DataElement]
 ]
 
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements

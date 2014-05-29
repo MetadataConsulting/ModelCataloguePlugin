@@ -6,7 +6,7 @@ angular.module('mc.core.ui.bs.catalogueElementTreeview', ['mc.core.ui.catalogueE
           <catalogue-element-treeview-item element="item" descend="descend" root-id="id" repeat="repeat" ng-repeat="item in children"></catalogue-element-treeview-item>
           <li ng-switch-when="list" ng-if="hasMore" class="catalogue-element-treeview-item">
             <span class="catalogue-element-treeview-labels" ng-click="showMore()">
-              <a ng-click="showMore()" class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a> <a ng-click="showMore()">Show more</a>
+              <a class="btn btn-link"><span class="glyphicon glyphicon-chevron-down"></span></a> <a>Show more</a>
             </span>
           </li>
           <catalogue-element-treeview-item element="element" descend="descend" root-id="id" repeat="repeat" ng-switch-when="element"></catalogue-element-treeview-item>

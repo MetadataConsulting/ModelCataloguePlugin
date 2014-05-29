@@ -5,21 +5,18 @@
 #= require modelcatalogue/core/index
 #= require modelcatalogue/core/ui/index
 #= require modelcatalogue/core/ui/bs/index
+#= require modelcatalogue/core/ui/states/index
 #= require modelcatalogue/core/ui/bs/elementViews/index
 
 angular.module('demo', [
   'demo.config'
   'mc.core.ui.bs'
+  'mc.core.ui.states'
   'ui.bootstrap'
 
-]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', '$rootScope', 'messages', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns, $rootScope, messages)->
-  emptyList =
-    list: []
-    next: {size: 0}
-    previous: {size: 0}
-    total: 0
-    empty: true
-    source: 'demo'
+]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', '$rootScope', 'messages', 'enhance', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns, $rootScope, messages, enhance)->
+  listEnhancer = enhance.getEnhancer('list')
+
 
 
   $scope.listResource     = """resource("dataElement").list()"""
@@ -27,7 +24,7 @@ angular.module('demo', [
   $scope.searchSomething  = """search("patient")"""
   $scope.searchModel      = """resource("model").search("patient")"""
   $scope.outgoing         = """resource("dataElement").list() >>> $r.list[0].outgoingRelationships()"""
-  $scope.indicator        = """resource("dataElement").search("NHS NUMBER STATUS INDICATOR CODE") >>> $r.list[0]"""
+  $scope.indicator        = """resource("conceptualDomain").search("NHIC") >>> $r.list[0]"""
 
   $scope.resource         = catalogueElementResource
   $scope.search           = modelCatalogueSearch
@@ -42,7 +39,7 @@ angular.module('demo', [
           $scope.list = result
           $scope.element = null
         if result?.elementType?
-          $scope.list = emptyList
+          $scope.list = listEnhancer.createSingletonList(result)
           $scope.element = result
         else
           $log.info "Instead of list or element got: ", result
@@ -62,7 +59,7 @@ angular.module('demo', [
           $scope.columns = columns(result.itemType)
           $scope.element = null
         if result?.elementType?
-          $scope.list = emptyList
+          $scope.list = listEnhancer.createSingletonList(result)
           $scope.element = result
         else
           $log.info "Instead of list got: ", result
@@ -71,7 +68,7 @@ angular.module('demo', [
   $scope.selection = []
 
   $scope.columns = columns()
-  $scope.list    = emptyList
+  $scope.list    = listEnhancer.createEmptyList()
 
   $scope.actions = [
     {type: 'primary', title: 'Test', icon: 'info-sign', action: (element) -> alert(element.name)}

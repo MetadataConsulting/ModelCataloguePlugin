@@ -31,9 +31,15 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
         de4.ext.put("metadata", "test2")
         de4.ext.put("test3", "test2")
         de4.ext.put("test4", "test2")
+        de1.ext.put("Data item No.", "C1031")  // used in def "find relationships"
+        de2.ext.put("Optional_Local_Identifier", "C1031") // used in def "find relationships"
     }
 
     def cleanupSpec(){
+        de1 = DataElement.findByName("DE_author")
+        de2 = DataElement.findByName("DE_author1")
+        md.refresh()
+        vd.refresh()
         de1.removeFromContainedIn(md)
         de2.removeFromInstantiatedBy(vd)
     }
@@ -66,7 +72,24 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
 
     }
 
+    def "find relationships and action them"() {
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        def relatedDataElements = dataArchitectService.findRelationsByMetadataKeys("Data item No.","Optional_Local_Identifier", params)
 
+        then:
+        relatedDataElements.each {row ->
+            relatedDataElements.list.collect{it.source}contains(de1)
+            relatedDataElements.list.collect{it.destination}contains(de2)
+        }
 
+        when:
+        dataArchitectService.actionRelationshipList(relatedDataElements.list)
+
+        then:
+        de1.relations.contains(de2)
+
+    }
 
 }
