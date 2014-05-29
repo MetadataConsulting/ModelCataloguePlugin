@@ -103,12 +103,21 @@ class DataArchitectController {
     }
 
     def findRelationsByMetadataKeys(Integer max){
+        setSafeMax(max)
         def results
         def keyOne = params.keyOne
         def keyTwo = params.keyTwo
         if(keyOne && keyTwo) {
             try {
                 results = dataArchitectService.findRelationsByMetadataKeys(keyOne, keyTwo, params)
+            } catch (Exception e) {
+                println(e)
+                return
+            }
+
+            //FIXME we need new method to do this and integrate it with the ui
+            try {
+                dataArchitectService.actionRelationshipList(results.list)
             } catch (Exception e) {
                 println(e)
                 return
@@ -121,7 +130,7 @@ class DataArchitectController {
                     base: baseLink,
                     total: results.count,
                     items: results.list,
-                    itemType: DataElement,
+                    itemType: Relationship,
                     previous: links.previous,
                     next: links.next,
                     offset: params.int('offset') ?: 0,
@@ -132,7 +141,6 @@ class DataArchitectController {
 
             respond elements
 
-
         }else{
             respond "please enter keys"
         }
@@ -140,21 +148,20 @@ class DataArchitectController {
     }
 
 
-    def actionRelationships(){
-
-        def relations = params.relatedElements
-
-        try {
-            def errors = dataArchitectService.createRelationshipByType(relations, "relatedTo")
-        }
-        catch (Exception ex) {
-            //log.error("Exception in handling excel file: "+ ex.message)
-            log.error("Exception in handling excel file")
-            flash.message = "Error while creating relationships`.";
-        }
-
-    }
-
+//    def actionRelationships(){
+//
+//        def relations = params.relatedElements
+//
+//        try {
+//            def errors = dataArchitectService.createRelationshipByType(relations, "relatedTo")
+//        }
+//        catch (Exception ex) {
+//            //log.error("Exception in handling excel file: "+ ex.message)
+//            log.error("Exception in handling excel file")
+//            flash.message = "Error while creating relationships`.";
+//        }
+//
+//    }
 
     protected setSafeMax(Integer max) {
         withFormat {

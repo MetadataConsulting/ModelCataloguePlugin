@@ -36,8 +36,8 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
     }
 
     def cleanupSpec(){
-        de1.refresh()
-        de2.refresh()
+        de1 = DataElement.findByName("DE_author")
+        de2 = DataElement.findByName("DE_author1")
         md.refresh()
         vd.refresh()
         de1.removeFromContainedIn(md)

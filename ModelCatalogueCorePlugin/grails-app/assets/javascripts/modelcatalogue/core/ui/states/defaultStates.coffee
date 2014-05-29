@@ -28,7 +28,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
             $scope.contained.elements   = contained
         $scope.selectedElement          = element
         $scope.contained.elements       = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
-])
+
+    else if $scope.resource == 'newRelationships'
+      $scope.columns = [
+        {header: "source",          value: 'source.name',          class: 'col-md-6' }
+        {header: "destination",        value: 'destination.name',        class: 'col-md-6' }
+      ]
+
+  ])
 .config(['$stateProvider', ($stateProvider) ->
 
   DEFAULT_ITEMS_PER_PAGE = 10
@@ -107,15 +114,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
     controller: 'mc.core.ui.states.ListCtrl'
   }
-
-#  $stateProvider.state 'mc.dataArchitect.findSynonym', {
-#    url: "/findSynonymWithKeyValue",
-#    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-#    controller: ['$state','$modal',($state, $modal)->
-#      $state.go('mc.dataArchitect.findSynonymWithKeyValue', {"Data item No.","Optional_Local_Identifier"})
-#
-#    ]
-#  }
 
 
   $stateProvider.state 'mc.dataArchitect.metadataKey', {
@@ -196,7 +194,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
     resolve:
       list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        $stateParams.resource = "dataElement"
+        $stateParams.resource = "newRelationships"
         # it's safe to call top level for each controller, only model controller will respond on it
         return modelCatalogueDataArchitect.findRelationsByMetadataKeys($stateParams.keyOne, $stateParams.keyTwo)
       ]
@@ -232,7 +230,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         </div>
       </span>
       <h2>{{title}} List</h2>
-      <decorated-list list="list"></decorated-list>
+      <decorated-list list="list" columns="columns"></decorated-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">

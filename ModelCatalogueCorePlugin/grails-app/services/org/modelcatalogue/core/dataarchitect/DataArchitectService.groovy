@@ -117,26 +117,8 @@ class DataArchitectService {
     def actionRelationshipList(ArrayList<Relationship> list){
         def errorMessages = []
         list.each { relationship ->
-            def source = relationship.source
-            def destination = relationship.destination
-            def relationshipType = relationship.relationshipType
-            if (source && relationshipType && destination) {
-                try {
-                    if(relationshipType.validateSourceDestination(source, destination, [:])==null) {
-                        relationshipService.link(source, destination, relationshipType)
-                    }else{
-                        errorMessages.add("could not create relationship between ${source} and ${destination} with relationship type: ${relationshipType} ")
-                    }
-                } catch (Exception e) {
-                    errorMessages.add("could not create relationship between ${source} and ${destination} with relationship type: ${relationshipType} ")
-                }
-            }else{
-                if(!source){errorMessages.add("could not find source element: ${row[0]}")}
-                if(!destination){errorMessages.add("could not find destination element: ${row[1]}")}
-                if(!relationshipType){errorMessages.add("could not find relationship type: ${relType}")}
-            }
+            relationship.save()
         }
-        return errorMessages
     }
 
     def indexAll(){
