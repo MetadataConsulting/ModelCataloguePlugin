@@ -114,12 +114,12 @@ class DataArchitectService {
         return results
     }
 
-    def createRelationshipByType(ArrayList rows, String relType){
-        def relationshipType = RelationshipType.findByName(relType)
+    def actionRelationshipList(ArrayList<Relationship> list){
         def errorMessages = []
-        rows.each { def row ->
-            def source =row[0]
-            def destination =row[1]
+        list.each { relationship ->
+            def source = relationship.source
+            def destination = relationship.destination
+            def relationshipType = relationship.relationshipType
             if (source && relationshipType && destination) {
                 try {
                     if(relationshipType.validateSourceDestination(source, destination, [:])==null) {

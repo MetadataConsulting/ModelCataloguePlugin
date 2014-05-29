@@ -72,7 +72,7 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
 
     }
 
-    def "find relationships"() {
+    def "find relationships and action them"() {
         when:
         Map params = [:]
         params.put("max", 12)
@@ -80,33 +80,16 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
 
         then:
         relatedDataElements.each {row ->
-            relatedDataElements.list.contains(de1)
-            relatedDataElements.list.contains(de2)
+            relatedDataElements.list.collect{it.source}contains(de1)
+            relatedDataElements.list.collect{it.destination}contains(de2)
         }
-    }
-
-
-    def "create relationship by type" (){
-
-        def relType = RelationshipType.findByName("relatedTo")
 
         when:
-
-        def row = [de1.refresh(),de2.refresh()]
-        def rows=[]
-        rows << row
-        def errorMessages = dataArchitectService.createRelationshipByType(rows,"relatedTo")
+        dataArchitectService.actionRelationshipList(relatedDataElements.list)
 
         then:
-        assert errorMessages.size()==0
-        de1.getRelationsByType(relType).contains(de2)
-        de2.getRelationsByType(relType).contains(de1)
-
-        cleanup:
-        de1.removeLinkTo(de2, relType)
+        de1.relations.contains(de2)
 
     }
-
-
 
 }
