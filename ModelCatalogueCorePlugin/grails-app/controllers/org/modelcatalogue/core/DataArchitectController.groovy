@@ -130,25 +130,29 @@ class DataArchitectController {
                     order: params.order
             )
 
-            //FIXME: We need to abstract this out to another method in the future
-            //when we develop the ui further
-
-            try {
-                def errors = dataArchitectService.createRelationshipByType(results.list, "relatedTo")
-            }
-            catch (Exception ex) {
-                //log.error("Exception in handling excel file: "+ ex.message)
-                log.error("Exception in handling excel file")
-                flash.message = "Error while creating relationships`.";
-            }
-
             respond elements
 
 
         }else{
             respond "please enter keys"
         }
-       //respond elements
+
+    }
+
+
+    def actionRelationships(){
+
+        def relations = params.relatedElements
+
+        try {
+            def errors = dataArchitectService.createRelationshipByType(relations, "relatedTo")
+        }
+        catch (Exception ex) {
+            //log.error("Exception in handling excel file: "+ ex.message)
+            log.error("Exception in handling excel file")
+            flash.message = "Error while creating relationships`.";
+        }
+
     }
 
 

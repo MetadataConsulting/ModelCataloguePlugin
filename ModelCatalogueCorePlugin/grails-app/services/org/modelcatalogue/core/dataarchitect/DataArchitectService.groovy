@@ -86,6 +86,8 @@ class DataArchitectService {
         ListAndCount results = new ListAndCount()
         def searchParams = getParams(params)
         def synonymDataElements = []
+        //FIXME the relationship type should be configurable
+        def relType = RelationshipType.findByName("relatedTo")
 
         def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
                 "inner join a.extensions e " +
@@ -101,8 +103,9 @@ class DataArchitectService {
 
             // Create a Map
             key2Elements.each {
-                def newSynonymDataElement = [dataElement, it]
-                synonymDataElements << newSynonymDataElement
+                //FIXME the relationship type needs to be configurable
+                def relationship = new Relationship(source: dataElement, destination: it, relationshipType: relType)
+                synonymDataElements << relationship
             }
         }
 
