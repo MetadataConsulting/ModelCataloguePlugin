@@ -27,7 +27,7 @@ class EnumeratedType extends DataType {
     static transients = ['enumerations']
 
     static constraints = {
-        enumAsString nullable: false, unique:true, maxSize: 10000, validator: { encodedVal, obj ->
+        enumAsString nullable: false, /*unique:true,*/ maxSize: 10000, validator: { encodedVal, obj ->
             Map<String, String> val = stringToMap(encodedVal)
             if (!val) return true
             if (val.size() < 1) return false

@@ -20,7 +20,7 @@ import org.modelcatalogue.core.ValueDomain
 
 class DataImportService {
 
-    static transactional = false
+    static transactional = true
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
     //the import script accepts and array of headers these should include the following:
