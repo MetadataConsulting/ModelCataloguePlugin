@@ -92,15 +92,31 @@ class Importer {
 
     def void ingestImportQueue() {
         def queue = importQueue.iterator()
+        def it = 0
         while (queue.hasNext()) {
             ImportRow row = queue.next()
             if (!row.rowActions) {
-                ingestRow(row)
-                println(row.dataElementName)
-                queue.remove()
+                if(it<60) {
+                    ingestRow(row)
+                    println(row.dataElementName)
+                    queue.remove()
+                }else{
+                    it=0
+                    cleanUpGorm()
+                }
             }
         }
         actionPendingModels()
+        cleanUpGorm()
+    }
+
+
+    def cleanUpGorm() {
+        def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+        def session = sessionFactory.currentSession
+        session.flush()
+        session.clear()
+        propertyInstanceMap.get().clear()
     }
 
     def void ingestRow(ImportRow row) {
