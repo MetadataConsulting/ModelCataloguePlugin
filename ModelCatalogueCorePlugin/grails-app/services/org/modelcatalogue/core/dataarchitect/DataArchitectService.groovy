@@ -91,7 +91,7 @@ class DataArchitectService {
 
         def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
                 "inner join a.extensions e " +
-                "WHERE e.name = ?)", [keyOne])//, [max: searchParams.max, offset: searchParams.offset])
+                "WHERE e.name = ?)", [keyOne: keyOne, keyTwo:keyTwo,],[ max: searchParams.max, offset: searchParams.offset])//, [max: searchParams.max, offset: searchParams.offset])
 
         key1Elements.eachWithIndex { DataElement dataElement, int dataElementIndex ->
             def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf {
@@ -102,11 +102,11 @@ class DataArchitectService {
                     "WHERE e.name = ? and e.extensionValue = ?) ", [keyTwo, extensionName], [max: searchParams.max, offset: searchParams.offset])
 
             // Create a Map
-            key2Elements.each {
-                //FIXME the relationship type needs to be configurable
-                def relationship = new Relationship(source: dataElement, destination: it, relationshipType: relType)
-                synonymDataElements << relationship
-            }
+//            key2Elements.each {
+//                //FIXME the relationship type needs to be configurable
+//                def relationship = new Relationship(source: dataElement, destination: it, relationshipType: relType)
+//                synonymDataElements << relationship
+//            }
         }
 
         results.list = synonymDataElements
@@ -120,28 +120,6 @@ class DataArchitectService {
             relationship.save()
         }
     }
-
-    def indexAll(){
-        modelCatalogueSearchService.index(ConceptualDomain.list())
-        modelCatalogueSearchService.index(DataType.list())
-        modelCatalogueSearchService.index(EnumeratedType.list())
-        modelCatalogueSearchService.index(ExtensionValue.list())
-        modelCatalogueSearchService.index(MeasurementUnit.list())
-        modelCatalogueSearchService.index(ValueDomain.list())
-        modelCatalogueSearchService.index(DataElement.list())
-        modelCatalogueSearchService.index(Model.list())
-        modelCatalogueSearchService.index(CatalogueElement)
-        modelCatalogueSearchService.index(ExtendibleElement)
-        modelCatalogueSearchService.index(PublishedElement)
-        modelCatalogueSearchService.index(RelationshipType)
-        modelCatalogueSearchService.index(Relationship)
-        //TODO: find a better way of unindexing archived elements
-        def params = [:]
-        params.status = PublishedElementStatus.ARCHIVED
-        def archivedElements = publishedElementService.list(params)
-        if(archivedElements){ modelCatalogueSearchService.unindex(archivedElements) }
-    }
-
 
     private static Map getParams(Map params){
         def searchParams = [:]
