@@ -64,15 +64,21 @@ abstract class CatalogueElement {
     }
 
     Long countIncomingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, getClass().get(this.id)).count
+        CatalogueElement refreshed = getClass().get(this.id)
+        if (!refreshed) return 0
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, refreshed).count
     }
 
     Long countOutgoingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, getClass().get(this.id)).count
+        CatalogueElement refreshed = getClass().get(this.id)
+        if (!refreshed) return 0
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, refreshed).count
     }
 
     Long countRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.BOTH, getClass().get(this.id)).count
+        CatalogueElement refreshed = getClass().get(this.id)
+        if (!refreshed) return 0
+        relationshipService.getRelationships([:], RelationshipDirection.BOTH, refreshed).count
     }
 
 
