@@ -107,7 +107,6 @@ class Importer {
             }
         }
         actionPendingModels()
-        cleanUpGorm()
     }
 
 
@@ -409,58 +408,68 @@ class Importer {
 
 
     def importDataType(String name, String data) {
-        def dataTypeReturn = DataType.findByName(data)
-        if(!dataTypeReturn){ dataTypeReturn = DataType.findByNameIlike(data) }
-        if (!dataTypeReturn) {
-            if (data.contains("|")) {
-                try { data = sortEnumAsString(data)
-                } catch (Exception e) { return null }
-                dataTypeReturn = EnumeratedType.findWhere(enumAsString: data)
-                if (!dataTypeReturn) { dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumAsString: data).save() }
-            } else if (data.contains("\n") || data.contains("\r")) {
-                String[] lines = data.split("\\r?\\n")
-                if (lines.size() > 0 && lines[] != null) {
-                    Map enumerations = new HashMap()
-                    lines.each { enumeratedValues ->
-                        def EV = enumeratedValues.split(":")
-                        if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
-                            def key = EV[0]
-                            def value = EV[1]
-                            if (value.size() > 244) { value = value[0..244]}
-                            key = key.trim()
-                            value = value.trim()
-                            if (value.isEmpty()) { value = "_" }
-                            enumerations.put(key, value)
+        DataType dataTypeReturn = importEnumeratedType(data)
+        if(!dataTypeReturn) dataTypeReturn = DataType.findByName(data)
+        if(!dataTypeReturn) dataTypeReturn = DataType.findByNameIlike(data)
+        return dataTypeReturn
+    }
+
+    protected static EnumeratedType importEnumeratedType(String data){
+        def dataTypeReturn, sortedData
+        if (data.contains("|")) {
+            try { sortedData = sortEnumAsString(data) } catch (Exception e) { return null }
+            dataTypeReturn = EnumeratedType.findByEnumAsString(sortedData)
+            if (!dataTypeReturn) { dataTypeReturn = new EnumeratedType(name:  ( (sortedData.size()>20) ? sortedData[0..20] : sortedData ) + "..", enumAsString: sortedData).save() }
+        } else if (data.contains("\n") || data.contains("\r")) {
+            String[] lines = data.split("\\r?\\n")
+            if (lines.size() > 0 && lines[] != null) {
+                Map enumerations = new HashMap()
+                lines.each { enumeratedValues ->
+                    def EV = enumeratedValues.split(":")
+                    if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
+                        def key = EV[0]
+                        def value = EV[1]
+                        if (value.size() > 244) {
+                            value = value[0..244]
                         }
+                        key = key.trim()
+                        value = value.trim()
+                        if (value.isEmpty()) {
+                            value = "_"
+                        }
+                        enumerations.put(key, value)
                     }
-                    if (!enumerations.isEmpty()) {
-                        String enumString = enumerations.sort() collect { key, val ->
-                            "${this.quote(key)}:${this.quote(val)}"
-                        }.join('|')
-                        dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
-                        if (!dataTypeReturn) {dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()}
+                }
+                if (!enumerations.isEmpty()) {
+                    String enumString = enumerations.sort() collect { key, val ->
+                        "${this.quote(key)}:${this.quote(val)}"
+                    }.join('|')
+                    dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
+                    if (!dataTypeReturn) {
+                        dataTypeReturn = new EnumeratedType(name:  ( (enumString.size()>20) ? enumString[0..20] : enumString ) + "..", enumerations: enumerations).save()
                     }
                 }
             }
         }
-        return dataTypeReturn
+        dataTypeReturn
     }
 
 
 
-    protected static String sortEnumAsString(String s) {
-        if (s == null) return null
+    protected static String sortEnumAsString(String inputString) {
+        if (inputString == null) return null
+        String sortedString
         Map<String, String> ret = [:]
-        s.split(/\|/).each { String part ->
+        inputString.split(/\|/).each { String part ->
             if (!part) return
             String[] pair = part.split(/:/)
             if (pair.length != 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
             ret[unquote(pair[0])] = unquote(pair[1])
         }
-        s = ret.sort() collect { key, val ->
+        sortedString = ret.sort() collect { key, val ->
             "${quote(key)}:${quote(val)}"
-        }.join('|')
-        s
+        }.join('|').trim()
+        sortedString
     }
 
     protected static String quote(String s) {
@@ -480,9 +489,5 @@ class Importer {
         }
         ret
     }
-
-
-
-
 
 }

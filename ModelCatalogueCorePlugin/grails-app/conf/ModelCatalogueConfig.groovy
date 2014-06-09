@@ -66,7 +66,8 @@ modelcatalogue.defaults.datatypes = [
         [name: "xs:decimal" , description: "A decimal value"],
         [name: "xs:int", description: "A signed 32-bit integer"],
         [name: "xs:integer", description: "An integer value"],
-        [name: "xs:long", description: "A signed 64-bit integer"]
+        [name: "xs:long", description: "A signed 64-bit integer"],
+        [name: "xs:boolean", description: "A signed 64-bit integer"]
 ]
 
 

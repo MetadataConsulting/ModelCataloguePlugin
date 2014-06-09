@@ -29,7 +29,7 @@ class DataImportService {
 
     def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap) {
         //get indexes of the appropriate sections
-        def newImporter = new Importer()
+        Importer newImporter = new Importer()
         def dataItemNameIndex = headers.indexOf(headersMap.dataElementNameRow)
         def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCodeRow)
         def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescriptionRow)
@@ -45,7 +45,6 @@ class DataImportService {
         if (dataItemNameIndex == -1) throw new Exception("Can not find 'Data Item Name' column")
         //iterate through the rows and import each line
         rows.eachWithIndex { def row, int i ->
-
             ImportRow importRow = new ImportRow()
             importRow.dataElementName = (dataItemNameIndex!=-1)?row[dataItemNameIndex]:null
             importRow.dataElementCode = (dataItemCodeIndex!=-1)?row[dataItemCodeIndex]:null
@@ -58,7 +57,6 @@ class DataImportService {
             importRow.measurementUnitName =   (unitsIndex!=-1)?row[unitsIndex]:null
             importRow.conceptualDomainName = conceptualDomain
             importRow.conceptualDomainDescription = conceptualDomainDescription
-
             def counter = metadataStartIndex
             def metadataColumns = [:]
             while (counter <= metadataEndIndex) {
@@ -70,8 +68,12 @@ class DataImportService {
             newImporter.save(flush:true)
 
         }
-        newImporter.resolveAllPendingRows()
-        newImporter.ingestImportQueue()
+        return newImporter
+    }
+
+    def resolveAll(Importer importer){
+       importer.resolveAllPendingRows()
+       importer.ingestImportQueue()
     }
 
 }

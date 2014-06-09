@@ -21,8 +21,7 @@ class ExcelLoader {
 
 	def parse(path) {
 		Workbook wb = WorkbookFactory.create(stream);
-        if(!wb)
-            return [[],[]]
+        if(!wb) return [[],[]]
 		Sheet sheet = wb.getSheetAt(0);
 
 		Iterator<Row> rowIt = sheet.rowIterator()

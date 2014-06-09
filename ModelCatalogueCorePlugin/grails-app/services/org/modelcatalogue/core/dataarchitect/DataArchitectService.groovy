@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
-import org.hibernate.Criteria
+//import org.hibernate.Criteria
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
@@ -25,28 +25,28 @@ class DataArchitectService {
 
     def uninstantiatedDataElements(Map params){
         ListAndCount results = new ListAndCount()
-        def uninstantiatedDataElements, totalCount
-        def instantiation = RelationshipType.findByName("instantiation")
-        def searchParams = getParams(params)
-
-            totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
-                    "WHERE a.outgoingRelationships IS EMPTY " +
-                    "OR a NOT IN " +
-                    "(SELECT a2 from DataElement a2 " +
-                    "JOIN a2.outgoingRelationships e2 " +
-                    "WHERE e2.relationshipType = ?)", [instantiation], [cache:true]
-            )
-
-            uninstantiatedDataElements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-                    "WHERE a.outgoingRelationships IS EMPTY " +
-                    "OR a NOT IN " +
-                    "(SELECT a2 from DataElement a2 " +
-                    "JOIN a2.outgoingRelationships e2 " +
-                    "WHERE e2.relationshipType = ?)", [instantiation], [max: searchParams.max, offset: searchParams.offset]
-            )
-
-        results.count = (totalCount.get(0))?totalCount.get(0):0
-        results.list = uninstantiatedDataElements
+//        def uninstantiatedDataElements, totalCount
+//        def instantiation = RelationshipType.findByName("instantiation")
+//        def searchParams = getParams(params)
+//
+//            totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
+//                    "WHERE a.outgoingRelationships IS EMPTY " +
+//                    "OR a NOT IN " +
+//                    "(SELECT a2 from DataElement a2 " +
+//                    "JOIN a2.outgoingRelationships e2 " +
+//                    "WHERE e2.relationshipType = ?)", [instantiation], [cache:true]
+//            )
+//
+//            uninstantiatedDataElements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+//                    "WHERE a.outgoingRelationships IS EMPTY " +
+//                    "OR a NOT IN " +
+//                    "(SELECT a2 from DataElement a2 " +
+//                    "JOIN a2.outgoingRelationships e2 " +
+//                    "WHERE e2.relationshipType = ?)", [instantiation], [max: searchParams.max, offset: searchParams.offset]
+//            )
+//
+//        results.count = (totalCount.get(0))?totalCount.get(0):0
+//        results.list = uninstantiatedDataElements
 
 
         return results
@@ -56,26 +56,26 @@ class DataArchitectService {
 
         def missingMetadataKey, totalCount
         ListAndCount results = new ListAndCount()
-        def searchParams = getParams(params)
-
-        totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
-                "WHERE a.extensions IS EMPTY " +
-                "OR a NOT IN " +
-                "(SELECT a2 from DataElement a2 " +
-                "JOIN a2.extensions e2 " +
-                "WHERE e2.name = ?)", [searchParams.key], [cache:true]
-        )
-
-        missingMetadataKey = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-                "WHERE a.extensions IS EMPTY " +
-                "OR a NOT IN " +
-                "(SELECT a2 from DataElement a2 " +
-                "JOIN a2.extensions e2 " +
-                "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
-        )
-
-        results.count = (totalCount.get(0))?totalCount.get(0):0
-        results.list = missingMetadataKey
+//        def searchParams = getParams(params)
+//
+//        totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
+//                "WHERE a.extensions IS EMPTY " +
+//                "OR a NOT IN " +
+//                "(SELECT a2 from DataElement a2 " +
+//                "JOIN a2.extensions e2 " +
+//                "WHERE e2.name = ?)", [searchParams.key], [cache:true]
+//        )
+//
+//        missingMetadataKey = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+//                "WHERE a.extensions IS EMPTY " +
+//                "OR a NOT IN " +
+//                "(SELECT a2 from DataElement a2 " +
+//                "JOIN a2.extensions e2 " +
+//                "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
+//        )
+//
+//        results.count = (totalCount.get(0))?totalCount.get(0):0
+//        results.list = missingMetadataKey
 
 
         return results
@@ -84,33 +84,33 @@ class DataArchitectService {
     def findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
         ListAndCount results = new ListAndCount()
-        def searchParams = getParams(params)
-        def synonymDataElements = []
-        //FIXME the relationship type should be configurable
-        def relType = RelationshipType.findByName("relatedTo")
-
-        def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-                "inner join a.extensions e " +
-                "WHERE e.name = ?)", [keyOne: keyOne, keyTwo:keyTwo,],[ max: searchParams.max, offset: searchParams.offset])//, [max: searchParams.max, offset: searchParams.offset])
-
-        key1Elements.eachWithIndex { DataElement dataElement, int dataElementIndex ->
-            def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf {
-                it.name == keyOne
-            }].extensionValue
-            def key2Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-                    "inner join a.extensions e " +
-                    "WHERE e.name = ? and e.extensionValue = ?) ", [keyTwo, extensionName], [max: searchParams.max, offset: searchParams.offset])
-
-            // Create a Map
+//        def searchParams = getParams(params)
+//        def synonymDataElements = []
+//        //FIXME the relationship type should be configurable
+//        def relType = RelationshipType.findByName("relatedTo")
+//
+//        def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+//                "inner join a.extensions e " +
+//                "WHERE e.name = ?)", [keyOne])//, [max: searchParams.max, offset: searchParams.offset])
+//
+//        key1Elements.eachWithIndex { DataElement dataElement, int dataElementIndex ->
+//            def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf {
+//                it.name == keyOne
+//            }].extensionValue
+//            def key2Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+//                    "inner join a.extensions e " +
+//                    "WHERE e.name = ? and e.extensionValue = ?) ", [keyTwo, extensionName], [max: searchParams.max, offset: searchParams.offset])
+//
+//            // Create a Map
 //            key2Elements.each {
 //                //FIXME the relationship type needs to be configurable
 //                def relationship = new Relationship(source: dataElement, destination: it, relationshipType: relType)
 //                synonymDataElements << relationship
 //            }
-        }
-
-        results.list = synonymDataElements
-        results.count = synonymDataElements.size()
+//        }
+//
+//        results.list = synonymDataElements
+//        results.count = synonymDataElements.size()
         return results
     }
 
