@@ -4,6 +4,7 @@ import grails.rest.render.RenderContext
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Relationships
@@ -21,7 +22,7 @@ class XLSXRendererSpec extends Specification {
         RenderContext indexContext = Mock(RenderContext)
         indexContext.getActionName() >> 'index'
 
-        XLSXListRenderer renderer = new XLSXListRenderer()
+        XLSXListRenderer renderer = new XLSXListRenderer(reportsRegistry: new ReportsRegistry())
 
         XLSXRowWriter idNameDescWriter = renderer.registerRowWriter {
             headers 'ID', 'Name', 'Description'

@@ -24,7 +24,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
         int total = dataType.relatedValueDomains.size()
         def list = sortOffsetMaxMinList(dataType.relatedValueDomains, params)
 
-        respondWithReports new ValueDomains(
+        respondWithLinks new ValueDomains(
                 base: "/${resourceName}/${params.id}/valueDomain",
                 items: list,
                 total: total

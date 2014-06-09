@@ -4,11 +4,15 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
       <span class="pull-right">
 
         <div class="btn-group btn-group-sm">
-          <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="reports &amp;&amp; reports.length == 0">
+          <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="reports &amp;&amp; reports.length == 0  &amp;&amp; !element.availableReports">
             <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
-            <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in reports">{{report.name || 'Export'}}</a></li>
+            <li role="presentation" class="dropdown-header">{{element.elementTypeName}} Exports</li>
+            <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in element.availableReports">{{report.title || 'Export'}}</a></li>
+            <li class="divider" role="presentation" ng-show="reports &amp;&amp; reports.length != 0 &amp;&amp; element.availableReports"></li>
+            <li role="presentation" class="dropdown-header" ng-show="reports &amp;&amp; reports.length != 0">Exports for {{naturalPropertyName}}</li>
+            <li><a ng-href="{{report.url}}"  target="_blank" ng-repeat="report in reports">{{report.title || 'Export'}}</a></li>
           </ul>
         </div>
         <a class="btn btn-primary btn-sm" ng-click="edit()" ng-show="canEdit()"><span class="glyphicon glyphicon-edit"></span> Edit</a>

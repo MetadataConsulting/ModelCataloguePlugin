@@ -9,6 +9,7 @@ import org.modelcatalogue.core.util.ListWrapper
 class XLSXRowWriterBuilder {
 
     private String name
+    private String title
     private List<String> headers
     private Closure condition   = {container, condition -> true}
     private Closure writer      = {[]}
@@ -81,6 +82,19 @@ class XLSXRowWriterBuilder {
 
     }
 
+
+    /**
+     * Defines human readable title.
+     *
+     * @param title human readable title
+     * @return the builder with given title
+     */
+    XLSXRowWriterBuilder title(String title) {
+        this.title = title
+        this
+
+    }
+
     /**
      * Synonym for {@code write} method.
      * @see #write(groovy.lang.Closure)
@@ -108,6 +122,11 @@ class XLSXRowWriterBuilder {
             @Override
             List<List<String>> getRows(Object item) {
                 return self.writer(item)
+            }
+
+            @Override
+            String getTitle() {
+                return self.title ?: self.name ?: 'Excel'
             }
 
             @Override
