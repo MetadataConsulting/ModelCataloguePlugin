@@ -161,11 +161,12 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         [ "POST"  , "/$controller/1/outgoing/relationship"    , controller , "addOutgoing"     , { id = "1" ; type = "relationship" }  ],
         [ "POST"  , "/$controller/1/incoming/relationship"    , controller , "addIncoming"     , { id = "1" ; type = "relationship" }  ],
         [ "DELETE", "/$controller/1/outgoing/relationship"    , controller , "removeOutgoing"  , { id = "1" ; type = "relationship" }  ],
-        [ "DELETE", "/$controller/1/incoming/relationship"    , controller , "removeIncoming"  , { id = "1" ; type = "relationship" }  ]
+        [ "DELETE", "/$controller/1/incoming/relationship"    , controller , "removeIncoming"  , { id = "1" ; type = "relationship" }  ],
+        [ "GET"	  , "/$controller/1/relationships/relatedTo"  , controller , "relationships"   , { id = "1" ; type = "relatedTo" }  ]
         ]
     }
 
-    private static GrailsControllerClass getControllerClass(controller) {
+    private GrailsControllerClass getControllerClass(controller) {
         return grailsApplication.getArtefactByLogicalPropertyName(org.codehaus.groovy.grails.commons.ControllerArtefactHandler.TYPE, controller)
     }
 
