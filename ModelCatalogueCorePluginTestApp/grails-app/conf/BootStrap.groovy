@@ -2,6 +2,7 @@ import grails.rest.render.RenderContext
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.core.*
 
 class BootStrap {
 
