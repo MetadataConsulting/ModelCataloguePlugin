@@ -24,7 +24,7 @@ class BootStrap {
             title "Reversed DEMO Export"
             headers 'Description', 'Name', 'ID'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in ['index', 'search'] && CatalogueElement.isAssignableFrom(container.itemType)
+                context.actionName in ['index', 'search'] && container.itemType && CatalogueElement.isAssignableFrom(container.itemType)
             } then { CatalogueElement element ->
                 [[element.description, element.name, element.id]]
             }

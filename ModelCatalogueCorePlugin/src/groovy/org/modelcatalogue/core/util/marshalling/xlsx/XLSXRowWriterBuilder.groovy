@@ -1,11 +1,13 @@
 package org.modelcatalogue.core.util.marshalling.xlsx
 
 import grails.rest.render.RenderContext
+import groovy.util.logging.Log4j
 import org.modelcatalogue.core.util.ListWrapper
 
 /**
  * Created by ladin on 09.04.14.
  */
+@Log4j
 class XLSXRowWriterBuilder {
 
     private String name
@@ -111,7 +113,12 @@ class XLSXRowWriterBuilder {
         new XLSXRowWriter() {
             @Override
             boolean isApplicableOn(ListWrapper container, RenderContext context) {
-                self.condition(container, context)
+                try {
+                    return self.condition(container, context)
+                } catch (Exception e) {
+                    log.error("Exception testing row writer $name", e)
+                    return false
+                }
             }
 
             @Override

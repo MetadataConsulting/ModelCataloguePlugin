@@ -1,10 +1,12 @@
 package org.modelcatalogue.core.reports
 
+import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 
 /**
  * Created by ladin on 09.06.14.
  */
+@Log4j
 class ReportDescriptor {
 
     LinkGenerator generator
@@ -30,7 +32,12 @@ class ReportDescriptor {
 
     boolean appliesTo(Object model) {
         for (condition in conditions) {
-            if (!condition(model)) return false
+            try {
+                if (!condition(model)) return false
+            } catch (Exception e) {
+                log.error("Error evaluating applies to for $model", e)
+                return false
+            }
         }
         return true
     }

@@ -1,11 +1,14 @@
 package org.modelcatalogue.core.reports
 
+import groovy.util.logging.Log
+import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Created by ladin on 09.06.14.
  */
+@Log4j
 class ReportsRegistry {
 
     @Autowired LinkGenerator linkGenerator
@@ -25,9 +28,14 @@ class ReportsRegistry {
     List<ReportDescriptor> getAvailableReports(Object model) {
         List<ReportDescriptor> reports = []
         for (descriptor in descriptors) {
-            if (descriptor.appliesTo(model)) {
-                reports << descriptor
+            try {
+                if (descriptor.appliesTo(model)) {
+                    reports << descriptor
+                }
+            } catch (Exception e) {
+                log.error("Error evaluating report: $descriptor.title", e)
             }
+
         }
         reports
     }
