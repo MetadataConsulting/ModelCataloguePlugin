@@ -5,11 +5,16 @@ import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.reports.ReportDescriptor
+import org.modelcatalogue.core.reports.ReportsRegistry
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Created by ladin on 14.02.14.
  */
 abstract class CatalogueElementMarshallers extends AbstractMarshallers {
+
+    @Autowired ReportsRegistry reportsRegistry
 
     CatalogueElementMarshallers(Class type) {
         super(type)
@@ -35,8 +40,20 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         relationships.incoming?.each addRelationsJson('incoming', el, ret)
         relationships.outgoing?.each addRelationsJson('outgoing', el, ret)
 
+        ret.availableReports = getAvailableReports(el)
+
         ret
 
+    }
+
+    protected getAvailableReports(CatalogueElement el) {
+        def reports = []
+
+        for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
+            reports << [title: descriptor.title, url: descriptor.getLink(el)]
+        }
+
+        reports
     }
 
     static Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {

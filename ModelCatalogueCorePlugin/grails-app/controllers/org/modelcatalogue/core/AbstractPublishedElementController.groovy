@@ -16,7 +16,7 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         Integer total = publishedElementService.count(params, resource)
         def list = publishedElementService.list(params, resource)
 
-        respondWithReports new Elements(
+        respondWithLinks new Elements(
                 base: "/${resourceName}/${params.status ? params.status : ''}",
                 total: total,
                 items: list
@@ -39,7 +39,7 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         int total = resource.countByModelCatalogueIdLike "$element.bareModelCatalogueId%"
         def list = resource.findAllByModelCatalogueIdLike "$element.bareModelCatalogueId%", customParams
 
-        respondWithReports new Elements(
+        respondWithLinks new Elements(
                 base: "/${resourceName}/${params.id}/history",
                 items: list,
                 total: total

@@ -21,6 +21,13 @@ interface XLSXRowWriter<T> {
     String getName()
 
     /**
+     * Human readable title.
+     * Can be <code>null</code>. The name or the word <code>Excel</code> is used instead if not available.
+     * @return the title of this writer
+     */
+    String getTitle()
+
+    /**
      * Returns the name of the excel file or {@code null} if default name should be used.
      * @param context the renderer context
      * @return the name of the excel file or {@code null} if default name should be used

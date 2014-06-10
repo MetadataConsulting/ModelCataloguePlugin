@@ -3,6 +3,7 @@ import grails.util.Environment
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Relationships
@@ -59,6 +60,7 @@ Model catalogue core plugin (metadata registry)
         mergeConfig(application)
 
         xlsxListRenderer(XLSXListRenderer)
+        reportsRegistry(ReportsRegistry)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
@@ -97,6 +99,7 @@ Model catalogue core plugin (metadata registry)
         XLSXListRenderer xlsxListRenderer = ctx.getBean('xlsxListRenderer')
 
         xlsxListRenderer.registerRowWriter {
+            title "Catalogue Elements to Excel"
             headers 'ID', 'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && CatalogueElement.isAssignableFrom(container.itemType)
@@ -106,6 +109,7 @@ Model catalogue core plugin (metadata registry)
         }
 
         xlsxListRenderer.registerRowWriter {
+            title "Relationship Types to Excel"
             headers 'Name', 'Source to Destination', 'Destination to Source'
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search'] && RelationshipType.isAssignableFrom(container.itemType)
@@ -115,6 +119,7 @@ Model catalogue core plugin (metadata registry)
         }
 
         xlsxListRenderer.registerRowWriter {
+            title "Current Relations"
             headers 'Type', 'Source', 'Destination'
             when { container, context ->
                 container instanceof Relationships

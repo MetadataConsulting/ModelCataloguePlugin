@@ -42,7 +42,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 total: total,
                 items: results.searchResults
             )
-        respondWithReports elements
+        respondWithLinks elements
     }
 
     protected setSafeMax(Integer max) {
@@ -66,7 +66,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         def total = countResources()
         def list = listAllResources(params)
 
-        respondWithReports new Elements(
+        respondWithLinks new Elements(
                 base: "/${resourceName}/",
                 total: total,
                 items: list
@@ -132,7 +132,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
 
 
-    protected void respondWithReports(Class itemType = resource, ListWrapper listWrapper) {
+    protected void respondWithLinks(Class itemType = resource, ListWrapper listWrapper) {
         def links = ListWrapper.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
         listWrapper.previous    = links.previous
         listWrapper.next        = links.next
@@ -143,7 +143,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if (!listWrapper.itemType) {
             listWrapper.itemType = itemType
         }
-        respond xlsxListRenderer.fillListWithReports(listWrapper, webRequest)
+        respond listWrapper
     }
 
 }
