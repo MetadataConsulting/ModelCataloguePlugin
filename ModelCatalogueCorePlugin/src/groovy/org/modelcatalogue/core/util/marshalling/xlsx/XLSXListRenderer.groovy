@@ -64,7 +64,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
 
     public <T> XLSXRowWriter<T> findRowWriter(String name, ListWrapper<T> container, RenderContext context) {
-        List<XLSXRowWriter> byName = writers.get(name)
+        List<XLSXRowWriter> byName = writers.get(name ?: null)
 
         if (!byName) return DEFAULT_WRITER
 
@@ -104,7 +104,18 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                 ServletRenderContext context = new ServletRenderContext(webRequest)
                 writer.isApplicableOn(it, context)
             }
-            link params: [format: 'xslt', report: writer.name ?: '']
+            link {
+                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes()
+                Map params = [:]
+                params.putAll(webRequest.params)
+                params.format = 'xlsx'
+                params.report = writer.name
+                params.remove('sort')
+                params.remove('order')
+                params.remove('max')
+                params.remove('offset')
+                [controller: webRequest.controllerName, action: webRequest.actionName, params: params]
+            }
         }
 
         writer

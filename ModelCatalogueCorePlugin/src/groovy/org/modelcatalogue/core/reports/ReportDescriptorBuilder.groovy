@@ -33,21 +33,21 @@ class ReportDescriptorBuilder {
     }
 
     ReportDescriptorBuilder uri(String uri) {
-        descriptor.linkParams = [(LinkGenerator.ATTRIBUTE_URI): uri] ; this
+        descriptor.linkParams = {[(LinkGenerator.ATTRIBUTE_URI): uri]} ; this
     }
 
 
     ReportDescriptorBuilder url(String url) {
-        descriptor.linkParams = [(LinkGenerator.ATTRIBUTE_URL): url] ; this
+        descriptor.linkParams = {[(LinkGenerator.ATTRIBUTE_URL): url]} ; this
     }
-
-
-
 
     ReportDescriptorBuilder link(Map<String, Object> linkParams) {
-        descriptor.linkParams = linkParams ; this
+        descriptor.linkParams = { linkParams } ; this
     }
 
+    ReportDescriptorBuilder link(Closure<Map<String, Object>> linkParams) {
+        descriptor.linkParams = linkParams ; this
+    }
 
     ReportDescriptor build(LinkGenerator generator) {
         if (!descriptor.title) throw new IllegalStateException("The descriptor is missing it's title")

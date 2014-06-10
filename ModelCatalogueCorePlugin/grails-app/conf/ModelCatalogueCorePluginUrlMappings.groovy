@@ -1,86 +1,50 @@
+import org.springframework.http.HttpMethod
+
 class ModelCatalogueCorePluginUrlMappings {
 
 
 	static mappings = {
-        group "/api/modelCatalogue/core", {
-            "/$controller(.$format)?" {
-                action = [GET: "index", POST: "save"]
-            }
-            "/$controller/search/$search?(.$format)?" {
-                action = [GET: "search"]
-            }
-            "/$controller/validate(.$format)?" {
-                action = [POST: "validate"]
-            }
-            "/$controller/$id/validate(.$format)?" {
-                action = [POST: "validate"]
-            }
-            "/$controller/$id(.$format)?" {
-                action = [GET: "show", PUT: "update", DELETE: "delete"]
-            }
-            "/$controller/$id/incoming(.$format)?" {
-                action = [GET: "incoming"]
-            }
-            "/$controller/$id/outgoing(.$format)?" {
-                action = [GET: "outgoing"]
-            }
-            "/$controller/$id/relationships(.$format)?" {
-                action = [GET: "relationships"]
-            }
-            "/$controller/$id/outgoing/$type(.$format)?" {
-                action = [GET: "outgoing", POST: "addOutgoing", DELETE: "removeOutgoing"]
-            }
-            "/$controller/$id/incoming/$type(.$format)?" {
-                action = [GET: "incoming", POST: "addIncoming", DELETE: "removeIncoming"]
-            }
-            "/$controller/$id/mapping/$destination(.$format)?" {
-                action = [POST: "addMapping", DELETE: "removeMapping"]
-                constraints {
-                    controller inList: ['valueDomain']
-                }
-            }
-            "/$controller/$id/valueDomain(.$format)?" {
-                action = [GET: "valueDomains"]
-                constraints {
-                    controller inList: ['dataType']
-                }
-            }
-            "/$controller/$id/mapping(.$format)?" {
-                action = [GET: "mappings"]
+
+        def allElements         = ['catalogueElement', 'conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'extendibleElement', 'measurementUnit', 'model', 'publishedElement', 'relationshipType', 'valueDomain']
+        def publishedElements   = ['dataElement', 'extendibleElement', 'model', 'publishedElement']
+
+        for (String controllerName in allElements) {
+            "/api/modelCatalogue/core/$controllerName" (controller: controllerName, action: 'index', method: HttpMethod.GET)
+            "/api/modelCatalogue/core/$controllerName" (controller: controllerName, action: 'save', method: HttpMethod.POST)
+            "/api/modelCatalogue/core/$controllerName/search/$search?" (controller: controllerName, action: 'search', method: HttpMethod.GET)
+            "/api/modelCatalogue/core/$controllerName/$id/validate" (controller: controllerName, action: 'validate', method: HttpMethod.POST)
+            "/api/modelCatalogue/core/$controllerName/validate" (controller: controllerName, action: 'validate', method: HttpMethod.POST)
+            "/api/modelCatalogue/core/$controllerName/$id" (controller: controllerName, action: 'show', method: HttpMethod.GET)
+            "/api/modelCatalogue/core/$controllerName/$id" (controller: controllerName, action: 'update', method: HttpMethod.PUT)
+            "/api/modelCatalogue/core/$controllerName/$id" (controller: controllerName, action: 'delete', method: HttpMethod.DELETE)
+            "/api/modelCatalogue/core/$controllerName/$id/relationships" (controller: controllerName, action: "relationships", method: HttpMethod.GET)
+            "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'outgoing', method: HttpMethod.GET)
+            "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'addOutgoing', method: HttpMethod.POST)
+            "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'removeOutgoing', method: HttpMethod.DELETE)
+            "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'incoming', method: HttpMethod.GET)
+            "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'addIncoming', method: HttpMethod.POST)
+            "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'removeIncoming', method: HttpMethod.DELETE)
+            "/api/modelCatalogue/core/$controllerName/$id/incoming" (controller: controllerName, action: "incoming", method: HttpMethod.GET)
+            "/api/modelCatalogue/core/$controllerName/$id/outgoing" (controller: controllerName, action: "outgoing", method: HttpMethod.GET)
+            "/api/modelCatalogue/core/$controllerName/$id/mapping/$destination" (controller: controllerName, action: 'addMapping', method: HttpMethod.POST)
+            "/api/modelCatalogue/core/$controllerName/$id/mapping/$destination" (controller: controllerName, action: 'removeMapping', method: HttpMethod.DELETE)
+            "/api/modelCatalogue/core/$controllerName/$id/mapping" (controller: controllerName, action: 'mappings', method: HttpMethod.GET)
+
+            if (controllerName in publishedElements) {
+                "/api/modelCatalogue/core/$controllerName/$id/history" (controller: controllerName, action: 'history', method: HttpMethod.GET)
             }
 
-            "/$controller/$id/history(.$format)?" {
-                action = [GET: "history"]
-            }
-
-            constraints {
-                controller inList: ['conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'model', 'valueDomain']
+            if (controllerName == 'dataType') {
+                "/api/modelCatalogue/core/$controllerName/$id/valueDomain"  (controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
             }
         }
 
-        "/api/modelCatalogue/core/search/$search(.$format)?" (controller:"search") {
-            action = [GET: "index"]
-        }
+        "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
 
-        group "/api/modelCatalogue/core/dataArchitect", {
-            "/uninstantiatedDataElements(.$format)?" (controller:"dataArchitect"){
-                action = [GET: "uninstantiatedDataElements"]
-            }
-            "/metadataKeyCheck/$key?(.$format)?" (controller:"dataArchitect"){
-                action = [GET: "metadataKeyCheck"]
-            }
-            "/getSubModelElements/$modelId?(.$format)?" (controller:"dataArchitect"){
-                action = [GET: "getSubModelElements"]
-            }
-            "/findRelationsByMetadataKeys/$key?(.$format)?" (controller:"dataArchitect"){
-                action = [GET: "findRelationsByMetadataKeys"]
-            }
-
-        }
-
-
-         "/"(view:"index")
-
+        "/api/modelCatalogue/core/dataArchitect/uninstantiatedDataElements" (controller:"dataArchitect", action: "uninstantiatedDataElements", method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataArchitect/metadataKeyCheck/$key?" (controller:"dataArchitect", action: "metadataKeyCheck", method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataArchitect/getSubModelElements/$id?" (controller:"dataArchitect", action: "getSubModelElements", method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataArchitect/findRelationsByMetadataKeys/$key?" (controller:"dataArchitect", action: "findRelationsByMetadataKeys", method: HttpMethod.GET)
 
 	}
 }

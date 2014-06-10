@@ -1,8 +1,7 @@
 import grails.rest.render.RenderContext
 import grails.util.Environment
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
@@ -96,13 +95,13 @@ Model catalogue core plugin (metadata registry)
         //ctx.domainModellerService.modelDomains()
         ctx.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
 
-        XLSXListRenderer xlsxListRenderer = ctx.getBean('xlsxListRenderer')
+        XLSXListRenderer xlsxListRenderer = ctx.getBean(XLSXListRenderer)
 
         xlsxListRenderer.registerRowWriter {
             title "Catalogue Elements to Excel"
             headers 'ID', 'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && CatalogueElement.isAssignableFrom(container.itemType)
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || CatalogueElement.isAssignableFrom(container.itemType))
             } then { CatalogueElement element ->
                 [[element.id, element.name, element.description]]
             }
@@ -112,7 +111,7 @@ Model catalogue core plugin (metadata registry)
             title "Relationship Types to Excel"
             headers 'Name', 'Source to Destination', 'Destination to Source'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search'] && RelationshipType.isAssignableFrom(container.itemType)
+                context.actionName in [null, 'index', 'search'] && (!container.itemType || RelationshipType.isAssignableFrom(container.itemType))
             } then { RelationshipType type ->
                 [[type.name, type.sourceToDestination, type.destinationToSource]]
             }
@@ -126,6 +125,46 @@ Model catalogue core plugin (metadata registry)
             } then { Relationship r ->
                 [[r.relationshipType, r.source.name, r.destination.name]]
             }
+        }
+
+        xlsxListRenderer.registerRowWriter('COSD') {
+            title 'Export All to COSD'
+            headers "Parent Model Unique Code",	"Parent Model",	"Model Unique Code", "Model", "Data Item Unique Code", "Data Item Name", "Data Item Description", "Measurement Unit", "Data type",	"Metadata", "Data item No.","Schema Specification","Data Dictionary Element", "Current Collection", "Format"
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in ['index', 'search', 'metadataKeyCheck', 'uninstantiatedDataElements', 'getSubModelElements'] && DataElement.isAssignableFrom(container.itemType)
+            } then { DataElement element ->
+                [[getParentModel(element)?.modelCatalogueId, getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name, element.modelCatalogueId, element.name, element.description, getUnitOfMeasure(element), getDataType(element), "-", element.ext.get("Data item No."), element.ext.get("Schema Specification"), element.ext.get("Data Dictionary Element"), element.ext.get("Current Collection"), element.ext.get("Format") ]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter('NHIC') {
+            title "Export All to NHIC"
+            headers "Parent Model Unique Code",	"Parent Model",	"Model Unique Code", "Model", "Data Item Unique Code", "Data Item Name", "Data Item Description", "Measurement Unit", "Data type",	"Metadata", "NHIC_Identifier","Link_to_existing_definition", "Notes_from_GD_JCIS" ,"Optional_Local_Identifier","A" ,"B","C" ,"D" ,"E" ,"F" ,"G","H","E2", "System", "Comments", "Group"
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in ['index', 'search', 'metadataKeyCheck', 'uninstantiatedDataElements', 'getSubModelElements'] && DataElement.isAssignableFrom(container.itemType)
+            } then { DataElement element ->
+                [[getParentModel(element)?.modelCatalogueId, getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name, element.modelCatalogueId, element.name, element.description, getUnitOfMeasure(element), getDataType(element), "-", element.ext.NHIC_Identifier, element.ext.Link_to_existing_definition, element.ext.Notes_from_GD_JCIS , element.ext.Optional_Local_Identifier, element.ext.A, element.ext.B, element.ext.C , element.ext.D , element.ext.E , element.ext.F , element.ext.G, element.ext.H, element.ext.E2, element.ext.System, element.ext.Comments, element.ext.Group]]
+            }
+        }
+
+        ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
+
+        reportsRegistry.register {
+            title 'Export All to COSD'
+            type Model
+            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report: 'COSD'], id: true
+        }
+
+        reportsRegistry.register {
+            title 'Export All to NHIC'
+            type Model
+            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report: 'NHIC'], id: true
+        }
+
+        reportsRegistry.register {
+            title 'Export All to XML'
+            type Model
+            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xml'], id: true
         }
 
     }
@@ -145,11 +184,56 @@ Model catalogue core plugin (metadata registry)
         // TODO Implement code that is executed when the application shuts down (optional)
     }
 
-    protected mergeConfig(application){
+    protected static mergeConfig(GrailsApplication application){
         application.config.merge(loadConfig(application))
     }
 
-    protected loadConfig(application){
+    protected static loadConfig(GrailsApplication application){
         new ConfigSlurper(Environment.current.name).parse(application.classLoader.loadClass("ModelCatalogueConfig"))
+    }
+
+
+
+    def static getContainingModel(DataElement dataElement){
+        if(dataElement.containedIn) {
+            return dataElement.containedIn.first()
+        }
+        return null
+    }
+
+    def static getParentModel(DataElement dataElement){
+        Model containingModel = getContainingModel(dataElement)
+        if(containingModel.childOf) {
+            return containingModel.childOf.first()
+        }
+        return null
+    }
+
+    def static getValueDomain(DataElement dataElement){
+        if(dataElement.instantiatedBy) {
+            return dataElement.instantiatedBy.first()
+        }
+        return null
+    }
+
+    def static getDataType(DataElement dataElement){
+        ValueDomain valueDomain = getValueDomain(dataElement)
+        if(valueDomain) {
+            DataType dataType = valueDomain.dataType
+            if (dataType instanceof EnumeratedType) {
+                return dataType.enumAsString
+            }
+            return dataType.name
+        }
+        return null
+    }
+
+    def static getUnitOfMeasure(DataElement dataElement){
+        ValueDomain valueDomain = getValueDomain(dataElement)
+        if(valueDomain) {
+            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
+            return unitOfMeasure?.name
+        }
+        return null
     }
 }
