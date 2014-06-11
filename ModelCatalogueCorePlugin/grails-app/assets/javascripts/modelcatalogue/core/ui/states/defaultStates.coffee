@@ -2,10 +2,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
     $scope.element  = element
 ])
+
 .controller('mc.core.ui.states.ImportCtrl', ['$scope', '$stateParams', ($scope, $stateParams)->
 
 ])
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', ($scope, $stateParams, $state, $log, list, names, enhance) ->
+
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'messages', ($scope, $stateParams, $state, $log, list, names, enhance, messages) ->
     listEnhancer    = enhance.getEnhancer('list')
 
     $scope.list                     = list
@@ -19,6 +21,18 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       {header: 'Name',          value: "relation.name",        classes: 'col-md-6', show: "relation.show()"}
       {header: 'Description',   value: "relation.description", classes: 'col-md-6'}
     ]
+
+    $scope.canCreate = ->
+      messages.hasPromptFactory('edit-' + $scope.resource)
+
+
+    $scope.create = (resource = null) ->
+      resource ?= $scope.resource
+      messages.prompt('Create ' + names.getNaturalName(resource), '', {type: 'edit-' + resource, create: (resource)}).then (created)->
+        created.show()
+#        $scope.list?.reload().then (result) ->
+#          $scope.list = result
+
 
     if $scope.resource == 'model'
       for item in list
@@ -229,6 +243,16 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-if="list.total &amp;&amp; resource != 'model'">
       <span class="pull-right">
+        <a ng-click="create()" ng-show="canCreate() &amp;&amp; resource != 'dataType'" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus-sign"></span> New {{title}}</a>
+         <div class="btn-group btn-group-sm" ng-show="canCreate() &amp;&amp; resource == 'dataType'">
+          <button type="button" class="btn btn-success dropdown-toggle">
+            <span class="glyphicon glyphicon-download-alt"></span> New Data Type <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a ng-click="create('dataType')">New Data Type</a></li>
+            <li><a ng-click="create('enumeratedType')">New Enumerated Type</a></li>
+          </ul>
+        </div>
         <div class="btn-group btn-group-sm">
           <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="list.availableReports &amp;&amp; list.availableReports.length == 0">
             <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
@@ -243,7 +267,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">
-        <div class="col-md-4"><h2>Model Hierarchy</h2></div>
+        <div class="col-md-4"><h2>Model Hierarchy <a ng-click="create()" ng-show="canCreate() &amp;&amp; resource != 'dataType'" class="btn btn-sm btn-success pull-right"><span class="glyphicon glyphicon-plus-sign"></span> New {{title}}</a></h2></div>
         <div class="col-md-8"><h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements</h3></div>
       </div>
       <div class="row">
