@@ -2,6 +2,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
     $scope.element  = element
 ])
+.controller('mc.core.ui.states.ImportCtrl', ['$scope', '$stateParams', ($scope, $stateParams)->
+
+])
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', ($scope, $stateParams, $state, $log, list, names, enhance) ->
     listEnhancer    = enhance.getEnhancer('list')
 
@@ -204,33 +207,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
   $stateProvider.state 'mc.dataArchitect.importData', {
     url: "/importData",
-    templateUrl: 'modelcatalogue/core/ui/state/parent.html',
-    controller: ['$scope','$state','$modal',($scope, $state, $modal)->
-      dialog = $modal.open {
-        windowClass: 'messages-modal-prompt'
-        template: '''
-     <div class="modal-header">
-        <h4>please select file to import</h4>
-    </div>
-    <div class="modal-body">
-        <form role="form">
-        <div class="form-group">
-            <label for="keyOne">metadata key one</label>
-            <input type="text" id="keyOne" ng-model="result.keyOne" class="form-control">
-            <label for="keyTwo">metadata key two</label>
-            <input type="text" id="keyTwo" ng-model="result.keyTwo" class="form-control">
-        </form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="$close(result)">OK</button>
-        <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
-    </div>
-    '''
-      }
-
-      dialog.result.then (result) ->
-        $state.go('mc.dataArchitect.showMetadataRelations', {'keyOne':result.keyOne, 'keyTwo':result.keyTwo})
-    ]
+    templateUrl: 'modelcatalogue/core/ui/state/importData.html',
+    controller: 'mc.core.ui.states.ImportCtrl'
   }
 
 ])
@@ -285,6 +263,13 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       <catalogue-element-view element="element"></catalogue-element-view>
     </div>
   '''
+
+  $templateCache.put 'modelcatalogue/core/ui/state/importData.html', '''
+    <div>
+      <import-data-view></import-data-view>
+    </div>
+  '''
+
 ])
 # debug states
 #.run(['$rootScope', '$log', ($rootScope, $log) ->

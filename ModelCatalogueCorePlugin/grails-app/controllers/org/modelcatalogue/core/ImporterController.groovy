@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 class ImporterController {
 
     static responseFormats = ['json']
+    static allowedMethods = [upload: "POST"]
     def dataImportService
 
     def upload()
@@ -17,7 +18,7 @@ class ImporterController {
         if(!(request instanceof MultipartHttpServletRequest)) return ["No File to process!"]
         String conceptualDomainName, conceptualDomainDescription
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest)request
-        MultipartFile  file = multiRequest.getFile("excelFile")
+        MultipartFile  file = multiRequest.getFile("file")
         def params = multiRequest.getParameterMap()
         if (!params?.conceptualDomainName) return ["No conceptual domain!"] else conceptualDomainName = params.conceptualDomainName.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
         if (params.conceptualDomainDescription) conceptualDomainDescription = params.conceptualDomainDescription.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else conceptualDomainDescription=""

@@ -52,6 +52,12 @@ class Importer {
             row.rowActions.add(action)
         }
         if (row.containingModelCode) {
+            def md = Model.findByModelCatalogueId(row.containingModelCode)
+            if(!md){
+                RowAction action = new RowAction(field: "containingModelCode", action: "Containing Model Id does not match an existing element. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL)
+                row.rowActions.add(action)
+            }
+
             if (!row.containingModelCode.matches(REGEX)) {
                 RowAction action = new RowAction(field: "containingModelCode", action: "the model catalogue code for the containing model is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
                 row.rowActions.add(action)
@@ -62,6 +68,11 @@ class Importer {
             row.rowActions.add(action)
         }
         if (row.parentModelCode) {
+            def md = Model.findByModelCatalogueId(row.parentModelCode)
+            if(!md){
+                RowAction action = new RowAction(field: "parentModelCode", action: "Parent Model Id does not match an existing element. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL)
+                row.rowActions.add(action)
+            }
             if (!row.parentModelCode.matches(REGEX)) {
                 RowAction action = new RowAction(field: "parentModelCode", action: "the model catalogue code for the parent model is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
                 row.rowActions.add(action)
@@ -77,8 +88,13 @@ class Importer {
                 row.rowActions.add(action)
             }
             if (row.dataElementCode) {
+                def de = DataElement.findByModelCatalogueId(row.dataElementCode)
                 if (!row.dataElementCode.matches(REGEX)) {
                     RowAction action = new RowAction(field: "dataElementCode", action: "the model catalogue code for the data element is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
+                    row.rowActions.add(action)
+                }
+                if (!de) {
+                    RowAction action = new RowAction(field: "dataElementCode", action: "Data Element Id does not match an existing element. New data element will be created.", actionType: ActionType.CREATE_DATA_ELEMENT)
                     row.rowActions.add(action)
                 }
             }

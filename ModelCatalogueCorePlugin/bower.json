@@ -21,6 +21,8 @@
     "angular": "~1.2.11",
     "angular-mocks": "~1.2.11",
     "jasmine": "~2.0.0",
-    "angular-ui-router": "~0.2.9"
+    "angular-ui-router": "~0.2.9",
+    "ng-file-upload-shim": "~1.4.0",
+    "ng-file-upload": "~1.4.0"
   }
 }

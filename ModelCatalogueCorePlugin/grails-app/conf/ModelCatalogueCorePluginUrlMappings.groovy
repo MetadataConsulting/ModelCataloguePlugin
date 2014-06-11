@@ -75,6 +75,9 @@ class ModelCatalogueCorePluginUrlMappings {
             "/findRelationsByMetadataKeys/$key?" (controller:"dataArchitect"){
                 action = [GET: "findRelationsByMetadataKeys"]
             }
+            "/importData" (controller:"importer"){
+                action = [POST: "upload"]
+            }
 
         }
 

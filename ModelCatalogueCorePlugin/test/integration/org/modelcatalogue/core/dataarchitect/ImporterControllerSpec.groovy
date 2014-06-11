@@ -21,7 +21,7 @@ class ImporterControllerSpec extends AbstractIntegrationSpec implements ResultRe
     @Shared
     def fileName, recorder
     def setupSpec(){
-        fileName = "test/integration/resources/ntest1.xls"
+        fileName = "test/integration/resources/DataTemplate.xls"
         loadMarshallers()
         recorder = DefaultResultRecorder.create(
                 "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
