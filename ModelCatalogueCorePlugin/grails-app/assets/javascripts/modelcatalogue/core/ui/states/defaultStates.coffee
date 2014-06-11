@@ -247,7 +247,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
             <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
-            <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in list.availableReports">{{natural(report.name)}}</a></li>
+            <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in list.availableReports">{{report.title}}</a></li>
           </ul>
         </div>
       </span>
