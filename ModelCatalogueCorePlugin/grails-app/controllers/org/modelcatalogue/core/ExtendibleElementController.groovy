@@ -16,7 +16,7 @@ class ExtendibleElementController extends AbstractExtendibleElementController<Ex
         Integer total = publishedElementService.count(params, ExtendibleElement)
         def list = publishedElementService.list(params, ExtendibleElement)
 
-        respondWithReports new Elements(
+        respondWithLinks new Elements(
                 base: "/${resourceName}/${params.status ? params.status : ''}",
                 total: total,
                 items: list

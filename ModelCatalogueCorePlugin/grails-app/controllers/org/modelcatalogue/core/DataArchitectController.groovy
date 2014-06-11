@@ -77,8 +77,9 @@ class DataArchitectController {
     def getSubModelElements(){
 
         def results = new ListAndCount(count: 0, list: [])
-        if(params?.modelId){
-            Model model = Model.get(params.modelId)
+        if (params.modelId || params.id){
+            Long id = params.long('modelId') ?: params.long('id')
+            Model model = Model.get(id)
             def subModels = modelService.getSubModels(model)
             results = modelService.getDataElementsFromModels(subModels.list)
         }

@@ -1,8 +1,13 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.XML
+import org.modelcatalogue.core.reports.ReportDescriptor
+import org.modelcatalogue.core.reports.ReportsRegistry
+import org.springframework.beans.factory.annotation.Autowired
 
 abstract class ListWrapperMarshaller extends AbstractMarshallers {
+
+    @Autowired ReportsRegistry reportsRegistry
 
     ListWrapperMarshaller(Class cls) {
         super(cls)
@@ -22,10 +27,20 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
                 list: elements.items,
                 previous: elements.previous,
                 next: elements.next,
-                availableReports: elements.availableReports,
+                availableReports: getAvailableReports(elements),
                 sort: elements.sort,
                 order: elements.order
         ]
+    }
+
+    protected getAvailableReports(el) {
+        def reports = []
+
+        for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
+            reports << [title: descriptor.title, url: descriptor.getLink(el)]
+        }
+
+        reports
     }
 
     @Override
@@ -57,6 +72,5 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         addXmlAttribute(elements.offset, "offset", xml)
         addXmlAttribute(elements.items.size(), "size", xml)
         addXmlAttribute("true", "success", xml)
-        addXmlAttribute(elements.availableReports.toList().join(','), "availableReports", xml)
     }
 }

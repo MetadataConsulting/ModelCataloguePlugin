@@ -1,7 +1,8 @@
 import grails.rest.render.RenderContext
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.core.*
 
 class BootStrap {
 
@@ -11,6 +12,7 @@ class BootStrap {
     def publishedElementService
 
     XLSXListRenderer xlsxListRenderer
+    ReportsRegistry reportsRegistry
 
     def init = { servletContext ->
 
@@ -19,20 +21,12 @@ class BootStrap {
         initCatalogueService.initDefaultMeasurementUnits()
 
         xlsxListRenderer.registerRowWriter('reversed') {
+            title "Reversed DEMO Export"
             headers 'Description', 'Name', 'ID'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in ['index', 'search'] && CatalogueElement.isAssignableFrom(container.itemType)
+                context.actionName in ['index', 'search'] && container.itemType && CatalogueElement.isAssignableFrom(container.itemType)
             } then { CatalogueElement element ->
                 [[element.description, element.name, element.id]]
-            }
-        }
-
-        xlsxListRenderer.registerRowWriter {
-            headers 'Type', 'Source', 'Destination'
-            when { ListWrapper container, RenderContext context ->
-                Relationship.isAssignableFrom(container.itemType)
-            } then { Relationship rel ->
-                [[rel.relationshipType.name, rel.source.name, rel.destination.name]]
             }
         }
 
@@ -78,4 +72,5 @@ class BootStrap {
     }
     def destroy = {
     }
+
 }

@@ -165,7 +165,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         }
 
         ListAndCount listAndCount = relationshipService.getRelationships(params, direction, element, type)
-        respondWithReports new Relationships(
+        respondWithLinks new Relationships(
                 base: "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""),
                 owner: element,
                 items: listAndCount.list,
@@ -186,7 +186,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         int total = element.outgoingMappings.size()
         def list = Mapping.findAllBySource(element, params)
 
-        respondWithReports new Mappings(
+        respondWithLinks new Mappings(
                 base: "/${resourceName}/${params.id}/mapping",
                 items: list,
                 total: total

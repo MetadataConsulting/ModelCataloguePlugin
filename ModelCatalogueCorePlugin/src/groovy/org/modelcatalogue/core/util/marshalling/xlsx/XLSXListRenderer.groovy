@@ -6,7 +6,10 @@ import grails.util.GrailsWebUtil
 import org.codehaus.groovy.grails.web.mime.MimeType
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.plugins.web.rest.render.ServletRenderContext
+import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.context.request.RequestContextHolder
 import pl.touk.excel.export.WebXlsxExporter
 
 /**
@@ -19,6 +22,8 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
     static final XLSXRowWriter DEFAULT_WRITER   = XLSXRowWriterBuilder.writer().headers('EXPORT NOT CONFIGURED').build()
 
     private final Map<String, List<XLSXRowWriter>> writers = [:]
+
+    @Autowired ReportsRegistry reportsRegistry
 
     XLSXListRenderer() {
         super(ListWrapper, [EXCEL, XLSX] as MimeType[])
@@ -59,7 +64,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
 
     public <T> XLSXRowWriter<T> findRowWriter(String name, ListWrapper<T> container, RenderContext context) {
-        List<XLSXRowWriter> byName = writers.get(name)
+        List<XLSXRowWriter> byName = writers.get(name ?: null)
 
         if (!byName) return DEFAULT_WRITER
 
@@ -89,26 +94,31 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
     XLSXRowWriter registerRowWriter(String name, @DelegatesTo(XLSXRowWriterBuilder) Closure definition) {
         XLSXRowWriterBuilder builder = XLSXRowWriterBuilder.writer(name)
         builder.with definition
-        registerRowWriter(builder.build())
-    }
+        XLSXRowWriter writer = registerRowWriter(builder.build())
 
-
-    ListWrapper fillListWithReports(ListWrapper list, GrailsWebRequest webRequest) {
-        ServletRenderContext context = new ServletRenderContext(webRequest)
-        writers.each { name, writersList ->
-            if (writersList.any {
-                if (it == DEFAULT_WRITER) return false
-                it.isApplicableOn(list, context)
-            }) {
-                if (name) {
-                    list.availableReports << [name: name, url: context.resourcePath.contains('?') ? (context.resourcePath + '&format=xlsx&report=' + name) :  (context.resourcePath + '?format=xlsx&report=' + name)]
-                } else {
-                    list.availableReports << [name: name, url: context.resourcePath.contains('?') ? (context.resourcePath + '&format=xlsx') :  (context.resourcePath + '?format=xlsx')]
-
-                }
+        reportsRegistry.register {
+            title writer.title
+            type ListWrapper
+            when {
+                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes()
+                ServletRenderContext context = new ServletRenderContext(webRequest)
+                writer.isApplicableOn(it, context)
+            }
+            link {
+                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes()
+                Map params = [:]
+                params.putAll(webRequest.params)
+                params.format = 'xlsx'
+                params.report = writer.name
+                params.remove('sort')
+                params.remove('order')
+                params.remove('max')
+                params.remove('offset')
+                [controller: webRequest.controllerName, action: webRequest.actionName, params: params]
             }
         }
-        list
+
+        writer
     }
 
 }

@@ -17,6 +17,7 @@
 #= require modalPromptBasicEdit
 #= require modalPromptMeasurementUnitEdit
 #= require modalPromptValueDomainEdit
+#= require modalPromptEnumeratedTypeEdit
 
 
 angular.module('mc.core.ui.bs', [
@@ -40,4 +41,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptBasicEdit'
   'mc.core.ui.bs.modalPromptMeasurementUnitEdit'
   'mc.core.ui.bs.modalPromptValueDomainEdit'
+  'mc.core.ui.bs.modalPromptEnumeratedTypeEdit'
 ])

@@ -8,8 +8,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'modelCatalogueApiRoot', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, modelCatalogueApiRoot) ->
-      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
+    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'modelCatalogueApiRoot', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource) ->
+      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -29,6 +29,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         isTable = false
         if $scope.showTabs
           if newProperty
+            $scope.naturalPropertyName = names.getNaturalName(newProperty)
             for tab in $scope.tabs
               tab.active = tab.name == newProperty
               if tab.active
@@ -180,8 +181,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
             activeTabSet = true
-            if element.elementTypeName == 'Model'
-              $scope.reports = [{name: "exportAll COSD", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx&report=COSD"}, {name: "exportAll NHIC", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx&report=NHIC"},{name: "exportAll XML", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xml"}]
 
           tabs.unshift tabDefinition
 

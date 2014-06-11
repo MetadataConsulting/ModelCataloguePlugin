@@ -3,7 +3,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
     (title, body, args) ->
       deferred = $q.defer()
 
-      if not args?.element?
+      if not args?.element? and not args?.create?
         messages.error('Cannot create relationship dialog.', 'The element to be edited is missing.')
         deferred.reject('Missing element argument!')
         return deferred.promise
@@ -46,8 +46,8 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
         </div>
         '''
         controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', ($scope, messages, names, catalogueElementResource, $modalInstance) ->
-          $scope.copy     = angular.copy(args.element)
-          $scope.original = args.element
+          $scope.copy     = angular.copy(args.element ? {})
+          $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.ruleCollapsed = true
 
@@ -70,8 +70,18 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
               return
 
 
-            catalogueElementResource($scope.copy.elementType).update($scope.copy).then (result) ->
-              messages.success('Updated ' + $scope.copy.elementTypeName, "You have updated #{$scope.copy.elementTypeName} #{$scope.copy.name}.")
+            promise = null
+
+            if args?.create
+              promise = catalogueElementResource(args.create).save($scope.copy)
+            else
+              promise = catalogueElementResource($scope.copy.elementType).update($scope.copy)
+
+            promise.then (result) ->
+              if args?.create
+                messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
+              else
+                messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
               $modalInstance.close(result)
             , (response) ->
               for err in response.data.errors

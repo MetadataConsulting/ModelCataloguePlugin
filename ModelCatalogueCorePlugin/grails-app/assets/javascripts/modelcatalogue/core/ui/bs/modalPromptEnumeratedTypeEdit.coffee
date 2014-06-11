@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       deferred = $q.defer()
@@ -26,6 +26,7 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
             </form>
+            <simple-object-editor object="copy.enumerations" title="Enumerations"></simple-object-editor>
         </div>
         <div class="modal-footer">
             <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
@@ -33,8 +34,8 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
         </div>
         '''
         controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', ($scope, messages, names, catalogueElementResource, $modalInstance) ->
-          $scope.copy     = angular.copy(args.element ? {})
-          $scope.original = args.element ? {}
+          $scope.copy     = angular.copy(args.element ? {enumerations: {}})
+          $scope.original = args.element ? {enumerations: {}}
           $scope.messages = messages.createNewMessages()
 
           $scope.hasChanged   = ->
@@ -76,8 +77,5 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
       deferred.promise
   ]
 
-  messagesProvider.setPromptFactory 'edit-model', factory
-  messagesProvider.setPromptFactory 'edit-dataElement', factory
-  messagesProvider.setPromptFactory 'edit-dataType', factory
-  messagesProvider.setPromptFactory 'edit-conceptualDomain', factory
+  messagesProvider.setPromptFactory 'edit-enumeratedType', factory
 ]

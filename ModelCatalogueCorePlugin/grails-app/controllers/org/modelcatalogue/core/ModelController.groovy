@@ -20,7 +20,7 @@ class ModelController extends AbstractExtendibleElementController<Model> {
 
         ListAndCount topLevel = modelService.getTopLevelModels(params)
 
-        respondWithReports new Elements(
+        respondWithLinks new Elements(
                 base: "/${resourceName}/${params.status ? params.status : ''}",
                 total: topLevel.count,
                 items: topLevel.list
