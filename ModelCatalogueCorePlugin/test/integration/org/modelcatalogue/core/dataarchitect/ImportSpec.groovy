@@ -1,31 +1,27 @@
 package org.modelcatalogue.core.dataarchitect
 
-import grails.test.mixin.TestFor
-import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import spock.lang.Shared
-import spock.lang.Specification
 import spock.lang.Unroll
 
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
 
-class ImporterSpec extends AbstractIntegrationSpec {
+class ImportSpec extends AbstractIntegrationSpec {
 
     @Shared
-    Importer importer
+    Import importer
     @Shared
     ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2, modelOnlyImportRow3
 
     def setupSpec() {
-        importer = new Importer()
+        importer = new Import()
         loadFixtures()
         validImportRow = new ImportRow()
         validImportRow2 = new ImportRow()
@@ -102,7 +98,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
 
 
     @Unroll
-    def "validate valid Row where expected #number"() {
+    def "#number validate valid Row where expected #number"() {
 
         ImportRow importRow = new ImportRow()
 
@@ -122,21 +118,21 @@ class ImporterSpec extends AbstractIntegrationSpec {
 
         then:
         row.rowActions.size() == size
-        row.rowActions.collect { it.action == rowAction } == actions
+        row.rowActions.collect { it.action.equals(rowAction) }.contains(true) == actions
 
         where:
         number | size | actions | rowAction                                                                                                                  | dataElementName | dataElementDescription | dataElementCode                             | parentModelName       | parentModelCode                             | containingModelName | containingModelCode                         | dataType | measurementUnitName | conceptualDomainName | conceptualDomainDescription
-        1      | 0    | []      | null                                                                                                                       | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        2      | 1    | [true]  | "Data element does not have model catalogue code. New data element will be created."                                       | "testDataItem"  | "blah blah blah"       | ""                                          | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        3      | 1    | [true]  | "No data element in row. Only Model information imported"                                                                  | ""              | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelName" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        4      | 1    | [true]  | "the model catalogue code for the data element is invalid, please action to import row"                                    | "testDataItem"  | "blah blah blah"       | "MC_037easdfsadf70b64dff10_1"               | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        5      | 1    | [true]  | "please enter conceptual domain name to import row"                                                                        | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | ""                   | " the domain of formula one"
-        6      | 1    | [true]  | "please complete the containing model name to import row"                                                                  | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | ""                  | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        7      | 1    | [true]  | "Containing model does not have model catalogue code. New model will be created."                                          | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | ""                                          | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        8      | 1    | [true]  | "the model catalogue code for the containing model is invalid, please action to import row"                                | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-asd"            | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        9      | 1    | [true]  | "Parent model does not have model catalogue code. New model will be created."                                              | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | ""                                          | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        10     | 1    | [true]  | "the model catalogue code for the parent model is invalid, please action to import row"                                    | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-asdf-das"            | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
-        11     | 1    | [true]  | "the row does not contain a data type therefore will not be associated with a value domain, is this the expected outcome?" | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | ""       | "mph"               | "formula one"        | " the domain of formula one"
+        1      | 3    | true  | "Data Element Id does not match an existing element. New data element will be created."                                                                                                                       | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        2      | 3    | true  | "Data element does not have model catalogue code. New data element will be created."                                       | "testDataItem"  | "blah blah blah"       | ""                                          | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        3      | 3    | true  | "No data element in row. Only Model information imported"                                                                  | ""              | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelName" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        4      | 4    | true  | "the model catalogue code for the data element is invalid, please action to import row"                                    | "testDataItem"  | "blah blah blah"       | "MC_037easdfsadf70b64dff10_1"               | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        5      | 4    | true  | "please enter conceptual domain name to import row"                                                                        | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | ""                   | " the domain of formula one"
+        6      | 4    | true  | "please complete the containing model name to import row"                                                                  | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | ""                  | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        7      | 3    | true  | "Containing model does not have model catalogue code. New model will be created."                                          | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | ""                                          | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        8      | 4    | true  | "the model catalogue code for the containing model is invalid, please action to import row"                                | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-asd"            | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        9      | 3    | true  | "Parent model does not have model catalogue code. New model will be created."                                              | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | ""                                          | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        10     | 4    | true  | "the model catalogue code for the parent model is invalid, please action to import row"                                    | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-asdf-das"            | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | "String" | "mph"               | "formula one"        | " the domain of formula one"
+        11     | 4    | true  | "the row does not contain a data type therefore will not be associated with a value domain, is this the expected outcome?" | "testDataItem"  | "blah blah blah"       | "MC_037e6162-3b6f-4ae3-a171-2570b64dff10_1" | "testParentModelCode" | "MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1" | "testModel"         | "MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1" | ""       | "mph"               | "formula one"        | " the domain of formula one"
     }
 
     def "addRows to importer then action those rows"() {
@@ -147,12 +143,15 @@ class ImporterSpec extends AbstractIntegrationSpec {
         importer.addRow(modelOnlyImportRow)
 
         then:
-        importer.importQueue.contains(validImportRow)
-        importer.importQueue.contains(validImportRow2)
+        importer.pendingAction.contains(validImportRow)
+        importer.pendingAction.contains(validImportRow2)
         importer.pendingAction.contains(modelOnlyImportRow)
 
         when:
+        def x = modelOnlyImportRow
         importer.resolveImportRowPendingAction(modelOnlyImportRow, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        importer.resolveImportRowPendingAction(modelOnlyImportRow, "parenModelCode", ActionType.CREATE_PARENT_MODEL)
+        importer.resolveImportRowPendingAction(modelOnlyImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         !importer.pendingAction.contains(modelOnlyImportRow)
@@ -170,7 +169,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
     def "add model only Rows to importer, action those rows and then ingest"() {
 
         setup:
-        importer = new Importer()
+        importer = new Import()
 
         when:
         importer.addRow(modelOnlyImportRow3)
@@ -355,7 +354,7 @@ class ImporterSpec extends AbstractIntegrationSpec {
     def "test ingest importing two different versions"() {
 
         setup:
-        importer = new Importer()
+        importer = new Import()
 
         when:
         importer.addRow(validImportRow)

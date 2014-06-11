@@ -32,7 +32,7 @@ class EnumeratedType extends DataType {
             Map<String, String> val = stringToMap(encodedVal)
             if (!val) return true
             if (val.size() < 1) return false
-            if (EnumeratedType.findByEnumAsString(encodedVal)) return false
+           // if (EnumeratedType.findByEnumAsString(encodedVal)) return false
             return true
         }
     }

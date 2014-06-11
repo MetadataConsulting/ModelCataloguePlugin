@@ -42,25 +42,16 @@ class ModelCatalogueCorePluginUrlMappings {
 
 
         group "/api/modelCatalogue/core/dataArchitect", {
-            "/uninstantiatedDataElements" (controller:"dataArchitect"){
-                action = [GET: "uninstantiatedDataElements"]
-            }
-            "/metadataKeyCheck/$key?" (controller:"dataArchitect"){
-                action = [GET: "metadataKeyCheck"]
-            }
-            "/getSubModelElements/$modelId?" (controller:"dataArchitect"){
-                action = [GET: "getSubModelElements"]
-            }
-            "/findRelationsByMetadataKeys/$key?" (controller:"dataArchitect"){
-                action = [GET: "findRelationsByMetadataKeys"]
-            }
-            "/importData" (controller:"importer"){
-                action = [POST: "upload"]
-            }
-
+            "/uninstantiatedDataElements" (controller: "dataArchitect", action: 'uninstantiatedDataElements', method: HttpMethod.GET)
+            "/metadataKeyCheck/$key?" (controller: "dataArchitect", action: 'metadataKeyCheck', method: HttpMethod.GET)
+            "/getSubModelElements/$modelId?" (controller: "dataArchitect", action: 'getSubModelElements', method: HttpMethod.GET)
+            "/findRelationsByMetadataKeys/$key?" (controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)
+            "/importData" (controller: "import", action: 'upload', method: HttpMethod.POST)
+            "/import" (controller: "import", action: 'index', method: HttpMethod.GET)
+            "/import/$id" (controller: "import", action: 'show', method: HttpMethod.GET)
         }
 
-         "/"(view:"index")
+        "/"(view:"index")
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataArchitect/uninstantiatedDataElements" (controller:"dataArchitect", action: "uninstantiatedDataElements", method: HttpMethod.GET)
         "/api/modelCatalogue/core/dataArchitect/metadataKeyCheck/$key?" (controller:"dataArchitect", action: "metadataKeyCheck", method: HttpMethod.GET)

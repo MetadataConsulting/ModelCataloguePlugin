@@ -1,23 +1,5 @@
 package org.modelcatalogue.core.dataarchitect
 
-import grails.transaction.Transactional
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ConceptualDomain
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.ExtendibleElement
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Mapping
-import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.PublishedElementStatus
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
-
-
 class DataImportService {
 
     static transactional = true
@@ -29,7 +11,7 @@ class DataImportService {
 
     def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap) {
         //get indexes of the appropriate sections
-        Importer newImporter = new Importer()
+        Import newImporter = new Import()
         def dataItemNameIndex = headers.indexOf(headersMap.dataElementNameRow)
         def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCodeRow)
         def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescriptionRow)
@@ -64,14 +46,13 @@ class DataImportService {
                 counter++
             }
             importRow.metadata = (metadataColumns)?metadataColumns:null
+            importRow.save()
             newImporter.addRow(importRow)
-            newImporter.save(flush:true)
-
         }
-        return newImporter
+        return newImporter.save()
     }
 
-    def resolveAll(Importer importer){
+    def resolveAll(Import importer){
        importer.resolveAllPendingRows()
        importer.ingestImportQueue()
     }

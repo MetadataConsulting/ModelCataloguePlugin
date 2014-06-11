@@ -26,7 +26,7 @@ controller: ['modelCatalogueApiRoot','$scope', '$upload', (modelCatalogueApiRoot
       $scope.upload = $upload.upload(
         url: "#{modelCatalogueApiRoot}/dataArchitect/importData"
         data:
-          conceptualDomain: $scope.conceptualDomain
+          conceptualDomainName: $scope.conceptualDomainName
         method: "POST"
         file: file
       ).progress((evt) ->
@@ -35,7 +35,8 @@ controller: ['modelCatalogueApiRoot','$scope', '$upload', (modelCatalogueApiRoot
       ).success((data, status, headers, config) ->
 
         # file is uploaded successfully
-        console.log data
+        $scope.pendingAction = data
+        console.log(data)
         return
       )
       i++

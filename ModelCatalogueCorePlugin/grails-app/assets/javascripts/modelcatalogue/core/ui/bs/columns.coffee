@@ -65,4 +65,10 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: "Enumerations", value: 'enumerations', class: 'col-md-6'}
   ]
 
+  columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.Importer', [
+    {header: "conceptualDomainName",      value: 'conceptualDomainName',      class: 'col-md-1' }
+    {header: "Name",        value: 'name',        class: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
+    {header: "Description", value: 'description', class: 'col-md-6'}
+  ]
+
 ]

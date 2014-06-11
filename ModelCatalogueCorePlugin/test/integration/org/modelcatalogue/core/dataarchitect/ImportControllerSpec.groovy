@@ -1,12 +1,10 @@
 package org.modelcatalogue.core.dataarchitect
 
-import grails.test.mixin.TestFor
-import grails.test.spock.IntegrationSpec
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.ImporterController
+import org.modelcatalogue.core.ImportController
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 import org.springframework.mock.web.MockMultipartFile
@@ -17,7 +15,7 @@ import spock.lang.Shared
  * Created by sus_avi on 01/05/2014.
  */
 
-class ImporterControllerSpec extends AbstractIntegrationSpec implements ResultRecorder{
+class ImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder{
     @Shared
     def fileName, recorder
     def setupSpec(){
@@ -33,7 +31,7 @@ class ImporterControllerSpec extends AbstractIntegrationSpec implements ResultRe
 
     def "Test the dataImportService in the ImporterController"()
     {
-        def controller = new ImporterController()
+        def controller = new ImportController()
         when: "The dataImportService is called"
         def numElements = DataElement.count()
         controller.response.format = 'json'
@@ -49,7 +47,7 @@ class ImporterControllerSpec extends AbstractIntegrationSpec implements ResultRe
         then: "The an importer is created and there are items in the importQueue and actions"
         json
         json.pendingAction
-        Importer.list().size()>0
+        Import.list().size()>0
 
     }
 

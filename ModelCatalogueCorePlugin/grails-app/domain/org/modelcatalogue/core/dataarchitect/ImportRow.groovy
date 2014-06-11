@@ -17,7 +17,25 @@ class ImportRow {
     String measurementUnitName
     String measurementSymbol
     Map metadata
-    Collection<RowAction> rowActions = []
+
+    static hasMany = [rowActions: RowAction]
+
+    static constraints = {
+        dataElementCode nullable: true
+        dataElementName nullable: true
+        dataElementDescription nullable: true
+        conceptualDomainName nullable: true
+        conceptualDomainDescription  nullable: true
+        dataType nullable: true
+        parentModelName nullable: true
+        parentModelCode nullable: true
+        containingModelName nullable: true
+        containingModelCode nullable: true
+        measurementUnitName nullable: true
+        measurementSymbol nullable: true
+        metadata nullable: true
+        rowActions  nullable: true
+    }
 
     def resolveAction(String field, ActionType actionType){
         RowAction actionToResolve = rowActions.find{it.field == field && it.actionType==actionType}

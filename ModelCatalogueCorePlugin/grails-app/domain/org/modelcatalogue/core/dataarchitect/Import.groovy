@@ -10,9 +10,9 @@ import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.marshalling.EnumeratedTypeMarshaller
 
-class Importer {
+class Import {
 
-    def publishedElementService, dataArchitectService, sessionFactory
+    def publishedElementService, sessionFactory
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":": "&#58;", "|": "&#124;", "%": "&#37;"]
 
@@ -40,67 +40,67 @@ class Importer {
 
     def ImportRow validateAndActionRow(ImportRow row){
         if (!row.conceptualDomainName) {
-            RowAction action = new RowAction(field: "conceptualDomainName", action: "please enter conceptual domain name to import row", actionType: ActionType.RESOLVE_ERROR)
-            row.rowActions.add(action)
+            RowAction action = new RowAction(field: "conceptualDomainName", action: "please enter conceptual domain name to import row", actionType: ActionType.RESOLVE_ERROR).save()
+            row.addToRowActions(action)
         }
         if (!row.containingModelName) {
-            RowAction action = new RowAction(field: "containingModelName", action: "please complete the containing model name to import row", actionType: ActionType.RESOLVE_ERROR)
-            row.rowActions.add(action)
+            RowAction action = new RowAction(field: "containingModelName", action: "please complete the containing model name to import row", actionType: ActionType.RESOLVE_ERROR).save()
+            row.addToRowActions(action)
         }
         if (!row.containingModelCode) {
-            RowAction action = new RowAction(field: "containingModelCode", action: "Containing model does not have model catalogue code. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL)
-            row.rowActions.add(action)
+            RowAction action = new RowAction(field: "containingModelCode", action: "Containing model does not have model catalogue code. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL).save()
+            row.addToRowActions(action)
         }
         if (row.containingModelCode) {
             def md = Model.findByModelCatalogueId(row.containingModelCode)
             if(!md){
-                RowAction action = new RowAction(field: "containingModelCode", action: "Containing Model Id does not match an existing element. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL)
-                row.rowActions.add(action)
+                RowAction action = new RowAction(field: "containingModelCode", action: "Containing Model Id does not match an existing element. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL).save()
+                row.addToRowActions(action)
             }
 
             if (!row.containingModelCode.matches(REGEX)) {
-                RowAction action = new RowAction(field: "containingModelCode", action: "the model catalogue code for the containing model is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
-                row.rowActions.add(action)
+                RowAction action = new RowAction(field: "containingModelCode", action: "the model catalogue code for the containing model is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR).save()
+                row.addToRowActions(action)
             }
         }
         if (!row.parentModelCode && row.parentModelName) {
-            RowAction action = new RowAction(field: "parentModelCode", action: "Parent model does not have model catalogue code. New model will be created.", actionType: ActionType.CREATE_PARENT_MODEL)
-            row.rowActions.add(action)
+            RowAction action = new RowAction(field: "parentModelCode", action: "Parent model does not have model catalogue code. New model will be created.", actionType: ActionType.CREATE_PARENT_MODEL).save()
+            row.addToRowActions(action)
         }
         if (row.parentModelCode) {
             def md = Model.findByModelCatalogueId(row.parentModelCode)
             if(!md){
-                RowAction action = new RowAction(field: "parentModelCode", action: "Parent Model Id does not match an existing element. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL)
-                row.rowActions.add(action)
+                RowAction action = new RowAction(field: "parentModelCode", action: "Parent Model Id does not match an existing element. New model will be created.", actionType: ActionType.CREATE_PARENT_MODEL).save()
+                row.addToRowActions(action)
             }
             if (!row.parentModelCode.matches(REGEX)) {
-                RowAction action = new RowAction(field: "parentModelCode", action: "the model catalogue code for the parent model is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
-                row.rowActions.add(action)
+                RowAction action = new RowAction(field: "parentModelCode", action: "the model catalogue code for the parent model is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR).save()
+                row.addToRowActions(action)
             }
         }
         if (!row.dataElementName) {
-            RowAction action = new RowAction(field: "dataElementName", action: "No data element in row. Only Model information imported", actionType: ActionType.MODEL_ONLY_ROW)
-            row.rowActions.add(action)
+            RowAction action = new RowAction(field: "dataElementName", action: "No data element in row. Only Model information imported", actionType: ActionType.MODEL_ONLY_ROW).save()
+            row.addToRowActions(action)
         }else{
             //we are importing a data element so we need to do these additional checks
             if (!row.dataElementCode) {
-                RowAction action = new RowAction(field: "dataElementCode", action: "Data element does not have model catalogue code. New data element will be created.", actionType: ActionType.CREATE_DATA_ELEMENT)
-                row.rowActions.add(action)
+                RowAction action = new RowAction(field: "dataElementCode", action: "Data element does not have model catalogue code. New data element will be created.", actionType: ActionType.CREATE_DATA_ELEMENT).save()
+                row.addToRowActions(action)
             }
             if (row.dataElementCode) {
                 def de = DataElement.findByModelCatalogueId(row.dataElementCode)
                 if (!row.dataElementCode.matches(REGEX)) {
-                    RowAction action = new RowAction(field: "dataElementCode", action: "the model catalogue code for the data element is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR)
-                    row.rowActions.add(action)
+                    RowAction action = new RowAction(field: "dataElementCode", action: "the model catalogue code for the data element is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR).save()
+                    row.addToRowActions(action)
                 }
                 if (!de) {
-                    RowAction action = new RowAction(field: "dataElementCode", action: "Data Element Id does not match an existing element. New data element will be created.", actionType: ActionType.CREATE_DATA_ELEMENT)
-                    row.rowActions.add(action)
+                    RowAction action = new RowAction(field: "dataElementCode", action: "Data Element Id does not match an existing element. New data element will be created.", actionType: ActionType.CREATE_DATA_ELEMENT).save()
+                    row.addToRowActions(action)
                 }
             }
             if (!row.dataType) {
-                RowAction action = new RowAction(field: "dataType", action: "the row does not contain a data type therefore will not be associated with a value domain, is this the expected outcome?", actionType: ActionType.DECISION)
-                row.rowActions.add(action)
+                RowAction action = new RowAction(field: "dataType", action: "the row does not contain a data type therefore will not be associated with a value domain, is this the expected outcome?", actionType: ActionType.DECISION).save()
+                row.addToRowActions(action)
             }
         }
         return row
