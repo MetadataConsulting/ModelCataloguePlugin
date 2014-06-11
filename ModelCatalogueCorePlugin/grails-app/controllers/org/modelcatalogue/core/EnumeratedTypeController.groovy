@@ -16,23 +16,14 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
     }
 
     @Override
-    protected EnumeratedType createResource(Map params) {
-
-        def json = request.getJSON()
-        if(json){
-            def instance = super.createResource(json)
-            return instance
-        }
-
-        def xml = request.getXML()
-        if(xml){
-            EnumeratedType instance = super.createResource(params)
-            //TODO implement
+    protected EnumeratedType createResource() {
+        EnumeratedType instance = super.createResource()
+        if(response.format == 'xml'){
             instance.clearErrors()
-            instance.enumerations = getXMLEnumerations(xml)
+            instance.enumerations = getXMLEnumerations(request.getXML())
             instance.save()
-            return instance
         }
+        instance
 
     }
 
@@ -66,12 +57,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
             return
         }
 
-
-        if(request.format == "json"){
-            instance.properties = request.getJSON()
-        }else{
-            instance.properties = getParametersToBind()
-        }
+            instance.properties = request
 
         if(request.format == "xml"){
             instance.clearErrors()

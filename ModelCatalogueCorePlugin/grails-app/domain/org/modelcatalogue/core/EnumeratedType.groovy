@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import com.google.gson.JsonPrimitive
 import org.apache.commons.lang.builder.EqualsBuilder
 import org.apache.commons.lang.builder.HashCodeBuilder
 
@@ -111,6 +112,10 @@ class EnumeratedType extends DataType {
             ret[unquote(pair[0])] = unquote(pair[1])
         }
         return ret
+    }
+
+    private static String quote(JsonPrimitive primitive) {
+        quote(primitive.asString)
     }
 
     private static String quote(String s) {

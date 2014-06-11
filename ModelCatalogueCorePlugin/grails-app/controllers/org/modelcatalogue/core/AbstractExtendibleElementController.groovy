@@ -27,11 +27,9 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             return
         }
 
-        def paramsToBind = getParametersToBind()
+        instance.properties = request
 
-        instance.properties = paramsToBind
-
-        def ext = paramsToBind.ext
+        def ext = request.ext
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }

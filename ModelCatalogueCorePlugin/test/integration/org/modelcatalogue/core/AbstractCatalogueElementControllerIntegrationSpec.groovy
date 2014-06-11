@@ -20,7 +20,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "Link existing elements using add to #direction endpoint with JSON result"(){
-
+        controller.request.method = 'POST'
         controller.response.format = 'json'
         controller.request.json = loadItem as JSON
         controller."add${direction.capitalize()}"(anotherLoadItem.id, relationshipType.name)
@@ -45,9 +45,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "Link existing elements using add to #direction endpoint with XML result"(){
-
+        controller.request.method = 'POST'
         controller.response.format = 'xml'
-        controller.request.xml = anotherLoadItem.encodeAsXML()
+        controller.request.xml = anotherLoadItem
         controller."add${direction.capitalize()}"(loadItem.id, relationshipType.name)
         def xml = controller.response.xml
         recordResult "add${direction.capitalize()}", xml
@@ -71,20 +71,20 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "Unlink non existing elements using add to #direction endpoint with #format result"(){
-
+        controller.request.method = 'DELETE'
         if (direction == "outgoing") {
             controller.relationshipService.unlink(loadItem, anotherLoadItem, relationshipType)
         } else {
             controller.relationshipService.unlink(anotherLoadItem, loadItem, relationshipType)
         }
         controller.response.format = format.toLowerCase()
-        def input = anotherLoadItem."encodeAs$format"()
+        def input = anotherLoadItem
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
         if(format=="JSON"){
-            recordInputJSON fixtureName, input
+            recordInputJSON fixtureName, input.toString()
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input
+            recordInputXML fixtureName, input.toString()
         }
         controller.request."${format.toLowerCase()}"= input
         controller."remove${direction.capitalize()}"(loadItem.id, relationshipType.name)
@@ -103,20 +103,20 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "Unlink existing elements using add to #direction endpoint with #format result"(){
-
+        controller.request.method = 'DELETE'
         if (direction == "outgoing") {
             controller.relationshipService.link(loadItem, anotherLoadItem, relationshipType)
         } else {
             controller.relationshipService.link(anotherLoadItem, loadItem, relationshipType)
         }
         controller.response.format = format.toLowerCase()
-        def input = anotherLoadItem."encodeAs$format"()
+        def input = anotherLoadItem
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
         if(format=="JSON"){
-            recordInputJSON fixtureName, input
+            recordInputJSON fixtureName, input.toString()
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input
+            recordInputXML fixtureName, input.toString()
         }
         controller.request."${format.toLowerCase()}"= input
         controller."remove${direction.capitalize()}"(loadItem.id, relationshipType.name)
@@ -138,6 +138,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     def "Link existing elements using add to #direction endpoint with failing constraint as JSON result"(){
 
         RelationshipType relationshipType = RelationshipType.findByName("falseRuleReturn")
+        controller.request.method = 'POST'
         controller.response.format = 'json'
         controller.request.json = anotherLoadItem as JSON
         controller."add${direction.capitalize()}"(loadItem.id, relationshipType.name)
@@ -160,8 +161,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     def "Link existing elements using add to #direction endpoint with failing constraint as XML result"(){
 
         RelationshipType relationshipType = RelationshipType.findByName("falseRuleReturn")
+        controller.request.method = 'POST'
         controller.response.format = 'xml'
-        controller.request.xml = anotherLoadItem.encodeAsXML()
+        controller.request.xml = anotherLoadItem
         controller."add${direction.capitalize()}"(loadItem.id, relationshipType.name)
         def xml = controller.response.xml
         recordResult "add${direction.capitalize()}Failed", xml
@@ -179,16 +181,17 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "#action with non-existing one to #direction endpoint with #format result"(){
+        controller.request.method = action == 'add' ? 'POST' : 'DELETE'
         controller.response.format = format.toLowerCase()
         def item = newResourceInstance()
         item.id = 1000000
-        def input = item."encodeAs$format"()
+        def input = item
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
         if(format=="JSON"){
-            recordInputJSON fixtureName, input
+            recordInputJSON fixtureName, input.toString()
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input
+            recordInputXML fixtureName, input.toString()
         }
         controller.request."${format.toLowerCase()}"= input
         controller."${action}${direction.capitalize()}"(loadItem.id, relationshipType.name)
@@ -215,14 +218,15 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "#action with not-existing type to #direction endpoint with #format result"(){
+        controller.request.method = action == 'add' ? 'POST' : 'DELETE'
         controller.response.format = format.toLowerCase()
-        def input = anotherLoadItem."encodeAs$format"()
+        def input = anotherLoadItem
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
         if(format=="JSON"){
-            recordInputJSON fixtureName, input
+            recordInputJSON fixtureName, input.toString()
         }
         if(format=="XML"){
-            recordInputXML fixtureName, input
+            recordInputXML fixtureName, input.toString()
         }
         controller.request."${format.toLowerCase()}" = input
         controller."${action}${direction.capitalize()}"(loadItem.id, "no-such-type")
@@ -276,6 +280,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
             incomingOrOutgoing = 'incoming'
         }
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.offset = offset
         controller.params.id = first.id
@@ -328,6 +333,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
             incomingOrOutgoing = 'incoming'
         }
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.offset = offset
         controller.params.id = first.id
@@ -348,6 +354,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as JSON for incoming relationships queried by type"() {
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.id = "1"
         controller.incoming(10, "no-such-type")
@@ -359,6 +366,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as XML for incoming relationships queried by type"() {
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.id = "1"
         controller.incoming(10, "no-such-type")
@@ -371,6 +379,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     def "Return 404 for non-existing item as JSON for combined relationships queried by type"() {
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.id = "1"
         controller.relationships(10, "no-such-type")
@@ -382,6 +391,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as XML for combined relationships queried by type"() {
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.id = "1"
         controller.relationships(10, "no-such-type")
@@ -393,6 +403,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as JSON for outgoing relationships queried by type"() {
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.id = "1"
         controller.outgoing(10, "no-such-type")
@@ -404,6 +415,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as XML for outgoing relationships queried by type"() {
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.id = "1"
         controller.outgoing(10, "no-such-type")
@@ -415,6 +427,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as JSON for combined relationships"() {
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.id = "1000000"
         controller.relationships(10, null)
@@ -426,6 +439,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as XML for combined relationships"() {
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.id = "1000000"
         controller.relationships(10, null)
@@ -437,6 +451,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as JSON for incoming relationships"() {
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.id = "1000000"
         controller.incoming(10, null)
@@ -448,6 +463,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as XML for incoming relationships"() {
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.id = "1000000"
         controller.incoming(10, null)
@@ -459,6 +475,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as JSON for outgoing relationships"() {
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.id = "1000000"
         controller.outgoing(10, null)
@@ -470,6 +487,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "Return 404 for non-existing item as XML for outgoing relationships"() {
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.id = "1000000"
         controller.outgoing(10, null)
@@ -689,7 +707,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     abstract Object getAnotherLoadItem()
 
-    @Override
     RelationshipType getRelationshipType(){
         RelationshipType.findByName("relationship")
     }
@@ -723,6 +740,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
             incomingOrOutgoing = 'incoming'
         }
         def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.offset = offset
         controller.params.id = first.id
@@ -747,7 +765,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert item.relation.id == relation.id
     }
 
-    @Override
     protected static checkJsonCorrectListValues(JSONElement json, total, size, offset, max, next, previous) {
         assert json.success
         assert json.total == total
@@ -857,6 +874,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         mapToDummyEntities(first)
 
         when:
+        controller.request.method = 'GET'
         controller.params.id = first.id
         controller.params.offset = offset
         controller.params.max = max
@@ -894,6 +912,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         mapToDummyEntities(first)
 
         when:
+        controller.request.method = 'GET'
         controller.params.id = first.id
         controller.params.offset = offset
         controller.params.max = max
@@ -926,6 +945,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "return 404 for non existing domain calling #method method with #format format"() {
+        controller.request.method = httpMethod
         controller.response.format = format
         controller.params.id = 1000000
 
@@ -936,17 +956,18 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
 
         where:
-        format | method
-        "json" | "mappings"
-        "xml"  | "mappings"
-        "json" | "addMapping"
-        "xml"  | "addMapping"
-        "json" | "removeMapping"
-        "xml"  | "removeMapping"
+        format | method             | httpMethod
+        "json" | "mappings"         | 'GET'
+        "xml"  | "mappings"         | 'GET'
+        "json" | "addMapping"       | 'POST'
+        "xml"  | "addMapping"       | 'POST'
+        "json" | "removeMapping"    | 'DELETE'
+        "xml"  | "removeMapping"    | 'DELETE'
     }
 
     @Unroll
     def "return 404 for non existing other side calling #method method with #format format"() {
+        controller.request.method = httpMethod
         controller.response.format = format
         controller.params.id = loadItem.id
         controller.params.destination = 10000000
@@ -960,15 +981,16 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
 
         where:
-        format | method          | payload
-        "json" | "addMapping"    | """{"mapping":"x"}"""
-        "json" | "removeMapping" | """{"mapping":"x"}"""
-        "xml"  | "addMapping"    | """<mapping>x</mapping>"""
-        "xml"  | "removeMapping" | """<mapping>x</mapping>"""
+        httpMethod | format | method          | payload
+        'POST'     | "json" | "addMapping"    | """{"mapping":"x"}"""
+        'DELETE'   | "json" | "removeMapping" | """{"mapping":"x"}"""
+        'POST'     | "xml"  | "addMapping"    | """<mapping>x</mapping>"""
+        'DELETE'   | "xml"  | "removeMapping" | """<mapping>x</mapping>"""
     }
 
     @Unroll
     def "Map existing domains with failing constraint #format"(){
+        controller.request.method = 'POST'
         controller.response.format = format
         controller.request."$format" = payload
         controller.params.id           = loadItem.id
@@ -989,6 +1011,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "unmap non existing mapping will return 404 for #format request"(){
+        controller.request.method = 'DELETE'
         controller.response.format = format
         controller.mappingService.unmap(loadItem, anotherLoadItem)
         controller.params.id           = loadItem.id
@@ -1005,6 +1028,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "unmap existing mapping will return 204 for #format request"(){
+        controller.request.method = 'DELETE'
         controller.response.format = format
 
         controller.mappingService.map(loadItem, anotherLoadItem, [one: "one"])
@@ -1020,6 +1044,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "map valid domains with json"() {
+        controller.request.method = 'POST'
         controller.response.format = "json"
         controller.request.json = """{"mapping":"x"}"""
         controller.params.id           = loadItem.id
@@ -1040,6 +1065,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     def "map valid domains with xml"() {
+        controller.request.method = 'POST'
         controller.response.format = "xml"
         controller.request.xml = """<mapping>x</mapping>"""
         controller.params.id           = loadItem.id
