@@ -1,12 +1,12 @@
 package org.modelcatalogue.core.reports
 
+import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
-import org.springframework.web.context.request.RequestContextHolder
 
 /**
  * Created by ladin on 09.06.14.
  */
+@Log4j
 class ReportDescriptor {
 
     LinkGenerator generator
@@ -28,28 +28,35 @@ class ReportDescriptor {
      *
      * @see org.codehaus.groovy.grails.web.mapping.LinkGenerator
      */
-    Map<String, Object> linkParams = [:]
+    Closure<Map> linkParams = {[:]}
 
     boolean appliesTo(Object model) {
         for (condition in conditions) {
-            if (!condition(model)) return false
+            try {
+                if (!condition(model)) return false
+            } catch (Exception e) {
+                log.error("Error evaluating applies to for $model", e)
+                return false
+            }
         }
         return true
     }
 
     String getLink(Object model) {
-        Map params = new HashMap(linkParams)
-        if (params.id && model.hasProperty('id')) {
-            params.id = model.id
-        }
-        if (!params.base) {
-            params.base = '/api/modelCatalogue/core'
-            GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes()
-            String contextPath = webRequest.contextPath
-            if (contextPath) {
-                params.base = "${contextPath}${params.base}"
+        Map params = new HashMap(linkParams(model))
+        if (params.id) {
+            if (model.hasProperty('id')) {
+                params.id = model.id
+            } else {
+                params.remove('id')
             }
+
         }
+
+        if(!params.method) {
+            params.method = 'GET'
+        }
+
         generator.link(params)
     }
 

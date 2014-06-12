@@ -19,7 +19,7 @@ class ModelCatalogueSearchService implements SearchCatalogue{
         if (PublishedElement.isAssignableFrom(resource)) {
             DetachedCriteria criteria = new DetachedCriteria(resource)
             criteria.and {
-                eq('status', PublishedElementStatus.FINALIZED)
+                'in'('status', PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED)
                 or {
                     ilike('name', query)
                     ilike('description', query)

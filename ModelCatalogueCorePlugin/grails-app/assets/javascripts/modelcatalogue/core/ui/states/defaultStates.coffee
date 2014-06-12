@@ -2,7 +2,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
     $scope.element  = element
 ])
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', ($scope, $stateParams, $state, $log, list, names, enhance) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'messages', ($scope, $stateParams, $state, $log, list, names, enhance, messages) ->
     listEnhancer    = enhance.getEnhancer('list')
 
     $scope.list                     = list
@@ -16,6 +16,39 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       {header: 'Name',          value: "relation.name",        classes: 'col-md-6', show: "relation.show()"}
       {header: 'Description',   value: "relation.description", classes: 'col-md-6'}
     ]
+
+    $scope.canCreate = ->
+      messages.hasPromptFactory('edit-' + $scope.resource)
+
+
+    $scope.create = (resource = null) ->
+      resource ?= $scope.resource
+      messages.prompt('Create ' + names.getNaturalName(resource), '', {type: 'edit-' + resource, create: (resource)}).then (created)->
+        created.show()
+#        $scope.list?.reload().then (result) ->
+#          $scope.list = result
+
+
+    $scope.getStatusButtonClass = ->
+      return 'btn-info' if $stateParams.status == 'draft'
+      return 'btn-warning' if $stateParams.status == 'pending'
+      return 'btn-primary'
+
+
+    $scope.getStatusIconClass = ->
+      return 'glyphicon-pencil' if $stateParams.status == 'draft'
+      return 'glyphicon-time'   if $stateParams.status == 'pending'
+      return 'glyphicon-ok'
+
+
+    $scope.switchStatus = (status) ->
+      newParams = angular.copy($stateParams)
+      if status == 'finalized'
+        newParams.status = undefined
+      else
+        newParams.status = status
+      $state.go 'mc.resource.list', newParams
+
 
     if $scope.resource == 'model'
       for item in list
@@ -51,7 +84,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all?page&order&sort'
+    url: '/all?page&order&sort&status'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
@@ -60,9 +93,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           page = parseInt($stateParams.page ? 1, 10)
           page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only model controller will respond on it
-          params = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
-          params.order = $stateParams.order ? 'asc'
-          params.sort  = $stateParams.sort ? 'name'
+          params        = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
+          params.order  = $stateParams.order ? 'asc'
+          params.sort   = $stateParams.sort ? 'name'
+          params.status = $stateParams.status ? 'finalized'
           catalogueElementResource($stateParams.resource).list(params)
         ]
 
@@ -218,14 +252,34 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   '''
 
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
-    <div ng-if="list.total &amp;&amp; resource != 'model'">
+    <div ng-if="resource != 'model'">
       <span class="pull-right">
+        <a ng-click="create()" ng-show="canCreate() &amp;&amp; resource != 'dataType'" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus-sign"></span> New {{title}}</a>
+        <div class="btn-group btn-group-sm" ng-show="canCreate() &amp;&amp; resource == 'dataType'">
+          <button type="button" class="btn btn-success dropdown-toggle">
+            <span class="glyphicon glyphicon-download-alt"></span> New Data Type <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a ng-click="create('dataType')">New Data Type</a></li>
+            <li><a ng-click="create('enumeratedType')">New Enumerated Type</a></li>
+          </ul>
+        </div>
+        <div class="btn-group btn-group-sm" ng-show="resource == 'dataElement'">
+          <button type="button" class="btn dropdown-toggle" ng-class="getStatusButtonClass()">
+            <span class="glyphicon" ng-class="getStatusIconClass()"></span> {{natural($stateParams.status || 'finalized')}} <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a ng-click="switchStatus('draft')"><span class="glyphicon glyphicon-pencil"> Draft</a></li>
+            <li><a ng-click="switchStatus('pending')"><span class="glyphicon glyphicon-time"> Pending</a></li>
+            <li><a ng-click="switchStatus('finalized')"><span class="glyphicon glyphicon-ok"> Finalized</a></li>
+          </ul>
+        </div>
         <div class="btn-group btn-group-sm">
           <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="list.availableReports &amp;&amp; list.availableReports.length == 0">
             <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
-            <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in list.availableReports">{{natural(report.name)}}</a></li>
+            <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in list.availableReports">{{report.title}}</a></li>
           </ul>
         </div>
       </span>
@@ -234,7 +288,24 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">
-        <div class="col-md-4"><h2>Model Hierarchy</h2></div>
+        <div class="col-md-4">
+          <h2>
+            Model Hierarchy
+            <span class="pull-right btn-group">
+              <a ng-click="create()" ng-show="canCreate() &amp;&amp; resource != 'dataType'" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus-sign"></span></a>
+              <div class="btn-group btn-group-sm">
+                <button type="button" class="btn dropdown-toggle" ng-class="getStatusButtonClass()" title="Show">
+                  <span class="glyphicon" ng-class="getStatusIconClass()"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a ng-click="switchStatus('draft')"><span class="glyphicon glyphicon-pencil"> Draft</a></li>
+                  <li><a ng-click="switchStatus('pending')"><span class="glyphicon glyphicon-time"> Pending</a></li>
+                  <li><a ng-click="switchStatus('finalized')"><span class="glyphicon glyphicon-ok"> Finalized</a></li>
+                </ul>
+              </div>
+            </span>
+          </h2>
+        </div>
         <div class="col-md-8"><h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements</h3></div>
       </div>
       <div class="row">

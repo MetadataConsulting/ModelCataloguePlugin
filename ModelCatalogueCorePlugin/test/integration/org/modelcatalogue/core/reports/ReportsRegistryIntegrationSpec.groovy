@@ -24,9 +24,9 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         ReportsRegistry registry    = applicationContext.getBean(ReportsRegistry)
 
         registry.register {
-            title 'COSD'
+            title 'Export All to COSD'
             type Model
-            link controller: 'model', action: 'index', params: [format: 'xslt'], id: true
+            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xslt', report: 'COSD'], id: true
 
         }
 
@@ -46,8 +46,8 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
         expect:
         modelReports.size()                 >= 1
-        modelReports[0].title               == 'COSD'
-        modelReports[0].getLink(model)      == '/model/index/1?format=xslt'
+        modelReports[0].title               == 'Export All to COSD'
+        modelReports[0].getLink(model)      == '/api/modelCatalogue/core/dataArchitect/getSubModelElements/1?format=xlsx&report=COSD'
 
         when:
         def models = new Elements(itemType: Model)
@@ -69,7 +69,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
             title "Export Relationships TEST"
             headers 'Type', 'Source', 'Destination'
             when { ListWrapper container, RenderContext context ->
-                Relationship.isAssignableFrom(container.itemType)
+                container.itemType && Relationship.isAssignableFrom(container.itemType)
             } then { Relationship rel ->
                 [[rel.relationshipType.name, rel.source.name, rel.destination.name]]
             }
@@ -80,7 +80,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         expect:
         relationshipsReports.size()                           >= 2
         relationshipsReports[1].title                         == 'Export Relationships TEST'
-        relationshipsReports[1].getLink(new Relationships())  == '?format=xslt&report='
+        relationshipsReports[1].getLink(new Relationships())  == '?format=xlsx&report='
 
 
 

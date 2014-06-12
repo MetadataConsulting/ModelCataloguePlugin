@@ -1,5 +1,8 @@
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import junit.framework.AssertionFailedError
+import org.codehaus.groovy.grails.commons.GrailsControllerClass
+import org.codehaus.groovy.grails.web.mapping.UrlMappingsHolder
 import org.modelcatalogue.core.*
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -18,9 +21,11 @@ import spock.lang.Unroll
 @Unroll
 class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
 
+    private assertionKeys = ["controller", "action", "view"]
+
     def "for method #method and url /api/modelCatalogue/core#url expect controller #controller and action #action with #paramsAssertions"() {
         expect:
-        assertRestForwardUrlMapping(method, "/api/modelCatalogue/core$url", controller: controller, action: action, paramsAssertions)
+        assertRestForwardUrlMapping(method, "/api/modelCatalogue/core$url".toString(), controller: controller, action: action, paramsAssertions)
 
         where:
         [method, url, controller, action, paramsAssertions] << generateAssertionsForCatalogueElementControllers('conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'model', 'valueDomain')
@@ -28,7 +33,7 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
 
     def "value domain extra mappings mehtod #method maps and url #url maps to action #action"() {
         expect:
-        assertRestForwardUrlMapping(method, url, controller: "valueDomain", action: action, paramsToCheck)
+        assertRestForwardUrlMapping(method, url.toString(), controller: "valueDomain", action: action, paramsToCheck)
         where:
         method      | action             | url                                                  | paramsToCheck
         "GET"       | "mappings"         | "/api/modelCatalogue/core/valueDomain/1/mapping"     | {id = "1"}
@@ -38,7 +43,7 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
 
     def "for method #method and url /api/modelCatalogue/core#url there should be no mappings found"() {
         when:
-        assertRestForwardUrlMapping([controller: "foo", action: "bar"], method, "/api/modelCatalogue/core$url", {})
+        assertRestForwardUrlMapping([controller: "foo", action: "bar"], method, "/api/modelCatalogue/core$url".toString(), {})
 
         then:
         thrown(AssertionError)
@@ -51,15 +56,74 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
 
     def "search controller url mapping"() {
         expect:
-        assertRestForwardUrlMapping("index", "/api/modelCatalogue/core/search/author", controller: "search", action: "index", { search = "author"} )
-        assertRestForwardUrlMapping("index", "/api/modelCatalogue/core/search", controller: "search", action: "index", {} )
+        assertRestForwardUrlMapping("GET", "/api/modelCatalogue/core/search/author", controller: "search", action: "index", { search = "author"} )
+        assertRestForwardUrlMapping("GET", "/api/modelCatalogue/core/search", controller: "search", action: "index", {} )
 
     }
 
 
-    private void assertRestForwardUrlMapping(assertions, String method, url, paramAssertions) {
-        webRequest.currentRequest.method = method
-        assertForwardUrlMapping(assertions, url, paramAssertions)
+
+    private void assertRestForwardUrlMapping(Map assertions, String method, String url, Closure paramAssertions) {
+        UrlMappingsHolder mappingsHolder = applicationContext.getBean("grailsUrlMappingsHolder", UrlMappingsHolder)
+        if (assertions.action && !assertions.controller) {
+            throw new AssertionFailedError("Cannot assert action for url mapping without asserting controller")
+        }
+
+        if (assertions.controller) assertController(assertions.controller, url)
+        if (assertions.action) assertAction(assertions.controller, assertions.action, url)
+        if (assertions.view) assertView(assertions.controller, assertions.view, url)
+
+        def mappingInfos
+        if (url instanceof Integer) {
+            mappingInfos = []
+            def mapping = mappingsHolder.matchStatusCode(url)
+            if (mapping) mappingInfos << mapping
+        }
+        else {
+            mappingInfos = mappingsHolder.matchAll(url, method)
+        }
+
+        if (mappingInfos.size() == 0) throw new AssertionFailedError("url '$url' did not match any mappings")
+
+        def mappingMatched = mappingInfos.any {mapping ->
+            mapping.configure(webRequest)
+            for (key in assertionKeys) {
+                if (assertions.containsKey(key)) {
+                    def expected = assertions[key]
+                    def actual = mapping."${key}Name"
+
+                    switch (key) {
+                        case "controller":
+                            if (actual && !getControllerClass(actual)) return false
+                            break
+                        case "view":
+                            if (actual[0] == "/") actual = actual.substring(1)
+                            if (expected[0] == "/") expected = expected.substring(1)
+                            break
+                        case "action":
+                            if (key == "action" && actual == null) {
+                                final controllerClass = getControllerClass(assertions.controller)
+                                actual = controllerClass?.defaultAction
+                            }
+                            break
+                    }
+
+                    assert expected == actual
+                }
+            }
+            if (paramAssertions) {
+                def params = [:]
+                paramAssertions.delegate = params
+                paramAssertions.resolveStrategy = Closure.DELEGATE_ONLY
+                paramAssertions.call()
+                params.each {name, value ->
+                    assert value == mapping.params[name]
+                }
+            }
+            return true
+        }
+
+        if (!mappingMatched) throw new IllegalArgumentException("url '$url' did not match any mappings")
     }
 
 
@@ -97,8 +161,13 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         [ "POST"  , "/$controller/1/outgoing/relationship"    , controller , "addOutgoing"     , { id = "1" ; type = "relationship" }  ],
         [ "POST"  , "/$controller/1/incoming/relationship"    , controller , "addIncoming"     , { id = "1" ; type = "relationship" }  ],
         [ "DELETE", "/$controller/1/outgoing/relationship"    , controller , "removeOutgoing"  , { id = "1" ; type = "relationship" }  ],
-        [ "DELETE", "/$controller/1/incoming/relationship"    , controller , "removeIncoming"  , { id = "1" ; type = "relationship" }  ]
+        [ "DELETE", "/$controller/1/incoming/relationship"    , controller , "removeIncoming"  , { id = "1" ; type = "relationship" }  ],
+        [ "GET"	  , "/$controller/1/relationships/relatedTo"  , controller , "relationships"   , { id = "1" ; type = "relatedTo" }  ]
         ]
+    }
+
+    private GrailsControllerClass getControllerClass(controller) {
+        return grailsApplication.getArtefactByLogicalPropertyName(org.codehaus.groovy.grails.commons.ControllerArtefactHandler.TYPE, controller)
     }
 
 
