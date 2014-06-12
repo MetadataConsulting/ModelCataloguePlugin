@@ -40,7 +40,7 @@ class ModelCatalogueCorePluginUrlMappings {
             }
 
             if (controllerName == 'asset') {
-                "/api/modelCatalogue/core/$controllerName/$id/upload"  (controller: controllerName, action: 'upload', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/upload"  (controller: controllerName, action: 'upload', method: HttpMethod.POST)
             }
         }
 

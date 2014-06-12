@@ -2,17 +2,21 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
+import spock.lang.Unroll
 
 /**
  * Created by adammilward on 27/02/2014.
  */
 class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
-    def "upload asset"() {
+    @Unroll
+    def "expect uploaded asset will have #expectedName if params are #params"() {
         GrailsMockMultipartFile mockFile = new GrailsMockMultipartFile('asset', 'readme.txt', 'text/plain', 'some file contents'.bytes)
 
-        controller.request.method   = 'POST'
-        controller.response.format  = 'json'
+        controller.request.method       = 'POST'
+        controller.params.name          = params.name
+        controller.params.description   = params.description
+        controller.response.format      = 'json'
 
         controller.request.addFile mockFile
 
@@ -21,21 +25,27 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
         def json = controller.response.json
 
         expect:
-        json.name            == 'readme.txt'
+        json.name            == expectedName
         json.ext.contentType == 'text/plain'
 
         when:
-        Asset asset = Asset.findByName('readme.txt')
+        Asset asset = Asset.findByName(expectedName)
 
         then:
+        json
         json.id                  == asset.id
+        asset
         asset.ext.contentType    == 'text/plain'
         asset.ext.size           == mockFile.size.toString()
 
         cleanup:
         asset?.delete()
-    }
 
+        where:
+        expectedName    | params
+        'readme.txt'    | [:]
+        'blah'          | [name: 'blah']
+    }
 
     @Override
     Map getPropertiesToEdit(){
