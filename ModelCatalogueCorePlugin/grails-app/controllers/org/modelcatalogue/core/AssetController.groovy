@@ -12,7 +12,10 @@ class AssetController extends AbstractExtendibleElementController<Asset> {
 
     def upload() {
         MultipartFile file = request.getFile('asset')
-        Asset asset = new Asset(name: params.name ?: file.originalFilename, description: params.description)
+        Asset asset = params.id ? Asset.get(params.id) : new Asset()
+
+        asset.name          = params.name ?: file.originalFilename
+        asset.description   = params.description
 
         asset.validate()
 

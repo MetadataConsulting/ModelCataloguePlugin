@@ -47,6 +47,43 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
         'blah'          | [name: 'blah']
     }
 
+    def "existing asset is updated if already exists and the id is passed to the action"() {
+        Asset existing = new Asset(name: 'existing')
+        existing.save()
+
+        GrailsMockMultipartFile mockFile = new GrailsMockMultipartFile('asset', 'readme.txt', 'text/plain', 'some file contents'.bytes)
+
+        controller.request.method       = 'POST'
+        controller.params.id            = existing.id
+        controller.params.name          = 'updated'
+        controller.response.format      = 'json'
+
+        controller.request.addFile mockFile
+
+        controller.upload()
+
+        def json = controller.response.json
+
+        expect:
+        json.name            == 'updated'
+        json.ext.contentType == 'text/plain'
+
+        when:
+        Asset asset = Asset.findByName('updated')
+
+        then:
+        json
+        json.id == existing.id
+        asset
+        asset.id == existing.id
+
+        cleanup:
+        if (asset && existing.id != asset.id) {
+            asset.delete()
+        }
+        existing?.delete()
+    }
+
     @Override
     Map getPropertiesToEdit(){
         [name: "changedName", description: "edited description ", code: "AA123"]
