@@ -76,6 +76,7 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
       deferred.promise
   ]
 
+  messagesProvider.setPromptFactory 'edit-asset', factory # will get it's own prompt soon
   messagesProvider.setPromptFactory 'edit-model', factory
   messagesProvider.setPromptFactory 'edit-dataElement', factory
   messagesProvider.setPromptFactory 'edit-dataType', factory

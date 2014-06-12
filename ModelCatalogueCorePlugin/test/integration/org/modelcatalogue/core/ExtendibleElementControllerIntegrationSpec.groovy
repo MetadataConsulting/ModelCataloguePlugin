@@ -6,7 +6,7 @@ package org.modelcatalogue.core
 class ExtendibleElementControllerIntegrationSpec extends PublishedElementControllerIntegrationSpec {
 
     def setupSpec(){
-        totalCount = 24
+        totalCount = 36
     }
 
     @Override
@@ -31,5 +31,4 @@ class ExtendibleElementControllerIntegrationSpec extends PublishedElementControl
                 [6, 1, 2, 10, 11, "", "${baseLink}?max=2&offset=8"]
         ]
     }
-
 }

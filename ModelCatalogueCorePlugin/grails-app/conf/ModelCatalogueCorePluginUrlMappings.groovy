@@ -5,8 +5,8 @@ class ModelCatalogueCorePluginUrlMappings {
 
 	static mappings = {
 
-        def allElements         = ['catalogueElement', 'conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'extendibleElement', 'measurementUnit', 'model', 'publishedElement', 'relationshipType', 'valueDomain']
-        def publishedElements   = ['dataElement', 'extendibleElement', 'model', 'publishedElement']
+        def allElements         = ['asset', 'catalogueElement', 'conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'extendibleElement', 'measurementUnit', 'model', 'publishedElement', 'relationshipType', 'valueDomain']
+        def publishedElements   = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
 
         for (String controllerName in allElements) {
             "/api/modelCatalogue/core/$controllerName" (controller: controllerName, action: 'index', method: HttpMethod.GET)

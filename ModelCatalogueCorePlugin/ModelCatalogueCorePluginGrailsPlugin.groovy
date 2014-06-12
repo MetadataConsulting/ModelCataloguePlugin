@@ -63,6 +63,7 @@ Model catalogue core plugin (metadata registry)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
+                    new AssetMarshaller(),
                     new ConceptualDomainMarshaller(),
                     new DataElementMarshaller(),
                     new DataTypeMarshaller(),
