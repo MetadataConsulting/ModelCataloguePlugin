@@ -14,8 +14,11 @@ class AssetController extends AbstractExtendibleElementController<Asset> {
         MultipartFile file = request.getFile('asset')
         Asset asset = params.id ? Asset.get(params.id) : new Asset()
 
-        asset.name          = params.name ?: file.originalFilename
-        asset.description   = params.description
+        asset.name              = params.name ?: file.originalFilename
+        asset.description       = params.description
+        asset.contentType       = file.contentType
+        asset.size              = file.size
+        asset.originalFileName  = file.originalFilename
 
         asset.validate()
 
@@ -25,9 +28,6 @@ class AssetController extends AbstractExtendibleElementController<Asset> {
         }
 
         asset.save flush: true
-
-        asset.ext.contentType    = file.contentType
-        asset.ext.size           = file.size.toString()
 
         respond asset
     }

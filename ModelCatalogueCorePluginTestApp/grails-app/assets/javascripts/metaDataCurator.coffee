@@ -1,6 +1,8 @@
 #= require jquery/dist/jquery
 #= require bootstrap/dist/js/bootstrap
+#= require ng-file-upload-shim/angular-file-upload-shim
 #= require angular/angular
+#= require ng-file-upload/angular-file-upload
 #= require angular-ui-router/release/angular-ui-router
 #= require modelcatalogue/util/index
 #= require modelcatalogue/core/index

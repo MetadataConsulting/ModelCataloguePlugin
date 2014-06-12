@@ -20,6 +20,22 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
   # special
 
+  computeBytes = (asset) ->
+    GIGA = 1024 * 1024 * 1024
+    MEGA = 1024 * 1024
+    KILO = 1024
+    return "#{(asset.size / GIGA).toFixed(2)} GB" if asset.size > GIGA
+    return "#{(asset.size / MEGA).toFixed(2)} MB" if asset.size > MEGA
+    return "#{(asset.size / KILO).toFixed(2)} KB" if asset.size > KILO
+    return "#{(asset.size)} B"
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.Asset', [
+    {header: "Name",        value: 'name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: true}
+    {header: "File Name",   value: 'originalFileName',  class: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
+    {header: "Size",        value: computeBytes,        class: 'col-md-2', sort: {property: 'size', type: 'order'}}
+    {header: "Mime Type",   value: 'contentType',       class: 'col-md-2', sort: {property: 'contentType', type: 'alphabet'}}
+  ]
+
   columnsProvider.registerColumns 'org.modelcatalogue.core.Mapping', [
     {header: 'Destination',     value: "destination.name",                                    classes: 'col-md-4', show: 'destination.show()', sort: {property: 'destination.name', type: 'alphabet'}}
     {header: 'Mapping',         value: 'mapping',                                             classes: 'col-md-5'}
@@ -41,9 +57,9 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Relationship', [
-    {header: 'Relation',        value: 'type[direction]',                               classes: 'col-md-3'}
-    {header: 'Destination',     value: "relation.name",                                 classes: 'col-md-3', show: "relation.show()"}
-    {header: 'Metadata',        value:  printMetadata,                                   classes: 'col-md-5'}
+    {header: 'Relation',        value: 'type[direction]',  classes: 'col-md-3'}
+    {header: 'Destination',     value: "relation.name",    classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Metadata',        value:  printMetadata,     classes: 'col-md-5'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.RelationshipType', [

@@ -25,18 +25,21 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
         def json = controller.response.json
 
         expect:
-        json.name            == expectedName
-        json.ext.contentType == 'text/plain'
+        json.name               == expectedName
+        json.contentType        == 'text/plain'
+        json.originalFileName   == 'readme.txt'
+        json.size               == mockFile.size
 
         when:
         Asset asset = Asset.findByName(expectedName)
 
         then:
         json
-        json.id                  == asset.id
+        json.id                == asset.id
         asset
-        asset.ext.contentType    == 'text/plain'
-        asset.ext.size           == mockFile.size.toString()
+        asset.contentType      == 'text/plain'
+        asset.originalFileName == 'readme.txt'
+        asset.size             == mockFile.size
 
         cleanup:
         asset?.delete()
@@ -65,17 +68,19 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
         def json = controller.response.json
 
         expect:
-        json.name            == 'updated'
-        json.ext.contentType == 'text/plain'
+        json.name               == 'updated'
+        json.contentType        == 'text/plain'
+        json.originalFileName   == 'readme.txt'
 
         when:
         Asset asset = Asset.findByName('updated')
 
         then:
         json
-        json.id == existing.id
+        json.id                 == existing.id
         asset
-        asset.id == existing.id
+        asset.id                == existing.id
+        asset.originalFileName  == 'readme.txt'
 
         cleanup:
         if (asset && existing.id != asset.id) {

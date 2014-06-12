@@ -23,7 +23,7 @@ abstract class CatalogueElement {
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
     static relationships = [
-            outgoing: [attachment: 'has attachment of']
+            outgoing: [attachment: 'hasAttachmentOf']
     ]
 
     static constraints = {

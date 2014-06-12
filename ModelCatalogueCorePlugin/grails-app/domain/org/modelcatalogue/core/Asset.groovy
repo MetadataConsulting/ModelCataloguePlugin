@@ -2,6 +2,10 @@ package org.modelcatalogue.core
 
 class Asset extends ExtendibleElement {
 
+    Long    size
+    String  contentType
+    String  originalFileName
+
     static searchable = {
         modelCatalogueId boost:10
         name boost:5
@@ -11,8 +15,14 @@ class Asset extends ExtendibleElement {
         except = ['ext', 'contains', 'hasContextOf', 'parentOf', 'childOf']
     }
 
+    static constraints = {
+        contentType maxSize: 255, nullable: true
+        originalFileName maxSize: 255, nullable: true
+        size nullable: true
+    }
+
     static relationships = [
-            incoming: [attachment: 'is attached to']
+            incoming: [attachment: 'isAttachedTo']
     ]
 
     String toString() {
