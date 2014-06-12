@@ -24,6 +24,9 @@ abstract class ListWrapper<T> {
         if (params.sort) {
             link += "&sort=${params.sort}"
         }
+        if (params.status) {
+            link += "&status=${params.status}"
+        }
         if (params.order) {
             link += "&order=${params.order}"
         }
