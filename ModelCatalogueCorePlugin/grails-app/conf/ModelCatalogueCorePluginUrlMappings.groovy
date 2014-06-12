@@ -38,6 +38,10 @@ class ModelCatalogueCorePluginUrlMappings {
             if (controllerName == 'dataType') {
                 "/api/modelCatalogue/core/$controllerName/$id/valueDomain"  (controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
             }
+
+            if (controllerName == 'asset') {
+                "/api/modelCatalogue/core/$controllerName/$id/upload"  (controller: controllerName, action: 'upload', method: HttpMethod.POST)
+            }
         }
 
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)

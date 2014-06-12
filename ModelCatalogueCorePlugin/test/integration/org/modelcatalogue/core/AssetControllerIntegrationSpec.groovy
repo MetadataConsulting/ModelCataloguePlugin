@@ -1,11 +1,41 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
 
 /**
  * Created by adammilward on 27/02/2014.
  */
 class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+
+    def "upload asset"() {
+        GrailsMockMultipartFile mockFile = new GrailsMockMultipartFile('asset', 'readme.txt', 'text/plain', 'some file contents'.bytes)
+
+        controller.request.method   = 'POST'
+        controller.response.format  = 'json'
+
+        controller.request.addFile mockFile
+
+        controller.upload()
+
+        def json = controller.response.json
+
+        expect:
+        json.name            == 'readme.txt'
+        json.ext.contentType == 'text/plain'
+
+        when:
+        Asset asset = Asset.findByName('readme.txt')
+
+        then:
+        json.id                  == asset.id
+        asset.ext.contentType    == 'text/plain'
+        asset.ext.size           == mockFile.size.toString()
+
+        cleanup:
+        asset?.delete()
+    }
+
 
     @Override
     Map getPropertiesToEdit(){
