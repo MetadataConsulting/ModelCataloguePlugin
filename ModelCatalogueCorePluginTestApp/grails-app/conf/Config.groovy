@@ -1,3 +1,4 @@
+import com.bertramlabs.plugins.karman.CloudFileACL
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 
@@ -207,3 +208,8 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true]
 ]
+
+grails.plugins.karman.local.serveLocalStorage = true
+grails.plugins.karman.local.serveLocalMapping = "/storage"
+grails.plugins.karman.local.storagePath = "/tmp/modelcatalogue/storage"
+grails.plugins.karman.local.defaultFileACL = CloudFileACL.Private

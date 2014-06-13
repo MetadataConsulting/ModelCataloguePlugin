@@ -1,3 +1,4 @@
+import com.bertramlabs.plugins.karman.KarmanConfigHolder
 import grails.rest.render.RenderContext
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication

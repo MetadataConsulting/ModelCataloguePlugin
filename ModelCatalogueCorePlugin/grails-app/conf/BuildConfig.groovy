@@ -36,6 +36,7 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.codehaus.org"
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
+        mavenRepo 'http://jcenter.bintray.com'
         mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
     }
     dependencies {
@@ -56,6 +57,8 @@ grails.project.dependency.resolution = {
         compile ":hibernate:3.6.10.8"
 
         compile ":excel-export:0.2.1"
+
+        compile ":karman:0.5.2"
 
         test ':build-test-data:1.1.1'
         test ':fixtures:1.2'
@@ -85,3 +88,4 @@ codenarc.reports = {
 
 // release
 grails.project.repos.metadataSnapshots.url = "http://repository-metadata.forge.cloudbees.com/snapshot/"
+

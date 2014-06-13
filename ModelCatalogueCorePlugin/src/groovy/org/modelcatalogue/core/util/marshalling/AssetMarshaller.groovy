@@ -16,7 +16,8 @@ class AssetMarshaller extends ExtendibleElementMarshallers {
         ret.putAll(
                 contentType: el.contentType,
                 originalFileName: el.originalFileName,
-                size: el.size
+                size: el.size,
+                downloadUrl: el.downloadUrl
         )
         ret
     }
@@ -26,7 +27,9 @@ class AssetMarshaller extends ExtendibleElementMarshallers {
         super.addXmlAttributes(el, xml)
         addXmlAttribute(el.contentType, "contentType", xml)
         addXmlAttribute(el.originalFileName, "originalFileName", xml)
+        addXmlAttribute(el.downloadUrl, "downloadUrl", xml)
         addXmlAttribute(el.size, "size", xml)
+
     }
 
 }

@@ -1,3 +1,4 @@
+import com.bertramlabs.plugins.karman.KarmanConfigHolder
 import grails.rest.render.RenderContext
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper

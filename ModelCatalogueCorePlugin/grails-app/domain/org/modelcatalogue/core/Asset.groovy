@@ -5,6 +5,8 @@ class Asset extends ExtendibleElement {
     Long    size
     String  contentType
     String  originalFileName
+    String  downloadUrl
+
 
     static searchable = {
         modelCatalogueId boost:10
@@ -18,6 +20,7 @@ class Asset extends ExtendibleElement {
     static constraints = {
         contentType maxSize: 255, nullable: true
         originalFileName maxSize: 255, nullable: true
+        downloadUrl maxSize: 2000, nullable: true
         size nullable: true
     }
 
