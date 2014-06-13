@@ -13,15 +13,17 @@ import spock.lang.Unroll
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
 
-class ImportSpec extends AbstractIntegrationSpec {
+class DataImportSpec extends AbstractIntegrationSpec {
 
     @Shared
-    Import importer
+    def dataImportService
+    @Shared
+    DataImport importer
     @Shared
     ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2, modelOnlyImportRow3
 
     def setupSpec() {
-        importer = new Import()
+        importer = new DataImport()
         loadFixtures()
         validImportRow = new ImportRow()
         validImportRow2 = new ImportRow()
@@ -114,7 +116,7 @@ class ImportSpec extends AbstractIntegrationSpec {
         importRow.measurementUnitName = measurementUnitName
         importRow.conceptualDomainName = conceptualDomainName
         importRow.conceptualDomainDescription = conceptualDomainDescription
-        def row = importer.validateAndActionRow(importRow)
+        def row = dataImportService.validateAndActionRow(importRow)
 
         then:
         row.rowActions.size() == size
@@ -138,9 +140,9 @@ class ImportSpec extends AbstractIntegrationSpec {
     def "addRows to importer then action those rows"() {
 
         when:
-        importer.addRow(validImportRow)
-        importer.addRow(validImportRow2)
-        importer.addRow(modelOnlyImportRow)
+        dataImportService.addRow(importer, validImportRow)
+        dataImportService.addRow(importer, validImportRow2)
+        dataImportService.addRow(importer, modelOnlyImportRow)
 
         then:
         importer.pendingAction.contains(validImportRow)
@@ -148,18 +150,18 @@ class ImportSpec extends AbstractIntegrationSpec {
         importer.pendingAction.contains(modelOnlyImportRow)
 
         when:
-        importer.resolveImportRowPendingAction(modelOnlyImportRow, "dataElementName", ActionType.MODEL_ONLY_ROW)
-        importer.resolveImportRowPendingAction(modelOnlyImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        importer.resolveImportRowPendingAction(modelOnlyImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         !importer.pendingAction.contains(modelOnlyImportRow)
         importer.importQueue.contains(modelOnlyImportRow)
 
         cleanup:
-        importer.importQueue.remove(modelOnlyImportRow)
-        importer.importQueue.remove(validImportRow2)
-        importer.importQueue.remove(validImportRow)
+        dataImportService.removeFromImportQueue(importer, modelOnlyImportRow)
+        dataImportService.removeFromImportQueue(importer, validImportRow2)
+        dataImportService.removeFromImportQueue(importer, validImportRow)
         importer.delete()
 
 
@@ -168,11 +170,11 @@ class ImportSpec extends AbstractIntegrationSpec {
     def "add model only Rows to importer, action those rows and then ingest"() {
 
         setup:
-        importer = new Import()
+        importer = new DataImport()
 
         when:
-        importer.addRow(modelOnlyImportRow3)
-        importer.addRow(modelOnlyImportRow2)
+        dataImportService.addRow(modelOnlyImportRow3)
+        dataImportService.addRow(modelOnlyImportRow2)
 
         then:
         importer.pendingAction.contains(modelOnlyImportRow3)
@@ -180,19 +182,19 @@ class ImportSpec extends AbstractIntegrationSpec {
 
         when:
 
-        importer.resolveImportRowPendingAction(modelOnlyImportRow3, "dataElementName", ActionType.MODEL_ONLY_ROW)
-        importer.resolveImportRowPendingAction(modelOnlyImportRow3, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        importer.resolveImportRowPendingAction(modelOnlyImportRow3, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
-        importer.resolveImportRowPendingAction(modelOnlyImportRow2, "dataElementName", ActionType.MODEL_ONLY_ROW)
-        importer.resolveImportRowPendingAction(modelOnlyImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        importer.resolveImportRowPendingAction(modelOnlyImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow3, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow3, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow3, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow2, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         importer.importQueue.contains(modelOnlyImportRow3)
         importer.importQueue.contains(modelOnlyImportRow2)
 
         when:
-        importer.ingestImportQueue()
+        dataImportService.ingestImportQueue()
         Model parentModel = Model.findByModelCatalogueId("MC_037e6962-3b6f-9ae4-a171-2570b64dfq10_1")
         Model childModel = Model.findByModelCatalogueId("MC_037e6162-2b9f-4ae4-a171-2570b64daf10_1")
 
@@ -211,7 +213,7 @@ class ImportSpec extends AbstractIntegrationSpec {
     def "test import new enumerated data type"(){
 
         when:
-        def dataType = importer.importDataType('testEnum', "t:test|t1:testONe")
+        def dataType = dataImportService.importDataType('testEnum', "t:test|t1:testONe")
         def testDataType =  DataType.findByName("t:test|t1:testONe..")
 
         then:
@@ -229,7 +231,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
 
         when:
-        def dataType = importer.importDataType('string', 'string')
+        def dataType = dataImportService.importDataType('string', 'string')
 
         then:
         dataType.name == "String"
@@ -241,7 +243,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
 
         when:
-        def dataType = importer.importDataType('asd', 'xs:string')
+        def dataType = dataImportService.importDataType('asd', 'xs:string')
 
         then:
         dataType.name == "xs:string"
@@ -250,7 +252,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
     def "test import existing enumerated data type"(){
         when:
-        def dataType = importer.importDataType('xxxxx', 'm:male|f:female|u:unknown|ns:not specified')
+        def dataType = dataImportService.importDataType('xxxxx', 'm:male|f:female|u:unknown|ns:not specified')
 
         then:
         dataType.name == "gender"
@@ -258,7 +260,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
     def "import invalid data type"(){
         when:
-        def dataType = importer.importDataType('blah', 'blah')
+        def dataType = dataImportService.importDataType('blah', 'blah')
 
         then:
         !dataType
@@ -267,7 +269,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
     def "test import invalid enumerated data type"(){
         when:
-        def dataType = importer.importDataType('test', 'a:|asdasd|asdad:ads')
+        def dataType = dataImportService.importDataType('test', 'a:|asdasd|asdad:ads')
         then:
         !dataType
     }
@@ -279,7 +281,7 @@ class ImportSpec extends AbstractIntegrationSpec {
         params.symbol = "°C"
 
         when:
-        def mu = importer.importMeasurementUnit(params)
+        def mu = dataImportService.importMeasurementUnit(params)
 
         then:
         mu.name == "Degrees Celsius"
@@ -292,7 +294,7 @@ class ImportSpec extends AbstractIntegrationSpec {
         params.name = "Degrees Celsius"
 
         when:
-        def mu = importer.importMeasurementUnit(params)
+        def mu = dataImportService.importMeasurementUnit(params)
 
         then:
         mu.name == "Degrees Celsius"
@@ -305,7 +307,7 @@ class ImportSpec extends AbstractIntegrationSpec {
         params.symbol = "°C"
 
         when:
-        def mu = importer.importMeasurementUnit(params)
+        def mu = dataImportService.importMeasurementUnit(params)
 
         then:
         mu.name == "Degrees Celsius"
@@ -315,7 +317,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
     def "test import existing conceptualDomain"(){
         when:
-        def cd = importer.importConceptualDomain("public libraries", "")
+        def cd = dataImportService.importConceptualDomain("public libraries", "")
 
         then:
         cd.name == "public libraries"
@@ -325,7 +327,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
     def "test create conceptualDomain"(){
         when:
-        def cd = importer.importConceptualDomain("test", "testConceptualDomain")
+        def cd = dataImportService.importConceptualDomain("test", "testConceptualDomain")
 
         then:
         cd
@@ -346,7 +348,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
 
         when:
-        def de = importer.importDataElement([name: "testDataElement", description: "asdf asdffsda", modelCatalogueId: ""], ['1a':"as", '2a':"adsf"], book, [name: "values", description: "blabh albh",  dataType: dataType, measurementUnit: null], cd)
+        def de = dataImportService.importDataElement([name: "testDataElement", description: "asdf asdffsda", modelCatalogueId: ""], ['1a':"as", '2a':"adsf"], book, [name: "values", description: "blabh albh",  dataType: dataType, measurementUnit: null], cd)
 
         then:
         de
@@ -357,25 +359,25 @@ class ImportSpec extends AbstractIntegrationSpec {
     def "test ingest importing two different versions"() {
 
         setup:
-        importer = new Import()
+        importer = new DataImport()
 
         when:
-        importer.addRow(validImportRow)
-        importer.addRow(validImportRow2)
-        importer.resolveImportRowPendingAction(validImportRow, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
-        importer.resolveImportRowPendingAction(validImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        importer.resolveImportRowPendingAction(validImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
-        importer.resolveImportRowPendingAction(validImportRow2, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
-        importer.resolveImportRowPendingAction(validImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        importer.resolveImportRowPendingAction(validImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.addRow(validImportRow)
+        dataImportService.addRow(validImportRow2)
+        dataImportService.resolveImportRowPendingAction(validImportRow, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
+        dataImportService.resolveImportRowPendingAction(validImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(validImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.resolveImportRowPendingAction(validImportRow2, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
+        dataImportService.resolveImportRowPendingAction(validImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(validImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         importer.importQueue.contains(validImportRow)
         importer.importQueue.contains(validImportRow2)
 
         when:
-        importer.ingestImportQueue()
-        importer.actionPendingModels()
+        dataImportService.ingestImportQueue()
+        dataImportService.actionPendingModels()
         def dataElement1 = DataElement.findByName("testDataItem")
         def valueDomain1 = dataElement1.instantiatedBy
         def dataElement2 = DataElement.findByName("testDataItem2")

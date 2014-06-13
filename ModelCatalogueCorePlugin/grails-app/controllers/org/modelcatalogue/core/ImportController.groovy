@@ -2,8 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
-import org.modelcatalogue.core.dataarchitect.Import
-import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.dataarchitect.DataImport
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -14,12 +13,12 @@ class ImportController extends AbstractRestfulController{
     def dataImportService
 
     ImportController() {
-        super(Import, false)
+        super(DataImport, false)
     }
 
     def upload(Integer max) {
         def errorMsg
-        Import importer
+        DataImport importer
         setSafeMax(max)
         if (!(request instanceof MultipartHttpServletRequest)) return ["No File to process!"]
         String conceptualDomainName, conceptualDomainDescription

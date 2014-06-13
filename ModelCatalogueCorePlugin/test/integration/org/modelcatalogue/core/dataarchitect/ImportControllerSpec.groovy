@@ -47,7 +47,7 @@ class ImportControllerSpec extends AbstractIntegrationSpec implements ResultReco
         then: "The an importer is created and there are items in the importQueue and actions"
         json
         json.pendingAction
-        Import.list().size()>0
+        DataImport.list().size()>0
 
     }
 

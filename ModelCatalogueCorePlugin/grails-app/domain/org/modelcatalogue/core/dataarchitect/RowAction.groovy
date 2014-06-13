@@ -9,8 +9,8 @@ class RowAction {
     ActionType actionType
 
     static constraints = {
-        field nullable: false
-        action nullable: false
+        field nullable: false, maxSize: 255
+        action nullable: false, maxSize: 255
         actionType nullable: false
     }
 

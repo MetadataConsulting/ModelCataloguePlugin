@@ -1,12 +1,12 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.dataarchitect.Import
+import org.modelcatalogue.core.dataarchitect.DataImport
 
 class ImportMarshaller extends AbstractMarshallers {
 
     ImportMarshaller() {
-        super(Import)
+        super(DataImport)
     }
 
     protected Map<String, Object> prepareJsonMap(el) {

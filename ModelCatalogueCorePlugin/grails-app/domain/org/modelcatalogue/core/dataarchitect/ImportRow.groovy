@@ -21,18 +21,18 @@ class ImportRow {
     static hasMany = [rowActions: RowAction]
 
     static constraints = {
-        dataElementCode nullable: true
-        dataElementName nullable: true
-        dataElementDescription nullable: true
-        conceptualDomainName nullable: true
-        conceptualDomainDescription  nullable: true
-        dataType nullable: true
-        parentModelName nullable: true
-        parentModelCode nullable: true
-        containingModelName nullable: true
-        containingModelCode nullable: true
-        measurementUnitName nullable: true
-        measurementSymbol nullable: true
+        dataElementCode nullable: true, maxSize: 255
+        dataElementName nullable: true, maxSize: 255
+        dataElementDescription nullable: true, maxSize: 2000
+        conceptualDomainName nullable: true, maxSize: 255
+        conceptualDomainDescription  nullable: true, maxSize: 2000
+        dataType nullable: true, maxSize: 255
+        parentModelName nullable: true, maxSize: 255
+        parentModelCode nullable: true, maxSize: 255
+        containingModelName nullable: true, maxSize: 255
+        containingModelCode nullable: true, maxSize: 255
+        measurementUnitName nullable: true, maxSize: 255
+        measurementSymbol nullable: true, maxSize: 255
         metadata nullable: true
         rowActions  nullable: true
     }

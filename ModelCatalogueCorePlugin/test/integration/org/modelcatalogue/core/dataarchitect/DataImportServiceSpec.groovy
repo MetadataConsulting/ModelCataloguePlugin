@@ -11,7 +11,7 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
     ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2
 
     def setupSpec() {
-        dataImportService = new Import()
+        dataImportService = new DataImport()
         loadFixtures()
         validImportRow = new ImportRow()
         validImportRow2 = new ImportRow()
