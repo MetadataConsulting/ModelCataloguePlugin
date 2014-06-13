@@ -5,8 +5,8 @@ class ModelCatalogueCorePluginUrlMappings {
 
 	static mappings = {
 
-        def allElements         = ['catalogueElement', 'conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'extendibleElement', 'measurementUnit', 'model', 'publishedElement', 'relationshipType', 'valueDomain']
-        def publishedElements   = ['dataElement', 'extendibleElement', 'model', 'publishedElement']
+        def allElements         = ['asset', 'catalogueElement', 'conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'extendibleElement', 'measurementUnit', 'model', 'publishedElement', 'relationshipType', 'valueDomain']
+        def publishedElements   = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
 
         for (String controllerName in allElements) {
             "/api/modelCatalogue/core/$controllerName" (controller: controllerName, action: 'index', method: HttpMethod.GET)
@@ -32,11 +32,17 @@ class ModelCatalogueCorePluginUrlMappings {
             "/api/modelCatalogue/core/$controllerName/$id/mapping" (controller: controllerName, action: 'mappings', method: HttpMethod.GET)
 
             if (controllerName in publishedElements) {
-                "/api/modelCatalogue/core/$controllerName/$id/history" (controller: controllerName, action: 'history', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
             }
 
             if (controllerName == 'dataType') {
-                "/api/modelCatalogue/core/$controllerName/$id/valueDomain"  (controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
+            }
+
+            if (controllerName == 'asset') {
+                "/api/modelCatalogue/core/$controllerName/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/download"(controller: controllerName, action: 'download', method: HttpMethod.GET)
             }
         }
 

@@ -218,7 +218,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
 
       $scope.edit = ->
-        return if not $scope.element
+        return if not $scope.element or $scope.element.archived
         messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
           $scope.element = updated
 

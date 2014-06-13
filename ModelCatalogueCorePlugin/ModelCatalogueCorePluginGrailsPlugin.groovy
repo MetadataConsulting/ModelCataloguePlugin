@@ -1,3 +1,4 @@
+import com.bertramlabs.plugins.karman.KarmanConfigHolder
 import grails.rest.render.RenderContext
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsApplication
@@ -63,6 +64,7 @@ Model catalogue core plugin (metadata registry)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
+                    new AssetMarshaller(),
                     new ConceptualDomainMarshaller(),
                     new DataElementMarshaller(),
                     new DataTypeMarshaller(),

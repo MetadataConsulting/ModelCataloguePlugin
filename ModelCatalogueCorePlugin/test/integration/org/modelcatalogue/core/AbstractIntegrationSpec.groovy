@@ -20,7 +20,7 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
 
     def loadFixtures(){
         if(CatalogueElement.count()==0){
-            fixtures = fixtureLoader.load("dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "dataElements/*", "conceptualDomains/*", "models/*", "relationshipTypes/*").load("valueDomains/*", "extensions/*")
+            fixtures = fixtureLoader.load("assets/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "dataElements/*", "conceptualDomains/*", "models/*", "relationshipTypes/*").load("valueDomains/*", "extensions/*")
         }
         initCatalogueService.initDefaultRelationshipTypes()
     }
