@@ -38,7 +38,7 @@ class ImportControllerSpec extends AbstractIntegrationSpec implements ResultReco
         controller.metaClass.request = new MockMultipartHttpServletRequest()
         controller.request.parameters = ['conceptualDomainName' : 'test']
         InputStream inputStream = new FileInputStream(fileName)
-        controller.request.addFile(new MockMultipartFile('excelFile', fileName,"application/octet-stream" , inputStream))
+        controller.request.addFile(new MockMultipartFile('file', fileName,"application/octet-stream" , inputStream))
         controller.upload()
         JSONElement json = controller.response.json
         String list = "list1"

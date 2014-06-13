@@ -46,6 +46,7 @@ class DataImportService {
                 counter++
             }
             importRow.metadata = (metadataColumns)?metadataColumns:null
+            println(i)
             importRow.save()
             newImporter.addRow(importRow)
         }

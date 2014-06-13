@@ -148,9 +148,8 @@ class ImportSpec extends AbstractIntegrationSpec {
         importer.pendingAction.contains(modelOnlyImportRow)
 
         when:
-        def x = modelOnlyImportRow
         importer.resolveImportRowPendingAction(modelOnlyImportRow, "dataElementName", ActionType.MODEL_ONLY_ROW)
-        importer.resolveImportRowPendingAction(modelOnlyImportRow, "parenModelCode", ActionType.CREATE_PARENT_MODEL)
+        importer.resolveImportRowPendingAction(modelOnlyImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
         importer.resolveImportRowPendingAction(modelOnlyImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
@@ -182,7 +181,11 @@ class ImportSpec extends AbstractIntegrationSpec {
         when:
 
         importer.resolveImportRowPendingAction(modelOnlyImportRow3, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        importer.resolveImportRowPendingAction(modelOnlyImportRow3, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        importer.resolveImportRowPendingAction(modelOnlyImportRow3, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
         importer.resolveImportRowPendingAction(modelOnlyImportRow2, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        importer.resolveImportRowPendingAction(modelOnlyImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        importer.resolveImportRowPendingAction(modelOnlyImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         importer.importQueue.contains(modelOnlyImportRow3)
@@ -209,7 +212,7 @@ class ImportSpec extends AbstractIntegrationSpec {
 
         when:
         def dataType = importer.importDataType('testEnum', "t:test|t1:testONe")
-        def testDataType =  DataType.findByName("testEnum")
+        def testDataType =  DataType.findByName("t:test|t1:testONe..")
 
         then:
         dataType
@@ -359,6 +362,12 @@ class ImportSpec extends AbstractIntegrationSpec {
         when:
         importer.addRow(validImportRow)
         importer.addRow(validImportRow2)
+        importer.resolveImportRowPendingAction(validImportRow, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
+        importer.resolveImportRowPendingAction(validImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        importer.resolveImportRowPendingAction(validImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        importer.resolveImportRowPendingAction(validImportRow2, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
+        importer.resolveImportRowPendingAction(validImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        importer.resolveImportRowPendingAction(validImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         importer.importQueue.contains(validImportRow)

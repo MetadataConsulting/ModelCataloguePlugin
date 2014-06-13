@@ -38,9 +38,11 @@ class ImportRow {
     }
 
     def resolveAction(String field, ActionType actionType){
-        RowAction actionToResolve = rowActions.find{it.field == field && it.actionType==actionType}
-        if(actionToResolve){
-            rowActions.remove(actionToResolve)
+        def actionsToResolve = rowActions.findAll{it.field == field && it.actionType==actionType}
+        actionsToResolve.each { RowAction actionToResolve ->
+            if (actionToResolve) {
+                rowActions.remove(actionToResolve)
+            }
         }
     }
 

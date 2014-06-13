@@ -17,18 +17,19 @@ class ImportController extends AbstractRestfulController{
         super(Import, false)
     }
 
-    def upload(Integer max)
-    {
+    def upload(Integer max) {
         def errorMsg
         Import importer
         setSafeMax(max)
-        if(!(request instanceof MultipartHttpServletRequest)) return ["No File to process!"]
+        if (!(request instanceof MultipartHttpServletRequest)) return ["No File to process!"]
         String conceptualDomainName, conceptualDomainDescription
-        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest)request
-        MultipartFile  file = multiRequest.getFile("file")
+        MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request
+        MultipartFile file = multiRequest.getFile("file")
         def params = multiRequest.getParameterMap()
         if (!params?.conceptualDomainName) {
-            errorMsg = ["error":"No conceptual domain!"]
+            errorMsg = ["error": "No conceptual domain!"]
+        }else if(!file){
+            errorMsg = ["error": "No file"]
         }else {
             if (params?.conceptualDomainDescription) conceptualDomainDescription = params.conceptualDomainDescription.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else conceptualDomainDescription=""
             //Microsoft Excel files
