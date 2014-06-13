@@ -58,8 +58,6 @@ grails.project.dependency.resolution = {
 
         compile ":excel-export:0.2.1"
 
-        compile ":karman:0.5.2"
-
         test ':build-test-data:1.1.1'
         test ':fixtures:1.2'
 

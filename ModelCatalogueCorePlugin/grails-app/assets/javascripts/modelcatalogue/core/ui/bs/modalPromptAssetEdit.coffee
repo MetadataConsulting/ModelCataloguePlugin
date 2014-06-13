@@ -25,8 +25,8 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
               </div>
               <div class="form-group">
                 <label for="asset" class="">File</label>
-                <input ng-hide="progress" type="file" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
-                <progressbar value="progress" ng-show="progress">{{progress}} %</progressbar>
+                <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
+                <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
               </div>
               <div class="form-group">
                 <label for="description" class="">Description</label>
@@ -55,7 +55,13 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
             $modalInstance.dismiss('Upload Canceled')
 
           $scope.onFileSelect = ($files) ->
+            if not args?.create
+              $scope.messages.clearAllMessages()
+              $scope.messages.info 'By changing the file you\'re creating new version automatically'
             $scope.copy.file = $files[0]
+            if $scope.copy.name == $scope.copy.originalFileName or $scope.nameFromFile
+              $scope.nameFromFile = true
+              $scope.copy.name = $scope.copy.file.name
 
           $scope.saveElement = ->
             $scope.messages.clearAllMessages()
@@ -84,8 +90,11 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
                   else
                     messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
                   $modalInstance.close(enhance result)
-              ).error( ->
+              ).error((data) ->
+                for err in data.errors
+                  $scope.messages.error err.message
                 $scope.uploading = false
+                $scope.progress  = 0
               )
             else
               promise = null

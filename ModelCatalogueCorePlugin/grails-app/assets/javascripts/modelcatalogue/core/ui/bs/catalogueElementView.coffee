@@ -15,7 +15,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
             <li><a ng-href="{{report.url}}"  target="_blank" ng-repeat="report in reports">{{report.title || 'Export'}}</a></li>
           </ul>
         </div>
-        <a class="btn btn-primary btn-sm" ng-click="edit()" ng-show="canEdit()"><span class="glyphicon glyphicon-edit"></span> Edit</a>
+        <a class="btn btn-primary btn-sm" ng-click="edit()" ng-show="canEdit()" ng-class="{'disabled': element.archived}"><span class="glyphicon glyphicon-edit"></span> Edit</a>
         <a ng-show="element.downloadUrl" class="btn btn-primary btn-sm" ng-href="{{element.downloadUrl}}"><span class="glyphicon glyphicon-download"></span> Download</a>
         <a class="btn btn-success btn-sm" ng-click="createRelationship()"><span class="glyphicon glyphicon-link"></span> Create Relationship</a>
       </span>

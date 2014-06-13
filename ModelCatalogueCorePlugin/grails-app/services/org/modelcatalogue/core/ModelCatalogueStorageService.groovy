@@ -1,14 +1,20 @@
 package org.modelcatalogue.core
 
-import com.bertramlabs.plugins.karman.CloudFile
-import com.bertramlabs.plugins.karman.Directory
-import com.bertramlabs.plugins.karman.StorageProvider
-import com.bertramlabs.plugins.karman.local.LocalStorageProvider
-import grails.util.Environment
+import org.codehaus.groovy.grails.commons.GrailsApplication
 
-class ModelCatalogueStorageService {
+import javax.annotation.PostConstruct
 
-    def grailsApplication
+class ModelCatalogueStorageService implements StorageService {
+
+    GrailsApplication grailsApplication
+    private File fileStoreBase
+    private Long maxSize
+
+    @PostConstruct
+    private void init() {
+        fileStoreBase   = new File(grailsApplication.config.modelcatalogue.storage.directory ?: 'storage')
+        maxSize         = grailsApplication.config.modelcatalogue.storage.maxSize ?: (20 * 1024 * 1024)
+    }
 
     /**
      * Returns serving url if available or null if the content has to be served from current application.
@@ -19,23 +25,24 @@ class ModelCatalogueStorageService {
     String getServingUrl(String directory, String filename) { null }
 
     /**
+     * Returns the maximal size of the file the storage can handle.
+     * @return the maximal size of the file the storage can handle
+     */
+    long getMaxFileSize() {
+        maxSize
+    }
+
+    /**
      * Stores the file defined by given bytes and returns true if succeeded.
      * @param directory directory (bucket) of the file
      * @param filename name (id)  of the file
      * @param contentType content type of the file
      * @param content content of the file
-     * @return <code>true</code> if the file has been stored successfully
      */
-    boolean store(String directory, String filename, String contentType, byte[] content) {
-        try {
-            CloudFile file = getCloudFile(filename)
-            file.contentType(contentType)
-            file.bytes = content
-            file.save()
-            return true
-        } catch (ignored) {
-            return false
-        }
+    void store(String directory, String filename, String contentType, InputStream stream) {
+        File dir = new File(fileStoreBase, directory)
+        dir.mkdirs()
+        new File(dir, filename).newOutputStream() << stream
     }
 
     /**
@@ -45,7 +52,9 @@ class ModelCatalogueStorageService {
      * @return <code>true</code> if the file exits in the store
      */
     boolean exists(String directory, String filename) {
-        CloudFile file = getCloudFile(filename)
+        File dir = new File(fileStoreBase, directory)
+        if (!dir.exists()) return false
+        File file = new File(dir, filename)
         file.exists()
     }
 
@@ -57,23 +66,7 @@ class ModelCatalogueStorageService {
      * @throws FileNotFoundException if the file does not exist in the store
      */
     InputStream fetch(String directory, String filename) {
-        CloudFile file = getCloudFile(filename)
-        if (!file.exists()) throw new FileNotFoundException("No such file $filename in $directory")
-        file.inputStream
-    }
-
-    private CloudFile getCloudFile(String assetFileName) {
-        String providerName = grailsApplication.config.modelcatalogue.karman.provider ?: 'local'
-        String directoryName = grailsApplication.config.modelcatalogue.karman.directory ?: 'assets'
-
-        StorageProvider provider = StorageProvider.create(provider: providerName)
-
-        if (provider instanceof LocalStorageProvider) {
-            provider.basePath = grailsApplication.config.modelcatalogue.karman.basePath ? grailsApplication.config.modelcatalogue.karman.basePath : "${System.getProperty(Environment.currentEnvironment == Environment.DEVELOPMENT ? "java.io.tmpdir" : "user.dir")}/modelcatalogue/storage"
-        }
-
-        Directory directory = provider.getDirectory(directoryName)
-        directory.mkdirs()
-        directory.getFile(assetFileName)
+        if (!exists(directory, filename)) throw new FileNotFoundException("No such file $filename in $directory")
+        new File(new File(fileStoreBase, directory), filename).newInputStream()
     }
 }

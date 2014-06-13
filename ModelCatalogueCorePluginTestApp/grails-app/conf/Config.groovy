@@ -1,4 +1,3 @@
-import com.bertramlabs.plugins.karman.CloudFileACL
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 
@@ -209,5 +208,7 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true]
 ]
 
-grails.plugins.karman.local.storagePath = "/tmp/modelcatalogue/storage"
-grails.plugins.karman.local.defaultFileACL = CloudFileACL.Private
+
+// configure the default storage
+modelcatalogue.storage.directory = "/tmp/modelcatalogue/storage"
+modelcatalogue.storage.maxSize   = 50 * 1024 * 1024
