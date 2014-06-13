@@ -40,7 +40,7 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
         asset.contentType      == 'text/plain'
         asset.originalFileName == 'readme.txt'
         asset.size             == mockFile.size
-        asset.downloadUrl
+        asset.uploaded
 
         cleanup:
         asset?.delete()
@@ -82,7 +82,7 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
         asset
         asset.id                == existing.id
         asset.originalFileName  == 'readme.txt'
-        asset.downloadUrl
+        asset.uploaded
 
         cleanup:
         if (asset && existing.id != asset.id) {

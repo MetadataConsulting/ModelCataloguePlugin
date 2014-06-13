@@ -10,7 +10,9 @@ import org.springframework.web.multipart.MultipartFile
 
 class AssetController extends AbstractExtendibleElementController<Asset> {
 
-    static allowedMethods = [upload: 'POST']
+    ModelCatalogueStorageService modelCatalogueStorageService
+
+    static allowedMethods = [upload: 'POST', download: 'GET']
 
     AssetController() {
         super(Asset, false)
@@ -33,16 +35,13 @@ class AssetController extends AbstractExtendibleElementController<Asset> {
             return
         }
 
-        asset.save flush: true
-
-        CloudFile stored = getCloudFile(asset.modelCatalogueId)
-
-        stored.bytes = file.bytes
-        stored.contentType(file.contentType)
-        stored.save()
-
-        asset.downloadUrl = createLink(controller: 'asset', action: 'download', id: asset.id, absolute: true)
         asset.save()
+
+        asset.uploaded = modelCatalogueStorageService.store('assets', asset.modelCatalogueId, file.contentType, file.bytes)
+
+        if (asset.uploaded) {
+            asset.save()
+        }
 
         respond asset
     }
@@ -54,9 +53,14 @@ class AssetController extends AbstractExtendibleElementController<Asset> {
             return
         }
 
-        CloudFile stored = getCloudFile(asset.modelCatalogueId)
+        String servingUrl = modelCatalogueStorageService.getServingUrl('assets', asset.modelCatalogueId)
 
-        if (!stored.exists()) {
+        if (servingUrl) {
+            redirect servingUrl
+        }
+
+
+        if (!modelCatalogueStorageService.exists('assets', asset.modelCatalogueId)) {
             notFound()
             return
         }
@@ -65,23 +69,7 @@ class AssetController extends AbstractExtendibleElementController<Asset> {
 
         response.contentType    = asset.contentType
         response.contentLength  = asset.size
-        response.outputStream << stored.bytes
-        response.flushBuffer()
-    }
-
-    protected CloudFile getCloudFile(String assetFileName) {
-        String providerName = grailsApplication.config.modelcatalogue.karman.provider ?: 'local'
-        String directoryName = grailsApplication.config.modelcatalogue.karman.directory ?: 'assets'
-
-        StorageProvider provider = StorageProvider.create(provider: providerName)
-
-        if (provider instanceof LocalStorageProvider) {
-            provider.basePath = grailsApplication.config.modelcatalogue.karman.basePath ? grailsApplication.config.modelcatalogue.karman.basePath : "${System.getProperty(Environment.currentEnvironment == Environment.DEVELOPMENT ? "java.io.tmpdir" : "user.dir")}/modelcatalogue/storage"
-        }
-
-        Directory directory = provider.getDirectory(directoryName)
-        directory.mkdirs()
-        directory.getFile(assetFileName)
+        response.outputStream << modelCatalogueStorageService.fetch('assets', asset.modelCatalogueId)
     }
 
 }

@@ -1,9 +1,12 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.XML
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.Asset
 
 class AssetMarshaller extends ExtendibleElementMarshallers {
+
+    LinkGenerator linkGenerator
 
     AssetMarshaller() {
         super(Asset)
@@ -16,9 +19,11 @@ class AssetMarshaller extends ExtendibleElementMarshallers {
         ret.putAll(
                 contentType: el.contentType,
                 originalFileName: el.originalFileName,
-                size: el.size,
-                downloadUrl: el.downloadUrl
+                size: el.size
         )
+        if (el.uploaded) {
+            ret.downloadUrl = linkGenerator.link(controller: 'asset', action: 'download', id: el.id, absolute: true)
+        }
         ret
     }
 
@@ -27,7 +32,9 @@ class AssetMarshaller extends ExtendibleElementMarshallers {
         super.addXmlAttributes(el, xml)
         addXmlAttribute(el.contentType, "contentType", xml)
         addXmlAttribute(el.originalFileName, "originalFileName", xml)
-        addXmlAttribute(el.downloadUrl, "downloadUrl", xml)
+        if (el.uploaded) {
+            addXmlAttribute(linkGenerator.link(controller: 'asset', action: 'download', id: el.id, absolute: true), 'downloadUrl', xml)
+        }
         addXmlAttribute(el.size, "size", xml)
 
     }

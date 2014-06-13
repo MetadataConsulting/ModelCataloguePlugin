@@ -209,7 +209,5 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true]
 ]
 
-grails.plugins.karman.local.serveLocalStorage = true
-grails.plugins.karman.local.serveLocalMapping = "/storage"
 grails.plugins.karman.local.storagePath = "/tmp/modelcatalogue/storage"
 grails.plugins.karman.local.defaultFileACL = CloudFileACL.Private
