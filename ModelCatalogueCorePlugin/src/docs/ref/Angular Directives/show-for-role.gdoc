@@ -1,0 +1,15 @@
+h1. show-for-role
+
+Attribute directive for showing elements based on the roles of logged in user. If the currently logged in user (if any)
+has role given as the value for this attribute then the element is visible. It listens to [userLoggedIn|Angular Events]
+and [userLoggedOut|Angular Events] to change the visibility when the user logs in or out.
+
+See [security|Angular Services] for more details.
+
+h2. Usage
+Add an attribute to any element to show it only when the user has particular role:
+{code}
+<p show-for-role="ADMIN">Only admin will see this message</p>
+{code}
+
+

@@ -1,0 +1,15 @@
+h1. userLoggedOut
+
+Event broadcast on the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope] when
+ user logs out using [security|Angular Services]. The previously logged in user is passed as the event's argument.
+
+h2. Usage
+Register the handler on the current scope or the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope]
+to listen to user logout events.
+
+
+{code}
+$scope.$on('userLoggedOut', function(event, user) {
+    // remove some content
+})
+{code}

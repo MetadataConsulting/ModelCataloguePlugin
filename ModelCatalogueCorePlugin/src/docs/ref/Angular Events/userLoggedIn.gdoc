@@ -1,0 +1,15 @@
+h1. userLoggedIn
+
+Event broadcast on the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope] when
+ user logs in using [security|Angular Services]. The newly logged in user is passed as the event's argument.
+
+h2. Usage
+Register the handler on the current scope or the [$rootScope|http://docs.angularjs.org/api/ng/service/$rootScope]
+to listen to user login events.
+
+
+{code}
+$scope.$on('userLoggedIn', function(event, user) {
+    // show more content
+})
+{code}

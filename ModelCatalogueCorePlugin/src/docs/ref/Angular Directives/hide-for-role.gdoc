@@ -1,0 +1,15 @@
+h1. hide-for-role
+
+Attribute directive for hiding elements based on the roles of logged in user. If the currently logged in user (if any)
+has role given as the value for this attribute then the element is hidden. It listens to [userLoggedIn|Angular Events]
+and [userLoggedOut|Angular Events] to change the visibility when the user logs in or out.
+
+See [security|Angular Services] for more details.
+
+h2. Usage
+Add an attribute to any element to hide it when the user has particular role:
+{code}
+<p hide-for-role="ADMIN">Admin won't see this message</p>
+{code}
+
+

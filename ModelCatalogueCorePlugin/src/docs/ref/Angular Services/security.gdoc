@@ -15,7 +15,7 @@ Method Signature                        | Description
 isUserLoggedIn()                        | returns true if the user is logged in (including mock users)
 getCurrentUser()                        | returns the current user containing at least @displayName@ property or undefined if no user is logged in
 hasRole(name)                           | returns true if currently logged in user has given role or false otherwise or if no user is logged in
-login(username, password, rememberMe)   | logs in the user using given username and password, returns the new current user or object containing errors property filled with list of errors which occurred
+login(username, password, rememberMe)   | logs in the user using given username and password, returns promise for the new current user or object containing errors property filled with list of errors which occurred
 logout()                                | logs out the current user or do nothing for mock implementations
 {table}
 

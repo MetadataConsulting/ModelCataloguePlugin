@@ -23,6 +23,7 @@
 angular.module('mc.core.ui.bs', [
   # depends on
   'mc.core.ui'
+  'mc.util.ui'
   'ui.bootstrap'
   # list of modules
   'mc.core.ui.bs.decoratedListTable'
