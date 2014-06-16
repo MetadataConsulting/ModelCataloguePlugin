@@ -1,3 +1,6 @@
+import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.CatalogueElement
+
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -197,9 +200,15 @@ modelcatalogue.defaults.relationshiptypes =  [
 
             return true
         '''],
+        [name: "attachment", sourceToDestination: "attachments", destinationToSource: "owners", sourceClass: CatalogueElement, destinationClass: Asset],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
         [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true]
 ]
+
+
+// configure the default storage
+modelcatalogue.storage.directory = "/tmp/modelcatalogue/storage"
+modelcatalogue.storage.maxSize   = 50 * 1024 * 1024

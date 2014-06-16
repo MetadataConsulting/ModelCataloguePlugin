@@ -264,7 +264,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
             <li><a ng-click="create('enumeratedType')">New Enumerated Type</a></li>
           </ul>
         </div>
-        <div class="btn-group btn-group-sm" ng-show="resource == 'dataElement'">
+        <div class="btn-group btn-group-sm" ng-show="resource == 'dataElement' || resource == 'asset' ">
           <button type="button" class="btn dropdown-toggle" ng-class="getStatusButtonClass()">
             <span class="glyphicon" ng-class="getStatusIconClass()"></span> {{natural($stateParams.status || 'finalized')}} <span class="caret"></span>
           </button>
