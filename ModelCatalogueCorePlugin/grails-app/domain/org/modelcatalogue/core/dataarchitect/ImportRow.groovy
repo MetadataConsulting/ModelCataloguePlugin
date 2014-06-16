@@ -26,7 +26,7 @@ class ImportRow {
         dataElementDescription nullable: true, maxSize: 2000
         conceptualDomainName nullable: true, maxSize: 255
         conceptualDomainDescription  nullable: true, maxSize: 2000
-        dataType nullable: true, maxSize: 255
+        dataType nullable: true, maxSize: 10000
         parentModelName nullable: true, maxSize: 255
         parentModelCode nullable: true, maxSize: 255
         containingModelName nullable: true, maxSize: 255
@@ -35,6 +35,10 @@ class ImportRow {
         measurementSymbol nullable: true, maxSize: 255
         metadata nullable: true
         rowActions  nullable: true
+    }
+
+    static mapping = {
+        metadata type: "text"
     }
 
     def resolveAction(String field, ActionType actionType){

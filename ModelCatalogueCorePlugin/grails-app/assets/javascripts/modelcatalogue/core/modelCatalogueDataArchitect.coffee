@@ -13,5 +13,9 @@ angular.module("mc.core.modelCatalogueDataArchitect", ['mc.util.rest', 'mc.util.
     params = angular.extend({keyOne: query}, {keyTwo: query2}, additionalParams)
     enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/findRelationsByMetadataKeys", params: params
 
+  modelCatalogueDataArchitect.imports = (additionalParams = {}) ->
+    params = angular.extend(additionalParams)
+    enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/import", params: params
+
   modelCatalogueDataArchitect
 ]

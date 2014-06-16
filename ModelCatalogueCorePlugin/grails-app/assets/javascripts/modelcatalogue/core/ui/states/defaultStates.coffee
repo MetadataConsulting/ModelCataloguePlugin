@@ -241,10 +241,22 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ListCtrl'
   }
 
-  $stateProvider.state 'mc.dataArchitect.importData', {
-    url: "/importData",
-    templateUrl: 'modelcatalogue/core/ui/state/importData.html',
-    controller: 'mc.core.ui.states.ImportCtrl'
+  $stateProvider.state 'mc.dataArchitect.imports', {
+    url: '/imports'
+    templateUrl: 'modelcatalogue/core/ui/state/list.html'
+    resolve:
+      list: ['$stateParams','modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        $stateParams.resource = "imports"
+        page = parseInt($stateParams.page ? 1, 10)
+        page = 1 if isNaN(page)
+        # it's safe to call top level for each controller, only model controller will respond on it
+        params        = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
+        params.order  = $stateParams.order ? 'asc'
+        params.sort   = $stateParams.sort ? 'name'
+        return modelCatalogueDataArchitect.imports(params)
+      ]
+
+    controller: 'mc.core.ui.states.ListCtrl'
   }
 
 ])
@@ -275,7 +287,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
             <li><a ng-click="create('enumeratedType')">New Enumerated Type</a></li>
           </ul>
         </div>
-        <div class="btn-group btn-group-sm" ng-show="resource == 'dataElement' || resource == 'asset' ">
+        <div class="btn-group btn-group-sm" ng-show="resource == 'dataElement' || resource == 'asset'  || resource == 'imports'">
           <button type="button" class="btn dropdown-toggle" ng-class="getStatusButtonClass()">
             <span class="glyphicon" ng-class="getStatusIconClass()"></span> {{natural($stateParams.status || 'finalized')}} <span class="caret"></span>
           </button>

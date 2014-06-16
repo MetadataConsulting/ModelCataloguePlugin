@@ -15,9 +15,9 @@ class DataImportService {
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
     private static final REGEX = '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
 
-    def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap) {
+    def importData(ArrayList headers, ArrayList rows, String name, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap) {
         //get indexes of the appropriate sections
-        DataImport newImporter = new DataImport()
+        DataImport newImporter = new DataImport(name: name)
         def dataItemNameIndex = headers.indexOf(headersMap.dataElementNameRow)
         def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCodeRow)
         def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescriptionRow)
@@ -48,14 +48,22 @@ class DataImportService {
             def counter = metadataStartIndex
             def metadataColumns = [:]
             while (counter <= metadataEndIndex) {
-                metadataColumns.put(headers[counter], row[counter])
+                String key = headers[counter].toString()
+                String value = row[counter].toString()
+                metadataColumns.put(key, value)
                 counter++
             }
             importRow.metadata = (metadataColumns)?metadataColumns:null
-            importRow.save()
-            newImporter.addRow(importRow)
+            importRow.save(flush:true, failOnError:true)
+            addRow(newImporter, importRow)
         }
-        return newImporter.save()
+
+        newImporter.save(flush:true, failOnError:true)
+
+        def test = DataImport.get(1)
+        test.refresh()
+        return test
+
     }
 
     def resolveAll(DataImport importer){

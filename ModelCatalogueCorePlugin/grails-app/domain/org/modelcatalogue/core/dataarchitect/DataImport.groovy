@@ -13,6 +13,7 @@ import org.modelcatalogue.core.util.marshalling.EnumeratedTypeMarshaller
 class DataImport {
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":": "&#58;", "|": "&#124;", "%": "&#37;"]
+    String name
     Collection<Model> models = []
     Collection<String> messages = []
     Set pendingAction = []
@@ -22,6 +23,7 @@ class DataImport {
     static hasMany = [pendingAction: ImportRow, importQueue: ImportRow, imported: ImportRow]
 
     static constraints = {
+        name nullable: false
         imported nullable: true
         pendingAction nullable: true
         importQueue nullable: true

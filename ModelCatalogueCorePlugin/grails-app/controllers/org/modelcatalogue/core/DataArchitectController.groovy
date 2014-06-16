@@ -4,11 +4,19 @@ import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWrapper
 
-class DataArchitectController {
+class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
     def dataArchitectService, modelService
+
+    DataArchitectController(Class<T> resource, boolean readOnly) {
+        super(resource, readOnly)
+    }
+
+    DataArchitectController(Class<T> resource) {
+        super(resource, false)
+    }
 
     def index(){}
 
@@ -24,22 +32,15 @@ class DataArchitectController {
         }
 
         def baseLink = "/dataArchitect/uninstantiatedDataElements"
-        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
+        def total = (results.count)?results.count.intValue():0
 
         Elements elements =  new Elements(
                 base: baseLink,
-                total: results.count,
-                items: results.list,
-                itemType: DataElement,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10,
-                sort: params.sort,
-                order: params.order
+                total: total,
+                items: results.list
         )
 
-        respond elements
+        respondWithLinks elements
     }
 
 
@@ -61,17 +62,10 @@ class DataArchitectController {
         Elements elements =  new Elements(
                 base: baseLink,
                 total: results.count,
-                items: results.list,
-                itemType: DataElement,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10,
-                sort: params.sort,
-                order: params.order
+                items: results.list
         )
 
-        respond elements
+        respondWithLinks elements
     }
 
     def getSubModelElements(){
@@ -85,22 +79,14 @@ class DataArchitectController {
         }
 
         def baseLink = "/dataArchitect/getSubModelElements"
-        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
         Elements elements =  new Elements(
                 base: baseLink,
                 total: results.count,
                 items: results.list,
-                itemType: DataElement,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10,
-                sort: params.sort,
-                order: params.order
         )
 
-        respond elements
+        respondWithLinks elements
     }
 
     def findRelationsByMetadataKeys(Integer max){
@@ -125,22 +111,13 @@ class DataArchitectController {
             }
 
             def baseLink = "/dataArchitect/findRelationsByMetadataKeys"
-            def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
-
             Elements elements =  new Elements(
                     base: baseLink,
                     total: results.count,
                     items: results.list,
-                    itemType: Relationship,
-                    previous: links.previous,
-                    next: links.next,
-                    offset: params.int('offset') ?: 0,
-                    page: params.int('max') ?: 10,
-                    sort: params.sort,
-                    order: params.order
             )
 
-            respond elements
+            respondWithLinks elements
 
         }else{
             respond "please enter keys"
@@ -164,19 +141,5 @@ class DataArchitectController {
 //
 //    }
 
-    protected setSafeMax(Integer max) {
-        withFormat {
-            json {
-                params.max = Math.min(max ?: 10, 10000)
-            }
-            xml {
-                params.max = Math.min(max ?: 10, 10000)
-            }
-            xlsx {
-                params.max = Math.min(max ?: 10000, 10000)
-            }
-        }
-
-    }
 
 }

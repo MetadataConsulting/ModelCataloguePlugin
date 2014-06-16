@@ -77,7 +77,8 @@ Model catalogue core plugin (metadata registry)
                     new RelationshipsMarshaller(),
                     new ValueDomainMarshaller(),
                     new MappingMarshallers(),
-                    new MappingsMarshaller()
+                    new MappingsMarshaller(),
+                    new DataImportMarshaller()
             ]
         }
 

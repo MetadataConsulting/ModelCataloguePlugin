@@ -3,9 +3,9 @@ package org.modelcatalogue.core.util.marshalling
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.dataarchitect.DataImport
 
-class ImportMarshaller extends AbstractMarshallers {
+class DataImportMarshaller extends AbstractMarshallers {
 
-    ImportMarshaller() {
+    DataImportMarshaller() {
         super(DataImport)
     }
 

@@ -52,9 +52,9 @@ class ModelCatalogueCorePluginUrlMappings {
             "/metadataKeyCheck/$key?" (controller: "dataArchitect", action: 'metadataKeyCheck', method: HttpMethod.GET)
             "/getSubModelElements/$modelId?" (controller: "dataArchitect", action: 'getSubModelElements', method: HttpMethod.GET)
             "/findRelationsByMetadataKeys/$key?" (controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)
-            "/importData" (controller: "import", action: 'upload', method: HttpMethod.POST)
-            "/import" (controller: "import", action: 'index', method: HttpMethod.GET)
-            "/import/$id" (controller: "import", action: 'show', method: HttpMethod.GET)
+            "/importData" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
+            "/import" (controller: "dataImport", action: 'index', method: HttpMethod.GET)
+            "/import/$id" (controller: "dataImport", action: 'show', method: HttpMethod.GET)
         }
 
         "/"(view:"index")

@@ -6,13 +6,13 @@ import org.modelcatalogue.core.dataarchitect.DataImport
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
-class ImportController extends AbstractRestfulController{
+class DataImportController extends AbstractRestfulController{
 
     static responseFormats = ['json']
     static allowedMethods = [upload: "POST"]
     def dataImportService
 
-    ImportController() {
+    DataImportController() {
         super(DataImport, false)
     }
 
@@ -21,16 +21,20 @@ class ImportController extends AbstractRestfulController{
         DataImport importer
         setSafeMax(max)
         if (!(request instanceof MultipartHttpServletRequest)) return ["No File to process!"]
-        String conceptualDomainName, conceptualDomainDescription
+        String conceptualDomainName, conceptualDomainDescription, importName
         MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request
         MultipartFile file = multiRequest.getFile("file")
         def params = multiRequest.getParameterMap()
         if (!params?.conceptualDomainName) {
             errorMsg = ["error": "No conceptual domain!"]
+        }else if (!params?.name) {
+            errorMsg = ["error": "No import name"]
         }else if(!file){
             errorMsg = ["error": "No file"]
         }else {
             if (params?.conceptualDomainDescription) conceptualDomainDescription = params.conceptualDomainDescription.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else conceptualDomainDescription=""
+            if (params?.name) importName = params.name.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else name=""
+
             //Microsoft Excel files
             //Microsoft Excel 2007 files
             def okContentTypes = ['application/vnd.ms-excel','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream']
@@ -40,7 +44,7 @@ class ImportController extends AbstractRestfulController{
                     def (headers, rows) = parser.parse()
                     HeadersMap headersMap = new HeadersMap()
                     headersMap = populateHeaders(headersMap)
-                    importer = dataImportService.importData(headers, rows, conceptualDomainName, conceptualDomainDescription, headersMap)
+                    importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap)
 
             } else {
                 if(!okContentTypes.contains(confType))

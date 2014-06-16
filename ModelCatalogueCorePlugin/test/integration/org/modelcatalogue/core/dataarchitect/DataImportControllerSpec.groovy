@@ -4,7 +4,7 @@ import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.ImportController
+import org.modelcatalogue.core.DataImportController
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 import org.springframework.mock.web.MockMultipartFile
@@ -15,7 +15,7 @@ import spock.lang.Shared
  * Created by sus_avi on 01/05/2014.
  */
 
-class ImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder{
+class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder{
     @Shared
     def fileName, recorder
     def setupSpec(){
@@ -31,12 +31,12 @@ class ImportControllerSpec extends AbstractIntegrationSpec implements ResultReco
 
     def "Test the dataImportService in the ImporterController"()
     {
-        def controller = new ImportController()
+        def controller = new DataImportController()
         when: "The dataImportService is called"
         def numElements = DataElement.count()
         controller.response.format = 'json'
         controller.metaClass.request = new MockMultipartHttpServletRequest()
-        controller.request.parameters = ['conceptualDomainName' : 'test']
+        controller.request.parameters = ['conceptualDomainName' : 'test', 'name' : 'testImport123']
         InputStream inputStream = new FileInputStream(fileName)
         controller.request.addFile(new MockMultipartFile('file', fileName,"application/octet-stream" , inputStream))
         controller.upload()

@@ -4,7 +4,6 @@
 #= require modelcatalogue/core/index
 #= require decoratedList
 #= require catalogueElementView
-#= require importDataView
 #= require catalogueElementTreeviewItem
 #= require catalogueElementTreeview
 #= require catalogueElementPicker
@@ -21,7 +20,6 @@ angular.module('mc.core.ui', [
   # list of modules
   'mc.core.ui.decoratedList'
   'mc.core.ui.catalogueElementView'
-  'mc.core.ui.importDataView'
   'mc.core.ui.catalogueElementTreeviewItem'
   'mc.core.ui.catalogueElementTreeview'
   'mc.core.ui.catalogueElementPicker'

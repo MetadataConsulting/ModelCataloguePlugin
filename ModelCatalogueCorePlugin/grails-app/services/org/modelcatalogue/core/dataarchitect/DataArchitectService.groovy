@@ -25,28 +25,28 @@ class DataArchitectService {
 
     def uninstantiatedDataElements(Map params){
         ListAndCount results = new ListAndCount()
-//        def uninstantiatedDataElements, totalCount
-//        def instantiation = RelationshipType.findByName("instantiation")
-//        def searchParams = getParams(params)
-//
-//            totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
-//                    "WHERE a.outgoingRelationships IS EMPTY " +
-//                    "OR a NOT IN " +
-//                    "(SELECT a2 from DataElement a2 " +
-//                    "JOIN a2.outgoingRelationships e2 " +
-//                    "WHERE e2.relationshipType = ?)", [instantiation], [cache:true]
-//            )
-//
-//            uninstantiatedDataElements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-//                    "WHERE a.outgoingRelationships IS EMPTY " +
-//                    "OR a NOT IN " +
-//                    "(SELECT a2 from DataElement a2 " +
-//                    "JOIN a2.outgoingRelationships e2 " +
-//                    "WHERE e2.relationshipType = ?)", [instantiation], [max: searchParams.max, offset: searchParams.offset]
-//            )
-//
-//        results.count = (totalCount.get(0))?totalCount.get(0):0
-//        results.list = uninstantiatedDataElements
+        def uninstantiatedDataElements, totalCount
+        def instantiation = RelationshipType.findByName("instantiation")
+        def searchParams = getParams(params)
+
+            totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
+                    "WHERE a.outgoingRelationships IS EMPTY " +
+                    "OR a NOT IN " +
+                    "(SELECT a2 from DataElement a2 " +
+                    "JOIN a2.outgoingRelationships e2 " +
+                    "WHERE e2.relationshipType = ?)", [instantiation], [cache:true]
+            )
+
+            uninstantiatedDataElements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                    "WHERE a.outgoingRelationships IS EMPTY " +
+                    "OR a NOT IN " +
+                    "(SELECT a2 from DataElement a2 " +
+                    "JOIN a2.outgoingRelationships e2 " +
+                    "WHERE e2.relationshipType = ?)", [instantiation], [max: searchParams.max, offset: searchParams.offset]
+            )
+
+        results.count = (totalCount.get(0))?totalCount.get(0):0
+        results.list = uninstantiatedDataElements
 
 
         return results
@@ -56,26 +56,26 @@ class DataArchitectService {
 
         def missingMetadataKey, totalCount
         ListAndCount results = new ListAndCount()
-//        def searchParams = getParams(params)
-//
-//        totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
-//                "WHERE a.extensions IS EMPTY " +
-//                "OR a NOT IN " +
-//                "(SELECT a2 from DataElement a2 " +
-//                "JOIN a2.extensions e2 " +
-//                "WHERE e2.name = ?)", [searchParams.key], [cache:true]
-//        )
-//
-//        missingMetadataKey = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-//                "WHERE a.extensions IS EMPTY " +
-//                "OR a NOT IN " +
-//                "(SELECT a2 from DataElement a2 " +
-//                "JOIN a2.extensions e2 " +
-//                "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
-//        )
-//
-//        results.count = (totalCount.get(0))?totalCount.get(0):0
-//        results.list = missingMetadataKey
+        def searchParams = getParams(params)
+
+        totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
+                "WHERE a.extensions IS EMPTY " +
+                "OR a NOT IN " +
+                "(SELECT a2 from DataElement a2 " +
+                "JOIN a2.extensions e2 " +
+                "WHERE e2.name = ?)", [searchParams.key], [cache:true]
+        )
+
+        missingMetadataKey = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                "WHERE a.extensions IS EMPTY " +
+                "OR a NOT IN " +
+                "(SELECT a2 from DataElement a2 " +
+                "JOIN a2.extensions e2 " +
+                "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
+        )
+
+        results.count = (totalCount.get(0))?totalCount.get(0):0
+        results.list = missingMetadataKey
 
 
         return results
