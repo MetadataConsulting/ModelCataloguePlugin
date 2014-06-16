@@ -1,6 +1,7 @@
 #= require_self
 #= require angular-bootstrap/ui-bootstrap-tpls
 #= require modelcatalogue/core/index
+#= require modelcatalogue/util/ui/index
 #= require catalogueElementView
 #= require catalogueElementTreeview
 #= require catalogueElementTreeviewItem

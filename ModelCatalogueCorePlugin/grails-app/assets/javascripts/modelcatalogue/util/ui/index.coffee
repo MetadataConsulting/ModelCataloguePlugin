@@ -1,8 +1,8 @@
 #= require_self
 #= require hideForRole
 #= require showForRole
-#= require hideIfNotLoggedIn
-#= require showIfNotLoggedIn
+#= require hideIfLoggedIn
+#= require showIfLoggedIn
 
 angular.module 'mc.util.ui', [
   # dependencies
@@ -11,6 +11,6 @@ angular.module 'mc.util.ui', [
   # list of modules
   'mc.util.ui.hideForRole'
   'mc.util.ui.showForRole'
-  'mc.util.ui.hideIfNotLoggedIn'
-  'mc.util.ui.showIfNotLoggedIn'
+  'mc.util.ui.hideIfLoggedIn'
+  'mc.util.ui.showIfLoggedIn'
 ]
