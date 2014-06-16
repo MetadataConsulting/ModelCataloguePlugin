@@ -1,0 +1,15 @@
+h1. show-if-logged-in
+
+Attribute directive for showing elements based on whether the user is logged in or not. Only if the user is currently
+logged in then the element is visible. It listens to [userLoggedIn|Angular Events]
+and [userLoggedOut|Angular Events] to change the visibility when the user logs in or out.
+
+See [security|Angular Services] for more details.
+
+h2. Usage
+Add an attribute to any element to show it only when the user is logged in:
+{code}
+<a href="/logout" show-if-logged-in>Logout</a>
+{code}
+
+

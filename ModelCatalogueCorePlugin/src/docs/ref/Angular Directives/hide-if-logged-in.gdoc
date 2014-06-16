@@ -1,0 +1,15 @@
+h1. hide-if-logged-in
+
+Attribute directive for hiding elements based on whether the user is logged in or not. If the user is currently
+logged in then the element is hidden. It listens to [userLoggedIn|Angular Events]
+and [userLoggedOut|Angular Events] to change the visibility when the user logs in or out.
+
+See [security|Angular Services] for more details.
+
+h2. Usage
+Add an attribute to any element to hide it when the user is logged in:
+{code}
+<a href="/login" hide-if-logged-in>Login</a>
+{code}
+
+
