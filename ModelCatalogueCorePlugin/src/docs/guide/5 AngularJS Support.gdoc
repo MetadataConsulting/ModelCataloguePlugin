@@ -8,15 +8,19 @@ h2. Including AngularJS services and directives in you application
 If you use asset pipeline plugin, your application main script should require following javascript assets
 
 {code}
-//= require jquery/dist/jquery
-//= require bootstrap/dist/js/bootstrap
+#= require jquery/dist/jquery
+#= require bootstrap/dist/js/bootstrap
 #= require ng-file-upload-shim/angular-file-upload-shim
 #= require angular/angular
+#= require angular-animate/angular-animate
 #= require ng-file-upload/angular-file-upload
-//= require modelcatalogue/util/index
-//= require modelcatalogue/core/index
-//= require modelcatalogue/core/ui/index
-//= require modelcatalogue/core/ui/bs/index
+#= require angular-loading-bar/build/loading-bar
+#= require angular-ui-router/release/angular-ui-router
+#= require modelcatalogue/util/index
+#= require modelcatalogue/core/index
+#= require modelcatalogue/core/ui/index
+#= require modelcatalogue/core/ui/states/index
+#= require modelcatalogue/core/ui/bs/index
 {code}
 
 and following stylesheets
@@ -24,6 +28,7 @@ and following stylesheets
 /*
  *= require bootstrap/dist/css/bootstrap
  *= require modelcatalogue/core/ui/bs/directives
+ *= require angular-loading-bar/build/loading-bar
  */
 {code}
 

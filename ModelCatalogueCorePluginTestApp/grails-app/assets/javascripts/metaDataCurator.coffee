@@ -2,7 +2,9 @@
 #= require bootstrap/dist/js/bootstrap
 #= require ng-file-upload-shim/angular-file-upload-shim
 #= require angular/angular
+#= require angular-animate/angular-animate
 #= require ng-file-upload/angular-file-upload
+#= require angular-loading-bar/build/loading-bar
 #= require angular-ui-router/release/angular-ui-router
 #= require modelcatalogue/util/index
 #= require modelcatalogue/core/index
@@ -17,6 +19,8 @@ metadataCurator = angular.module('metadataCurator', [
   'mc.core.ui.bs'
   'mc.core.ui.states'
   'ui.bootstrap'
+  'angular-loading-bar'
+  'ngAnimate'
 ])
 
 metadataCurator.config ($stateProvider, $urlRouterProvider)->
