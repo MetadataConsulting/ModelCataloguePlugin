@@ -50,6 +50,9 @@ grails-app/assets/bower_components/*
 # elasticsearch index
 /data
 
+# blob data
+/storage
+
 
 # other
 *.iws

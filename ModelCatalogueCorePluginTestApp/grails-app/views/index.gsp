@@ -42,6 +42,7 @@
                     <li class="dropdown" ui-sref-active="active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogue Elements<b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                            <li ui-sref-active="active"><a id="assetLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Assets</a></li>
                             <li ui-sref-active="active"><a id="modelLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Models</a></li>
                             <li ui-sref-active="active"><a id="dataElementLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Data Elements</a></li>
                             <li ui-sref-active="active"><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}">Value Domains</a></li>

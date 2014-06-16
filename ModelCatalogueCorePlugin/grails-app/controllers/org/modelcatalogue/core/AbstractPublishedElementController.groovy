@@ -17,7 +17,7 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         def list = publishedElementService.list(params, resource)
 
         respondWithLinks new Elements(
-                base: "/${resourceName}/${params.status ? params.status : ''}",
+                base: "/${resourceName}/",
                 total: total,
                 items: list
         )

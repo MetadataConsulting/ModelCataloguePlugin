@@ -47,7 +47,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             return false  if self.elementType is 'org.modelcatalogue.core.Relationship'     and type isnt 'org.modelcatalogue.core.Relationship'
             return false  if self.elementType is 'org.modelcatalogue.core.Mapping'          and type isnt 'org.modelcatalogue.core.Mapping'
             return true   if type is 'org.modelcatalogue.core.CatalogueElement'
-            return true   if type in ['org.modelcatalogue.core.ExtendibleElement', 'org.modelcatalogue.core.PublishedElement'] and self.elementType in ['org.modelcatalogue.core.Model', 'org.modelcatalogue.core.DataElement']
+            return true   if type in ['org.modelcatalogue.core.ExtendibleElement', 'org.modelcatalogue.core.PublishedElement'] and self.elementType in ['org.modelcatalogue.core.Asset', 'org.modelcatalogue.core.Model', 'org.modelcatalogue.core.DataElement']
             return self.elementType == type
 
 

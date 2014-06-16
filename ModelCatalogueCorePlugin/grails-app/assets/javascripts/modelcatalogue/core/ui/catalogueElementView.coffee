@@ -9,7 +9,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
     controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'modelCatalogueApiRoot', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource) ->
-      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports']
+      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -218,7 +218,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
 
       $scope.edit = ->
-        return if not $scope.element
+        return if not $scope.element or $scope.element.archived
         messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
           $scope.element = updated
 
