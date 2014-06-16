@@ -4,6 +4,7 @@
 #= require angular/angular
 #= require angular-animate/angular-animate
 #= require ng-file-upload/angular-file-upload
+#= require angular-http-auth/src/http-auth-interceptor
 #= require angular-loading-bar/build/loading-bar
 #= require angular-ui-router/release/angular-ui-router
 #= require modelcatalogue/util/index
