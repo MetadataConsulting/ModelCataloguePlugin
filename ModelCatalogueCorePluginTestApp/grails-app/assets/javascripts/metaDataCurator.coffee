@@ -8,6 +8,7 @@
 #= require angular-loading-bar/build/loading-bar
 #= require angular-ui-router/release/angular-ui-router
 #= require modelcatalogue/util/index
+#= require modelcatalogue/util/ui/index
 #= require modelcatalogue/core/index
 #= require modelcatalogue/core/ui/index
 #= require modelcatalogue/core/ui/states/index
