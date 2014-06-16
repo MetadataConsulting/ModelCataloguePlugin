@@ -10,7 +10,7 @@ import org.modelcatalogue.core.util.CatalogueElementFinder
 class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegrationSpec {
 
     def setupSpec() {
-        totalCount = 13
+        totalCount = 14
     }
 
     def "return list of catalogue element classes in json"() {
@@ -126,18 +126,18 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4"],
-                [5, 2, 10, 10, 12, "", "${baseLink}?max=10&offset=0"],
-                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8"]
+                [1, 10, 10, 0, 13, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 13, "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, 13, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, 13, "${baseLink}?max=4&offset=12", "${baseLink}?max=4&offset=4"],
+                [5, 3, 10, 10, 13, "", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, 13, "${baseLink}?max=2&offset=12", "${baseLink}?max=2&offset=8"]
         ]
     }
 
 
     protected getTotalRowsExported() {
-        12
+        13
     }
 
 }
