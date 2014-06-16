@@ -23,7 +23,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
     ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2, modelOnlyImportRow3
 
     def setupSpec() {
-        importer = new DataImport()
+
         loadFixtures()
         validImportRow = new ImportRow()
         validImportRow2 = new ImportRow()
@@ -102,6 +102,8 @@ class DataImportSpec extends AbstractIntegrationSpec {
     @Unroll
     def "#number validate valid Row where expected #number"() {
 
+        setup:
+        importer = new DataImport()
         ImportRow importRow = new ImportRow()
 
         when:
@@ -139,6 +141,9 @@ class DataImportSpec extends AbstractIntegrationSpec {
 
     def "addRows to importer then action those rows"() {
 
+        setup:
+        importer = new DataImport()
+
         when:
         dataImportService.addRow(importer, validImportRow)
         dataImportService.addRow(importer, validImportRow2)
@@ -150,18 +155,18 @@ class DataImportSpec extends AbstractIntegrationSpec {
         importer.pendingAction.contains(modelOnlyImportRow)
 
         when:
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow, "dataElementName", ActionType.MODEL_ONLY_ROW)
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer, modelOnlyImportRow, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        dataImportService.resolveImportRowPendingAction(importer, modelOnlyImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer, modelOnlyImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         !importer.pendingAction.contains(modelOnlyImportRow)
         importer.importQueue.contains(modelOnlyImportRow)
 
         cleanup:
-        dataImportService.removeFromImportQueue(importer, modelOnlyImportRow)
-        dataImportService.removeFromImportQueue(importer, validImportRow2)
-        dataImportService.removeFromImportQueue(importer, validImportRow)
+        importer.removeFromImportQueue(modelOnlyImportRow)
+        importer.removeFromImportQueue(validImportRow2)
+        importer.removeFromImportQueue(validImportRow)
         importer.delete()
 
 
@@ -173,8 +178,8 @@ class DataImportSpec extends AbstractIntegrationSpec {
         importer = new DataImport()
 
         when:
-        dataImportService.addRow(modelOnlyImportRow3)
-        dataImportService.addRow(modelOnlyImportRow2)
+        dataImportService.addRow(importer, modelOnlyImportRow3)
+        dataImportService.addRow(importer, modelOnlyImportRow2)
 
         then:
         importer.pendingAction.contains(modelOnlyImportRow3)
@@ -182,19 +187,19 @@ class DataImportSpec extends AbstractIntegrationSpec {
 
         when:
 
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow3, "dataElementName", ActionType.MODEL_ONLY_ROW)
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow3, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow3, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow2, "dataElementName", ActionType.MODEL_ONLY_ROW)
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        dataImportService.resolveImportRowPendingAction(modelOnlyImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer,modelOnlyImportRow3, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        dataImportService.resolveImportRowPendingAction(importer,modelOnlyImportRow3, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer,modelOnlyImportRow3, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer,modelOnlyImportRow2, "dataElementName", ActionType.MODEL_ONLY_ROW)
+        dataImportService.resolveImportRowPendingAction(importer,modelOnlyImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer,modelOnlyImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         importer.importQueue.contains(modelOnlyImportRow3)
         importer.importQueue.contains(modelOnlyImportRow2)
 
         when:
-        dataImportService.ingestImportQueue()
+        dataImportService.ingestImportQueue(importer)
         Model parentModel = Model.findByModelCatalogueId("MC_037e6962-3b6f-9ae4-a171-2570b64dfq10_1")
         Model childModel = Model.findByModelCatalogueId("MC_037e6162-2b9f-4ae4-a171-2570b64daf10_1")
 
@@ -362,22 +367,22 @@ class DataImportSpec extends AbstractIntegrationSpec {
         importer = new DataImport()
 
         when:
-        dataImportService.addRow(validImportRow)
-        dataImportService.addRow(validImportRow2)
-        dataImportService.resolveImportRowPendingAction(validImportRow, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
-        dataImportService.resolveImportRowPendingAction(validImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        dataImportService.resolveImportRowPendingAction(validImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
-        dataImportService.resolveImportRowPendingAction(validImportRow2, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
-        dataImportService.resolveImportRowPendingAction(validImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
-        dataImportService.resolveImportRowPendingAction(validImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.addRow(importer,validImportRow)
+        dataImportService.addRow(importer,validImportRow2)
+        dataImportService.resolveImportRowPendingAction(importer,validImportRow, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
+        dataImportService.resolveImportRowPendingAction(importer,validImportRow, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer,validImportRow, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer,validImportRow2, "dataElementCode", ActionType.CREATE_DATA_ELEMENT)
+        dataImportService.resolveImportRowPendingAction(importer,validImportRow2, "parentModelCode", ActionType.CREATE_PARENT_MODEL)
+        dataImportService.resolveImportRowPendingAction(importer,validImportRow2, "containingModelCode", ActionType.CREATE_CONTAINING_MODEL)
 
         then:
         importer.importQueue.contains(validImportRow)
         importer.importQueue.contains(validImportRow2)
 
         when:
-        dataImportService.ingestImportQueue()
-        dataImportService.actionPendingModels()
+        dataImportService.ingestImportQueue(importer)
+        dataImportService.actionPendingModels(importer)
         def dataElement1 = DataElement.findByName("testDataItem")
         def valueDomain1 = dataElement1.instantiatedBy
         def dataElement2 = DataElement.findByName("testDataItem2")

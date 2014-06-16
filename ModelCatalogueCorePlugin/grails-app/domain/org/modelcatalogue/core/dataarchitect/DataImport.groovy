@@ -13,12 +13,11 @@ import org.modelcatalogue.core.util.marshalling.EnumeratedTypeMarshaller
 class DataImport {
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":": "&#58;", "|": "&#124;", "%": "&#37;"]
-
-    //TODO replace this with a call to the published element domain class constraint for model catalogue id directly
-    private static final REGEX = '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
-
     Collection<Model> models = []
     Collection<String> messages = []
+    Set pendingAction = []
+    Set importQueue = []
+    Set imported = []
 
     static hasMany = [pendingAction: ImportRow, importQueue: ImportRow, imported: ImportRow]
 

@@ -10,10 +10,10 @@ import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.ValueDomain
 
 class DataImportService {
-
     static transactional = false
     def publishedElementService, sessionFactory
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
+    private static final REGEX = '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
 
     def importData(ArrayList headers, ArrayList rows, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap) {
         //get indexes of the appropriate sections
@@ -144,7 +144,7 @@ class DataImportService {
             ImportRow row = queue.next()
             if (!row.rowActions) {
                 if(it<60) {
-                    ingestRow(row)
+                    ingestRow(importer, row)
                     queue.remove()
                 }else{
                     it=0
@@ -152,7 +152,7 @@ class DataImportService {
                 }
             }
         }
-        actionPendingModels()
+        actionPendingModels(importer)
     }
 
 
@@ -170,10 +170,10 @@ class DataImportService {
             conceptualDomain = importConceptualDomain(row.conceptualDomainName, row.conceptualDomainDescription)
             if(!row.dataElementName){
                 //only need to import the model information
-                importModels(row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
+                importModels(importer, row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
             }else {
                 dataType = (row.dataType) ? importDataType(row.dataElementName, row.dataType) : null
-                model = importModels(row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
+                model = importModels(importer, row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
                 measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
                 if (dataType || measurementUnit) {
                     //need to import value domain stuff as well
@@ -197,17 +197,17 @@ class DataImportService {
     }
 
 
-    protected Model addModelToImport(Model model) {
-        if (!models.find{it.id == model.id}) {
+    protected Model addModelToImport(DataImport importer, Model model) {
+        if (!importer.models.find{it.id == model.id}) {
             if(model.status != PublishedElementStatus.UPDATED){model.status = PublishedElementStatus.PENDING}
             model.save()
-            models.add(model)
+            importer.models.add(model)
         }
         return model
     }
 
-    def void actionPendingModels() {
-        models.each { model ->
+    def void actionPendingModels(DataImport importer) {
+        importer.models.each { model ->
             def pendingDataElements = model.contains.findAll { it.status == PublishedElementStatus.UPDATED }
             if (pendingDataElements|| model.status == PublishedElementStatus.UPDATED ) {
                 def archivedModel = publishedElementService.archiveAndIncreaseVersion(model)
@@ -223,11 +223,11 @@ class DataImportService {
                 }
             }
             model.status = PublishedElementStatus.FINALIZED
-            model.save(failOnError:true)
+            model.save(flush:true)
         }
     }
 
-    def importModels(String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain) {
+    def importModels(DataImport importer, String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain) {
         if (parentCode) { parentCode = parentCode.trim() }
         if (modelCode) { modelCode = modelCode.trim() }
         if (parentName) { parentName = parentName.trim() }
@@ -236,20 +236,20 @@ class DataImportService {
         Model parentModel = Model.findByModelCatalogueId(parentCode)
 
         //if there are no models or an id hasn't been specified then try to match the model
-        if (!model) { model = matchOrCreateModel([name: modelName, modelCatalogueId: (modelCode) ? modelCode : null], conceptualDomain)
+        if (!model) { model = matchOrCreateModel(importer, [name: modelName, modelCatalogueId: (modelCode) ? modelCode : null], conceptualDomain)
         }else{ updateModel(model, modelName) }
-        if(!parentModel){ parentModel = matchOrCreateModel([name: parentName, modelCatalogueId: (parentCode) ? parentCode : null], conceptualDomain)
+        if(!parentModel){ parentModel = matchOrCreateModel(importer, [name: parentName, modelCatalogueId: (parentCode) ? parentCode : null], conceptualDomain)
         }else{updateModel( parentModel, parentName) }
 
-        if(model){ model = addModelToImport(model) }
-        if(parentModel){ parentModel = addModelToImport(parentModel) }
+        if(model){ model = addModelToImport(importer, model) }
+        if(parentModel){ parentModel = addModelToImport(importer, parentModel) }
         if(model && parentModel) {model.addToChildOf(parentModel) }
         return model
     }
 
-    protected Model matchOrCreateModel(Map modelParams, ConceptualDomain conceptualDomain) {
+    protected Model matchOrCreateModel(DataImport importer, Map modelParams, ConceptualDomain conceptualDomain) {
         //check cache of models to see if it has already been created
-        Model model = models.find{it.name == modelParams.name}
+        Model model = importer.models.find{it.name == modelParams.name}
         if(!model && modelParams.name){
             model = new Model(modelParams).save()
             model.addToHasContextOf(conceptualDomain)
