@@ -11,7 +11,13 @@
     <asset:stylesheet href="demo.css"/>
     <asset:javascript src="demo.js"/>
     <script type="text/javascript">
-        angular.module('demo.config', ['mc.core.modelCatalogueApiRoot']).value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
+        var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot'])
+        democonfig.config(function (securityProvider) {
+            securityProvider.springSecurity({
+                contextPath: ${request.contextPath ?: ''}
+            })
+        })
+        demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
     </script>
 
     %{--<!-- example of customization -->--}%
@@ -46,6 +52,7 @@
 <div class="container">
     <h1>Model Catalogue Core Demo Page</h1>
     <messages-panel max="3"></messages-panel>
+
     <div>
         <form class="form" role="form" ng-submit="show()">
             <div class="form-group">
@@ -73,7 +80,8 @@
 
     <div ng-show="!list.empty">
         <h2>Decorated List Widget</h2>
-        <decorated-list list="list" columns="columns" selection="selection" actions="actions" id="main-list"></decorated-list>
+        <decorated-list list="list" columns="columns" selection="selection" actions="actions"
+                        id="main-list"></decorated-list>
     </div>
 
     <div ng-show="!list.empty">
@@ -85,30 +93,37 @@
         <div class="row">
             <div class="col-md-12">
                 <h2>Tree View</h2>
+
                 <div>
                     <form class="form" role="form">
                         <div class="form-group">
                             <label for="descendPath">Descend Path</label>
                             <input type="text" id="descendPath" ng-model="descendPath" class="form-control">
                             <label for="selectedInTreeview">Selection</label>
-                            <input type="text" id="selectedInTreeview" ng-model="selectedInTreeview" catalogue-element-picker>
+                            <input type="text" id="selectedInTreeview" ng-model="selectedInTreeview"
+                                   catalogue-element-picker>
                         </div>
                     </form>
                 </div>
+
                 <div class="col-md-8">
-                    <catalogue-element-treeview list="list" descend="descend" id="tree-widget" repeat="true"></catalogue-element-treeview>
+                    <catalogue-element-treeview list="list" descend="descend" id="tree-widget"
+                                                repeat="true"></catalogue-element-treeview>
                 </div>
             </div>
         </div>
     </div>
+
     <div>
         <h2>Messages Demo</h2>
+
         <form class="form" role="form" ng-submit="addMessage(messageText, messageType)">
             <div class="form-group">
                 <label for="messageText">Message Text</label>
                 <input type="text" id="messageText" ng-model="messageText" class="form-control">
                 <label for="messageType">Message Type</label>
-                <select id="messageType" ng-model="messageType" class="form-control" ng-options="value for value in messagesTypes"></select>
+                <select id="messageType" ng-model="messageType" class="form-control"
+                        ng-options="value for value in messagesTypes"></select>
                 <br/>
                 <a ng-click="showConfirm()" class="btn btn-default">Show Confirm Dialog</a>
                 <a ng-click="showPrompt()" class="btn btn-default">Show Prompt Dialog</a>

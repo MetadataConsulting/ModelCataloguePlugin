@@ -1,5 +1,9 @@
 import grails.rest.render.RenderContext
 import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.testapp.Requestmap
+import org.modelcatalogue.core.testapp.UserRole
+import org.modelcatalogue.core.testapp.Role
+import org.modelcatalogue.core.testapp.User
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.core.*
@@ -30,20 +34,60 @@ class BootStrap {
             }
         }
 
+        def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
+        def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
+        def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
+
+        def admin = User.findByUsername('admin') ?: new User(username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+
+        if (!admin.authorities.contains(roleAdmin)) {
+            UserRole.create admin, roleUser
+            UserRole.create admin, metadataCurator
+            UserRole.create admin, roleAdmin, true
+        }
+
+        //permit all for assets and initial pages
+        for (String url in [
+                '/',
+                '/**/favicon.ico',
+                '/fonts/**',
+                '/assets/**',
+                '/plugins/**/js/**',
+                '/js/vendor/**',
+                '/**/*.less',
+                '/**/js/**',
+                '/**/css/**',
+                '/**/images/**',
+                '/**/img/**',
+                '/login', '/login.*', '/login/*',
+                '/logout', '/logout.*', '/logout/*',
+                '/register/*', '/errors', '/errors/*'
+        ]) {
+            new Requestmap(url: url, configAttribute: 'permitAll').save(failOnError: true)
+        }
+
+        new Requestmap(url: '/api/modelCatalogue/core/model/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/dataElement/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/dataType/**', configAttribute: 'ROLE_USER').save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/relationshipTypes/**', configAttribute: 'ROLE_ADMIN').save(failOnError: true)
+
+
+
         environments {
             development {
                 importService.importData()
-                def de = new DataElement(name: "testera", description:"test data architect").save()
+                def de = new DataElement(name: "testera", description: "test data architect").save(failOnError: true)
                 de.ext.metadata = "test metadata"
 
                 15.times {
-                    new Model(name: "Another root #${String.format('%03d', it)}").save()
+                    new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
                 }
 
                 def parentModel1 = Model.findByName("Another root #001")
 
                 15.times{
-                    def child = new Model(name: "Another root #${String.format('%03d', it)}").save()
+                    def child = new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
                     parentModel1.addToParentOf(child)
                 }
 
@@ -55,7 +99,7 @@ class BootStrap {
 
                 PublishedElement.list().each {
                     it.status = PublishedElementStatus.FINALIZED
-                    it.save()
+                    it.save(failOnError: true)
                 }
 
                 def withHistory = DataElement.findByName("NHS NUMBER STATUS INDICATOR CODE")

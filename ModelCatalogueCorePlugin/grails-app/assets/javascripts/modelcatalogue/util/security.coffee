@@ -1,4 +1,4 @@
-angular.module('mc.util.security', []).provider 'security', [ ->
+angular.module('mc.util.security', ['http-auth-interceptor']).provider('security', [ ->
   noSecurityFactory = ['$log', ($log) ->
     security =
       isUserLoggedIn: -> true
@@ -7,10 +7,9 @@ angular.module('mc.util.security', []).provider 'security', [ ->
       login: (username, password, rememberMe = false) -> security.getCurrentUser()
       logout: -> $log.info "Logout requested on default security service"
       mock: true
-
   ]
 
-  readOnlySecurityFactory = ['$log', ($log) ->
+  readOnlySecurityFactory = ['$log', '$rootScope', 'messages', ($log) ->
     security =
       isUserLoggedIn: -> true
       getCurrentUser: -> { displayName: 'Anonymous Viewer' }
@@ -28,6 +27,66 @@ angular.module('mc.util.security', []).provider 'security', [ ->
 
   securityProvider.noSecurity = ->
     securityFactory = noSecurityFactory
+
+  # you need login to return
+  securityProvider.springSecurity = (config = {}) ->
+    securityFactory = ['$http', ($http) ->
+      httpMethod = config.httpMethod ? 'POST'
+      loginUrl = 'j_spring_security_check'
+      logoutUrl = 'logout'
+      usernameParam = config.username ? 'j_username'
+      passwordParam = config.password ? 'j_password'
+      rememberParam = config.rememberMe ? '_spring_security_remember_me'
+
+      if config.loginUrl
+        loginUrl = config.loginUrl
+      else if config.contextPath
+        loginUrl = "#{config.contextPath}/j_spring_security_check"
+
+      if config.logoutUrl
+        logoutUrl = config.logoutUrl
+      else if config.contextPath
+        logoutUrl = "#{config.contextPath}/logout"
+
+      currentUser = null
+      security =
+        isUserLoggedIn: ->
+          currentUser?
+        getCurrentUser: ->
+          currentUser
+        hasRole: (role) ->
+          return false if not currentUser?.roles
+          return role in currentUser.roles
+        login: (username, password, rememberMe = false) ->
+          params = {ajax: true}
+          params[usernameParam] = username
+          params[passwordParam] = password
+
+          if rememberMe
+            params[rememberParam] = 'on'
+
+          $http(
+            method: httpMethod,
+            url: loginUrl
+            params: params
+          ).then (result) ->
+            if result.data.success
+              currentUser = result.data
+              currentUser.displayName ?= currentUser.username
+              currentUser.roles       ?= []
+
+              for roleName, roleSynonyms of (config.roles ? [])
+                for role in roleSynonyms
+                  if role in currentUser.roles
+                    currentUser.roles.push roleName
+
+            result
+        logout: ->
+          $http(method: httpMethod, url: logoutUrl).then ->
+            currentUser = null
+
+      return security
+    ]
 
   securityProvider.setup = (factory) ->
     securityFactory = factory
@@ -57,11 +116,25 @@ angular.module('mc.util.security', []).provider 'security', [ ->
     logoutFn        = security.logout
     security.logout = ->
       oldUser = security.getCurrentUser()
-      logoutFn()
-      $rootScope.$broadcast 'userLoggedOut', oldUser
+      $q.when(logoutFn()).then ->
+        $rootScope.$broadcast 'userLoggedOut', oldUser
 
     security
   ]
 
   securityProvider
+]).run ['security', '$rootScope', 'messages', 'authService', (security, $rootScope, messages, authService) ->
+  # installs the security listeners
+  $rootScope.$on 'event:auth-loginRequired', ->
+    if security.mock
+      messages.error('You are trying to access protected resource',
+        'The application will not work as expected. Please, set up the security properly.')
+    else
+      messages.prompt('Login', null, type: 'login').then (success)->
+        authService.loginConfirmed(success)
+        messages.clearAllMessages()
+      , ->
+        messages.warning('You are trying to access protected resource',
+          if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in')
+
 ]
