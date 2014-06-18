@@ -60,10 +60,6 @@ class DataImportService {
 
         newImporter.save(flush:true, failOnError:true)
 
-        def test = DataImport.get(1)
-        test.refresh()
-        return test
-
     }
 
     def resolveAll(DataImport importer){

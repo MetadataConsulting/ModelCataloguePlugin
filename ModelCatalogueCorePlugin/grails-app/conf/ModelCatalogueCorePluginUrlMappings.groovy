@@ -52,17 +52,16 @@ class ModelCatalogueCorePluginUrlMappings {
             "/metadataKeyCheck/$key?" (controller: "dataArchitect", action: 'metadataKeyCheck', method: HttpMethod.GET)
             "/getSubModelElements/$modelId?" (controller: "dataArchitect", action: 'getSubModelElements', method: HttpMethod.GET)
             "/findRelationsByMetadataKeys/$key?" (controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)
-            "/importData" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
-            "/import" (controller: "dataImport", action: 'index', method: HttpMethod.GET)
-            "/import/$id" (controller: "dataImport", action: 'show', method: HttpMethod.GET)
         }
 
         "/"(view:"index")
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
-        "/api/modelCatalogue/core/dataArchitect/uninstantiatedDataElements" (controller:"dataArchitect", action: "uninstantiatedDataElements", method: HttpMethod.GET)
-        "/api/modelCatalogue/core/dataArchitect/metadataKeyCheck/$key?" (controller:"dataArchitect", action: "metadataKeyCheck", method: HttpMethod.GET)
-        "/api/modelCatalogue/core/dataArchitect/getSubModelElements/$id?" (controller:"dataArchitect", action: "getSubModelElements", method: HttpMethod.GET)
-        "/api/modelCatalogue/core/dataArchitect/findRelationsByMetadataKeys/$key?" (controller:"dataArchitect", action: "findRelationsByMetadataKeys", method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataImports/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
+        "/api/modelCatalogue/core/dataImports" (controller: "dataImport", action: 'index', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataImport/$id" (controller: "dataImport", action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataImport/$id/pendingAction" (controller: "dataImport", action: 'pendingAction', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataImport/$id/importQueue" (controller: "dataImport", action: 'importQueue', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataImport/$id/imported" (controller: "dataImport", action: 'imported', method: HttpMethod.GET)
 
 	}
 }

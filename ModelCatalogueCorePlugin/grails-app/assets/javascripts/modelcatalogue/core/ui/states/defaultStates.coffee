@@ -23,12 +23,15 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     ]
 
     $scope.canCreate = ->
-      messages.hasPromptFactory('edit-' + $scope.resource)
-
+      messages.hasPromptFactory('edit-' + $scope.resource) || messages.hasPromptFactory('new-' + $scope.resource)
 
     $scope.create = (resource = null) ->
       resource ?= $scope.resource
-      messages.prompt('Create ' + names.getNaturalName(resource), '', {type: 'edit-' + resource, create: (resource)}).then (created)->
+
+      if resource=="import"
+        messages.prompt('New Import', '', {type: 'new-import', create: resource})
+      else
+        messages.prompt('Create ' + names.getNaturalName(resource), '', {type: 'edit-' + resource, create: (resource)}).then (created)->
         created.show()
 #        $scope.list?.reload().then (result) ->
 #          $scope.list = result
@@ -246,7 +249,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
     resolve:
       list: ['$stateParams','modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        $stateParams.resource = "imports"
+        $stateParams.resource = "import"
         page = parseInt($stateParams.page ? 1, 10)
         page = 1 if isNaN(page)
         # it's safe to call top level for each controller, only model controller will respond on it
@@ -287,7 +290,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
             <li><a ng-click="create('enumeratedType')">New Enumerated Type</a></li>
           </ul>
         </div>
-        <div class="btn-group btn-group-sm" ng-show="resource == 'dataElement' || resource == 'asset'  || resource == 'imports'">
+        <div class="btn-group btn-group-sm" ng-show="resource == 'dataElement' || resource == 'asset' ">
           <button type="button" class="btn dropdown-toggle" ng-class="getStatusButtonClass()">
             <span class="glyphicon" ng-class="getStatusIconClass()"></span> {{natural($stateParams.status || 'finalized')}} <span class="caret"></span>
           </button>

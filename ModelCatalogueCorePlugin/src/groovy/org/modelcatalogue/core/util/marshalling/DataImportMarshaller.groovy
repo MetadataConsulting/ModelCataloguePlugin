@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.dataarchitect.DataImport
+import org.modelcatalogue.core.dataarchitect.ImportRow
 
 class DataImportMarshaller extends AbstractMarshallers {
 
@@ -13,11 +15,12 @@ class DataImportMarshaller extends AbstractMarshallers {
         if (!el) return [:]
         def ret = [
                 id: el.id,
+                name: el.name,
                 elementType: el.class.name,
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
-                imported: el.imported,
-                pendingAction: el.pendingAction,
-                importQueue: el.importQueue,
+                imported: [count: el?.imported ? el.imported.size() : 0 , itemType: ImportRow.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/imported"],
+                pendingAction: [count: el?.pendingAction ? el.pendingAction.size() : 0 , itemType: ImportRow.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/pendingAction"],
+                importQueue: [count: el?.importQueue ? el.importQueue.size() : 0 , itemType: ImportRow.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/importQueue"],
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 ]
         ret

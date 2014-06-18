@@ -15,7 +15,8 @@ angular.module("mc.core.modelCatalogueDataArchitect", ['mc.util.rest', 'mc.util.
 
   modelCatalogueDataArchitect.imports = (additionalParams = {}) ->
     params = angular.extend(additionalParams)
-    enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}/dataArchitect/import", params: params
+    enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}/dataImports", params: params
+
 
   modelCatalogueDataArchitect
 ]
