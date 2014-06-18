@@ -18,8 +18,6 @@ class DataImportSpec extends AbstractIntegrationSpec {
     @Shared
     def dataImportService
     @Shared
-    DataImport importer
-    @Shared
     ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2, modelOnlyImportRow3
 
     def setupSpec() {
@@ -103,7 +101,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
     def "#number validate valid Row where expected #number"() {
 
         setup:
-        importer = new DataImport(name: "test3")
+        def importer = new DataImport(name: "test3")
         ImportRow importRow = new ImportRow()
 
         when:
@@ -142,7 +140,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
     def "addRows to importer then action those rows"() {
 
         setup:
-        importer = new DataImport(name: "test4")
+        def importer = new DataImport(name: "test4")
 
         when:
         dataImportService.addRow(importer, validImportRow)
@@ -175,7 +173,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
     def "add model only Rows to importer, action those rows and then ingest"() {
 
         setup:
-        importer = new DataImport(name: "testImport1")
+        def importer = new DataImport(name: "testImport1")
 
         when:
         dataImportService.addRow(importer, modelOnlyImportRow3)
@@ -364,7 +362,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
     def "test ingest importing two different versions"() {
 
         setup:
-        importer = new DataImport(name: "test2")
+        def importer = new DataImport(name: "test2")
 
         when:
         dataImportService.addRow(importer,validImportRow)

@@ -100,9 +100,30 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                         messages.error('Error removing relationship', 'Relationship cannot be removed, see application logs for details')
 
                 deferred.promise
-
-
             }
+          else if fn.itemType == 'org.modelcatalogue.core.dataarchitect.ImportRow'
+              tabDefinition.actions.push {
+                title:  'Resolve All'
+                icon:   'remove'
+                type:   'danger'
+                action: (rel) ->
+                  deferred = $q.defer()
+                  messages.confirm('Resolve Actions', "Do you really want to resolve all actions : '#{rel.actions}'?").then () ->
+                    debugger
+                    rel.resolve().then ->
+                      messages.success('Row actions resolved!', "actions are resolved")
+                      # reloads the table
+                      deferred.resolve(true)
+                    , (response) ->
+                      if response.status == 404
+                        messages.error('Error resolving actions', 'Actions cannot be resolve, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
+                        deferred.resolve(true)
+                      else
+                        messages.error('Error removing relationship', 'Actions cannot be resolved. Possibly there is an error that needs user input')
+
+                  deferred.promise
+
+              }
 
           if tabDefinition.name == $scope.property
             tabDefinition.active = true

@@ -4,15 +4,16 @@ import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.dataarchitect.ImportRow
-import org.modelcatalogue.core.util.ImportRows
+import org.modelcatalogue.core.util.Elements
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class DataImportController extends AbstractRestfulController{
 
+    def dataImportService
+    private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream']
     static responseFormats = ['json']
     static allowedMethods = [upload: "POST"]
-    def dataImportService
 
     DataImportController() {
         super(DataImport, false)
@@ -37,20 +38,15 @@ class DataImportController extends AbstractRestfulController{
             } else {
                 if (params?.conceptualDomainDescription) conceptualDomainDescription = params.conceptualDomainDescription.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else conceptualDomainDescription = ""
                 if (params?.name) importName = params.name.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else name = ""
-
-                //Microsoft Excel files
-                //Microsoft Excel 2007 files
-                def okContentTypes = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream']
                 def confType = file.getContentType()
-                if (okContentTypes.contains(confType) && file.size > 0) {
+                if (CONTENT_TYPES.contains(confType) && file.size > 0) {
                     ExcelLoader parser = new ExcelLoader(file.inputStream)
                     def (headers, rows) = parser.parse()
-                    HeadersMap headersMap = new HeadersMap()
-                    headersMap = populateHeaders(headersMap)
+                    HeadersMap headersMap = populateHeaders()
                     importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap)
 
                 } else {
-                    if (!okContentTypes.contains(confType))
+                    if (!CONTENT_TYPES.contains(confType))
                         importer.errors.rejectValue('uploaded', 'import.uploadfailed', "\"error\":\"Input should be an Excel file!\\n\"+\n" +
                                 "                            \"but uploaded content is \"+confType")
                     else if (file.size <= 0)
@@ -64,51 +60,56 @@ class DataImportController extends AbstractRestfulController{
     }
 
 
-    def pendingAction(){
+    def pendingAction(Integer max){
+        setSafeMax(max)
         DataImport importer = queryForResource(params.id)
         def total = (importer?.pendingAction)? importer?.pendingAction.size() : 0
-
-        List<ImportRow> items = importer.pendingAction
+        def offset = 0
+        List<ImportRow> items = []
+        if (importer.pendingAction) items.addAll(importer?.pendingAction)
 
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataImport/${params.id}/pendingAction",
-                items: importer.pendingAction,
+                items: items.subList(offset, Math.min( offset + params.max, total )),
                 total: total
         )
 
     }
 
-    def imported(){
+    def imported(Integer max){
+        setSafeMax(max)
         DataImport importer = queryForResource(params.id)
         def total = (importer?.imported)? importer?.imported.size() : 0
-
-        def test = new ImportRows(
-                base: "/dataImport/${params.id}/pendingAction",
-                items: importer.pendingAction,
-                total: total
-        )
-
+        def offset = 0
+        List<ImportRow> items = []
+        if (importer.imported) items.addAll(importer?.imported)
 
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataImport/${params.id}/pendingAction",
-                items: importer.pendingAction,
+                items: items.subList(offset, Math.min( offset + params.max, total )),
                 total: total
         )
     }
 
-    def importQueue(){
+    def importQueue(Integer max){
+        setSafeMax(max)
         DataImport importer = queryForResource(params.id)
         def total = (importer?.importQueue)? importer?.importQueue.size() : 0
+        def offset = 0
+        List<ImportRow> items = []
+        if (importer.pendingAction) items.addAll(importer?.importQueue)
+
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataImport/${params.id}/pendingAction",
-                items: importer.pendingAction,
+                items: items.subList(offset, Math.min( offset + params.max, total )),
                 total: total
         )
     }
 
 
 
-    protected static HeadersMap populateHeaders(HeadersMap headersMap){
+    protected static HeadersMap populateHeaders(){
+        HeadersMap headersMap = new HeadersMap()
         headersMap.dataElementCodeRow = "Data Item Unique Code"
         headersMap.dataElementNameRow = "Data Item Name"
         headersMap.dataElementDescriptionRow = "Data Item Description"
