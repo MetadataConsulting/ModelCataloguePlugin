@@ -160,5 +160,6 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
       , ->
         messages.warning('You are trying to access protected resource',
           if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in')
+  $rootScope.$security = security
 
 ]

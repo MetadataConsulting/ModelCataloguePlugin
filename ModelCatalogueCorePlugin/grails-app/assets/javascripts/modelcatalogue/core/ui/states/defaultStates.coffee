@@ -254,8 +254,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-if="resource != 'model'">
       <span class="pull-right">
-        <a ng-click="create()" ng-show="canCreate() &amp;&amp; resource != 'dataType'" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus-sign"></span> New {{title}}</a>
-        <div class="btn-group btn-group-sm" ng-show="canCreate() &amp;&amp; resource == 'dataType'">
+        <a  ng-click="create()" ng-show="canCreate() &amp;&amp; resource != 'dataType' &amp;&amp; $security.hasRole('CURATOR')" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus-sign"></span> New {{title}}</a>
+        <div class="btn-group btn-group-sm" ng-show="canCreate() &amp;&amp; resource == 'dataType' &amp;&amp; $security.hasRole('CURATOR')">
           <button type="button" class="btn btn-success dropdown-toggle">
             <span class="glyphicon glyphicon-download-alt"></span> New Data Type <span class="caret"></span>
           </button>
@@ -264,7 +264,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
             <li><a ng-click="create('enumeratedType')">New Enumerated Type</a></li>
           </ul>
         </div>
-        <div class="btn-group btn-group-sm" ng-show="resource == 'dataElement' || resource == 'asset' ">
+        <div class="btn-group btn-group-sm" ng-show="(resource == 'dataElement' || resource == 'asset') &amp;&amp; $security.hasRole('CURATOR')">
           <button type="button" class="btn dropdown-toggle" ng-class="getStatusButtonClass()">
             <span class="glyphicon" ng-class="getStatusIconClass()"></span> {{natural($stateParams.status || 'finalized')}} <span class="caret"></span>
           </button>
@@ -291,9 +291,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         <div class="col-md-4">
           <h2>
             Model Hierarchy
-            <span class="pull-right btn-group">
-              <a ng-click="create()" ng-show="canCreate() &amp;&amp; resource != 'dataType'" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus-sign"></span></a>
-              <div class="btn-group btn-group-sm">
+            <span show-for-role="CURATOR" class="pull-right btn-group">
+              <a  ng-click="create()" ng-show="canCreate() &amp;&amp; resource != 'dataType'" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-plus-sign"></span></a>
+              <div show-for-role="CURATOR" class="btn-group btn-group-sm">
                 <button type="button" class="btn dropdown-toggle" ng-class="getStatusButtonClass()" title="Show">
                   <span class="glyphicon" ng-class="getStatusIconClass()"></span>
                 </button>

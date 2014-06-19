@@ -61,30 +61,30 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogue Elements<b
                                 class="caret"></b></a>
                         <ul class="dropdown-menu">
-                            <li show-for-role="CURATOR" ui-sref-active="active"><a id="assetLink"
+                            <li ui-sref-active="active"><a id="assetLink"
                                                                                    ui-sref="mc.resource.list({resource: 'asset'})"
                                                                                    ui-sref-opts="{inherit: false}">Assets</a>
                             </li>
                             <li ui-sref-active="active"><a id="modelLink"
                                                            ui-sref="mc.resource.list({resource: 'model'})"
                                                            ui-sref-opts="{inherit: false}">Models</a></li>
-                            <li show-for-role="CURATOR" ui-sref-active="active"><a id="dataElementLink"
+                            <li ui-sref-active="active"><a id="dataElementLink"
                                                                                    ui-sref="mc.resource.list({resource: 'dataElement'})"
                                                                                    ui-sref-opts="{inherit: false}">Data Elements</a>
                             </li>
-                            <li show-for-role="CURATOR" ui-sref-active="active"><a id="valueDomainLink"
+                            <li ui-sref-active="active"><a id="valueDomainLink"
                                                                                    ui-sref="mc.resource.list({resource: 'valueDomain'})"
                                                                                    ui-sref-opts="{inherit: false}">Value Domains</a>
                             </li>
-                            <li show-for-role="CURATOR" ui-sref-active="active"><a id="conceptualDomainLink"
+                            <li ui-sref-active="active"><a id="conceptualDomainLink"
                                                                                    ui-sref="mc.resource.list({resource: 'conceptualDomain'})"
                                                                                    ui-sref-opts="{inherit: false}">Conceptual Domains</a>
                             </li>
-                            <li show-for-role="VIEWER" ui-sref-active="active"><a id="dataTypeLink"
+                            <li ui-sref-active="active"><a id="dataTypeLink"
                                                                                   ui-sref="mc.resource.list({resource: 'dataType'})"
                                                                                   ui-sref-opts="{inherit: false}">Data Types</a>
                             </li>
-                            <li show-for-role="CURATOR" ui-sref-active="active"><a id="measurementUnitLink"
+                            <li ui-sref-active="active"><a id="measurementUnitLink"
                                                                                    ui-sref="mc.resource.list({resource: 'measurementUnit'})"
                                                                                    ui-sref-opts="{inherit: false}">Measurement Unit</a>
                             </li>
