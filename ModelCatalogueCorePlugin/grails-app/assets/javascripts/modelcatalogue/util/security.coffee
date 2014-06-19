@@ -9,7 +9,7 @@ angular.module('mc.util.security', ['http-auth-interceptor']).provider('security
       mock: true
   ]
 
-  readOnlySecurityFactory = ['$log', '$rootScope', 'messages', ($log) ->
+  readOnlySecurityFactory = ['$log', ($log) ->
     security =
       isUserLoggedIn: -> true
       getCurrentUser: -> { displayName: 'Anonymous Viewer' }
@@ -30,25 +30,46 @@ angular.module('mc.util.security', ['http-auth-interceptor']).provider('security
 
   # you need login to return
   securityProvider.springSecurity = (config = {}) ->
-    securityFactory = ['$http', ($http) ->
-      httpMethod = config.httpMethod ? 'POST'
-      loginUrl = 'j_spring_security_check'
-      logoutUrl = 'logout'
+    securityFactory = ['$http', '$rootScope',  ($http, $rootScope) ->
+      httpMethod    = config.httpMethod ? 'POST'
+      loginUrl      = 'j_spring_security_check'
+      logoutUrl     = 'logout'
+      userUrl       = 'login/ajaxSuccess'
       usernameParam = config.username ? 'j_username'
       passwordParam = config.password ? 'j_password'
       rememberParam = config.rememberMe ? '_spring_security_remember_me'
 
+
+      if config.userUrl
+        userUrl = config.userUrl
+      else if config.contextPath
+        userUrl = "#{config.contextPath}/#{userUrl}"
+
       if config.loginUrl
         loginUrl = config.loginUrl
       else if config.contextPath
-        loginUrl = "#{config.contextPath}/j_spring_security_check"
+        loginUrl = "#{config.contextPath}/#{loginUrl}"
 
       if config.logoutUrl
         logoutUrl = config.logoutUrl
       else if config.contextPath
-        logoutUrl = "#{config.contextPath}/logout"
+        logoutUrl = "#{config.contextPath}/#{logoutUrl}"
 
-      currentUser = null
+      currentUser = config.currentUser
+
+      handleUserResponse = (result) ->
+        if result.data.success
+          currentUser = result.data
+          currentUser.displayName ?= currentUser.username
+          currentUser.roles       ?= []
+
+          for roleName, roleSynonyms of (config.roles ? [])
+            for role in roleSynonyms
+              if role in currentUser.roles
+                currentUser.roles.push roleName
+
+        result
+
       security =
         isUserLoggedIn: ->
           currentUser?
@@ -69,21 +90,17 @@ angular.module('mc.util.security', ['http-auth-interceptor']).provider('security
             method: httpMethod,
             url: loginUrl
             params: params
-          ).then (result) ->
-            if result.data.success
-              currentUser = result.data
-              currentUser.displayName ?= currentUser.username
-              currentUser.roles       ?= []
-
-              for roleName, roleSynonyms of (config.roles ? [])
-                for role in roleSynonyms
-                  if role in currentUser.roles
-                    currentUser.roles.push roleName
-
-            result
+          ).then handleUserResponse
         logout: ->
           $http(method: httpMethod, url: logoutUrl).then ->
             currentUser = null
+
+      if not currentUser
+        currentUserPromise = $http(method: 'GET', url: userUrl)
+
+        currentUserPromise.then(handleUserResponse).then ->
+          if currentUser
+            $rootScope.$broadcast 'userLoggedIn', currentUser
 
       return security
     ]

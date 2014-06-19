@@ -161,17 +161,21 @@ beans = {
 }
 {code}
 
-Next step is to make the success login ajax handler action returning the user roles. Find the @LoginController@
-of your application and update the @ajaxSuccess@ action closure:
+Next step is to make the success login ajax handler action returning the user roles and return @[success: false]@
+if any user is not logged in. Find the @LoginController@ of your application and update the @ajaxSuccess@ action closure:
 
 {code}
-    def ajaxSuccess = {
-        render([
-            success: true,
-            username: springSecurityService.authentication.name,
-            roles: springSecurityService.authentication.authorities*.authority
-        ] as JSON)
+def ajaxSuccess = {
+    if (!springSecurityService.currentUser) {
+        render([success: false] as JSON)
+        return
     }
+    render([
+        success: true,
+        username: springSecurityService.authentication.name,
+        roles: springSecurityService.authentication.authorities*.authority] as JSON
+    )
+}
 {code}
 
 You can add more information such as display name there as well. The returned JSON will be accessible using @security.getCurrentUser()@ method
@@ -195,6 +199,7 @@ in following way in your index page or main layout:
             httpMethod:    'PUT',           // default is 'POST'
             loginUrl:      '/my/login'      // default is contextPath + '/j_spring_security_check'
             logoutUrl:     '/my/logout'     // default is contextPath + '/logout'
+            userUrl:       '/my/user'       // default is contextPath + '/login/ajaxSuccess'
             usernameParam: 'username'       // default is 'j_username'
             passwordParam: 'password'       // default is 'j_password'
             rememberParam: 'rememberMe'     // default is '_spring_security_remember_me'
@@ -202,7 +207,7 @@ in following way in your index page or main layout:
             // context path for prefixing the default login and logout url
             // if not defined, default login and logout url will lack the slash in the beginning
             // so loginUrl will be just 'j_spring_security_check'
-            // and loogoutUrl will be just 'logout'
+            // and logoutUrl will be just 'logout'
             contextPath: '${request.contextPath ?: ''}',
 
             // mapping from Spring Security roles to roles expected by the plugin
@@ -213,6 +218,13 @@ in following way in your index page or main layout:
                 CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
                 ADMIN:      ['ROLE_ADMIN'],
             }
+            // prepopulate the current user to prevent flickering
+            <sec:ifLoggedIn>
+            currentUser: {
+                roles: ${org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
+                username: '${sec.username()}'
+            }
+            </sec:ifLoggedIn>
         })
     })
 </script>

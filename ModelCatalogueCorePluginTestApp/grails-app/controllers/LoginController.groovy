@@ -120,7 +120,15 @@ class LoginController {
      *
      */
     def ajaxSuccess = {
-        render([success: true, username: springSecurityService.authentication.name, roles: springSecurityService.authentication.authorities*.authority] as JSON)
+        if (!springSecurityService.currentUser) {
+            render([success: false] as JSON)
+            return
+        }
+        render([
+            success: true,
+            username: springSecurityService.authentication.name,
+            roles: springSecurityService.authentication.authorities*.authority] as JSON
+        )
     }
 
     /**

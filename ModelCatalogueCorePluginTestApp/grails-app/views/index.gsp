@@ -26,7 +26,13 @@
                     VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
                     CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
                     ADMIN:      ['ROLE_ADMIN'],
+                },
+                <sec:ifLoggedIn>
+                currentUser: {
+                    roles: ${org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
+                    username: '${sec.username()}'
                 }
+                </sec:ifLoggedIn>
             })
         })
         demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
