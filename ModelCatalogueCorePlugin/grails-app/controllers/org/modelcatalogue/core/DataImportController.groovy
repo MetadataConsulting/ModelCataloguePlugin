@@ -5,6 +5,7 @@ import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.dataarchitect.ImportRow
 import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.ImportRows
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -67,13 +68,11 @@ class DataImportController extends AbstractRestfulController{
         def offset = 0
         List<ImportRow> items = []
         if (importer.pendingAction) items.addAll(importer?.pendingAction)
-
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataImport/${params.id}/pendingAction",
                 items: items.subList(offset, Math.min( offset + params.max, total )),
                 total: total
         )
-
     }
 
     def imported(Integer max){
@@ -104,6 +103,18 @@ class DataImportController extends AbstractRestfulController{
                 items: items.subList(offset, Math.min( offset + params.max, total )),
                 total: total
         )
+    }
+
+    def resolveRow(Long id, Long rowId){
+        DataImport importer = queryForResource(params.id)
+        ImportRow importRow = ImportRow.get(params.rowId)
+        def response =  [result: "success"]
+        if(importer && importRow){
+            dataImportService.resolveRow(importer, importRow)
+        }else{
+            response = ["error": "import or import row not found"]
+        }
+        respond response
     }
 
 

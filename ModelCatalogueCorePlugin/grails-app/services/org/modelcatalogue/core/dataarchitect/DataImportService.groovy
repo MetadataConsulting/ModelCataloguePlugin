@@ -62,6 +62,14 @@ class DataImportService {
 
     }
 
+    def resolveRow(DataImport importer, ImportRow importRow) {
+        importRow.resolveAll()
+        if (!importRow.rowActions) {
+            importer.removeFromPendingAction(importRow)
+            importer.addToImportQueue(importRow)
+        }
+    }
+
     def resolveAll(DataImport importer){
        resolveAllPendingRows(importer)
        ingestImportQueue(importer)

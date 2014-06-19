@@ -110,7 +110,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                   deferred = $q.defer()
                   messages.confirm('Resolve Actions', "Do you really want to resolve all actions : '#{rel.actions}'?").then () ->
                     debugger
-                    rel.resolve().then ->
+                    rel.resolveAll().then ->
                       messages.success('Row actions resolved!', "actions are resolved")
                       # reloads the table
                       deferred.resolve(true)

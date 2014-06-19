@@ -1,12 +1,12 @@
 angular.module('mc.core.resolvableItemEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
-  condition = (item) -> item.hasOwnProperty('resolveLink')
+  condition = (item) -> item.hasOwnProperty('resolveAllLink')
   factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, enhance) ->
     (element) ->
       link = "#{modelCatalogueApiRoot}#{element.resolveLink}"
-      element.resolve = () ->
+      element.resolveAll = () ->
         debugger
         enhance(rest(method: 'POST', url: link, data: element)).then (result)->
-          $rootScope.$broadcast 'actionResolved', element
+          $rootScope.$broadcast 'actionsResolved', element
           result
 
       element
