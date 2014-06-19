@@ -95,7 +95,10 @@ angular.module('mc.util.security', ['http-auth-interceptor']).provider('security
           $http(method: httpMethod, url: logoutUrl).then ->
             currentUser = null
 
-      if not currentUser
+      if currentUser
+        currentUser.success = true
+        handleUserResponse data: currentUser
+      else
         currentUserPromise = $http(method: 'GET', url: userUrl)
 
         currentUserPromise.then(handleUserResponse).then ->
