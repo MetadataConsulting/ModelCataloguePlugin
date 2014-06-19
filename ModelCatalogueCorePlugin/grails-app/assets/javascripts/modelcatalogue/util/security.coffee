@@ -99,6 +99,7 @@ angular.module('mc.util.security', ['http-auth-interceptor']).provider('security
 
     security = $injector.invoke securityFactory
 
+    throw "security service must not provide requireLogin() method" if angular.isFunction(security.requireLogin)
     throw "security service must provide isUserLoggedIn() method" if not angular.isFunction(security.isUserLoggedIn)
     throw "security service must provide getCurrentUser() method" if not angular.isFunction(security.getCurrentUser)
     throw "security service must provide hasRole(role) method" if not angular.isFunction(security.hasRole)
@@ -118,6 +119,9 @@ angular.module('mc.util.security', ['http-auth-interceptor']).provider('security
       oldUser = security.getCurrentUser()
       $q.when(logoutFn()).then ->
         $rootScope.$broadcast 'userLoggedOut', oldUser
+
+    security.requireLogin = ->
+      $rootScope.$broadcast 'event:auth-loginRequired'
 
     security
   ]

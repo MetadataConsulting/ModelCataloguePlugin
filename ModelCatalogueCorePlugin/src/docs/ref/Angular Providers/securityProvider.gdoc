@@ -1,30 +1,9 @@
 h1. securityProvider
 
-Configures the [security|Angular Services] service. You can supply your own security service definition using
- @setup(factory)@ or set the application to read only state using @readOnly()@ method. In read only
- state the @hasRole(role)@ method only returns true for role @VIEWER@.
-Declared in @mc.util.security@ module inside [mc.util|Angular Packages] package.
+Configures the [security|Angular Services] service. You can setup the security using @noSecurity()@, @readOnly()@
+or @springSecurity()@ methods. You can also provide your own factory for [security|Angular Services] using the
+@setup@ method (see the service for list of methods expected)
 
 h2. Usage
 
-Change the security service definition using @setup(factory)@ method.
-
-{code}
-angular
-.module('foo', ['mc.core.security'])
-.config(function(securityProvider) {
-     securityProvider.setup(['$log', function ($log) {
-        security = {
-          isUserLoggedIn: function() { return true },
-          getCurrentUser: function() { return { displayName: 'Horrible Monster', hasRole: function(role) { return role == 'BOO'} } },
-          hasRole: function(role) { return role == 'BOO' },
-          login: function(username, password, rememberMe) { return security.getCurrentUser() },
-          logout: function() { $log.info("Logout requested on custom security service") }
-        }
-        return security
-      }]
-});
-{code}
-
-All the methods are required and not supplying any of @isUserLoggedIn@, @getCurrentUser@, @hasRole@, @login@ or @logout@
-method on the security service would throw an error during initialization.
+Follow the security section in [Intro|guide:5 AngularJS Support] how to setup the security completely.

@@ -44,7 +44,7 @@ metadataCurator.controller('metadataCurator.logoutCtrl', ['$scope', 'security', 
     security.logout()
 ])
 
-metadataCurator.controller('metadataCurator.loginCtrl', ['$rootScope', '$scope', ($rootScope, $scope)->
+metadataCurator.controller('metadataCurator.loginCtrl', ['security', '$scope', (security, $scope)->
   $scope.login = ->
-    $rootScope.$broadcast 'event:auth-loginRequired'
+    security.requireLogin()
 ])

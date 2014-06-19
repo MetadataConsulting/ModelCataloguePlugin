@@ -22,7 +22,11 @@
         demoConfig.config(function (securityProvider) {
             securityProvider.springSecurity({
                 contextPath: '${request.contextPath ?: ''}',
-                roles: {VIEWER: ['ROLE_USER'], CURATOR: ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN']}
+                roles: {
+                    VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
+                    CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
+                    ADMIN:      ['ROLE_ADMIN'],
+                }
             })
         })
         demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
@@ -80,7 +84,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li show-for-role="ROLE_ADMIN" ui-sref-active="active"><a id="relationshipTypeLink"
+                    <li show-for-role="ADMIN" ui-sref-active="active"><a id="relationshipTypeLink"
                                                                               ui-sref="mc.resource.list({resource: 'relationshipType'})"
                                                                               ui-sref-opts="{inherit: false}">Relationship Types</a>
                     </li>
