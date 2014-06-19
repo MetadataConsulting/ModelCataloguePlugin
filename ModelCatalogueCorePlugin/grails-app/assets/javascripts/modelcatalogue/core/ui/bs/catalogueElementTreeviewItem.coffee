@@ -3,7 +3,15 @@ angular.module('mc.core.ui.bs.catalogueElementTreeviewItem', ['mc.core.ui.catalo
     <li class="catalogue-element-treeview-item">
       <div class="catalogue-element-treeview-text-content" ng-class="{'active': active}">
         <span class="badge pull-right" ng-if="currentDescend &amp;&amp; numberOfChildren">{{numberOfChildren}}</span>
-        <span class="catalogue-element-treeview-labels" ng-dblclick="element.show()">
+        <span
+          popover="{{element.name}}"
+          popover-trigger="mouseenter"
+          popover-placement="top"
+
+          class="catalogue-element-treeview-labels"
+
+          ng-dblclick="element.show()"
+        >
           <span ng-if="!element.elementType"><a class="btn btn-link"><span class="glyphicon glyphicon-ban-circle"></span></a> No Data</span>
           <a ng-if="currentDescend &amp;&amp; element.elementType" ng-click="collapseOrExpand()" class="btn btn-link">
             <span class="glyphicon glyphicon-folder-close" ng-if="collapsed &amp;&amp; !loadingChildren"></span>
