@@ -30,6 +30,7 @@ angular.module('mc.core.ui.bs.modalPromptPublishedElement', ['mc.util.messages']
         <div class="modal-footer">
             <button class="btn btn-success" ng-click="saveElement(false)" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
             <button class="btn btn-success" ng-hide="create" ng-click="saveElement(true)"><span class="glyphicon glyphicon-circle-arrow-up"></span> Save as New Version</button>
+            <button class="btn btn-success" ng-hide="create" ng-click="copy.status = 'FINALIZED' ; saveElement(true)"><span class="glyphicon glyphicon-check"></span> Finalize</button>
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
