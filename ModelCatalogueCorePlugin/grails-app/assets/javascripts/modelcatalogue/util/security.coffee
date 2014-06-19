@@ -1,4 +1,4 @@
-angular.module('mc.util.security', ['http-auth-interceptor']).provider('security', [ ->
+angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']).provider('security', [ ->
   noSecurityFactory = ['$log', ($log) ->
     security =
       isUserLoggedIn: -> true
