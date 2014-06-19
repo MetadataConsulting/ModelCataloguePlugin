@@ -36,6 +36,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
         </div>
         <div class="modal-footer">
             <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged() || uploading"><span class="glyphicon glyphicon-ok"></span> Save</button>
+            <button class="btn btn-success" ng-hide="create" ng-click="saveElement(true)"><span class="glyphicon glyphicon-circle-arrow-up"></span> Save as New Version</button>
             <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
         </div>
         '''
@@ -43,6 +44,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
           $scope.copy     = angular.copy(args.element ? {})
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
+          $scope.create   = args.create
 
           $scope.hasChanged   = ->
             $scope.copy.file or $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
@@ -63,7 +65,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
               $scope.nameFromFile = true
               $scope.copy.name = $scope.copy.file.name
 
-          $scope.saveElement = ->
+          $scope.saveElement = (newVersion) ->
             $scope.messages.clearAllMessages()
             if not $scope.copy.name and not $scope.copy.file
               $scope.messages.error 'Empty Name', 'Please fill the name'
@@ -102,7 +104,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
               if args?.create
                 promise = catalogueElementResource(args.create).save($scope.copy)
               else
-                promise = catalogueElementResource($scope.copy.elementType).update($scope.copy)
+                promise = catalogueElementResource($scope.copy.elementType).update($scope.copy, {newVersion: newVersion})
 
               promise.then (result) ->
                 if args?.create

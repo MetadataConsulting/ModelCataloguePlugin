@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptPublishedElement', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       deferred = $q.defer()
@@ -28,7 +28,8 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
+            <button class="btn btn-success" ng-click="saveElement(false)" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
+            <button class="btn btn-success" ng-hide="create" ng-click="saveElement(true)"><span class="glyphicon glyphicon-circle-arrow-up"></span> Save as New Version</button>
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
@@ -36,11 +37,12 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
           $scope.copy     = angular.copy(args.element ? {})
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
+          $scope.create   = args.create
 
           $scope.hasChanged   = ->
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
 
-          $scope.saveElement = ->
+          $scope.saveElement = (newVersion)->
             $scope.messages.clearAllMessages()
             if not $scope.copy.name
               $scope.messages.error 'Empty Name', 'Please fill the name'
@@ -52,7 +54,7 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
             if args?.create
               promise = catalogueElementResource(args.create).save($scope.copy)
             else
-              promise = catalogueElementResource($scope.copy.elementType).update($scope.copy)
+              promise = catalogueElementResource($scope.copy.elementType).update($scope.copy, {newVersion: newVersion})
 
             promise.then (result) ->
               if args?.create
@@ -76,6 +78,6 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
       deferred.promise
   ]
 
-  messagesProvider.setPromptFactory 'edit-dataType', factory
-  messagesProvider.setPromptFactory 'edit-conceptualDomain', factory
+  messagesProvider.setPromptFactory 'edit-model', factory
+  messagesProvider.setPromptFactory 'edit-dataElement', factory
 ]

@@ -43,6 +43,11 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             return
         }
 
+        if (params.boolean('newVersion')) {
+            publishedElementService.archiveAndIncreaseVersion(queryForResource(params.id))
+        }
+
+
         instance.save flush:true
         request.withFormat {
             form multipartForm {
