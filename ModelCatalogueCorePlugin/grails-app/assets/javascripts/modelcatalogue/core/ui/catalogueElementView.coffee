@@ -214,11 +214,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
 
       $scope.canEdit = ->
-        return false if not $scope.element
+        return false if not $scope.element or $scope.element.archived or $scope.element?.status == 'FINALIZED'
         messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
 
       $scope.edit = ->
-        return if not $scope.element or $scope.element.archived
+        return if not $scope.element or $scope.element.archived or $scope.element?.status == 'FINALIZED'
         messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
           $scope.element = updated
 
