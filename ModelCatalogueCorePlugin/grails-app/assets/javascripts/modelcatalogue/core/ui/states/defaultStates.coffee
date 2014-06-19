@@ -306,7 +306,24 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
             </span>
           </h2>
         </div>
-        <div class="col-md-8"><h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements</h3></div>
+        <div class="col-md-8">
+          <h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements
+            <span class="pull-right">
+              <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="contained &amp;&amp; contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length == 0  &amp;&amp; !selectedElement.availableReports">
+                  <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  <li role="presentation" class="dropdown-header">{{selectedElement.name}} Exports</li>
+                  <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in selectedElement.availableReports">{{report.title || 'Export'}}</a></li>
+                  <li class="divider" role="presentation" ng-show="contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length != 0 &amp;&amp; selectedElement.availableReports"></li>
+                  <li role="presentation" class="dropdown-header" ng-show="contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length != 0">Exports for Data Elements</li>
+                  <li><a ng-href="{{report.url}}"  target="_blank" ng-repeat="report in contained.elements.availableReports">{{report.title || 'Export'}}</a></li>
+                </ul>
+              </div>
+            </span>
+          </h3>
+        </div>
       </div>
       <div class="row">
         <div class="col-md-4">
