@@ -49,8 +49,7 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
 
 
     protected Map getParametersToBind() {
-        Map ret = new LinkedHashMap(super.getParametersToBind())
-        // you cannot assign these directly from the controller
+        Map ret = super.parametersToBind
         ret.remove 'modelCatalogueId'
         ret.remove 'versionNumber'
         ret
