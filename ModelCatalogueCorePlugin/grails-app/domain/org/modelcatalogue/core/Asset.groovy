@@ -7,7 +7,7 @@ class Asset extends ExtendibleElement {
     Long    size
     String  contentType
     String  originalFileName
-    Boolean uploaded = Boolean.FALSE
+    String  md5
 
 
     static searchable = {
@@ -21,6 +21,7 @@ class Asset extends ExtendibleElement {
 
     static constraints = {
         contentType maxSize: 255, nullable: true
+        md5 maxSize: 32, nullable: true
         originalFileName maxSize: 255, nullable: true
         size nullable: true
     }

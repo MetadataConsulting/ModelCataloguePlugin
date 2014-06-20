@@ -1,6 +1,10 @@
 package org.modelcatalogue.core
 
+import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
+
+import java.security.DigestInputStream
+import java.security.MessageDigest
 
 class AssetController extends AbstractExtendibleElementController<Asset> {
 
@@ -17,7 +21,7 @@ class AssetController extends AbstractExtendibleElementController<Asset> {
 
         if (file.size > modelCatalogueStorageService.maxFileSize) {
             Asset asset = new Asset()
-            asset.errors.rejectValue('uploaded', 'asset.uploadfailed', "You cannot upload files greater than ${toBytes(modelCatalogueStorageService.maxFileSize)}")
+            asset.errors.rejectValue('md5', 'asset.uploadfailed', "You cannot upload files greater than ${toBytes(modelCatalogueStorageService.maxFileSize)}")
             respond asset.errors, view: 'create' // STATUS CODE 422
             return
         }
@@ -58,35 +62,56 @@ class AssetController extends AbstractExtendibleElementController<Asset> {
 
         asset.save()
 
+        DigestInputStream dis = null
+
         try {
-            modelCatalogueStorageService.store('assets', asset.modelCatalogueId, file.contentType, file.inputStream)
-            asset.uploaded = true
+            MessageDigest md5 = MessageDigest.getInstance('MD5')
+            dis = new DigestInputStream(file.inputStream, md5)
+            modelCatalogueStorageService.store('assets', asset.modelCatalogueId, file.contentType, dis)
+            asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
             asset.save()
         } catch (e) {
             log.error('Exception storing asset ' + asset.name, e)
-            asset.errors.rejectValue('uploaded', 'asset.uploadfailed', "There were problems uploading file $file.originalFilename")
+            asset.errors.rejectValue('md5', 'asset.uploadfailed', "There were problems uploading file $file.originalFilename")
             respond asset.errors, view: 'create' // STATUS CODE 422
             return
+        } finally {
+            dis?.close()
         }
 
         respond asset
     }
 
     def download() {
-        Asset asset = Asset.get(params.id)
-        if (!asset) {
+        Asset currentAsset = Asset.get(params.id)
+        if (!currentAsset) {
             notFound()
             return
         }
 
-        String servingUrl = modelCatalogueStorageService.getServingUrl('assets', asset.modelCatalogueId)
+        String servingUrl = modelCatalogueStorageService.getServingUrl('assets', currentAsset.modelCatalogueId)
 
         if (servingUrl) {
             redirect servingUrl
         }
 
+        String assetName = null
+        for (int i = currentAsset.versionNumber ; i > 0 ; i--) {
+            String testedName = "${currentAsset.bareModelCatalogueId}_${i}"
+            if (modelCatalogueStorageService.exists('assets', testedName)) {
+                assetName = testedName
+                break
+            }
+        }
 
-        if (!modelCatalogueStorageService.exists('assets', asset.modelCatalogueId)) {
+        if (!assetName) {
+            notFound()
+            return
+        }
+
+        Asset asset = currentAsset.modelCatalogueId == assetName ? currentAsset : Asset.findByModelCatalogueId(assetName)
+
+        if (!asset) {
             notFound()
             return
         }

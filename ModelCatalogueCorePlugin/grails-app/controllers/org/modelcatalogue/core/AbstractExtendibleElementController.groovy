@@ -27,9 +27,14 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             return
         }
 
-        T helper = createResource(instance.properties)
+        def oldProps = new HashMap(instance.properties)
+
+        oldProps.remove('modelCatalogueId')
+
+        T helper = createResource(oldProps)
 
         def paramsToBind = getParametersToBind()
+
 
         helper.properties = paramsToBind
 
@@ -50,6 +55,7 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
 
         instance.properties = paramsToBind
         instance.save flush:true
+
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
