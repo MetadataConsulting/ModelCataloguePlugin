@@ -10,7 +10,7 @@ modelcatalogue.storage.maxSize   = 10 * 1024 * 1024 // defaults to 20 * 1024 * 1
 {code}
 
 It's very common that your application doesn't want or simply can't store files on the disc. You can use your own
-implementation of [Asset|api:org.modelcatalogue.core.StorageService] and override the definition of @modelCatalogueStorageService@
+implementation of [StorageService|api:org.modelcatalogue.core.StorageService] and override the definition of @modelCatalogueStorageService@
 bean.
 
 {code}
