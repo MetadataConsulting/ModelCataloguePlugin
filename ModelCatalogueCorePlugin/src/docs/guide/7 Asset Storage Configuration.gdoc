@@ -1,0 +1,24 @@
+h2. Asset Storage Configuration
+
+Model Catalogue provides special published element of type [Asset|api:org.modelcatalogue.core.Asset] which serves for
+storing files with additional metadata. By default the uploaded files are stored on the disc. You can custimize the
+default storage in @Config.groovy@:
+
+{code}
+modelcatalogue.storage.directory = '/assets'        // defaults to 'storage'
+modelcatalogue.storage.maxSize   = 10 * 1024 * 1024 // defaults to 20 * 1024 * 1024
+{code}
+
+It's very common that your application doesn't want or simply can't store files on the disc. You can use your own
+implementation of [Asset|api:org.modelcatalogue.core.StorageService] and override the definition of @modelCatalogueStorageService@
+bean.
+
+{code}
+import com.example.yourapp.YourStorageService
+
+// Place your Spring DSL code here
+beans = {
+    // ...
+    modelCatalogueStorageService(YourStorageService)
+}
+{code}
