@@ -9,6 +9,9 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
       getIndexPath: () ->
         "#{modelCatalogueApiRoot}/#{@pathName}"
 
+      getByUUID: (uuid) ->
+        enhance rest method: 'GET', url: "#{@getIndexPath()}/uuid/#{uuid}"
+
       get: (id) ->
         enhance rest method: 'GET', url: "#{@getIndexPath()}/#{id}"
 
