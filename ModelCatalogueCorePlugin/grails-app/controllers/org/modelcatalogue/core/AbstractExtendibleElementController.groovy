@@ -27,27 +27,28 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             return
         }
 
+        T helper = createResource(instance.properties)
+
         def paramsToBind = getParametersToBind()
 
-        instance.properties = paramsToBind
+        helper.properties = paramsToBind
+
+        if (helper.hasErrors()) {
+            respond helper.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        if (params.boolean('newVersion')) {
+            publishedElementService.archiveAndIncreaseVersion(instance)
+        }
+
 
         def ext = paramsToBind.ext
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
-
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view:'edit' // STATUS CODE 422
-            return
-        }
-
-        if (params.boolean('newVersion')) {
-            publishedElementService.archiveAndIncreaseVersion(queryForResource(params.id))
-        }
-
-
+        instance.properties = paramsToBind
         instance.save flush:true
         request.withFormat {
             form multipartForm {
