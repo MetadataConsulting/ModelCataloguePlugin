@@ -19,20 +19,20 @@ grails.project.groupId = appName // change this to alter the default package nam
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [ // the first one is the default format
-    atom:          'application/atom+xml',
-    css:           'text/css',
-    csv:           'text/csv',
-    form:          'application/x-www-form-urlencoded',
-    html:          ['text/html','application/xhtml+xml'],
-    js:            'text/javascript',
-    json:          ['application/json', 'text/json'],
-    multipartForm: 'multipart/form-data',
-    rss:           'application/rss+xml',
-    text:          'text/plain',
-    hal:           ['application/hal+json','application/hal+xml'],
-    xml:           ['text/xml', 'application/xml'],
-    xlsx:          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
+                      atom         : 'application/atom+xml',
+                      css          : 'text/css',
+                      csv          : 'text/csv',
+                      form         : 'application/x-www-form-urlencoded',
+                      html         : ['text/html', 'application/xhtml+xml'],
+                      js           : 'text/javascript',
+                      json         : ['application/json', 'text/json'],
+                      multipartForm: 'multipart/form-data',
+                      rss          : 'application/rss+xml',
+                      text         : 'text/plain',
+                      hal          : ['application/hal+json', 'application/hal+xml'],
+                      xml          : ['text/xml', 'application/xml'],
+                      xlsx         : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                      all          : '*/*', // 'all' maps to '*' or the first available format in withFormat
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000
@@ -67,7 +67,7 @@ grails {
         }
     }
 }
- 
+
 grails.converters.encoding = "UTF-8"
 // scaffolding templates configuration
 grails.scaffolding.templates.domainSuffix = 'Instance'
@@ -79,7 +79,7 @@ grails.enable.native2ascii = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
 // whether to disable processing of multi part requests
-grails.web.disable.multipart=false
+grails.web.disable.multipart = false
 
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
@@ -107,21 +107,22 @@ log4j = {
 
     debug 'org.modelcatalogue'
     debug 'org.codehaus.groovy.grails.web.mapping'
+//    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
-    error  'org.codehaus.groovy.grails.web.servlet',        // controllers
-           'org.codehaus.groovy.grails.web.pages',          // GSP
-           'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-           'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-           'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-           'org.codehaus.groovy.grails.commons',            // core / classloading
-           'org.codehaus.groovy.grails.plugins',            // plugins
-           'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-           'org.springframework',
-           'org.hibernate',
-           'net.sf.ehcache.hibernate'
+    error 'org.codehaus.groovy.grails.web.servlet',        // controllers
+            'org.codehaus.groovy.grails.web.pages',          // GSP
+            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
+            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+            'org.codehaus.groovy.grails.web.mapping',        // URL mapping
+            'org.codehaus.groovy.grails.commons',            // core / classloading
+            'org.codehaus.groovy.grails.plugins',            // plugins
+            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
+            'org.springframework',
+            'org.hibernate',
+            'net.sf.ehcache.hibernate'
 }
-grails.views.gsp.encoding="UTF-8"
+grails.views.gsp.encoding = "UTF-8"
 
 elasticSearch.client.mode = 'local'
 elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
@@ -143,29 +144,29 @@ modelcatalogue.defaults.measurementunits = [
         [name: "celsius", description: "degrees celsius", symbol: "°C"],
         [name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"],
         [name: "newtons", description: "measurement of force", symbol: "N"],
-        [name:'meter',description:'length', symbol:'m'],
-        [name:'kilogram',description:'mass', symbol:'kg'],
-        [name:'second',description:'time', symbol:'s'],
-        [name:'ampere',description:'electric current', symbol:'A'],
-        [name:'kelvin',description:'thermodynamic temperature', symbol:'K'],
-        [name:'mole',description:'amount of substance', symbol:'mol'],
-        [name:'candela',description:'luminous intensity', symbol:'cd'],
-        [name:'area',description:'square meter', symbol:'m2'],
-        [name:'volume',description:'cubic meter', symbol:'m3'],
-        [name:'speed, velocity',description:'meter per second', symbol:'m/s'],
-        [name:'acceleration',description:'meter per second squared  ', symbol:'m/s2'],
-        [name:'wave number',description:'reciprocal meter', symbol:'m-1'],
-        [name:'mass density',description:'kilogram per cubic meter', symbol:'kg/m3'],
-        [name:'specific volume',description:'cubic meter per kilogram', symbol:'m3/kg'],
-        [name:'current density',description:'ampere per square meter', symbol:'A/m2'],
-        [name:'magnetic field strength  ',description:'ampere per meter', symbol:'A/m'],
-        [name:'amount-of-substance concentration',description:'mole per cubic meter', symbol:'mol/m3'],
-        [name:'luminance',description:'candela per square meter', symbol:'cd/m2'],
-        [name:'mass fraction',description:'kilogram per kilogram', symbol:'kg/kg = 1']
+        [name: 'meter', description: 'length', symbol: 'm'],
+        [name: 'kilogram', description: 'mass', symbol: 'kg'],
+        [name: 'second', description: 'time', symbol: 's'],
+        [name: 'ampere', description: 'electric current', symbol: 'A'],
+        [name: 'kelvin', description: 'thermodynamic temperature', symbol: 'K'],
+        [name: 'mole', description: 'amount of substance', symbol: 'mol'],
+        [name: 'candela', description: 'luminous intensity', symbol: 'cd'],
+        [name: 'area', description: 'square meter', symbol: 'm2'],
+        [name: 'volume', description: 'cubic meter', symbol: 'm3'],
+        [name: 'speed, velocity', description: 'meter per second', symbol: 'm/s'],
+        [name: 'acceleration', description: 'meter per second squared  ', symbol: 'm/s2'],
+        [name: 'wave number', description: 'reciprocal meter', symbol: 'm-1'],
+        [name: 'mass density', description: 'kilogram per cubic meter', symbol: 'kg/m3'],
+        [name: 'specific volume', description: 'cubic meter per kilogram', symbol: 'm3/kg'],
+        [name: 'current density', description: 'ampere per square meter', symbol: 'A/m2'],
+        [name: 'magnetic field strength  ', description: 'ampere per meter', symbol: 'A/m'],
+        [name: 'amount-of-substance concentration', description: 'mole per cubic meter', symbol: 'mol/m3'],
+        [name: 'luminance', description: 'candela per square meter', symbol: 'cd/m2'],
+        [name: 'mass fraction', description: 'kilogram per kilogram', symbol: 'kg/kg = 1']
 ]
 
 
-modelcatalogue.defaults.relationshiptypes =  [
+modelcatalogue.defaults.relationshiptypes = [
         [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
             Integer sourceMinOccurs = ext['Source Min Occurs'] as Integer
             Integer sourceMaxOccurs = ext['Source Max Occurs'] as Integer
@@ -208,7 +209,12 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true]
 ]
 
-
 // configure the default storage
 modelcatalogue.storage.directory = "/tmp/modelcatalogue/storage"
-modelcatalogue.storage.maxSize   = 50 * 1024 * 1024
+modelcatalogue.storage.maxSize = 50 * 1024 * 1024
+// Added by the Spring Security Core plugin:
+grails.plugins.springsecurity.userLookup.userDomainClassName = 'org.modelcatalogue.core.testapp.User'
+grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatalogue.core.testapp.UserRole'
+grails.plugins.springsecurity.authority.className = 'org.modelcatalogue.core.testapp.Role'
+grails.plugins.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
+grails.plugins.springsecurity.securityConfigType = 'Requestmap'

@@ -17,9 +17,11 @@
 #= require simpleObjectEditor
 #= require modalPromptAssetEdit
 #= require modalPromptBasicEdit
+#= require modalPromptLogin
 #= require modalPromptMeasurementUnitEdit
 #= require modalPromptValueDomainEdit
 #= require modalPromptEnumeratedTypeEdit
+#= require modalPromptPublishedElement
 
 
 angular.module('mc.core.ui.bs', [
@@ -42,8 +44,10 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewImport'
   'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'
+  'mc.core.ui.bs.modalPromptLogin'
   'mc.core.ui.bs.modalPromptBasicEdit'
   'mc.core.ui.bs.modalPromptMeasurementUnitEdit'
   'mc.core.ui.bs.modalPromptValueDomainEdit'
   'mc.core.ui.bs.modalPromptEnumeratedTypeEdit'
+  'mc.core.ui.bs.modalPromptPublishedElement'
 ])

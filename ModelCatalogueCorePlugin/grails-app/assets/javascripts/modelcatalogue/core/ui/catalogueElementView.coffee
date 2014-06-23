@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'modelCatalogueApiRoot', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource) ->
+    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -80,7 +80,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               {header: "Name", value: 'name', class: 'col-md-5', show: true}
               {header: "Model Catalogue Id", value: 'modelCatalogueId', class: 'col-md-6'}
             ]
-          else if fn.itemType == 'org.modelcatalogue.core.Relationship'
+          else if fn.itemType == 'org.modelcatalogue.core.Relationship' and security.hasRole('CURATOR')
             tabDefinition.actions.push {
               title:  'Remove'
               icon:   'remove'
@@ -143,7 +143,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             value:      obj ? {}
             original:   angular.copy(obj ? {})
             properties: []
-            type:       'simple-object-editor'
+            type:       if security.hasRole('CURATOR') then 'simple-object-editor' else 'properties-pane'
             isDirty:    () -> angular.equals(@original, @value)
             reset:      () -> @value = angular.copy @original
             update:     () ->
@@ -235,11 +235,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
 
       $scope.canEdit = ->
-        return false if not $scope.element
+        return false if not $scope.element or $scope.element.archived or $scope.element?.status == 'FINALIZED'
         messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
 
       $scope.edit = ->
-        return if not $scope.element or $scope.element.archived
+        return if not $scope.element or $scope.element.archived or $scope.element?.status == 'FINALIZED'
         messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
           $scope.element = updated
 

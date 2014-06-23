@@ -28,10 +28,23 @@ metadataCurator = angular.module('metadataCurator', [
 metadataCurator.config ($stateProvider, $urlRouterProvider)->
   $urlRouterProvider.otherwise("/catalogue/model/all")
 
-metadataCurator.controller('metadataCurator.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names)->
-  $scope.search = () ->
-    unless (typeof $scope.searchSelect == 'string')
+metadataCurator.controller('metadataCurator.searchCtrl',
+  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names',
+    (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names)->
+      $scope.search = () ->
+        unless (typeof $scope.searchSelect == 'string')
 #      $state.go('search', {searchString: $scope.searchSelect })
 #    else
-      $state.go('mc.resource.show', {resource: names.getPropertyNameFromType($scope.searchSelect.elementType) , id: $scope.searchSelect.id})
+          $state.go('mc.resource.show',
+            {resource: names.getPropertyNameFromType($scope.searchSelect.elementType), id: $scope.searchSelect.id})
+  ])
+
+metadataCurator.controller('metadataCurator.logoutCtrl', ['$scope', 'security', ($scope, security)->
+  $scope.logout = ->
+    security.logout()
+])
+
+metadataCurator.controller('metadataCurator.loginCtrl', ['security', '$scope', (security, $scope)->
+  $scope.login = ->
+    security.requireLogin()
 ])

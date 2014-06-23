@@ -40,7 +40,7 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
         asset.contentType      == 'text/plain'
         asset.originalFileName == 'readme.txt'
         asset.size             == mockFile.size
-        asset.uploaded
+        asset.md5
 
         cleanup:
         asset?.delete()
@@ -82,13 +82,14 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
         asset
         asset.id                == existing.id
         asset.originalFileName  == 'readme.txt'
-        asset.uploaded
+        asset.md5
 
         cleanup:
-        if (asset && existing.id != asset.id) {
-            asset.delete()
+        if (existing) {
+            for (Asset a in Asset.findAllByModelCatalogueIdLike("${existing.bareModelCatalogueId}%")) {
+                a.delete()
+            }
         }
-        existing?.delete()
     }
 
     @Override

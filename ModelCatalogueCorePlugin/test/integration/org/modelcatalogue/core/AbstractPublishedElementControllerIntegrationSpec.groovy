@@ -10,6 +10,43 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
     def publishedElementService
 
+
+    def "update and create new version"() {
+        if (controller.readOnly) return
+
+        String newName                  = "UPDATED NAME WITH NEW VERSION"
+        PublishedElement another        = PublishedElement.get(anotherLoadItem.id)
+        String currentName              = another.name
+        String currentModelCatalogueId  = another.modelCatalogueId
+        Integer currentVersionNumber    = another.versionNumber
+        Integer numberOfCurrentVersions = another.countVersions()
+
+        when:
+        controller.params.id            = another.id
+        controller.params.newVersion    = true
+        controller.request.json         = [name: newName]
+        controller.response.format      = "json"
+
+        controller.update()
+
+        PublishedElement oldVersion    = PublishedElement.findByModelCatalogueId(currentModelCatalogueId)
+
+        def json = controller.response.json
+
+        then:
+        json.versionNumber          == currentVersionNumber + 1
+        json.modelCatalogueId       != currentModelCatalogueId
+        json.modelCatalogueId       == another.bareModelCatalogueId + '_' + (currentVersionNumber + 1)
+        json.name                   == newName
+
+        another.countVersions()     == numberOfCurrentVersions + 1
+
+        oldVersion.versionNumber    == currentVersionNumber
+        oldVersion.modelCatalogueId == currentModelCatalogueId
+        oldVersion.name             == currentName
+        oldVersion.name             != json.name
+    }
+
     @Unroll
     def "get json history: #no where max: #max offset: #offset\""() {
         CatalogueElement first = CatalogueElement.get(loadItem.id)

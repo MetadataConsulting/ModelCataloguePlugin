@@ -85,6 +85,154 @@ and shows them in paginated table.
 <decorated-list list="list"></decorated-list>
 {code}
 
+h2. Security
+
+The backend provided by this plugin by default provides no security. The AngularJS service [security|Angular Services]
+provides simple abstraction of standard role-based security. The default implementation returns @true@ for
+all roles queries. There a several attribute directives you can use to hide or show particular HTML elements in your
+application.
+
+  * [hide-if-logged-in|Angular Directives]
+  * [show-if-logged-in|Angular Directives]
+  * [hide-for-role|Angular Directives]
+  * [show-for-role|Angular Directives]
+
+
+
+h3. Read-only Views
+You can easily switch to read-only mode by configuring the [securityProvider|Angular Providers].
+
+{code}
+<script type="text/javascript">
+    var demoConfig = angular.module('demo.config', ['mc.util.security'])
+    demoConfig.config(function (securityProvider) {
+        securityProvider.readOnly()
+    })
+</script>
+
+{code}
+
+This will trigger to setup the security service which will only respond @true@ for @VIEWER@ role queries.
+
+{code}
+<p>This will be visible to everyone</p>
+<p show-for-role="VIEWER">This will be still visible for read-only view</p>
+<p show-for-role="CURATOR">This won't be visible for read-only view</p>
+{code}
+
+
+h3. Spring Security
+
+As more than half of Grails application uses Spring Security plugin this plugin provides integration out of box as well.
+
+There are several changes you need to do before using the out of box integration.
+
+First of all you have to ensure the application will return status code 401 when the AJAX calls are trying to reach
+secured endpoint. To do so you can use [Spring Security Ajax Aware|https://github.com/MetadataRegistry/spring-security-ajax-aware]
+helper library.
+
+To include the library in your application, add following dependency your @grails-app/conf/BuildConfig.groovy@
+
+{code}
+    repositories {
+        // ...
+        mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
+    }
+
+    dependencies {
+        // ...
+        runtime "org.modelcatalogue:spring-security-ajax-aware:0.1.1"
+    }
+{code}
+
+Than configure the @authenticationEntryPoint@ bean in @grails-app/conf/spring/resources.groovy@ file
+
+{code}
+import org.modelcatalogue.core.security.ajax.AjaxAwareLoginUrlAuthenticationEntryPoint
+
+// Place your Spring DSL code here
+beans = {
+    // ...
+    authenticationEntryPoint(AjaxAwareLoginUrlAuthenticationEntryPoint) {
+        loginFormUrl = '/login/auth' // has to be specified even though it's ignored
+        portMapper = ref('portMapper')
+        portResolver = ref('portResolver')
+    }
+}
+{code}
+
+Next step is to make the success login ajax handler action returning the user roles and return @[success: false]@
+if any user is not logged in. Find the @LoginController@ of your application and update the @ajaxSuccess@ action closure:
+
+{code}
+def ajaxSuccess = {
+    if (!springSecurityService.currentUser) {
+        render([success: false] as JSON)
+        return
+    }
+    render([
+        success: true,
+        username: springSecurityService.authentication.name,
+        roles: springSecurityService.authentication.authorities*.authority] as JSON
+    )
+}
+{code}
+
+You can add more information such as display name there as well. The returned JSON will be accessible using @security.getCurrentUser()@ method
+in your Angular code.
+
+{warning}
+Your application is also responsible to secure the backend properly e.g. using request maps entities or intercepting urls.
+See @ModelCatalogueCorePluginUrlMappings@ for complete list of url mappings which needs to be secured. Don't
+use whole-catch URL mappings such as @"/$controller/$action?/$id?(.$format)?"@ because they will also apply on
+the model catalogue plugin controllers and actions and causes bypassing the url security.
+{warning}
+
+As soon as you backend configuration is updated you can setup the Angular security service configuring [securityProvider|Angular Providers]
+in following way in your index page or main layout:
+
+{code}
+<script type="text/javascript">
+    var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security'])
+    demoConfig.config(function (securityProvider) {
+        securityProvider.springSecurity({
+            httpMethod:    'PUT',           // default is 'POST'
+            loginUrl:      '/my/login'      // default is contextPath + '/j_spring_security_check'
+            logoutUrl:     '/my/logout'     // default is contextPath + '/logout'
+            userUrl:       '/my/user'       // default is contextPath + '/login/ajaxSuccess'
+            usernameParam: 'username'       // default is 'j_username'
+            passwordParam: 'password'       // default is 'j_password'
+            rememberParam: 'rememberMe'     // default is '_spring_security_remember_me'
+
+            // context path for prefixing the default login and logout url
+            // if not defined, default login and logout url will lack the slash in the beginning
+            // so loginUrl will be just 'j_spring_security_check'
+            // and logoutUrl will be just 'logout'
+            contextPath: '${request.contextPath ?: ''}',
+
+            // mapping from Spring Security roles to roles expected by the plugin
+            // if user has any of roles defined in the array, the role defined
+            // as the key is added to her roles
+            roles: {
+                VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
+                CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
+                ADMIN:      ['ROLE_ADMIN'],
+            }
+            // prepopulate the current user to prevent flickering
+            <sec:ifLoggedIn>
+            currentUser: {
+                roles: ${org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
+                username: '${sec.username()}'
+            }
+            </sec:ifLoggedIn>
+        })
+    })
+</script>
+{code}
+
+
+
+
 h2. Further reading
 
 See the Quick Reference documentation on the left side for more examples.

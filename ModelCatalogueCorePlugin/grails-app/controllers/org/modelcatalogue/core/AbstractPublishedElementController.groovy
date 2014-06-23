@@ -46,4 +46,13 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         )
     }
 
+
+
+    protected Map getParametersToBind() {
+        Map ret = super.parametersToBind
+        ret.remove 'modelCatalogueId'
+        ret.remove 'versionNumber'
+        ret
+    }
+
 }
