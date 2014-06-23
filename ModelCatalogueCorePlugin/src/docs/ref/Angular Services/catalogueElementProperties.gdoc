@@ -1,0 +1,21 @@
+h1. catalogueElementProperties
+
+Service which provides single method @getConfigurationFor@ retrieving metadata of catalogue elements' properties.
+The metadata are set up using [catalogueElementPropertiesProvider|Angular Providers].
+Declared in @mc.core.ui.catalogueElementProperties@ module inside [mc.core.ui|Angular Packages] package.
+
+
+h2. Usage
+
+Call the @columns@ function with item type to retrieve predefined columns.
+
+{code}
+angular
+.module('foo', ['mc.core.ui.catalogueElementProperties', 'mc.util.security'])
+.factory('bar', function(security, catalogueElementProperties) {
+    var config      = catalogueElementProperties.getConfigurationFor('foobar');
+    var isHidden    = config.hidden(security);
+    var label       = config.label;
+    var columns     = config.columns;
+});
+{code}

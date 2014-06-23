@@ -10,7 +10,7 @@ Register new column definition or set the new defaults using the config method o
 
 {code}
 angular
-.module('foo', ['mc.core.enhance'])
+.module('foo', ['mc.core.ui.columns'])
 .config(function(columnsProvider) {
     columnsProvider.setDefaultColumns([{header: 'ID', show: true, value: 'id'}]);
     columnsProvider.registerColumns('com.example.test.Class', [

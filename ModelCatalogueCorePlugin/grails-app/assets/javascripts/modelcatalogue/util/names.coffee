@@ -10,4 +10,8 @@ angular.module( 'mc.util.names', []).service 'names', ->
       simpleName = if type.indexOf('.') > -1 then type.substring(type.lastIndexOf('.') + 1) else type
       simpleName[0].toLowerCase() + simpleName[1..-1]
 
+    getPropertyNameFromQualifier: (type) ->
+      return null if not type
+      if type.indexOf('.') > -1 then type.substring(type.lastIndexOf('.') + 1) else type
+
   names
