@@ -27,21 +27,35 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             return
         }
 
-        instance.properties = request
+        def oldProps = new HashMap(instance.properties)
 
-        def ext = request.ext
+        oldProps.remove('modelCatalogueId')
+
+        T helper = createResource(oldProps)
+
+        def paramsToBind = getParametersToBind()
+
+
+        helper.properties = paramsToBind
+
+        if (helper.hasErrors()) {
+            respond helper.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        if (params.boolean('newVersion')) {
+            publishedElementService.archiveAndIncreaseVersion(instance)
+        }
+
+
+        def ext = paramsToBind.ext
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
-
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view:'edit' // STATUS CODE 422
-            return
-        }
-
+        instance.properties = paramsToBind
         instance.save flush:true
+
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])

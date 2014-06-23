@@ -17,7 +17,7 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         def list = publishedElementService.list(params, resource)
 
         respondWithLinks new Elements(
-                base: "/${resourceName}/${params.status ? params.status : ''}",
+                base: "/${resourceName}/",
                 total: total,
                 items: list
         )
@@ -44,6 +44,15 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
                 items: list,
                 total: total
         )
+    }
+
+
+
+    protected Map getParametersToBind() {
+        Map ret = super.parametersToBind
+        ret.remove 'modelCatalogueId'
+        ret.remove 'versionNumber'
+        ret
     }
 
 }

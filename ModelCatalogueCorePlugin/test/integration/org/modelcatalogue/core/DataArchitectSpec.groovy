@@ -3,11 +3,12 @@ package org.modelcatalogue.core
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.util.ListAndCount
 import spock.lang.Shared
+import spock.lang.Stepwise
 
 /**
 * Created by adammilward on 05/02/2014.
 */
-
+@Stepwise
 class DataArchitectSpec extends AbstractIntegrationSpec{
     @Shared
     def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, vd, md
@@ -44,6 +45,27 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
         de2.removeFromInstantiatedBy(vd)
     }
 
+    def "find relationships and action them"() {
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        def relatedDataElements = dataArchitectService.findRelationsByMetadataKeys("Data item No.","Optional_Local_Identifier", params)
+
+        then:
+        relatedDataElements.each {row ->
+            relatedDataElements.list.collect{it.source}contains(de1)
+            relatedDataElements.list.collect{it.destination}contains(de2)
+        }
+
+        when:
+        dataArchitectService.actionRelationshipList(relatedDataElements.list)
+
+
+        then:
+        de1.relations.contains(de2)
+
+    }
+
     def "find data elements without particular extension key"(){
         when:
         Map params = [:]
@@ -69,26 +91,6 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
         !dataElements.list.contains(DataElement.get(de2.id))
         dataElements.list.contains(DataElement.get(de1.id))
         dataElements.list.contains(DataElement.get(de3.id))
-
-    }
-
-    def "find relationships and action them"() {
-        when:
-        Map params = [:]
-        params.put("max", 12)
-        def relatedDataElements = dataArchitectService.findRelationsByMetadataKeys("Data item No.","Optional_Local_Identifier", params)
-
-        then:
-        relatedDataElements.each {row ->
-            relatedDataElements.list.collect{it.source}contains(de1)
-            relatedDataElements.list.collect{it.destination}contains(de2)
-        }
-
-        when:
-        dataArchitectService.actionRelationshipList(relatedDataElements.list)
-
-        then:
-        de1.relations.contains(de2)
 
     }
 

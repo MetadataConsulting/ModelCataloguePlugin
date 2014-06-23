@@ -15,6 +15,10 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     def relationshipService
     def mappingService
 
+	def uuid(String uuid){
+		respond resource.findByModelCatalogueId(uuid)
+	}
+
     AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
         super(resource, readOnly)
     }

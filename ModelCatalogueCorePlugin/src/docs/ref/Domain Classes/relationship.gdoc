@@ -1,6 +1,6 @@
 h1. Relationship
 
-A relationship can be declared between [catalogueElement|Domain Class]s using the [relationshipService|Services] or using the metamethod shortcuts if the [relationships|Domain Class] declarations has been included in the @CatalogueElements@.
+A relationship can be declared between [catalogueElement|Domain Classes]s using the [relationshipService|Services] or using the metamethod shortcuts if the [relationships|Domain Classes] declarations has been included in the @CatalogueElements@.
 Relationships take the form of a triple where the properties: source - subject; relationshipType - predicate; and destination - object.
 
 {warning}

@@ -9,6 +9,9 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
       getIndexPath: () ->
         "#{modelCatalogueApiRoot}/#{@pathName}"
 
+      getByUUID: (uuid) ->
+        enhance rest method: 'GET', url: "#{@getIndexPath()}/uuid/#{uuid}"
+
       get: (id) ->
         enhance rest method: 'GET', url: "#{@getIndexPath()}/#{id}"
 
@@ -23,12 +26,12 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
           $rootScope.$broadcast 'catalogueElementCreated', result
           result
 
-      update: (data) ->
+      update: (data, params) ->
         if !data.id?
           throw "Missing ID, use save instead"
         props = angular.copy(data)
         delete props.id
-        enhance rest method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, params: {format: 'json'}
+        enhance rest method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, params: angular.extend({format: 'json'}, params)
 
       validate: (data) ->
         enhance rest method: 'POST', url: "#{@getIndexPath()}/validate", data: data

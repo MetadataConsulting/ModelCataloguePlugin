@@ -1,0 +1,9 @@
+h1. securityProvider
+
+Configures the [security|Angular Services] service. You can setup the security using @noSecurity()@, @readOnly()@
+or @springSecurity()@ methods. You can also provide your own factory for [security|Angular Services] using the
+@setup@ method (see the service for list of methods expected)
+
+h2. Usage
+
+Follow the security section in [Intro|guide:5 AngularJS Support] how to setup the security completely.

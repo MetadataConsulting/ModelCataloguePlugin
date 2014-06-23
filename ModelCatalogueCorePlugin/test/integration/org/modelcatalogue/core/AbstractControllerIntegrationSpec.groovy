@@ -148,6 +148,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         controller.response.format = "xml"
         controller.params.id = "${loadItem.id}"
         controller.show()
+        println controller.response.text
         GPathResult xml = controller.response.xml
         recordResult "showOne", xml
 

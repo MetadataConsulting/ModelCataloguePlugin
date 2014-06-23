@@ -14,7 +14,7 @@ mc.core.ui.catalogueElementView             | provides [catalogue-element-view|A
 mc.core.ui.columns                          | provides [columns|Angular Services] service to define default columns to display when catalogue element is rendered
 mc.core.ui.columnsConfiguration             | provides [columns-configuration|Angular Directives] directive for configuring @decorated-list@ columns
 mc.core.ui.decoratedList                    | provides [decorated-list|Angular Directives] directive for rendering enhanced list data structures
-mc.core.ui.messagesPanel                    | provides [message-panel|Angular Directives] directive for rendering information messages
+mc.core.ui.messagesPanel                    | provides [messages-panel|Angular Directives] directive for rendering information messages
 mc.core.ui.propertiesPane                   | provides [properties-pane|Angular Directives] directive to displaying JavaScript object properties
 {table}
 

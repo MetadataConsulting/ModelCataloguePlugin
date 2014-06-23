@@ -17,19 +17,26 @@ abstract class CatalogueElement {
 
     String name
     String description
+	String modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
 
     static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
+    static relationships = [
+            outgoing: [attachment: 'hasAttachmentOf']
+    ]
+
     static constraints = {
         name size: 1..255
         description nullable: true, maxSize: 2000
+		modelCatalogueId nullable: true, unique: true, maxSize: 255, matches: '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
     }
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
+		modelCatalogueId boost:10
         name boost:5
         incomingMappings component: true
         except = ['incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
@@ -139,7 +146,7 @@ abstract class CatalogueElement {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${getId()}, name: ${getName()}]"
+        "${getClass().simpleName}[id: ${getId()}, name: ${getName()}, modelCatalogueId: ${modelCatalogueId}]"
     }
 
     Map<String, Object> getInfo() {
@@ -170,4 +177,19 @@ abstract class CatalogueElement {
             mapping.delete(flush:true)
         }
     }
+
+	def updateModelCatalogueId() {
+		def newCatalogueId = modelCatalogueId.split("_")
+		newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
+		modelCatalogueId = newCatalogueId.join("_")
+	}
+
+	/**
+	 * Get the Model Catalogue ID excluding any version information suffix.
+	 * @return The model catalogue ID, minus any trailing underscore and version numbers
+	 */
+	def getBareModelCatalogueId() {
+		// Match everything from the ID except the final underscore and integers ('_\d+')
+		(modelCatalogueId =~ /(?i)(MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}))/)[0][1]
+	}
 }

@@ -23,3 +23,13 @@ describe 'mc.util.names', ->
     it "can convert '#{type}' to property name '#{expectedPropertyName}'", inject (names) ->
       expect(names.getPropertyNameFromType).toBeFunction()
       expect(names.getPropertyNameFromType(type)).toBe(expectedPropertyName)
+
+  propertyQualifierData = {
+      'com.modelacatalogue.core.CatalogueElement.history' : 'history'
+      'history'                                           : 'history'
+    }
+
+  for qualifier, expectedProperty of propertyQualifierData
+    it "can convert qualifier '#{qualifier}' to property '#{expectedProperty}'", inject (names) ->
+      expect(names.getPropertyNameFromQualifier).toBeFunction()
+      expect(names.getPropertyNameFromQualifier(qualifier)).toBe(expectedProperty)

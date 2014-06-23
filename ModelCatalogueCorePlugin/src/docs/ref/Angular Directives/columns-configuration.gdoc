@@ -1,6 +1,6 @@
 h1. columns-configuration
 
-Element directive for rendering configuring columns for [decorated-list|Angular Directive] directive. Default template defined in
+Element directive for rendering configuring columns for [decorated-list|Angular Directives] directive. Default template defined in
 module @mc.core.ui.bs.columnsConfiguration@ provides configuration widget in table layout.
 
 h2. Usage

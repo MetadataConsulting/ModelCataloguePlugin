@@ -1,0 +1,25 @@
+h1. security
+
+Security service for retrieving currently signed-in user and determining her current roles. Also provides
+@login@ and @logout@ functionality.
+See [securityProvider|Angular Providers] how to configure the security mechanism.
+Declared in @mc.core.security@ module inside [mc.util|Angular Packages] package.
+
+
+h2. Usage
+
+The service provides following methods:
+
+{table}
+Method Signature                        | Description
+requireLogin()                          | requests the login dialog to show if the security implementation supports it
+isUserLoggedIn()                        | returns true if the user is logged in (including mock users)
+getCurrentUser()                        | returns the current user containing at least @displayName@ property or undefined if no user is logged in
+hasRole(name)                           | returns true if currently logged in user has given role or false otherwise or if no user is logged in
+login(username, password, rememberMe)   | logs in the user using given username and password, returns promise which is resolved with the new current user or rejected with object containing errors
+logout()                                | logs out the current user and returns a promise which resolves when the user is actually logged out or returns promise which resolves immediately for mock implementations
+{table}
+
+The service can may contain property @mock@ signaling that the service implementation is not bound to any backend but
+only changes the way the application is displayed (e.g. simple read only view). All but @requireLogin@ methods
+are required if you are creating your own security implementation.
