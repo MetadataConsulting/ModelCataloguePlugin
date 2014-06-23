@@ -5,6 +5,11 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Identification',  value: "relation.elementTypeName + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()"}
   ]
 
+  nameAndIdent = -> [
+    {header: 'Name',            value: "relation.dataType.name",                                 classes: 'col-md-6', show: "relation.dataType.show()"}
+    {header: 'Identification',  value: "relation.dataType.elementTypeName + ': ' + relation.id", classes: 'col-md-5', show: "relation.dataType.show()"}
+  ]
+
   computeBytes = (relationship) ->
     asset = relationship.relation
     GIGA = 1024 * 1024 * 1024
@@ -29,7 +34,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'parentOf',        label: 'Children',            columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'childOf',         label: 'Parent',              columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor',    label: 'Models',              columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Data Types',          columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Data Types',          columns: dataTypes()
   catalogueElementPropertiesProvider.configureProperty 'instantiatedBy',  label: 'Data Type',           columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'contains',        label: 'Data Elements',       columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'containedIn',     label: 'Models',              columns: nameAndIdent()
