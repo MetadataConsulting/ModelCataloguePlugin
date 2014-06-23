@@ -115,6 +115,19 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ShowCtrl'
   }
 
+  $stateProvider.state 'mc.resource.uuid', {
+    url: '/uuid/:uuid'
+
+    templateUrl: 'modelcatalogue/core/ui/state/show.html'
+
+    resolve:
+      element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
+        catalogueElementResource($stateParams.resource).getByUUID($stateParams.uuid)
+      ]
+
+    controller: 'mc.core.ui.states.ShowCtrl'
+  }
+
   $stateProvider.state 'mc.resource.show.property', {url: '/:property?page'}
 
   $stateProvider.state('mc.search', {
