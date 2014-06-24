@@ -177,14 +177,11 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
 
       $scope.resolveAll = () ->
         modelCatalogueDataArchitect.resolveAll($scope.element.id).then (result)->
-          console.log('finished1')
-          refreshElement
+          $rootScope.$broadcast 'actionsResolved', $scope.element
 
       $scope.ingestQueue = () ->
         modelCatalogueDataArchitect.ingestQueue($scope.element.id).then (result)->
-          console.log('finished2')
-          refreshElement
-
+          $rootScope.$broadcast 'actionsResolved', $scope.element
 
       refreshElement = () ->
         if $scope.element

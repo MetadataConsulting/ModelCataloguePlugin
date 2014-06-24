@@ -9,7 +9,7 @@ describe "mc.core.ui.dataImportView", ->
   it "element get compiled",  inject ($compile, $rootScope, enhance,  $httpBackend) ->
     $httpBackend.when('GET', /.*/).respond({ok: true})
 
-    catEl = enhance angular.copy(fixtures.valueDomain.showOne)
+    catEl = enhance angular.copy(fixtures.Importer.list1)
     catEl.description = "Hello World!"
 
     $rootScope.element = catEl
@@ -21,7 +21,7 @@ describe "mc.core.ui.dataImportView", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName').toLowerCase()).toBe('div')
-    expect(element.find('h3.ce-name').text()).toBe("#{catEl.name} (#{catEl.elementTypeName}: #{catEl.id})")
+    expect(element.find('h3.ce-name').text()).toBe("#{catEl.name} (: #{catEl.id})")
     expect(element.find('blockquote.ce-description').text()).toBe(catEl.description)
 
     expect(element.find('ul.nav.nav-tabs li').length).toBe(6)
