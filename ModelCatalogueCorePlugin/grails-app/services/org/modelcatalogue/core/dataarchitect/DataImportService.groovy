@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.dataarchitect
 
+import grails.transaction.Transactional
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
@@ -15,6 +16,7 @@ class DataImportService {
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
     private static final REGEX = '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
 
+    @Transactional
     def importData(ArrayList headers, ArrayList rows, String name, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap) {
         //get indexes of the appropriate sections
         DataImport newImporter = new DataImport(name: name)
@@ -149,6 +151,7 @@ class DataImportService {
         return row
     }
 
+    @Transactional
     def void ingestImportQueue(DataImport importer) {
         def queue = importer.importQueue.iterator()
         def it = 0
