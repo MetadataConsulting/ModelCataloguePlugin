@@ -11,6 +11,7 @@ class ModelCatalogueCorePluginUrlMappings {
         for (String controllerName in allElements) {
             "/api/modelCatalogue/core/$controllerName" (controller: controllerName, action: 'index', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$controllerName" (controller: controllerName, action: 'save', method: HttpMethod.POST)
+			"/api/modelCatalogue/core/$controllerName/uuid/$uuid" (controller: controllerName, action: 'uuid', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$controllerName/search/$search?" (controller: controllerName, action: 'search', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$controllerName/$id/validate" (controller: controllerName, action: 'validate', method: HttpMethod.POST)
             "/api/modelCatalogue/core/$controllerName/validate" (controller: controllerName, action: 'validate', method: HttpMethod.POST)

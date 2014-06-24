@@ -1,0 +1,38 @@
+h1. catalogueElementsPropertiesProvider
+
+Configures the [catalogueElementProperties|Angular Services] service.
+You can register new properties configuration in generic way using @configureProperty@ method which accepts
+the fully qualified name of the property (one composed from element type and the name of the property joined using
+dot '.' e.g. @org.modelcatalogue.core.DataElement.attachments@) or just plain property name e.g. @attachments@ and
+the configuration object. The configuration is additive so you can call method multiple times with different keys
+and values and the result configuration object will contain all the key-value pairs.
+In case of duplicates the ones added later win. The values for the properties specified with fully qualified names
+are merged with the ones without the qualifier so you can configure properties in all classes and then add special
+handling for particular element types.
+
+Declared in @mc.core.ui.catalogueElementsPropertiesProvider@ module inside [mc.core.ui|Angular Packages] package.
+
+h2. Usage
+
+Update the configuration for property using @configureProperty@ method:
+
+{code}
+angular
+.module('foo', ['mc.core.ui.catalogueElementsPropertiesProvider'])
+.config(function(catalogueElementsPropertiesProvider) {
+    // hides all foobar properties
+    catalogueElementsPropertiesProvider.configureProperty('foobar', {hidden: true })
+
+    // overrides the hidden value and adds more configuration properties
+    catalogueElementsPropertiesProvider.configureProperty('foo.Bar.foobar', {
+        // this is currently used by catalogue-element-view for hiding tabs
+        hidden: function(security) { return security.hasRole('CURATOR') },
+
+        // column definition for catalogue-element-view
+        columns: [/* ... */],
+        // tab name for catalogue-element-view
+        label: "Foo Bar 4ever"
+
+    });
+});
+{code}

@@ -1,7 +1,6 @@
 # FormsPlugin
 /ModelCatalogueFormsPlugin
 *.iml
-*/web-app/*
-*/.idea/*
-ModelCatalogueCorePlugin/test/integration/resources/NHIC_ACS_v2.9.5test.xls
-ModelCatalogueCorePlugin/test/integration/resources/NHIC_HEP_v8.1.9test.xls
+**/web-app/*
+**/.idea/*
+**/atlassian-ide-plugin.xml

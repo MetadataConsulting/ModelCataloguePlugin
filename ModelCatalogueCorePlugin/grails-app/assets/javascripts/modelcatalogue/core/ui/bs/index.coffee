@@ -6,6 +6,7 @@
 #= require importView
 #= require catalogueElementTreeview
 #= require catalogueElementTreeviewItem
+#= require catalogueElementProperties
 #= require decoratedListTable
 #= require propertiesPane
 #= require columns
@@ -36,6 +37,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.importView'
   'mc.core.ui.bs.catalogueElementTreeview'
   'mc.core.ui.bs.catalogueElementTreeviewItem'
+  'mc.core.ui.bs.catalogueElementProperties'
   'mc.core.ui.bs.propertiesPane'
   'mc.core.ui.bs.columns'
   'mc.core.ui.bs.columnsConfiguration'

@@ -107,6 +107,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
               $scope.loadingChildren = false
           else
             $scope.collapsed = false
+            $scope.select($scope.element)
         else
           $scope.collapsed = true
 

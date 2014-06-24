@@ -24,6 +24,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         if (!el) return [:]
         def ret = [
                 id: el.id,
+				modelCatalogueId: el.modelCatalogueId,
                 archived: el.archived,
                 name: el.name,
                 description: el.description,
@@ -87,6 +88,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     protected void addXmlAttributes(el, XML xml) {
         addXmlAttribute(el.id, "id", xml)
+		addXmlAttribute(el.modelCatalogueId, "modelCatalogueId", xml)
         addXmlAttribute(el.archived, "archived", xml)
         addXmlAttribute(el.version, "version", xml)
         addXmlAttribute("/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id", "link", xml)
