@@ -127,7 +127,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        def metadata = parametersToBind.metadata
+        def metadata = request.metadata
 
         if (metadata != null) {
             rel.setExt(metadata)

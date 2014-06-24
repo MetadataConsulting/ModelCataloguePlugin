@@ -57,6 +57,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         )
 
         when:
+        controller.request.method = 'GET'
         controller.params.put("modelId", md.id)
         controller.response.format = "json"
         controller.getSubModelElements()
@@ -84,6 +85,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         )
 
         when:
+        controller.request.method = 'GET'
         controller.params.put("modelId", md.id)
         controller.response.format = "xml"
         controller.getSubModelElements()
@@ -114,6 +116,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         )
 
         when:
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.uninstantiatedDataElements()
         JSONElement json = controller.response.json
@@ -144,6 +147,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
                 "dataArchitect"
         )
         when:
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.put("key", "metadata")
         controller.metadataKeyCheck()
@@ -175,6 +179,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         )
 
         when:
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.uninstantiatedDataElements()
         GPathResult xml = controller.response.xml
@@ -201,6 +206,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         )
 
         when:
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.put("key", "metadata")
         controller.metadataKeyCheck()
@@ -230,6 +236,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
                 "dataArchitect"
         )
         when:
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.put("keyOne", "Data item No.")
         controller.params.put("keyTwo", "Optional_Local_Identifier")
@@ -260,6 +267,7 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         )
 
         when:
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.put("keyOne", "Data item No.")
         controller.params.put("keyTwo", "Optional_Local_Identifier")

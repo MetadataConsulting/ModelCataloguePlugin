@@ -212,8 +212,8 @@ class ImportService {
                 if (enumerated) {
 
 
-                    String enumString = enumerations.sort() collect { key, val ->
-                        "${this.quote(key)}:${this.quote(val)}"
+                    String enumString = enumerations.sort().collect { key, val ->
+                        "${quote(key)}:${quote(val)}"
                     }.join('|')
 
                     dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)

@@ -14,6 +14,7 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     }
 
     def "return list of catalogue element classes in json"() {
+        controller.request.method = 'GET'
         controller.response.format = 'json'
 
         controller.elementClasses()
@@ -26,6 +27,7 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
 
 
     def "return list of catalogue element classes in xml"() {
+        controller.request.method = 'GET'
         controller.response.format = 'xml'
 
         controller.elementClasses()

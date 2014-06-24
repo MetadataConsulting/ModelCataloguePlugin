@@ -20,6 +20,7 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
         createValueDomainsUsingDataType(first, 12)
 
         when:
+        controller.request.method = 'GET'
         controller.params.id = first.id
         controller.params.offset = offset
         controller.params.max = max
@@ -56,6 +57,7 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
         createValueDomainsUsingDataType(first, 12)
 
         when:
+        controller.request.method = 'GET'
         controller.params.id = first.id
         controller.params.offset = offset
         controller.params.max = max

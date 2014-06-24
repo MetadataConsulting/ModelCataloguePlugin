@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import grails.transaction.Transactional
+import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
@@ -10,6 +11,7 @@ import org.springframework.dao.DataIntegrityViolationException
 import javax.servlet.http.HttpServletResponse
 
 import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.OK
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
@@ -81,7 +83,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if(handleReadOnly()) {
             return
         }
-        def instance = createResource(getParametersToBind())
+        def instance = createResource()
 
         instance.validate()
         if (instance.hasErrors()) {
@@ -120,15 +122,47 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         render status: NO_CONTENT // NO CONTENT STATUS CODE
     }
 
-
-    protected Map getParametersToBind() {
-        Map ret = params
-        if (response.format == 'json') {
-            ret = request.getJSON()
+    /**
+     * Updates a resource for the given id
+     * @param id
+     * @deprecated this will be fixed in Groovy 2.4.1 (hopefully)
+     */
+    @Override
+    @Transactional
+    @Deprecated
+    def update() {
+        if(handleReadOnly()) {
+            return
         }
-        ret
-    }
 
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        instance.properties = request
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        instance.save flush:true
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
+                redirect instance
+            }
+            '*'{
+                response.addHeader(HttpHeaders.LOCATION,
+                        g.createLink(
+                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
+                                namespace: hasProperty('namespace') ? this.namespace : null ))
+                respond instance, [status: OK]
+            }
+        }
+    }
 
 
 

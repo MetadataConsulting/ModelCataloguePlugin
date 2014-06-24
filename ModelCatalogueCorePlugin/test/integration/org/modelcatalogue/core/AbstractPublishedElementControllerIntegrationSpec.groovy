@@ -53,6 +53,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
         createArchiveVersions(first)
 
         when:
+        controller.request.method = 'GET'
         controller.params.id = first.id
         controller.params.offset = offset
         controller.params.max = max
@@ -81,6 +82,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
         createArchiveVersions(first)
 
         when:
+        controller.request.method = 'GET'
         controller.params.id = first.id
         controller.params.offset = offset
         controller.params.max = max

@@ -33,10 +33,8 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
 
         T helper = createResource(oldProps)
 
-        def paramsToBind = getParametersToBind()
-
-
-        helper.properties = paramsToBind
+        helper.properties = request
+        helper.validate()
 
         if (helper.hasErrors()) {
             respond helper.errors, view:'edit' // STATUS CODE 422
@@ -48,12 +46,12 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
         }
 
 
-        def ext = paramsToBind.ext
+        def ext = request.ext
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
-        instance.properties = paramsToBind
+        instance.properties = request
         instance.save flush:true
 
         request.withFormat {

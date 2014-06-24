@@ -44,6 +44,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resource.count() == totalCount
 
         when:
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.max = max
         controller.params.offset = offset
@@ -78,6 +79,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resource.count() == totalCount
 
         when:
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.max = max
         controller.params.offset = offset
@@ -103,6 +105,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Export items to excel test"() {
+        controller.request.method = 'GET'
         controller.response.format = "xlsx"
         controller.index()
 
@@ -122,6 +125,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     def "Show single existing item as JSON"() {
 
         when:
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.id = "${loadItem.id}"
         controller.show()
@@ -140,6 +144,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     def "Show single existing item as XML"() {
 
         when:
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.id = "${loadItem.id}"
         controller.show()
@@ -165,6 +170,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         !resource.findByName(badInstance.name)
 
         when:
+        controller.request.method = 'POST'
         controller.response.format = "json"
         def props = badInstance
         controller.request.json = props
@@ -192,6 +198,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         !resource.findByName(newInstance.name)
 
         when:
+        controller.request.method = 'POST'
         controller.response.format = "json"
         def json = newInstance
         controller.request.json = json
@@ -216,9 +223,10 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         !resource.findByName(newInstance.name)
 
         when:
+        controller.request.method = 'POST'
         controller.response.format = "xml"
-        def xml = resource.newInstance(newInstance).encodeAsXML()
-        recordInputXML "createInput", xml
+        def xml = resource.newInstance(newInstance)
+        recordInputXML "createInput", xml.toString()
         controller.request.xml = xml
         controller.save()
         GPathResult created = controller.response.xml
@@ -251,6 +259,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         json
 
         when:
+        controller.request.method = 'PUT'
         controller.response.format = "json"
         controller.params.id = loadItem.id
         controller.request.json = json
@@ -279,11 +288,12 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         loadItem
 
         when:
+        controller.request.method = 'PUT'
         controller.response.format = "xml"
         controller.params.id = loadItem.id
-        def xml = instance.encodeAsXML()
+        def xml = instance
         controller.request.xml = xml
-        recordInputXML "updateInput", xml
+        recordInputXML "updateInput", xml.toString()
         controller.update()
         GPathResult updated = controller.response.xml
         recordResult 'updateOk', updated
@@ -302,10 +312,11 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         !resource.findByName("")
 
         when:
+        controller.request.method = 'POST'
         controller.response.format = "xml"
-        def xml = resource.newInstance(badInstance).encodeAsXML()
+        def xml = resource.newInstance(badInstance)
         controller.request.xml = xml
-        recordInputXML action + "ErrorsInput", xml
+        recordInputXML action + "ErrorsInput", xml.toString()
         controller."$action"()
         GPathResult created = controller.response.xml
         def stored = resource.findByName("")
@@ -330,6 +341,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         instance
 
         when:
+        controller.request.method = 'PUT'
         controller.response.format = "json"
         controller.params.id = instance.id
         controller.request.json = [name: "g" * 256]
@@ -356,10 +368,11 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         instance
 
         when:
+        controller.request.method = 'PUT'
         controller.response.format = "xml"
         controller.params.id = instance.id
-        def xml = resource.newInstance(badInstance).encodeAsXML()
-        recordInputXML "updateErrorsInput", xml
+        def xml = resource.newInstance(badInstance)
+        recordInputXML "updateErrorsInput", xml.toString()
         controller.request.xml = xml
         controller.update()
         GPathResult updated = controller.response.xml
@@ -373,6 +386,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Return 404 for non-existing item as JSON"() {
+        controller.request.method = 'GET'
         controller.response.format = "json"
         controller.params.id = "1000000"
         controller.show()
@@ -384,6 +398,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Return 404 for non-existing item as XML"() {
+        controller.request.method = 'GET'
         controller.response.format = "xml"
         controller.params.id = "1000000"
         controller.show()
@@ -397,6 +412,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     def "Return 404 for non-existing item as JSON on delete"() {
         if (controller.readOnly) return
 
+        controller.request.method = 'DELETE'
         controller.response.format = "json"
         controller.params.id = "1000000"
         controller.delete()
@@ -410,6 +426,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     def "Return 404 for non-existing item as XML on delete"() {
         if (controller.readOnly) return
 
+        controller.request.method = 'DELETE'
         controller.response.format = "xml"
         controller.params.id = "1000000"
         controller.params.id = "1000000"
@@ -426,6 +443,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         if (controller.readOnly) return
 
         def elementToDelete = resource.newInstance(newInstance).save()
+        controller.request.method = 'DELETE'
         controller.response.format = "json"
         controller.params.id = elementToDelete.id
         controller.delete()
@@ -441,6 +459,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         if (controller.readOnly) return
 
         def elementToDelete = resource.newInstance(newInstance).save()
+
         controller.response.format = "xml"
         controller.params.id = elementToDelete.id
         controller.delete()

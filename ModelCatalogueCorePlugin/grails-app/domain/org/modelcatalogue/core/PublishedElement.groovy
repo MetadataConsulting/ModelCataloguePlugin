@@ -21,6 +21,7 @@ abstract class PublishedElement extends CatalogueElement {
         !status.modificable
     }
     static constraints = {
+        versionNumber bindable: false
 //        TODO we need to think about what restrictions we put on publishing elements
 //        status validator: { val , obj->
 //            if(!val){ return true}
