@@ -31,6 +31,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       if resource=="import"
         messages.prompt('New Import', '', {type: 'new-import', create: resource}).then (created)->
           created.show()
+
       else
         messages.prompt('Create ' + names.getNaturalName(resource), '', {type: 'edit-' + resource, create: (resource)}).then (created)->
           created.show()

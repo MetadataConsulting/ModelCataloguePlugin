@@ -200,7 +200,6 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
 
       onElementUpdate($scope.element)
 
-
     ]
   }
 ]

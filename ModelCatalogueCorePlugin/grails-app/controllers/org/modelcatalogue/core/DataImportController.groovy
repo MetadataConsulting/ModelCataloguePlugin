@@ -34,7 +34,8 @@ class DataImportController extends AbstractRestfulController{
     }
 
     def upload(Integer max) {
-        DataImport importer = new DataImport()
+        def response
+        DataImport importer
         setSafeMax(max)
         if (!(request instanceof MultipartHttpServletRequest)) {
             importer.errors.rejectValue('uploaded', 'import.uploadfailed', "No file")
@@ -44,11 +45,11 @@ class DataImportController extends AbstractRestfulController{
             MultipartFile file = multiRequest.getFile("file")
             def params = multiRequest.getParameterMap()
             if (!params?.conceptualDomain) {
-                importer.errors.rejectValue('uploaded', 'import.uploadfailed', "No conceptual domain!")
+                response = ["errors": "No conceptual domain!"]
             } else if (!params?.name) {
-                importer.errors.rejectValue('uploaded', 'import.uploadfailed', "import name")
+                response = ["errors": "no import name"]
             } else if (!file) {
-                importer.errors.rejectValue('uploaded', 'import.uploadfailed', "No file")
+                response = ["errors": "No file"]
             } else {
                 conceptualDomainName = params.conceptualDomain.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
                 if (params?.conceptualDomainDescription) conceptualDomainDescription = params.conceptualDomainDescription.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else conceptualDomainDescription = ""
@@ -59,19 +60,19 @@ class DataImportController extends AbstractRestfulController{
                     def (headers, rows) = parser.parse()
                     HeadersMap headersMap = populateHeaders()
                     importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap)
+                    response = importer
 
                 } else {
-                    if (!CONTENT_TYPES.contains(confType))
-                        importer.errors.rejectValue('uploaded', 'import.uploadfailed', "\"error\":\"Input should be an Excel file!\\n\"+\n" +
-                                "                            \"but uploaded content is \"+confType")
-                    else if (file.size <= 0)
-                        importer.errors.rejectValue('uploaded', 'import.uploadfailed', "The uploaded file is empty!")
+                    if (!CONTENT_TYPES.contains(confType)) {
+                        response = ["errors": "input should be an Excel file but uploaded content is ${confType}"]
+                    } else if (file.size <= 0){
+                        response = ["errors": "The uploaded file is empty"]
+                    }
                 }
-
             }
         }
 
-        respond importer
+        respond response
     }
 
 

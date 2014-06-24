@@ -58,7 +58,7 @@ class ModelCatalogueCorePluginUrlMappings {
             "/imports/$id" (controller: "dataImport", action: 'show', method: HttpMethod.GET)
             "/imports/$id/pendingAction" (controller: "dataImport", action: 'pendingAction', method: HttpMethod.GET)
             "/imports/$id/pendingAction/$rowId/resolveAllRowActions" (controller: "dataImport", action: 'resolveAllRowActions', method: HttpMethod.POST)
-            "/imports/$id/pendingAction/$rowId/ingestRow" (controller: "dataImport", action: 'ingestRow', method: HttpMethod.POST)
+            "/imports/$id/importQueue/$rowId/ingestRow" (controller: "dataImport", action: 'ingestRow', method: HttpMethod.POST)
             "/imports/$id/importQueue" (controller: "dataImport", action: 'importQueue', method: HttpMethod.GET)
             "/imports/$id/imported" (controller: "dataImport", action: 'imported', method: HttpMethod.GET)
             "/imports/$id/resolveAll" (controller: "dataImport", action: 'resolveAll', method: HttpMethod.POST)
