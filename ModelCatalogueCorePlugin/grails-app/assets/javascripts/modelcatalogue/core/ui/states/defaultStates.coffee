@@ -3,8 +3,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.element  = element
 ])
 
-.controller('mc.core.ui.states.ImportCtrl', ['$scope', '$stateParams', ($scope, $stateParams)->
-
+.controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+    $scope.element  = element
 ])
 
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'messages', ($scope, $stateParams, $state, $log, list, names, enhance, messages) ->
@@ -29,10 +29,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       resource ?= $scope.resource
 
       if resource=="import"
-        messages.prompt('New Import', '', {type: 'new-import', create: resource})
+        messages.prompt('New Import', '', {type: 'new-import', create: resource}).then (created)->
+          created.show()
       else
         messages.prompt('Create ' + names.getNaturalName(resource), '', {type: 'edit-' + resource, create: (resource)}).then (created)->
-        created.show()
+          created.show()
 #        $scope.list?.reload().then (result) ->
 #          $scope.list = result
 
@@ -245,7 +246,13 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   }
 
   $stateProvider.state 'mc.dataArchitect.imports', {
-    url: '/imports'
+    abstract: true
+    url: '/:imports'
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  }
+
+  $stateProvider.state 'mc.dataArchitect.imports.list', {
+    url: '/all?page&order&sort&status'
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
     resolve:
       list: ['$stateParams','modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
@@ -262,7 +269,19 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ListCtrl'
   }
 
+  $stateProvider.state 'mc.dataArchitect.imports.show', {
+    url: '/{id:\\d+}'
+    templateUrl: 'modelcatalogue/core/ui/state/dataImport.html'
+    resolve:
+      element: ['$stateParams','modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        $stateParams.resource = "Import"
+        return modelCatalogueDataArchitect.getImport($stateParams.id)
+      ]
+
+    controller: 'mc.core.ui.states.DataImportCtrl'
+  }
 ])
+
 .run(['$rootScope', '$state', '$stateParams', ($rootScope, $state, $stateParams) ->
     # It's very handy to add references to $state and $stateParams to the $rootScope
     # so that you can access them from any scope within your applications.For example,
@@ -369,9 +388,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     </div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/state/importData.html', '''
-    <div>
-      <import-data-view></import-data-view>
+  $templateCache.put 'modelcatalogue/core/ui/state/dataImport.html', '''
+    <div ng-show="element">
+      <import-view element="element"></import-view>
     </div>
   '''
 

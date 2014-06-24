@@ -6,7 +6,7 @@
 #= require listReferenceEnhancer
 #= require modelCatalogueApiRoot
 #= require removableItemEnhancer
-#= require resolvableItemEnhancer
+#= require actionableItemEnhancer
 #= require modelCatalogueSearch
 #= require modelCatalogueDataArchitect
 
@@ -23,5 +23,5 @@ angular.module 'mc.core', [
   'mc.core.modelCatalogueSearch'
   'mc.core.modelCatalogueDataArchitect'
   'mc.core.removableItemEnhancer'
-  'mc.core.resolvableItemEnhancer'
+  'mc.core.actionableItemEnhancer'
 ]

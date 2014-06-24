@@ -17,6 +17,7 @@ class ImportRow {
     String measurementUnitName
     String measurementSymbol
     Map metadata
+    Boolean imported = false
 
     static hasMany = [rowActions: RowAction]
 
@@ -35,6 +36,7 @@ class ImportRow {
         measurementSymbol nullable: true, maxSize: 255
         metadata nullable: true
         rowActions  nullable: true
+        imported nulable: true
     }
 
     static mapping = {
@@ -51,9 +53,12 @@ class ImportRow {
     }
 
     def resolveAll(){
-        def errors = rowActions.find{it.actionType==ActionType.RESOLVE_ERROR}
-        if(!errors) {
-            rowActions = []
+        def queue = rowActions.iterator()
+        while (queue.hasNext()) {
+            RowAction rowAction = queue.next()
+            if (rowAction.actionType!=ActionType.RESOLVE_ERROR) {
+                    queue.remove()
+            }
         }
     }
 }

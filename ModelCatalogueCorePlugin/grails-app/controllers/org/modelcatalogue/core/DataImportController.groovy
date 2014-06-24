@@ -20,8 +20,21 @@ class DataImportController extends AbstractRestfulController{
         super(DataImport, false)
     }
 
+    @Override
+    def index(Integer max) {
+        setSafeMax(max)
+        def total = countResources()
+        def list = listAllResources(params)
+
+        respondWithLinks new Elements(
+                base: "/dataArchitect/imports",
+                total: total,
+                items: list
+        )
+    }
+
     def upload(Integer max) {
-        DataImport importer
+        DataImport importer = new DataImport()
         setSafeMax(max)
         if (!(request instanceof MultipartHttpServletRequest)) {
             importer.errors.rejectValue('uploaded', 'import.uploadfailed', "No file")
@@ -37,6 +50,7 @@ class DataImportController extends AbstractRestfulController{
             } else if (!file) {
                 importer.errors.rejectValue('uploaded', 'import.uploadfailed', "No file")
             } else {
+                conceptualDomainName = params.conceptualDomain.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
                 if (params?.conceptualDomainDescription) conceptualDomainDescription = params.conceptualDomainDescription.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else conceptualDomainDescription = ""
                 if (params?.name) importName = params.name.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else name = ""
                 def confType = file.getContentType()
@@ -53,7 +67,7 @@ class DataImportController extends AbstractRestfulController{
                     else if (file.size <= 0)
                         importer.errors.rejectValue('uploaded', 'import.uploadfailed', "The uploaded file is empty!")
                 }
-                conceptualDomainName = params.conceptualDomain.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
+
             }
         }
 
@@ -69,7 +83,7 @@ class DataImportController extends AbstractRestfulController{
         List<ImportRow> items = []
         if (importer.pendingAction) items.addAll(importer?.pendingAction)
         respondWithLinks ImportRow, new ImportRows(
-                base: "/dataImport/${params.id}/pendingAction",
+                base: "/dataArchitect/imports/${params.id}/pendingAction",
                 items: items.subList(offset, Math.min( offset + params.max, total )),
                 total: total
         )
@@ -84,7 +98,7 @@ class DataImportController extends AbstractRestfulController{
         if (importer.imported) items.addAll(importer?.imported)
 
         respondWithLinks ImportRow, new ImportRows(
-                base: "/dataImport/${params.id}/pendingAction",
+                base: "/dataArchitect/imports/${params.id}/imported",
                 items: items.subList(offset, Math.min( offset + params.max, total )),
                 total: total
         )
@@ -96,21 +110,60 @@ class DataImportController extends AbstractRestfulController{
         def total = (importer?.importQueue)? importer?.importQueue.size() : 0
         def offset = 0
         List<ImportRow> items = []
-        if (importer.pendingAction) items.addAll(importer?.importQueue)
+        if (importer.importQueue) items.addAll(importer?.importQueue)
 
         respondWithLinks ImportRow, new ImportRows(
-                base: "/dataImport/${params.id}/pendingAction",
+                base: "/dataArchitect/imports/${params.id}/importQueue",
                 items: items.subList(offset, Math.min( offset + params.max, total )),
                 total: total
         )
     }
 
-    def resolveRow(Long id, Long rowId){
+    def resolveAllRowActions(Long id, Long rowId){
+        def response
         DataImport importer = queryForResource(params.id)
         ImportRow importRow = ImportRow.get(params.rowId)
-        def response =  [result: "success"]
         if(importer && importRow){
             dataImportService.resolveRow(importer, importRow)
+            response = importer
+        }else{
+            response = ["error": "import or import row not found"]
+        }
+        respond response
+    }
+
+    def ingestRow(Long id, Long rowId){
+        def response
+        DataImport importer = queryForResource(params.id)
+        ImportRow importRow = ImportRow.get(params.rowId)
+        if(importer && importRow){
+            dataImportService.ingestRow(importer, importRow)
+            dataImportService.actionPendingModels(importer)
+            response = importer
+        }else{
+            response = ["error": "import or import row not found"]
+        }
+        respond response
+    }
+
+    def resolveAll(Long id){
+        def response
+        DataImport importer = queryForResource(params.id)
+        if(importer){
+            dataImportService.resolveAllPendingRows(importer)
+            response = importer
+        }else{
+            response = ["error": "import or import row not found"]
+        }
+        respond response
+    }
+
+    def ingestQueue(Long id){
+        def response
+        DataImport importer = queryForResource(params.id)
+        if(importer){
+            dataImportService.ingestImportQueue(importer)
+            response = importer
         }else{
             response = ["error": "import or import row not found"]
         }

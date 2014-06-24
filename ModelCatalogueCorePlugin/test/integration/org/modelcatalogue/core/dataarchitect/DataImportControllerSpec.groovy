@@ -36,7 +36,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         def numElements = DataElement.count()
         controller.response.format = 'json'
         controller.metaClass.request = new MockMultipartHttpServletRequest()
-        controller.request.parameters = ['conceptualDomainName' : 'test', 'name' : 'testImport123']
+        controller.request.parameters = ['conceptualDomain' : 'test', 'name' : 'testImport123']
         InputStream inputStream = new FileInputStream(fileName)
         controller.request.addFile(new MockMultipartFile('file', fileName,"application/octet-stream" , inputStream))
         controller.upload()

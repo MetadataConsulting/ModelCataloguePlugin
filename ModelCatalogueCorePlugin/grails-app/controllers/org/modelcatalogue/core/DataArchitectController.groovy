@@ -126,20 +126,4 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
     }
 
 
-//    def actionRelationships(){
-//
-//        def relations = params.relatedElements
-//
-//        try {
-//            def errors = dataArchitectService.createRelationshipByType(relations, "relatedTo")
-//        }
-//        catch (Exception ex) {
-//            //log.error("Exception in handling excel file: "+ ex.message)
-//            log.error("Exception in handling excel file")
-//            flash.message = "Error while creating relationships`.";
-//        }
-//
-//    }
-
-
 }

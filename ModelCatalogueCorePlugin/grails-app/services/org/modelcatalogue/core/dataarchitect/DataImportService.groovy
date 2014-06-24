@@ -156,7 +156,7 @@ class DataImportService {
             ImportRow row = queue.next()
             if (!row.rowActions) {
                 if(it<60) {
-                    ingestRow(importer, row)
+                    ingestRow(importer, row, true)
                     queue.remove()
                 }else{
                     it=0
@@ -176,7 +176,7 @@ class DataImportService {
         propertyInstanceMap.get().clear()
     }
 
-    def void ingestRow(DataImport importer, ImportRow row) {
+    def void ingestRow(DataImport importer, ImportRow row, Boolean bulkIngest = false) {
         if(row.rowActions.isEmpty()) {
             def conceptualDomain, model, dataType, measurementUnit
             conceptualDomain = importConceptualDomain(row.conceptualDomainName, row.conceptualDomainDescription)
@@ -195,6 +195,9 @@ class DataImportService {
                     importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model)
                 }
             }
+            if(!bulkIngest) importer.removeFromImportQueue(row)
+            row.imported = true
+            importer.addToImported(row)
         }
     }
 
@@ -235,7 +238,7 @@ class DataImportService {
                 }
             }
             model.status = PublishedElementStatus.FINALIZED
-            model.save(flush:true)
+            model.save(flush:true, failOnError:true)
         }
     }
 

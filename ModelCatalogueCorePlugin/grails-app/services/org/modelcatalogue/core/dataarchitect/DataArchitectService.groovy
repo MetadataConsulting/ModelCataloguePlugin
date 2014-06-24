@@ -18,9 +18,10 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListAndCount
 
-@Transactional
+
 class DataArchitectService {
 
+    static transactional = false
     def modelCatalogueSearchService, publishedElementService, relationshipService
 
     def uninstantiatedDataElements(Map params){
@@ -81,39 +82,41 @@ class DataArchitectService {
         return results
     }
 
+    @Transactional
     def findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
         ListAndCount results = new ListAndCount()
-//        def searchParams = getParams(params)
-//        def synonymDataElements = []
-//        //FIXME the relationship type should be configurable
-//        def relType = RelationshipType.findByName("relatedTo")
-//
-//        def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-//                "inner join a.extensions e " +
-//                "WHERE e.name = ?)", [keyOne])//, [max: searchParams.max, offset: searchParams.offset])
-//
-//        key1Elements.eachWithIndex { DataElement dataElement, int dataElementIndex ->
-//            def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf {
-//                it.name == keyOne
-//            }].extensionValue
-//            def key2Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-//                    "inner join a.extensions e " +
-//                    "WHERE e.name = ? and e.extensionValue = ?) ", [keyTwo, extensionName], [max: searchParams.max, offset: searchParams.offset])
-//
-//            // Create a Map
-//            key2Elements.each {
-//                //FIXME the relationship type needs to be configurable
-//                def relationship = new Relationship(source: dataElement, destination: it, relationshipType: relType)
-//                synonymDataElements << relationship
-//            }
-//        }
-//
-//        results.list = synonymDataElements
-//        results.count = synonymDataElements.size()
+        def searchParams = getParams(params)
+        def synonymDataElements = []
+        //FIXME the relationship type should be configurable
+        def relType = RelationshipType.findByName("relatedTo")
+
+        def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                "inner join a.extensions e " +
+                "WHERE e.name = ?)", [keyOne])//, [max: searchParams.max, offset: searchParams.offset])
+
+        key1Elements.eachWithIndex { DataElement dataElement, int dataElementIndex ->
+            def extensionName = dataElement.extensions[dataElement.extensions.findIndexOf {
+                it.name == keyOne
+            }].extensionValue
+            def key2Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                    "inner join a.extensions e " +
+                    "WHERE e.name = ? and e.extensionValue = ?) ", [keyTwo, extensionName], [max: searchParams.max, offset: searchParams.offset])
+
+            // Create a Map
+            key2Elements.each {
+                //FIXME the relationship type needs to be configurable
+                def relationship = new Relationship(source: dataElement, destination: it, relationshipType: relType)
+                synonymDataElements << relationship
+            }
+        }
+
+        results.list = synonymDataElements
+        results.count = synonymDataElements.size()
         return results
     }
 
+    @Transactional
     def actionRelationshipList(ArrayList<Relationship> list){
         def errorMessages = []
         list.each { relationship ->

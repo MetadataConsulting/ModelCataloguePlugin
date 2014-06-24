@@ -72,7 +72,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
             $scope.uploading = true
             $scope.upload = $upload.upload({
               params: {id: $scope.copy.id, name: $scope.copy.name, conceptualDomain: $scope.copy.conceptualDomain}
-              url:                "#{modelCatalogueApiRoot}/dataImports/upload"
+              url:                "#{modelCatalogueApiRoot}/dataArchitect/imports/upload"
               file:               $scope.copy.file
               fileFormDataName:   'file'
             }).progress((evt) ->

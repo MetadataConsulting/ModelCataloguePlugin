@@ -3,6 +3,7 @@
 #= require modelcatalogue/core/index
 #= require modelcatalogue/util/ui/index
 #= require catalogueElementView
+#= require importView
 #= require catalogueElementTreeview
 #= require catalogueElementTreeviewItem
 #= require decoratedListTable
@@ -32,6 +33,7 @@ angular.module('mc.core.ui.bs', [
   # list of modules
   'mc.core.ui.bs.decoratedListTable'
   'mc.core.ui.bs.catalogueElementView'
+  'mc.core.ui.bs.importView'
   'mc.core.ui.bs.catalogueElementTreeview'
   'mc.core.ui.bs.catalogueElementTreeviewItem'
   'mc.core.ui.bs.propertiesPane'

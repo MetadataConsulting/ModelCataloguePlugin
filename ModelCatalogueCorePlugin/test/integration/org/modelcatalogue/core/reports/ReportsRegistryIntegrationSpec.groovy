@@ -47,7 +47,8 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         expect:
         modelReports.size()                 >= 1
         modelReports[0].title               == 'Export All to XML'
-        modelReports[0].getLink(model)      == '/api/modelCatalogue/core/dataArchitect/getSubModelElements/1?format=xml'
+//        modelReports[0].getLink(model)      == '/api/modelCatalogue/core/dataArchitect/getSubModelElements/1?format=xml'
+        modelReports[0].getLink(model)      == '/api/modelCatalogue/core/dataArchitect/getSubModelElements?format=xml&id=1'
 
         when:
         def models = new Elements(itemType: Model)
