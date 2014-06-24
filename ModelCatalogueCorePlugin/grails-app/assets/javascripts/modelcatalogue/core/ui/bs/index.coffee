@@ -3,6 +3,7 @@
 #= require modelcatalogue/core/index
 #= require modelcatalogue/util/ui/index
 #= require catalogueElementView
+#= require importView
 #= require catalogueElementTreeview
 #= require catalogueElementTreeviewItem
 #= require catalogueElementProperties
@@ -14,6 +15,7 @@
 #= require modalConfirm
 #= require modalPrompt
 #= require modalPromptNewRelationship
+#= require modalPromptNewImport
 #= require simpleObjectEditor
 #= require modalPromptAssetEdit
 #= require modalPromptBasicEdit
@@ -32,6 +34,7 @@ angular.module('mc.core.ui.bs', [
   # list of modules
   'mc.core.ui.bs.decoratedListTable'
   'mc.core.ui.bs.catalogueElementView'
+  'mc.core.ui.bs.importView'
   'mc.core.ui.bs.catalogueElementTreeview'
   'mc.core.ui.bs.catalogueElementTreeviewItem'
   'mc.core.ui.bs.catalogueElementProperties'
@@ -42,6 +45,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalConfirm'
   'mc.core.ui.bs.modalPrompt'
   'mc.core.ui.bs.modalPromptNewRelationship'
+  'mc.core.ui.bs.modalPromptNewImport'
   'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'
   'mc.core.ui.bs.modalPromptLogin'

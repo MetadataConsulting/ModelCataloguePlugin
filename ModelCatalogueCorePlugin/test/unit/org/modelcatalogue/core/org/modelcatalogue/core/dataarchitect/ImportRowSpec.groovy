@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.org.modelcatalogue.core.dataarchitect
 
+import grails.test.mixin.Mock
 import org.modelcatalogue.core.dataarchitect.ActionType
 import org.modelcatalogue.core.dataarchitect.ImportRow
 import org.modelcatalogue.core.dataarchitect.RowAction
@@ -8,6 +9,7 @@ import spock.lang.Specification
 /**
  * Created by adammilward on 23/05/2014.
  */
+@Mock([ImportRow, RowAction])
 class ImportRowSpec extends Specification {
 
     def "test create new import row"(){
@@ -25,9 +27,10 @@ class ImportRowSpec extends Specification {
         importRow.measurementUnitName =   "mph"
         importRow.conceptualDomainName = "conceptual domain"
         importRow.conceptualDomainDescription = "conceptual domain description"
+        importRow.save()
 
         then:
-        importRow
+        ImportRow.get(importRow.id)
 
     }
 
@@ -50,7 +53,9 @@ class ImportRowSpec extends Specification {
         importRow.measurementUnitName =   "mph"
         importRow.conceptualDomainName = "conceptual domain"
         importRow.conceptualDomainDescription = "conceptual domain description"
-        importRow.rowActions.add(rowAction)
+        importRow.addToRowActions(rowAction)
+        rowAction.save()
+        importRow.save()
 
         then:
         importRow

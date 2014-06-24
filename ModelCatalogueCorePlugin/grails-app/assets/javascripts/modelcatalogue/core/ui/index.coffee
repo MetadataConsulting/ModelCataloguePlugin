@@ -1,8 +1,10 @@
 #= require_self
 #= require angular-ui-router/release/angular-ui-router
+#= require ng-file-upload/angular-file-upload.js
 #= require modelcatalogue/core/index
 #= require decoratedList
 #= require catalogueElementView
+#= require importView
 #= require catalogueElementTreeviewItem
 #= require catalogueElementTreeview
 #= require catalogueElementPicker
@@ -20,6 +22,7 @@ angular.module('mc.core.ui', [
   # list of modules
   'mc.core.ui.decoratedList'
   'mc.core.ui.catalogueElementView'
+  'mc.core.ui.importView'
   'mc.core.ui.catalogueElementTreeviewItem'
   'mc.core.ui.catalogueElementTreeview'
   'mc.core.ui.catalogueElementPicker'

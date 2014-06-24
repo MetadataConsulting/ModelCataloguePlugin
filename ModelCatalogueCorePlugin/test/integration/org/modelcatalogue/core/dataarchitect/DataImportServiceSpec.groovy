@@ -1,14 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
-import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.ConceptualDomain
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.Model
 import spock.lang.Shared
-import spock.lang.Unroll
 
 class DataImportServiceSpec extends AbstractIntegrationSpec {
 
@@ -18,7 +11,7 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
     ImportRow validImportRow, validImportRow2, modelOnlyImportRow, invalidImportRow, modelOnlyImportRow2
 
     def setupSpec() {
-        dataImportService = new Importer()
+        dataImportService = new DataImport()
         loadFixtures()
         validImportRow = new ImportRow()
         validImportRow2 = new ImportRow()

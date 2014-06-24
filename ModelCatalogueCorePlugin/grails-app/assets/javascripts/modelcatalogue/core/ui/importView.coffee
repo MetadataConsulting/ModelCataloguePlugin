@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'ui.router', 'mc.core.ui.catalogueElementProperties']).directive 'catalogueElementView',  [-> {
+angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'ui.router']).directive 'importView',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -6,10 +6,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       property: '=?'
       id: '@'
 
-    templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
+    templateUrl: 'modelcatalogue/core/ui/importView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties) ->
-      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl', 'archived']
+    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource','modelCatalogueDataArchitect', 'security', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, modelCatalogueDataArchitect, security) ->
+      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -23,84 +23,49 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.property ?= $rootScope?.$stateParams?.property
       $scope.reports  = []
 
-      onPropertyUpdate = (newProperty, oldProperty) ->
-        propCfg = catalogueElementProperties.getConfigurationFor("#{$scope.element.elementType}.#{newProperty}")
-        page    = 1
-        options = {}
-        isTable = false
-        if $scope.showTabs and not propCfg.hidden(security)
-          if newProperty
-            $scope.naturalPropertyName = propCfg.label
-            for tab in $scope.tabs
-              tab.active = tab.name == newProperty
-              if tab.active
-                isTable = tab.type == 'decorated-list'
-                if isTable and tab.value.total
-                  page = tab.value.currentPage
-
-          else
-            for tab in $scope.tabs
-              if tab.active
-                $scope.property = tab.name
-                isTable = tab.type == 'decorated-list'
-                if isTable and tab.value.total
-                  page = tab.value.currentPage
-                break
-
-        page = undefined if page == 1 or isNaN(page)
-        options.location = "replace" if newProperty and not oldProperty
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page}, options if $scope.element
-
       onElementUpdate = (element) ->
         resource = catalogueElementResource(element.elementType) if element and element.elementType
 
-        activeTabSet = false
-
-        onPropertyUpdate($scope.property, $rootScope?.$stateParams?.property)
+        activeTabSet     = false
 
         tabs = []
 
         for name, fn of element when enhance.isEnhancedBy(fn, 'listReference')
           if name in propExcludes
             continue
-
-          propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.#{name}")
-
-          if propertyConfiguration.hidden(security)
-            continue
-
           tabDefinition =
-            heading:  propertyConfiguration.label
+            heading:  names.getNaturalName(name)
             value:    listEnhancer.createEmptyList(fn.itemType)
             disabled: fn.total == 0
             loader:   fn
             type:     'decorated-list'
-            columns:   propertyConfiguration.columns ? columns(fn.itemType)
+            columns:   columns(fn.itemType)
             actions:  []
             name:     name
             reports:  []
 
 
-          if fn.itemType == 'org.modelcatalogue.core.Relationship' and security.hasRole('CURATOR')
+          if fn.itemType == 'org.modelcatalogue.core.dataarchitect.ImportRow'&& tabDefinition.name != 'imported'
             tabDefinition.actions.push {
-              title:  'Remove'
+              title:  'resolve action'
               icon:   'remove'
               type:   'danger'
               action: (rel) ->
                 deferred = $q.defer()
-                messages.confirm('Removing Relationship', "Do you really want to remove relation '#{element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
-                    rel.remove().then ->
-                      messages.success('Relationship removed!', "#{rel.relation.name} is no longer related to #{element.name}")
-                      # reloads the table
+                messages.confirm('Resolve Actions', "Do you really want to resolve all actions : '#{rel.actions}'?").then () ->
+                  rel.action().then ->
+                    messages.success('Row actions resolved!', "actions are resolved")
+                    # reloads the table
+                    deferred.resolve(true)
+                  , (response) ->
+                    if response.status == 404
+                      messages.error('Error resolving actions', 'Actions cannot be resolve, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
                       deferred.resolve(true)
-                    , (response) ->
-                      if response.status == 404
-                        messages.error('Error removing relationship', 'Relationship cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
-                        deferred.resolve(true)
-                      else
-                        messages.error('Error removing relationship', 'Relationship cannot be removed, see application logs for details')
+                    else
+                      messages.error('Error on action', 'Actions cannot be resolved. Possibly there is an error that needs user input')
 
                 deferred.promise
+
             }
 
           if tabDefinition.name == $scope.property
@@ -115,15 +80,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             continue
           unless angular.isObject(obj) and !angular.isArray(obj) and !enhance.isEnhanced(obj)
             continue
-
-          propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.#{name}")
-
-          if propertyConfiguration.hidden(security)
-            continue
-
           tabDefinition =
             name:       name
-            heading:    propertyConfiguration.label
+            heading:    names.getNaturalName(name)
             value:      obj ? {}
             original:   angular.copy(obj ? {})
             properties: []
@@ -211,25 +170,20 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         if !tab.disabled and tab.value.empty
           tab.loader().then (result) ->
             tab.value       = result
-            $scope.reports  = result.availableReports
-        else
-          $scope.reports    = tab.value?.availableReports
 
-      $scope.createRelationship = () ->
-        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
-
-      $scope.canEdit = ->
-        return false if not $scope.element or $scope.element.archived or $scope.element?.status == 'FINALIZED'
-        messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
-
-      $scope.edit = ->
-        return if not $scope.element or $scope.element.archived or $scope.element?.status == 'FINALIZED'
-        messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
-          $scope.element = updated
 
       # watches
       $scope.$watch 'element', onElementUpdate
-      $scope.$watch 'property', onPropertyUpdate
+
+      $scope.resolveAll = () ->
+        modelCatalogueDataArchitect.resolveAll($scope.element.id).then (result)->
+          console.log('finished1')
+          refreshElement
+
+      $scope.ingestQueue = () ->
+        modelCatalogueDataArchitect.ingestQueue($scope.element.id).then (result)->
+          console.log('finished2')
+          refreshElement
 
 
       refreshElement = () ->
@@ -239,17 +193,17 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.$on 'catalogueElementCreated', refreshElement
       $scope.$on 'catalogueElementDeleted', refreshElement
-
-      $rootScope.$on 'userLoggedIn', refreshElement
-      $rootScope.$on 'userLoggedOut', refreshElement
-
+      $scope.$on 'actionsResolved', refreshElement
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
         $scope.property = params.property
 
       # init
+
       onElementUpdate($scope.element)
+
+
     ]
   }
 ]

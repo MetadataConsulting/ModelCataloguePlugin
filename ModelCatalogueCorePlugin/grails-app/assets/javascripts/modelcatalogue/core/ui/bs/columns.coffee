@@ -29,6 +29,19 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     return "#{(asset.size / KILO).toFixed(2)} KB" if asset.size > KILO
     return "#{(asset.size)} B"
 
+  columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.ImportRow', [
+    {header: "Model",        value: 'containingModelName',              class: 'col-md-4', sort: {property: 'containingModelName', type: 'alphabet'}}
+    {header: "Data Element",        value: 'dataElementName',              class: 'col-md-4', sort: {property: 'dataElementName', type: 'alphabet'}}
+    {header: "Row Actions",        value: 'actions',              class: 'col-md-4', sort: {property: 'actions', type: 'alphabet'}}
+  ]
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.DataImport', [
+    {header: "Name",        value: 'name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: true}
+    {header: "Rows Imported",    value: "imported.total",  class: 'col-md-3', sort: {property: "imported.total", type: 'alphabet'}}
+    {header: "Rows Pending",    value: 'pendingAction.total',  class: 'col-md-3', sort: {property: 'pendingAction.total', type: 'alphabet'}}
+    {header: "Rows Queue",    value: 'importQueue.total',  class: 'col-md-3', sort: {property: 'importQueue.total', type: 'alphabet'}}
+  ]
+
   columnsProvider.registerColumns 'org.modelcatalogue.core.Asset', [
     {header: "Name",        value: 'name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: true}
     {header: "File Name",   value: 'originalFileName',  class: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
@@ -80,5 +93,6 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: "Name",        value: 'name',        class: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
     {header: "Enumerations", value: 'enumerations', class: 'col-md-6'}
   ]
+
 
 ]

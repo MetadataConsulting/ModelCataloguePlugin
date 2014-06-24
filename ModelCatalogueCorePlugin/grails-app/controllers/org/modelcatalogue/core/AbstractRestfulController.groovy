@@ -137,7 +137,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         listWrapper.previous    = links.previous
         listWrapper.next        = links.next
         listWrapper.offset      = params.int('offset') ?: 0
-        listWrapper.page        = params.int('max') ?: 0
+        listWrapper.page        = params.int('max') ?: 10
         listWrapper.sort        = params.sort ?: defaultSort
         listWrapper.order       = params.order ?: defaultOrder
         if (!listWrapper.itemType) {

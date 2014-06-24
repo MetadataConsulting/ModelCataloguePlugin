@@ -59,6 +59,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
         $scope.reports = list.availableReports
 
         if not $state.current.abstract and not $scope.stateless
+
           newParams = angular.copy $stateParams
           newParams[pageParam] = list.currentPage
           if newParams[pageParam] == 1 or isNaN(newParams[pageParam])
@@ -71,7 +72,6 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
           if newParams[orderParam] =='asc'
             newParams[orderParam] = undefined
-
           $state.go '.', newParams
 
       $scope.hasSelection = () -> $scope.selection?

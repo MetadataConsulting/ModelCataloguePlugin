@@ -7,4 +7,11 @@ class RowAction {
     String field
     String action
     ActionType actionType
+
+    static constraints = {
+        field nullable: false, maxSize: 255
+        action nullable: false, maxSize: 255
+        actionType nullable: false
+    }
+
 }

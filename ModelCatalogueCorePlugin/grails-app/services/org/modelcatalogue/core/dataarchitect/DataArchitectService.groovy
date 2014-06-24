@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
-import org.hibernate.Criteria
+//import org.hibernate.Criteria
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
@@ -18,9 +18,10 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListAndCount
 
-@Transactional
+
 class DataArchitectService {
 
+    static transactional = false
     def modelCatalogueSearchService, publishedElementService, relationshipService
 
     def uninstantiatedDataElements(Map params){
@@ -81,6 +82,7 @@ class DataArchitectService {
         return results
     }
 
+    @Transactional
     def findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
         ListAndCount results = new ListAndCount()
@@ -114,34 +116,13 @@ class DataArchitectService {
         return results
     }
 
+    @Transactional
     def actionRelationshipList(ArrayList<Relationship> list){
         def errorMessages = []
         list.each { relationship ->
             relationship.save()
         }
     }
-
-    def indexAll(){
-        modelCatalogueSearchService.index(ConceptualDomain.list())
-        modelCatalogueSearchService.index(DataType.list())
-        modelCatalogueSearchService.index(EnumeratedType.list())
-        modelCatalogueSearchService.index(ExtensionValue.list())
-        modelCatalogueSearchService.index(MeasurementUnit.list())
-        modelCatalogueSearchService.index(ValueDomain.list())
-        modelCatalogueSearchService.index(DataElement.list())
-        modelCatalogueSearchService.index(Model.list())
-        modelCatalogueSearchService.index(CatalogueElement)
-        modelCatalogueSearchService.index(ExtendibleElement)
-        modelCatalogueSearchService.index(PublishedElement)
-        modelCatalogueSearchService.index(RelationshipType)
-        modelCatalogueSearchService.index(Relationship)
-        //TODO: find a better way of unindexing archived elements
-        def params = [:]
-        params.status = PublishedElementStatus.ARCHIVED
-        def archivedElements = publishedElementService.list(params)
-        if(archivedElements){ modelCatalogueSearchService.unindex(archivedElements) }
-    }
-
 
     private static Map getParams(Map params){
         def searchParams = [:]
