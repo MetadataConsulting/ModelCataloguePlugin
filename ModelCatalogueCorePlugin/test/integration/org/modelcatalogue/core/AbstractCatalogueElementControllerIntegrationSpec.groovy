@@ -4,7 +4,6 @@ import grails.converters.JSON
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
-import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.ResultRecorder
@@ -261,7 +260,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         RelationshipType type2 = new RelationshipType(name: "xyz", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "xyz", destinationToSource: "zyx")
         assert type2.save()
         controller."${method}"(max, type2.name)
-        JSONObject json = controller.response.json
+        def json = controller.response.json
         recordResult "${method}WithNonExistingType${no}", json
         assert json.success
         assert !json.list
@@ -745,7 +744,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.params.offset = offset
         controller.params.id = first.id
         controller."${method}"(max, typeParam)
-        JSONElement json = controller.response.json
+        def json = controller.response.json
         recordResult "${method}${no}", json
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
         assert json.listType == Relationships.name
