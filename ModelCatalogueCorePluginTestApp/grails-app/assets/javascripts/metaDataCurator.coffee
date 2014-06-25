@@ -94,6 +94,8 @@ metadataCurator.controller('metadataCurator.searchCtrl',
       initActions()
   ])
 
+
+
 metadataCurator.controller('metadataCurator.logoutCtrl', ['$scope', 'security', ($scope, security)->
   $scope.logout = ->
     security.logout()

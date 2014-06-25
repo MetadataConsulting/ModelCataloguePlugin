@@ -159,6 +159,18 @@ abstract class CatalogueElement {
 
     boolean isArchived() { false }
 
+
+
+    def afterInsert(){
+       if(!getModelCatalogueId()) {
+           createModelCatalogueId()
+       }
+    }
+
+    def createModelCatalogueId(){
+        modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
+    }
+
     def beforeDelete(){
         outgoingRelationships.each{ relationship->
             relationship.beforeDelete()
@@ -183,6 +195,8 @@ abstract class CatalogueElement {
 		newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
 		modelCatalogueId = newCatalogueId.join("_")
 	}
+
+
 
 	/**
 	 * Get the Model Catalogue ID excluding any version information suffix.
