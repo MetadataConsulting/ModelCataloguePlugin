@@ -15,6 +15,7 @@ class BootStrap {
     def initCatalogueService
     def publishedElementService
 
+
     XLSXListRenderer xlsxListRenderer
     ReportsRegistry reportsRegistry
 
@@ -128,6 +129,7 @@ class BootStrap {
         }
 
     }
+
     def destroy = {
     }
 
