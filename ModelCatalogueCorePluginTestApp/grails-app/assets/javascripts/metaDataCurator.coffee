@@ -28,40 +28,49 @@ metadataCurator = angular.module('metadataCurator', [
 metadataCurator.config ($stateProvider, $urlRouterProvider)->
   $urlRouterProvider.otherwise("/catalogue/model/all")
 
+metadataCurator.run ($templateCache) ->
+  $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
+  <a>
+      <span class="glyphicon omnisearch-icon" ng-class="'glyphicon-' + match.model.icon"></span>
+      <span ng-if="!match.model.highlight" bind-html-unsafe="match.label"></span>
+      <span ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+  </a>
+'''
+
 metadataCurator.controller('metadataCurator.searchCtrl',
-  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names',
-    (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names)->
+  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names', '$filter',
+    (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names, $filter)->
       actions = []
-
-      initActions = ->
-        actions = []
-        actions.push {
-          label: (term) ->
-            "Search <strong>Catalogue</strong> for #{term}"
-          action: (item, model, label) ->
-            $state.go('mc.search', {q: model})
-          icon: 'search'
-        }
-
-      $scope.$on '$stateChangeSuccess', (event, newState) ->
-        $scope.searchSelect = if $state.params.q then $state.params.q else undefined
-        initActions()
-        if $state.$current.params.indexOf('q') >= 0 and $state.params.resource
-          naturalName = names.getNaturalName($state.params.resource)
-          actions.push {
-             label: (term) ->
-               "Search <strong>#{naturalName}</strong> for #{term}"
-             action: (item, model, label) ->
-                 $state.go(newState.name, {q: model})
-             icon: 'search'
-           }
 
       $scope.search = (item, model, label) ->
         if angular.isString(item)
           $state.go('mc.search', {q: model })
         else
-          item.action item, model, label
+          item?.action item, model, label
 
+      initActions = ->
+        actions = []
+        actions.push {
+          condition: (term) -> term
+          label: (term) ->
+            "Search <strong>Catalogue Element</strong> for <strong>#{term}</strong>"
+
+          action: (term) -> ->
+              $state.go('mc.search', {q: term})
+
+          icon: 'search'
+        }
+
+        actions.push {
+          condition: (term) -> term and $state.current.name != 'mc.search' and  $state.$current.params.indexOf('q') >= 0 and $state.params.resource
+          label: (term) ->
+            naturalName = names.getNaturalName($state.params.resource)
+            "Search <strong>#{naturalName}</strong> for <strong>#{term}</strong>"
+          action: (term) ->
+            (item, model, label) ->
+              $state.go($state.current.name, {q: term})
+          icon: 'search'
+        }
 
       $scope.getResults = (term) ->
         deferred = $q.defer()
@@ -70,23 +79,30 @@ metadataCurator.controller('metadataCurator.searchCtrl',
 
         return if not term
 
-        for action in actions
-          value =
+        for action in actions when action.condition(term)
+          results.push {
             label:  action.label(term)
-            action: action.action
-            term: term
+            action: action.action(term)
+            icon:   action.icon
+            term:   term
+          }
 
-          results.push value
+        deferred.notify results
 
-        modelCatalogueSearch(term).then (searchResults)->
-          for searchResult in searchResults.list
-            results.push {
-              label:  searchResult.name
-              action: -> searchResult.show()
-              term: term
-            }
+        if term
+          modelCatalogueSearch(term).then (searchResults)->
+            for searchResult in searchResults.list
+              results.push {
+                label:      searchResult.name
+                action:     searchResult.show
+                icon:       'file'
+                term:       term
+                highlight:  true
+              }
 
-          deferred.resolve(results)
+            deferred.resolve results
+        else
+          deferred.resolve results
 
         deferred.promise
 
