@@ -342,7 +342,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         </div>
       </span>
       <h2>{{title}} List</h2>
-      <decorated-list list="list" columns="columns"></decorated-list>
+      <decorated-list list="list" columns="columns" state-driven="true"></decorated-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">
