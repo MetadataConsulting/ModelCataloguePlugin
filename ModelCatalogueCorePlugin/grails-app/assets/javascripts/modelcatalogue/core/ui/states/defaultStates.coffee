@@ -34,8 +34,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       else
         messages.prompt('Create ' + names.getNaturalName(resource), '', {type: 'edit-' + resource, create: (resource)}).then (created)->
           created.show()
-#        $scope.list?.reload().then (result) ->
-#          $scope.list = result
 
 
     $scope.getStatusButtonClass = ->
@@ -93,7 +91,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all?page&order&sort&status'
+    url: '/all?page&order&sort&status&q'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
@@ -106,6 +104,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           params.order  = $stateParams.order ? 'asc'
           params.sort   = $stateParams.sort ? 'name'
           params.status = $stateParams.status ? 'finalized'
+
+          if $stateParams.q
+            return catalogueElementResource($stateParams.resource).search($stateParams.q, params)
+
           catalogueElementResource($stateParams.resource).list(params)
         ]
 
@@ -309,6 +311,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     <ui-view></ui-view>
   '''
 
+  #language=HTML
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-if="resource != 'model'">
       <span class="pull-right">
