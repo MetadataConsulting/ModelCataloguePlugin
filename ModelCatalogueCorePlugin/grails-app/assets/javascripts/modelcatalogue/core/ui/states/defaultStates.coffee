@@ -145,7 +145,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       templateUrl: 'modelcatalogue/core/ui/state/list.html'
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
-          $stateParams.resource = "dataElement"
+          $stateParams.resource = "search"
           return modelCatalogueSearch($stateParams.searchString)
         ]
       },

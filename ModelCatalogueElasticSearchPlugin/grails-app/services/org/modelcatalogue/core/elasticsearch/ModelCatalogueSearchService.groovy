@@ -1,10 +1,11 @@
 package org.modelcatalogue.core.elasticsearch
 
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.SearchCatalogue
 
 class ModelCatalogueSearchService implements SearchCatalogue{
 
-    def elasticSearchService, elasticSearchAdminService
+    def elasticSearchService, elasticSearchAdminService, grailsApplication
 
     def search(Class resource, Map params) {
         def searchResults = [:]
@@ -13,8 +14,13 @@ class ModelCatalogueSearchService implements SearchCatalogue{
             searchResults.put("errors" , searchParams.errors)
             return searchResults
         }
+        searchParams.put("indices", "org.modelcatalogue.core")
+        def types = getTypes(resource)
+        searchParams.put("types", types)
+        //searchParams.put("types", types)
+
         try{
-            searchResults = resource.search(searchParams){
+            searchResults = elasticSearchService.search(searchParams){
                 bool {
                     must {
                         query_string(query: params.search)
@@ -73,6 +79,11 @@ class ModelCatalogueSearchService implements SearchCatalogue{
         if(params.order){searchParams.put("order" , params.order.toLowerCase())}
         if(params.offset){searchParams.put("from" , "$params.offset")}
         return searchParams
+    }
+
+    private getTypes(Class resource){
+        def types = grailsApplication.getDomainClass(resource.name).getSubClasses().collect{it.clazz.name}
+        return types
     }
 
     //TODO add a few more of these
