@@ -80,13 +80,11 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
         def baseLink = "/dataArchitect/getSubModelElements"
 
-        Elements elements =  new Elements(
+        respondWithLinks DataElement, new Elements(
                 base: baseLink,
                 total: results.count,
-                items: results.list,
+                items: results.list
         )
-
-        respondWithLinks elements
     }
 
     def findRelationsByMetadataKeys(Integer max){
