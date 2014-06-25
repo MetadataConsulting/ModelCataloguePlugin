@@ -142,12 +142,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   $stateProvider.state 'mc.resource.show.property', {url: '/:property?page'}
 
   $stateProvider.state('mc.search', {
-      url: "/search/{searchString}",
+      url: "/search/{q}",
       templateUrl: 'modelcatalogue/core/ui/state/list.html'
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
-          $stateParams.resource = "dataElement"
-          return modelCatalogueSearch($stateParams.searchString)
+          $stateParams.resource = "searchResult"
+          return modelCatalogueSearch($stateParams.q)
         ]
       },
       controller: 'mc.core.ui.states.ListCtrl'

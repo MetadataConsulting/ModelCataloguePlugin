@@ -31,12 +31,67 @@ metadataCurator.config ($stateProvider, $urlRouterProvider)->
 metadataCurator.controller('metadataCurator.searchCtrl',
   ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names',
     (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names)->
-      $scope.search = () ->
-        unless (typeof $scope.searchSelect == 'string')
-#      $state.go('search', {searchString: $scope.searchSelect })
-#    else
-          $state.go('mc.resource.show',
-            {resource: names.getPropertyNameFromType($scope.searchSelect.elementType), id: $scope.searchSelect.id})
+      actions = []
+
+      initActions = ->
+        actions = []
+        actions.push {
+          label: (term) ->
+            "Search <strong>Catalogue</strong> for #{term}"
+          action: (item, model, label) ->
+            $state.go('mc.search', {q: model})
+          icon: 'search'
+        }
+
+      $scope.$on '$stateChangeSuccess', (event, newState) ->
+        $scope.searchSelect = if $state.params.q then $state.params.q else undefined
+        initActions()
+        if $state.$current.params.indexOf('q') >= 0 and $state.params.resource
+          naturalName = names.getNaturalName($state.params.resource)
+          actions.push {
+             label: (term) ->
+               "Search <strong>#{naturalName}</strong> for #{term}"
+             action: (item, model, label) ->
+                 $state.go(newState.name, {q: model})
+             icon: 'search'
+           }
+
+      $scope.search = (item, model, label) ->
+        if angular.isString(item)
+          $state.go('mc.search', {q: model })
+        else
+          item.action item, model, label
+
+
+      $scope.getResults = (term) ->
+        deferred = $q.defer()
+
+        results = []
+
+        return if not term
+
+        for action in actions
+          value =
+            label:  action.label(term)
+            action: action.action
+            term: term
+
+          results.push value
+
+        modelCatalogueSearch(term).then (searchResults)->
+          for searchResult in searchResults.list
+            results.push {
+              label:  searchResult.name
+              action: -> searchResult.show()
+              term: term
+            }
+
+          deferred.resolve(results)
+
+        deferred.promise
+
+
+      initActions()
   ])
 
 metadataCurator.controller('metadataCurator.logoutCtrl', ['$scope', 'security', ($scope, security)->
