@@ -35,8 +35,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       else
         messages.prompt('Create ' + names.getNaturalName(resource), '', {type: 'edit-' + resource, create: (resource)}).then (created)->
           created.show()
-#        $scope.list?.reload().then (result) ->
-#          $scope.list = result
 
 
     $scope.getStatusButtonClass = ->
@@ -94,7 +92,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all?page&order&sort&status'
+    url: '/all?page&order&sort&status&q'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
@@ -107,6 +105,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           params.order  = $stateParams.order ? 'asc'
           params.sort   = $stateParams.sort ? 'name'
           params.status = $stateParams.status ? 'finalized'
+
+          if $stateParams.q
+            return catalogueElementResource($stateParams.resource).search($stateParams.q, params)
+
           catalogueElementResource($stateParams.resource).list(params)
         ]
 
@@ -141,12 +143,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   $stateProvider.state 'mc.resource.show.property', {url: '/:property?page'}
 
   $stateProvider.state('mc.search', {
-      url: "/search/{searchString}",
+      url: "/search/{q}",
       templateUrl: 'modelcatalogue/core/ui/state/list.html'
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
-          $stateParams.resource = "dataElement"
-          return modelCatalogueSearch($stateParams.searchString)
+          $stateParams.resource = "searchResult"
+          return modelCatalogueSearch($stateParams.q)
         ]
       },
       controller: 'mc.core.ui.states.ListCtrl'
@@ -310,6 +312,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     <ui-view></ui-view>
   '''
 
+  #language=HTML
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-if="resource != 'model'">
       <span class="pull-right">
@@ -343,7 +346,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         </div>
       </span>
       <h2>{{title}} List</h2>
-      <decorated-list list="list" columns="columns"></decorated-list>
+      <decorated-list list="list" columns="columns" state-driven="true"></decorated-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">

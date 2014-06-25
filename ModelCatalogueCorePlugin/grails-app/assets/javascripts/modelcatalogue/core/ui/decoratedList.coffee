@@ -8,6 +8,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
       actions: '=?'
       id: '@'
       stateless: '=?'
+      stateDriven: '=?'
       reports: '=?'
       pageParam: '@'
       sortParam: '@'
@@ -31,6 +32,30 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
         total: 0
         empty: true
         source: 'directive'
+
+      changeStateFor = (list, paramsOverrides) ->
+        newParams = angular.copy $stateParams
+
+        # initialization
+        newParams[pageParam] = list.currentPage
+        newParams[sortParam]  = list.sort  if list.sort
+        newParams[orderParam] = list.order if list.order
+
+        # overrides
+        angular.extend newParams, paramsOverrides
+
+        # normalization
+        if newParams[pageParam] == 1 or isNaN(newParams[pageParam])
+          newParams[pageParam] = undefined
+
+        if newParams[sortParam] =='name'
+          newParams[sortParam] = undefined
+
+        if newParams[orderParam] =='asc'
+          newParams[orderParam] = undefined
+
+
+        $state.go '.', newParams
 
       onListChange = (list) ->
         if !columnsDefined
@@ -58,21 +83,9 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
         $scope.reports = list.availableReports
 
-        if not $state.current.abstract and not $scope.stateless
+        if not $scope.stateDriven and not $state.current.abstract and not $scope.stateless
+          changeStateFor list
 
-          newParams = angular.copy $stateParams
-          newParams[pageParam] = list.currentPage
-          if newParams[pageParam] == 1 or isNaN(newParams[pageParam])
-            newParams[pageParam] = undefined
-          newParams[sortParam]  = list.sort  if list.sort
-          newParams[orderParam] = list.order if list.order
-
-          if newParams[sortParam] =='name'
-            newParams[sortParam] = undefined
-
-          if newParams[orderParam] =='asc'
-            newParams[orderParam] = undefined
-          $state.go '.', newParams
 
       $scope.hasSelection = () -> $scope.selection?
 
@@ -98,10 +111,14 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
       $scope.goto = (page) ->
         return if $scope.loading
-        $scope.loading = true
-        $scope.list.goto(page).then (result) ->
-          $scope.loading = false
-          $scope.list = result
+
+        if $scope.list and $scope.stateDriven and not $state.current.abstract and not $scope.stateless
+          changeStateFor $scope.list, page: page
+        else
+          $scope.loading = true
+          $scope.list.goto(page).then (result) ->
+            $scope.loading = false
+            $scope.list = result
 
       hasNextOrPrev = (nextOrPrevFn) -> nextOrPrevFn.size? and nextOrPrevFn.size != 0
 
@@ -154,13 +171,17 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
       $scope.sortBy = (column) ->
         return if $scope.loading
-        $scope.loading = true
-        $scope.list.reload({
-          sort: column.sort.property,
-          order: if $scope.list.order == 'asc' then 'desc' else 'asc'
-        }).then (result) ->
-          $scope.loading = false
-          $scope.list = result
+
+        if $scope.list and $scope.stateDriven and not $state.current.abstract and not $scope.stateless
+          changeStateFor $scope.list, sort: column.sort.property, order: if $scope.list.order == 'asc' then 'desc' else 'asc'
+        else
+          $scope.loading = true
+          $scope.list.reload({
+            sort: column.sort.property,
+            order: if $scope.list.order == 'asc' then 'desc' else 'asc'
+          }).then (result) ->
+            $scope.loading = false
+            $scope.list = result
 
       $scope.getSortClass = (column) ->
         return 'glyphicon-sort' if column.sort.property != $scope.list.sort

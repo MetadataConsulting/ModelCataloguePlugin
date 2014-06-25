@@ -298,9 +298,13 @@ class DataImportService {
         while (resolveQueue.hasNext()) {
             ImportRow pendingRow = resolveQueue.next()
             pendingRow.resolveAll()
-            importer.addToImportQueue(pendingRow)
+
+            if(pendingRow.rowActions.size()==0){
+                resolveQueue.remove()
+                importer.addToImportQueue(pendingRow)
+            }
+
         }
-        importer.pendingAction.clear()
     }
 
     protected DataElement updateMetadata(Map metadata, DataElement dataElement) {

@@ -120,10 +120,20 @@
                 <form class="navbar-form navbar-right navbar-input-group" role="search" autocomplete="off"
                       ng-submit="search()" ng-controller="metadataCurator.searchCtrl">
                     <div class="form-group">
-                        <input ng-model="searchSelect" type="text" name="search-term" id="search-term"
-                               placeholder="Search" catalogue-element-picker typeahead-on-select="search()">
+                        <input
+                               ng-model="searchSelect"
+                               type="text"
+                               name="search-term"
+                               id="search-term"
+                               placeholder="Search"
+                               typeahead="result.term as result.label for result in getResults($viewValue)"
+                               typeahead-on-select="search($item, $model, $label)"
+                               typeahead-template-url="modelcatalogue/core/ui/omnisearchItem.html"
+                               typeahead-wait-ms="300"
+                               class="form-control"
+                        >
                     </div>
-                    <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                    <button class="btn btn-default" ng-click="select(searchSelect)"><i class="glyphicon glyphicon-search"></i></button>
                 </form>
             </div><!--/.nav-collapse -->
         </div>
