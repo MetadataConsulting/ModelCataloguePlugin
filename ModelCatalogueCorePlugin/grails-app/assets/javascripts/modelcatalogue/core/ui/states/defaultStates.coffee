@@ -384,6 +384,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           </h3>
         </div>
       </div>
+  <div class="resizable"><p>dasdfsdsadfasdf</p></test>
       <div class="row">
         <div class="col-md-4">
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>

@@ -14,6 +14,7 @@
 #= require columns
 #= require columnsConfiguration
 #= require simpleObjectEditor
+#= require resizable
 
 angular.module('mc.core.ui', [
   # depends on
@@ -32,4 +33,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.columns'
   'mc.core.ui.columnsConfiguration'
   'mc.core.ui.simpleObjectEditor'
+  'mc.core.ui.resizable'
 ])
