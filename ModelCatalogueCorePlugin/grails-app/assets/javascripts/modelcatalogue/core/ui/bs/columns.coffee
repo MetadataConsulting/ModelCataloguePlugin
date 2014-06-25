@@ -32,7 +32,12 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.ImportRow', [
     {header: "Model",        value: 'containingModelName',              class: 'col-md-4', sort: {property: 'containingModelName', type: 'alphabet'}}
     {header: "Data Element",        value: 'dataElementName',              class: 'col-md-4', sort: {property: 'dataElementName', type: 'alphabet'}}
-    {header: "Row Actions",        value: 'actions',              class: 'col-md-4', sort: {property: 'actions', type: 'alphabet'}}
+    {
+      header: "Row Actions"
+      value: (row) -> row.actions?.join('\n\n')
+      class: 'col-md-4'
+      sort: {property: 'actions', type: 'alphabet'}
+    }
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.DataImport', [

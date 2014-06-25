@@ -263,7 +263,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 
   $stateProvider.state 'mc.dataArchitect.imports', {
     abstract: true
-    url: '/:imports'
+    url: '/imports'
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
 
