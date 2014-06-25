@@ -35,11 +35,14 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'childOf',         label: 'Parent',              columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor',    label: 'Models',              columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Data Types',          columns: dataTypes()
-  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy',  label: 'Data Type',           columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy',  label: 'Data Type',           columns: dataTypes()
   catalogueElementPropertiesProvider.configureProperty 'contains',        label: 'Data Elements',       columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'containedIn',     label: 'Models',              columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments',         columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf',    label: 'Conceptual Domains',  columns: nameAndIdent()
+
+  catalogueElementPropertiesProvider.configureProperty 'includedIn',      label: 'Conceptual Domains',  columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'instantiates',    label: 'Data Elements'     ,  columns: nameAndIdent()
 
   catalogueElementPropertiesProvider.configureProperty 'history', {
     hidden: (security) ->
@@ -50,7 +53,14 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
       {header: "Description", value: 'description', class: 'col-md-6'}
     ]
   }
-  catalogueElementPropertiesProvider.configureProperty 'relationships',   hidden: (security) -> !security.hasRole('CURATOR')
+  catalogueElementPropertiesProvider.configureProperty 'relationships',   {
+    hidden: true
+  }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.relationships',   {
+      hidden: false
+  }
+
   catalogueElementPropertiesProvider.configureProperty 'valueDomains',    hidden: (security) -> !security.hasRole('CURATOR')
   catalogueElementPropertiesProvider.configureProperty 'supersededBy',    hidden: true
   catalogueElementPropertiesProvider.configureProperty 'supersedes',      hidden: true

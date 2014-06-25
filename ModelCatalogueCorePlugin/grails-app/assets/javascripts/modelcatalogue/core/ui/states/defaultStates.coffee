@@ -334,10 +334,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           </ul>
         </div>
         <div class="btn-group btn-group-sm">
-          <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="list.availableReports &amp;&amp; list.availableReports.length == 0">
+          <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="list.availableReports &amp;&amp; list.availableReports.length == 0" id="exportBtn">
             <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu" role="menu">
+          <ul class="dropdown-menu" role="menu" id="exportBtnItems">
             <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in list.availableReports">{{report.title}}</a></li>
           </ul>
         </div>
@@ -366,6 +366,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           </h2>
         </div>
         <div class="col-md-8">
+
           <h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements
             <span class="pull-right">
               <div class="btn-group btn-group-sm">
@@ -382,6 +383,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
               </div>
             </span>
           </h3>
+          <blockquote class="ce-description" ng-show="selectedElement.description">{{selectedElement.description}}</blockquote>
         </div>
       </div>
       <div class="row">
