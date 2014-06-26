@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     return "#{(asset.size)} B"
 
   attachmentColumns = -> [
-    {header: "Name",        value: 'relation.name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: true}
+    {header: "Name",        value: 'relation.name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: 'relation.show()'}
     {header: "File Name",   value: 'relation.originalFileName',  class: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
     {header: "Size",        value: computeBytes,                 class: 'col-md-2', sort: {property: 'size', type: 'order'}}
     {header: "Mime Type",   value: 'relation.contentType',       class: 'col-md-2', sort: {property: 'contentType', type: 'alphabet'}}
