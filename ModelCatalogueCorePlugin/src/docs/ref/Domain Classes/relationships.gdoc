@@ -4,7 +4,7 @@ You can use static map @relationships@ to create shortcuts in the domain class. 
 lightweight way how to express relation between two @CatalogueElement@ entities which is extremly powerful but
 sometimes you may want to express the relationships in developer friendlier way.
 
-@relationship@ map can contains up to two keys - @incoming@ and @outgoing@ - each having another map as a value.
+@relationship@ map can contains up to three keys - @incoming@, @outgoing@, @bidirectional@ - each having another map as a value.
 Keys for these maps are the unique @RelationshipType@ names and the values are the property names to be used for the shortcuts.
 
 If we have following declaration in our domain class
@@ -12,7 +12,8 @@ If we have following declaration in our domain class
 {code}
     static relationships = [
         incoming: [context: 'hasContextOf', hierarchy: 'childOf'],
-        outgoing: [containment: 'contains', hierarchy: 'parentOf']
+        outgoing: [containment: 'contains', hierarchy: 'parentOf'],
+        bidirectional: [synonym: 'synonyms']
     ]
 {code}
 

@@ -50,7 +50,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
           appendToRelationshipTypes = (result) ->
             for type in result.list
               relationshipTypes.push {type: type, direction: 'sourceToDestination', value: type.sourceToDestination, relation: 'destination', direction: 'outgoing'} if args.element.isInstanceOf(type.sourceClass)
-              relationshipTypes.push {type: type, direction: 'destinationToSource', value: type.destinationToSource, relation: 'source', direction: 'incoming'} if args.element.isInstanceOf(type.destinationClass)
+              relationshipTypes.push {type: type, direction: 'destinationToSource', value: type.destinationToSource, relation: 'source', direction: 'incoming'} if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource
 
             if result.next.size > 0
               result.next().then appendToRelationshipTypes
