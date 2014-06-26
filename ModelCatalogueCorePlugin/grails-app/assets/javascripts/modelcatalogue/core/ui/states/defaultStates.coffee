@@ -386,7 +386,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
               </div>
             </span>
           </h3>
-          <blockquote class="ce-description" ng-show="selectedElement.description">{{selectedElement.description}}</blockquote>
         </div>
       </div>
       <div class="row">
@@ -394,6 +393,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
         <div class="col-md-8">
+          <blockquote class="ce-description" ng-show="selectedElement.name">{{selectedElement.description}}</blockquote>
           <decorated-list list="contained.elements" columns="contained.columns" stateless="true"></decorated-list>
         </div>
         <hr/>
