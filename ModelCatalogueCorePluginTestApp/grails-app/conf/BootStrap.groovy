@@ -91,39 +91,6 @@ class BootStrap {
 
         environments {
             development {
-                importService.importData()
-                def de = new DataElement(name: "testera", description: "test data architect").save(failOnError: true)
-                de.ext.metadata = "test metadata"
-
-                15.times {
-                    new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
-                }
-
-                def parentModel1 = Model.findByName("Another root #001")
-
-                15.times{
-                    def child = new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
-                    parentModel1.addToParentOf(child)
-                }
-
-
-                for (DataElement element in DataElement.list()) {
-                    parentModel1.addToContains element
-                }
-
-
-                PublishedElement.list().each {
-                    it.status = PublishedElementStatus.FINALIZED
-                    it.save(failOnError: true)
-                }
-
-                def withHistory = DataElement.findByName("NHS NUMBER STATUS INDICATOR CODE")
-
-                10.times {
-                    log.info "Creating archived version #${it}"
-                    publishedElementService.archiveAndIncreaseVersion(withHistory)
-                }
-
                 //domainModellerService.modelDomains()
             }
         }
