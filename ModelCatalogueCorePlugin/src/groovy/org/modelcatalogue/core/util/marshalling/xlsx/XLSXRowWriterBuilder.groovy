@@ -16,6 +16,7 @@ class XLSXRowWriterBuilder {
     private Closure condition   = {container, condition -> true}
     private Closure writer      = {[]}
     private Closure fileName    = { null }
+	private String layoutFileName
 
     /**
      * Creates new builder for writer of given name.
@@ -46,6 +47,12 @@ class XLSXRowWriterBuilder {
         this.headers = headers
         this
     }
+
+
+	XLSXRowWriterBuilder layoutFileName(String layoutFileName) {
+		this.layoutFileName = layoutFileName
+		this
+	}
 
     /**
      * Specifies the name of the exported file omitting the extension.
@@ -140,6 +147,11 @@ class XLSXRowWriterBuilder {
             List<String> getHeaders() {
                 return self.headers
             }
+
+			@Override
+			String getLayoutFileName(){
+				return  self.layoutFileName;
+			}
 
             @Override
             String toString() {
