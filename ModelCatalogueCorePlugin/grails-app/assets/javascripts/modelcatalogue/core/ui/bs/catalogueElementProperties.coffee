@@ -61,7 +61,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
       hidden: false
   }
 
-  catalogueElementPropertiesProvider.configureProperty 'valueDomains',    hidden: (security) -> !security.hasRole('CURATOR')
+#  catalogueElementPropertiesProvider.configureProperty 'valueDomains',    hidden: (security) -> !security.hasRole('CURATOR')
   catalogueElementPropertiesProvider.configureProperty 'supersededBy',    hidden: true
   catalogueElementPropertiesProvider.configureProperty 'supersedes',      hidden: true
 
