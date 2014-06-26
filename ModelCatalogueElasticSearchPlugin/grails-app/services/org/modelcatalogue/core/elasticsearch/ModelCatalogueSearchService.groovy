@@ -83,6 +83,7 @@ class ModelCatalogueSearchService implements SearchCatalogue{
 
     private getTypes(Class resource){
         def types = grailsApplication.getDomainClass(resource.name).getSubClasses().collect{it.clazz.name}
+        if(!types && resource) types = [resource?.name]
         return types
     }
 

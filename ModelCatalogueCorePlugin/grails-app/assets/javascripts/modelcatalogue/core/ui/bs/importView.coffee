@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.importView', ['mc.core.ui.importView', 'mc.core.ui.decoratedList',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor',  'ui.bootstrap']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/importView.html', '''
     <div>
-    <span class="pull-right">
+    <span class="pull-right" show-for-role="CURATOR">
           <div class="btn-group btn-group-sm">
           <button type="button" class="btn btn-primary dropdown-toggle" >
             <span class="glyphicon glyphicon-download-alt"></span> Options <span class="caret"></span>
