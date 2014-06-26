@@ -373,10 +373,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           <h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements
             <span class="pull-right">
               <div class="btn-group btn-group-sm">
-                <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="contained &amp;&amp; contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length == 0  &amp;&amp; !selectedElement.availableReports">
+                <button id="exportBtn" type="button" class="btn btn-primary dropdown-toggle" ng-disabled="contained &amp;&amp; contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length == 0  &amp;&amp; !selectedElement.availableReports">
                   <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu" role="menu">
+                <ul class="dropdown-menu" role="menu" id="exportBtnItems">
                   <li role="presentation" class="dropdown-header">{{selectedElement.name}} Exports</li>
                   <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in selectedElement.availableReports">{{report.title || 'Export'}}</a></li>
                   <li class="divider" role="presentation" ng-show="contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length != 0 &amp;&amp; selectedElement.availableReports"></li>
