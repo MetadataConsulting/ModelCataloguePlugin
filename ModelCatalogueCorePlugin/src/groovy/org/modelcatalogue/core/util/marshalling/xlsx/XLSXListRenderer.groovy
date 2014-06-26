@@ -17,6 +17,7 @@ import pl.touk.excel.export.WebXlsxExporter
  */
 class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
+	static String DEFAULT_LAYOUT_FILENAME       = "web-app/excelLayouts/defaultLayout.xlsx"
     static final MimeType XLSX                  = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
     static final MimeType EXCEL                 = new MimeType('application/vnd.ms-excel', 'xlsx')
     static final XLSXRowWriter DEFAULT_WRITER   = XLSXRowWriterBuilder.writer().headers('EXPORT NOT CONFIGURED').build()
@@ -40,8 +41,34 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
         XLSXRowWriter writer = findRowWriter(context.webRequest.params.report?.toString(), container, context)
 
-        WebXlsxExporter exporter = new WebXlsxExporter()
-        exporter.setResponseHeaders(context.webRequest.currentResponse, writer.getFileName(context) ?: context.controllerName)
+
+
+		def inputLayoutFileName = writer.layoutFileName
+		def layoutFileName = DEFAULT_LAYOUT_FILENAME
+
+		//Check for filePath separator
+		// if it is in windows, then replace it
+		if(File.separator == '\\' && File.separatorChar == '\\' as char)
+			layoutFileName.replace("/","\\");
+
+
+		//check if layoutFileName is provided & it exists
+		if(inputLayoutFileName && (new File(inputLayoutFileName).exists())) {
+			layoutFileName = inputLayoutFileName;
+		}
+
+		File templateFile = new File(layoutFileName);
+		WebXlsxExporter exporter = new WebXlsxExporter()
+		//check if the file exists
+		//Excel-plugin just accepts XLSX not XLS as template, we need to check it as well
+		if(templateFile.exists()){
+			exporter = new WebXlsxExporter(layoutFileName)
+		}
+		//it should be set, before adding any row
+		exporter.setWorksheetName('Export')
+
+
+		exporter.setResponseHeaders(context.webRequest.currentResponse, writer.getFileName(context) ?: context.controllerName)
 
         int counter = 0
 
@@ -58,7 +85,6 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
             }
         }
 
-        exporter.setWorksheetName('Export')
         exporter.save(context.webRequest.currentResponse.outputStream)
     }
 
