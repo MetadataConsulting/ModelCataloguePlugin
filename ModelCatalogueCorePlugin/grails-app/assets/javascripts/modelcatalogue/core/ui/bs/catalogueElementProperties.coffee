@@ -34,7 +34,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'parentOf',        label: 'Children',            columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'childOf',         label: 'Parent',              columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor',    label: 'Models',              columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Data Types',          columns: dataTypes()
+  catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Value Domain',          columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'instantiatedBy',  label: 'Value Domains',           columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'contains',        label: 'Data Elements',       columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'containedIn',     label: 'Models',              columns: nameAndIdent()
