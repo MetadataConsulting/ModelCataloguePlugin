@@ -49,7 +49,7 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
             tabDefinition.actions.push {
               title:  'resolve action'
               icon:   'remove'
-              type:   'danger'
+              type:   'default'
               action: (rel) ->
                 deferred = $q.defer()
                 messages.confirm('Resolve Actions', "Do you really want to resolve all actions : '#{rel.actions}'?").then () ->
