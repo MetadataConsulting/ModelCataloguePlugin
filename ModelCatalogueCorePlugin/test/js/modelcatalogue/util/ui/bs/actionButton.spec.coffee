@@ -1,5 +1,7 @@
-describe "mc.util.ui.bs.actionButton", ->
-  beforeEach module 'mc.util.ui.bs.actionButton'
+describe "mc.util.ui.actionButton", ->
+  beforeEach module 'mc.util.ui.actionButton'
+  beforeEach module 'mc.util.ui.bs.actionButtonSingle'
+  beforeEach module 'mc.util.ui.bs.actionButtonDropdown'
   beforeEach module 'mc.util.ui.actions'
   beforeEach module 'mc.util.security'
 
@@ -41,19 +43,19 @@ describe "mc.util.ui.bs.actionButton", ->
     $rootScope.action  = actions.getActionById('edit-catalogue-element-nested-2', {element: contextEl })
 
     element = $compile('''
-        <action-button action="action" />
+        <action-button-single action="action" />
       ''')($rootScope)
 
     $rootScope.$digest()
 
-    expect(element.find('button').hasClass('btn')).toBeTruthy()
-    expect(element.find('button').hasClass('btn-default')).toBeTruthy()
-    expect(element.find('button').text().trim()).toBe('Edit as Admin')
-    expect(element.find('button').find('span.glyphicon.glyphicon-edit').length).toBe(1)
+    expect(element.hasClass('btn')).toBeTruthy()
+    expect(element.hasClass('btn-default')).toBeTruthy()
+    expect(element.text().trim()).toBe('Edit as Admin')
+    expect(element.find('span.glyphicon.glyphicon-edit').length).toBe(1)
 
     expect(contextEl.name).toBe('The Element')
 
-    element.find('button').click()
+    element.click()
 
     expect(contextEl.name).toBe('The Element Edited')
 
@@ -66,7 +68,7 @@ describe "mc.util.ui.bs.actionButton", ->
     $rootScope.action.abstract = true
 
     element = $compile('''
-        <action-button action="action" />
+        <action-button-dropdown action="action" />
       ''')($rootScope)
 
     $rootScope.$digest()
@@ -87,7 +89,7 @@ describe "mc.util.ui.bs.actionButton", ->
 
     expect(childActionLink.length).toBe(1)
 
-    expect(childActionLink.text().trim()).toBe('Edit as Admin')
+    expect(childActionLink.text().trim()).toBe('Edit')
     expect(childActionLink.find('span.glyphicon.glyphicon-edit').length).toBe(1)
 
     childActionLink.click()

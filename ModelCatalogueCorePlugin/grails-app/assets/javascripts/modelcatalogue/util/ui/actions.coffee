@@ -72,6 +72,17 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     actions.getActionById = (id, actionContext) ->
       createAction(availableActionsById[id], actions, $injector, actionContext)
 
+    ###
+    # Creates context which will be crated from properties of given names of the given scope
+    # and propagates their changes back to that scope.
+    ###
+    actions.createScopeContext = ($scope, properties...) ->
+      context = $scope.$new(true)
+      for property in properties
+        context[property] = $scope[property]
+        context.$watch property, (newValue) -> $scope[property] = newValue
+      context
+
     actions
   ]
 

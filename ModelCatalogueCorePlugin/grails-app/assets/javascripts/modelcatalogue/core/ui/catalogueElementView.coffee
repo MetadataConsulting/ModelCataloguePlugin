@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'ui.router', 'mc.core.ui.catalogueElementProperties']).directive 'catalogueElementView',  [-> {
+angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'ui.router', 'mc.core.ui.catalogueElementProperties']).directive 'catalogueElementView',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties) ->
+    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', 'actions', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, actions) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl', 'archived']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -215,17 +215,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         else
           $scope.reports    = tab.value?.availableReports
 
-      $scope.createRelationship = () ->
-        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
-
-      $scope.canEdit = ->
-        return false if not $scope.element or $scope.element.archived or $scope.element?.status == 'FINALIZED'
-        messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
-
-      $scope.edit = ->
-        return if not $scope.element or $scope.element.archived or $scope.element?.status == 'FINALIZED'
-        messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
-          $scope.element = updated
+      $scope.actionsContext = actions.createScopeContext $scope, 'element'
 
       # watches
       $scope.$watch 'element', onElementUpdate

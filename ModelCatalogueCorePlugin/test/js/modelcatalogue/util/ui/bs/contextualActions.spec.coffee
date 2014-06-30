@@ -45,8 +45,6 @@ describe "mc.util.ui.bs.contextualActions", ->
 
     $rootScope.$digest()
 
-    console.log element
-
     expect(element.find('button:first-child').hasClass('btn')).toBeTruthy()
     expect(element.find('button:first-child').hasClass('btn-primary')).toBeTruthy()
     expect(element.find('button:first-child').text().trim()).toBe('Edit')

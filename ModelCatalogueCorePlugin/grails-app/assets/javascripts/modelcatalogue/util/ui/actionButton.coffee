@@ -1,8 +1,12 @@
-angular.module('mc.util.ui.actionButton', []).directive 'actionButton',  [-> {
+angular.module('mc.util.ui.actionButton', ['mc.util.ui.actionButtonSingle', 'mc.util.ui.actionButtonDropdown']).directive 'actionButton',  ['$compile', ($compile)-> {
   restrict: 'E'
-  replace: true
-  scope:
-    action: '='
 
-  templateUrl: 'modelcatalogue/util/ui/actionButton.html'
+  scope:
+    action:     '='
+    size:       '=?'
+    iconOnly:   '=?'
+
+  link: (scope, element) ->
+    tpl = if scope.action.children then '<action-button-dropdown action="action" size="size" icon-only="iconOnly"></action-button-dropdown>' else  '<action-button-single action="action" size="size" icon-only="iconOnly"></action-button-single>'
+    element.replaceWith($compile(tpl)(scope))
 }]
