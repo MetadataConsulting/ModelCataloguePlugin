@@ -36,7 +36,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
             }
 
-            if (controllerName == 'dataType') {
+            if (controllerName == 'dataType' || controllerName == 'enumeratedType' ) {
                 "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
             }
 
