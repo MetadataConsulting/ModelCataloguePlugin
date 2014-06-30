@@ -4,7 +4,9 @@
 #= require hideIfLoggedIn
 #= require showIfLoggedIn
 #= require contextualActions
+#= require actions
 #= require actionButton
+#= require contextualActions
 
 angular.module 'mc.util.ui', [
   # dependencies
@@ -16,5 +18,7 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.hideIfLoggedIn'
   'mc.util.ui.showIfLoggedIn'
   'mc.util.ui.contextualActions'
+  'mc.util.ui.actions'
   'mc.util.ui.actionButton'
+  'mc.util.ui.contextualActions'
 ]

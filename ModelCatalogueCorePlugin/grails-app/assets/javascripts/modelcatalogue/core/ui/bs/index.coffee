@@ -3,6 +3,7 @@
 #= require angular-cookies/angular-cookies
 #= require modelcatalogue/core/index
 #= require modelcatalogue/util/ui/index
+#= require modelcatalogue/util/ui/bs/index
 #= require catalogueElementView
 #= require importView
 #= require catalogueElementTreeview
