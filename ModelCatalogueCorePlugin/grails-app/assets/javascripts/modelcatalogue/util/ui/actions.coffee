@@ -6,15 +6,19 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
 
     return if not condition
 
-    action = {abstract: true}
+    action =
+      abstract: true
+      type:     'default'
+      disabled: condition == 'disabled'
+      id:       actionConfig.id
 
     if actionConfig.action
-      action = ->
-        self = this
-        $injector.invoke(actionConfig.action, actionConfig, {actionContext: actionContext, action: self, actions: actionsService})
-
-    action.disabled   = condition == 'disabled'
-    action.id         = actionConfig.id
+      action.abstract = false
+      unless action.disabled
+        action.run = ->
+          $injector.invoke(actionConfig.action, actionConfig, {actionContext: actionContext, action: action, actions: actionsService})
+      else
+        action.run = ->
 
     for property in ['label', 'position', 'icon', 'type']
       value = actionConfig[property]
@@ -22,6 +26,8 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
         action[property] = $injector.invoke(value, actionConfig, {actionContext: actionContext, action: action, actions: actionsService})
       else
         action[property] = value
+
+    action.type ?= 'default'
 
     if actionConfig.children
       action.children = []
@@ -61,6 +67,10 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
         currentActions.push action if action
 
       $filter('orderBy')(currentActions, 'position')
+
+
+    actions.getActionById = (id, actionContext) ->
+      createAction(availableActionsById[id], actions, $injector, actionContext)
 
     actions
   ]

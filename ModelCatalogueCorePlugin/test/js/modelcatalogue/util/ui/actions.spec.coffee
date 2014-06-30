@@ -56,6 +56,16 @@ describe "mc.util.ui.actions", ->
     expect(editAction.children).toBeArray()
     expect(editAction.children.length).toBe(1)
 
-    editAction()
+    editAction.run()
 
     expect(editCalled).toBeTruthy()
+
+    byId = actions.getActionById('edit-catalogue-element', {element: element})
+
+    expect(byId).toBeDefined()
+    expect(byId.position).toBe(100)
+    expect(byId.label).toBe('Edit')
+    expect(byId.icon).toBe('edit')
+    expect(byId.type).toBe('primary')
+    expect(byId.children).toBeArray()
+    expect(byId.children.length).toBe(1)
