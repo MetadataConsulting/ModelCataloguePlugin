@@ -48,6 +48,6 @@ interface XLSXRowWriter<T> {
     List<Object> getHeaders()
 
 
-	String getLayoutFileName()
+	String getLayoutResourceName()
 
 }

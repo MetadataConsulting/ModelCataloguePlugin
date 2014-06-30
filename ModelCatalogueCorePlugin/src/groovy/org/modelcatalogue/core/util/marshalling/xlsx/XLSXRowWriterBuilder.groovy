@@ -16,7 +16,7 @@ class XLSXRowWriterBuilder {
     private Closure condition   = {container, condition -> true}
     private Closure writer      = {[]}
     private Closure fileName    = { null }
-	private String layoutFileName
+	private String layoutResourceName
 
     /**
      * Creates new builder for writer of given name.
@@ -149,8 +149,8 @@ class XLSXRowWriterBuilder {
             }
 
 			@Override
-			String getLayoutFileName(){
-				return  self.layoutFileName;
+			String getLayoutResourceName(){
+				return  self.layoutResourceName;
 			}
 
             @Override

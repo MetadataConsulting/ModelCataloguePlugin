@@ -17,7 +17,7 @@ import pl.touk.excel.export.WebXlsxExporter
  */
 class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
-	static String DEFAULT_LAYOUT_FILENAME       = "web-app/excelLayouts/defaultLayout.xlsx"
+	static String DEFAULT_LAYOUT_RESOURCENAME       = "/excelLayouts/defaultLayout.xlsx"
     static final MimeType XLSX                  = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
     static final MimeType EXCEL                 = new MimeType('application/vnd.ms-excel', 'xlsx')
     static final XLSXRowWriter DEFAULT_WRITER   = XLSXRowWriterBuilder.writer().headers('EXPORT NOT CONFIGURED').build()
@@ -43,26 +43,20 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
 
 
-		def inputLayoutFileName = writer.layoutFileName
-		def layoutFileName = DEFAULT_LAYOUT_FILENAME
+ 		URL layoutResource      = this.class.getResource(DEFAULT_LAYOUT_RESOURCENAME)
 
-		//Check for filePath separator
-		// if it is in windows, then replace it
-		if(File.separator == '\\' && File.separatorChar == '\\' as char)
-			layoutFileName.replace("/","\\");
-
-
-		//check if layoutFileName is provided & it exists
-		if(inputLayoutFileName && (new File(inputLayoutFileName).exists())) {
-			layoutFileName = inputLayoutFileName;
+		//check if layoutResource is provided & it exists
+		//then use this input
+		if( writer.layoutResourceName && (new File(this.class.getResource(writer.layoutResourceName).file).exists())) {
+			layoutResource = this.class.getResource(writer.layoutResourceName);
 		}
 
-		File templateFile = new File(layoutFileName);
+		File templateFile = new File(layoutResource.file);
 		WebXlsxExporter exporter = new WebXlsxExporter()
 		//check if the file exists
 		//Excel-plugin just accepts XLSX not XLS as template, we need to check it as well
 		if(templateFile.exists()){
-			exporter = new WebXlsxExporter(layoutFileName)
+			exporter = new WebXlsxExporter(layoutResource.file)
 		}
 		//it should be set, before adding any row
 		exporter.setWorksheetName('Export')
