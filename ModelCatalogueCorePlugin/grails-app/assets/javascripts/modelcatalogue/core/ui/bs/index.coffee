@@ -31,6 +31,7 @@ angular.module('mc.core.ui.bs', [
   # depends on
   'mc.core.ui'
   'mc.util.ui'
+  'mc.util.ui.bs'
   'ui.bootstrap'
   'ngCookies'
   # list of modules

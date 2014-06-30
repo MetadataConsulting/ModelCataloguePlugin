@@ -2,7 +2,7 @@ angular.module('mc.util.ui.actionButton', []).directive 'actionButton',  [-> {
   restrict: 'E'
   replace: true
   scope:
-    action: '=?'
+    action: '='
 
   templateUrl: 'modelcatalogue/util/ui/actionButton.html'
 }]
