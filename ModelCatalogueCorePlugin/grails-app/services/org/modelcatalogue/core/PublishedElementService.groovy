@@ -61,13 +61,13 @@ class PublishedElementService {
         if(element instanceof DataElement) {
             if (element.containedIn.size() > 0) {
                 element.containedIn.each { Model model ->
-                    if (model.status != PublishedElementStatus.PENDING && model.status != PublishedElementStatus.UPDATED) {
+                    if (model.status != PublishedElementStatus.DRAFT && model.status != PublishedElementStatus.UPDATED) {
                         Model archivedModel = archiveAndIncreaseVersion(model)
                         archivedModel.removeFromContains(element)
                         archivedModel.addToContains(archived)
                     }
 
-                    if (model.status == PublishedElementStatus.PENDING) {element.status = PublishedElementStatus.PENDING}
+                    if (model.status == PublishedElementStatus.DRAFT) {element.status = PublishedElementStatus.DRAFT}
                 }
 
                 element.save()
