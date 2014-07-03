@@ -92,7 +92,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all?page&order&sort&status&q'
+    url: '/all?page&order&sort&status&q&max'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
@@ -105,6 +105,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           params.order  = $stateParams.order ? 'asc'
           params.sort   = $stateParams.sort ? 'name'
           params.status = $stateParams.status ? 'finalized'
+          params.max    = $stateParams.max ? 10
 
           if $stateParams.q
             return catalogueElementResource($stateParams.resource).search($stateParams.q, params)
