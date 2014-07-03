@@ -217,7 +217,7 @@ class DataImportService {
 
     protected Model addModelToImport(DataImport importer, Model model) {
         if (!importer.models.find{it.id == model.id}) {
-            if(model.status != PublishedElementStatus.UPDATED){model.status = PublishedElementStatus.PENDING}
+            if(model.status != PublishedElementStatus.UPDATED){model.status = PublishedElementStatus.DRAFT}
             model.save()
             importer.models.add(model)
         }
@@ -351,8 +351,8 @@ class DataImportService {
             dataElement.status = PublishedElementStatus.UPDATED
             dataElement.save()
             dataElement = updateMetadata(metadata, dataElement)
-            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.PENDING){
-                model.status = PublishedElementStatus.PENDING
+            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
+                model.status = PublishedElementStatus.DRAFT
                 model.save()
             }
         }
@@ -389,8 +389,8 @@ class DataImportService {
 
             }
 
-            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.PENDING){
-                model.status = PublishedElementStatus.PENDING
+            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
+                model.status = PublishedElementStatus.DRAFT
                 model.save()
             }
         }
