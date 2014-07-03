@@ -41,23 +41,20 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
         XLSXRowWriter writer = findRowWriter(context.webRequest.params.report?.toString(), container, context)
 
+ 		URL layoutResource = this.class.getResource(DEFAULT_LAYOUT_RESOURCENAME)
+		String layoutFileName
 
-
- 		URL layoutResource      = this.class.getResource(DEFAULT_LAYOUT_RESOURCENAME)
-
-		//check if layoutResource is provided & it exists
-		//then use this input
-		if( writer.layoutResourceName && (new File(this.class.getResource(writer.layoutResourceName).file).exists())) {
-			layoutResource = this.class.getResource(writer.layoutResourceName);
+		if(layoutResource && layoutResource.file && (new File(layoutResource.file).exists())){
+			layoutFileName = layoutResource.file;
 		}
 
-		File templateFile = new File(layoutResource.file);
-		WebXlsxExporter exporter = new WebXlsxExporter()
-		//check if the file exists
-		//Excel-plugin just accepts XLSX not XLS as template, we need to check it as well
-		if(templateFile.exists()){
-			exporter = new WebXlsxExporter(layoutResource.file)
+		WebXlsxExporter exporter
+		if(layoutFileName){
+			exporter = new WebXlsxExporter(layoutFileName)
+		}else{
+			exporter = new WebXlsxExporter()
 		}
+
 		//it should be set, before adding any row
 		exporter.setWorksheetName('Export')
 
