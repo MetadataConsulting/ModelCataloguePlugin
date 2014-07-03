@@ -215,8 +215,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         else
           $scope.reports    = tab.value?.availableReports
 
-      $scope.actionsContext = actions.createScopeContext $scope, 'element'
-
       # watches
       $scope.$watch 'element', onElementUpdate
       $scope.$watch 'property', onPropertyUpdate

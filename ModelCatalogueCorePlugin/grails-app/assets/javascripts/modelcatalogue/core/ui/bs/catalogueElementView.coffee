@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView.html', '''
     <div>
       <span class="pull-right">
-        <contextual-actions context="actionsContext" size="sm"></contextual-actions>
+        <contextual-actions></contextual-actions>
         <div class="btn-group btn-group-sm">
           <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="reports &amp;&amp; reports.length == 0  &amp;&amp; !element.availableReports">
             <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>

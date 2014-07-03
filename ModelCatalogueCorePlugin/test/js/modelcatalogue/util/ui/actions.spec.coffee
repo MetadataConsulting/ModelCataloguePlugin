@@ -69,22 +69,3 @@ describe "mc.util.ui.actions", ->
     expect(byId.type).toBe('primary')
     expect(byId.children).toBeArray()
     expect(byId.children.length).toBe(1)
-
-  it "can create live context which reflect the changes to the scope", inject ($rootScope, actions) ->
-    $rootScope.element = {name: 'One'}
-    context = actions.createScopeContext $rootScope, 'element'
-
-    expect(context.element).toBeDefined()
-    expect(context.element).toEqual($rootScope.element)
-
-    context.element.name = 'Two'
-
-    expect(context.element.name).toBe('Two')
-    expect($rootScope.element.name).toBe('Two')
-
-    context.element = {name: 'Three'}
-
-    $rootScope.$digest()
-
-    expect(context.element.name).toBe('Three')
-    expect($rootScope.element.name).toBe('Three')
