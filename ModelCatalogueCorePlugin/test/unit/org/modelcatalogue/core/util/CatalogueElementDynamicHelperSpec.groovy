@@ -21,8 +21,8 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 
         where:
         clazz                   | transients
-        TestCatalogueElement1   | ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'hasContextOf', 'parentOf', 'childOf']
-        TestCatalogueElement2   | ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'hasContextOf', 'parentOf', 'childOf', 'b', 'd']
+        TestCatalogueElement1   | ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'hasContextOf', 'parentOf', 'childOf', 'synonyms']
+        TestCatalogueElement2   | ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'hasContextOf', 'parentOf', 'childOf', 'synonyms', 'b', 'd']
 
     }
 
@@ -45,6 +45,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         clazz                   | prop
         TestCatalogueElement1   | 'hasContextOf'
         TestCatalogueElement1   | 'parentOf'
+        TestCatalogueElement1   | 'synonyms'
         TestCatalogueElement1   | 'childOf'
         TestCatalogueElement2   | 'hasContextOf'
         TestCatalogueElement2   | 'parentOf'
@@ -97,8 +98,9 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 class TestCatalogueElement1 extends CatalogueElement {
 
     static relationships = [
-        incoming: [context: 'hasContextOf', hierarchy: 'parentOf'],
-        outgoing: [hierarchy: 'childOf']
+        incoming:           [context: 'hasContextOf', hierarchy: 'parentOf'],
+        outgoing:           [hierarchy: 'childOf'],
+        bidirectional:      [synonym: 'synonyms']
     ]
 
 }

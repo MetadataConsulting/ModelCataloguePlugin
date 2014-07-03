@@ -337,10 +337,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           </ul>
         </div>
         <div class="btn-group btn-group-sm">
-          <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="list.availableReports &amp;&amp; list.availableReports.length == 0">
+          <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="list.availableReports &amp;&amp; list.availableReports.length == 0" id="exportBtn">
             <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu" role="menu">
+          <ul class="dropdown-menu" role="menu" id="exportBtnItems">
             <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in list.availableReports">{{report.title}}</a></li>
           </ul>
         </div>
@@ -369,13 +369,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           </h2>
         </div>
         <div class="col-md-8">
+
           <h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements
             <span class="pull-right">
               <div class="btn-group btn-group-sm">
-                <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="contained &amp;&amp; contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length == 0  &amp;&amp; !selectedElement.availableReports">
+                <button id="exportBtn" type="button" class="btn btn-primary dropdown-toggle" ng-disabled="contained &amp;&amp; contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length == 0  &amp;&amp; !selectedElement.availableReports">
                   <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu" role="menu">
+                <ul class="dropdown-menu" role="menu" id="exportBtnItems">
                   <li role="presentation" class="dropdown-header">{{selectedElement.name}} Exports</li>
                   <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in selectedElement.availableReports">{{report.title || 'Export'}}</a></li>
                   <li class="divider" role="presentation" ng-show="contained.elements.availableReports &amp;&amp; contained.elements.availableReports.length != 0 &amp;&amp; selectedElement.availableReports"></li>
@@ -392,6 +393,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
         <div class="col-md-8">
+          <blockquote class="ce-description" ng-show="selectedElement.name">{{selectedElement.description}}</blockquote>
           <decorated-list list="contained.elements" columns="contained.columns" stateless="true"></decorated-list>
         </div>
         <hr/>

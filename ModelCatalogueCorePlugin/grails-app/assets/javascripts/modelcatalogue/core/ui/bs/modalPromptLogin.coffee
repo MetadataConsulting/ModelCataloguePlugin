@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', 'security', ($modal, $q, messages, security) ->
     ->
       deferred = $q.defer()
@@ -32,9 +32,10 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages']).config ['
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', 'messages', 'security', '$modalInstance', '$log',
-          ($scope, messages, security, $modalInstance) ->
-            $scope.user = {}
+        controller: ['$scope', '$cookies', 'messages', 'security', '$modalInstance', '$log',
+          ($scope, $cookies, messages, security, $modalInstance) ->
+            console.log $cookies
+            $scope.user = {rememberMe: $cookies.mc_remember_me == "true"}
             $scope.messages = messages.createNewMessages()
 
             $scope.login = ->
@@ -45,6 +46,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages']).config ['
                   for error in success.data.errors
                     $scope.messages.error error
                 else
+                  $cookies.mc_remember_me = $scope.user.rememberMe
                   $modalInstance.close success
 
 

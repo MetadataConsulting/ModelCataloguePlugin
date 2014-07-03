@@ -20,8 +20,9 @@ class CatalogueElementDynamicHelper {
         def transients      = GrailsClassUtils.getStaticFieldValue(type, 'transients')      ?: []
         def relationships   = GrailsClassUtils.getStaticFieldValue(type, 'relationships')   ?: [:]
 
-        relationships.incoming?.each handleRelationships(type, 'incoming', transients)
-        relationships.outgoing?.each handleRelationships(type, 'outgoing', transients)
+        relationships.incoming?.each        handleRelationships(type, 'incoming', transients)
+        relationships.outgoing?.each        handleRelationships(type, 'outgoing', transients)
+        relationships.bidirectional?.each   handleRelationships(type, '', transients)
 
         type.transients = new LinkedHashSet(transients).toList()
     }
@@ -60,7 +61,7 @@ class CatalogueElementDynamicHelper {
                 type.metaClass[addMethodName] = { other ->
                     RelationshipType relType = RelationshipType.findByName(relName)
                     if (!relType) throw new IllegalArgumentException("Unknown relationship type $relName")
-                    delegate."createLink${direction == 'outgoing' ? 'To' : 'From'}"(other, relType)
+                    delegate."createLink${direction == 'incoming' ? 'From' : 'To'}"(other, relType)
                 }
             }
 
@@ -69,7 +70,7 @@ class CatalogueElementDynamicHelper {
                 type.metaClass[removeMethodName] = {other ->
                     RelationshipType relType = RelationshipType.findByName(relName)
                     if (!relType) throw new IllegalArgumentException("Unknown relationship type $relType")
-                    delegate."removeLink${direction == 'outgoing' ? 'To' : 'From'}"(other, relType)
+                    delegate."removeLink${direction == 'incoming' ? 'From' : 'To'}"(other, relType)
                 }
             }
 

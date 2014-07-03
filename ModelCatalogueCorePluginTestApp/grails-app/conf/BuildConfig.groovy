@@ -80,6 +80,8 @@ grails.project.dependency.resolution = {
         //runtime ":jquery:1.10.2.2"
         runtime ":resources:1.2.1"
         compile ":csv:0.3.1"
+
+        compile ":quartz:1.0.2"
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"
         //runtime ":cached-resources:1.1"

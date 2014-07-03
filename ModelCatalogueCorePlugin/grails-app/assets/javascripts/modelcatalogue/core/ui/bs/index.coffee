@@ -1,5 +1,6 @@
 #= require_self
 #= require angular-bootstrap/ui-bootstrap-tpls
+#= require angular-cookies/angular-cookies
 #= require modelcatalogue/core/index
 #= require modelcatalogue/util/ui/index
 #= require catalogueElementView
@@ -31,6 +32,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui'
   'mc.util.ui'
   'ui.bootstrap'
+  'ngCookies'
   # list of modules
   'mc.core.ui.bs.decoratedListTable'
   'mc.core.ui.bs.catalogueElementView'
