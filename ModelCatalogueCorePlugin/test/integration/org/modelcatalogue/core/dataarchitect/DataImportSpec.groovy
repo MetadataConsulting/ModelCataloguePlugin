@@ -224,7 +224,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
 
         when:
         def dataType = dataImportService.importDataType('testEnum', "t:test|t1:testONe")
-        def testDataType =  DataType.findByName("t:test|t1:testONe..")
+        def testDataType =  DataType.findByName("testEnum")
 
         then:
         dataType
