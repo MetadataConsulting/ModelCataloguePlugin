@@ -1,20 +1,32 @@
-angular.module('mc.util.ui.contextualActions', ['mc.util.ui.actionButton']).directive 'contextualActions',  [-> {
+angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingle','mc.util.ui.bs.actionButtonDropdown']).directive 'contextualActions',  ['$compile', '$templateCache', 'actions', ($compile, $templateCache, actions)-> {
   restrict: 'E'
-  replace: true
-  scope:
-    group:      '=?'
+  replace:  true
+ scope:
+    group:      '@'
     size:       '@'
-    iconsOnly:  '=?'
+    iconOnly:   '@'
 
 
   templateUrl: 'modelcatalogue/util/ui/contextualActions.html'
 
-  controller: ['$scope', 'actions', '$attrs', ($scope, actions) ->
-    $scope.actions = actions.getActions($scope.$parent)
+  link: ($scope, $element) ->
+    getTemplate = (action) ->
+      $templateCache.get(if action.children then 'modelcatalogue/util/ui/actionButtonDropdown.html' else 'modelcatalogue/util/ui/actionButtonSingle.html')
 
-    $scope.$on 'userLoggedIn', -> $scope.actions = actions.getActions($scope.$parent)
-    $scope.$on 'userLoggedOut', -> $scope.actions = actions.getActions($scope.$parent)
 
-    $scope.$on 'redrawConceptualActions', -> $scope.actions = actions.getActions($scope.$parent)
-  ]
+    updateActions = ->
+      $element.empty()
+      for action in actions.getActions($scope.$parent)
+
+        newScope = $scope.$new()
+        newScope.action = action
+        $element.append($compile(getTemplate(action))(newScope))
+
+    updateActions()
+
+
+    $scope.$on 'userLoggedIn', updateActions
+    $scope.$on 'userLoggedOut', updateActions
+
+    $scope.$on 'redrawContextualActions', updateActions
 }]
