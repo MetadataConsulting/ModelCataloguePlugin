@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView.html', '''
     <div>
       <span class="pull-right">
-        <contextual-actions size="sm"></contextual-actions>
+        <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
       <h3 class="ce-name">{{element.name}} <small ng-show="element.elementTypeName">({{element.elementTypeName}}: {{element.id}})</small></h3>
       <blockquote class="ce-description" ng-show="element.description">{{element.description}}</blockquote>

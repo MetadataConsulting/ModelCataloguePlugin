@@ -2,21 +2,23 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
   restrict: 'E'
   replace:  true
  scope:
+    scope:      '=?'
     group:      '@'
     size:       '@'
     iconOnly:   '@'
+    noColors:   '@'
 
 
   templateUrl: 'modelcatalogue/util/ui/contextualActions.html'
 
   link: ($scope, $element) ->
     getTemplate = (action) ->
-      $templateCache.get(if action.children then 'modelcatalogue/util/ui/actionButtonDropdown.html' else 'modelcatalogue/util/ui/actionButtonSingle.html')
+      $templateCache.get(if action.children?.length or action.abstract then 'modelcatalogue/util/ui/actionButtonDropdown.html' else 'modelcatalogue/util/ui/actionButtonSingle.html')
 
 
     updateActions = ->
       $element.empty()
-      for action in actions.getActions($scope.$parent)
+      for action in actions.getActions($scope.scope ? $scope.$parent)
 
         newScope = $scope.$new()
         newScope.action = action

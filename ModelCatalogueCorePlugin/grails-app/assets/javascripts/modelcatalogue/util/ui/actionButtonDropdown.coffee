@@ -5,6 +5,7 @@ angular.module('mc.util.ui.actionButtonDropdown', []).directive 'actionButtonDro
     action:     '='
     size:       '=?'
     iconOnly:   '=?'
+    noColors:   '=?'
 
   templateUrl: 'modelcatalogue/util/ui/actionButtonDropdown.html'
 }]

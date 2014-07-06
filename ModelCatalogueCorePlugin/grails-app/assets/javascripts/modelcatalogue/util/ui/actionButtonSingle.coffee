@@ -5,6 +5,7 @@ angular.module('mc.util.ui.actionButtonSingle', []).directive 'actionButtonSingl
     action:     '='
     size:       '=?'
     iconOnly:   '=?'
+    noColors:   '=?'
 
   templateUrl: 'modelcatalogue/util/ui/actionButtonSingle.html'
 }]

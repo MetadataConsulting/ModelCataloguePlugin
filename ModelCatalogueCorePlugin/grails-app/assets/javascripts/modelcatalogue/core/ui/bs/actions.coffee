@@ -1,159 +1,207 @@
 angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actionsProvider', (actionsProvider)->
 
-  actionsProvider.registerAction {
-    id:         'edit-catalogue-element'
-    position:   100
-    label:      'Edit'
-    icon:       'edit'
-    type:       'primary'
-    condition:  ['security', '$scope', (security, $scope)->
-      # returning false will hide the element completely
-      return false if not $scope.element
-      # returning 'disabled' will show the action but disable it (action.disabled == true)
-      return false if not security.hasRole('CURATOR')
-      # disable for archived and finalized elements
-      return 'disabled' if $scope.element.archived or $scope.element?.status == 'FINALIZED'
-      # always return true explicitly
-      return true
-    ]
-    action: [ '$scope', 'messages', 'names', ($scope, messages, names) ->
-      messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
-        $scope.element = updated
-    ]
-  }
+  actionsProvider.registerAction 'create-catalogue-element', ['$scope', 'names', 'security', 'messages', ($scope, names, security, messages) ->
+    return undefined if not security.hasRole('CURATOR')
+    return undefined if not $scope.resource
+    return undefined if not messages.hasPromptFactory('edit-' + $scope.resource)
 
-  actionsProvider.registerAction {
-    id:         'create-new-relationship'
-    position:   200
-    label:      'Create Relationship'
-    icon:       'link'
-    type:       'success'
-    condition:  ['security', '$scope', (security, $scope)->
-      # returning false will hide the element completely
-      return false if not $scope.element
-      # returning 'disabled' will show the action but disable it (action.disabled == true)
-      return false if not security.hasRole('CURATOR')
-      # always return true explicitly
-      return true
-    ]
-    action: [ '$scope', 'messages', 'names', ($scope, messages) ->
-      messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
-    ]
-  }
+    {
+      position:   100
+      label:      "New #{names.getNaturalName($scope.resource)}"
+      icon:       'plus-sign'
+      type:       'success'
+      action:     ->
+        messages.prompt('Create ' + names.getNaturalName($scope.resource), '', {type: 'edit-' + $scope.resource, create: ($scope.resource)}).then (created)->
+          created.show()
+    }
+  ]
 
-  actionsProvider.registerAction {
-      id:         'download-asset'
+  actionsProvider.registerChildAction 'create-catalogue-element', 'create-enumerated-type', ['security', '$scope', 'messages', (security, $scope, messages)->
+    return undefined if not security.hasRole('CURATOR')
+    return undefined if not messages.hasPromptFactory('edit-enumeratedType')
+    return undefined if $scope.resource != 'dataType'
+
+    {
+      position:   100
+      label:      "New Enumerated Type"
+      #icon:      'plus-sign'
+      type:       'success'
+      action:     ->
+        messages.prompt('Create Enumerated Type', '', {type: 'edit-enumeratedType', create: ($scope.resource)}).then (created)->
+          created.show()
+    }
+  ]
+
+  actionsProvider.registerAction 'create-import', ['security', '$scope', 'messages', (security, $scope, messages)->
+    return undefined unless security.hasRole('CURATOR') and $scope.resource == 'import' and messages.hasPromptFactory('new-import')
+
+    {
+      position:   100
+      label:      "New Import"
+      icon:       'plus-sign'
+      type:       'success'
+      action:     ->
+        messages.prompt('Create Import', '', {type: 'new-import', create: ($scope.resource)}).then (created)->
+          created.show()
+    }
+  ]
+
+  actionsProvider.registerAction 'edit-catalogue-element', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+    return undefined if not $scope.element
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   100
+      label:      'Edit'
+      icon:       'edit'
+      type:       'primary'
+      disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
+      action:     ->
+        messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
+          $scope.element = updated
+    }
+  ]
+
+  actionsProvider.registerAction 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+    return undefined if not $scope.element
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   200
+      label:      'Create Relationship'
+      icon:       'link'
+      type:       'success'
+      action:     ->
+        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element}).then (updated)->
+          $scope.element = updated
+    }
+  ]
+
+  actionsProvider.registerAction 'download-asset', [ '$scope', '$window', ($scope, $window) ->
+    return undefined if not $scope.element?.downloadUrl?
+
+    {
       position:   0
       label:      'Download'
       icon:       'download'
       type:       'primary'
-      condition:  ['$scope', ($scope)->
-        # returning false will hide the element completely
-        return false if not $scope.element?.downloadUrl?
-        # always return true explicitly
-        return true
-      ]
-      action: [ '$scope', '$window', ($scope, $window) ->
+      action:     ->
         $window.open $scope.element.downloadUrl, '_blank'; return true
-      ]
-  }
 
-  actionsProvider.registerAction {
-    id:         'catalogue-element-export'
-    position:   1000
-    label:      'Export'
-    icon:       'download-alt'
-    type:       'primary'
-    condition:  ['$scope', ($scope)->
-      # returning false will hide the element completely
-      return false if not $scope.element
-      # always return true explicitly
-      return true
-    ]
-  }
+    }
+  ]
 
-  actionsProvider.registerAction {
-    id: 'catalogue-element-export-specific-reports'
-    parent: 'catalogue-element-export'
-    position: 1000
+  actionsProvider.registerAction 'export', ['$scope', ($scope)->
+    return undefined unless $scope.list or $scope.element
 
-    label: ['$scope', ($scope)->
-      "#{$scope.element.name} Reports"
-    ]
+    {
+      position:   1000
+      label:      'Export'
+      icon:       'download-alt'
+      type:       'primary'
+    }
+  ]
 
-    condition: ['$scope', ($scope)->
-      return false      if not $scope.element
-      return 'disabled' if not $scope.element?.availableReports?.length
-      return true
-    ]
+  actionsProvider.registerChildAction 'export', 'catalogue-element-export-specific-reports' , ['$scope', '$window', ($scope, $window) ->
+    return undefined if not $scope.element
 
-    generator: ['$scope', '$window', 'action', '$filter', 'headingAction', ($scope, $window, action, $filter, headingAction)->
-      updateReports = (reports)->
+    {
+      position:   1000
+      label:      "#{$scope.element.name} Reports"
+      disabled:   not $scope.element?.availableReports?.length
+      generator:  (action) ->
+        action.createActionsFrom 'element.availableReports', (reports = []) ->
+          for report in reports
+            {
+              label:  report.title
+              run:    -> $window.open(report.url, '_blank') ; return true
+            }
+    }
+  ]
 
-        ret = $filter('filter')(action.children, (cha) -> cha.generatedBy != 'catalogue-element-export-specific-reports')
+  actionsProvider.registerChildAction 'export', 'generic-reports', ['$scope', '$window', ($scope, $window) ->
+    {
+      position:   2000
+      label:      "Other Reports"
+      disabled:   not $scope.reports?.length
+      generator: (action) ->
+        action.createActionsFrom 'reports', (reports = []) ->
+          for report in reports
+            {
+              label:  report.title
+              run:    -> $window.open(report.url, '_blank') ; return true
+            }
+    }
+  ]
 
-        added = 0
+  actionsProvider.registerChildAction 'export', 'list-exports-current', ['$scope', '$window', ($scope, $window) ->
+    return undefined if not $scope.list?
 
-        for report, i in reports
-          added++
-          ret.push {
-            generatedBy: 'catalogue-element-export-specific-reports'
-            label:  report.title
-            position: 1001 + i
-            run:    -> $window.open(report.url, '_blank') ; return true
-          }
-        ret
-        action.children = ret
-        action.sortChildren()
-        headingAction.disabled = added == 0
+    {
+      position:   5000
+      label:      "Current Reports"
+      disabled:   not $scope.list.availableReports?.length
+      generator:  (action) ->
+        action.createActionsFrom 'list.availableReports', (reports = []) ->
+          for report in reports
+            {
+              label:  report.title
+              run:    -> $window.open(report.url, '_blank') ; return true
+            }
+    }
+  ]
 
-      $scope.$watch 'element.availableReports', updateReports
+  actionsProvider.registerAction 'switch-status', ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
+    return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and not $scope.noStatusSwitch
 
+    {
+      abstract: true
+      position: 500
 
-      updateReports($scope.element.availableReports)
-    ]
+      type:     (->
+        return 'info'     if $stateParams.status == 'draft'
+        return 'warning'  if $stateParams.status == 'pending'
+        return 'primary'
+      )()
+      icon:     (->
+        return 'pencil'   if $stateParams.status == 'draft'
+        return 'time'     if $stateParams.status == 'pending'
+        return 'ok'
+      )()
+      label:    (->
+        return 'Draft'    if $stateParams.status == 'draft'
+        return 'Pending'  if $stateParams.status == 'pending'
+        return 'Finalized'
+      )()
+    }
+  ]
 
-  }
+  actionsProvider.registerChildAction 'switch-status', 'switch-status-finalized', ['$state', '$stateParams', ($state, $stateParams) ->
+    {
+      position:   300
+      label:      "Finalized"
+      icon:       'ok'
+      type:       'primary'
+      active:     !$stateParams.status or $stateParams.status == 'finalized'
+      action:     ->
+        newParams = angular.copy($stateParams)
+        newParams.status = undefined
+        $state.go 'mc.resource.list', newParams
+    }
+  ]
 
-  actionsProvider.registerAction {
-    id:         'catalogue-element-export-generic-reports'
-    parent:     'catalogue-element-export'
-    position:   2000
-
-    label:      "Other Reports"
-
-    condition:  ['$scope', ($scope)->
-      # returning false will hide the element completely
-      return 'disabled' if not $scope.reports?.length
-      # always return true explicitly
-      return true
-    ]
-
-    generator: ['$scope', '$window', 'action', '$filter', 'headingAction', ($scope, $window, action, $filter, headingAction)->
-      updateReports = (reports)->
-        ret = $filter('filter')(action.children, (cha) -> cha.generatedBy != 'catalogue-element-export-generic-reports')
-        added = 0
-        for report, i in reports
-          added++
-          ret.push {
-            generatedBy: 'catalogue-element-export-generic-reports'
-            label:  report.title
-            position: 2001 + i
-            run:    -> $window.open(report.url, '_blank') ; return true
-          }
-        ret
-        action.children = ret
-        action.sortChildren()
-        headingAction.disabled = added == 0
-
-      $scope.$watch 'reports', updateReports
-
-
-      updateReports($scope.reports)
-    ]
-
-  }
-
-  # actionsProvider.registerAction {}
+  actionsProvider.registerChildAction 'switch-status', 'switch-status-draft', ['$state', '$stateParams', ($state, $stateParams) ->
+    {
+      position:   100
+      label:      "Draft"
+      icon:       'pencil'
+      type:       'info'
+      active:     $stateParams.status == 'draft'
+      action:     ->
+        newParams = angular.copy($stateParams)
+        newParams.status = 'draft'
+        $state.go 'mc.resource.list', newParams
+    }
+  ]
 
 ]
