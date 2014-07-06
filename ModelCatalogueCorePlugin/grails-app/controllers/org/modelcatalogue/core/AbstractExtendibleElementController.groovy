@@ -34,7 +34,8 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
         T helper = createResource(oldProps)
 
         def paramsToBind = getParametersToBind()
-
+        def ext = paramsToBind.ext
+        paramsToBind.remove 'ext'
 
         helper.properties = paramsToBind
 
@@ -47,8 +48,6 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             publishedElementService.archiveAndIncreaseVersion(instance)
         }
 
-
-        def ext = paramsToBind.ext
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
