@@ -114,7 +114,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           for report in reports
             {
               label:  report.title
-              run:    -> $window.open(report.url, '_blank') ; return true
+              action: -> $window.open(report.url, '_blank') ; return true
             }
     }
   ]
@@ -129,7 +129,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           for report in reports
             {
               label:  report.title
-              run:    -> $window.open(report.url, '_blank') ; return true
+              action: -> $window.open(report.url, '_blank') ; return true
             }
     }
   ]
@@ -146,7 +146,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           for report in reports
             {
               label:  report.title
-              run:    -> $window.open(report.url, '_blank') ; return true
+              action: -> $window.open(report.url, '_blank') ; return true
             }
     }
   ]

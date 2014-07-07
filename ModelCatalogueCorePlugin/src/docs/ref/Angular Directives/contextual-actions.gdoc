@@ -1,0 +1,34 @@
+h1. contextual-actions
+
+Element directive for rendering all actions applicable for the current scope. By default it uses the scope at the place
+of insertion (more specific the parent scope of scope created for instance of this directive) but this can be
+overridden by @scope@ attribute.
+
+You can tune the appearance of the rendered actions by using self-explanatory attributes: @iconOnly@, @size@, @group@ and @noColors@.
+@size@ attributes for default implementation accepts @xs@, @sm@ and @lg@ which are used with @btn-@ prefix.
+
+h2. Usage
+
+Considering you have following code in you controller:
+
+{code}
+$scope.element          = {/* ... */}
+$scope.nested           = $scope.$new(true)
+$scope.nested.hello     = "Hola"
+{code}
+
+And following HTML snippet in your page:
+{code}
+ <contextual-actions size="sm" icon-only="true" group="true" scope="nested" no-colors="true"></contextual-actions>
+{code}
+
+Than you get all actions applicable for the @nested@ scope rendered in small grouped toolbar with icons only. If you
+omit the scope argument, you will get all actions applicable for the current scope.
+
+h2. Customization
+You can override the @modelcatalogue/util/ui/contextualActions.html@ template to plug your own either using
+@text/ng-template@ script definition, creating the template on the appropriate location in your server
+or using the [$templateCache|http://docs.angularjs.org/api/ng/service/$templateCache]. The content of root element is
+replaced by the group inner elements - [action-button-single|Angular Directives] or [action-button-dropdown|Angular Directives]
+depending on whether the action has or hasn't any children.
+

@@ -1,0 +1,73 @@
+h1. actionsProvider
+
+Defines actions for the [actions|Angular Services] service. You can register new actions using @registerAction(id, factory)@
+and @registerChildAction(parentId, id, factory)@. The factory is [injectable|http://docs.angularjs.org/api/auto/service/$injector]
+function which returns object with properties defined bellow or falsy value if the action defined by the factory is not
+applicable in current context (usually a scope).
+
+
+
+{table}
+Property / Method           | Description
+abstract                    | The boolean value that represents whether the action is placeholder for child actions and can't be called
+action                      | The function to be run when the action button is clicked
+active                      | The boolean value to return whether action is currently active (useful for menus and dropdowns)
+disabled                    | The boolean value if the action is disabled for current context, you can choose either not to return action at all or return action with @disabled@ set to false to disable the current action
+generator                   | The function that accepts the parent action as parameter and generates more child actions, the base child action's label is used as a heading in drop down if some actions are generated. See @action.createActionsFrom(watchExpression, callback)@ bellow for more information
+icon                        | The icon of the action to be displayed in the button or link, for default implementation the @glyphicon@ icon suffix
+label                       | The description of the action to be displayed in the button or link
+position                    | The position of the action, actions returned from [actions|Angular Services] @getActions()@ are sorted ascendant by this number
+type                        | The type of the action such as success or danger, for default implementation adds class @btn-<type>@ to the action button
+{table}
+
+The function declared as @generator@ property usually generates another actions based on current scope value. If you use
+@action.createActionsFrom(watchExpression, callback)@  the @callback@ will be run every time the @watchExpression@ changes
+and of course in the initial call as well. The expected return value is array of actions to be added based on current context.
+
+Declared in @mc.util.ui.actions@ module inside [mc.util.ui|Angular Packages] package.
+
+h2. Usage
+
+Register new action using the @registerAction(id, factory)@ method. After the registration the action
+will be returned from [actions|Angular Services] service @getAction(scope)@ method if applicable.
+
+{code}
+angular
+.module('foo', ['mc.util.ui.actions'])
+.config(function(actionsProvider) {
+    actionsProvider.registerAction('hello-world', function($window, $scope) {
+            if (!$scope.hello) {
+                return undefined;
+            }
+            return {
+                label:      'Say Hello',
+                icon:       'volume-up',
+                type:       'success',
+                position:   1000,
+                action:     function(){
+                    $window.alert($scope.hello + " World");
+                },
+            }
+    });
+})
+{code}
+
+You can also register a child action to any existing action using @registerChildAction(parentId, id, factory)@ method.
+Child actions after instantiation are returned in @children@ array of the parent action. You usually don't have to
+repeat the any precondition checks in the child actions as they can't be instantiated if the parent actions is not
+instantiated.
+
+{code}
+angular
+.module('bar', ['mc.util.ui.actions'])
+.config(function(actionsProvider) {
+    actionsProvider.registerChildAction('hello-world', 'goodbye', function($window, $scope) {
+            return {
+                label:      'Say Goodbye',
+                action:     function(){
+                    $window.alert("Goodbye World");
+                },
+            }
+    });
+})
+{code}

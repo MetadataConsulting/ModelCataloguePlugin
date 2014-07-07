@@ -63,6 +63,8 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
                 createdAction.generatedBy = childAction.id
                 createdAction.id          = createdAction.id ? "#{childAction.id}:#{i}"
                 createdAction.position    = childAction.position + (1 + i)
+                createdAction.run         = ->
+                  $rootScope.$broadcast "actionPerformed:#{childAction.id}", createdAction.action()
                 ret.push createdAction
 
               if createdActions?.length > 0
@@ -97,10 +99,6 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
         currentActions.push action if action
 
       $filter('orderBy')(currentActions, 'position')
-
-
-    actions.getActionById = (id, $scope) ->
-      createAction(undefined, id, availableActionsById[id], actions, $scope)
 
     actions
   ]

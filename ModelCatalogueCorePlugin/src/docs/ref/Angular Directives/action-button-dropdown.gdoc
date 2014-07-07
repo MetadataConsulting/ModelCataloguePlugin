@@ -1,0 +1,4 @@
+h1. action-button-single
+
+Helper directive for rendering action as a dropdown button to be used by [contextual-actions|Angular Directives] directive.
+Not designed by used separately.
