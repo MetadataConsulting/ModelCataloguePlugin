@@ -71,7 +71,11 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   }
 
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.relationships',   {
-      hidden: false
+    hidden: false
+  }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.synonyms',   {
+    hidden: true
   }
 
 #  catalogueElementPropertiesProvider.configureProperty 'valueDomains',    hidden: (security) -> !security.hasRole('CURATOR')
