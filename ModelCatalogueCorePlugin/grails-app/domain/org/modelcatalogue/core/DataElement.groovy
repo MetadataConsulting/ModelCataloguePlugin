@@ -10,7 +10,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 *
 * */
 
-class DataElement extends ExtendibleElement {
+class DataElement extends PublishedElement {
 
     static constraints = {}
 

@@ -5,7 +5,7 @@ import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 import static org.springframework.http.HttpStatus.OK
 
-class AbstractExtendibleElementController<T> extends AbstractPublishedElementController<T> {
+class AbstractExtendibleElementController<T> extends AbstractCatalogueElementController<T> {
 
     AbstractExtendibleElementController(Class<T> type, boolean readOnly) {
         super(type, readOnly)
@@ -44,10 +44,6 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             return
         }
 
-        if (params.boolean('newVersion')) {
-            publishedElementService.archiveAndIncreaseVersion(instance)
-        }
-
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
@@ -68,6 +64,10 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
                 respond instance, [status: OK]
             }
         }
+    }
+
+    protected T createHelper(){
+
     }
 
 }

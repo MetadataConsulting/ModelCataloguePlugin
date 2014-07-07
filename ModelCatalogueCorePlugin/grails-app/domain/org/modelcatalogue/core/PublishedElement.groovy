@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-abstract class PublishedElement extends CatalogueElement {
+abstract class PublishedElement extends ExtendibleElement  {
 
     //version number - this gets iterated every time a new version is created from a finalized version
     Integer versionNumber = 1

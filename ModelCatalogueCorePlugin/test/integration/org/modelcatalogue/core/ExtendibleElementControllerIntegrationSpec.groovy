@@ -28,11 +28,6 @@ class ExtendibleElementControllerIntegrationSpec extends AbstractExtendibleEleme
     }
 
     @Override
-    protected getTotalRowsExported() {
-        19
-    }
-
-    @Override
     AbstractCatalogueElementController getController() {
         new ExtendibleElementController()
     }
@@ -85,12 +80,12 @@ class ExtendibleElementControllerIntegrationSpec extends AbstractExtendibleEleme
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 19, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, 19, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, 19, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 4, 4, 8, 19, "${baseLink}?max=4&offset=12", "${baseLink}?max=4&offset=4"],
-                [5, 9, 10, 10, 19, "", "${baseLink}?max=10&offset=0"],
-                [6, 2, 2, 10, 19, "${baseLink}?max=2&offset=12", "${baseLink}?max=2&offset=8"]
+                [1, 10, 10, 0, 36, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 36, "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, 36, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, 36, "${baseLink}?max=4&offset=12", "${baseLink}?max=4&offset=4"],
+                [5, 10, 10, 10, 36, "${baseLink}?max=10&offset=20", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, 36, "${baseLink}?max=2&offset=12", "${baseLink}?max=2&offset=8"]
         ]
     }
 }

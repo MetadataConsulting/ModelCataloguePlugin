@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 
-class Asset extends ExtendibleElement {
+class Asset extends PublishedElement {
 
     Long    size
     String  contentType

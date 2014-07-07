@@ -6,7 +6,7 @@ import spock.lang.Unroll
 /**
  * Created by ladin on 28.04.14.
  */
-abstract class AbstractPublishedElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+abstract class AbstractPublishedElementControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
 
     def publishedElementService
 

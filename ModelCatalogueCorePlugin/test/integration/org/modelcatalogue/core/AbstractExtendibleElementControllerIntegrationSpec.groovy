@@ -6,7 +6,7 @@ import spock.lang.Unroll
 /**
  * Created by ladin on 28.04.14.
  */
-abstract class AbstractExtendibleElementControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+abstract class AbstractExtendibleElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
 
     def "update and create new version"() {
