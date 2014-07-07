@@ -5,10 +5,23 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Identification',  value: "relation.elementTypeName + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()"}
   ]
 
+  nameAndIdAndMetadata = -> [
+    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-4', show: "relation.show()"}
+    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-4', show: "relation.show()"}
+    {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
+  ]
+
   dataTypes = -> [
     {header: 'Name',            value: "relation.dataType.name",                                 classes: 'col-md-6', show: "relation.dataType.show()"}
     {header: 'Identification',  value: "relation.dataType.elementTypeName + ': ' + relation.id", classes: 'col-md-5', show: "relation.dataType.show()"}
   ]
+
+  printMetadata = (relationship) ->
+    result  = ''
+    ext     = relationship.ext ? {}
+    for key, value of ext
+      result += "#{key}: #{value ? ''}\n"
+    result
 
   computeBytes = (relationship) ->
     asset = relationship.relation
@@ -34,15 +47,15 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'parentOf',        label: 'Children',            columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'childOf',         label: 'Parent',              columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'isContextFor',    label: 'Models',              columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Value Domain',          columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy',  label: 'Value Domains',           columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'contains',        label: 'Data Elements',       columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'containedIn',     label: 'Models',              columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Value Domains',          columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy',  label: 'Value Domains',           columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'contains',        label: 'Data Elements',       columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'containedIn',     label: 'Models',              columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments',         columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf',    label: 'Conceptual Domains',  columns: nameAndIdent()
 
   catalogueElementPropertiesProvider.configureProperty 'includedIn',      label: 'Conceptual Domains',  columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'instantiates',    label: 'Data Elements'     ,  columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'instantiates',    label: 'Data Elements'     ,  columns: nameAndIdAndMetadata()
 
   catalogueElementPropertiesProvider.configureProperty 'history', {
     hidden: (security) ->

@@ -18,6 +18,7 @@ class ImportRow {
     String measurementSymbol
     Map metadata
     Boolean imported = false
+    Set<RowAction> rowActions = []
 
     static hasMany = [rowActions: RowAction]
 

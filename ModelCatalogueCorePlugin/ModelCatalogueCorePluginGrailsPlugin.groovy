@@ -107,7 +107,7 @@ Model catalogue core plugin (metadata registry)
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || CatalogueElement.isAssignableFrom(container.itemType))
             } then { CatalogueElement element ->
-                [[element.modelCatalogueId, element.name, element.description]]
+                [[element.id, element.name, element.description]]
             }
         }
 
