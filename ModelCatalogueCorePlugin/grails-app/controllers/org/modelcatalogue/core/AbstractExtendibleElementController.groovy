@@ -66,8 +66,4 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
         }
     }
 
-    protected T createHelper(){
-
-    }
-
 }

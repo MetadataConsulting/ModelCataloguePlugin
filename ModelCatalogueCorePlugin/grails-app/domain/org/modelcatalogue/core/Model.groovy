@@ -14,7 +14,6 @@ class Model extends PublishedElement  {
         extensions component:true
         incomingRelationships component: true
         outgoingRelationships component: true
-        except = ['ext', 'contains', 'hasContextOf', 'parentOf', 'childOf']
     }
 
     static relationships = [

@@ -16,7 +16,7 @@ class Asset extends PublishedElement {
         extensions component:true
         incomingRelationships component: true
         outgoingRelationships component: true
-        except = ['ext', 'contains', 'hasContextOf', 'parentOf', 'childOf']
+        except = ['md5']
     }
 
     static constraints = {

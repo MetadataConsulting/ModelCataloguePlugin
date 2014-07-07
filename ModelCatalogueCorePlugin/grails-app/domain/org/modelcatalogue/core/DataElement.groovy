@@ -22,7 +22,6 @@ class DataElement extends PublishedElement {
         extensions component:true
         incomingRelationships component: true
         outgoingRelationships component: true
-        except =  ['containedIn', 'instantiatedBy']
     }
 
     static relationships = [

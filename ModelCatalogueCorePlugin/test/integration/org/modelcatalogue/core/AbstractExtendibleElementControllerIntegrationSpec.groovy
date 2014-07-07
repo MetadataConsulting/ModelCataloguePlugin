@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.Elements
 import spock.lang.Unroll
 
@@ -9,40 +10,28 @@ import spock.lang.Unroll
 abstract class AbstractExtendibleElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
 
-    def "update and create new version"() {
+    def "update and set metadata"() {
         if (controller.readOnly) return
-
-        String newName                  = "UPDATED NAME WITH NEW VERSION"
-        PublishedElement another        = PublishedElement.get(anotherLoadItem.id)
+        ExtendibleElement another        = ExtendibleElement.get(anotherLoadItem.id)
+        String newName                  = "UPDATED NAME"
         String currentName              = another.name
         String currentModelCatalogueId  = another.modelCatalogueId
-        Integer currentVersionNumber    = another.versionNumber
-        Integer numberOfCurrentVersions = another.countVersions()
+        Map keyValue = new HashMap()
+        keyValue.put('testKey', 'testValue')
 
         when:
         controller.params.id            = another.id
         controller.params.newVersion    = true
-        controller.request.json         = [name: newName, ext: [['testkey', 'testvalue']]]
+        controller.request.json         = [name: newName, ext: keyValue]
         controller.response.format      = "json"
 
         controller.update()
-
-        PublishedElement oldVersion    = PublishedElement.findByModelCatalogueId(currentModelCatalogueId)
-
         def json = controller.response.json
 
         then:
-        json.versionNumber          == currentVersionNumber + 1
-        json.modelCatalogueId       != currentModelCatalogueId
-        json.modelCatalogueId       == another.bareModelCatalogueId + '_' + (currentVersionNumber + 1)
         json.name                   == newName
+        json.ext == keyValue
 
-        another.countVersions()     == numberOfCurrentVersions + 1
-
-        oldVersion.versionNumber    == currentVersionNumber
-        oldVersion.modelCatalogueId == currentModelCatalogueId
-        oldVersion.name             == currentName
-        oldVersion.name             != json.name
     }
 
 }

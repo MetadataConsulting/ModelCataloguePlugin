@@ -14,7 +14,6 @@ abstract class ExtendibleElement extends CatalogueElement implements Extendible 
 
     static searchable = {
         extensions component:true
-        except = ['ext']
     }
 
     static hasMany = [extensions: ExtensionValue]
