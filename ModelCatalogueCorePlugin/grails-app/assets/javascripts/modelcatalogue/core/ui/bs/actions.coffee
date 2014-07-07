@@ -62,6 +62,24 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerAction 'create-new-version', ['$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($scope, messages, names, security, catalogueElementResource) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.status
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   150
+      label:      'New Version'
+      icon:       'circle-arrow-up'
+      type:       'primary'
+      action:     ->
+        messages.confirm('Do you want to create new version?', "New version will be created for #{$scope.element.elementTypeName} #{$scope.element.name}").then ->
+          catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true}).then (updated) ->
+            $scope.element = updated
+            messages.success("New version created for #{$scope.element.name}")
+    }
+  ]
+
   actionsProvider.registerAction 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not security.hasRole('CURATOR')
