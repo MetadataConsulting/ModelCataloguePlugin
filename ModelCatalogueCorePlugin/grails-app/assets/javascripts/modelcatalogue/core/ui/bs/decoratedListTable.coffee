@@ -32,13 +32,16 @@ angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList'])
         <tfoot>
           <tr ng-hide="!list.total || list.total <= list.page">
             <td colspan="{{getColumnsCount()}}" class="text-center">
-              <ul class="pagination">
-                <li class="previous dl-table-prev" ng-class="{disabled: !hasPrevious()}"><a ng-click="previous()">Previous</a></li>
-                <li ng-show="hasMorePrevPages"><a ng-click="goto(pages[0] - 1)" class>...</a></li>
-                <li ng-repeat="page in pages"  ng-class="{active: page == list.currentPage}"><a ng-click="goto(page)">{{page}}</a></li>
-                <li ng-show="hasMoreNextPages"><a ng-click="goto(pages[pages.length - 1] + 1)" class>...</a></li>
-                <li class="next dl-table-next" ng-class="{disabled: !hasNext()}"><a ng-click="next()">Next</a></li>
-              </ul>
+                <ul class="pagination">
+                  <li class="previous dl-table-prev" ng-class="{disabled: !hasPrevious()}"><a ng-click="previous()">Previous</a></li>
+                  <li ng-show="hasMorePrevPages"><a ng-click="goto(pages[0] - 1)" class>...</a></li>
+                  <li ng-repeat="page in pages"  ng-class="{active: page == list.currentPage}"><a ng-click="goto(page)">{{page}}</a></li>
+                  <li ng-show="hasMoreNextPages"><a ng-click="goto(pages[pages.length - 1] + 1)" class>...</a></li>
+                  <li class="next dl-table-next" ng-class="{disabled: !hasNext()}"><a ng-click="next()">Next</a></li>
+                </ul>
+                <ul class="pagination pull-right">
+                  <li ng-repeat="theMax in [10, 50, 100]"  ng-class="{active: list.page == theMax}"><a ng-click="setMax(theMax)">{{theMax}}</a></li>
+                </ul>
             </td>
           </tr>
         </tfoot>
