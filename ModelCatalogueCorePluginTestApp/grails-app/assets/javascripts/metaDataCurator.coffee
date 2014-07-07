@@ -38,7 +38,7 @@ metadataCurator.run ($templateCache) ->
 '''
 
 metadataCurator.controller('metadataCurator.searchCtrl',
-  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names',
+  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names'
     (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names)->
       actions = []
 
@@ -109,7 +109,7 @@ metadataCurator.controller('metadataCurator.searchCtrl',
       initActions()
 
       $scope.$on '$stateChangeSuccess', (event, toState, toParams) ->
-        $scope.searchSelect = undefined if !toParams.q?
+        $scope.searchSelect = toParams.q
 
   ])
 
