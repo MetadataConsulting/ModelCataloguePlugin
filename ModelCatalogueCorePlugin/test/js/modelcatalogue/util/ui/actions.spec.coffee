@@ -4,34 +4,26 @@ describe "mc.util.ui.actions", ->
   beforeEach module 'mc.util.security'
 
   beforeEach module (actionsProvider) ->
-    actionsProvider.registerAction {
-      id:         'edit-catalogue-element'
-      position:   100
-      label:      'Edit'
-      icon:       'edit'
-      type:       'primary'
-      condition:  ['security', 'actionContext', (security, actionContext)->
-        # returning false will hide the element completely
-        return false if not actionContext.element
-        # returning 'disabled' will show the action but disable it (action.disabled == true)
-        return 'disabled' if not security.hasRole('CURATOR')
-        # always return true explicitly
-        return true
-      ]
-      action: [ 'actionContext', (actionContext) ->
-          actionContext.element.edit()
-      ]
-    }
 
-    actionsProvider.registerAction {
-      parent:     'edit-catalogue-element'
-      id:         'edit-catalogue-element-nested'
-      label:      'Edit as Admin'
-      icon:       'edit'
-      action: [ 'actionContext', (actionContext) ->
-        actionContext.element.editAsAdmin()
-      ]
-    }
+    actionsProvider.registerAction 'edit-catalogue-element', ['security', '$scope', (security, $scope)->
+      {
+        position:   100
+        label:      'Edit'
+        icon:       'edit'
+        type:       'primary'
+        action: ->
+          $scope.element.edit()
+      }
+    ]
+
+    actionsProvider.registerChildAction 'edit-catalogue-element', 'edit-catalogue-element-nested', ['$scope', ($scope)->
+      {
+        label:      'Edit as Admin'
+        icon:       'edit'
+        action: ->
+          $scope.element.editAsAdmin()
+      }
+    ]
 
     return
 

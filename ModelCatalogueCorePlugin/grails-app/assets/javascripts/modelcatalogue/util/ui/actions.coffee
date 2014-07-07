@@ -4,7 +4,9 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
   actionsProvider           = {}
 
   registerActionInternal = (parentId, id, actionFactory) ->
-    throw "Missing action id" if not id
+    throw {message: "Missing action id"} if not id
+    throw {message: "id must be string", id: id} if not angular.isString(id)
+    throw {message: "parent id must be string", parentId: parentId} if parentId and not angular.isString(parentId)
     if parentId
       actionsChildrenByParentId[parentId] ?= {}
       actionsChildrenByParentId[parentId][id] = actionFactory
@@ -99,6 +101,13 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
         currentActions.push action if action
 
       $filter('orderBy')(currentActions, 'position')
+
+
+    ###
+      Retrieves top-level action by it's id for the current scope. Mainly for the testing purposes.
+    ###
+    actions.getActionById = (id, $scope) ->
+      createAction(undefined, id, availableActionsById[id], actions, $scope)
 
     actions
   ]
