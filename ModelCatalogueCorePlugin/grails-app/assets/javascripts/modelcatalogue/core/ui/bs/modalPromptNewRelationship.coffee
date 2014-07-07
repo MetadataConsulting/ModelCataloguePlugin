@@ -24,10 +24,10 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                       {{element.name}}
                     </td>
                     <td class="col-md-4">
-                      <input id="type" type="text" placeholder="relates to ..." class="form-control input-sm" ng-model="relationshipTypeInfo" typeahead="rt as rt.value for rt in getFiteredRelationshipTypes($viewValue)" typeahead-on-select="updateRelationshipType(relationshipTypeInfo)">
+                      <select id="type" class="form-control input-sm" ng-model="relationshipTypeInfo" ng-options="rt as rt.value for rt in relationshipTypes" ng-change="updateInfo(relationshipTypeInfo)"></select>
                     </td>
                     <td class="col-md-4">
-                      <input id="type" type="text" placeholder="... element" class="form-control input-sm" ng-model="relation" catalogue-element-picker resource="relationType" typeahead-on-select="updateRelation(relation)" ng-disabled="!relationshipTypeInfo.type">
+                      <input id="element" type="text" placeholder="... element" class="form-control input-sm" ng-model="relation" catalogue-element-picker resource="relationType" typeahead-on-select="updateRelation(relation)" ng-disabled="!relationshipTypeInfo.type">
                     </td>
                   </tr>
                 </tbody>
@@ -43,41 +43,32 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
         </div>
         '''
         controller: ['$scope', 'messages', '$modalInstance', ($scope, messages, $modalInstance) ->
-          deferredRelationshipTypes = $q.defer()
-
-          relationshipTypes = []
+          $scope.relationshipTypes    = []
+          $scope.relationshipTypeInfo = null
 
           appendToRelationshipTypes = (result) ->
             for type in result.list
-              relationshipTypes.push {type: type, direction: 'sourceToDestination', value: type.sourceToDestination, relation: 'destination', direction: 'outgoing'} if args.element.isInstanceOf(type.sourceClass)
-              relationshipTypes.push {type: type, direction: 'destinationToSource', value: type.destinationToSource, relation: 'source', direction: 'incoming'} if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource
+              $scope.relationshipTypes.push {type: type, direction: 'sourceToDestination', value: type.sourceToDestination, relation: 'destination', direction: 'outgoing'} if args.element.isInstanceOf(type.sourceClass)
+              $scope.relationshipTypes.push {type: type, direction: 'destinationToSource', value: type.destinationToSource, relation: 'source', direction: 'incoming'} if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource
 
             if result.next.size > 0
               result.next().then appendToRelationshipTypes
-            else
-              deferredRelationshipTypes.resolve(relationshipTypes)
 
           catalogueElementResource('relationshipType').list(max: 100).then appendToRelationshipTypes
 
-          $scope.relationshipTypes = deferredRelationshipTypes.promise
-
-          $scope.getFiteredRelationshipTypes = (query) ->
-            deferredResult = $q.defer()
-            filtered = []
-            $scope.relationshipTypes.then (types) ->
-              for type in types when type.value.indexOf(query) > -1
-                filtered.push type
-              deferredResult.resolve filtered
-            deferredResult.promise
-
-
           $scope.element    = args.element
 
-          $scope.updateRelationshipType = (info) ->
-            $scope.relationshipTypeInfo = info
-            $scope.relationshipType = info.type
-            $scope.relationType = $scope.relationshipType["#{info.relation}Class"]
-            $scope.direction = info.direction
+          $scope.updateInfo = (info) ->
+            if info
+              $scope.relationshipTypeInfo = info
+              $scope.relationshipType = info.type
+              $scope.relationType = $scope.relationshipType["#{info.relation}Class"]
+              $scope.direction = info.direction
+            else
+              $scope.relationshipTypeInfo = null
+              $scope.relationshipType = null
+              $scope.relationType = null
+              $scope.direction = null
 
           $scope.updateRelation = (relation) ->
             $scope.relation = relation
