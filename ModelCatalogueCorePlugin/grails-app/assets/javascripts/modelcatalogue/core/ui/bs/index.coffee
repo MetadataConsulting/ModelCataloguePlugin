@@ -3,6 +3,7 @@
 #= require angular-cookies/angular-cookies
 #= require modelcatalogue/core/index
 #= require modelcatalogue/util/ui/index
+#= require modelcatalogue/util/ui/bs/index
 #= require catalogueElementView
 #= require importView
 #= require catalogueElementTreeview
@@ -10,6 +11,7 @@
 #= require catalogueElementProperties
 #= require decoratedListTable
 #= require propertiesPane
+#= require actions
 #= require columns
 #= require columnsConfiguration
 #= require messagesPanel
@@ -31,6 +33,7 @@ angular.module('mc.core.ui.bs', [
   # depends on
   'mc.core.ui'
   'mc.util.ui'
+  'mc.util.ui.bs'
   'ui.bootstrap'
   'ngCookies'
   # list of modules
@@ -41,6 +44,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.catalogueElementTreeviewItem'
   'mc.core.ui.bs.catalogueElementProperties'
   'mc.core.ui.bs.propertiesPane'
+  'mc.core.ui.bs.actions'
   'mc.core.ui.bs.columns'
   'mc.core.ui.bs.columnsConfiguration'
   'mc.core.ui.bs.messagesPanel'

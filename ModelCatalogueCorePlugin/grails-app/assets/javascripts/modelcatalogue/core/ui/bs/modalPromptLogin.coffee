@@ -34,7 +34,6 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
         '''
         controller: ['$scope', '$cookies', 'messages', 'security', '$modalInstance', '$log',
           ($scope, $cookies, messages, security, $modalInstance) ->
-            console.log $cookies
             $scope.user = {rememberMe: $cookies.mc_remember_me == "true"}
             $scope.messages = messages.createNewMessages()
 

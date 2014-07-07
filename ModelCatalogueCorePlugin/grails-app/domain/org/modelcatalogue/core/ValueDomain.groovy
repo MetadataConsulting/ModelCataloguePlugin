@@ -66,7 +66,8 @@ class ValueDomain extends CatalogueElement  {
 
 
     static relationships = [
-        incoming: [inclusion: 'includedIn', instantiation: 'instantiates']
+        incoming: [inclusion: 'includedIn', instantiation: 'instantiates', base: 'basedOn'],
+        outgoing: [base: 'isBaseFor']
     ]
 
     void setRegexDef(String regex) {
