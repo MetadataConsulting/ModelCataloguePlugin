@@ -2,8 +2,8 @@ angular.module('mc.core.ui.bs.propertiesPane', ['mc.core.ui.propertiesPane']).ru
     $templateCache.put 'modelcatalogue/core/ui/propertiesPane.html', '''
       <table class="pp-table table">
         <thead>
-          <th class="col-md-4">&nbsp;</th>
-          <th class="col-md-6">&nbsp;</th>
+          <th class="col-md-4">{{title}}</th>
+          <th class="col-md-6">{{valueTitle}}</th>
         </thead>
         <tbody>
           <tr class="pp-table-property-row" ng-repeat="property in properties" ng-switch="canShow(property.value, item)">

@@ -3,7 +3,7 @@ angular.module('mc.core.ui.bs.simpleObjectEditor', ['mc.core.ui.simpleObjectEdit
       <table class="soe-table table">
         <thead>
           <th class="col-md-4 soe-table-property-key">{{title}}</th>
-          <th class="col-md-7 soe-table-property-value ">&nbsp;</th>
+          <th class="col-md-7 soe-table-property-value ">{{valueTitle}}</th>
           <th class="col-md-1 soe-table-property-actions">&nbsp;</th>
         </thead>
         <tbody>
