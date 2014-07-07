@@ -58,19 +58,20 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
             continue
 
           action.createActionsFrom = (watchExpression, createActionsFunction) ->
+            generatorAction = childAction
             updateChildActions = (input)->
-              ret = $filter('filter')(action.children, (cha) -> cha.generatedBy != childAction.id and cha.id != childAction.id)
+              ret = $filter('filter')(action.children, (cha) -> cha.generatedBy != generatorAction.id and cha.id != generatorAction.id)
               createdActions = createActionsFunction(input) ? []
               for createdAction, i in createdActions
-                createdAction.generatedBy = childAction.id
-                createdAction.id          = createdAction.id ? "#{childAction.id}:#{i}"
-                createdAction.position    = childAction.position + (1 + i)
+                createdAction.generatedBy = generatorAction.id
+                createdAction.id          = createdAction.id ? "#{generatorAction.id}:#{i}"
+                createdAction.position    = generatorAction.position + (1 + i)
                 createdAction.run         = ->
-                  $rootScope.$broadcast "actionPerformed:#{childAction.id}", createdAction.action()
+                  $rootScope.$broadcast "actionPerformed:#{generatorAction.id}", createdAction.action()
                 ret.push createdAction
 
               if createdActions?.length > 0
-                ret.push childAction
+                ret.push generatorAction
 
               action.children = ret
 

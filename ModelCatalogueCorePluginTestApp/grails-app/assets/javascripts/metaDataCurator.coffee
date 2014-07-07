@@ -38,8 +38,8 @@ metadataCurator.run ($templateCache) ->
 '''
 
 metadataCurator.controller('metadataCurator.searchCtrl',
-  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names', '$filter',
-    (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names, $filter)->
+  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names',
+    (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names)->
       actions = []
 
       $scope.search = (item, model, label) ->
@@ -67,7 +67,7 @@ metadataCurator.controller('metadataCurator.searchCtrl',
             naturalName = names.getNaturalName($state.params.resource)
             "Search <strong>#{naturalName}</strong> for <strong>#{term}</strong>"
           action: (term) ->
-            (item, model, label) ->
+            ->
               $state.go($state.current.name, {q: term})
           icon: 'search'
         }
@@ -106,11 +106,12 @@ metadataCurator.controller('metadataCurator.searchCtrl',
 
         deferred.promise
 
-
       initActions()
+
+      $scope.$on '$stateChangeSuccess', (event, toState, toParams) ->
+        $scope.searchSelect = undefined if !toParams.q?
+
   ])
-
-
 
 metadataCurator.controller('metadataCurator.logoutCtrl', ['$scope', 'security', ($scope, security)->
   $scope.logout = ->
