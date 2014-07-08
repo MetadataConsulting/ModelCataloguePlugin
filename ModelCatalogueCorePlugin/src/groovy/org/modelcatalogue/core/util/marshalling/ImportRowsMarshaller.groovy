@@ -18,9 +18,9 @@ class ImportRowsMarshaller extends ListWrapperMarshaller {
         def ret = super.prepareJsonMap(elements)
         ret.list = elements.items.collect{
             if(!it.imported){
-                [id: it.id, containingModelName: it.containingModelName, dataElementName: it.dataElementName, actionLinks: getActionsLink(elements.base, it.id, it.rowActions.size()), actions: it.rowActions.collect{it.action}]
+                [id: it.id, parentModelName: it.parentModelName, containingModelName: it.containingModelName, dataElementName: it.dataElementName, dataType: it.dataType, measurementUnitName: it.measurementUnitName, actionLinks: getActionsLink(elements.base, it.id, it.rowActions.size()), actions: it.rowActions.collect{it.action}]
             }else{
-                [id: it.id, containingModelName: it.containingModelName, dataElementName: it.dataElementName, actions: it.rowActions.collect{it.action}]
+                [id: it.id, parentModelName: it.parentModelName, containingModelName: it.containingModelName, dataElementName: it.dataElementName, dataType: it.dataType, measurementUnitName: it.measurementUnitName, actions: it.rowActions.collect{it.action}]
             }
         }
         ret

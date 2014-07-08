@@ -47,8 +47,8 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
 
           if fn.itemType == 'org.modelcatalogue.core.dataarchitect.ImportRow'&& tabDefinition.name != 'imported'
             tabDefinition.actions.push {
-              title:  'resolve action'
-              icon:   'remove'
+              title:  'resolve'
+              icon:   'thumbs-up'
               type:   'default'
               action: (rel) ->
                 deferred = $q.defer()
