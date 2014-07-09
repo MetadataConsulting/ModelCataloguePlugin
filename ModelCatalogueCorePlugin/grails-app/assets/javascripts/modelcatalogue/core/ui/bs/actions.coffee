@@ -102,11 +102,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         $scope.element = updated
     }
 
-    $scope.$watch 'element.status', (status) ->
-      action.disabled = status == 'FINALIZED'
+    $scope.$watch ['element.status'], (status) ->
+      action.disabled = status == 'FINALIZED' or $scope.element.archived
 
     $scope.$watch 'element.archived', (archived) ->
-      action.disabled = archived
+      action.disabled = archived or $scope.element?.status == 'FINALIZED'
 
     return action
 
