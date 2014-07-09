@@ -91,22 +91,21 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if $scope.element.elementTypeName == 'Data Import'
     return undefined if not security.hasRole('CURATOR')
 
-    action = {
-    position:   100
-    label:      'Edit'
-    icon:       'edit'
-    type:       'primary'
-    disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
-    action:     ->
-      messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
-        $scope.element = updated
-    }
+    action =
+      position:   100
+      label:      'Edit'
+      icon:       'edit'
+      type:       'primary'
+      disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
+      action:     ->
+        messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
+          $scope.element = updated
 
-    $scope.$watch 'element.status', (status) ->
-      action.disabled = status == 'FINALIZED'
+    updateAction = ->
+      action.disabled = $scope.element.archived or $scope.element?.status == 'FINALIZED'
 
-    $scope.$watch 'element.archived', (archived) ->
-      action.disabled = archived
+    $scope.$watch 'element.status', updateAction
+    $scope.$watch 'element.archived', updateAction
 
     return action
 
