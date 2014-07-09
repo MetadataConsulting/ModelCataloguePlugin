@@ -496,13 +496,17 @@ class DataImportService {
         return dataTypeReturn
     }
 
-    protected static EnumeratedType importEnumeratedType(String data, String name){
+    protected EnumeratedType importEnumeratedType(String data, String name){
         def dataTypeReturn
         if (data.contains("|")) {
-//            try { sortedData = sortEnumAsString(data) } catch (Exception e) { return null }
             dataTypeReturn = EnumeratedType.findByEnumAsString(data)
             if (!dataTypeReturn) {
-                dataTypeReturn = new EnumeratedType(name:  name, enumAsString: data).save()
+                try {
+                    dataTypeReturn = new EnumeratedType(name:  name, enumAsString: data).save()
+                }
+                catch (Exception e) {
+                    log.error "Error: ${e.message}", e
+                }
             }
         } else if (data.contains("\n") || data.contains("\r")) {
             String[] lines = data.split("\\r?\\n")
@@ -530,7 +534,12 @@ class DataImportService {
                     }.join('|')
                     dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
                     if (!dataTypeReturn) {
-                        dataTypeReturn = new EnumeratedType(name:  name, enumerations: enumerations).save()
+                        try {
+                            dataTypeReturn = new EnumeratedType(name:  name, enumerations: enumerations).save()
+                        }
+                        catch (Exception e) {
+                            log.error "Error: ${e.message}", e
+                        }
                     }
                 }
             }
@@ -540,7 +549,7 @@ class DataImportService {
 
 
 
-    protected static String sortEnumAsString(String inputString) {
+    protected String sortEnumAsString(String inputString) {
         if (inputString == null) return null
         String sortedString
         Map<String, String> ret = [:]
@@ -556,7 +565,7 @@ class DataImportService {
         sortedString
     }
 
-    protected static String quote(String s) {
+    protected String quote(String s) {
         if (s == null) return null
         String ret = s
         QUOTED_CHARS.each { original, replacement ->
@@ -565,7 +574,7 @@ class DataImportService {
         ret
     }
 
-    protected static String unquote(String s) {
+    protected String unquote(String s) {
         if (s == null) return null
         String ret = s
         QUOTED_CHARS.reverseEach { original, pattern ->
