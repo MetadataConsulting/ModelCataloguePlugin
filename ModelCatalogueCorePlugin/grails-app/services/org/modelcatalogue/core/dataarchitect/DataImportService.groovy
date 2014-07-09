@@ -5,6 +5,7 @@ import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.ExtendibleElement
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
@@ -316,14 +317,14 @@ class DataImportService {
         }
     }
 
-    protected DataElement updateMetadata(Map metadata, DataElement dataElement) {
+    protected ExtendibleElement updateMetadata(Map metadata, ExtendibleElement instance) {
         metadata.each { key, value ->
             if (key) { key = key.toString().take(255) }
             if (value) { value = value.toString().take(255) }
-            dataElement.ext.put(key, value)
+            instance.ext.put(key, value)
         }
-        dataElement.save()
-        dataElement
+        instance.save()
+        instance
     }
 
     protected Boolean checkValueDomainForChanges(Map params, ValueDomain valueDomain, ConceptualDomain cd){
