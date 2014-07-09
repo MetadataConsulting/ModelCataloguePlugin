@@ -60,6 +60,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         RelationshipService service = new RelationshipService()
         CatalogueElementDynamicHelper.addShortcuts(TestCatalogueElement2)
         RelationshipType type = new RelationshipType(name: 'a', sourceToDestination: "a to b", destinationToSource: "b to a", sourceClass: CatalogueElement, destinationClass: CatalogueElement)
+        type.relationshipTypeService = new RelationshipTypeService()
 
         expect:
         type.save()
