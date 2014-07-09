@@ -141,7 +141,7 @@
 
     <div class="container">
         <div class="row">
-            <messages-panel max="3"></messages-panel>
+            <messages-panel max="3" growl="true"></messages-panel>
         </div>
 
         <div class="row">
