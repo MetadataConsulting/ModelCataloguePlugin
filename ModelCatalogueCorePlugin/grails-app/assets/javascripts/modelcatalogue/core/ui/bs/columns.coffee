@@ -34,13 +34,13 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: "Data Element",        value: 'dataElementName',              class: 'col-md-2', sort: {property: 'dataElementName', type: 'alphabet'}}
     {
       header: "Data Type",
-      value: (row) -> row.dataType.replace /\|/g , "\n"
+      value: (row) -> if row.dataType then row.dataType.replace /\|/g , "\n"
       class: 'col-md-2',
       sort: {property: 'dataType', type: 'alphabet'}
     }
     {
       header: "Row Actions"
-      value: (row) -> row.actions?.join('\n\n')
+      value: (row) -> if row.actions then row.actions?.join('\n\n')
       class: 'col-md-6'
       sort: {property: 'actions', type: 'alphabet'}
     }

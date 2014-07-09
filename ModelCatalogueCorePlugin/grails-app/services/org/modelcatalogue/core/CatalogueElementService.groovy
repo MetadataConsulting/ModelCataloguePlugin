@@ -38,6 +38,17 @@ class CatalogueElementService {
         return
     }
 
+    def getDataType(ValueDomain valueDomain){
+        if(valueDomain) {
+            DataType dataType = valueDomain.dataType
+            if (dataType instanceof EnumeratedType) {
+                return dataType.enumAsString
+            }
+            return dataType.name
+        }
+        return
+    }
+
     def getUnitOfMeasure(DataElement dataElement){
         ValueDomain valueDomain = getValueDomain(dataElement)
         if(valueDomain) {
