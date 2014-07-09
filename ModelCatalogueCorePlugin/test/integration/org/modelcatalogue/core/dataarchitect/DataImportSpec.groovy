@@ -262,7 +262,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
 
     def "test import existing enumerated data type"(){
         when:
-        def dataType = dataImportService.importDataType('xxxxx', 'm:male|f:female|u:unknown|ns:not specified')
+        def dataType = dataImportService.importDataType('gender', 'm:male|f:female|u:unknown|ns:not specified')
 
         then:
         dataType.name == "gender"
