@@ -30,6 +30,7 @@ class Relationship implements Extendible {
 
     static searchable = {
         except = ['source', 'destination']
+        extensions component:true
         relationshipType component:true
     }
 

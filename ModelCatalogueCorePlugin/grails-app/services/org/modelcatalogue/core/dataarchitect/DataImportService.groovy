@@ -52,7 +52,7 @@ class DataImportService {
             def metadataColumns = [:]
             while (counter <= metadataEndIndex) {
                 String key = headers[counter].toString()
-                String value = row[counter].toString()
+                String value = (row[counter]!=null) ? row[counter].toString() : ""
                 metadataColumns.put(key, value)
                 counter++
             }
@@ -147,6 +147,14 @@ class DataImportService {
             if (!row.dataType) {
                 RowAction action = new RowAction(field: "dataType", action: "the row does not contain a data type therefore will not be associated with a value domain, is this the expected outcome?", actionType: ActionType.DECISION).save()
                 row.addToRowActions(action)
+            }
+            if (row.dataType.contains("|")) {
+                try {
+                    row.dataType = sortEnumAsString(row.dataType)
+                } catch (Exception e) {
+                    RowAction action = new RowAction(field: "dataType", action: "the row has an invalid enumerated data type. Please action to import row", actionType: ActionType.RESOLVE_ERROR).save()
+                    row.addToRowActions(action)
+                }
             }
         }
         return row
@@ -489,11 +497,13 @@ class DataImportService {
     }
 
     protected static EnumeratedType importEnumeratedType(String data, String name){
-        def dataTypeReturn, sortedData
+        def dataTypeReturn
         if (data.contains("|")) {
-            try { sortedData = sortEnumAsString(data) } catch (Exception e) { return null }
-            dataTypeReturn = EnumeratedType.findByEnumAsString(sortedData)
-            if (!dataTypeReturn) { dataTypeReturn = new EnumeratedType(name:  name, enumAsString: sortedData).save() }
+//            try { sortedData = sortEnumAsString(data) } catch (Exception e) { return null }
+            dataTypeReturn = EnumeratedType.findByEnumAsString(data)
+            if (!dataTypeReturn) {
+                dataTypeReturn = new EnumeratedType(name:  name, enumAsString: data).save()
+            }
         } else if (data.contains("\n") || data.contains("\r")) {
             String[] lines = data.split("\\r?\\n")
             if (lines.size() > 0 && lines[] != null) {
@@ -536,7 +546,7 @@ class DataImportService {
         Map<String, String> ret = [:]
         inputString.split(/\|/).each { String part ->
             if (!part) return
-            String[] pair = part.split(/:/)
+            String[] pair = part.split("(?<!\\\\):")
             if (pair.length != 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
             ret[unquote(pair[0])] = unquote(pair[1])
         }
