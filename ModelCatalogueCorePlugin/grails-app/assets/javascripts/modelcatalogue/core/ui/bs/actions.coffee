@@ -55,7 +55,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     icon:       'thumbs-up'
     type:       'primary'
     action:     ->
-      modelCatalogueDataArchitect.resolveAll($scope.element.id).then (result)->
+      modelCatalogueDataArchitect.resolveAll($scope.element.id).then ->
         $rootScope.$broadcast 'actionsResolved', $scope.element
     }
 
@@ -75,7 +75,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:       'ok-circle'
       type:       'primary'
       action:     ->
-        modelCatalogueDataArchitect.ingestQueue($scope.element.id).then (result)->
+        modelCatalogueDataArchitect.ingestQueue($scope.element.id).then ->
           $rootScope.$broadcast 'queueIngested', $scope.element
     }
 
@@ -133,6 +133,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   actionsProvider.registerAction 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
+    return undefined if not $scope.element.isInstanceOf('org.modelcatalogue.core.CatalogueElement')
     return undefined if $scope.element.elementTypeName == 'Data Import'
     return undefined if not security.hasRole('CURATOR')
 
@@ -226,7 +227,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerAction 'switch-status', ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
-    return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and not $scope.noStatusSwitch
+    return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and not $scope.noStatusSwitch and $stateParams.resource in ['model', 'dataElement', 'asset']
 
     {
     abstract: true

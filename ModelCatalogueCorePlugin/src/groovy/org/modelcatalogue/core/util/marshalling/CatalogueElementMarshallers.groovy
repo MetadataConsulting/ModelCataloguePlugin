@@ -78,24 +78,36 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
 
         relationshipTypeService.getRelationshipTypesFor(type).each { String name, RelationshipType relationshipType ->
-            relationships.each { String direction, Map<String, String> config ->
-                if (relationshipType.system) {
+            if (relationshipType.system) {
+                relationships.each { String direction, Map<String, String> config ->
                     config.remove name
                 }
+                return
             }
-            if (relationshipType.bidirectional && !relationships.bidirectional.containsKey(name)) {
-                relationships.incoming.remove(name)
-                relationships.outgoing.remove(name)
 
-                relationships.bidirectional[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
-            } else if (relationshipType.sourceClass.isAssignableFrom(type) && !relationships.outgoing.containsKey(name)) {
-                relationships.bidirectional.remove(name)
+            if (relationshipType.bidirectional) {
+                if (!relationships.bidirectional.containsKey(name)) {
+                    relationships.incoming.remove(name)
+                    relationships.outgoing.remove(name)
 
-                relationships.outgoing[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
-            } else if (relationshipType.destinationClass.isAssignableFrom(type) && !relationships.incoming.containsKey(name)) {
-                relationships.bidirectional.remove(name)
+                    relationships.bidirectional[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
+                }
+            } else {
+                if (relationshipType.sourceClass.isAssignableFrom(type)) {
+                    if (!relationships.outgoing.containsKey(name)){
+                        relationships.bidirectional.remove(name)
 
-                relationships.incoming[name] = RelationshipType.toCamelCase(relationshipType.destinationToSource)
+                        relationships.outgoing[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
+                    }
+                }
+                if (relationshipType.destinationClass.isAssignableFrom(type)) {
+                    if (!relationships.incoming.containsKey(name)) {
+
+                        relationships.bidirectional.remove(name)
+
+                        relationships.incoming[name] = RelationshipType.toCamelCase(relationshipType.destinationToSource)
+                    }
+                }
             }
         }
 
@@ -135,7 +147,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
             RelationshipType type = types[relationshipType]
             def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
             switch (incomingOrOutgoing) {
-                case 'bidirectional':
+                case 'relationships':
                     relation.count = el.countRelationsByType(type)
                     break
                 case 'incoming':
@@ -155,7 +167,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
             RelationshipType type = types[relationshipType]
             def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
             switch (incomingOrOutgoing) {
-                case 'bidirectional':
+                case 'relationships':
                     relation.count = el.countRelationsByType(type)
                     break
                 case 'incoming':

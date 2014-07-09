@@ -20,10 +20,17 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     }
 
     protected List<RelationshipType> listAllResources(Map params) {
+        if (params.boolean('system')) {
+            return resource.list(params)
+        }
         resource.findAllBySystem(false, params)
+
     }
 
     protected Integer countResources() {
+        if (params.boolean('system')) {
+            return resource.count()
+        }
         resource.countBySystem(false)
     }
 
