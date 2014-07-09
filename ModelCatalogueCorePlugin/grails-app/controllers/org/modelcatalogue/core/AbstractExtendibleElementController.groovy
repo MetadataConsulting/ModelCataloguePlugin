@@ -5,7 +5,7 @@ import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 import static org.springframework.http.HttpStatus.OK
 
-class AbstractExtendibleElementController<T> extends AbstractPublishedElementController<T> {
+class AbstractExtendibleElementController<T> extends AbstractCatalogueElementController<T> {
 
     AbstractExtendibleElementController(Class<T> type, boolean readOnly) {
         super(type, readOnly)
@@ -42,10 +42,6 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
         if (helper.hasErrors()) {
             respond helper.errors, view:'edit' // STATUS CODE 422
             return
-        }
-
-        if (params.boolean('newVersion')) {
-            publishedElementService.archiveAndIncreaseVersion(instance)
         }
 
         if (ext != null) {

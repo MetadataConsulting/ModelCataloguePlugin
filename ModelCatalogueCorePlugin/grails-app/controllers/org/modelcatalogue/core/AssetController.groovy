@@ -6,7 +6,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.security.DigestInputStream
 import java.security.MessageDigest
 
-class AssetController extends AbstractExtendibleElementController<Asset> {
+class AssetController extends AbstractPublishedElementController<Asset> {
 
     StorageService modelCatalogueStorageService
 

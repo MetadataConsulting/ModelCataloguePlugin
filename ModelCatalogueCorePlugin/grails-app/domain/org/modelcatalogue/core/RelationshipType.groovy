@@ -11,7 +11,7 @@ class RelationshipType {
         name boost: 5
         sourceClass converter: RelationshipTypeClassConverter
         destinationClass converter: RelationshipTypeClassConverter
-        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions', 'ext']
+        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions']
     }
 
     //name of the relationship type i.e. parentChild  or synonym

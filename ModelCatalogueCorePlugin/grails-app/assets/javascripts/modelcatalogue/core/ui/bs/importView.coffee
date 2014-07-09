@@ -1,17 +1,11 @@
 angular.module('mc.core.ui.bs.importView', ['mc.core.ui.importView', 'mc.core.ui.decoratedList',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor',  'ui.bootstrap']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/importView.html', '''
     <div>
-    <span class="pull-right" show-for-role="CURATOR">
-          <div class="btn-group btn-group-sm">
-          <button type="button" class="btn btn-primary dropdown-toggle" >
-            <span class="glyphicon glyphicon-download-alt"></span> Options <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" role="menu">
-            <li><a ng-click="resolveAll()" target="_blank" >Resolve All Pending</a></li>
-            <li><a ng-click="ingestQueue()"  target="_blank"">Ingest Queue</a></li>
-          </ul>
-        </div>
-      </span>
+
+    <span class="pull-right">
+        <contextual-actions size="sm" no-colors="true"></contextual-actions>
+     </span>
+
           <h3 class="ce-name">{{element.name}} <small ng-show="element.elementTypeName">({{element.elementTypeName}}: {{element.id}})</small></h3>
           <blockquote class="ce-description" ng-show="element.description">{{element.description}}</blockquote>
           <tabset ng-show="showTabs">

@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ModelControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
+class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){

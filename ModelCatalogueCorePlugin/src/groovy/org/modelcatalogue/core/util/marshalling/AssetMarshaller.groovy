@@ -4,7 +4,7 @@ import grails.converters.XML
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.Asset
 
-class AssetMarshaller extends ExtendibleElementMarshallers {
+class AssetMarshaller extends PublishedElementMarshallers {
 
     LinkGenerator linkGenerator
 

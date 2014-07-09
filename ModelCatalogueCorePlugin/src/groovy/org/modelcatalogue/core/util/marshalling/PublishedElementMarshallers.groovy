@@ -6,7 +6,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by ladin on 14.02.14.
  */
-abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
+abstract class PublishedElementMarshallers extends ExtendibleElementMarshallers {
 
 
     PublishedElementMarshallers(Class type) {

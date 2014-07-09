@@ -47,8 +47,8 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
 
           if fn.itemType == 'org.modelcatalogue.core.dataarchitect.ImportRow'&& tabDefinition.name != 'imported'
             tabDefinition.actions.push {
-              title:  'resolve action'
-              icon:   'remove'
+              title:  'resolve'
+              icon:   'thumbs-up'
               type:   'default'
               action: (rel) ->
                 deferred = $q.defer()
@@ -175,14 +175,6 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
       # watches
       $scope.$watch 'element', onElementUpdate
 
-      $scope.resolveAll = () ->
-        modelCatalogueDataArchitect.resolveAll($scope.element.id).then (result)->
-          $rootScope.$broadcast 'actionsResolved', $scope.element
-
-      $scope.ingestQueue = () ->
-        modelCatalogueDataArchitect.ingestQueue($scope.element.id).then (result)->
-          $rootScope.$broadcast 'actionsResolved', $scope.element
-
       refreshElement = () ->
         if $scope.element
           $scope.element.refresh().then (refreshed)->
@@ -191,6 +183,7 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
       $scope.$on 'catalogueElementCreated', refreshElement
       $scope.$on 'catalogueElementDeleted', refreshElement
       $scope.$on 'actionsResolved', refreshElement
+      $scope.$on 'queueIngested', refreshElement
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'

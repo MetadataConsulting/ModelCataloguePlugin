@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ValueDomainControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){

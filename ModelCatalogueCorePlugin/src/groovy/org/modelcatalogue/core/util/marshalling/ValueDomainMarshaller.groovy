@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.ValueDomain
 
-class ValueDomainMarshaller extends CatalogueElementMarshallers {
+class ValueDomainMarshaller extends ExtendibleElementMarshallers {
 
     ValueDomainMarshaller() {
         super(ValueDomain)
@@ -30,6 +30,7 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
             mappings count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"
         }
     }
+
 }
 
 

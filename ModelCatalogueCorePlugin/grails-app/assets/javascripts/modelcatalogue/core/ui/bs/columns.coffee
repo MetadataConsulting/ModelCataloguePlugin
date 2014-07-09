@@ -30,12 +30,18 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     return "#{(asset.size)} B"
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.ImportRow', [
-    {header: "Model",        value: 'containingModelName',              class: 'col-md-4', sort: {property: 'containingModelName', type: 'alphabet'}}
-    {header: "Data Element",        value: 'dataElementName',              class: 'col-md-4', sort: {property: 'dataElementName', type: 'alphabet'}}
+    {header: "Model Path",        value: " parentModelName + ' -> ' + containingModelName",              class: 'col-md-2', sort: {property: 'containingModelName', type: 'alphabet'}}
+    {header: "Data Element",        value: 'dataElementName',              class: 'col-md-2', sort: {property: 'dataElementName', type: 'alphabet'}}
+    {
+      header: "Data Type",
+      value: (row) -> row.dataType.replace /\|/g , "\n"
+      class: 'col-md-2',
+      sort: {property: 'dataType', type: 'alphabet'}
+    }
     {
       header: "Row Actions"
       value: (row) -> row.actions?.join('\n\n')
-      class: 'col-md-4'
+      class: 'col-md-6'
       sort: {property: 'actions', type: 'alphabet'}
     }
   ]

@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 
-class Asset extends ExtendibleElement {
+class Asset extends PublishedElement {
 
     Long    size
     String  contentType
@@ -16,7 +16,7 @@ class Asset extends ExtendibleElement {
         extensions component:true
         incomingRelationships component: true
         outgoingRelationships component: true
-        except = ['ext', 'contains', 'hasContextOf', 'parentOf', 'childOf']
+        except = ['md5']
     }
 
     static constraints = {
