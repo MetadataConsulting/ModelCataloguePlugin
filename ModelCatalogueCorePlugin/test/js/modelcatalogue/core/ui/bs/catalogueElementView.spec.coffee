@@ -12,6 +12,12 @@ describe "mc.core.ui.catalogueElementView", ->
     catEl = enhance angular.copy(fixtures.valueDomain.showOne)
     catEl.description = "Hello World!"
 
+    numberOfTabs = 0
+
+    for key, value of catEl
+      if enhance.isEnhancedBy(value, 'listReference')
+        numberOfTabs++
+
     $rootScope.element = catEl
 
     element = $compile('''
@@ -24,8 +30,8 @@ describe "mc.core.ui.catalogueElementView", ->
     expect(element.find('h3.ce-name').text()).toBe("#{catEl.name}  (#{catEl.elementTypeName}: #{catEl.id})")
     expect(element.find('blockquote.ce-description').text()).toBe(catEl.description)
 
-    expect(element.find('ul.nav.nav-tabs li').length).toBe(10)
-    expect(element.find('div.tab-pane').length).toBe(10)
+    expect(element.find('ul.nav.nav-tabs li').length).toBe(numberOfTabs)
+    expect(element.find('div.tab-pane').length).toBe(numberOfTabs)
 
     expect(element.find('.dl-table-item-row').length).toBe(0)
 
