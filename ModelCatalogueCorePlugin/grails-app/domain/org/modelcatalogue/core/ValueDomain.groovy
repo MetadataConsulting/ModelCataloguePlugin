@@ -44,6 +44,7 @@ class ValueDomain extends ExtendibleElement  {
         unitOfMeasure component:true
         incomingRelationships component: true
         outgoingRelationships component: true
+        extensions component:true
     }
 
 	MeasurementUnit unitOfMeasure
