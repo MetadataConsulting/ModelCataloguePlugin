@@ -7,6 +7,7 @@ angular.module('mc.core.ui.messagesPanel', ['mc.util.messages']).directive 'mess
   scope:
     max: '=?'
     messages: '=?'
+    growl: '@?'
 
   controller: ['$scope', 'messages', ($scope, messages) ->
     $scope.max ?= 5

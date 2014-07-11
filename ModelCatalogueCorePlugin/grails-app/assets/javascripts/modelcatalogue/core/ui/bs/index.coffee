@@ -27,6 +27,7 @@
 #= require modalPromptValueDomainEdit
 #= require modalPromptEnumeratedTypeEdit
 #= require modalPromptPublishedElement
+#= require modalPromptRelationshipTypeEdit
 
 
 angular.module('mc.core.ui.bs', [
@@ -60,4 +61,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptValueDomainEdit'
   'mc.core.ui.bs.modalPromptEnumeratedTypeEdit'
   'mc.core.ui.bs.modalPromptPublishedElement'
+  'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
 ])

@@ -96,3 +96,63 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   margin-bottom: 20px;
   float: right!important;
 }
+
+.messages-panel.growl {
+  position: fixed;
+  right:    15px;
+  bottom:   15px;
+  width:    35%;
+  z-index:  1000;
+
+  .alert:hover {
+    opacity: .3;
+  }
+
+  .alert {
+    &.ng-enter, &.ng-move {
+      -webkit-transition: 1s ease all;
+      -moz-transition: 1s ease all;
+      -o-transition: 1s ease all;
+      transition: 1s ease all;
+
+      opacity:0;
+    }
+
+    &.ng-enter-active, &.ng-move-active,  {
+      opacity: .9;
+    }
+
+    &.ng-leave {
+      -webkit-animation:0.5s my_animation;
+      -moz-animation:0.5s my_animation;
+      -o-animation:0.5s my_animation;
+      animation:0.5s my_animation;
+    }
+  }
+
+  .alert {
+    opacity: 0.9;
+  }
+
+}
+
+@keyframes my_animation {
+  from { opacity:1; }
+  to { opacity:0; }
+}
+
+@-webkit-keyframes my_animation {
+  from { opacity:1; }
+  to { opacity:0; }
+}
+
+@-moz-keyframes my_animation {
+  from { opacity:1; }
+  to { opacity:0; }
+}
+
+@-o-keyframes my_animation {
+  from { opacity:1; }
+  to { opacity:0; }
+}
+

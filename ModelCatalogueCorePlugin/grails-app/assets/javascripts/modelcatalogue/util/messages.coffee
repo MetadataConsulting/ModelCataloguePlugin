@@ -6,6 +6,8 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
   nextId = 1
 
+  hideAfter = 5000
+
   messagesProvider = @
 
   @setConfirmFactory = (customConfirm) ->
@@ -20,8 +22,11 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
   @hasPromptFactory = (type) ->
     promptFactories[type]?
 
+  @setHideAfter = (newHideAfter) ->
+    hideAfter = newHideAfter
+
   # factory method
-  @$get = [ '$injector', '$q', '$log', '$window', ($injector, $q, $log, $window) ->
+  @$get = [ '$injector', '$q', '$log', '$window', '$timeout', ($injector, $q, $log, $window, $timeout) ->
     createNewMessages = () ->
       messagesStack = []
 
@@ -72,13 +77,19 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
           type: type
           messageId: nextId++
 
-        msg.remove = () ->
+        msg.remove = ->
           messages.removeMessage(msg)
+
 
         for existing in messagesStack
           return msg if existing.type == msg.type and existing.title == msg.title and existing.body == msg.body
 
         messagesStack.push msg
+
+        afterTimeout = $timeout((-> msg.remove()), hideAfter)
+
+        msg.noTimeout = -> $timeout.cancel(afterTimeout)
+
         msg
 
       ###
