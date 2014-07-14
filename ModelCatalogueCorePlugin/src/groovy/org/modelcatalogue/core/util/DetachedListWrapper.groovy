@@ -5,7 +5,7 @@ import grails.gorm.DetachedCriteria
 /**
  * Created by ladin on 14.07.14.
  */
-class DetachedListWrapper<T>  implements ListWrapper<T> {
+class DetachedListWrapper<T> implements ListWrapper<T> {
 
     final DetachedCriteria<T> criteria
     final Map<String, Object> params
@@ -16,6 +16,22 @@ class DetachedListWrapper<T>  implements ListWrapper<T> {
 
     private Long total = null
     private List<T> items = null
+
+    public static <T> DetachedListWrapper<T> create(Class<T> type, String base){
+        create([:], type, base, (String) null)
+    }
+
+    public static <T> DetachedListWrapper<T> create(Class<T> type, String base, String name){
+        create([:], type, base, name)
+    }
+
+    public static <T> DetachedListWrapper<T> create(Map params, Class<T> type, String base){
+        create(params, type, base, (String) null)
+    }
+
+    public static <T> DetachedListWrapper<T> create(Map params, Class<T> type, String base, String name){
+        create(params, type, base, name, {})
+    }
 
     public static <T> DetachedListWrapper<T> create(Class<T> type, String base, @DelegatesTo(DetachedCriteria) Closure buildClosure){
         create([:], type, base, null, buildClosure)
@@ -85,7 +101,7 @@ class DetachedListWrapper<T>  implements ListWrapper<T> {
 
     @Override
     int getPage() {
-        return params.max ? Integer.valueOf(params.max.toString()) : 0
+        return params.max ? Integer.valueOf(params.max.toString()) : 10
     }
 
     @Override

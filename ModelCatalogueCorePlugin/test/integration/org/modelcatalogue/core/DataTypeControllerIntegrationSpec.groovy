@@ -30,8 +30,6 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
 
         then:
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
-        json.listType == ValueDomains.name
-        //json.itemType == ValueDomain.name
 
         when:
         def item  = json.list[0]

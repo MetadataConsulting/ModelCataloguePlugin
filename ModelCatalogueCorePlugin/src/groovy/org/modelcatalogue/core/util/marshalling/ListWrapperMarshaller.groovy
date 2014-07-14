@@ -18,7 +18,6 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         [
                 base: elements.base,
                 itemType: elements.itemType?.name,
-                listType: type.name,
                 success: true,
                 total: elements.total,
                 offset: elements.offset,
@@ -76,7 +75,7 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
 
     @Override
     protected String getElementName(Object element) {
-        return element.elementName
+        return element.elementName ?: 'elements'
     }
 
     @Override

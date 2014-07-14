@@ -65,7 +65,6 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
         then:
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
-        json.listType == Elements.name
         json.itemType == resource.name
 
         // TODO: add more verification

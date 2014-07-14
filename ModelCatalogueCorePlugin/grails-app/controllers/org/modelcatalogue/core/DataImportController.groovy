@@ -21,16 +21,8 @@ class DataImportController extends AbstractRestfulController{
     }
 
     @Override
-    def index(Integer max) {
-        setSafeMax(max)
-        def total = countResources()
-        def list = listAllResources(params)
-
-        respondWithLinks new Elements(
-                base: "/dataArchitect/imports",
-                total: total,
-                items: list
-        )
+    protected getBasePath() {
+        return "/dataArchitect/imports"
     }
 
     def upload(Integer max) {
