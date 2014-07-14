@@ -57,6 +57,7 @@ grails.project.dependency.resolution = {
         compile ":hibernate:3.6.10.8"
 
         compile ":excel-export:0.2.1"
+        compile ":executor:0.3"
 
         test ':build-test-data:1.1.1'
         test ':fixtures:1.2'
