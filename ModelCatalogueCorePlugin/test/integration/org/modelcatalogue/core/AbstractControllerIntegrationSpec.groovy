@@ -62,7 +62,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         json.list.size() == size
         json.next == next
         json.previous == previous
-        json.listType == Elements.name
         json.itemType == resource.name
         resource.count() == totalCount
 

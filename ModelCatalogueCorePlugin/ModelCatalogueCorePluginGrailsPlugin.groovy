@@ -80,7 +80,8 @@ Model catalogue core plugin (metadata registry)
                     new MappingsMarshaller(),
                     new ImportRowMarshaller(),
                     new ImportRowsMarshaller(),
-                    new DataImportMarshaller()
+                    new DataImportMarshaller(),
+                    new DetachedListWrapperMarshaller()
             ]
         }
 

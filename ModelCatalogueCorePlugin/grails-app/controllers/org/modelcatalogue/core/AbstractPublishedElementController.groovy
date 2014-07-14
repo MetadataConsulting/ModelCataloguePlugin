@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
+import org.modelcatalogue.core.util.DetachedListWrapper
 import org.modelcatalogue.core.util.Elements
 
 import static org.springframework.http.HttpStatus.OK
@@ -17,14 +18,10 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     @Override
     def index(Integer max) {
         setSafeMax(max)
-        Integer total = publishedElementService.count(params, resource)
-        def list = publishedElementService.list(params, resource)
 
-        respondWithLinks new Elements(
-                base: "/${resourceName}/",
-                total: total,
-                items: list
-        )
+        respond DetachedListWrapper.create(params, resource, "/${resourceName}/") {
+            eq 'status', PublishedElementService.getStatusFromParams(params)
+        }
     }
 
     /**

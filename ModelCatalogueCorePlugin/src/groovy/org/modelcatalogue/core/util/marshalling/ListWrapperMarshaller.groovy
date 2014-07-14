@@ -18,7 +18,6 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         [
                 base: elements.base,
                 itemType: elements.itemType?.name,
-                listType: type.name,
                 success: true,
                 total: elements.total,
                 offset: elements.offset,
@@ -72,5 +71,15 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         addXmlAttribute(elements.offset, "offset", xml)
         addXmlAttribute(elements.items.size(), "size", xml)
         addXmlAttribute("true", "success", xml)
+    }
+
+    @Override
+    protected String getElementName(Object element) {
+        return element.elementName ?: 'elements'
+    }
+
+    @Override
+    protected boolean isSupportingCustomElementName() {
+        return true
     }
 }
