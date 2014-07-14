@@ -264,6 +264,20 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerChildAction 'switch-status', 'switch-status-pending', ['$state', '$stateParams', ($state, $stateParams) ->
+    {
+      position:   200
+      label:      "Pending"
+      icon:       'time'
+      type:       'warning'
+      active:     $stateParams.status == 'pending'
+      action:     ->
+        newParams = angular.copy($stateParams)
+        newParams.status = 'pending'
+        $state.go 'mc.resource.list', newParams
+    }
+  ]
+
   actionsProvider.registerChildAction 'switch-status', 'switch-status-draft', ['$state', '$stateParams', ($state, $stateParams) ->
     {
     position:   100
