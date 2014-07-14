@@ -1,8 +1,12 @@
 package org.modelcatalogue.core.util
+
+import grails.util.GrailsNameUtils
+
 /**
  * Wrapper used for easier marshalling of relations result lists
  */
 class SimpleListWrapper<T> implements ListWrapper<T>{
+    String name
     String base
     String next
     String previous
@@ -15,6 +19,10 @@ class SimpleListWrapper<T> implements ListWrapper<T>{
     List<T> items
     List<Map<String, String>> availableReports = []
 
+    @Override
+    String getElementName() {
+        return name ?: GrailsNameUtils.getPropertyName(getClass().getSimpleName())
+    }
 
     static Map<String, String> nextAndPreviousLinks(Map params, String baseLink, Long total) {
         def link = "${baseLink}?"

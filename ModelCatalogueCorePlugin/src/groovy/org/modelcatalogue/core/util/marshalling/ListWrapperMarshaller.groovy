@@ -73,4 +73,14 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         addXmlAttribute(elements.items.size(), "size", xml)
         addXmlAttribute("true", "success", xml)
     }
+
+    @Override
+    protected String getElementName(Object element) {
+        return element.elementName
+    }
+
+    @Override
+    protected boolean isSupportingCustomElementName() {
+        return true
+    }
 }

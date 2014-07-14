@@ -21,10 +21,18 @@ abstract class AbstractMarshallers {
             if (!el) return null
             prepareJsonMap(el)
         }
-        XML.registerObjectMarshaller(type) { el, XML xml ->
+
+        Closure cl ={ el, XML xml ->
             if (!el) return
             addXmlAttributes(el, xml)
             buildXml(el, xml)
+        }
+
+
+        if (supportingCustomElementName) {
+            XML.registerObjectMarshaller(new NameAwareClosureObjectMarshaller<XML>({ getElementName(it) }, type, cl))
+        } else {
+            XML.registerObjectMarshaller(type, cl)
         }
     }
 
@@ -37,5 +45,8 @@ abstract class AbstractMarshallers {
     protected static void addXmlAttribute(property, String attribute, XML xml) {
         if(property!=null){xml.attribute(attribute, "${property}")}
     }
+
+    protected String getElementName(element) { return null }
+    protected boolean isSupportingCustomElementName() { return false }
 
 }
