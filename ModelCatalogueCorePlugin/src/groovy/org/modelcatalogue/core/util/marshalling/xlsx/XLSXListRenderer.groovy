@@ -1,20 +1,33 @@
 package org.modelcatalogue.core.util.marshalling.xlsx
 
+import grails.gorm.DetachedCriteria
+import grails.gorm.PagedResultList
 import grails.rest.render.AbstractRenderer
 import grails.rest.render.RenderContext
-import grails.util.GrailsWebUtil
+import groovy.util.logging.Log4j
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.codehaus.groovy.grails.web.mime.MimeType
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+import org.codehaus.groovy.grails.web.util.StreamByteBuffer
+import org.grails.datastore.mapping.query.Query
 import org.grails.plugins.web.rest.render.ServletRenderContext
+import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.AssetService
+import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.multipart.MultipartFile
 import pl.touk.excel.export.WebXlsxExporter
+
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 
 /**
  * Created by ladin on 07.04.14.
  */
+@Log4j
 class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
 	static String DEFAULT_LAYOUT_RESOURCENAME       = "/excelLayouts/defaultLayout.xlsx"
@@ -25,6 +38,9 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
     private final Map<String, List<XLSXRowWriter>> writers = [:]
 
     @Autowired ReportsRegistry reportsRegistry
+    @Autowired ExecutorService executorService
+    @Autowired LinkGenerator linkGenerator
+    @Autowired AssetService assetService
 
     XLSXListRenderer() {
         super(ListWrapper, [EXCEL, XLSX] as MimeType[])
@@ -33,50 +49,120 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
     @Override
     void render(ListWrapper container, RenderContext context) {
+        log.info "Rendering XLSX for container ${container} and context ${context}"
         if (!(context instanceof ServletRenderContext)) {
             throw new IllegalStateException("This renderer only works for servlet environment with ServletRendererContext")
         }
 
-        context.setContentType(GrailsWebUtil.getContentType(XLSX.name, GrailsWebUtil.DEFAULT_ENCODING))
+        // context.setContentType(GrailsWebUtil.getContentType(XLSX.name, GrailsWebUtil.DEFAULT_ENCODING))
 
         XLSXRowWriter writer = findRowWriter(context.webRequest.params.report?.toString(), container, context)
 
- 		URL layoutResource = this.class.getResource(DEFAULT_LAYOUT_RESOURCENAME)
-		String layoutFileName
+ 		String layoutFileName = getLayoutResourceFileName()
 
-		if(layoutResource && layoutResource.file && (new File(layoutResource.file).exists())){
-			layoutFileName = layoutResource.file;
-		}
+        String theName = writer.getFileName(context)
 
-		WebXlsxExporter exporter
-		if(layoutFileName){
-			exporter = new WebXlsxExporter(layoutFileName)
-		}else{
-			exporter = new WebXlsxExporter()
-		}
+        if (!theName && writer.title) theName = writer.title
+        if (!theName && writer.name) theName = writer.name
+        if (!theName) theName = context.controllerName ?: 'export'
 
-		//it should be set, before adding any row
-		exporter.setWorksheetName('Export')
+        if (!theName.endsWith('.xlsx')) theName += '.xlsx'
 
+        Asset asset = new Asset(
+            name: theName,
+            originalFileName: theName,
+            description: "Your export will be available in this asset soon",
+            status: PublishedElementStatus.PENDING,
+            contentType: XLSX.name,
+            size: 0
+        )
 
-		exporter.setResponseHeaders(context.webRequest.currentResponse, writer.getFileName(context) ?: context.controllerName)
+        assert asset.save()
+        
+        Long id = asset.id
 
-        int counter = 0
+        DetachedCriteria criteria = null
 
-        List<Object> headers = writer.getHeaders()
+        if (container.items instanceof PagedResultList) {
+            PagedResultList list = container.items
+            Query query = list.query
+            criteria = new DetachedCriteria(query.entity.javaClass)
+            criteria.add(query.criteria)
 
-        if (headers) {
-            exporter.fillRow(headers, counter++)
+            log.info "List criteria: ${query.criteria}"
+            log.info "Detached criteria: ${criteria}"
         }
 
-        for(item in container.items) {
-            List<List<Object>> rows = writer.getRows(item)
-            for (List<Object> row in rows) {
-                exporter.fillRow(row, counter++)
+        executorService.submit {
+            try {
+
+                Asset.withDatastoreSession {
+                    if (criteria) {
+                        container.items = criteria.list(context.webRequest.params)
+                    }
+
+
+                    WebXlsxExporter exporter
+                    if (layoutFileName) {
+                        exporter = new WebXlsxExporter(layoutFileName)
+                    } else {
+                        exporter = new WebXlsxExporter()
+                    }
+
+                    exporter.setWorksheetName('Export')
+
+                    int counter = 0
+
+                    List<Object> headers = writer.getHeaders()
+
+                    if (headers) {
+                        exporter.fillRow(headers, counter++)
+                    }
+
+                    for (item in container.items) {
+                        List<List<Object>> rows = writer.getRows(item)
+                        for (List<Object> row in rows) {
+                            exporter.fillRow(row, counter++)
+                        }
+                    }
+
+
+                    Asset updatedAsset = Asset.get(id)
+
+                    assetService.storeAssetWithSteam(updatedAsset, XLSX.name) {
+                        exporter.save(it)
+                    }
+
+                    updatedAsset.status = PublishedElementStatus.FINALIZED
+                    updatedAsset.description = "Your export is ready. Use Download button to view it."
+                    assert updatedAsset.save()
+
+                }
+            } catch (e) {
+                log.error "Exception exporting asset ${id}", e
             }
         }
 
-        exporter.save(context.webRequest.currentResponse.outputStream)
+
+        context.webRequest.currentResponse.with {
+            def link = linkGenerator.link(controller: 'asset', id: asset.id, action: 'show')
+            status = 302
+            setHeader("Location", link)
+            outputStream << link
+            outputStream.flush()
+        }
+
+    }
+
+
+    private static String getLayoutResourceFileName() {
+        URL layoutResource = XLSXListRenderer.getResource(DEFAULT_LAYOUT_RESOURCENAME)
+
+        if (layoutResource && layoutResource.file && (new File(layoutResource.file).exists())) {
+            return layoutResource.file;
+        }
+
+        return null
     }
 
 
