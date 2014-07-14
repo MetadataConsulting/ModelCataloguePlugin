@@ -4,6 +4,7 @@ import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.SimpleListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -133,7 +134,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
 
     protected void respondWithLinks(Class itemType = resource, ListWrapper listWrapper) {
-        def links = ListWrapper.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
+        def links = SimpleListWrapper.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
         listWrapper.previous    = links.previous
         listWrapper.next        = links.next
         listWrapper.offset      = params.int('offset') ?: 0

@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.SimpleListWrapper
 
 class SearchController {
 
@@ -19,7 +20,7 @@ class SearchController {
 
         def total = (results.total)?results.total.intValue():0
         def baseLink = "/search/${params.search}"
-        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, total)
+        def links = SimpleListWrapper.nextAndPreviousLinks(params, baseLink, total)
         Elements elements =  new Elements(
                 base: baseLink,
                 total: total,
