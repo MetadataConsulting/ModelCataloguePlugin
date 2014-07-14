@@ -17,7 +17,6 @@ class SimpleListWrapper<T> implements ListWrapper<T>{
     int page
     int offset
     List<T> items
-    List<Map<String, String>> availableReports = []
 
     @Override
     String getElementName() {

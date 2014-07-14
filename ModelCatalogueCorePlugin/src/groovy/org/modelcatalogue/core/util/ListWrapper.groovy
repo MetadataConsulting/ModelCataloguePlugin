@@ -13,6 +13,5 @@ interface ListWrapper<T> {
     int getOffset()
     List<T> getItems()
     String getElementName()
-    List<Map<String, String>> getAvailableReports()
 
 }
