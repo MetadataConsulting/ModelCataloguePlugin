@@ -12,7 +12,7 @@ class ExtendibleElementController extends AbstractExtendibleElementController<Ex
 //
 //    @Override
 //    def index(Integer max) {
-//        setSafeMax(max)
+//        handleParams(max)
 //        Integer total = publishedElementService.count(params, ExtendibleElement)
 //        def list = publishedElementService.list(params, ExtendibleElement)
 //

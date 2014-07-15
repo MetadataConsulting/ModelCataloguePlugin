@@ -14,7 +14,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
 
 
     def valueDomains(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         DataType dataType = queryForResource(params.id)
         if (!dataType) {
             notFound()

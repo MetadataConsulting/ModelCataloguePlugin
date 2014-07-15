@@ -17,7 +17,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
 
     @Override
     def index(Integer max) {
-        setSafeMax(max)
+        handleParams(max)
 
         respond DetachedListWrapper.create(params, resource, "/${resourceName}/") {
             eq 'status', PublishedElementService.getStatusFromParams(params)
@@ -85,7 +85,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     }
 
     def history(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         PublishedElement element = queryForResource(params.id)
         if (!element) {
             notFound()

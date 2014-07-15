@@ -17,28 +17,12 @@ class DetachedListWrapper<T> implements ListWrapper<T> {
     private Long total = null
     private List<T> items = null
 
-    public static <T> DetachedListWrapper<T> create(Class<T> type, String base){
-        create([:], type, base, (String) null)
-    }
-
-    public static <T> DetachedListWrapper<T> create(Class<T> type, String base, String name){
-        create([:], type, base, name)
-    }
-
     public static <T> DetachedListWrapper<T> create(Map params, Class<T> type, String base){
         create(params, type, base, (String) null)
     }
 
     public static <T> DetachedListWrapper<T> create(Map params, Class<T> type, String base, String name){
         create(params, type, base, name, {})
-    }
-
-    public static <T> DetachedListWrapper<T> create(Class<T> type, String base, @DelegatesTo(DetachedCriteria) Closure buildClosure){
-        create([:], type, base, null, buildClosure)
-    }
-
-    public static <T> DetachedListWrapper<T> create(Class<T> type, String base, String name, @DelegatesTo(DetachedCriteria) Closure buildClosure){
-        create([:], type, base, name, buildClosure)
     }
 
     public static <T> DetachedListWrapper<T> create(Map params, Class<T> type, String base, @DelegatesTo(DetachedCriteria) Closure buildClosure){
@@ -48,14 +32,6 @@ class DetachedListWrapper<T> implements ListWrapper<T> {
     public static <T> DetachedListWrapper<T> create(Map params, Class<T> type, String base, String name, @DelegatesTo(DetachedCriteria) Closure buildClosure){
         create(params, base, name, new DetachedCriteria<T>(type).build(buildClosure))
 
-    }
-
-    public static <T> DetachedListWrapper<T> create(String base, DetachedCriteria<T> criteria){
-        create([:], base, null, criteria)
-    }
-
-    public static <T> DetachedListWrapper<T> create(String base, String name, DetachedCriteria<T> criteria){
-        create([:], base, name, criteria)
     }
 
     public static <T> DetachedListWrapper<T> create(Map params, String base, DetachedCriteria<T> criteria){

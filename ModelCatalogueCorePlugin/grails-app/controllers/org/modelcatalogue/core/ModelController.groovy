@@ -16,7 +16,7 @@ class ModelController extends AbstractPublishedElementController<Model> {
         if (!params.boolean("toplevel")) {
             return super.index(max)
         }
-        setSafeMax(max)
+        handleParams(max)
 
         ListAndCount topLevel = modelService.getTopLevelModels(params)
 

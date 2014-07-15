@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
-import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.util.DetachedListWrapper
-import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.Relationships
@@ -156,7 +154,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     }
 
     private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
-        setSafeMax(max)
+        handleParams(max)
 
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
@@ -179,21 +177,16 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
 
     def mappings(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
             return
         }
 
-        int total = element.outgoingMappings.size()
-        def list = Mapping.findAllBySource(element, params)
-
-        respondWithLinks new Mappings(
-                base: "/${resourceName}/${params.id}/mapping",
-                items: list,
-                total: total
-        )
+        respond new Mappings(list: DetachedListWrapper.create(params, Mapping, "/${resourceName}/${params.id}/mapping", "mappings") {
+            eq 'source', element
+        })
     }
 
     def removeMapping() {

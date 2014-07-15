@@ -29,7 +29,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     def search(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         def results =  modelCatalogueSearchService.search(resource, params)
 
         if(results.errors){
@@ -47,7 +47,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         respondWithLinks elements
     }
 
-    protected setSafeMax(Integer max) {
+    protected handleParams(Integer max) {
         withFormat {
             json {
                 params.max = Math.min(max ?: 10, 100)
@@ -65,7 +65,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     @Override
     def index(Integer max) {
-        setSafeMax(max)
+        handleParams(max)
         respond DetachedListWrapper.create(params, resource, basePath)
     }
 

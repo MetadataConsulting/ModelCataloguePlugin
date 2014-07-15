@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.util.ValueDomains
 import spock.lang.Unroll
 
 /**
@@ -158,8 +157,8 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
     def getMappingPaginationParameters(baseLink){
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 2, 10, 0, 11, "${baseLink}?max=10&offset=10", ""],
-                [2, 2, 5, 0, 11, "${baseLink}?max=5&offset=5", ""],
+                [1, 2, 10, 0, 2, "", ""],
+                [2, 2, 5, 0, 2, "", ""],
         ]
 
     }

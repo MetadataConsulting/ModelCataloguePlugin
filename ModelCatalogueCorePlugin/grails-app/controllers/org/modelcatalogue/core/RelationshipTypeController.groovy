@@ -18,7 +18,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
 
     @Override
     def index(Integer max) {
-        setSafeMax(max)
+        handleParams(max)
         respond DetachedListWrapper.create(params, resource, "/${resourceName}/") {
             if (!params.boolean('system')) {
                 eq 'system', false

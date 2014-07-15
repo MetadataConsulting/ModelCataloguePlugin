@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
-import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.SimpleListWrapper
 
 class DataArchitectController<T> extends AbstractRestfulController<T>{
@@ -22,7 +21,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
     def index(){}
 
     def uninstantiatedDataElements(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         ListAndCount results
 
         try{
@@ -46,7 +45,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
 
     def metadataKeyCheck(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         ListAndCount results
 
         try{
@@ -89,7 +88,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
     }
 
     def findRelationsByMetadataKeys(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         def results
         def keyOne = params.keyOne
         def keyTwo = params.keyTwo
