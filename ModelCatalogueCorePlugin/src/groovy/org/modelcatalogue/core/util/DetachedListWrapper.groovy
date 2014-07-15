@@ -46,11 +46,24 @@ class DetachedListWrapper<T> implements ListWrapper<T> {
     }
 
     public static <T> DetachedListWrapper<T> create(Map params, Class<T> type, String base, String name, @DelegatesTo(DetachedCriteria) Closure buildClosure){
-        DetachedCriteria<T> criteria = new DetachedCriteria<T>(type)
+        create(params, base, name, new DetachedCriteria<T>(type).build(buildClosure))
 
-        criteria = criteria.build buildClosure
+    }
 
-        new DetachedListWrapper<T>(criteria, base, name,new HashMap(params))
+    public static <T> DetachedListWrapper<T> create(String base, DetachedCriteria<T> criteria){
+        create([:], base, null, criteria)
+    }
+
+    public static <T> DetachedListWrapper<T> create(String base, String name, DetachedCriteria<T> criteria){
+        create([:], base, name, criteria)
+    }
+
+    public static <T> DetachedListWrapper<T> create(Map params, String base, DetachedCriteria<T> criteria){
+        create(params, base, null, criteria)
+    }
+
+    public static <T> DetachedListWrapper<T> create(Map params, String base, String name, DetachedCriteria<T> criteria){
+        new DetachedListWrapper<T>(criteria, base, name, new HashMap(params))
 
     }
 

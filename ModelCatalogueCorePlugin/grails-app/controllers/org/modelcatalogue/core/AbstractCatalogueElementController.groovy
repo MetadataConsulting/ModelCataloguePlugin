@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.util.DetachedListWrapper
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -168,13 +170,10 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        ListAndCount listAndCount = relationshipService.getRelationships(params, direction, element, type)
-        respondWithLinks new Relationships(
-                base: "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""),
+        respond new Relationships(
                 owner: element,
-                items: listAndCount.list,
                 direction: direction,
-                total: listAndCount.count,
+                list: DetachedListWrapper.create(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type))
         )
     }
 

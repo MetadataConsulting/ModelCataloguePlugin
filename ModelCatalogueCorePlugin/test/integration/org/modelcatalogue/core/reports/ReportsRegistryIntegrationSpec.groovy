@@ -8,6 +8,7 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.SimpleListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import spock.lang.Stepwise
 
@@ -81,7 +82,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         expect:
         relationshipsReports.size()                           >= 2
         relationshipsReports[1].title                         == 'Export Relationships TEST'
-        relationshipsReports[1].getLink(new Relationships())  == '?format=xlsx&report='
+        relationshipsReports[1].getLink(new Relationships(list: new SimpleListWrapper<Relationship>(itemType: Relationship)))  == '?format=xlsx&report='
 
 
 
