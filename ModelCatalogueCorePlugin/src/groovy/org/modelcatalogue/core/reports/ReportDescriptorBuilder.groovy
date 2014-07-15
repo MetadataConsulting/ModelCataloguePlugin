@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.reports
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import org.modelcatalogue.core.reports.ReportDescriptor.RenderType
 import org.modelcatalogue.core.util.ListWrapper
 
 /**
@@ -55,4 +56,11 @@ class ReportDescriptorBuilder {
         descriptor.generator = generator
         descriptor
     }
+
+    ReportDescriptorBuilder creates(RenderType type) {
+        descriptor.renderType = type ; this
+    }
+
+    static RenderType getAsset() { RenderType.ASSET }
+    static RenderType getLink()  { RenderType.LINK  }
 }

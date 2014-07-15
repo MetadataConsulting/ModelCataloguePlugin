@@ -151,12 +151,29 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if not $scope.element?.downloadUrl?
 
     {
-    position:   0
-    label:      'Download'
-    icon:       'download'
-    type:       'primary'
-    action:     ->
-      $window.open $scope.element.downloadUrl, '_blank'; return true
+      position:   0
+      label:      'Download'
+      icon:       'download'
+      type:       'primary'
+      action:     ->
+        $window.open $scope.element.downloadUrl, '_blank'; return true
+
+    }
+  ]
+
+  actionsProvider.registerAction 'refresh-asset', [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
+    return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
+    return undefined if $scope.element.status != 'PENDING'
+
+    {
+      position:   0
+      label:      'Refresh'
+      icon:       'refresh'
+      type:       'primary'
+      action:     ->
+        catalogueElementResource($scope.element.elementType).get($scope.element.id).then (refreshed) ->
+          $scope.element = refreshed
+          $rootScope.$broadcast 'redrawContextualActions'
 
     }
   ]
@@ -175,8 +192,20 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  generateReports = ($scope, $window, enhance, rest) ->
+    (reports = []) ->
+      for report in reports
+        {
+          label:  report.title
+          action: ->
+            switch report.type
+              when 'LINK' then $window.open(report.url, '_blank')
+              else enhance(rest(method: 'GET', url: report.url)).then (result) ->
+                result.show()
+            return true
+        }
 
-  actionsProvider.registerChildAction 'export', 'catalogue-element-export-specific-reports' , ['$scope', '$window', ($scope, $window) ->
+  actionsProvider.registerChildAction 'export', 'catalogue-element-export-specific-reports' , ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
     return undefined if not $scope.element
 
     {
@@ -184,31 +213,21 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     label:      "#{$scope.element.name} Reports"
     disabled:   not $scope.element?.availableReports?.length
     generator:  (action) ->
-      action.createActionsFrom 'element.availableReports', (reports = []) ->
-        for report in reports
-          {
-            label:  report.title
-            action: -> $window.open(report.url, '_blank') ; return true
-          }
+      action.createActionsFrom 'element.availableReports', generateReports($scope, $window, enhance, rest)
     }
   ]
 
-  actionsProvider.registerChildAction 'export', 'generic-reports', ['$scope', '$window', ($scope, $window) ->
+  actionsProvider.registerChildAction 'export', 'generic-reports', ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
     {
     position:   2000
     label:      "Other Reports"
     disabled:   not $scope.reports?.length
     generator: (action) ->
-      action.createActionsFrom 'reports', (reports = []) ->
-        for report in reports
-          {
-            label:  report.title
-            action: -> $window.open(report.url, '_blank') ; return true
-          }
+      action.createActionsFrom 'reports', generateReports($scope, $window, enhance, rest)
     }
   ]
 
-  actionsProvider.registerChildAction 'export', 'list-exports-current', ['$scope', '$window', ($scope, $window) ->
+  actionsProvider.registerChildAction 'export', 'list-exports-current', ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
     return undefined if not $scope.list?
 
     {
@@ -216,12 +235,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     label:      "Current Reports"
     disabled:   not $scope.list.availableReports?.length
     generator:  (action) ->
-      action.createActionsFrom 'list.availableReports', (reports = []) ->
-        for report in reports
-          {
-            label:  report.title
-            action: -> $window.open(report.url, '_blank') ; return true
-          }
+      action.createActionsFrom 'list.availableReports', generateReports($scope, $window, enhance, rest)
     }
   ]
 

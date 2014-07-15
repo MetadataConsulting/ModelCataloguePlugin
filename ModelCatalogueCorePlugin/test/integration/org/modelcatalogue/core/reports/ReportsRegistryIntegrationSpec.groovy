@@ -32,12 +32,14 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         }
 
         registry.register {
+            creates link
             title 'BLAH'
             type DataElement
             link controller: 'data', action: 'index', params: [format: 'xslt'], id: true
         }
 
         registry.register {
+            creates asset
             title 'WRAPPER'
             item Model
             link controller: 'foo', action: 'bar', params: [format: 'xml']
@@ -82,6 +84,7 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         expect:
         relationshipsReports.size()                           >= 2
         relationshipsReports[1].title                         == 'Export Relationships TEST'
+        relationshipsReports[1].renderType                    == ReportDescriptor.RenderType.ASSET
         relationshipsReports[1].getLink(new Relationships(list: new SimpleListWrapper<Relationship>(itemType: Relationship)))  == '?format=xlsx&report='
 
 

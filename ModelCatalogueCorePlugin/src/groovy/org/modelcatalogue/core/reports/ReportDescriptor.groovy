@@ -9,6 +9,19 @@ import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 @Log4j
 class ReportDescriptor {
 
+    static enum RenderType {
+        /**
+         * Report will be generated in new asset.
+         */
+        ASSET,
+
+        /**
+         * Report is plain link
+         */
+        LINK
+
+    }
+
     LinkGenerator generator
 
     /**
@@ -20,6 +33,8 @@ class ReportDescriptor {
      * List of conditions which all needs to be met to apply make this report available to given endpoint.
      */
     List<Closure> conditions = []
+
+    RenderType renderType = RenderType.LINK
 
     /**
      * Additional params to be used to generate the destination URL.
