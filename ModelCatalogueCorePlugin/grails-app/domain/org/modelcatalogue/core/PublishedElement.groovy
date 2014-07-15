@@ -7,7 +7,7 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     //status: once an object is finalized it cannot be changed
     //it's version number is updated and any subsequent update will
-    //be mean that the element is superceded. We will provide a supercede function
+    //be mean that the element is superseded. We will provide a supersede function
     //to do this
     PublishedElementStatus status = PublishedElementStatus.DRAFT
 

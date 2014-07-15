@@ -42,7 +42,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
         Map<String, Map<String, String>> relationships = getRelationshipConfiguration(el.getClass())
 
-        Map<String, RelationshipType> types = relationshipTypeService.getRelationshipTypesFor(el.getClass())
+        Map<String, RelationshipType> types = getRelationshipTypesFor(el.getClass())
 
         relationships.incoming?.each        addRelationsJson('incoming', el, ret, types)
         relationships.outgoing?.each        addRelationsJson('outgoing', el, ret, types)
@@ -64,6 +64,10 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         reports
     }
 
+    protected getRelationshipTypesFor(Class elementClass){
+        relationshipTypeService.getRelationshipTypesFor(elementClass)
+    }
+
     Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {
         def relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
         if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) {
@@ -77,7 +81,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         relationships.outgoing.putAll(fromType.outgoing ?: [:])
         relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
 
-        relationshipTypeService.getRelationshipTypesFor(type).each { String name, RelationshipType relationshipType ->
+        getRelationshipTypesFor(type).each { String name, RelationshipType relationshipType ->
             if (relationshipType.system) {
                 relationships.each { String direction, Map<String, String> config ->
                     config.remove name
@@ -125,7 +129,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
         def relationships = getRelationshipConfiguration(type)
 
-        Map<String, RelationshipType> types = relationshipTypeService.getRelationshipTypesFor(el.getClass())
+        Map<String, RelationshipType> types = getRelationshipTypesFor(el.getClass())
 
         relationships.incoming?.each        addRelationsXml('incoming', el, xml, types)
         relationships.outgoing?.each        addRelationsXml('outgoing', el, xml, types)
