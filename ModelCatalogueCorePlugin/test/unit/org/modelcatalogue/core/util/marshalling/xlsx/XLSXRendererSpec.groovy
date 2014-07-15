@@ -55,7 +55,7 @@ class XLSXRendererSpec extends Specification {
         def w1 = renderer.findRowWriter(null, new Elements(itemType: ValueDomain), showContext)
         def w2 = renderer.findRowWriter(null, new Elements(itemType: ValueDomain), indexContext)
         def w3 = renderer.findRowWriter('reversed', new Elements(itemType: ValueDomain), indexContext)
-        def w4 = renderer.findRowWriter(null, new Relationships(itemType: ValueDomain), indexContext)
+        def w4 = renderer.findRowWriter(null, new Relationships(), indexContext)
 
         then:
         w1 == XLSXListRenderer.DEFAULT_WRITER
