@@ -98,23 +98,9 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         customParams.sort   = 'versionNumber'
         customParams.order  = 'desc'
 
-        int total = resource.countByModelCatalogueIdLike "$element.bareModelCatalogueId%"
-        def list = resource.findAllByModelCatalogueIdLike "$element.bareModelCatalogueId%", customParams
-
-        respondWithLinks new Elements(
-                base: "/${resourceName}/${params.id}/history",
-                items: list,
-                total: total
-        )
-    }
-
-
-
-    protected Map getParametersToBind() {
-        Map ret = super.parametersToBind
-        ret.remove 'modelCatalogueId'
-        ret.remove 'versionNumber'
-        ret
+        respond DetachedListWrapper.create(customParams, resource, "/${resourceName}/${params.id}/history") {
+            ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
+        }
     }
 
 }
