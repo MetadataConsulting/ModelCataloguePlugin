@@ -1,13 +1,15 @@
 package org.modelcatalogue.core.util
 
+import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.ValueDomain
 
 /**
  * Created by ladin on 25.02.14.
  */
-class ValueDomains extends SimpleListWrapper<ValueDomain> {
+class ValueDomains implements ListWrapper<ValueDomain> {
 
-    ValueDomains() {
-        itemType = ValueDomain
-    }
+    @Delegate ListWrapper<ValueDomain> list
+
+    Class<Mapping> getItemType() { ValueDomain }
+
 }
