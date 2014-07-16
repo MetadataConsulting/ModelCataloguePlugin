@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.DetachedListWrapper
+import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.Relationships
@@ -173,6 +174,47 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
                 direction: direction,
                 list: DetachedListWrapper.create(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type))
         )
+    }
+
+    def searchIncoming(Integer max, String type) {
+        searchWithinRelationshipsInternal(max, type, RelationshipDirection.INCOMING)
+    }
+
+    def searchOutgoing(Integer max, String type) {
+        searchWithinRelationshipsInternal(max, type, RelationshipDirection.OUTGOING)
+    }
+
+
+    def searchRelationships(Integer max, String type) {
+        searchWithinRelationshipsInternal(max, type, RelationshipDirection.BOTH)
+    }
+
+    private searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
+        CatalogueElement element = queryForResource(params.id)
+
+        if (!element) {
+            notFound()
+            return
+        }
+
+        RelationshipType relationshipType = RelationshipType.findByName(type)
+
+        handleParams(max)
+        def results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
+
+        if(results.errors){
+            respond results
+            return
+        }
+
+        def total = (results.total)?results.total.intValue():0
+
+        Elements elements = new Elements(
+                base: "/${resourceName}/${params.id}/${direction.actionName}/search" + (type ? "/${type}" : ""),
+                total: total,
+                items: results.searchResults
+        )
+        respondWithLinks elements
     }
 
 

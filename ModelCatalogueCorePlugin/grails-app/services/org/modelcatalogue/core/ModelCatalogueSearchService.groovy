@@ -1,12 +1,18 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
  * Poor man's search service searching in name and description
  * , you should use search service designed for particular search plugin
  */
-class ModelCatalogueSearchService implements SearchCatalogue{
+class ModelCatalogueSearchService implements SearchCatalogue {
+
+    @Override
+    def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
+        throw new UnsupportedOperationException()
+    }
 
     def search(Class resource, Map params) {
         if (!params.search) {

@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 import org.modelcatalogue.core.util.DetachedListWrapper
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.SimpleListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
