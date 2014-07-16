@@ -30,10 +30,16 @@ class ModelCatalogueSearchService implements SearchCatalogue{
                             must {
                                 terms(['destination.id': [element.id]])
                             }
+                            must {
+                                query_string(query: params.search , fields: ['source.name', 'source.description'])
+                            }
                             break
                         case RelationshipDirection.OUTGOING:
                             must {
                                 terms(['source.id': [element.id]])
+                            }
+                            must {
+                                query_string(query: params.search , fields: ['destination.name', 'destination.description'])
                             }
                             break
                         case RelationshipDirection.BOTH:
@@ -43,6 +49,9 @@ class ModelCatalogueSearchService implements SearchCatalogue{
                             should {
                                 terms(['source.id': [element.id]])
                             }
+                            must {
+                                query_string(query: params.search , fields: ['source.name', 'source.description', 'destination.name', 'destination.description'])
+                            }
                             minimum_should_match = 1
                             break
                     }
@@ -50,9 +59,6 @@ class ModelCatalogueSearchService implements SearchCatalogue{
                         must {
                             term 'relationshipType.id': type.id
                         }
-                    }
-                    must {
-                        query_string(query: params.search)
                     }
                     must_not {
                         terms archived: ['true']

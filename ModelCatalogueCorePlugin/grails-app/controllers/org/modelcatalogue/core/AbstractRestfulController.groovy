@@ -5,7 +5,6 @@ import grails.transaction.Transactional
 import org.modelcatalogue.core.util.DetachedListWrapper
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
-import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.SimpleListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
@@ -135,17 +134,21 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      */
     @Deprecated
     protected void respondWithLinks(Class itemType = resource, ListWrapper listWrapper) {
-        def links = SimpleListWrapper.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
-        listWrapper.previous    = links.previous
-        listWrapper.next        = links.next
-        listWrapper.offset      = params.int('offset') ?: 0
-        listWrapper.page        = params.int('max') ?: 10
-        listWrapper.sort        = params.sort ?: defaultSort
-        listWrapper.order       = params.order ?: defaultOrder
         if (!listWrapper.itemType) {
             listWrapper.itemType = itemType
         }
-        respond listWrapper
+        respond withLinks(listWrapper)
+    }
+
+    private <T> ListWrapper<T> withLinks(ListWrapper<T> listWrapper) {
+        def links = SimpleListWrapper.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
+        listWrapper.previous = links.previous
+        listWrapper.next = links.next
+        listWrapper.offset = params.int('offset') ?: 0
+        listWrapper.page = params.int('max') ?: 10
+        listWrapper.sort = params.sort ?: defaultSort
+        listWrapper.order = params.order ?: defaultOrder
+        listWrapper
     }
 
     /**

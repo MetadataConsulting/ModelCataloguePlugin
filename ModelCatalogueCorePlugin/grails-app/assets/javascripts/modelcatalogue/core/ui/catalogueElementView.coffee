@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties) ->
+    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl', 'archived', 'status']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -20,17 +20,51 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           size++
         size
 
+      tabsByName = {}
+
       $scope.property ?= $rootScope?.$stateParams?.property
       $scope.reports  = []
 
+
+      loadTab = (property) ->
+        tab = tabsByName[property]
+
+        return if not tab?.loader?
+
+        if !tab.disabled and (tab.value.empty or tab.search != $state.params.q)
+          promise = null
+
+          if tab.value.empty or tab.search != $state.params.q
+            if $state.params.q
+              promise = tab.loader 'search', {search: $state.params.q}
+            else
+              promise = tab.loader()
+          else
+            promise = $q.when tab.value
+
+          tab.search = $state.params.q
+
+          promise.then (result) ->
+            tab.value       = result
+            $scope.reports  = result.availableReports
+        else
+          $scope.reports    = tab.value?.availableReports
+
+
       onPropertyUpdate = (newProperty, oldProperty) ->
+        loadTab(newProperty)
+
         propCfg = catalogueElementProperties.getConfigurationFor("#{$scope.element.elementType}.#{newProperty}")
         page    = 1
         options = {}
         isTable = false
         if $scope.showTabs and not propCfg.hidden(security)
           if newProperty
+
             $scope.naturalPropertyName = propCfg.label
+
+            $rootScope.$$searchContext = if tabsByName[newProperty]?.loader then propCfg.label else undefined
+
             for tab in $scope.tabs
               tab.active = tab.name == newProperty
               if tab.active
@@ -46,10 +80,12 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 if isTable and tab.value.total
                   page = tab.value.currentPage
                 break
+        else
+          $rootScope.$$searchContext = undefined
 
         page = undefined if page == 1 or isNaN(page)
         options.location = "replace" if newProperty and not oldProperty
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page}, options if $scope.element
+        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
 
       onElementUpdate = (element) ->
         resource = catalogueElementResource(element.elementType) if element and element.elementType
@@ -189,6 +225,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           tabs.unshift tabDefinition
 
+        tabsByName = {}
+        for tab in tabs
+          tabsByName[tab.name] = tab
+
 
         showTabs = false
         if not activeTabSet
@@ -206,14 +246,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.tabs   = []
       $scope.select = (tab) ->
-        $scope.property = tab.name
-        return if not tab.loader?
-        if !tab.disabled and tab.value.empty
-          tab.loader().then (result) ->
-            tab.value       = result
-            $scope.reports  = result.availableReports
-        else
-          $scope.reports    = tab.value?.availableReports
+        $state.go '.', {property: tab.name, q: tab.search}
 
       # watches
       $scope.$watch 'element', onElementUpdate
@@ -234,7 +267,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
+
         $scope.property = params.property
+
+        loadTab(params.property)
 
       # init
       onElementUpdate($scope.element)

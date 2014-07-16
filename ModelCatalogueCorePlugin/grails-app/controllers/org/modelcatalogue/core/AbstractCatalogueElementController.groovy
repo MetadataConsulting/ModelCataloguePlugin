@@ -5,6 +5,7 @@ import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.SimpleListWrapper
 
 import javax.servlet.http.HttpServletResponse
 
@@ -209,12 +210,12 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
         def total = (results.total)?results.total.intValue():0
 
-        Elements elements = new Elements(
-                base: "/${resourceName}/${params.id}/${direction.actionName}/search" + (type ? "/${type}" : ""),
+        SimpleListWrapper<Relationship> elements = new SimpleListWrapper<Relationship>(
+                base: "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}",
                 total: total,
-                items: results.searchResults
+                items: results.searchResults,
         )
-        respondWithLinks elements
+        respond new Relationships(owner: element, direction: direction, list: withLinks(elements))
     }
 
 

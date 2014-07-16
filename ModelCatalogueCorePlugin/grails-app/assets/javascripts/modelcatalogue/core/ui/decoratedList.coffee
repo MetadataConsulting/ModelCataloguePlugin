@@ -113,6 +113,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
         nextOrPrevFn().then (result) ->
           $scope.loading = false
           $scope.list = result
+        , -> $scope.loading = false
 
       $scope.goto = (page) ->
         return if $scope.loading
@@ -124,6 +125,7 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
           $scope.list.goto(page).then (result) ->
             $scope.loading = false
             $scope.list = result
+          , -> $scope.loading = false
 
       $scope.setMax = (newMax) ->
         if $scope.list and $scope.stateDriven and not $state.current.abstract and not $scope.stateless

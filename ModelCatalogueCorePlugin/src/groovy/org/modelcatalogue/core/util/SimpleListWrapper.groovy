@@ -24,31 +24,36 @@ class SimpleListWrapper<T> implements ListWrapper<T>{
     }
 
     static Map<String, String> nextAndPreviousLinks(Map params, String baseLink, Long total) {
-        def link = "${baseLink}?"
+        def link = baseLink.contains('?') ? "${baseLink}&" : "${baseLink}?"
         if (params.max) {
-            link += "max=${params.max}"
+            link += "max=${params.max ?: 10}"
         }
-        if (params.sort) {
-            link += "&sort=${params.sort}"
+        params.each { String k, Object v ->
+            if (!(k in ['offset', 'max', 'type', 'action', 'controller', 'id']) && !(baseLink =~ /[\?&]${k}=/)) {
+                link += "&$k=$v"
+            }
         }
-        if (params.status) {
-            link += "&status=${params.status}"
-        }
-        if (params.order) {
-            link += "&order=${params.order}"
-        }
-        if (params.key) {
-            link += "&key=${params.key}"
-        }
-        if (params.keyOne) {
-            link += "&keyOne=${params.keyOne}"
-        }
-        if (params.keyTwo) {
-            link += "&keyTwo=${params.keyTwo}"
-        }
-        if (params.toplevel) {
-            link += "&toplevel=${params.toplevel}"
-        }
+//        if (params.sort) {
+//            link += "&sort=${params.sort}"
+//        }
+//        if (params.status) {
+//            link += "&status=${params.status}"
+//        }
+//        if (params.order) {
+//            link += "&order=${params.order}"
+//        }
+//        if (params.key) {
+//            link += "&key=${params.key}"
+//        }
+//        if (params.keyOne) {
+//            link += "&keyOne=${params.keyOne}"
+//        }
+//        if (params.keyTwo) {
+//            link += "&keyTwo=${params.keyTwo}"
+//        }
+//        if (params.toplevel) {
+//            link += "&toplevel=${params.toplevel}"
+//        }
         def nextLink = ""
         def previousLink = ""
         if (params?.max && params.max < total) {

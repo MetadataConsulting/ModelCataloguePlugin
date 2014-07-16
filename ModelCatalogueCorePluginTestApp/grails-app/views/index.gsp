@@ -117,8 +117,9 @@
                     <button class="btn btn-success" type="submit"><i class="glyphicon glyphicon-log-in"></i></button>
                 </form>
 
-                <form class="navbar-form navbar-right navbar-input-group" role="search" autocomplete="off"
+                <form class="navbar-form navbar-right navbar-input-group search-form" role="search" autocomplete="off"
                       ng-submit="search()" ng-controller="metadataCurator.searchCtrl">
+                    <a ng-click="clearSelection()" ng-class="{'invisible': !$stateParams.q}" class="clear-selection btn btn-link"><span class="glyphicon glyphicon-remove"></span></a>
                     <div class="form-group">
                         <input
                                ng-model="searchSelect"
@@ -131,6 +132,7 @@
                                typeahead-template-url="modelcatalogue/core/ui/omnisearchItem.html"
                                typeahead-wait-ms="300"
                                class="form-control"
+                               ng-class="{'expanded': searchSelect}"
                         >
                     </div>
                     <button class="btn btn-default" ng-click="select(searchSelect)"><i class="glyphicon glyphicon-search"></i></button>

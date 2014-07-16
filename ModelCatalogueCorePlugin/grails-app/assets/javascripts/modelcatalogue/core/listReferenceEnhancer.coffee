@@ -3,8 +3,8 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
   factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, enhance) ->
     (listReference) ->
       link = "#{modelCatalogueApiRoot}#{listReference.link}"
-      query = (tail = null) ->
-        enhance rest method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}"
+      query = (tail = null, params = {}) ->
+        enhance rest method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}", params: params
       query.total = listReference.count
       query.link = link.toString()
       query.itemType = listReference.itemType
