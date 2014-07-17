@@ -47,9 +47,9 @@ class DetachedListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     @Override
     List<T> getItems() {
         if (items == null)  {
-            return (items = criteria.list(params))
+            return (items = Collections.unmodifiableList(criteria.list(params)))
         }
-        return Collections.unmodifiableList(items)
+        return items
     }
 
     @Override

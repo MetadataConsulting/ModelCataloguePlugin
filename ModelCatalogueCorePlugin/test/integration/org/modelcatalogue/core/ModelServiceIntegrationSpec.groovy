@@ -43,9 +43,9 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         expect:
         Model.count()           >= 5
-        topLevel.count          >= 2
-        topLevel.list.size()    == topLevel.count
-        topLevel.list.each {
+        topLevel.total          >= 2
+        topLevel.items.size()   == topLevel.total
+        topLevel.items.each {
             assert !it.childOf
         }
 

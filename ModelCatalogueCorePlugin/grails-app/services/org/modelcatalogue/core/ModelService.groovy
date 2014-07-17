@@ -2,46 +2,44 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListCountAndType
 import org.modelcatalogue.core.util.ListWithTotal
+import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.QueryListWithTotalAndType
 
 @Transactional
 class ModelService {
 
-    ListWithTotal<Model> getTopLevelModels(Map params) {
+    ListWithTotalAndType<Model> getTopLevelModels(Map params) {
         RelationshipType hierarchy      = RelationshipType.hierarchyType
         PublishedElementStatus status   = PublishedElementService.getStatusFromParams(params)
 
-
-        List<Model> list = Model.executeQuery("""
+        Lists.fromQuery params, Model, """
             select distinct m
             from Model m
             where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
             group by m.name
             order by m.name
-        """, [type: hierarchy, status: status], params)
-
-        Long count = Model.executeQuery("""
+        ""","""
             select count(m.id)
             from Model m
             where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-        """, [type: hierarchy, status: status])[0]
-
-        new ListAndCount(count: count, list: list)
+        """, [type: hierarchy, status: status]
     }
 
-    ListWithTotal<Model> getSubModels(Model model) {
-
+    ListWithTotalAndType<Model> getSubModels(Model model) {
         List<Model> models = listChildren(model)
-        new ListAndCount(count: models.size(), list: models)
+        new ListCountAndType<Model>(count: models.size(), list: models, itemType: Model)
 
     }
 
-    ListWithTotal<DataElement> getDataElementsFromModels(List<Model> models){
+    ListWithTotalAndType<DataElement> getDataElementsFromModels(List<Model> models){
         def results = []
         models.each{ model ->
             results.addAll(model.contains)
         }
-        new ListAndCount(count: results.size(), list: results)
+        new ListCountAndType<DataElement>(count: results.size(), list: results, itemType: DataElement)
     }
 
 
