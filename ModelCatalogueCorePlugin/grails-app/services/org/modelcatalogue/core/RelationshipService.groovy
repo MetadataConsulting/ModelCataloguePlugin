@@ -11,7 +11,7 @@ class RelationshipService {
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
         DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type)
-        new ListAndCount(list: criteria.list(params), count: criteria.count())
+        new ListAndCount(list: criteria.list([sort: 'id'] << params), count: criteria.count())
     }
 
 
