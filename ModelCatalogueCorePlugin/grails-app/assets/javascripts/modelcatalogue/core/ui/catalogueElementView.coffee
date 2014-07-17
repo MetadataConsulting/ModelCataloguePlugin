@@ -246,7 +246,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.tabs   = []
       $scope.select = (tab) ->
-        $state.go '.', {property: tab.name, q: tab.search}
+        if $state.current.abstract
+          $scope.property = tab.name
+          loadTab(tab.property)
+        else
+          $state.go '.', {property: tab.name, q: tab.search}
 
       # watches
       $scope.$watch 'element', onElementUpdate
