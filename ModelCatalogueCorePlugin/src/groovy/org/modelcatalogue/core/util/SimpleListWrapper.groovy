@@ -13,7 +13,7 @@ class SimpleListWrapper<T> implements ListWrapper<T>{
     Class<T> itemType
     String sort
     String order
-    int total
+    Long total
     int page
     int offset
     List<T> items
@@ -29,7 +29,7 @@ class SimpleListWrapper<T> implements ListWrapper<T>{
             link += "max=${params.max ?: 10}"
         }
         params.each { String k, Object v ->
-            if (!(k in ['offset', 'max', 'type', 'action', 'controller', 'id']) && !(baseLink =~ /[\?&]${k}=/)) {
+            if (v && !(k in ['offset', 'max', 'type', 'action', 'controller', 'id']) && !(baseLink =~ /[\?&]${k}=/)) {
                 link += "&$k=$v"
             }
         }

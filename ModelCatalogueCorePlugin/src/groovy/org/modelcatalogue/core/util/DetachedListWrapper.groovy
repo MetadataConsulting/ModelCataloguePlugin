@@ -73,14 +73,14 @@ class DetachedListWrapper<T> implements ListWrapper<T> {
     }
 
     @Override
-    int getTotal() {
+    Long getTotal() {
         if (total == null) {
             return total = criteria.count()
         }
         return total
     }
 
-    void setTotal(int ignored) {
+    void setTotal(Long ignored) {
         throw new UnsupportedOperationException("Setting total is not supported")
     }
 

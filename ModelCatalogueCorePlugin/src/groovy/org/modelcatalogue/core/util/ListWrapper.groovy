@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util
 
-interface ListWrapper<T> {
+interface ListWrapper<T> extends ListWithTotal<T> {
 
     String getBase()
     String getNext()
@@ -8,10 +8,8 @@ interface ListWrapper<T> {
     Class<T> getItemType()
     String getSort()
     String getOrder()
-    int getTotal()
     int getPage() // max
     int getOffset()
-    List<T> getItems()
     String getElementName()
 
 }

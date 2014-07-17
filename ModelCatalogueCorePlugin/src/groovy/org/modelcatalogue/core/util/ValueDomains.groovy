@@ -10,6 +10,6 @@ class ValueDomains implements ListWrapper<ValueDomain> {
 
     @Delegate ListWrapper<ValueDomain> list
 
-    Class<Mapping> getItemType() { ValueDomain }
+    Class<ValueDomain> getItemType() { ValueDomain }
 
 }

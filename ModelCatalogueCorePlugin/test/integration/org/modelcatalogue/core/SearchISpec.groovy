@@ -162,13 +162,13 @@ class SearchISpec extends AbstractIntegrationSpec{
     protected static getPaginationParameters() {
         [
                 // no, size, max, offset, total, next, previous, searchString, sort, order
-                [1, 10, 10, 0, 22, "/search/domain?max=10&offset=10",                                                    "",                                                     "domain"],
-                [2, 5, 5, 0, 22, "/search/domain?max=5&sort=name&order=ASC&offset=5",    "",                                                     "domain", "name",   "ASC"],
-                [3, 2, 2, 6, 22, "/search/domain?max=2&sort=name&order=ASC&offset=8",   "/search/domain?max=2&sort=name&order=ASC&offset=4",    "domain", "name",   "ASC"],
-                [4, 4, 4, 1, 22, "/search/domain?max=4&sort=name&order=ASC&offset=5",    "",                                                     "domain", "name",   "ASC"],
-                [5, 2, 2, 2, 22, "/search/domain?max=2&sort=name&order=ASC&offset=4",    "/search/domain?max=2&sort=name&order=ASC&offset=0",    "domain", "name",   "ASC"],
-                [6, 2, 2, 4, 22, "/search/domain?max=2&sort=name&offset=6",              "/search/domain?max=2&sort=name&offset=2",              "domain", "name",   ""],
-                [7, 2, 2, 4, 22, "/search/domain?max=2&offset=6",                        "/search/domain?max=2&offset=2",                        "domain", null,     null]
+                [1, 10, 10, 0, 22, "/search/?search=domain&max=10&offset=10",                      "",                                                              "domain"],
+                [2,  5,  5, 0, 22, "/search/?search=domain&max=5&sort=name&order=ASC&offset=5",    "",                                                              "domain", "name",   "ASC"],
+                [3,  2,  2, 6, 22, "/search/?search=domain&max=2&sort=name&order=ASC&offset=8",    "/search/?search=domain&max=2&sort=name&order=ASC&offset=4",     "domain", "name",   "ASC"],
+                [4,  4,  4, 1, 22, "/search/?search=domain&max=4&sort=name&order=ASC&offset=5",    "",                                                              "domain", "name",   "ASC"],
+                [5,  2,  2, 2, 22, "/search/?search=domain&max=2&sort=name&order=ASC&offset=4",    "/search/?search=domain&max=2&sort=name&order=ASC&offset=0",     "domain", "name",   "ASC"],
+                [6,  2,  2, 4, 22, "/search/?search=domain&max=2&sort=name&offset=6",              "/search/?search=domain&max=2&sort=name&offset=2",               "domain", "name",   ""],
+                [7,  2,  2, 4, 22, "/search/?search=domain&max=2&offset=6",                        "/search/?search=domain&max=2&offset=2",                         "domain", null,     null]
         ]
     }
 

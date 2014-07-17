@@ -19,7 +19,7 @@ class SearchController {
         }
 
         def total = (results.total)?results.total.intValue():0
-        def baseLink = "/search/${params.search}"
+        def baseLink = "/search/?search=${params.search.encodeAsURL()}"
         def links = SimpleListWrapper.nextAndPreviousLinks(params, baseLink, total)
         Elements elements =  new Elements(
                 base: baseLink,
