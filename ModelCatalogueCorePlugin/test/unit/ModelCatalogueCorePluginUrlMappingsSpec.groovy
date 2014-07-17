@@ -149,9 +149,9 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         ["GET"   , "/$controller/1/incoming/search"                         , controller , "searchIncoming"     , { id = "1" }  ],
         ["GET"   , "/$controller/1/outgoing/search"                         , controller , "searchOutgoing"     , { id = "1" }  ],
         ["GET"   , "/$controller/1/relationships/search"                    , controller , "searchRelationships", { id = "1" }  ],
-        ["GET"   , "/$controller/1/incoming/search/relationship"            , controller , "searchIncoming"     , { id = "1" ; type = "relationship" }  ],
-        ["GET"   , "/$controller/1/outgoing/search/relationship"            , controller , "searchOutgoing"     , { id = "1" ; type = "relationship" }  ],
-        ["GET"   , "/$controller/1/relationships/search/relationship"       , controller , "searchRelationships", { id = "1" ; type = "relationship" }  ],
+        ["GET"   , "/$controller/1/incoming/relationship/search"            , controller , "searchIncoming"     , { id = "1" ; type = "relationship" }  ],
+        ["GET"   , "/$controller/1/outgoing/relationship/search"            , controller , "searchOutgoing"     , { id = "1" ; type = "relationship" }  ],
+        ["GET"   , "/$controller/1/relationships/relationship/search"       , controller , "searchRelationships", { id = "1" ; type = "relationship" }  ],
         ]
     }
 
