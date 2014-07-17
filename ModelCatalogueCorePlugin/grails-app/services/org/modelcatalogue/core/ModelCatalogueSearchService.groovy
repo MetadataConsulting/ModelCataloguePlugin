@@ -11,7 +11,47 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
-        throw new UnsupportedOperationException()
+        String query = "%$params.search%"
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type)
+
+        switch (direction) {
+            case RelationshipDirection.OUTGOING:
+                criteria.destination {
+                    or {
+                        ilike('name', query)
+                        ilike('description', query)
+                    }
+                }
+                break
+            case RelationshipDirection.INCOMING:
+                criteria.source {
+                    or {
+                        ilike('name', query)
+                        ilike('description', query)
+                    }
+                }
+                break
+            case RelationshipDirection.BOTH:
+                criteria.or {
+                    destination {
+                        or {
+                            ilike('name', query)
+                            ilike('description', query)
+                        }
+                        ne('id', element.id)
+                    }
+                    source {
+                        or {
+                            ilike('name', query)
+                            ilike('description', query)
+                        }
+                        ne('id', element.id)
+                    }
+
+                }
+        }
+
+        [searchResults: criteria.list(params), total: criteria.count()]
     }
 
     def search(Class resource, Map params) {
