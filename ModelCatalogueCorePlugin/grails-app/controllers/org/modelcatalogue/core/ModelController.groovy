@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
-import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWithTotal
 
 class ModelController extends AbstractPublishedElementController<Model> {
 
@@ -18,12 +18,12 @@ class ModelController extends AbstractPublishedElementController<Model> {
         }
         handleParams(max)
 
-        ListAndCount topLevel = modelService.getTopLevelModels(params)
+        ListWithTotal topLevel = modelService.getTopLevelModels(params)
 
         respondWithLinks new Elements(
                 base: "/${resourceName}/",
-                total: topLevel.count,
-                items: topLevel.list
+                total: topLevel.total,
+                items: topLevel.items
         )
     }
 

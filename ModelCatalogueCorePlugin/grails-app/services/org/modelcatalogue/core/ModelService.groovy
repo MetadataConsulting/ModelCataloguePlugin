@@ -2,11 +2,12 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWithTotal
 
 @Transactional
 class ModelService {
 
-    ListAndCount getTopLevelModels(Map params) {
+    ListWithTotal<Model> getTopLevelModels(Map params) {
         RelationshipType hierarchy      = RelationshipType.hierarchyType
         PublishedElementStatus status   = PublishedElementService.getStatusFromParams(params)
 
@@ -28,14 +29,14 @@ class ModelService {
         new ListAndCount(count: count, list: list)
     }
 
-    ListAndCount getSubModels(Model model) {
+    ListWithTotal<Model> getSubModels(Model model) {
 
         List<Model> models = listChildren(model)
         new ListAndCount(count: models.size(), list: models)
 
     }
 
-    ListAndCount getDataElementsFromModels(List<Model> models){
+    ListWithTotal<DataElement> getDataElementsFromModels(List<Model> models){
         def results = []
         models.each{ model ->
             results.addAll(model.contains)

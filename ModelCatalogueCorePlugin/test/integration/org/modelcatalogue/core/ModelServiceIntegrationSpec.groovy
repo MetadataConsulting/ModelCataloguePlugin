@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWithTotal
 import spock.lang.Shared
 
 class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
@@ -39,7 +39,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         child1 = Model.findByName('chapter2')
         child2 = Model.findByName('mTest1')
         grandChild = Model.findByName('mTest2')
-        ListAndCount topLevel = modelService.getTopLevelModels([:])
+        ListWithTotal topLevel = modelService.getTopLevelModels([:])
 
         expect:
         Model.count()           >= 5
@@ -58,7 +58,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         child2 = Model.findByName('mTest1')
         grandChild = Model.findByName('mTest2')
         when:
-        ListAndCount subModels = modelService.getSubModels(parent1)
+        ListWithTotal subModels = modelService.getSubModels(parent1)
 
         then:
         subModels.count ==3
@@ -84,7 +84,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         grandChild.addToContains(de3)
 
         when:
-        ListAndCount dataElements = modelService.getDataElementsFromModels([parent1, child1, grandChild])
+        ListWithTotal dataElements = modelService.getDataElementsFromModels([parent1, child1, grandChild])
 
         then:
         dataElements.count ==3
@@ -111,7 +111,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         grandChild.addToParentOf parent1
 
         when:
-        ListAndCount subModels = modelService.getSubModels(parent1)
+        ListWithTotal subModels = modelService.getSubModels(parent1)
 
         then:
         subModels.count ==3

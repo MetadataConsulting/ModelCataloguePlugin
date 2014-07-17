@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.SimpleListWrapper
 
 class DataArchitectController<T> extends AbstractRestfulController<T>{
@@ -22,7 +23,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     def uninstantiatedDataElements(Integer max){
         handleParams(max)
-        ListAndCount results
+        ListWithTotal results
 
         try{
             results = dataArchitectService.uninstantiatedDataElements(params)
@@ -32,12 +33,12 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
         }
 
         def baseLink = "/dataArchitect/uninstantiatedDataElements"
-        def total = (results.count)?results.count.intValue():0
+        def total = (results.total)?results.total.intValue():0
 
         Elements elements =  new Elements(
                 base: baseLink,
                 total: total,
-                items: results.list
+                items: results.items
         )
 
         respondWithLinks elements
@@ -46,7 +47,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     def metadataKeyCheck(Integer max){
         handleParams(max)
-        ListAndCount results
+        ListWithTotal results
 
         try{
             results = dataArchitectService.metadataKeyCheck(params)
@@ -57,12 +58,12 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
 
         def baseLink = "/dataArchitect/metadataKeyCheck"
-        def links = SimpleListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
+        def links = SimpleListWrapper.nextAndPreviousLinks(params, baseLink, results.total)
 
         Elements elements =  new Elements(
                 base: baseLink,
-                total: results.count,
-                items: results.list
+                total: results.total,
+                items: results.items
         )
 
         respondWithLinks elements
@@ -70,7 +71,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     def getSubModelElements(){
 
-        def results = new ListAndCount(count: 0, list: [])
+        ListWithTotal results = new ListAndCount(count: 0, list: [])
         if (params.modelId || params.id){
             Long id = params.long('modelId') ?: params.long('id')
             Model model = Model.get(id)
@@ -82,8 +83,8 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
         respondWithLinks DataElement, new Elements(
                 base: baseLink,
-                total: results.count,
-                items: results.list
+                total: results.total,
+                items: results.items
         )
     }
 
@@ -111,7 +112,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
             def baseLink = "/dataArchitect/findRelationsByMetadataKeys"
             Elements elements =  new Elements(
                     base: baseLink,
-                    total: results.count,
+                    total: results.total,
                     items: results.list,
             )
 

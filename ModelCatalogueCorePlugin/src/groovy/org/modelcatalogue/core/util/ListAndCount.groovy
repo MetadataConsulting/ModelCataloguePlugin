@@ -6,6 +6,7 @@ class ListAndCount<T> implements ListWithTotal<T> {
     List<T> list
     Long count
 
+
     List<T> getItems() { list }
     Long getTotal() { count }
 

@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
@@ -91,15 +91,15 @@ abstract class CatalogueElement {
 
 
     List getIncomingRelationsByType(RelationshipType type) {
-        ListAndCount<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type)
-        relationships.list.collect {
+        ListWithTotal<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type)
+        relationships.items.collect {
             it.source
         }
     }
 
     List getOutgoingRelationsByType(RelationshipType type) {
-        ListAndCount<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type)
-        relationships.list.collect {
+        ListWithTotal<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type)
+        relationships.items.collect {
             it.destination
         }
     }
