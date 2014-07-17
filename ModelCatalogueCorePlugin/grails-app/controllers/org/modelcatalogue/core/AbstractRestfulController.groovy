@@ -2,10 +2,9 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import grails.transaction.Transactional
-import org.modelcatalogue.core.util.DetachedListWrapper
+import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
-import org.modelcatalogue.core.util.SimpleListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -66,7 +65,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Override
     def index(Integer max) {
         handleParams(max)
-        respond DetachedListWrapper.create(params, resource, basePath)
+        respond Lists.all(params, resource, basePath)
     }
 
 
@@ -141,7 +140,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     private <T> ListWrapper<T> withLinks(ListWrapper<T> listWrapper) {
-        def links = SimpleListWrapper.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
+        def links = Lists.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
         listWrapper.previous = links.previous
         listWrapper.next = links.next
         listWrapper.offset = params.int('offset') ?: 0

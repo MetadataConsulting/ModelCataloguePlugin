@@ -13,11 +13,11 @@ class DetachedListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     private Long total = null
     private List<T> items = null
 
-    public static <T> DetachedListWithTotalAndType<T> create(Map params, Class<T> type, @DelegatesTo(DetachedCriteria) Closure buildClosure){
+    public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, @DelegatesTo(DetachedCriteria) Closure buildClosure){
         create(params, new DetachedCriteria<T>(type).build(buildClosure))
     }
 
-    public static <T> DetachedListWithTotalAndType<T> create(Map params, DetachedCriteria<T> criteria){
+    public static <T> ListWithTotalAndType<T> create(Map params, DetachedCriteria<T> criteria){
         new DetachedListWithTotalAndType<T>(criteria, new HashMap(params))
     }
 

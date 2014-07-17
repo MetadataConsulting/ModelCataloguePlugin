@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
-import org.modelcatalogue.core.util.SimpleListWrapper
+import org.modelcatalogue.core.util.Lists
 
 class DataArchitectController<T> extends AbstractRestfulController<T>{
 
@@ -58,7 +58,6 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
 
         def baseLink = "/dataArchitect/metadataKeyCheck"
-        def links = SimpleListWrapper.nextAndPreviousLinks(params, baseLink, results.total)
 
         Elements elements =  new Elements(
                 base: baseLink,

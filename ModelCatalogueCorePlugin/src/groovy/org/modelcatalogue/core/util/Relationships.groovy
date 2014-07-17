@@ -6,7 +6,7 @@ import org.modelcatalogue.core.Relationship
 /**
  * Wrapper used for easier marshalling of relations result lists
  */
-class Relationships implements ListWrapper<Relationship> {
+class Relationships implements ListWrapper<Relationship>, HasListWrapper<Relationship> {
 
     CatalogueElement owner
     RelationshipDirection direction

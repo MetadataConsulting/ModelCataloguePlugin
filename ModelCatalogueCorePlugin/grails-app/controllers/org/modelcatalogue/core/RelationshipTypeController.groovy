@@ -4,7 +4,7 @@ import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.CatalogueElementFinder
-import org.modelcatalogue.core.util.DetachedListWrapper
+import org.modelcatalogue.core.util.Lists
 
 import javax.servlet.http.HttpServletResponse
 
@@ -19,7 +19,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     @Override
     def index(Integer max) {
         handleParams(max)
-        respond DetachedListWrapper.create(params, resource, "/${resourceName}/") {
+        respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             if (!params.boolean('system')) {
                 eq 'system', false
             }

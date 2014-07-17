@@ -2,8 +2,7 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
-import org.modelcatalogue.core.util.DetachedListWrapper
-import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.Lists
 
 import static org.springframework.http.HttpStatus.OK
 
@@ -19,7 +18,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     def index(Integer max) {
         handleParams(max)
 
-        respond DetachedListWrapper.create(params, resource, "/${resourceName}/") {
+        respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', PublishedElementService.getStatusFromParams(params)
         }
     }
@@ -98,7 +97,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         customParams.sort   = 'versionNumber'
         customParams.order  = 'desc'
 
-        respond DetachedListWrapper.create(customParams, resource, "/${resourceName}/${params.id}/history") {
+        respond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
             ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
         }
     }

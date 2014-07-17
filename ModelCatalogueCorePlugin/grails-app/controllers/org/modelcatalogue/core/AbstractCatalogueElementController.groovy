@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.DetachedListWrapper
-import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.Relationships
@@ -173,7 +172,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         respond new Relationships(
                 owner: element,
                 direction: direction,
-                list: DetachedListWrapper.create(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type))
         )
     }
 
@@ -227,7 +226,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        respond new Mappings(list: DetachedListWrapper.create(params, Mapping, "/${resourceName}/${params.id}/mapping", "mappings") {
+        respond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping", "mappings") {
             eq 'source', element
         })
     }
