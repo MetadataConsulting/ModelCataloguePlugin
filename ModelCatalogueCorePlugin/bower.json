@@ -28,6 +28,7 @@
     "ng-file-upload-shim": "~1.4.0",
     "angular-loading-bar": "~0.4.3",
     "angular-http-auth": "~1.2.1",
-    "jquery-ui": "~1.10.4"
+    "jquery-ui": "~1.10.4",
+    "angular-sanitize": "~1.2.20"
   }
 }
