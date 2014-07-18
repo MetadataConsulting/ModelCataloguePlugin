@@ -36,7 +36,7 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         def reports = []
 
         for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
-            reports << [title: descriptor.title, url: descriptor.getLink(el), type: descriptor.renderType]
+            reports << [title: descriptor.getTitle(el), url: descriptor.getLink(el), type: descriptor.renderType]
         }
 
         reports

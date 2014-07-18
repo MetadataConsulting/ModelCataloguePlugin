@@ -52,6 +52,10 @@ class Relationship implements Extendible {
 
     Boolean archived = false
 
+    static mapping = {
+        extensions lazy: false
+    }
+
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 
     static constraints = {

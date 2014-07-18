@@ -13,8 +13,13 @@ class ReportDescriptorBuilder {
 
 
     ReportDescriptorBuilder title(String title) {
-        descriptor.title = title ; this
+        descriptor.title = { title }  ; this
     }
+
+    ReportDescriptorBuilder title(Closure title) {
+        descriptor.title = title  ; this
+    }
+
 
     ReportDescriptorBuilder type(Class type) {
         descriptor.conditions << { type.isAssignableFrom(it.class)} ; this
@@ -53,6 +58,7 @@ class ReportDescriptorBuilder {
     ReportDescriptor build(LinkGenerator generator) {
         if (!descriptor.title) throw new IllegalStateException("The descriptor is missing it's title")
         if (!descriptor.linkParams) throw new IllegalStateException("The descriptor is missing it's link parameters")
+
         descriptor.generator = generator
         descriptor
     }

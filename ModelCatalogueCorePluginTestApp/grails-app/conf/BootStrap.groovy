@@ -130,7 +130,7 @@ class BootStrap {
 //                        println "Creating archived version #${it}"
 //                        publishedElementService.archiveAndIncreaseVersion(withHistory)
 //                    }
-                    println "Init finished"
+                    println "Init finished in ${new Date()}"
                 }
                 //domainModellerService.modelDomains()
             }

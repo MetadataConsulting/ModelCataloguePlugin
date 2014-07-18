@@ -27,14 +27,14 @@ class ReportDescriptor {
     /**
      * Title of the report to be displayed in the front end.
      */
-    String title
+    Closure<String> title = { '' }
 
     /**
      * List of conditions which all needs to be met to apply make this report available to given endpoint.
      */
     List<Closure> conditions = []
 
-    RenderType renderType = RenderType.ASSET
+    RenderType renderType = RenderType.LINK
 
     /**
      * Additional params to be used to generate the destination URL.
@@ -72,7 +72,20 @@ class ReportDescriptor {
             params.method = 'GET'
         }
 
+        if (renderType == RenderType.ASSET) {
+            if (!params.params) {
+                params.params = [asset: true, name: title(model)]
+            } else {
+                params.params.putAll asset: true, name: title(model)
+            }
+        }
+
         generator.link(params)
+    }
+
+    String getTitle(Object model) {
+        if (!title) return null
+        title(model)
     }
 
 

@@ -173,12 +173,19 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         return super.countResources()
     }
 
+    protected void reportCapableRespond(Map args, Object value) {
+        reportCapableRespond((Object)value, (Map) args)
+    }
+
+    protected void reportCapableRespond(Object value) {
+        reportCapableRespond((Object)value, (Map)[:])
+    }
     /**
      * Respond which is able to capture XML exports to asset if URL parameter is {@code asset=true}.
      * @param param object to be rendered
      */
-    protected void reportCapableRespond(Object param, Map args = [:]) {
-        if (params.format == 'xml' && !params.boolean('direct')) {
+    protected void reportCapableRespond(Object param, Map args) {
+        if (params.format == 'xml' && params.boolean('asset')) {
             Asset asset = renderXMLAsAsset (param as XML)
 
             webRequest.currentResponse.with {
@@ -189,17 +196,19 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 outputStream.flush()
             }
         } else {
-            respond param, args
+            respond((Object)param, (Map) args)
         }
     }
 
     protected Asset renderXMLAsAsset(XML xml) {
-        String theName = (params.name ?: params.action) + '.xml'
+        String theName = (params.name ?: params.action)
+
+        String uri = request.forwardURI + '?' + request.queryString
 
         Asset asset = new Asset(
                 name: theName,
                 originalFileName: theName,
-                description: "Your export will be available in this asset soon. Use Refresh action to reload",
+                description: "Your export will be available in this asset soon. Use Refresh action to reload.",
                 status: PublishedElementStatus.PENDING,
                 contentType: 'application/xml',
                 size: 0
@@ -220,6 +229,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 updated.status = PublishedElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.save(flush: true, failOnError: true)
+                updated.ext['Original URL'] = uri
             } catch (e) {
                 log.error "Exception of type ${e.class} exporting asset ${id}", e
                 throw e
