@@ -60,7 +60,7 @@ grails.project.dependency.resolution = {
         // runtime 'org.postgresql:postgresql:9.3-1100-jdbc41'
 
         runtime "org.modelcatalogue:spring-security-ajax-aware:0.1.1"
-
+        runtime 'mysql:mysql-connector-java:5.1.24'
     }
 
     plugins {
