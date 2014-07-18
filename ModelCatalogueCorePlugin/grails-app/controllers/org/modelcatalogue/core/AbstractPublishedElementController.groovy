@@ -18,7 +18,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     def index(Integer max) {
         handleParams(max)
 
-        respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', PublishedElementService.getStatusFromParams(params)
         }
     }
@@ -53,7 +53,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         helper.properties = paramsToBind
 
         if (helper.hasErrors()) {
-            respond helper.errors, view:'edit' // STATUS CODE 422
+            reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
             return
         }
 
@@ -78,7 +78,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
                         g.createLink(
                                 resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
                                 namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: OK]
+                reportCapableRespond instance, [status: OK]
             }
         }
     }
@@ -97,7 +97,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         customParams.sort   = 'versionNumber'
         customParams.order  = 'desc'
 
-        respond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
+        reportCapableRespond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
             ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
         }
     }

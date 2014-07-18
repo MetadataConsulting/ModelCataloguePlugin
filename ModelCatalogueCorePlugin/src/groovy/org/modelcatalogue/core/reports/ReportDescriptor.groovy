@@ -34,7 +34,7 @@ class ReportDescriptor {
      */
     List<Closure> conditions = []
 
-    RenderType renderType = RenderType.LINK
+    RenderType renderType = RenderType.ASSET
 
     /**
      * Additional params to be used to generate the destination URL.

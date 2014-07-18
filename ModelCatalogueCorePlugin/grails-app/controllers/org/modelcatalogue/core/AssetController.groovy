@@ -9,7 +9,6 @@ import java.security.MessageDigest
 class AssetController extends AbstractPublishedElementController<Asset> {
 
     StorageService modelCatalogueStorageService
-    AssetService assetService
 
     static allowedMethods = [upload: 'POST', download: 'GET']
 
@@ -28,11 +27,11 @@ class AssetController extends AbstractPublishedElementController<Asset> {
         }
 
         if (asset.hasErrors()) {
-            respond asset.errors, view: 'create' // STATUS CODE 422
+            reportCapableRespond asset.errors, view: 'create' // STATUS CODE 422
             return
         }
 
-        respond asset
+        reportCapableRespond asset
     }
 
     def download() {

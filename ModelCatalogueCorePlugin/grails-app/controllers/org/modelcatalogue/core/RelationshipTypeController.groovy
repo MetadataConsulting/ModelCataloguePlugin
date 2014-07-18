@@ -19,7 +19,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     @Override
     def index(Integer max) {
         handleParams(max)
-        respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             if (!params.boolean('system')) {
                 eq 'system', false
             }
@@ -27,7 +27,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     }
 
     def elementClasses() {
-        respond CatalogueElementFinder.catalogueElementClasses
+        reportCapableRespond CatalogueElementFinder.catalogueElementClasses
     }
 
     @Override
@@ -120,7 +120,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
         }
 
         if (instance.hasErrors()) {
-            respond instance.errors, view:'edit' // STATUS CODE 422
+            reportCapableRespond instance.errors, view:'edit' // STATUS CODE 422
             return
         }
 
@@ -135,7 +135,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
                         g.createLink(
                                 resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
                                 namespace: hasProperty('namespace') ? this.namespace : null ).toString())
-                respond instance, [status: OK]
+                reportCapableRespond instance, [status: OK]
             }
         }
     }

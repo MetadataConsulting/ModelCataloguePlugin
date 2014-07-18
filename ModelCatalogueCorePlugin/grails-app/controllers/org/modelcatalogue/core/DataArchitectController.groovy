@@ -118,7 +118,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
             respondWithLinks elements
 
         }else{
-            respond "please enter keys"
+            reportCapableRespond "please enter keys"
         }
 
     }

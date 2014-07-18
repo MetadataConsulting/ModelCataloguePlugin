@@ -22,7 +22,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
             return
         }
 
-        respond new ValueDomains(list: Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain", "valueDomains"){
+        reportCapableRespond new ValueDomains(list: Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain", "valueDomains"){
             eq "dataType", dataType
         })
 

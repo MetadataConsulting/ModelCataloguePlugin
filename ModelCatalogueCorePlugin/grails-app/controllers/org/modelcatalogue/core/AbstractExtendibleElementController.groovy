@@ -40,7 +40,7 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
         helper.properties = paramsToBind
 
         if (helper.hasErrors()) {
-            respond helper.errors, view:'edit' // STATUS CODE 422
+            reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
             return
         }
 
@@ -61,7 +61,7 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
                         g.createLink(
                                 resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
                                 namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: OK]
+                reportCapableRespond instance, [status: OK]
             }
         }
     }

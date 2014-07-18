@@ -73,7 +73,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
         
         Long id = asset.id
 
-        Future futureAsset = executorService.submit {
+        executorService.submit {
             try {
                 WebXlsxExporter exporter
                 if (layoutFileName) {
@@ -113,12 +113,6 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                 log.error "Exception of type ${e.class} exporting asset ${id}", e
                 throw e
             }
-        }
-
-
-        // mainly for testing purposes
-        if (context.webRequest.params.boolean('_x_wait_for_completion')) {
-            futureAsset.get()
         }
 
         context.webRequest.currentResponse.with {

@@ -1,7 +1,9 @@
 package org.modelcatalogue.core
 
+import grails.converters.XML
 import grails.rest.RestfulController
 import grails.transaction.Transactional
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
@@ -9,13 +11,18 @@ import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
 
 import javax.servlet.http.HttpServletResponse
+import java.util.concurrent.ExecutorService
 
 import static org.springframework.http.HttpStatus.NO_CONTENT
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     static responseFormats = ['json', 'xml', 'xlsx']
-    def modelCatalogueSearchService
+
+    AssetService assetService
+    SearchCatalogue modelCatalogueSearchService
+    ExecutorService executorService
+
     XLSXListRenderer xlsxListRenderer
 
 
@@ -32,7 +39,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         def results =  modelCatalogueSearchService.search(resource, params)
 
         if(results.errors){
-            respond results
+            reportCapableRespond results
             return
         }
 
@@ -65,7 +72,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Override
     def index(Integer max) {
         handleParams(max)
-        respond Lists.all(params, resource, basePath)
+        reportCapableRespond Lists.all(params, resource, basePath)
     }
 
 
@@ -82,11 +89,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.validate()
         if (instance.hasErrors()) {
-            respond instance.errors, view:'create' // STATUS CODE 422
+            reportCapableRespond instance.errors, view:'create' // STATUS CODE 422
             return
         }
 
-        respond instance
+        reportCapableRespond instance
     }
 
     @Override
@@ -106,11 +113,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             instance.delete flush:true
         }catch (DataIntegrityViolationException ignored){
             response.status = HttpServletResponse.SC_CONFLICT
-            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"]) // STATUS CODE 409
+            reportCapableRespond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"]) // STATUS CODE 409
             return
         } catch (Exception ignored){
             response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
-            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])  // STATUS CODE 501
+            reportCapableRespond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])  // STATUS CODE 501
             return
         }
 
@@ -136,7 +143,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if (!listWrapper.itemType) {
             listWrapper.itemType = itemType
         }
-        respond withLinks(listWrapper)
+        reportCapableRespond withLinks(listWrapper)
     }
 
     private <T> ListWrapper<T> withLinks(ListWrapper<T> listWrapper) {
@@ -165,4 +172,61 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected Integer countResources() {
         return super.countResources()
     }
+
+    /**
+     * Respond which is able to capture XML exports to asset if URL parameter is {@code asset=true}.
+     * @param param object to be rendered
+     */
+    protected void reportCapableRespond(Object param, Map args = [:]) {
+        if (params.format == 'xml' && !params.boolean('direct')) {
+            Asset asset = renderXMLAsAsset (param as XML)
+
+            webRequest.currentResponse.with {
+                def location = g.createLink(controller: 'asset', id: asset.id, action: 'show')
+                status = 302
+                setHeader("Location", location.toString())
+                setHeader("X-Asset-ID", asset.id.toString())
+                outputStream.flush()
+            }
+        } else {
+            respond param, args
+        }
+    }
+
+    protected Asset renderXMLAsAsset(XML xml) {
+        String theName = (params.name ?: params.action) + '.xml'
+
+        Asset asset = new Asset(
+                name: theName,
+                originalFileName: theName,
+                description: "Your export will be available in this asset soon. Use Refresh action to reload",
+                status: PublishedElementStatus.PENDING,
+                contentType: 'application/xml',
+                size: 0
+        )
+
+        asset.save(flush: true, failOnError: true)
+
+        Long id = asset.id
+
+        executorService.submit {
+            try {
+                Asset updated = Asset.get(id)
+
+                assetService.storeAssetWithSteam(updated, 'application/xml') { OutputStream out ->
+                    xml.render(new OutputStreamWriter(out, 'UTF-8'))
+                }
+
+                updated.status = PublishedElementStatus.FINALIZED
+                updated.description = "Your export is ready. Use Download button to view it."
+                updated.save(flush: true, failOnError: true)
+            } catch (e) {
+                log.error "Exception of type ${e.class} exporting asset ${id}", e
+                throw e
+            }
+        }
+
+        asset
+    }
+
 }

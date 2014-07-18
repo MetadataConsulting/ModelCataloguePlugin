@@ -17,7 +17,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     def mappingService
 
 	def uuid(String uuid){
-		respond resource.findByModelCatalogueId(uuid)
+		reportCapableRespond resource.findByModelCatalogueId(uuid)
 	}
 
     AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
@@ -124,7 +124,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType) :  relationshipService.link(destination, source, relationshipType)
 
         if (rel.hasErrors()) {
-            respond rel.errors
+            reportCapableRespond rel.errors
             return
         }
 
@@ -135,7 +135,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         }
 
         response.status = HttpServletResponse.SC_CREATED
-        respond rel
+        reportCapableRespond rel
     }
 
     protected parseOtherSide() {
@@ -169,7 +169,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        respond new Relationships(
+        reportCapableRespond new Relationships(
                 owner: element,
                 direction: direction,
                 list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type))
@@ -203,7 +203,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         def results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
 
         if(results.errors){
-            respond results
+            reportCapableRespond results
             return
         }
 
@@ -214,7 +214,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
                 total: total,
                 items: results.searchResults,
         )
-        respond new Relationships(owner: element, direction: direction, list: withLinks(elements))
+        reportCapableRespond new Relationships(owner: element, direction: direction, list: withLinks(elements))
     }
 
 
@@ -226,7 +226,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        respond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping", "mappings") {
+        reportCapableRespond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping", "mappings") {
             eq 'source', element
         })
     }
@@ -267,11 +267,11 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             }
             Mapping mapping = mappingService.map(element, destination, mappingString)
             if (mapping.hasErrors()) {
-                respond mapping.errors
+                reportCapableRespond mapping.errors
                 return
             }
             response.status = HttpServletResponse.SC_CREATED
-            respond mapping
+            reportCapableRespond mapping
             return
         }
         Mapping old = mappingService.unmap(element, destination)

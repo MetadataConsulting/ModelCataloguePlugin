@@ -63,7 +63,7 @@ class DataImportController extends AbstractRestfulController{
             }
         }
 
-        respond response
+        reportCapableRespond response
     }
 
 
@@ -121,7 +121,7 @@ class DataImportController extends AbstractRestfulController{
         }else{
             response = ["error": "import or import row not found"]
         }
-        respond response
+        reportCapableRespond response
     }
 
     def ingestRow(Long id, Long rowId){
@@ -135,7 +135,7 @@ class DataImportController extends AbstractRestfulController{
         }else{
             response = ["error": "import or import row not found"]
         }
-        respond response
+        reportCapableRespond response
     }
 
     def resolveAll(Long id){
@@ -147,7 +147,7 @@ class DataImportController extends AbstractRestfulController{
         }else{
             response = ["error": "import or import row not found"]
         }
-        respond response
+        reportCapableRespond response
     }
 
     def ingestQueue(Long id){
@@ -159,7 +159,7 @@ class DataImportController extends AbstractRestfulController{
         }else{
             response = ["error": "import or import row not found"]
         }
-        respond response
+        reportCapableRespond response
     }
 
 
