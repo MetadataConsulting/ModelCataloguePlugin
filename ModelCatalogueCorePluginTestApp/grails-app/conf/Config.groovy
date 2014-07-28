@@ -221,3 +221,6 @@ grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'org.modelcata
 grails.plugins.springsecurity.authority.className = 'org.modelcatalogue.core.testapp.Role'
 grails.plugins.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugins.springsecurity.securityConfigType = 'Requestmap'
+
+
+grails.assets.excludes = ["bootstrap/**/*.less", "jquery/**/*.js"]
