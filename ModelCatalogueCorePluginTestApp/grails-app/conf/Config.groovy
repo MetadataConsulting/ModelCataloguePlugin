@@ -224,3 +224,5 @@ grails.plugins.springsecurity.securityConfigType = 'Requestmap'
 
 
 grails.assets.excludes = ["bootstrap/**/*.less", "jquery/**/*.js"]
+// to debug minification
+grails.assets.bundle   = false
