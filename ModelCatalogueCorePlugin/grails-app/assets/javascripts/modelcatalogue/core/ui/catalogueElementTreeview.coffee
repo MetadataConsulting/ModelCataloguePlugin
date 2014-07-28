@@ -10,7 +10,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeview.html'
 
-    controller: ($scope, enhance, $log) ->
+    controller: ['$scope', 'enhance', ($scope, enhance) ->
       listEnhancer = enhance.getEnhancer('list')
 
       $scope.mode     = if $scope.element then 'element' else 'list'
@@ -42,5 +42,6 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
       if $scope.mode == 'list'
         onListChange $scope.list
         $scope.$watch 'list', onListChange
+    ]
   }
 ]
