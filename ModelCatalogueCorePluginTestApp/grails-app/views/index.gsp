@@ -29,7 +29,7 @@
                 },
                 <sec:ifLoggedIn>
                 currentUser: {
-                    roles: ${org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
+                    roles: ${grails.plugin.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
                     username: '${sec.username()}'
                 }
                 </sec:ifLoggedIn>

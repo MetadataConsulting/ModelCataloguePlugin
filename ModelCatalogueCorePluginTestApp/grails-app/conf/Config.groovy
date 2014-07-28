@@ -216,11 +216,11 @@ modelcatalogue.defaults.relationshiptypes = [
 modelcatalogue.storage.directory = "/tmp/modelcatalogue/storage"
 modelcatalogue.storage.maxSize = 50 * 1024 * 1024
 // Added by the Spring Security Core plugin:
-grails.plugins.springsecurity.userLookup.userDomainClassName = 'org.modelcatalogue.core.testapp.User'
-grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatalogue.core.testapp.UserRole'
-grails.plugins.springsecurity.authority.className = 'org.modelcatalogue.core.testapp.Role'
-grails.plugins.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
-grails.plugins.springsecurity.securityConfigType = 'Requestmap'
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'org.modelcatalogue.core.testapp.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatalogue.core.testapp.UserRole'
+grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.testapp.Role'
+grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
+grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
 
 grails.assets.excludes = ["bootstrap/**/*.less", "jquery/**/*.js", "angular/**/*.js"]

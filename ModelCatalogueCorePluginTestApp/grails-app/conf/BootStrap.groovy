@@ -80,9 +80,9 @@ class BootStrap {
             new Requestmap(url: url, configAttribute: 'permitAll').save(failOnError: true)
         }
 
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_USER', httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR', httpMethod: org.springframework.http.HttpMethod.POST).save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR', httpMethod: org.springframework.http.HttpMethod.PUT).save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY', httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR', httpMethod: org.springframework.http.HttpMethod.POST).save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR', httpMethod: org.springframework.http.HttpMethod.PUT).save(failOnError: true)
 
 //        new Requestmap(url: '/api/modelCatalogue/core/model/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save(failOnError: true)
 //        new Requestmap(url: '/api/modelCatalogue/core/dataElement/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
