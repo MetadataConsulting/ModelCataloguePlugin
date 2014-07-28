@@ -227,11 +227,11 @@ grails.assets.excludes = ["bootstrap/**/*.less", "jquery/**/*.js", "angular/**/*
 
 grails.assets.plugin."model-catalogue-core-plugin".excludes = ["bootstrap/**/*.less", "jquery/**/*.js", "angular/**/*.js"]
 grails.assets.plugin."model-catalogue-core-plugin".includes = ["bootstrap.less"]
-
-grails.assets.minifyOptions = [
-        strictSemicolons: false,
-        mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
-        genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
-]
+//
+//grails.assets.minifyOptions = [
+//        strictSemicolons: false,
+//        mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
+//        genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
+//]
 
 // grails.assets.minifyJs = false
