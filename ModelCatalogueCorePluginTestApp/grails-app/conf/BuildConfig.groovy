@@ -73,7 +73,6 @@ grails.project.dependency.resolution = {
 
         compile ':spring-security-core:1.2.7.4'
 
-        compile ":coffee-asset-pipeline:1.5.0"
         // plugins needed at runtime but not for compilation
         runtime ":hibernate:3.6.10.7" // or ":hibernate4:4.1.11.6"
         runtime ":database-migration:1.3.8"

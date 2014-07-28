@@ -26,10 +26,11 @@ metadataCurator = angular.module('metadataCurator', [
   'ngAnimate'
 ])
 
-metadataCurator.config ($stateProvider, $urlRouterProvider)->
+metadataCurator.config ['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider)->
   $urlRouterProvider.otherwise("/catalogue/model/all")
+]
 
-metadataCurator.run ($templateCache) ->
+metadataCurator.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
   <a>
       <span class="glyphicon omnisearch-icon" ng-class="'glyphicon-' + match.model.icon"></span>
@@ -37,6 +38,7 @@ metadataCurator.run ($templateCache) ->
       <span ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
   </a>
 '''
+]
 
 metadataCurator.controller('metadataCurator.searchCtrl',
   ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$log', '$q', '$state', 'names'
