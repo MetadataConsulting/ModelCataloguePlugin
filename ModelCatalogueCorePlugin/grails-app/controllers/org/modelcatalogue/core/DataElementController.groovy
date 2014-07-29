@@ -1,9 +1,9 @@
 package org.modelcatalogue.core
 
-class DataElementController extends CatalogueElementController<DataElement> {
+class DataElementController extends AbstractExtendibleElementController<DataElement> {
 
     DataElementController() {
-        super(DataElement)
+        super(DataElement, false)
     }
 
 }

@@ -1,14 +1,29 @@
-angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive 'decoratedList',  [-> {
+angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.columns']).directive 'decoratedList',  [-> {
     restrict: 'E'
     replace: true
     scope:
       list: '='
       columns: '=?'
       selection: '=?'
+      actions: '=?'
+      id: '@'
+      stateless: '=?'
+      reports: '=?'
+      pageParam: '@'
+      sortParam: '@'
+      orderParam: '@'
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
-    controller: ['$scope' , ($scope) ->
+    controller: ['$scope', 'columns', '$q', '$rootScope', '$state', '$stateParams' , ($scope, columns, $q, $rootScope, $state, $stateParams) ->
+      pageParam = $scope.pageParam ? 'page'
+      sortParam = $scope.sortParam ? 'sort'
+      orderParam = $scope.orderParam ? 'order'
+
+      $scope.id = null if !$scope.id
+
+      columnsDefined = $scope.columns?
+
       emptyList =
         list: []
         next: {size: 0}
@@ -17,7 +32,9 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
         empty: true
         source: 'directive'
 
-      updatePages = (list) ->
+      onListChange = (list) ->
+        if !columnsDefined
+          $scope.columns = columns(list.itemType)
         if list.total is 0
           $scope.pages = []
           $scope.hasMorePrevPages = false
@@ -38,6 +55,24 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
           $scope.hasMorePrevPages = lowerTen != 0
           $scope.hasMoreNextPages = (Math.floor(list.total / list.page) + 1) >= upperTen
           $scope.pages = pages
+
+        $scope.reports = list.availableReports
+
+        if not $state.current.abstract and not $scope.stateless
+          newParams = angular.copy $stateParams
+          newParams[pageParam] = list.currentPage
+          if newParams[pageParam] == 1 or isNaN(newParams[pageParam])
+            newParams[pageParam] = undefined
+          newParams[sortParam]  = list.sort  if list.sort
+          newParams[orderParam] = list.order if list.order
+
+          if newParams[sortParam] =='name'
+            newParams[sortParam] = undefined
+
+          if newParams[orderParam] =='asc'
+            newParams[orderParam] = undefined
+
+          $state.go '.', newParams
 
       $scope.hasSelection = () -> $scope.selection?
 
@@ -75,22 +110,13 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
       $scope.hasPrevious    = -> hasNextOrPrev($scope.list.previous)
       $scope.hasNext        = -> hasNextOrPrev($scope.list.next)
 
-      $scope.columns ?= [
-        {header: 'Name', value: 'name', classes: 'col-md-4', show: true}
-        {header: 'Descripton', value: 'description', classes: 'col-md-8'}
-      ]
-
-      $scope.itemClick ?= (item) ->
-        if item.show? and angular.isFunction(item.show)
-          item.show()
-        else
-          item._selected = !item._selected
-
 
       $scope.list ?= emptyList
 
+      if !columnsDefined
+        $scope.columns = columns($scope.list.itemType)
 
-      $scope.$watch 'list', updatePages
+      $scope.$watch 'list', onListChange
 
       $scope.evaluateClasses = (classes, element) ->
         if angular.isFunction(classes) then classes(element) else classes
@@ -105,6 +131,50 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer']).directive '
       $scope.showEnabled = (show) ->
         show?
 
+      $scope.getColumnsCount = () ->
+        count = $scope.columns.length
+        if $scope.hasSelection()
+          count++
+        if $scope.actions? and $scope.actions.length > 0
+          count++
+        count
+
+      $scope.getActionsClass = () ->
+        ' col-md-2'
+
+      $scope.getActionClass = (action) ->
+        return "btn-#{action.type}" if action.type?
+        "btn-primary"
+
+      $scope.performAction = (fn, element, list) ->
+        $q.when(fn(element, list)).then (result) ->
+          # only boolean value is the one we expect
+          if result == true
+            $scope.goto($scope.list.currentPage)
+
+      $scope.sortBy = (column) ->
+        return if $scope.loading
+        $scope.loading = true
+        $scope.list.reload({
+          sort: column.sort.property,
+          order: if $scope.list.order == 'asc' then 'desc' else 'asc'
+        }).then (result) ->
+          $scope.loading = false
+          $scope.list = result
+
+      $scope.getSortClass = (column) ->
+        return 'glyphicon-sort' if column.sort.property != $scope.list.sort
+        ret = "glyphicon-sort-by-#{if column.sort.type then column.sort.type else 'attributes'}"
+
+        return ret if $scope.list.order == 'asc'
+        ret + '-alt'
+
+
+      $scope.$on '$stateChangeSuccess', (event, state, params) ->
+        return if not $scope.list or not $scope.list.goto
+        page = parseInt(params[pageParam] ? 1, 10)
+        if page != $scope.list?.currentPage and not isNaN(page)
+          $scope.goto page
     ]
   }
 ]

@@ -1,3 +1,5 @@
+import org.modelcatalogue.core.*
+
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -16,7 +18,6 @@ grails.project.groupId = appName // change this to alter the default package nam
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [ // the first one is the default format
-    all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
     atom:          'application/atom+xml',
     css:           'text/css',
     csv:           'text/csv',
@@ -28,7 +29,9 @@ grails.mime.types = [ // the first one is the default format
     rss:           'application/rss+xml',
     text:          'text/plain',
     hal:           ['application/hal+json','application/hal+xml'],
-    xml:           ['text/xml', 'application/xml']
+    xml:           ['text/xml', 'application/xml'],
+    xlsx:          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    all:           '*/*', // 'all' maps to '*' or the first available format in withFormat
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000
@@ -102,6 +105,7 @@ log4j = {
     //}
 
     debug 'org.modelcatalogue'
+//    debug 'org.grails.plugins.elasticsearch'
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -120,3 +124,83 @@ grails.views.gsp.encoding="UTF-8"
 elasticSearch.client.mode = 'local'
 elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
 elasticSearch.datastoreImpl = 'hibernateDatastore'
+
+
+modelcatalogue.defaults.datatypes = [
+        [name: "String", description: "java.lang.String"],
+        [name: "Integer", description: "java.lang.Integer"],
+        [name: "Double", description: "java.lang.Double"],
+        [name: "Boolean", description: "java.lang.Boolean"],
+        [name: "Date", description: "java.util.Date"],
+        [name: "Time", description: "java.sql.Time"],
+        [name: "Currency", description: "java.util.Currency"]
+]
+
+
+modelcatalogue.defaults.measurementunits = [
+        [name: "celsius", description: "degrees celsius", symbol: "°C"],
+        [name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"],
+        [name: "newtons", description: "measurement of force", symbol: "N"],
+        [name:'meter',description:'length', symbol:'m'],
+        [name:'kilogram',description:'mass', symbol:'kg'],
+        [name:'second',description:'time', symbol:'s'],
+        [name:'ampere',description:'electric current', symbol:'A'],
+        [name:'kelvin',description:'thermodynamic temperature', symbol:'K'],
+        [name:'mole',description:'amount of substance', symbol:'mol'],
+        [name:'candela',description:'luminous intensity', symbol:'cd'],
+        [name:'area',description:'square meter', symbol:'m2'],
+        [name:'volume',description:'cubic meter', symbol:'m3'],
+        [name:'speed, velocity',description:'meter per second', symbol:'m/s'],
+        [name:'acceleration',description:'meter per second squared  ', symbol:'m/s2'],
+        [name:'wave number',description:'reciprocal meter', symbol:'m-1'],
+        [name:'mass density',description:'kilogram per cubic meter', symbol:'kg/m3'],
+        [name:'specific volume',description:'cubic meter per kilogram', symbol:'m3/kg'],
+        [name:'current density',description:'ampere per square meter', symbol:'A/m2'],
+        [name:'magnetic field strength  ',description:'ampere per meter', symbol:'A/m'],
+        [name:'amount-of-substance concentration',description:'mole per cubic meter', symbol:'mol/m3'],
+        [name:'luminance',description:'candela per square meter', symbol:'cd/m2'],
+        [name:'mass fraction',description:'kilogram per kilogram', symbol:'kg/kg = 1']
+]
+
+
+modelcatalogue.defaults.relationshiptypes =  [
+        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
+            Integer sourceMinOccurs = ext['Source Min Occurs'] as Integer
+            Integer sourceMaxOccurs = ext['Source Max Occurs'] as Integer
+            Integer destinationMinOccurs = ext['Destination Min Occurs'] as Integer
+            Integer destinationMaxOccurs = ext['Destination Max Occurs'] as Integer
+
+            if (sourceMinOccurs != null) {
+                if (sourceMinOccurs < 0) {
+                    return false
+                }
+                if (sourceMaxOccurs != null && sourceMaxOccurs < sourceMinOccurs) {
+                    return false
+                }
+            } else {
+                if (sourceMaxOccurs != null && sourceMaxOccurs < 1) {
+                    return false
+                }
+            }
+
+            if (destinationMinOccurs != null) {
+                if (destinationMinOccurs < 0) {
+                    return false
+                }
+                if (destinationMaxOccurs != null && destinationMaxOccurs < destinationMinOccurs) {
+                    return false
+                }
+            } else {
+                if (destinationMaxOccurs != null && destinationMaxOccurs < 1) {
+                    return false
+                }
+            }
+
+            return true
+        '''],
+        [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
+        [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
+        [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
+        [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
+        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true]
+]

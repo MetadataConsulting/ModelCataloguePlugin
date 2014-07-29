@@ -10,8 +10,8 @@ class Mapping {
         except = ['source', 'destination']
     }
 
-    ValueDomain source
-    ValueDomain destination
+    CatalogueElement source
+    CatalogueElement destination
 
     String mapping
 
@@ -23,7 +23,7 @@ class Mapping {
         source nullable: false, unique: ['destination']
         destination nullable: false, validator: { val, obj ->
             if (!val || !obj.source) return true
-            return val != obj.source
+            return val != obj.source && val.class == obj.source.class
         }
         mapping nullable: false, blank: false, maxSize: 10000, validator: { val, obj ->
             if (!val) return true
@@ -41,6 +41,13 @@ class Mapping {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}]"
+    }
+
+    def beforeDelete(){
+        if (source || destination) {
+            destination?.removeFromIncomingMappings(this)
+            source?.removeFromOutgoingMappings(this)
+        }
     }
 
 }

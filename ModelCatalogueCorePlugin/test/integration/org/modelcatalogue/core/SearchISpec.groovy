@@ -81,7 +81,7 @@ class SearchISpec extends AbstractIntegrationSpec{
             assert xml.@size == total
             assert xml.@total == total
             assert xml.@offset.text() == "0"
-            assert xml.@page.text() ==  "10"
+            assert xml.@page.text() ==  "10000"
             assert xml.element
             assert xml.element.size() ==  total
             assert xml.depthFirst().find {  it.name == expectedResult.name }
@@ -103,8 +103,8 @@ class SearchISpec extends AbstractIntegrationSpec{
         8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 1
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1
        10 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "xml"     | "sub1"                    | 1
-       11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees of Celsius"      | 1
-       12 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "xml"     | "Degrees of Celsius"      | 1
+       11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees Celsius"         | 1
+       12 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "xml"     | "Degrees Celsius"         | 1
        13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1
        14 | "Model"             | new ModelController()               | "Jabberwocky"                   | "xml"     | "chapter1"                | 1
        15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1

@@ -22,7 +22,7 @@ describe "mc.core.catalogueElementResource", ->
 
 
   it "creates catalogue element resource", ->
-    valueDomains = catalogueElementResource('valueDomain')
+    valueDomains = catalogueElementResource('com.modelcatalogue.core.ValueDomain')
     valueDomainsRootPath = "/api/modelCatalogue/core/valueDomain"
 
     expect(valueDomains.getIndexPath()).toBe(valueDomainsRootPath)
@@ -57,7 +57,6 @@ describe "mc.core.catalogueElementResource", ->
           expect(result.id).toBe(testElementId)
           expect(result.name).toBe("value domain Celsius")
           expect(result.description).toBeDefined()
-          expect(result.version).toBe(1)
 
 
           describe "fetched instance is enhanced", ->
@@ -153,6 +152,23 @@ describe "mc.core.catalogueElementResource", ->
 
               expect(updated).toBeDefined()
 
+            it "has refresh method", ->
+
+              $httpBackend
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}" )
+              .respond(fixtures.valueDomain.showOne)
+
+              expect(angular.isFunction(result.refresh)).toBeTruthy()
+
+              refreshed = null
+
+              result.update().then((result) -> refreshed = result)
+
+              expect(refreshed).toBeNull()
+
+              $httpBackend.flush()
+
+              expect(refreshed).toBeDefined()
 
             it "has validate method", ->
               result.version = 1
@@ -208,6 +224,11 @@ describe "mc.core.catalogueElementResource", ->
           error  = null
           ok     = null
 
+          fromEvent = null
+
+          $rootScope.$on "catalogueElementDeleted", (event, element)->
+            fromEvent = element
+
           valueDomains.delete(1).then( (_result_) ->
             result = _result_
             ok     = true
@@ -218,12 +239,16 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(result).toBeNull()
           expect(error).toBeNull()
+          expect(fromEvent).toBeNull()
 
           $httpBackend.flush()
+          $rootScope.$digest()
 
           expect(ok).toBeTruthy()
           expect(error).toBeNull()
           expect(result).toBe(204)
+          expect(fromEvent).not.toBeNull()
+          expect(fromEvent.link).toBe('/valueDomain/1')
 
         it "will return 404 if the resource does not exist", ->
           $httpBackend
@@ -282,10 +307,10 @@ describe "mc.core.catalogueElementResource", ->
       describe "can update entity", ->
         it "updates ok if entity exists", ->
           payloadWithId = angular.extend({}, fixtures.valueDomain.updateInput)
-          payloadWithId.id = 74
+          payloadWithId.id = fixtures.valueDomain.showOne.id
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{payloadWithId.id}", fixtures.valueDomain.updateInput)
+          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{payloadWithId.id}?format=json", fixtures.valueDomain.updateInput)
           .respond(fixtures.valueDomain.updateOk)
 
           result = null
@@ -304,8 +329,7 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(74)
-          expect(result.version).toBe(2)
+          expect(result.id).toBe(payloadWithId.id)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
 
@@ -330,8 +354,6 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(74)
-          expect(result.version).toBe(2)
           expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
           expect(result.update).toBeDefined()
 
@@ -340,7 +362,7 @@ describe "mc.core.catalogueElementResource", ->
           payloadWithId.id = 1000000
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1000000", fixtures.valueDomain.updateInput)
+          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1000000?format=json", fixtures.valueDomain.updateInput)
           .respond(404)
 
           result = null
@@ -370,7 +392,7 @@ describe "mc.core.catalogueElementResource", ->
           delete payloadWithoutId.id
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1", payloadWithoutId)
+          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1?format=json", payloadWithoutId)
           .respond(fixtures.valueDomain.updateErrors)
 
           result = null
@@ -402,6 +424,12 @@ describe "mc.core.catalogueElementResource", ->
             symbol:  "MPH"
           }
 
+          resultFromEvent = null
+
+          $rootScope.$on "catalogueElementCreated", (event, element) ->
+            resultFromEvent = element
+
+
           $httpBackend
           .when("POST", "#{modelCatalogueApiRoot}/valueDomain", payload)
           .respond(fixtures.valueDomain.saveOk)
@@ -417,8 +445,10 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(result).toBeNull()
           expect(error).toBeNull()
+          expect(resultFromEvent).toBeNull()
 
           $httpBackend.flush()
+          $rootScope.$digest()
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
@@ -426,6 +456,8 @@ describe "mc.core.catalogueElementResource", ->
           expect(result.version).toBe(fixtures.valueDomain.saveOk.version)
           expect(result.name).toBe(fixtures.valueDomain.saveOk.name)
           expect(result.update).toBeDefined()
+
+          expect(resultFromEvent).toEqual(result)
 
         it "save failed if wrong input", ->
           payload = {symbol: "MPH"}

@@ -1,5 +1,5 @@
 import org.modelcatalogue.core.DataType
 
 fixture{
-    DT_string(DataType, name: "string", description: "a string")
+    DT_string(DataType, name: "String", description: "a string")
 }

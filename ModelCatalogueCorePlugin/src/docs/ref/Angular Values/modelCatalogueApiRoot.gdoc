@@ -1,0 +1,42 @@
+h1. modelCatalogueApiRoot
+
+Sets and retrieves the current root of model catalogue api. Declared in @mc.core.modelCatalogueApiRoot@ module
+inside [mc.core|Angular Packages] package.
+
+h2. Usage
+
+You can inject the value in any construct in the run phase (service, factory, controller, etc.). The value is string pointing
+to the root of the model catalogue core REST API.
+
+{code}
+angular
+.module('foo', ['mc.core.modelCatalgoueApiRoot'])
+.factory('bar', function($http, $log, modelCatalogueApiRoot) {
+    $http.get(modelCatalogueApiRoot + '/bar').then(function(result){
+        $log.info('Result: ' + result);
+    });
+});
+{code}
+
+
+h2. Customization
+
+Default value is @/api/modelCatalogue/core@ which
+should be  sufficient if you create single page application. If you want to change the value (usually
+because of context path changes) place code similar to following one in your layout page anywhere after where
+angular resources are resolved.
+
+{code:html}
+<script type="text/javascript">
+    angular
+    .module('demo.config', ['mc.core.modelCatalogueApiRoot'])
+    .value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core');
+</script>
+{code}
+
+This is regular way [how to set AngularJS values|http://docs.angularjs.org/guide/providers#value-recipe].
+
+{note}
+Don't forget to depend on the module you used for customizing the value in your application module otherwise the changes
+wouldn't be taken into account.
+{note}

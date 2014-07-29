@@ -1,0 +1,40 @@
+
+
+h1. catalogue-element-view
+
+Element directive for showing single catalogue element item. Default template defined in
+@mc.core.ui.bs.catalogueElementView@ is showing the name and the description on the top of the panel, all simple properties in single Properties tab, plain JavaScript objects
+in separate tabs using [properties-pane|Angular Directives] directive and all [listReference|Angular Enhancers] properties in separate tabs using [decorated-list|Angular Directives] directive.
+It accepts only one attribute @element@ which is the element to show.
+
+h2. Usage
+
+Considering you have following code in you controller with injected [catalogueElementResource|Angular Services] service:
+
+{code}
+$scope.element = null;
+catalogueElementResource('valueDomain').get(1).then(function(element) {
+    $scope.element = element;
+});
+{code}
+
+And following HTML snippet in your page:
+{code}
+ <catalogue-element-view element="element"></catalogue-element-view>
+{code}
+
+Than you get the value domain rendered as described above.
+
+h2. Customization
+You can override the @modelcatalogue/core/ui/catalogueElementView.html@ template to plug your own either using
+@text/ng-template@ script definition, creating the template on the appropriate location in your server
+or using the [$templateCache|http://docs.angularjs.org/api/ng/service/$templateCache].
+
+Following variables and methods are added by the directive controller):
+
+{table}
+Name        | Description
+tabs        | The array of tab definitions (see directive declaration for more information)
+showTabs    | The array of booleans declaring which tab should be shown
+{table}
+

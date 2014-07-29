@@ -24,17 +24,14 @@ class ModelCatalogueCorePluginUrlMappings {
             "/$controller/$id/outgoing" {
                 action = [GET: "outgoing"]
             }
+            "/$controller/$id/relationships" {
+                action = [GET: "relationships"]
+            }
             "/$controller/$id/outgoing/$type" {
                 action = [GET: "outgoing", POST: "addOutgoing", DELETE: "removeOutgoing"]
             }
             "/$controller/$id/incoming/$type" {
                 action = [GET: "incoming", POST: "addIncoming", DELETE: "removeIncoming"]
-            }
-            "/$controller/$id/mapping" {
-                action = [GET: "mappings"]
-                constraints {
-                    controller inList: ['valueDomain']
-                }
             }
             "/$controller/$id/mapping/$destination" {
                 action = [POST: "addMapping", DELETE: "removeMapping"]
@@ -48,6 +45,13 @@ class ModelCatalogueCorePluginUrlMappings {
                     controller inList: ['dataType']
                 }
             }
+            "/$controller/$id/mapping" {
+                action = [GET: "mappings"]
+            }
+
+            "/$controller/$id/history" {
+                action = [GET: "history"]
+            }
 
             constraints {
                 controller inList: ['conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'model', 'valueDomain']
@@ -58,8 +62,24 @@ class ModelCatalogueCorePluginUrlMappings {
             action = [GET: "index"]
         }
 
-        
-        "/"(view:"index")
+        group "/api/modelCatalogue/core/dataArchitect", {
+            "/uninstantiatedDataElements" (controller:"dataArchitect"){
+                action = [GET: "uninstantiatedDataElements"]
+            }
+            "/metadataKeyCheck/$key?" (controller:"dataArchitect"){
+                action = [GET: "metadataKeyCheck"]
+            }
+            "/getSubModelElements/$modelId?" (controller:"dataArchitect"){
+                action = [GET: "getSubModelElements"]
+            }
+            "/findRelationsByMetadataKeys/$key?" (controller:"dataArchitect"){
+                action = [GET: "findRelationsByMetadataKeys"]
+            }
+
+        }
+
+
+         "/"(view:"index")
 
 
 	}

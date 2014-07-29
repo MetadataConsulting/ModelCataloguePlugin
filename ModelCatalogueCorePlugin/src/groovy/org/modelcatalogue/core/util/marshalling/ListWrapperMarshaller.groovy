@@ -11,7 +11,8 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
     @Override
     protected Map<String, Object> prepareJsonMap(Object elements) {
         [
-                itemType: elements.itemType,
+                base: elements.base,
+                itemType: elements.itemType?.name,
                 listType: type.name,
                 success: true,
                 total: elements.total,
@@ -21,6 +22,9 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
                 list: elements.items,
                 previous: elements.previous,
                 next: elements.next,
+                availableReports: elements.availableReports,
+                sort: elements.sort,
+                order: elements.order
         ]
     }
 
@@ -53,5 +57,6 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         addXmlAttribute(elements.offset, "offset", xml)
         addXmlAttribute(elements.items.size(), "size", xml)
         addXmlAttribute("true", "success", xml)
+        addXmlAttribute(elements.availableReports.toList().join(','), "availableReports", xml)
     }
 }

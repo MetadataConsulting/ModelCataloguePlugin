@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ModelControllerIntegrationSpec extends CatalogueElementControllerIntegrationSpec {
+class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){
@@ -34,7 +34,7 @@ class ModelControllerIntegrationSpec extends CatalogueElementControllerIntegrati
     }
 
     @Override
-    CatalogueElementController getController() {
+    AbstractCatalogueElementController getController() {
         new ModelController()
     }
 
@@ -83,6 +83,17 @@ class ModelControllerIntegrationSpec extends CatalogueElementControllerIntegrati
         checkStatusProperty(json.status , outputItem.status, "status")
         checkProperty(json.versionNumber , outputItem.versionNumber, "versionNumber")
         return true
+    }
+
+    @Override
+    protected getTotalRowsExported() { 5 }
+
+    def getPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 5, 10, 0, 5, "", ""],
+                [2, 5, 5, 0, 5, "", ""],
+        ]
     }
 
 }

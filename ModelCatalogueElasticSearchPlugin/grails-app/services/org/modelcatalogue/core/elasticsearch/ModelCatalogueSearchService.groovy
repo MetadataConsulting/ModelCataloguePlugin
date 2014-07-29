@@ -1,11 +1,10 @@
 package org.modelcatalogue.core.elasticsearch
 
-import grails.transaction.Transactional
+import org.modelcatalogue.core.SearchCatalogue
 
-@Transactional
-class ModelCatalogueSearchService {
+class ModelCatalogueSearchService implements SearchCatalogue{
 
-    def elasticSearchService
+    def elasticSearchService, elasticSearchAdminService
 
     def search(Class resource, Map params) {
         def searchResults = [:]
@@ -19,6 +18,9 @@ class ModelCatalogueSearchService {
                 bool {
                     must {
                         query_string(query: params.search)
+                    }
+                    must_not {
+                        terms status: ['archived', 'draft', 'pending', 'removed'], system: ['true']
                     }
                 }
             }
@@ -46,6 +48,9 @@ class ModelCatalogueSearchService {
                     must {
                         query_string(query: params.search)
                     }
+                    must_not {
+                        terms status: ['archived', 'draft', 'pending', 'removed']
+                    }
                 }
             }
         }catch(IllegalArgumentException e){
@@ -69,5 +74,28 @@ class ModelCatalogueSearchService {
         if(params.offset){searchParams.put("from" , "$params.offset")}
         return searchParams
     }
+
+    //TODO add a few more of these
+
+    def index(Class resource){
+        elasticSearchService.index(resource)
+    }
+
+    def index(Collection<Class> resource){
+        elasticSearchService.index(resource)
+    }
+
+    def unindex(Object object){
+        elasticSearchService.unindex(object)
+    }
+
+    def unindex(Collection<Object> object){
+        elasticSearchService.unindex(object)
+    }
+
+    def refresh(){
+        elasticSearchAdminService.refresh()
+    }
+
 
 }

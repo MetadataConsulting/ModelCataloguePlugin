@@ -20,8 +20,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class ConceptualDomain extends CatalogueElement {
 
-    static transients = ['isContextFor', 'includes']
-
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
@@ -39,27 +37,5 @@ class ConceptualDomain extends CatalogueElement {
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ConceptualDomain)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        ConceptualDomain cd = (ConceptualDomain) obj;
-        return new EqualsBuilder()
-                .append(name, cd.name)
-                .append(id, cd.id)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(id)
-                .toHashCode();
-    }
-
 
 }

@@ -7,7 +7,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class EnumeratedTypeControllerIntegrationSpec extends CatalogueElementControllerIntegrationSpec {
+class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
 
     @Unroll
@@ -108,7 +108,7 @@ class EnumeratedTypeControllerIntegrationSpec extends CatalogueElementController
     }
 
     @Override
-    CatalogueElementController getController() {
+    AbstractCatalogueElementController getController() {
         new EnumeratedTypeController()
     }
 
@@ -132,8 +132,9 @@ class EnumeratedTypeControllerIntegrationSpec extends CatalogueElementController
         super.xmlCustomPropertyCheck(xml, item)
         def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
         if (xmlProp) {
-            xmlProp = xmlProp.attributes()
-            checkPropertyMapMapString(xmlProp, item.getProperty("enumerations"), "enumerations")
+            def propMap = [:]
+            xmlProp.enumeration.each{ propMap.put(it.@key.toString(), it.text()) }
+            checkPropertyMapMapString(propMap, item.getProperty("enumerations"), "enumerations")
         }
         return true
     }
@@ -143,8 +144,9 @@ class EnumeratedTypeControllerIntegrationSpec extends CatalogueElementController
         super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
         def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
         if (xmlProp) {
-            xmlProp = xmlProp.attributes()
-            checkProperty(xmlProp, outputItem.getProperty("enumerations"), "enumerations")
+            def propMap = [:]
+            xmlProp.enumeration.each{ propMap.put(it.@key.toString(), it.text()) }
+            checkPropertyMapMapString(propMap, outputItem.getProperty("enumerations"), "enumerations")
         }
         return true
     }

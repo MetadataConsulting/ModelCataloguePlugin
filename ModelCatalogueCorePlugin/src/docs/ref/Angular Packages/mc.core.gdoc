@@ -1,0 +1,28 @@
+h1. mc.core
+
+Core package provides services for communicating with Model Catalogue Core Plugin backend and for setting up such
+communication.
+
+h2. Modules
+This package groups following modules for easier use:
+
+{table}
+Name                             | Description
+mc.core.catalogueElementEnhancer | enables [catalogueElement|Angular Enhancers] enhancer
+mc.core.catalogueElementResource | provides [catalogueElementResource|Angular Services] service
+mc.core.listEnhancer             | enables [list|Angular Enhancers] enhancer
+mc.core.listReferenceEnhancer    | enables [listReference|Angular Enhancers] enhancer
+mc.core.modelCatalogueApiRoot    | declares [modelCatalogueApiRoot|Angular Values] value
+mc.core.modelCatalogueSearch     | provides [modelCatalogueSearch|Angular Services] service
+mc.core.removableItemEnhancer    | enables [removableItem|Angular Enhancers] enhancer
+{table}
+
+h2. Include
+Require using asset pipeline plugin in your asset file
+{code}
+//= require modelcatalogue/core/index
+{code}
+or link directly in JSP
+{code:xml}
+<asset:javascript src="/modelcatalogue/core/index.js"/>
+{code}

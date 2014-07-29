@@ -1,0 +1,53 @@
+h1. catalogueElementResource
+
+Function which creates an interface to communicate with the model catalogue REST API resource such as @valueDomain@.
+Declared in @mc.core.catalogueElementResource@ module inside [mc.core|Angular Packages] package.
+
+h2. Usage
+
+You can inject the function in any construct in the run phase (service, factory, controller, etc.). The value is function
+taking one string parameter which is URL name of the resource such as @'valueDomain'@ and returning interface
+to communicate with the REST API backend.
+
+First of all, get the interface for the given resource. Than retrieve catalogue elements.
+
+{code}
+angular
+.module('foo', ['mc.core.catalogueElementResource'])
+.factory('bar', function(catalogueElementResource) {
+    var valueDomains = catalogueElementResource('valueDomain')
+    valueDomains.get(1).then(function(domain){
+        // do something with domain
+    });
+    valueDomains.list().then(function(list){
+        // do something with list
+    });
+    var domainData = {...};
+    valueDomains.save(domainData).then(function(domain) {
+        // do something with saved domain, e.g. save id somewhere
+    }, function(errors) {
+        // handle wrong data
+    });
+});
+{code}
+
+The returned object has following methods:
+
+{table}
+Method Signature          | Description
+get(id)                   | gets the catalogue element instance by given id if exists
+delete(id)                | deletes the catalogue element of given id if exists, resolves to 204 if successful
+save(data)                | creates new entity bases on given data, resolves to new entity if successful
+update(data)              | updates existing entity based on given data, resolves to updated entity if successful
+validate(data)            | checks if the given data are valid to create or update entity, rejects with validation errors if not valid
+list(\[params\])          | returns lists of resources, optionally paginated by given params (max and offset are accepted)
+search(term \[, params\]) | returns search result of given term, optionally paginated by given params (max and offset are accepted)
+{table}
+
+{note}
+All methods return promises to result which are resolved or rejected (in case of error,
+e.g. validation errors or resource not found errors) depending on the response
+from the backend server.
+The result object and arrays are enhanced by all present enhancers registered in
+[enhanceProvider|Angular Providers]
+{note}

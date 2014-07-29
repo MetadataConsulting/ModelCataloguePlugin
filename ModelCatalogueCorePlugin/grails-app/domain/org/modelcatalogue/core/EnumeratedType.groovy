@@ -6,7 +6,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
-* Enumerated Types are used by Value Domains (please see ValueDomain and Usance)
+* Enumerated Types are used by Value Domains (please see ValueDomain)
 * i.e. ValueDomain subjects uses EnumeratedType enumerations ['politics', 'history', 'science']
 * */
 
@@ -27,7 +27,7 @@ class EnumeratedType extends DataType {
     static transients = ['enumerations']
 
     static constraints = {
-        enumAsString nullable: false, unique:true, maxSize: 10000, validator: { encodedVal, obj ->
+        enumAsString nullable: false, /*unique:true,*/ maxSize: 10000, validator: { encodedVal, obj ->
             Map<String, String> val = stringToMap(encodedVal)
             if (!val) return true
             if (val.size() < 1) return false
@@ -42,6 +42,7 @@ class EnumeratedType extends DataType {
         enumAsString converter: EnumAsStringConverter
         incomingRelationships component: true
         outgoingRelationships component: true
+        except = ['relatedValueDomains']
     }
 
 
@@ -129,30 +130,5 @@ class EnumeratedType extends DataType {
         }
         ret
     }
-
-
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof EnumeratedType)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        EnumeratedType ce = (EnumeratedType) obj;
-        return new EqualsBuilder()
-                .append(name, ce.name)
-                .append(enumAsString, ce.enumAsString)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(enumAsString)
-                .toHashCode();
-    }
-
-
 
 }

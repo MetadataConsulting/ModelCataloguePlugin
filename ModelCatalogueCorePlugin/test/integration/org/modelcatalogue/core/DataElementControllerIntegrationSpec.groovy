@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class DataElementControllerIntegrationSpec extends CatalogueElementControllerIntegrationSpec {
+class DataElementControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){
@@ -34,7 +34,7 @@ class DataElementControllerIntegrationSpec extends CatalogueElementControllerInt
     }
 
     @Override
-    CatalogueElementController getController() {
+    AbstractCatalogueElementController getController() {
         new DataElementController()
     }
 
@@ -56,7 +56,7 @@ class DataElementControllerIntegrationSpec extends CatalogueElementControllerInt
     @Override
     def xmlCustomPropertyCheck(xml, item){
         super.xmlCustomPropertyCheck(xml, item)
-        checkProperty(xml.code, item.code, "code")
+        checkProperty(xml.modelCatalogueId, item.modelCatalogueId, "modelCatalogueId")
         checkProperty(xml.@status, item.status, "status")
         checkProperty(xml.@versionNumber, item.versionNumber, "versionNumber")
         def inputItem = item.getProperty("ext")
@@ -70,7 +70,7 @@ class DataElementControllerIntegrationSpec extends CatalogueElementControllerInt
     @Override
     def xmlCustomPropertyCheck(inputItem, xml, outputItem){
         super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkProperty(xml.code, inputItem.code, "code")
+        checkProperty(xml.modelCatalogueId, inputItem.modelCatalogueId, "modelCatalogueId")
         checkProperty(xml.@status, outputItem.status, "status")
         checkProperty(xml.@versionNumber, outputItem.versionNumber, "versionNumber")
         outputItem.getProperty("ext").each{ key, value ->
@@ -83,7 +83,7 @@ class DataElementControllerIntegrationSpec extends CatalogueElementControllerInt
     @Override
     def customJsonPropertyCheck(item, json){
         super.customJsonPropertyCheck(item, json)
-        checkStringProperty(json.code , item.code, "code")
+        checkStringProperty(json.modelCatalogueId , item.modelCatalogueId, "modelCatalogueId")
         checkProperty(json.status , item.status, "status")
         checkProperty(json.ext, item.ext, "extension")
         checkProperty(json.versionNumber , item.versionNumber, "versionNumber")
@@ -93,11 +93,22 @@ class DataElementControllerIntegrationSpec extends CatalogueElementControllerInt
     @Override
     def customJsonPropertyCheck(inputItem, json, outputItem){
         super.customJsonPropertyCheck(inputItem, json, outputItem)
-        checkProperty(json.code , inputItem.code, "code")
         checkProperty(json.status , outputItem.status, "status")
         checkMapProperty(json.ext , inputItem.ext, "extension")
         checkProperty(json.versionNumber , outputItem.versionNumber, "versionNumber")
         return true
+    }
+
+    @Override
+    protected getTotalRowsExported() { 7 }
+
+    def getPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 7, 10, 0, 7, "", ""],
+                [2, 5, 5, 0, 7, "${baseLink}?max=5&offset=5", ""],
+                [3, 2, 5, 5, 7, "", "${baseLink}?max=5&offset=0"],
+        ]
     }
 
 }

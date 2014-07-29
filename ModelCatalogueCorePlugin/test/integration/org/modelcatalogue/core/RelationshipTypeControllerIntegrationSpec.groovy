@@ -2,12 +2,41 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.util.CatalogueElementFinder
 
 /**
  * Created by adammilward on 27/02/2014.
  */
 class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegrationSpec {
 
+    def setupSpec() {
+        totalCount = 13
+    }
+
+    def "return list of catalogue element classes in json"() {
+        controller.response.format = 'json'
+
+        controller.elementClasses()
+        def json = controller.response.json
+
+        expect:
+        json.size() == CatalogueElementFinder.catalogueElementClasses.size()
+
+    }
+
+
+    def "return list of catalogue element classes in xml"() {
+        controller.response.format = 'xml'
+
+        controller.elementClasses()
+        def xml = controller.response.xml
+
+        println controller.response.text
+
+        expect:
+        xml.string.size() == CatalogueElementFinder.catalogueElementClasses.size()
+
+    }
     @Override
     Map getPropertiesToEdit(){
         [name: "changedName", sourceClass: PublishedElement, destinationClass: PublishedElement]
@@ -92,6 +121,23 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
         checkProperty(json.sourceClass , inputItem.sourceClass.name, "sourceClass")
         checkProperty(json.destinationClass , inputItem.destinationClass.name, "destinationClass")
         return true
+    }
+
+    def getPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4"],
+                [5, 2, 10, 10, 12, "", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8"]
+        ]
+    }
+
+
+    protected getTotalRowsExported() {
+        12
     }
 
 }

@@ -6,6 +6,9 @@ import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 import static org.springframework.http.HttpStatus.OK
 
+//TODO implement custom resource binding for xml enumerated type
+//at present we clear the errors
+
 class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 
     EnumeratedTypeController() {
@@ -24,15 +27,22 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         def xml = request.getXML()
         if(xml){
             EnumeratedType instance = super.createResource(params)
+            //TODO implement
+            instance.clearErrors()
             instance.enumerations = getXMLEnumerations(xml)
+            instance.save()
             return instance
         }
 
     }
 
-    private static getXMLEnumerations(GPathResult xml){
+    private static Map getXMLEnumerations(GPathResult xml){
         def xmlEnumerations = xml.depthFirst().find { it.name() == 'enumerations' }
-        return xmlEnumerations.attributes()
+        Map propMap = [:]
+        xmlEnumerations.enumeration.each{
+            propMap.put(it.@key.toString(), it.text())
+        }
+        return propMap
     }
 
 
@@ -64,9 +74,10 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         }
 
         if(request.format == "xml"){
-
+            instance.clearErrors()
             def xml = request.getXML()
             instance.enumerations = getXMLEnumerations(xml)
+            instance.save()
         }
 
         if (instance.hasErrors()) {

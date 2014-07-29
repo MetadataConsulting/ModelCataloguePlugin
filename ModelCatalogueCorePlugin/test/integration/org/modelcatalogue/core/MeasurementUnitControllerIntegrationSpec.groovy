@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class MeasurementUnitControllerIntegrationSpec extends CatalogueElementControllerIntegrationSpec {
+class MeasurementUnitControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){
@@ -34,7 +34,7 @@ class MeasurementUnitControllerIntegrationSpec extends CatalogueElementControlle
     }
 
     @Override
-    CatalogueElementController getController() {
+    AbstractCatalogueElementController getController() {
         new MeasurementUnitController()
     }
 
@@ -45,7 +45,7 @@ class MeasurementUnitControllerIntegrationSpec extends CatalogueElementControlle
 
     @Override
     MeasurementUnit getLoadItem() {
-        MeasurementUnit.findByName("Degrees of Celsius")
+        MeasurementUnit.findByName("Degrees Celsius")
     }
 
     @Override

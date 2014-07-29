@@ -1,8 +1,8 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
+import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -18,9 +18,9 @@ abstract class CatalogueElement {
     String name
     String description
 
-    static transients = ['relations', 'info']
+    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations']
 
-    static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship]
+    static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
     static constraints = {
         name size: 1..255
@@ -31,15 +31,16 @@ abstract class CatalogueElement {
 
     static searchable = {
         name boost:5
-        except = ['incomingRelationships', 'outgoingRelationships']
+        incomingMappings component: true
+        except = ['incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
     }
 
     static mapping = {
+        sort "name"
         description type: "text"
     }
 
-
-    static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination']
+    static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
 
     /**
      * Functions for specifying relationships between catalogue elements using the
@@ -49,32 +50,42 @@ abstract class CatalogueElement {
 
     List getRelations() {
         return [
-                (outgoingRelationships ?: []).collect { it.destination },
-                (incomingRelationships ?: []).collect { it.source }
+                outgoingRelations,
+                incomingRelations
         ].flatten()
     }
 
     List getIncomingRelations() {
-        return [
-                (incomingRelationships ?: []).collect { it.source }
-        ].flatten()
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).list.collect { it.source }
     }
 
     List getOutgoingRelations() {
-        return [
-                (outgoingRelationships ?: []).collect { it.destination }
-        ].flatten()
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).list.collect { it.destination }
+    }
+
+    Long countIncomingRelations() {
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, getClass().get(this.id)).count
+    }
+
+    Long countOutgoingRelations() {
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, getClass().get(this.id)).count
+    }
+
+    Long countRelations() {
+        relationshipService.getRelationships([:], RelationshipDirection.BOTH, getClass().get(this.id)).count
     }
 
 
     List getIncomingRelationsByType(RelationshipType type) {
-        Relationship.findAllByDestinationAndRelationshipType(this, type).collect {
+        ListAndCount<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type)
+        relationships.list.collect {
             it.source
         }
     }
 
     List getOutgoingRelationsByType(RelationshipType type) {
-        Relationship.findAllBySourceAndRelationshipType(this, type).collect {
+        ListAndCount<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type)
+        relationships.list.collect {
             it.destination
         }
     }
@@ -84,20 +95,20 @@ abstract class CatalogueElement {
     }
 
     int countIncomingRelationsByType(RelationshipType type) {
-        if (this.isAttached()) {
-            Relationship.countByDestinationAndRelationshipType(this, type)
-        }else{
-            Relationship.countByDestinationAndRelationshipType(CatalogueElement.get(this.id), type)
+        CatalogueElement self = this.isAttached() ? this : get(this.id)
+        if (archived) {
+            return Relationship.countByDestinationAndRelationshipType(self, type)
         }
+        Relationship.countByDestinationAndRelationshipTypeAndArchived(self, type, false)
 
     }
 
     int countOutgoingRelationsByType(RelationshipType type) {
-        if (this.isAttached()) {
-            Relationship.countBySourceAndRelationshipType(this, type)
-        }else{
-            Relationship.countBySourceAndRelationshipType(CatalogueElement.get(this.id), type)
+        CatalogueElement self = this.isAttached() ? this : get(this.id)
+        if (archived) {
+            return Relationship.countBySourceAndRelationshipType(self, type)
         }
+        Relationship.countBySourceAndRelationshipTypeAndArchived(self, type, false)
     }
 
     int countRelationsByType(RelationshipType type) {
@@ -122,37 +133,18 @@ abstract class CatalogueElement {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+        "${getClass().simpleName}[id: ${getId()}, name: ${getName()}]"
     }
 
     Map<String, Object> getInfo() {
         [
-                id: id,
+                id: getId(),
                 name: name,
-                link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
+                link: "/${GrailsNameUtils.getPropertyName(getClass())}/${getId()}"
         ]
     }
 
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CatalogueElement)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        CatalogueElement ce = (CatalogueElement) obj;
-        return new EqualsBuilder()
-                .append(name, ce.name)
-                .append(id, ce.id)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(id)
-                .toHashCode();
-    }
+    boolean isArchived() { false }
 
     def beforeDelete(){
         outgoingRelationships.each{ relationship->
@@ -162,6 +154,14 @@ abstract class CatalogueElement {
         incomingRelationships.each{ relationship ->
             relationship.beforeDelete()
             relationship.delete(flush:true)
+        }
+        outgoingMappings.each{ mapping ->
+            mapping.beforeDelete()
+            mapping.delete(flush:true)
+        }
+        incomingMappings.each{ mapping ->
+            mapping.beforeDelete()
+            mapping.delete(flush:true)
         }
     }
 }

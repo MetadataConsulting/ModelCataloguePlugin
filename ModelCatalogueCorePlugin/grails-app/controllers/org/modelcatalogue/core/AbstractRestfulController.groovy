@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
 
 import javax.servlet.http.HttpServletResponse
@@ -11,15 +13,21 @@ import static org.springframework.http.HttpStatus.NO_CONTENT
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
-    static responseFormats = ['json', 'xml']
+    static responseFormats = ['json', 'xml', 'xlsx']
     def modelCatalogueSearchService
+    XLSXListRenderer xlsxListRenderer
+
+
+    AbstractRestfulController(Class<T> resource, boolean readOnly) {
+        super(resource, readOnly)
+    }
 
     AbstractRestfulController(Class<T> resource) {
-        super(resource)
+        super(resource, false)
     }
 
     def search(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        setSafeMax(max)
         def results =  modelCatalogueSearchService.search(resource, params)
 
         if(results.errors){
@@ -28,36 +36,45 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         def total = (results.total)?results.total.intValue():0
-        def links = nextAndPreviousLinks("/${resourceName}/search", total)
-        Elements elements = new Elements(
-                    total: total,
-                    items: results.searchResults,
-                    previous: links.previous,
-                    next: links.next,
-                    offset: params.int('offset') ?: 0,
-                    page: params.int('max') ?: 10,
-                    itemType: resource.name
-            )
 
-        respond elements
+        Elements elements = new Elements(
+                base: "/${resourceName}/search",
+                total: total,
+                items: results.searchResults
+            )
+        respondWithReports elements
+    }
+
+    protected setSafeMax(Integer max) {
+        withFormat {
+            json {
+                params.max = Math.min(max ?: 10, 100)
+            }
+            xml {
+                params.max = Math.min(max ?: 10000, 10000)
+            }
+            xlsx {
+                params.max = Math.min(max ?: 10000, 10000)
+            }
+        }
+
     }
 
     @Override
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        setSafeMax(max)
         def total = countResources()
         def list = listAllResources(params)
-        def links = nextAndPreviousLinks("/${resourceName}/", total)
-        respond new Elements(
+
+        respondWithReports new Elements(
+                base: "/${resourceName}/",
                 total: total,
-                items: list,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0,
-                itemType: resource.name
+                items: list
         )
     }
+
+    protected getDefaultSort()  { null }
+    protected getDefaultOrder() { null }
 
 
     def validate() {
@@ -103,37 +120,30 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         render status: NO_CONTENT // NO CONTENT STATUS CODE
     }
 
-    protected Map<String, String> nextAndPreviousLinks(String baseLink, Integer total) {
-        def link = "${baseLink}?"
-        if (params.max) {
-            link += "max=${params.max}"
+
+    protected Map getParametersToBind() {
+        Map ret = params
+        if (response.format == 'json') {
+            ret = request.getJSON()
         }
-        if (params.sort) {
-            link += "&sort=${params.sort}"
+        ret
+    }
+
+
+
+
+    protected void respondWithReports(Class itemType = resource, ListWrapper listWrapper) {
+        def links = ListWrapper.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
+        listWrapper.previous    = links.previous
+        listWrapper.next        = links.next
+        listWrapper.offset      = params.int('offset') ?: 0
+        listWrapper.page        = params.int('max') ?: 0
+        listWrapper.sort        = params.sort ?: defaultSort
+        listWrapper.order       = params.order ?: defaultOrder
+        if (!listWrapper.itemType) {
+            listWrapper.itemType = itemType
         }
-        if (params.order) {
-            link += "&order=${params.order}"
-        }
-        if (params.search){
-            link +=  "&search=${params.search}"
-        }
-        def nextLink = ""
-        def previousLink = ""
-        if (params?.max && params.max < total) {
-            def offset = (params?.offset) ? params?.offset?.toInteger() : 0
-            def prev = offset - params?.max
-            def next = offset + params?.max
-            if (next < total) {
-                nextLink = "${link}&offset=${next}"
-            }
-            if (prev >= 0) {
-                previousLink = "${link}&offset=${prev}"
-            }
-        }
-        [
-                next: nextLink,
-                previous: previousLink
-        ]
+        respond xlsxListRenderer.fillListWithReports(listWrapper, webRequest)
     }
 
 }

@@ -9,6 +9,7 @@ class Model extends ExtendibleElement  {
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
+        modelCatalogueId boost:10
         name boost:5
         extensions component:true
         incomingRelationships component: true
@@ -22,31 +23,7 @@ class Model extends ExtendibleElement  {
     ]
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
     }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof Model)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        Model de = (Model) obj;
-        return new EqualsBuilder()
-                .append(name, de.name)
-                .append(versionNumber, de.versionNumber)
-                .append(extensions, de.extensions)
-                .isEquals()
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .append(versionNumber)
-                .append(extensions)
-                .toHashCode()
-    }
-
 
 }

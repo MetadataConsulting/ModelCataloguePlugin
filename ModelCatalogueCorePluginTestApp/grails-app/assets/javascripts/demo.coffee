@@ -5,21 +5,18 @@
 #= require modelcatalogue/core/index
 #= require modelcatalogue/core/ui/index
 #= require modelcatalogue/core/ui/bs/index
+#= require modelcatalogue/core/ui/states/index
 #= require modelcatalogue/core/ui/bs/elementViews/index
 
 angular.module('demo', [
   'demo.config'
   'mc.core.ui.bs'
+  'mc.core.ui.states'
   'ui.bootstrap'
 
-]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns)->
-  emptyList =
-    list: []
-    next: {size: 0}
-    previous: {size: 0}
-    total: 0
-    empty: true
-    source: 'demo'
+]).controller('demo.DemoCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', 'columns', '$rootScope', 'messages', 'enhance', (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, columns, $rootScope, messages, enhance)->
+  listEnhancer = enhance.getEnhancer('list')
+
 
 
   $scope.listResource     = """resource("dataElement").list()"""
@@ -27,7 +24,7 @@ angular.module('demo', [
   $scope.searchSomething  = """search("patient")"""
   $scope.searchModel      = """resource("model").search("patient")"""
   $scope.outgoing         = """resource("dataElement").list() >>> $r.list[0].outgoingRelationships()"""
-  $scope.indicator        = """resource("dataElement").search("NHS_NUMBER_STATUS_INDICATOR_CODE") >>> $r.list[0]"""
+  $scope.indicator        = """resource("conceptualDomain").search("NHIC") >>> $r.list[0]"""
 
   $scope.resource         = catalogueElementResource
   $scope.search           = modelCatalogueSearch
@@ -42,7 +39,7 @@ angular.module('demo', [
           $scope.list = result
           $scope.element = null
         if result?.elementType?
-          $scope.list = emptyList
+          $scope.list = listEnhancer.createSingletonList(result)
           $scope.element = result
         else
           $log.info "Instead of list or element got: ", result
@@ -62,7 +59,7 @@ angular.module('demo', [
           $scope.columns = columns(result.itemType)
           $scope.element = null
         if result?.elementType?
-          $scope.list = emptyList
+          $scope.list = listEnhancer.createSingletonList(result)
           $scope.element = result
         else
           $log.info "Instead of list got: ", result
@@ -71,17 +68,56 @@ angular.module('demo', [
   $scope.selection = []
 
   $scope.columns = columns()
+  $scope.list    = listEnhancer.createEmptyList()
 
-  $scope.removeColumn = (index) ->
-    return if $scope.columns.length <= 1
-    $scope.columns.splice(index, 1)
-
-  $scope.addColumn = (index, column = {header: 'ID', value: 'id', classes: 'col-md-2'}) ->
-    $scope.columns.splice(index + 1, 0, angular.copy(column))
-
+  $scope.actions = [
+    {type: 'primary', title: 'Test', icon: 'info-sign', action: (element) -> alert(element.name)}
+    #{title: 'Test 2', action: (element) -> alert(element.name)}
+  ]
 
   $scope.show()
 
+  # TODO: rewrite to states when finished
   $scope.$on 'showCatalogueElement', (event, element) ->
     $scope.element = element
+
+  $scope.$on 'treeviewElementSelected', (event, element) ->
+    $scope.selectedInTreeview = element
+
+  onDescendPathChange = (path) ->
+    if path.indexOf(',') > -1
+      $scope.descend = path.split(/\s*,\s*/)
+    else
+      $scope.descend = path
+
+  $scope.descendPath = 'includes, instantiates'
+  $scope.selectedInTreeview = null
+
+  $scope.$watch 'descendPath', onDescendPathChange
+  $scope.$watch 'selectedInTreeview', (selectedInTreeview) ->
+    $rootScope.$broadcast 'treeviewElementSelected', selectedInTreeview
+
+  $scope.messages       = messages
+  $scope.messageText    = 'Try me!'
+  $scope.messageType    = 'success'
+  $scope.messagesTypes  = ['info', 'success', 'warning', 'error']
+  $scope.addMessage     = (text, type) ->
+    messages[type](text)
+
+  $scope.showConfirm    = () ->
+    messages.confirm('Confirm Dialog', $scope.messageText).then (result) ->
+      if result
+        messages.success('Confirmed')
+      else
+        messages.error('Rejected')
+
+  $scope.showPrompt    = () ->
+    messages.prompt('Prompt Dialog', $scope.messageText).then (result) ->
+      messages.success('Returned: ' + result)
+    , () ->
+      messages.error('Rejected')
+
+
+
+  onDescendPathChange $scope.descendPath
 ])

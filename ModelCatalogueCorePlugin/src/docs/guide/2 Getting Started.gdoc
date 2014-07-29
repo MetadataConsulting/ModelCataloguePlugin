@@ -1,0 +1,25 @@
+h4. Installation
+
+To install the model catalogue core plugin include the following repositories and plugins in @BuildConfig.groovy@
+
+{code}
+
+repositories {
+        mavenRepo 'http://dl.bintray.com/modelcatalogue-core/ModelCatalogueCorePlugin/'
+            mavenRepo 'http://dl.bintray.com/modelcatalogue-core/ModelCatalogueElasticSearchPlugin/'
+}
+
+plugins{
+        compile "org.modelcatalogue.plugins:grails-model-catalogue-core-plugin:0.1"
+        compile "org.modelcatalogue.plugins:grails-model-catalogue-elastic-search-plugin:0.1"
+    }
+
+{code}
+
+h4. Requirements
+
+Grails 2.3.7<*
+
+h4. Sample usage
+
+There is a sample/minimal test webapp (under test/webapp) with some examples on how to use the plugin, see sources.

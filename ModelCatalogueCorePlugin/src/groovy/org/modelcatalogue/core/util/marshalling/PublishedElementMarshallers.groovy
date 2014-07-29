@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.XML
+import grails.util.GrailsNameUtils
 
 /**
  * Created by ladin on 14.02.14.
@@ -17,7 +18,9 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
         def ret = super.prepareJsonMap(el)
         ret.putAll(
                 versionNumber: el.versionNumber,
-                status: el.status.toString()
+                status: el.status.toString(),
+                modelCatalogueId: el.modelCatalogueId,
+                history: [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history"]
         )
         ret
     }
@@ -27,5 +30,6 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
         super.addXmlAttributes(el, xml)
         addXmlAttribute(el.versionNumber, "versionNumber", xml)
         addXmlAttribute(el.status, "status", xml)
+        addXmlAttribute(el.modelCatalogueId, "modelCatalogueId", xml)
     }
 }

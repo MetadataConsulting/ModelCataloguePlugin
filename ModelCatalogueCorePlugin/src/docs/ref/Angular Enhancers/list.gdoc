@@ -1,0 +1,38 @@
+h1. list
+
+@list@ enhancer turns @next@, @previous@ links to methods
+and also adds @goto(page)@ method to object structures
+which are considered to be pageable lists. These methods returns promises which are resolved
+again to objects enhanced by this enhancer.
+It provides all the functionality needed by
+[decorated-list|Angular Directives] directive. Enhancer itself provides @createEmptyList(\[itemType\])@
+to return empty list placeholder with all the expected properties set to sensible defaults.
+
+
+h2. Condition
+
+This enhancer is used if the object has own properties of name @next@ or @previous@.
+
+h2. Usage
+
+You usually get objects enhanced by this enhancer when accessing resource using [catalogueElementResource|Angular Services]
+or [modelCatalogueSearch|Angular Services].
+
+{code}
+angular
+.module('foo', ['mc.core.catalogueElementResource', 'mc.core.listEnhancer'])
+.factory('bar', function(catalogueElementResource, enhance) {
+    var valueDomains = catalogueElementResource('valueDomain')
+    valueDomains.list().then(function(list){
+        list.next().then(function(nextList) {
+            // do something with the next list
+        });
+        list.previous().then(function(previous) {
+            // do something with the previous list
+        });
+    });
+
+    var listEnhancer = enhance.getEnhancer('list');
+    var emptyDomainList = listEnhancer.createEmptyList('org.modelcatalogue.core.ValueDomain');
+});
+{code}

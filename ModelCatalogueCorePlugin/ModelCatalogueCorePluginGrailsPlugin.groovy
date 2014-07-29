@@ -1,12 +1,19 @@
+import grails.rest.render.RenderContext
+import grails.util.Environment
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
+import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.marshalling.*
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 
 class ModelCatalogueCorePluginGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.3.1"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.3 > *"
+    def grailsVersion = "2.3.7 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/index.gsp",
@@ -49,8 +56,9 @@ Model catalogue core plugin (metadata registry)
 
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
+        mergeConfig(application)
 
+        xlsxListRenderer(XLSXListRenderer)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
@@ -74,7 +82,6 @@ Model catalogue core plugin (metadata registry)
     }
 
     def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
         ctx.grailsApplication.domainClasses.each {
             if (CatalogueElement.isAssignableFrom(it.clazz)) {
                 CatalogueElementDynamicHelper.addShortcuts(it.clazz)
@@ -83,10 +90,38 @@ Model catalogue core plugin (metadata registry)
     }
 
     def doWithApplicationContext = { ctx ->
-        // TODO Implement post initialization spring config (optional)
         //register custom json Marshallers
         //ctx.domainModellerService.modelDomains()
         ctx.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
+
+        XLSXListRenderer xlsxListRenderer = ctx.getBean('xlsxListRenderer')
+
+        xlsxListRenderer.registerRowWriter {
+            headers 'ID', 'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null, 'index', 'search'] && CatalogueElement.isAssignableFrom(container.itemType)
+            } then { CatalogueElement element ->
+                [[element.id, element.name, element.description]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter {
+            headers 'Name', 'Source to Destination', 'Destination to Source'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null, 'index', 'search'] && RelationshipType.isAssignableFrom(container.itemType)
+            } then { RelationshipType type ->
+                [[type.name, type.sourceToDestination, type.destinationToSource]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter {
+            headers 'Type', 'Source', 'Destination'
+            when { container, context ->
+                container instanceof Relationships
+            } then { Relationship r ->
+                [[r.relationshipType, r.source.name, r.destination.name]]
+            }
+        }
 
     }
 
@@ -103,5 +138,13 @@ Model catalogue core plugin (metadata registry)
 
     def onShutdown = { event ->
         // TODO Implement code that is executed when the application shuts down (optional)
+    }
+
+    protected mergeConfig(application){
+        application.config.merge(loadConfig(application))
+    }
+
+    protected loadConfig(application){
+        new ConfigSlurper(Environment.current.name).parse(application.classLoader.loadClass("ModelCatalogueConfig"))
     }
 }

@@ -7,7 +7,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class DataTypeControllerIntegrationSpec extends CatalogueElementControllerIntegrationSpec {
+class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     def setupSpec(){
         totalCount = 24
@@ -113,7 +113,7 @@ class DataTypeControllerIntegrationSpec extends CatalogueElementControllerIntegr
     }
 
     @Override
-    CatalogueElementController getController() {
+    AbstractCatalogueElementController getController() {
         new DataTypeController()
     }
 
@@ -155,6 +155,15 @@ class DataTypeControllerIntegrationSpec extends CatalogueElementControllerIntegr
                     [5, 2, 10, 10, 12, "", "${baseLink}?max=10&offset=0"],
                     [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8"]
             ]
+    }
+
+    def getMappingPaginationParameters(baseLink){
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 2, 10, 0, 11, "${baseLink}?max=10&offset=10", ""],
+                [2, 2, 5, 0, 11, "${baseLink}?max=5&offset=5", ""],
+        ]
+
     }
 
 

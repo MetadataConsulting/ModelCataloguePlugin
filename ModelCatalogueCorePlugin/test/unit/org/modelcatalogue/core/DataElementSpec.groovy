@@ -31,7 +31,7 @@ import spock.lang.Unroll
 class DataElementSpec extends Specification {
 
     @Unroll
-    def "create a new data element from #args validates to #validates"() {
+    def "#no create a new data element from #args validates to #validates"() {
 
         expect:
 
@@ -41,23 +41,30 @@ class DataElementSpec extends Specification {
 
         DataElement dataElementInstance = new DataElement(args)
 
-        dataElementInstance.save()
+        dataElementInstance.save(flush: true)
+
 
         then:
-
+        dataElementInstance.id != null == validates
         !dataElementInstance.hasErrors() == validates
-        dataElementInstance.versionNumber == 0.1
+        dataElementInstance.versionNumber == 1
         DataElement.list().size() == size
+        if(modelCatalogueId) {
+            dataElementInstance.modelCatalogueId == modelCatalogueId
+        }else{
+            dataElementInstance.modelCatalogueId
+        }
 
 
         where:
 
-        validates | size | args
-        false     | 0    | [name: "x" * 256, description: "this is the the result description"]
-        false     | 0    | [name: "x", description: "x" * 2001]
-        false     | 0    | [name: "result1", description: "this is the the result description", code: "x" * 256]
-        true      | 1    | [name: "result1", description: "this is the the result description", code: "NHIC12341"]
-
+        no | validates | size | args | modelCatalogueId
+        1 | false     | 0    | [name: "x" * 256, description: "this is the the result description"] | null
+        2 | false     | 0    | [name: "x", description: "x" * 2001] | null
+        3 | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "x" * 256] | "x" * 256
+        4 | true      | 1    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"] | "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"
+        5 | true      | 1    | [name: "result2", description: "this is the the result description"] | null
+        6 | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_12asd33_3"] | "MC_12asd33_3"
     }
 
     @Unroll
@@ -86,28 +93,4 @@ class DataElementSpec extends Specification {
     }
 
 
-    def "check  EqualsAndHashCode works"() {
-
-        when:
-        def a = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
-        def b = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
-        def c = new DataElement(name: "test conceptasdsfdfsad", description: "test concept description", versionNumber: 0.1)
-        def d = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
-        def e = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.1)
-        def f = new DataElement(name: "test concept", description: "test concept description", code: "xxx", versionNumber: 0.2)
-        def ext = new ExtensionValue(name: "xxx", extensionValue: "x", element: d).save()
-        d.addToExtensions(ext)
-        e.addToExtensions(ext)
-        assert (!d.save().hasErrors())
-        assert (!e.save().hasErrors())
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-        !a.equals(d)
-        !a.equals(f)
-        d.equals(e)
-
-    }
 }

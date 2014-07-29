@@ -60,6 +60,8 @@ grails-app/assets/bower_components/*
 /grails-model-catalogue-core-plugin-0.0.1/**
 
 
+node_modules/
+
 
 
 

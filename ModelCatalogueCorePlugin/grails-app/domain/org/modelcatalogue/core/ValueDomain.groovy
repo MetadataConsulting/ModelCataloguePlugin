@@ -34,8 +34,6 @@ class ValueDomain extends CatalogueElement  {
         unitOfMeasure component:true
         incomingRelationships component: true
         outgoingRelationships component: true
-        incomingMappings component: true
-        outgoingMappings component: true
         except = ['includedIn', 'instantiates', 'regexDef']
     }
 
@@ -44,8 +42,6 @@ class ValueDomain extends CatalogueElement  {
 	MeasurementUnit unitOfMeasure
 	String rule
     static belongsTo = [dataType: DataType]
-    static hasMany  = [ outgoingMappings: Mapping,  incomingMappings: Mapping ]
-    static mappedBy = [ outgoingMappings: 'source', incomingMappings: 'destination']
     static transients = ['regexDef']
 
     static constraints = {
@@ -88,27 +84,5 @@ class ValueDomain extends CatalogueElement  {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
-//    public boolean equals(Object obj) {
-//        if (!(obj instanceof ValueDomain)) {
-//            return false;
-//        }
-//        if (this.is(obj)) {
-//            return true;
-//        }
-//        ValueDomain cd = (ValueDomain) obj;
-//        return new EqualsBuilder()
-//                .append(name, cd.name)
-//                .append(unitOfMeasure, cd.unitOfMeasure)
-//                .append(dataType, cd.dataType)
-//                .isEquals();
-//    }
-//
-//    public int hashCode() {
-//        return new HashCodeBuilder()
-//                .append(name)
-//                .append(unitOfMeasure)
-//                .append(dataType)
-//                .toHashCode();
-//    }
 
 }

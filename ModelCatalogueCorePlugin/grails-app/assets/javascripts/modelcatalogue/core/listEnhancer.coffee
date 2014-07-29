@@ -1,10 +1,26 @@
 angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot']).config ['enhanceProvider', (enhanceProvider)->
-  condition = (list) -> list.hasOwnProperty('next') or list.hasOwnProperty('previous')
-  factory   = ['$q', 'modelCatalogueApiRoot', 'rest', ($q, modelCatalogueApiRoot, rest) ->
-    listEnhancer = (list, enhance = @enhance) ->
+  condition = (list) -> list.hasOwnProperty('base')
+  factory   = ['$q', 'modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', ($q, modelCatalogueApiRoot, rest, $rootScope, enhance) ->
+    listEnhancer = (list) ->
       class ListDecorator
         constructor: (list) ->
           angular.extend(@, list)
+
+          self = @
+
+          $rootScope.$on 'catalogueElementDeleted', (event, element) ->
+            indexesToRemove = []
+            for item, i in self.list when item.id == element.id and item.elementType == element.elementType
+              indexesToRemove.push i
+
+            for index, i in indexesToRemove
+              self.list.splice index - i, 1
+              self.total--
+              self.size--
+
+            self.empty = self.size == 0
+
+
 
           if @next
             nextUrl = @next
@@ -54,30 +70,63 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
           @currentPage = Math.floor(@offset / @page) + 1
 
           @goto = (page) ->
-            return $q.when(@) if @total == 0
+            return $q.when(@) if @total == 0 or @total <= @page
             theOffset = (page - 1) * @page
             theLink   = "#{modelCatalogueApiRoot}#{@previous.url ? @next.url}"
 
             if theLink.indexOf('offset=') >= 0
               theLink = theLink.replace /offset=(\d+)/, () => "offset=#{theOffset}"
             else if theLink.indexOf('?') >= 0
-              theLink = "theLink&offset=#{theOffset}"
+              theLink = "#{theLink}&offset=#{theOffset}"
             else
-              theLink = "theLink?offset=#{theOffset}"
+              theLink = "#{theLink}?offset=#{theOffset}"
 
             enhance rest method: 'GET', url: theLink
 
+          @reload = (config = {}) ->
+            params = {
+              offset: @offset
+              max:    @page
+              sort:   @sort
+              order:  @order
+            }
 
-            # return new list decorator
+            angular.extend(params, config)
+
+            theLink = "#{modelCatalogueApiRoot}#{@base}"
+
+            enhance rest method: 'GET', url: theLink, params: params
+
+
+      # return new list decorator
       new ListDecorator(list)
 
-    listEnhancer.createEmptyList = (itemType = null) -> {
+    listEnhancer.createEmptyList = (itemType = null) -> listEnhancer {
       list: []
-      next: {size: 0}
-      previous: {size: 0}
+      size: 0
+      next: ''
+      previous: ''
       total: 0
       empty: true
-      source: 'catalogue-element-view'
+      itemType: itemType
+
+    }
+
+    listEnhancer.createSingletonList = (item) -> listEnhancer {
+      list: [item]
+      size: 1
+      next: ''
+      previous: ''
+      total: 1
+      itemType: item?.elementType
+    }
+
+    listEnhancer.createArrayList = (array, itemType = null) -> listEnhancer {
+      list: array
+      size: array.length
+      next: ''
+      previous: ''
+      total: array.length
       itemType: itemType
     }
 

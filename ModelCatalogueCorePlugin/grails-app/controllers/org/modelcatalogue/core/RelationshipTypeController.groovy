@@ -3,6 +3,9 @@ package org.modelcatalogue.core
 import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
+import org.modelcatalogue.core.util.CatalogueElementFinder
+
+import javax.servlet.http.HttpServletResponse
 
 import static org.springframework.http.HttpStatus.OK
 
@@ -10,6 +13,18 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
 
     RelationshipTypeController() {
         super(RelationshipType)
+    }
+
+    def elementClasses() {
+        respond CatalogueElementFinder.catalogueElementClasses
+    }
+
+    protected List<RelationshipType> listAllResources(Map params) {
+        resource.findAllBySystem(false, params)
+    }
+
+    protected Integer countResources() {
+        resource.countBySystem(false)
     }
 
     @Override
@@ -25,12 +40,13 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
 
         def xml = request.getXML()
         if(xml){
-            def src = (xml?.sourceClass.toString())?this.class.classLoader.loadClass(xml.sourceClass.toString()):null
-            def dest = (xml?.destinationClass.toString())?this.class.classLoader.loadClass(xml.destinationClass.toString()):null
-            def instance = new RelationshipType(name: xml?.name.toString(), sourceClass: src, destinationClass: dest, sourceToDestination: xml?.sourceToDestination.toString(), destinationToSource: xml?.destinationToSource.toString())
+            def src = (xml?.sourceClass?.toString())?this.class.classLoader.loadClass(xml.sourceClass.toString()):null
+            def dest = (xml?.destinationClass?.toString())?this.class.classLoader.loadClass(xml.destinationClass.toString()):null
+            def instance = new RelationshipType(name: xml?.name?.toString(), sourceClass: src, destinationClass: dest, sourceToDestination: xml?.sourceToDestination?.toString(), destinationToSource: xml?.destinationToSource?.toString())
             return instance
         }
-
+        response.status = HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE
+        return null
     }
 
     /**
@@ -53,19 +69,19 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
         if(request.format == "json"){
             def json = request.getJSON()
             Map props = json
-            def src = json?.sourceClass.toString()
+            def src = json?.sourceClass?.toString()
             if(src){
                 try{
                     props.sourceClass = this.class.classLoader.loadClass(src)
-                }catch(ClassNotFoundException e){
+                }catch(ClassNotFoundException ignored){
                     instance.errors.rejectValue("sourceClass", "org.modelcatalogue.core.RelationshipType.sourceClass.domainNotFound")
                 }
             }
-            def dest = json?.destinationClass.toString()
+            def dest = json?.destinationClass?.toString()
             if(dest){
                 try{
                     props.destinationClass = this.class.classLoader.loadClass(dest)
-                }catch(ClassNotFoundException e){
+                }catch(ClassNotFoundException ignored){
                     instance.errors.rejectValue("destinationClass", "org.modelcatalogue.core.RelationshipType.destinationClass.domainNotFound")
                 }
             }
@@ -83,7 +99,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
             if(src){
                 try{
                     props.sourceClass = this.class.classLoader.loadClass(src)
-                }catch(ClassNotFoundException e){
+                }catch(ClassNotFoundException ignored){
                     instance.errors.rejectValue("sourceClass", "org.modelcatalogue.core.RelationshipType.sourceClass.domainNotFound")
                 }
             }
@@ -91,7 +107,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
             if(dest){
                 try{
                     props.destinationClass = this.class.classLoader.loadClass(dest)
-                }catch(ClassNotFoundException e){
+                }catch(ClassNotFoundException ignored){
                     instance.errors.rejectValue("destinationClass", "org.modelcatalogue.core.RelationshipType.destinationClass.domainNotFound")
                 }
             }
@@ -115,7 +131,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
                 response.addHeader(HttpHeaders.LOCATION,
                         g.createLink(
                                 resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
-                                namespace: hasProperty('namespace') ? this.namespace : null ))
+                                namespace: hasProperty('namespace') ? this.namespace : null ).toString())
                 respond instance, [status: OK]
             }
         }

@@ -1,0 +1,32 @@
+h1. relationship service
+
+You can specify relationships, by [relationshipType|DomainClasses] between catalogue elements using the relationship service link and unlink methods.
+
+Usage:
+
+@.link@
+add relationship between catalogue elements with a relationship type
+
+{code}
+def relationshipService
+
+RelationshipType synonymity = RelationshipType.findByName("synonymity")
+DataElement speed = DataElement.findByName("speed")
+DataElement groundSpeed = DataElement.findByName("ground speed")
+
+relationshipService.link(bloodFlow, bloodFlowD, relationshipType)
+{code}
+
+
+@.unlink@
+remove a relationship between catalogue elements given a relationship type
+
+{code}
+def relationshipService
+
+RelationshipType synonymity = RelationshipType.findByName("synonymity")
+DataElement speed = DataElement.findByName("speed")
+DataElement groundSpeed = DataElement.findByName("ground speed")
+
+relationshipService.unlink(speed, groundSpeed, relationshipType)
+{code}

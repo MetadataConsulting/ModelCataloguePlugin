@@ -146,11 +146,61 @@ describe "mc.core.listEnhancer", ->
     expect(gotoResult.list).toBeDefined()
     expect(gotoResult.list.length).toBe(2)
 
+
+    $httpBackend
+    .when("GET", "#{modelCatalogueApiRoot}/valueDomain/?max=10&offset=10&order=asc&sort=name")
+    .respond(nextList)
+
+    reloadResult = null
+    error  = null
+    gotoResult.reload(sort: 'name', order: 'asc').then( (_result_) ->
+      reloadResult = _result_
+    , (_error_) ->
+      error = _error_
+    )
+
+    expect(reloadResult).toBeNull()
+
+    $httpBackend.flush()
+
+    expect(reloadResult).toBeDefined()
+    expect(reloadResult.total).toBe(12)
+    expect(reloadResult.page).toBe(10)
+    expect(reloadResult.size).toBe(2)
+    expect(reloadResult.offset).toBe(10)
+    expect(reloadResult.currentPage).toBe(2)
+    expect(reloadResult.list).toBeDefined()
+    expect(reloadResult.list.length).toBe(2)
+
+
+
     listEnhancer = enhance.getEnhancer('list')
+
     emptyList = listEnhancer.createEmptyList('relationships')
     expect(emptyList.total).toBe(0)
+    expect(emptyList.size).toBe(0)
     expect(emptyList.list).toEqual([])
-    expect(emptyList.next).toEqual(size: 0)
-    expect(emptyList.previous).toEqual(size: 0)
+    expect(emptyList.next.size).toBe(0)
+    expect(emptyList.previous.size).toBe(0)
     expect(emptyList.empty).toBeTruthy()
     expect(emptyList.itemType).toBe('relationships')
+
+    singleItem    = {foo: 'bar', elementType: 'the.type'}
+    singletonList = listEnhancer.createSingletonList(singleItem)
+    expect(singletonList.total).toBe(1)
+    expect(singletonList.size).toBe(1)
+    expect(singletonList.list).toEqual([singleItem])
+    expect(singletonList.next.size).toBe(0)
+    expect(singletonList.previous.size).toBe(0)
+    expect(singletonList.itemType).toBe('the.type')
+
+    theList     = [{one: 'one'}, {two: 2}, {3: 'three'}]
+    wrappedList = listEnhancer.createArrayList(theList, 'the.list.type')
+    expect(wrappedList.total).toBe(3)
+    expect(wrappedList.size).toBe(3)
+    expect(wrappedList.list).toEqual(theList)
+    expect(wrappedList.next.size).toBe(0)
+    expect(wrappedList.previous.size).toBe(0)
+    expect(wrappedList.itemType).toBe('the.list.type')
+
+

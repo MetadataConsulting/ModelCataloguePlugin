@@ -1,10 +1,10 @@
-angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRoot', 'mc.util.rest', 'mc.util.enhance']).provider 'catalogueElementResource', [ ->
+angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRoot', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names']).provider 'catalogueElementResource', [ ->
   # Method for instantiating
-  @$get = ['modelCatalogueApiRoot', 'rest', 'enhance', (modelCatalogueApiRoot, rest, enhance) ->
+  @$get = ['$rootScope', 'modelCatalogueApiRoot', 'rest', 'enhance', 'names', ($rootScope, modelCatalogueApiRoot, rest, enhance, names) ->
     class CatalogueElementResource
       constructor: (pathName) ->
         throw "Resource pathname must be defined" if not pathName?
-        @pathName = pathName
+        @pathName = names.getPropertyNameFromType(pathName)
 
       getIndexPath: () ->
         "#{modelCatalogueApiRoot}/#{@pathName}"
@@ -13,17 +13,22 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
         enhance rest method: 'GET', url: "#{@getIndexPath()}/#{id}"
 
       delete: (id) ->
-        enhance rest method: 'DELETE', url: "#{@getIndexPath()}/#{id}"
+        thePathName = @pathName
+        enhance(rest(method: 'DELETE', url: "#{@getIndexPath()}/#{id}")).then (result)->
+          $rootScope.$broadcast 'catalogueElementDeleted', {link: "/#{thePathName}/#{id}"}
+          result
 
       save: (data) ->
-        enhance rest method: 'POST', url: "#{@getIndexPath()}", data: data
+        enhance(rest(method: 'POST', url: "#{@getIndexPath()}", data: data)).then (result)->
+          $rootScope.$broadcast 'catalogueElementCreated', result
+          result
 
       update: (data) ->
         if !data.id?
           throw "Missing ID, use save instead"
         props = angular.copy(data)
         delete props.id
-        enhance rest method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props
+        enhance rest method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, params: {format: 'json'}
 
       validate: (data) ->
         enhance rest method: 'POST', url: "#{@getIndexPath()}/validate", data: data

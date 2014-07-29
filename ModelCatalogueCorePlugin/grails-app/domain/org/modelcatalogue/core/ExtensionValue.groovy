@@ -1,9 +1,6 @@
 package org.modelcatalogue.core
 
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
-class ExtensionValue extends CatalogueElement {
+class ExtensionValue implements Extension {
 
     /* the name property from catalogue element is a key for the extension */
 
@@ -11,43 +8,23 @@ class ExtensionValue extends CatalogueElement {
 
     static searchable = {
         name boost:5
-        incomingRelationships component: true
-        outgoingRelationships component: true
         except = ['element']
     }
 
+    String name
     String extensionValue
 
     static belongsTo = [element: ExtendibleElement]
 
     static constraints = {
+        name size: 1..255
         extensionValue maxSize: 1000, nullable: true
     }
 
 
     @Override
     public String toString() {
-        return "extension for ${element} (${name}=${extensionValue})";
-    }
-
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof ExtensionValue)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        ExtensionValue ce = (ExtensionValue) obj;
-        return new EqualsBuilder()
-                .append(name, ce.name)
-                .isEquals();
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .toHashCode();
+        return "extension for ${element} (${name}=${extensionValue})"
     }
 
 

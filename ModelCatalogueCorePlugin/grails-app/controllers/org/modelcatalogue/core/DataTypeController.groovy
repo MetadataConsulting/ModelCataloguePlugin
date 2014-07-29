@@ -2,19 +2,19 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ValueDomains
 
-class DataTypeController<T> extends CatalogueElementController<DataType> {
+class DataTypeController<T> extends AbstractCatalogueElementController<DataType> {
 
     DataTypeController() {
         super(DataType)
     }
 
-    DataTypeController(Class<T> resource) {
+    DataTypeController(Class<? extends DataType> resource) {
         super(resource)
     }
 
 
     def valueDomains(Integer max){
-        params.max = Math.min(max ?: 10, 100)
+        setSafeMax(max)
         DataType dataType = queryForResource(params.id)
         if (!dataType) {
             notFound()
@@ -23,20 +23,16 @@ class DataTypeController<T> extends CatalogueElementController<DataType> {
 
         int total = dataType.relatedValueDomains.size()
         def list = sortOffsetMaxMinList(dataType.relatedValueDomains, params)
-        def links = nextAndPreviousLinks("/${resourceName}/${params.id}/valueDomain", total)
 
-        respond new ValueDomains(
+        respondWithReports new ValueDomains(
+                base: "/${resourceName}/${params.id}/valueDomain",
                 items: list,
-                previous: links.previous,
-                next: links.next,
-                total: total,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 0
+                total: total
         )
     }
 
 
-    protected List<ValueDomain> sortOffsetMaxMinList(Collection<ValueDomain> valueDomains, Map params){
+    protected static List<ValueDomain> sortOffsetMaxMinList(Collection<ValueDomain> valueDomains, Map params){
 
         valueDomains = valueDomains.toList()
 

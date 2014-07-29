@@ -45,7 +45,7 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
 
     # dependency aware initialization
     for enhancer in enhancers
-      enhancer.enhancer = $injector.invoke(enhancer.factory)
+      enhancer.enhancer = $injector.invoke(enhancer.factory, undefined, {enhance: enhance})
       enhancer.enhance  = enhance
 
     ###

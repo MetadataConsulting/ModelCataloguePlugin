@@ -1,0 +1,27 @@
+h1. messages-panel
+
+Element directive for rendering messages stored by [messages|Angular Services] service. Default template defined in
+module @mc.core.ui.bs.messagesPanel@ renders the messages using Bootstrap alerts.
+You can supply @max@ attribute to constraint the maximum number of messages shown (defaults to 5).
+
+h2. Usage
+See [messages|Angular Services] to find out how to create new messages.
+
+Place following snippet in the place where you want to render the messages:
+{code}
+<messages-panel max="3"></messages-panel>
+{code}
+
+
+h2. Customization
+You can override the @modelcatalogue/core/ui/messagesPanel.html@ template to plug your own either using
+@text/ng-template@ script definition, creating the template on the appropriate location in your server
+or using the [$templateCache|http://docs.angularjs.org/api/ng/service/$templateCache].
+
+Following variables and methods are added by the directive controller:
+
+{table}
+Name          | Description
+getMessages() | Array of messages to be shown, each containing @body@, @type@ and optional @title@ properties as well as method @remove()@ to discard the message
+{table}
+

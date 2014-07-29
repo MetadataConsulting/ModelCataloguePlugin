@@ -1,13 +1,13 @@
-h1. Metadata Registry Plugin
+h1. Model Catalogue Core Plugin
 
 h2. Introduction
 
-This plugin makes it possible to use an MDR based on [ISO11179|http://metadata-standards.org/11179] in a Grails webapp.
-
+This plugin implements a metadata registry based on [ISO11179|http://metadata-standards.org/11179].
 This plugin is a component in an enterprise toolkit that can be used with a variety of persistent storage mechanisms and user interfaces to ensure data conformity to data standards.
-
-
 
 h4. License
 
 Licensed under the terms of the [MIT Licence, |http://opensource.org/licenses/MIT]
+
+
+

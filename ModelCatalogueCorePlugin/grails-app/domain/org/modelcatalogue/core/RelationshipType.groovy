@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class RelationshipType {
@@ -13,11 +11,14 @@ class RelationshipType {
         name boost: 5
         sourceClass converter: RelationshipTypeClassConverter
         destinationClass converter: RelationshipTypeClassConverter
-        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions']
+        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions', 'ext']
     }
 
     //name of the relationship type i.e. parentChild  or synonym
     String name
+
+    // system relationship types are not returned from the controller
+    Boolean system = false
 
     //the both sides of the relationship ie. for parentChild this would be parent (for synonym this is synonym, so the same on both sides)
     String sourceToDestination
@@ -31,13 +32,16 @@ class RelationshipType {
     // you can constrain the relationship type
     Class destinationClass
 
+    // comma separated list of metadata hints
+    String metadataHints
+
     /**
      * This is a script which will be evaluated with following binding:
      * source
      * destination
      * type
      *
-     * Type stands for current type evaluated
+     * Type stands for current type evaluated.
      *
      * For the beginning there are no constraints for the scripts so use them carefully.
      *
@@ -55,33 +59,54 @@ class RelationshipType {
         destinationToSource maxSize: 255
         sourceClass validator: classValidator
         destinationClass validator: classValidator
-        rule nullable: true, maxSize: 1000
+        metadataHints nullable: true, maxSize: 10000
+        rule nullable: true, maxSize: 10000
     }
 
 
     static mapping = {
         // this makes entities immutable
         // cache usage: 'read-only'
+        sort "name"
     }
 
-    boolean validateSourceDestination(CatalogueElement source, CatalogueElement destination) {
+    String validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
 
         if (!sourceClass.isInstance(source)) {
-            return false
+            return 'source.not.instance.of'
         }
 
         if (!destinationClass.isInstance(destination)) {
-            return false
+            return 'destination.not.instance.of'
         }
 
-        if (rule && rule.trim() && !validateRule(source, destination)) {
-            return false
+        if (rule && rule.trim()) {
+            def result = validateRule(source, destination, ext)
+            if (result instanceof CharSequence) {
+                return result
+            }
+            if (result instanceof Boolean && !result) {
+                return 'rule.did.not.pass'
+            }
+
+            if ((result instanceof Boolean && result) || result == null) {
+                return null
+            }
+
+            if (result instanceof Throwable) {
+                log.info("Rule thrown an exception. This is slightly discouraged!", result)
+                return result.message
+            }
+
+            if (result) {
+                log.warn("Rule returned value which is not String or Boolean, this is very likely a bug. Result: $result")
+            }
         }
 
-        return true
+        return null
     }
 
-    boolean validateRule(CatalogueElement source, CatalogueElement destination) {
+    def validateRule(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
         if (!rule || !rule.trim()) {
             return true
         }
@@ -89,29 +114,11 @@ class RelationshipType {
         new SecuredRuleExecutor(
                 source: source,
                 destination: destination,
-                type: this
+                type: this,
+                ext: ext
         ).execute(rule)
     }
 
-
-    static defaultRelationshipTypesDefinitions = [
-            [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement],
-            [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
-            [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
-            [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
-            [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
-            [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class"]
-
-    ]
-
-    static initDefaultRelationshipTypes() {
-        for (definition in defaultRelationshipTypesDefinitions) {
-            RelationshipType existing = findByName(definition.name)
-            if (!existing) {
-                new RelationshipType(definition).save()
-            }
-        }
-    }
 
     static getContainmentType() {
         readByName("containment")
@@ -144,26 +151,6 @@ class RelationshipType {
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
-
-    public boolean equals(Object obj) {
-        if (!(obj instanceof RelationshipType)) {
-            return false;
-        }
-        if (this.is(obj)) {
-            return true;
-        }
-        RelationshipType de = (RelationshipType) obj;
-        return new EqualsBuilder()
-                .append(name, de.name)
-                .isEquals()
-    }
-
-    public int hashCode() {
-        return new HashCodeBuilder()
-                .append(name)
-                .toHashCode()
-    }
-
 
     Map<String, Object> getInfo() {
         [

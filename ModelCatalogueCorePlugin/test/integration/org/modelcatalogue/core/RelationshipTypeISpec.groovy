@@ -20,10 +20,7 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     }
 
-    def cleanupSpec() {
-
-    }
-
+    //TODO: should we make some relationship types read-only and some editable
 //    def "read by name returns read only instance"() {
 //
 //        RelationshipType containment = RelationshipType.readByName("containment")
@@ -60,8 +57,8 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         model.removeFromContains(element)
 
         then:
-        !model.contains
-        !element.containedIn
+        !model.contains.contains(element)
+        !element.containedIn.contains(model)
 
         when:
         element.addToContainedIn(model)

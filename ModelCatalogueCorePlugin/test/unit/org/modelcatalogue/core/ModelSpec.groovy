@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -19,26 +18,33 @@ class ModelSpec extends Specification {
     def "Model creation for #args results in #validates"() {
 
         expect:
-
         Model.list().isEmpty()
 
         when:
-
         Model modelInstance = new Model(args)
-
         modelInstance.save()
 
         then:
-
         !modelInstance.hasErrors() == validates
+        modelInstance.versionNumber == 1
+        modelInstance.list().size() == size
+        if(modelCatalogueId) {
+            modelInstance.modelCatalogueId == modelCatalogueId
+        }else{
+            modelInstance.modelCatalogueId
+        }
+
+
 
         where:
 
-        validates | args
-        false     | [name: "", description: "test model description"]
-        false     | [name: "t" * 256, description: "test model description"]
-        false     | [name: "test model", description: "t" * 2001]
-        true      | [name: "test model", description: "test model description"]
+        no | validates | size | args | modelCatalogueId
+        1 | false      | 0    | [name: "", description: "test model description"] | null
+        2 | false      | 0    | [name: "t" * 256, description: "test model description"] | null
+        3 | false      | 0    | [name: "test model", description: "t" * 2001] | null
+        4 | false      | 0    | [name: "test model", description: "test model description", modelCatalogueId: "MC_12asd_3"] | "MC_12asd_3"
+        5 | true       | 1    | [name: "test model", description: "test model description"] | null
+        6 | true       | 1    | [name: "test model2", description: "test model description", modelCatalogueId: "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"] | "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"
 
     }
 
@@ -72,43 +78,17 @@ class ModelSpec extends Specification {
     def "Get link info"() {
 
 
-        Model modelInstance = new Model(name: "result1", description: "this is the the result description").save()
+        Model modelInstance = new Model(name: "result1", description: "this is the the result description").save(flush: true)
 
         expect:
         modelInstance
+        modelInstance.id
 
         modelInstance.info
         modelInstance.info.name == modelInstance.name
         modelInstance.info.id == modelInstance.id
         modelInstance.info.link == "/model/${modelInstance.id}"
     }
-
-
-    def "check  EqualsAndHashCode works"() {
-
-        when:
-        def a = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
-        def b = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
-        def c = new Model(name: "test conceptasdsfdfsad", description: "test concept description", versionNumber: 0.1)
-        def d = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
-        def e = new Model(name: "test concept", description: "test concept description", versionNumber: 0.1)
-        def f = new Model(name: "test concept", description: "test concept description", versionNumber: 0.2)
-        def ext = new ExtensionValue(name: "xxx", extensionValue: "x", element: d).save()
-        d.addToExtensions(ext)
-        e.addToExtensions(ext)
-        assert (!d.save().hasErrors())
-        assert (!e.save().hasErrors())
-
-        then:
-        a.equals(b)
-        b.equals(a)
-        !a.equals(c)
-        !a.equals(d)
-        !a.equals(f)
-        d.equals(e)
-
-    }
-
 
 }
 
