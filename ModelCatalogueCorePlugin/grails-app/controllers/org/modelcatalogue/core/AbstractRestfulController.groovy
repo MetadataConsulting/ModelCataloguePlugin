@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import grails.converters.XML
 import grails.rest.RestfulController
 import grails.transaction.Transactional
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
