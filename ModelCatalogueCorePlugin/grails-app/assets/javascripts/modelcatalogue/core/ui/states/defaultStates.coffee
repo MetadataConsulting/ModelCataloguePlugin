@@ -107,7 +107,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ShowCtrl'
   }
 
-  $stateProvider.state 'mc.resource.show.property', {url: '/:property?page'}
+  $stateProvider.state 'mc.resource.show.property', {url: '/:property?page&sort&order&max&q'}
 
   $stateProvider.state('mc.search', {
       url: "/search/{q}",

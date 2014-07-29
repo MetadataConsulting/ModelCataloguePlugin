@@ -31,6 +31,7 @@ abstract class PublishedElement extends ExtendibleElement  {
 //            }
 //            return true
 //         }
+        versionNumber bindable: false
     }
 
     static relationships = [

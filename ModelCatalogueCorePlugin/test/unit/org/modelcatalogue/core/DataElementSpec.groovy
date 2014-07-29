@@ -40,7 +40,7 @@ class DataElementSpec extends Specification {
         when:
 
         DataElement dataElementInstance = new DataElement(args)
-
+        dataElementInstance.modelCatalogueId = args.modelCatalogueId
         dataElementInstance.save(flush: true)
 
 

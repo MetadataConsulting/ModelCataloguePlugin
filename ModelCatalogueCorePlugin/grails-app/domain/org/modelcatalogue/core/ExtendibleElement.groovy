@@ -19,6 +19,10 @@ abstract class ExtendibleElement extends CatalogueElement implements Extendible 
     static hasMany = [extensions: ExtensionValue]
     static transients = ['ext']
 
+    static mapping = {
+        extensions lazy: false
+    }
+
     Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {

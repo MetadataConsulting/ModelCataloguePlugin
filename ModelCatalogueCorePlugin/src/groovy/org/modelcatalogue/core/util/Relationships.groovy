@@ -6,11 +6,13 @@ import org.modelcatalogue.core.Relationship
 /**
  * Wrapper used for easier marshalling of relations result lists
  */
-class Relationships extends ListWrapper<Relationship> {
+class Relationships implements ListWrapper<Relationship>, HasListWrapper<Relationship> {
+
     CatalogueElement owner
     RelationshipDirection direction
 
-    Relationships() {
-        itemType = Relationship
-    }
+    @Delegate ListWrapper<Relationship> list
+
+    Class<Relationship> getItemType() { Relationship }
+
 }

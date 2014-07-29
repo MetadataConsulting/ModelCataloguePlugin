@@ -1,31 +1,21 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
+
 //import org.hibernate.Criteria
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.ExtendibleElement
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListAndCount
-
+import org.modelcatalogue.core.util.ListWithTotal
 
 class DataArchitectService {
 
     static transactional = false
     def modelCatalogueSearchService, publishedElementService, relationshipService
 
-    def uninstantiatedDataElements(Map params){
-        ListAndCount results = new ListAndCount()
+    ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
+        ListWithTotal<DataElement> results = new ListAndCount()
         def uninstantiatedDataElements, totalCount
         def instantiation = RelationshipType.findByName("instantiation")
         def searchParams = getParams(params)
@@ -53,7 +43,7 @@ class DataArchitectService {
         return results
     }
 
-    def metadataKeyCheck(Map params){
+    ListWithTotal<DataElement> metadataKeyCheck(Map params){
 
         def missingMetadataKey, totalCount
         ListAndCount results = new ListAndCount()
@@ -83,7 +73,7 @@ class DataArchitectService {
     }
 
     @Transactional
-    def findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
+    ListWithTotal<DataElement> findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
         ListAndCount results = new ListAndCount()
         def searchParams = getParams(params)
@@ -118,7 +108,6 @@ class DataArchitectService {
 
     @Transactional
     def actionRelationshipList(ArrayList<Relationship> list){
-        def errorMessages = []
         list.each { relationship ->
             relationship.save()
         }

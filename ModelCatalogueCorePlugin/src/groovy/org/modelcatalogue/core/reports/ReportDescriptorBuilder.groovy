@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.reports
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import org.modelcatalogue.core.reports.ReportDescriptor.RenderType
 import org.modelcatalogue.core.util.ListWrapper
 
 /**
@@ -12,8 +13,13 @@ class ReportDescriptorBuilder {
 
 
     ReportDescriptorBuilder title(String title) {
-        descriptor.title = title ; this
+        descriptor.title = { title }  ; this
     }
+
+    ReportDescriptorBuilder title(Closure title) {
+        descriptor.title = title  ; this
+    }
+
 
     ReportDescriptorBuilder type(Class type) {
         descriptor.conditions << { type.isAssignableFrom(it.class)} ; this
@@ -52,7 +58,15 @@ class ReportDescriptorBuilder {
     ReportDescriptor build(LinkGenerator generator) {
         if (!descriptor.title) throw new IllegalStateException("The descriptor is missing it's title")
         if (!descriptor.linkParams) throw new IllegalStateException("The descriptor is missing it's link parameters")
+
         descriptor.generator = generator
         descriptor
     }
+
+    ReportDescriptorBuilder creates(RenderType type) {
+        descriptor.renderType = type ; this
+    }
+
+    static RenderType getAsset() { RenderType.ASSET }
+    static RenderType getLink()  { RenderType.LINK  }
 }

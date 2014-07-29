@@ -8,6 +8,7 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.SimpleListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import spock.lang.Stepwise
 
@@ -31,12 +32,14 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
         }
 
         registry.register {
+            creates link
             title 'BLAH'
             type DataElement
             link controller: 'data', action: 'index', params: [format: 'xslt'], id: true
         }
 
         registry.register {
+            creates asset
             title 'WRAPPER'
             item Model
             link controller: 'foo', action: 'bar', params: [format: 'xml']
@@ -46,9 +49,8 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
         expect:
         modelReports.size()                 >= 1
-        modelReports[0].title               == 'Export All to XML'
-//        modelReports[0].getLink(model)      == '/api/modelCatalogue/core/dataArchitect/getSubModelElements/1?format=xml'
-        modelReports[0].getLink(model)      == '/api/modelCatalogue/core/dataArchitect/getSubModelElements?format=xml&id=1'
+        modelReports[0].getTitle(model)     == 'Export All Elements of Test to XML'
+        modelReports[0].getLink(model)      == '/api/modelCatalogue/core/dataArchitect/getSubModelElements?format=xml&asset=true&name=Export+All+Elements+of+Test+to+XML&id=1'
 
         when:
         def models = new Elements(itemType: Model)
@@ -56,8 +58,8 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
         then:
         wrapperReports.size()               >= 2
-        wrapperReports[1].title             == 'WRAPPER'
-        wrapperReports[1].getLink(models)   == '/foo/bar?format=xml'
+        wrapperReports[1].getTitle(models)  == 'WRAPPER'
+        wrapperReports[1].getLink(models)   == '/foo/bar?format=xml&asset=true&name=WRAPPER'
 
     }
 
@@ -80,8 +82,9 @@ class ReportsRegistryIntegrationSpec extends IntegrationSpec {
 
         expect:
         relationshipsReports.size()                           >= 2
-        relationshipsReports[1].title                         == 'Export Relationships TEST'
-        relationshipsReports[1].getLink(new Relationships())  == '?format=xlsx&report='
+        relationshipsReports[1].getTitle(new Relationships()) == 'Export Relationships TEST'
+        relationshipsReports[1].renderType                    == ReportDescriptor.RenderType.ASSET
+        relationshipsReports[1].getLink(new Relationships(list: new SimpleListWrapper<Relationship>(itemType: Relationship)))  == '?format=xlsx&report=&asset=true&name=Export+Relationships+TEST'
 
 
 

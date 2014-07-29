@@ -15,11 +15,11 @@
     %{--</div>--}%
     %{--</script>--}%
 
-    <asset:stylesheet href="metadataCurator.css"/>
-    <asset:javascript src="metadataCurator.js"/>
+    <asset:stylesheet href="metaDataCurator.css"/>
+    <asset:javascript src="metaDataCurator.js"/>
     <script type="text/javascript">
         var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security'])
-        demoConfig.config(function (securityProvider) {
+        demoConfig.config(['securityProvider', function (securityProvider) {
             securityProvider.springSecurity({
                 contextPath: '${request.contextPath ?: ''}',
                 roles: {
@@ -29,12 +29,12 @@
                 },
                 <sec:ifLoggedIn>
                 currentUser: {
-                    roles: ${org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
+                    roles: ${grails.plugin.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
                     username: '${sec.username()}'
                 }
                 </sec:ifLoggedIn>
             })
-        })
+        }])
         demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
     </script>
 
@@ -117,8 +117,9 @@
                     <button class="btn btn-success" type="submit"><i class="glyphicon glyphicon-log-in"></i></button>
                 </form>
 
-                <form class="navbar-form navbar-right navbar-input-group" role="search" autocomplete="off"
+                <form class="navbar-form navbar-right navbar-input-group search-form" role="search" autocomplete="off"
                       ng-submit="search()" ng-controller="metadataCurator.searchCtrl">
+                    <a ng-click="clearSelection()" ng-class="{'invisible': !$stateParams.q}" class="clear-selection btn btn-link"><span class="glyphicon glyphicon-remove"></span></a>
                     <div class="form-group">
                         <input
                                ng-model="searchSelect"
@@ -131,6 +132,7 @@
                                typeahead-template-url="modelcatalogue/core/ui/omnisearchItem.html"
                                typeahead-wait-ms="300"
                                class="form-control"
+                               ng-class="{'expanded': searchSelect}"
                         >
                     </div>
                     <button class="btn btn-default" ng-click="select(searchSelect)"><i class="glyphicon glyphicon-search"></i></button>

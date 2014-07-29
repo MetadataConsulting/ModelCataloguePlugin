@@ -26,10 +26,11 @@ metadataCurator = angular.module('metadataCurator', [
   'ngAnimate'
 ])
 
-metadataCurator.config ($stateProvider, $urlRouterProvider)->
+metadataCurator.config ['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider)->
   $urlRouterProvider.otherwise("/catalogue/model/all")
+]
 
-metadataCurator.run ($templateCache) ->
+metadataCurator.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
   <a>
       <span class="glyphicon omnisearch-icon" ng-class="'glyphicon-' + match.model.icon"></span>
@@ -37,10 +38,11 @@ metadataCurator.run ($templateCache) ->
       <span ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
   </a>
 '''
+]
 
 metadataCurator.controller('metadataCurator.searchCtrl',
-  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$log', '$q', '$state', 'names'
-    (catalogueElementResource, modelCatalogueSearch, $scope, $log, $q, $state, names)->
+  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$log', '$q', '$state', 'names'
+    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $log, $q, $state, names)->
       actions = []
 
       $scope.search = (item, model, label) ->
@@ -48,6 +50,11 @@ metadataCurator.controller('metadataCurator.searchCtrl',
           $state.go('mc.search', {q: model })
         else
           item?.action item, model, label
+
+      $scope.clearSelection = ->
+        $state.searchSelect = undefined
+        $rootScope.$stateParams.q = undefined
+        $state.go('.', {q: undefined })
 
       initActions = ->
         actions = []
@@ -63,13 +70,23 @@ metadataCurator.controller('metadataCurator.searchCtrl',
         }
 
         actions.push {
-          condition: (term) -> term and $state.current.name != 'mc.search' and  $state.$current.params.indexOf('q') >= 0 and $state.params.resource
+          condition: (term) -> term and $state.includes("mc.resource.list.**") and  $state.$current.params.indexOf('q') >= 0 and $state.params.resource
           label: (term) ->
             naturalName = names.getNaturalName($state.params.resource)
-            "Search <strong>#{naturalName}</strong> for <strong>#{term}</strong>"
+            "Search any <strong>#{naturalName}</strong> for <strong>#{term}</strong>"
           action: (term) ->
             ->
-              $state.go($state.current.name, {q: term})
+              $state.go('mc.resource.list', {q: term})
+          icon: 'search'
+        }
+
+        actions.push {
+          condition: (term) -> term and $state.current.name == 'mc.resource.show.property' and  $state.$current.params.indexOf('q') >= 0 and $rootScope.$$searchContext
+          label: (term) ->
+            "Search current <strong>#{$rootScope.$$searchContext}</strong> for <strong>#{term}</strong>"
+          action: (term) ->
+            ->
+              $state.go('mc.resource.show.property', {q: term})
           icon: 'search'
         }
 

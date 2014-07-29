@@ -4,7 +4,6 @@ import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.dataarchitect.ImportRow
-import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ImportRows
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -21,22 +20,14 @@ class DataImportController extends AbstractRestfulController{
     }
 
     @Override
-    def index(Integer max) {
-        setSafeMax(max)
-        def total = countResources()
-        def list = listAllResources(params)
-
-        respondWithLinks new Elements(
-                base: "/dataArchitect/imports",
-                total: total,
-                items: list
-        )
+    protected getBasePath() {
+        return "/dataArchitect/imports"
     }
 
     def upload(Integer max) {
         def response
         DataImport importer
-        setSafeMax(max)
+        handleParams(max)
         if (!(request instanceof MultipartHttpServletRequest)) {
             importer.errors.rejectValue('uploaded', 'import.uploadfailed', "No file")
         }else {
@@ -72,12 +63,12 @@ class DataImportController extends AbstractRestfulController{
             }
         }
 
-        respond response
+        reportCapableRespond response
     }
 
 
     def pendingAction(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         DataImport importer = queryForResource(params.id)
         def total = (importer?.pendingAction)? importer?.pendingAction.size() : 0
         def offset = 0
@@ -91,7 +82,7 @@ class DataImportController extends AbstractRestfulController{
     }
 
     def imported(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         DataImport importer = queryForResource(params.id)
         def total = (importer?.imported)? importer?.imported.size() : 0
         def offset = 0
@@ -106,7 +97,7 @@ class DataImportController extends AbstractRestfulController{
     }
 
     def importQueue(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         DataImport importer = queryForResource(params.id)
         def total = (importer?.importQueue)? importer?.importQueue.size() : 0
         def offset = 0
@@ -130,7 +121,7 @@ class DataImportController extends AbstractRestfulController{
         }else{
             response = ["error": "import or import row not found"]
         }
-        respond response
+        reportCapableRespond response
     }
 
     def ingestRow(Long id, Long rowId){
@@ -144,7 +135,7 @@ class DataImportController extends AbstractRestfulController{
         }else{
             response = ["error": "import or import row not found"]
         }
-        respond response
+        reportCapableRespond response
     }
 
     def resolveAll(Long id){
@@ -156,7 +147,7 @@ class DataImportController extends AbstractRestfulController{
         }else{
             response = ["error": "import or import row not found"]
         }
-        respond response
+        reportCapableRespond response
     }
 
     def ingestQueue(Long id){
@@ -168,7 +159,7 @@ class DataImportController extends AbstractRestfulController{
         }else{
             response = ["error": "import or import row not found"]
         }
-        respond response
+        reportCapableRespond response
     }
 
 

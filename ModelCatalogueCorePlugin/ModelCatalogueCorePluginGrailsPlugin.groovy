@@ -80,7 +80,8 @@ Model catalogue core plugin (metadata registry)
                     new MappingsMarshaller(),
                     new ImportRowMarshaller(),
                     new ImportRowsMarshaller(),
-                    new DataImportMarshaller()
+                    new DataImportMarshaller(),
+                    new ListWithTotalAndTypeWrapperMarshaller()
             ]
         }
 
@@ -156,7 +157,8 @@ Model catalogue core plugin (metadata registry)
         ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
 
         reportsRegistry.register {
-            title 'Export All to XML'
+            creates asset
+            title { "Export All Elements of ${it.name} to XML" }
             type Model
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xml'], id: true
         }

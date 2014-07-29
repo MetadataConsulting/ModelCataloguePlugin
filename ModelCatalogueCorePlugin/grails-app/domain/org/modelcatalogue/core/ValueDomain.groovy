@@ -42,9 +42,9 @@ class ValueDomain extends ExtendibleElement  {
         name boost:5
         dataType component:true
         unitOfMeasure component:true
-        incomingRelationships component: true
-        outgoingRelationships component: true
         extensions component:true
+
+        except = ['incomingRelationships', 'outgoingRelationships']
     }
 
 	MeasurementUnit unitOfMeasure

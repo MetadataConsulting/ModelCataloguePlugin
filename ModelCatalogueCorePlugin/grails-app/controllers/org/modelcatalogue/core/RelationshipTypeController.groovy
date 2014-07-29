@@ -4,6 +4,7 @@ import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.CatalogueElementFinder
+import org.modelcatalogue.core.util.Lists
 
 import javax.servlet.http.HttpServletResponse
 
@@ -15,23 +16,18 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
         super(RelationshipType)
     }
 
+    @Override
+    def index(Integer max) {
+        handleParams(max)
+        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            if (!params.boolean('system')) {
+                eq 'system', false
+            }
+        }
+    }
+
     def elementClasses() {
-        respond CatalogueElementFinder.catalogueElementClasses
-    }
-
-    protected List<RelationshipType> listAllResources(Map params) {
-        if (params.boolean('system')) {
-            return resource.list(params)
-        }
-        resource.findAllBySystem(false, params)
-
-    }
-
-    protected Integer countResources() {
-        if (params.boolean('system')) {
-            return resource.count()
-        }
-        resource.countBySystem(false)
+        reportCapableRespond CatalogueElementFinder.catalogueElementClasses
     }
 
     @Override
@@ -124,7 +120,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
         }
 
         if (instance.hasErrors()) {
-            respond instance.errors, view:'edit' // STATUS CODE 422
+            reportCapableRespond instance.errors, view:'edit' // STATUS CODE 422
             return
         }
 
@@ -139,7 +135,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
                         g.createLink(
                                 resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
                                 namespace: hasProperty('namespace') ? this.namespace : null ).toString())
-                respond instance, [status: OK]
+                reportCapableRespond instance, [status: OK]
             }
         }
     }

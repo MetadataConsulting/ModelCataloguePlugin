@@ -138,14 +138,20 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
 
     private generateRestAssertion(String controller) {
         [
-      // method  | url                                  | controller | action            | paramsAssertions
-        ["GET"   , "/$controller"                       , controller , "index"           , {}            ],
-        ["POST"  , "/$controller"                       , controller , "save"            , {}            ],
-        ["GET"   , "/$controller/1"                     , controller , "show"            , { id = "1" }  ],
-        ["DELETE", "/$controller/1"                     , controller , "delete"          , { id = "1" }  ],
-        ["PUT"   , "/$controller/1"                     , controller , "update"          , { id = "1" }  ],
-        ["GET"   , "/$controller/search/author"         , controller , "search"          , { search = "author"} ],
-        ["GET"   , "/$controller/search"                , controller , "search"          , {}            ],
+      // method  | url                                                      | controller | action               | paramsAssertions
+        ["GET"   , "/$controller"                                           , controller , "index"              , {}            ],
+        ["POST"  , "/$controller"                                           , controller , "save"               , {}            ],
+        ["GET"   , "/$controller/1"                                         , controller , "show"               , { id = "1" }  ],
+        ["DELETE", "/$controller/1"                                         , controller , "delete"             , { id = "1" }  ],
+        ["PUT"   , "/$controller/1"                                         , controller , "update"             , { id = "1" }  ],
+        ["GET"   , "/$controller/search/author"                             , controller , "search"             , { search = "author"} ],
+        ["GET"   , "/$controller/search"                                    , controller , "search"             , {}            ],
+        ["GET"   , "/$controller/1/incoming/search"                         , controller , "searchIncoming"     , { id = "1" }  ],
+        ["GET"   , "/$controller/1/outgoing/search"                         , controller , "searchOutgoing"     , { id = "1" }  ],
+        ["GET"   , "/$controller/1/relationships/search"                    , controller , "searchRelationships", { id = "1" }  ],
+        ["GET"   , "/$controller/1/incoming/relationship/search"            , controller , "searchIncoming"     , { id = "1" ; type = "relationship" }  ],
+        ["GET"   , "/$controller/1/outgoing/relationship/search"            , controller , "searchOutgoing"     , { id = "1" ; type = "relationship" }  ],
+        ["GET"   , "/$controller/1/relationships/relationship/search"       , controller , "searchRelationships", { id = "1" ; type = "relationship" }  ],
         ]
     }
 

@@ -1,7 +1,5 @@
 package org.modelcatalogue.core
 
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
-
 class Asset extends PublishedElement {
 
     Long    size
@@ -14,9 +12,7 @@ class Asset extends PublishedElement {
         modelCatalogueId boost:10
         name boost:5
         extensions component:true
-        incomingRelationships component: true
-        outgoingRelationships component: true
-        except = ['md5']
+        except = ['md5', 'incomingRelationships', 'outgoingRelationships']
     }
 
     static constraints = {

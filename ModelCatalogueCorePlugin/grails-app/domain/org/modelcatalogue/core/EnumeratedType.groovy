@@ -42,9 +42,7 @@ class EnumeratedType extends DataType {
     static searchable = {
         name boost:5
         enumAsString converter: EnumAsStringConverter
-        incomingRelationships component: true
-        outgoingRelationships component: true
-        except = ['relatedValueDomains']
+        except = ['relatedValueDomains', 'incomingRelationships', 'outgoingRelationships']
     }
 
 

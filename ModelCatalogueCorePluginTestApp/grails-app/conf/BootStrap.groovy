@@ -14,6 +14,7 @@ class BootStrap {
     def domainModellerService
     def initCatalogueService
     def publishedElementService
+    def executorService
 
 
     XLSXListRenderer xlsxListRenderer
@@ -79,7 +80,10 @@ class BootStrap {
             new Requestmap(url: url, configAttribute: 'permitAll').save(failOnError: true)
         }
 
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY',   httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
+        new Requestmap(url: '/asset/download/*',             configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY',   httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.POST).save(failOnError: true)
+        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.PUT).save(failOnError: true)
 
 //        new Requestmap(url: '/api/modelCatalogue/core/model/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save(failOnError: true)
 //        new Requestmap(url: '/api/modelCatalogue/core/dataElement/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
@@ -91,6 +95,46 @@ class BootStrap {
 
         environments {
             development {
+                executorService.submit {
+                    println 'Running post init job'
+                    println 'Importing data'
+                    importService.importData()
+                    def de = new DataElement(name: "testera", description: "test data architect").save(failOnError: true)
+                    de.ext.metadata = "test metadata"
+
+                    println 'Creating dummy models'
+                    15.times {
+                        new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
+                    }
+
+                    def parentModel1 = Model.findByName("Another root #001")
+
+                    15.times{
+                        def child = new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
+                        parentModel1.addToParentOf(child)
+                    }
+
+
+                    for (DataElement element in DataElement.list()) {
+                        parentModel1.addToContains element
+                    }
+
+
+                    println 'Finalizing all published elements'
+                    PublishedElement.list().each {
+                        it.status = PublishedElementStatus.FINALIZED
+                        it.save(failOnError: true)
+                    }
+
+//                    println 'Creating history for NHS NUMBER STATUS INDICATOR CODE'
+//                    def withHistory = DataElement.findByName("NHS NUMBER STATUS INDICATOR CODE")
+//
+//                    10.times {
+//                        println "Creating archived version #${it}"
+//                        publishedElementService.archiveAndIncreaseVersion(withHistory)
+//                    }
+                    println "Init finished in ${new Date()}"
+                }
                 //domainModellerService.modelDomains()
             }
         }

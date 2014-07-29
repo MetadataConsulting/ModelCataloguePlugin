@@ -81,7 +81,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         }
 
         if (instance.hasErrors()) {
-            respond instance.errors, view:'edit' // STATUS CODE 422
+            reportCapableRespond instance.errors, view:'edit' // STATUS CODE 422
             return
         }
 
@@ -96,7 +96,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
                         g.createLink(
                                 resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
                                 namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: OK]
+                reportCapableRespond instance, [status: OK]
             }
         }
     }

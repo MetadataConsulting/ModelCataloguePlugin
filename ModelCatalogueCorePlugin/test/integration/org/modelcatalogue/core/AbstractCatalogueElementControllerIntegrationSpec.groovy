@@ -730,7 +730,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         JSONElement json = controller.response.json
         recordResult "${method}${no}", json
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
-        assert json.listType == Relationships.name
         assert json.itemType == Relationship.name
         def item = json.list[0]
         assert item.type
@@ -869,7 +868,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         then:
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
-        json.listType == Mappings.name
         json.itemType == Mapping.name
 
         when:

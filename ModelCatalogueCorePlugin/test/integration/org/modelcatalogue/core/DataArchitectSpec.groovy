@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
-import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWithTotal
 import spock.lang.Shared
 import spock.lang.Stepwise
 
@@ -9,7 +8,7 @@ import spock.lang.Stepwise
 * Created by adammilward on 05/02/2014.
 */
 @Stepwise
-class DataArchitectSpec extends AbstractIntegrationSpec{
+class DataArchitectSpec extends AbstractIntegrationSpec {
     @Shared
     def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, vd, md
 
@@ -71,13 +70,13 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
         Map params = [:]
         params.put("max", 12)
         params.put("key", "metadata")
-        ListAndCount dataElements = dataArchitectService.metadataKeyCheck(params)
+        ListWithTotal dataElements = dataArchitectService.metadataKeyCheck(params)
 
         then:
-        !dataElements.list.contains(de2)
-        !dataElements.list.contains(de4)
-        dataElements.list.contains(de1)
-        dataElements.list.contains(de5)
+        !dataElements.items.contains(de2)
+        !dataElements.items.contains(de4)
+        dataElements.items.contains(de1)
+        dataElements.items.contains(de5)
 
     }
 
@@ -85,12 +84,12 @@ class DataArchitectSpec extends AbstractIntegrationSpec{
         when:
         Map params = [:]
         params.put("max", 12)
-        ListAndCount dataElements = dataArchitectService.uninstantiatedDataElements(params)
+        ListWithTotal dataElements = dataArchitectService.uninstantiatedDataElements(params)
 
         then:
-        !dataElements.list.contains(DataElement.get(de2.id))
-        dataElements.list.contains(DataElement.get(de1.id))
-        dataElements.list.contains(DataElement.get(de3.id))
+        !dataElements.items.contains(DataElement.get(de2.id))
+        dataElements.items.contains(DataElement.get(de1.id))
+        dataElements.items.contains(DataElement.get(de3.id))
 
     }
 

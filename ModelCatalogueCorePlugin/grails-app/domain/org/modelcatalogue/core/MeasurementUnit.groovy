@@ -15,8 +15,7 @@ class MeasurementUnit extends CatalogueElement {
 
     static searchable = {
         name boost:5
-        incomingRelationships component: true
-        outgoingRelationships component: true
+        except = ['incomingRelationships', 'outgoingRelationships']
     }
 
     String symbol

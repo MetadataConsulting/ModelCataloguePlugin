@@ -31,11 +31,15 @@ class UserRole implements Serializable {
     }
 
     static UserRole create(User user, Role role, boolean flush = false) {
+        UserRole existing = findByUserAndRole(user, role)
+        if (existing) {
+            return existing
+        }
         new UserRole(user: user, role: role).save(flush: flush, insert: true)
     }
 
     static boolean remove(User user, Role role, boolean flush = false) {
-        UserRole instance = UserRole.findByUserAndRole(user, role)
+        UserRole instance = findByUserAndRole(user, role)
         if (!instance) {
             return false
         }

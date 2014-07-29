@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
-import org.modelcatalogue.core.util.Elements
+import org.modelcatalogue.core.util.Lists
 
 import static org.springframework.http.HttpStatus.OK
 
@@ -16,15 +16,11 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
 
     @Override
     def index(Integer max) {
-        setSafeMax(max)
-        Integer total = publishedElementService.count(params, resource)
-        def list = publishedElementService.list(params, resource)
+        handleParams(max)
 
-        respondWithLinks new Elements(
-                base: "/${resourceName}/",
-                total: total,
-                items: list
-        )
+        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            eq 'status', PublishedElementService.getStatusFromParams(params)
+        }
     }
 
     /**
@@ -57,7 +53,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         helper.properties = paramsToBind
 
         if (helper.hasErrors()) {
-            respond helper.errors, view:'edit' // STATUS CODE 422
+            reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
             return
         }
 
@@ -82,13 +78,13 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
                         g.createLink(
                                 resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
                                 namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: OK]
+                reportCapableRespond instance, [status: OK]
             }
         }
     }
 
     def history(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         PublishedElement element = queryForResource(params.id)
         if (!element) {
             notFound()
@@ -101,23 +97,9 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         customParams.sort   = 'versionNumber'
         customParams.order  = 'desc'
 
-        int total = resource.countByModelCatalogueIdLike "$element.bareModelCatalogueId%"
-        def list = resource.findAllByModelCatalogueIdLike "$element.bareModelCatalogueId%", customParams
-
-        respondWithLinks new Elements(
-                base: "/${resourceName}/${params.id}/history",
-                items: list,
-                total: total
-        )
-    }
-
-
-
-    protected Map getParametersToBind() {
-        Map ret = super.parametersToBind
-        ret.remove 'modelCatalogueId'
-        ret.remove 'versionNumber'
-        ret
+        reportCapableRespond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
+            ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
+        }
     }
 
 }

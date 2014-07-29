@@ -2,7 +2,8 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
-import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.ListWithTotal
+import org.modelcatalogue.core.util.Lists
 
 class DataArchitectController<T> extends AbstractRestfulController<T>{
 
@@ -21,8 +22,8 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
     def index(){}
 
     def uninstantiatedDataElements(Integer max){
-        setSafeMax(max)
-        ListAndCount results
+        handleParams(max)
+        ListWithTotal results
 
         try{
             results = dataArchitectService.uninstantiatedDataElements(params)
@@ -32,12 +33,12 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
         }
 
         def baseLink = "/dataArchitect/uninstantiatedDataElements"
-        def total = (results.count)?results.count.intValue():0
+        def total = (results.total)?results.total.intValue():0
 
         Elements elements =  new Elements(
                 base: baseLink,
                 total: total,
-                items: results.list
+                items: results.items
         )
 
         respondWithLinks elements
@@ -45,8 +46,8 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
 
     def metadataKeyCheck(Integer max){
-        setSafeMax(max)
-        ListAndCount results
+        handleParams(max)
+        ListWithTotal results
 
         try{
             results = dataArchitectService.metadataKeyCheck(params)
@@ -57,12 +58,11 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
 
         def baseLink = "/dataArchitect/metadataKeyCheck"
-        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
         Elements elements =  new Elements(
                 base: baseLink,
-                total: results.count,
-                items: results.list
+                total: results.total,
+                items: results.items
         )
 
         respondWithLinks elements
@@ -70,7 +70,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     def getSubModelElements(){
 
-        def results = new ListAndCount(count: 0, list: [])
+        ListWithTotal results = new ListAndCount(count: 0, list: [])
         if (params.modelId || params.id){
             Long id = params.long('modelId') ?: params.long('id')
             Model model = Model.get(id)
@@ -82,13 +82,13 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
         respondWithLinks DataElement, new Elements(
                 base: baseLink,
-                total: results.count,
-                items: results.list
+                total: results.total,
+                items: results.items
         )
     }
 
     def findRelationsByMetadataKeys(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         def results
         def keyOne = params.keyOne
         def keyTwo = params.keyTwo
@@ -111,14 +111,14 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
             def baseLink = "/dataArchitect/findRelationsByMetadataKeys"
             Elements elements =  new Elements(
                     base: baseLink,
-                    total: results.count,
+                    total: results.total,
                     items: results.list,
             )
 
             respondWithLinks elements
 
         }else{
-            respond "please enter keys"
+            reportCapableRespond "please enter keys"
         }
 
     }

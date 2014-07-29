@@ -23,9 +23,9 @@ public interface StorageService {
      * @param directory directory (bucket) of the file
      * @param filename name (id)  of the file
      * @param contentType content type of the file
-     * @param content content of the file
+     * @param withOutputStream the closure which gets files output stream as a parameter
      */
-    void store(String directory, String filename, String contentType, InputStream stream)
+    void store(String directory, String filename, String contentType, Closure withOutputStream)
 
     /**
      * Tests if the file exists in the store.
