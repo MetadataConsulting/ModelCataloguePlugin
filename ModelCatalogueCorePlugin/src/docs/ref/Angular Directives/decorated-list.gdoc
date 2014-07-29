@@ -6,7 +6,9 @@ The directive accepts following two-ways bound attributes @list@, @columns@, @se
 Only the @list@ attribute is mandatory and represents the list structure which should match the expected input.
 You can customize the state changes from this directive by setting attribute @stateless@ to @true@
 (the directive won't change the state of the app at all) or customizing the name of th @page@ parameter using
-@pageParam@ attribute (the directive will change the parameter of given name in the URL when tha page changes).
+@pageParam@ attribute (the directive will change the parameter of given name in the URL when tha page changes). If
+the referenced list is resolved form the state, you should set @state-driven@ attribute to @true@ to prevent
+loading of the resource twice.
 
 {code}
 {

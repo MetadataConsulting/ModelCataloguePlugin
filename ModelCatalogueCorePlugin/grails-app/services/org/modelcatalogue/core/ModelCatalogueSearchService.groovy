@@ -1,12 +1,58 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
  * Poor man's search service searching in name and description
  * , you should use search service designed for particular search plugin
  */
-class ModelCatalogueSearchService implements SearchCatalogue{
+class ModelCatalogueSearchService implements SearchCatalogue {
+
+    @Override
+    def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
+        String query = "%$params.search%"
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type)
+
+        switch (direction) {
+            case RelationshipDirection.OUTGOING:
+                criteria.destination {
+                    or {
+                        ilike('name', query)
+                        ilike('description', query)
+                    }
+                }
+                break
+            case RelationshipDirection.INCOMING:
+                criteria.source {
+                    or {
+                        ilike('name', query)
+                        ilike('description', query)
+                    }
+                }
+                break
+            case RelationshipDirection.BOTH:
+                criteria.or {
+                    destination {
+                        or {
+                            ilike('name', query)
+                            ilike('description', query)
+                        }
+                        ne('id', element.id)
+                    }
+                    source {
+                        or {
+                            ilike('name', query)
+                            ilike('description', query)
+                        }
+                        ne('id', element.id)
+                    }
+
+                }
+        }
+
+        [searchResults: criteria.list(params), total: criteria.count()]
+    }
 
     def search(Class resource, Map params) {
         if (!params.search) {
@@ -19,7 +65,7 @@ class ModelCatalogueSearchService implements SearchCatalogue{
         if (PublishedElement.isAssignableFrom(resource)) {
             DetachedCriteria criteria = new DetachedCriteria(resource)
             criteria.and {
-                eq('status', PublishedElementStatus.FINALIZED)
+                'in'('status', PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED)
                 or {
                     ilike('name', query)
                     ilike('description', query)

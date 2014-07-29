@@ -6,4 +6,6 @@ class PublishedElementController extends AbstractPublishedElementController<Publ
         super(PublishedElement, true)
     }
 
+
+
 }

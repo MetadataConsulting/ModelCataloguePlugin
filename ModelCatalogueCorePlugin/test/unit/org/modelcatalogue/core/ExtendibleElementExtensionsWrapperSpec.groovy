@@ -116,6 +116,7 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         assert target.save()
 
         RelationshipType type = new RelationshipType(sourceToDestination: "src to dest", destinationToSource: "dest to src", sourceClass: CatalogueElement, destinationClass: CatalogueElement, name: "type")
+        type.relationshipTypeService = new RelationshipTypeService()
         assert type.save()
 
         RelationshipService relationshipService = new RelationshipService()

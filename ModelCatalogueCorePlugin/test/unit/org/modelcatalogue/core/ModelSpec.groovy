@@ -22,6 +22,7 @@ class ModelSpec extends Specification {
 
         when:
         Model modelInstance = new Model(args)
+        modelInstance.modelCatalogueId = args.modelCatalogueId
         modelInstance.save()
 
         then:

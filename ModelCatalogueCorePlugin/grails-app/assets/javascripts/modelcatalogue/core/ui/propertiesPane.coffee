@@ -2,8 +2,10 @@ angular.module('mc.core.ui.propertiesPane', []).directive 'propertiesPane',  [->
     restrict: 'E'
     replace: true
     scope:
-      item: '='
-      properties: '='
+      item:         '='
+      properties:   '='
+      title:        '@?'
+      valueTitle:   '@?'
 
     templateUrl: 'modelcatalogue/core/ui/propertiesPane.html'
 

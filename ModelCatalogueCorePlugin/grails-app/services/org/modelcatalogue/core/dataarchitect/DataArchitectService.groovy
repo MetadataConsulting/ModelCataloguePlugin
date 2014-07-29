@@ -1,30 +1,21 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
-import org.hibernate.Criteria
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ConceptualDomain
+
+//import org.hibernate.Criteria
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.ExtendibleElement
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWithTotal
 
-@Transactional
 class DataArchitectService {
 
+    static transactional = false
     def modelCatalogueSearchService, publishedElementService, relationshipService
 
-    def uninstantiatedDataElements(Map params){
-        ListAndCount results = new ListAndCount()
+    ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
+        ListWithTotal<DataElement> results = new ListAndCount()
         def uninstantiatedDataElements, totalCount
         def instantiation = RelationshipType.findByName("instantiation")
         def searchParams = getParams(params)
@@ -52,7 +43,7 @@ class DataArchitectService {
         return results
     }
 
-    def metadataKeyCheck(Map params){
+    ListWithTotal<DataElement> metadataKeyCheck(Map params){
 
         def missingMetadataKey, totalCount
         ListAndCount results = new ListAndCount()
@@ -81,7 +72,8 @@ class DataArchitectService {
         return results
     }
 
-    def findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
+    @Transactional
+    ListWithTotal<DataElement> findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
         ListAndCount results = new ListAndCount()
         def searchParams = getParams(params)
@@ -114,34 +106,12 @@ class DataArchitectService {
         return results
     }
 
+    @Transactional
     def actionRelationshipList(ArrayList<Relationship> list){
-        def errorMessages = []
         list.each { relationship ->
             relationship.save()
         }
     }
-
-    def indexAll(){
-        modelCatalogueSearchService.index(ConceptualDomain.list())
-        modelCatalogueSearchService.index(DataType.list())
-        modelCatalogueSearchService.index(EnumeratedType.list())
-        modelCatalogueSearchService.index(ExtensionValue.list())
-        modelCatalogueSearchService.index(MeasurementUnit.list())
-        modelCatalogueSearchService.index(ValueDomain.list())
-        modelCatalogueSearchService.index(DataElement.list())
-        modelCatalogueSearchService.index(Model.list())
-        modelCatalogueSearchService.index(CatalogueElement)
-        modelCatalogueSearchService.index(ExtendibleElement)
-        modelCatalogueSearchService.index(PublishedElement)
-        modelCatalogueSearchService.index(RelationshipType)
-        modelCatalogueSearchService.index(Relationship)
-        //TODO: find a better way of unindexing archived elements
-        def params = [:]
-        params.status = PublishedElementStatus.ARCHIVED
-        def archivedElements = publishedElementService.list(params)
-        if(archivedElements){ modelCatalogueSearchService.unindex(archivedElements) }
-    }
-
 
     private static Map getParams(Map params){
         def searchParams = [:]
@@ -156,47 +126,5 @@ class DataArchitectService {
     }
 
 
-    def getContainingModel(DataElement dataElement){
-        if(dataElement.containedIn) {
-            return dataElement.containedIn.first()
-        }
-        return null
-    }
-
-    def getParentModel(DataElement dataElement){
-        Model containingModel = getContainingModel(dataElement)
-        if(containingModel.childOf) {
-            return containingModel.childOf.first()
-        }
-        return null
-    }
-
-    def getValueDomain(DataElement dataElement){
-        if(dataElement.instantiatedBy) {
-            return dataElement.instantiatedBy.first()
-        }
-        return null
-    }
-
-    def getDataType(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            DataType dataType = valueDomain.dataType
-            if (dataType instanceof EnumeratedType) {
-                return dataType.enumAsString
-            }
-            return dataType.name
-        }
-        return null
-    }
-
-    def getUnitOfMeasure(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
-            return unitOfMeasure?.name
-        }
-        return null
-    }
 
 }

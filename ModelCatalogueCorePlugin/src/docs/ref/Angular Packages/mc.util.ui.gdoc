@@ -1,0 +1,28 @@
+h1. mc.util.ui
+
+Util UI package provides directives to simplify usage of services and providers declared in [mc.util|Angular Packages].
+
+h2. Modules
+This package groups following modules for easier use:
+
+{table}
+Name                            | Description
+mc.util.ui.actions              | provides [actions|Angular Services] service for obtaining the UI actions related to current context
+mc.util.ui.actionButtonSingle   | provides [action-button-single|Angular Directives] directive for rendering actions as button
+mc.util.ui.actionButtonDropdown | provides [action-button-dropdown|Angular Directives] directive for rendering action as dropdown
+mc.util.ui.contextualActions    | provides [contextual-actions|Angular Directives] directive for rendering contextual actions
+mc.util.ui.hideForRole          | provides [hide-for-role|Angular Directives] directive for hiding elements for users not in particular role
+mc.util.ui.hideIfLoggedIn       | provides [hide-if-logged-in|Angular Directives] directive for hiding elements when the user is logged in
+mc.util.ui.showForRole          | provides [show-for-role|Angular Directives] directive for showing elements for users in particular role
+mc.util.ui.showIfLoggedIn       | provides [hide-if-logged-in|Angular Directives] directive for showing elements when the user is logged in
+{table}
+
+h2. Include
+Require using asset pipeline plugin in your asset file
+{code}
+//= require modelcatalogue/util/ui/index
+{code}
+or link directly in JSP
+{code:xml}
+<asset:javascript src="/modelcatalogue/util/ui/index.js"/>
+{code}

@@ -1,0 +1,24 @@
+h1. enhance
+
+Service to obtain all actions applicable for the current scope. Use @getActions($scope)@ method
+to get the list of actions for the current scope sorted by their position parameter.
+See [actionsProvider|Angular Providers] how to configure the actions.
+
+Declared in @mc.core.ui.actions@ module inside [mc.core.ui|Angular Packages] package.
+
+
+h2. Usage
+
+Call @getActions($scope)@ to get list of all actions applicable.
+
+{code}
+angular
+.module('foo', ['mc.core.ui.actions'])
+.factory('bar', function(actions) {
+    $scope.hello    = 'Hola'
+    $scope.actions  = actions.getActions($scope)
+});
+{code}
+
+See [actionsProvider|Angular Providers] for the list of action's properties. To perform the action, call its @run()@
+method without any parameters.

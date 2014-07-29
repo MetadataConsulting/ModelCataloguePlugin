@@ -5,11 +5,19 @@ import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.RelationshipTypeService
+import org.modelcatalogue.core.reports.ReportDescriptor
+import org.modelcatalogue.core.reports.ReportsRegistry
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Created by ladin on 14.02.14.
  */
 abstract class CatalogueElementMarshallers extends AbstractMarshallers {
+
+    @Autowired ReportsRegistry reportsRegistry
+    @Autowired RelationshipTypeService relationshipTypeService
 
     CatalogueElementMarshallers(Class type) {
         super(type)
@@ -19,6 +27,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         if (!el) return [:]
         def ret = [
                 id: el.id,
+				modelCatalogueId: el.modelCatalogueId,
+                archived: el.archived,
                 name: el.name,
                 description: el.description,
                 version: el.version,
@@ -30,25 +40,81 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 incomingRelationships: [count: el.countIncomingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"]
         ]
 
-        Map<String, Map<String, String>> relationships = getRelationshipConfiguration(type)
+        Map<String, Map<String, String>> relationships = getRelationshipConfiguration(el.getClass())
 
-        relationships.incoming?.each addRelationsJson('incoming', el, ret)
-        relationships.outgoing?.each addRelationsJson('outgoing', el, ret)
+        Map<String, RelationshipType> types = getRelationshipTypesFor(el.getClass())
+
+        relationships.incoming?.each        addRelationsJson('incoming', el, ret, types)
+        relationships.outgoing?.each        addRelationsJson('outgoing', el, ret, types)
+        relationships.bidirectional?.each   addRelationsJson('relationships', el, ret, types)
+
+        ret.availableReports = getAvailableReports(el)
 
         ret
 
     }
 
-    static Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {
-        def relationships  = [incoming: [:], outgoing: [:]]
+    protected getAvailableReports(CatalogueElement el) {
+        def reports = []
+
+        for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
+            reports << [title: descriptor.getTitle(el), url: descriptor.getLink(el), type: descriptor.renderType.toString()]
+        }
+
+        reports
+    }
+
+    protected getRelationshipTypesFor(Class elementClass){
+        relationshipTypeService.getRelationshipTypesFor(elementClass)
+    }
+
+    Map<String, Map<String, String>> getRelationshipConfiguration(Class type) {
+        def relationships  = [incoming: [:], outgoing: [:], bidirectional: [:]]
         if (type.superclass && CatalogueElement.isAssignableFrom(type.superclass)) {
             def fromSuperclass = getRelationshipConfiguration(type.superclass)
             relationships.incoming.putAll(fromSuperclass.incoming ?: [:])
             relationships.outgoing.putAll(fromSuperclass.outgoing ?: [:])
+            relationships.bidirectional.putAll(fromSuperclass.bidirectional ?: [:])
         }
-        def fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:]]
+        def fromType = GrailsClassUtils.getStaticFieldValue(type, 'relationships') ?: [incoming: [:], outgoing: [:], bidirectional: [:]]
         relationships.incoming.putAll(fromType.incoming ?: [:])
         relationships.outgoing.putAll(fromType.outgoing ?: [:])
+        relationships.bidirectional.putAll(fromType.bidirectional ?: [:])
+
+        getRelationshipTypesFor(type).each { String name, RelationshipType relationshipType ->
+            if (relationshipType.system) {
+                relationships.each { String direction, Map<String, String> config ->
+                    config.remove name
+                }
+                return
+            }
+
+            if (relationshipType.bidirectional) {
+                if (!relationships.bidirectional.containsKey(name)) {
+                    relationships.incoming.remove(name)
+                    relationships.outgoing.remove(name)
+
+                    relationships.bidirectional[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
+                }
+            } else {
+                if (relationshipType.sourceClass.isAssignableFrom(type)) {
+                    if (!relationships.outgoing.containsKey(name)){
+                        relationships.bidirectional.remove(name)
+
+                        relationships.outgoing[name] = RelationshipType.toCamelCase(relationshipType.sourceToDestination)
+                    }
+                }
+                if (relationshipType.destinationClass.isAssignableFrom(type)) {
+                    if (!relationships.incoming.containsKey(name)) {
+
+                        relationships.bidirectional.remove(name)
+
+                        relationships.incoming[name] = RelationshipType.toCamelCase(relationshipType.destinationToSource)
+                    }
+                }
+            }
+        }
+
         relationships
     }
 
@@ -63,28 +129,60 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
         def relationships = getRelationshipConfiguration(type)
 
-        relationships.incoming?.each addRelationsXml('incoming', el, xml)
-        relationships.outgoing?.each addRelationsXml('outgoing', el, xml)
+        Map<String, RelationshipType> types = getRelationshipTypesFor(el.getClass())
+
+        relationships.incoming?.each        addRelationsXml('incoming', el, xml, types)
+        relationships.outgoing?.each        addRelationsXml('outgoing', el, xml, types)
+        relationships.bidirectional?.each   addRelationsXml('relationships', el, xml, types)
     }
 
     protected void addXmlAttributes(el, XML xml) {
         addXmlAttribute(el.id, "id", xml)
+		addXmlAttribute(el.modelCatalogueId, "modelCatalogueId", xml)
+        addXmlAttribute(el.archived, "archived", xml)
         addXmlAttribute(el.version, "version", xml)
         addXmlAttribute("/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id", "link", xml)
         addXmlAttribute(el.class.name, "elementType", xml)
         addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }
 
-    private static Closure addRelationsJson(String incomingOrOutgoing, CatalogueElement el, Map ret) {
+    private static Closure addRelationsJson(String incomingOrOutgoing, CatalogueElement el, Map ret, Map<String, RelationshipType> types) {
         { String relationshipType, String name ->
-            ret[name] = [count: el."count${name.capitalize()}"(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
+            RelationshipType type = types[relationshipType]
+            def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
+            switch (incomingOrOutgoing) {
+                case 'relationships':
+                    relation.count = el.countRelationsByType(type)
+                    break
+                case 'incoming':
+                    relation.count = el.countIncomingRelationsByType(type)
+                    break
+                case 'outgoing':
+                    relation.count = el.countOutgoingRelationsByType(type)
+                    break
+            }
+
+            ret[name] = relation
         }
     }
 
-    private static Closure addRelationsXml(String incomingOrOutgoing, CatalogueElement el, XML xml) {
+    private static Closure addRelationsXml(String incomingOrOutgoing, CatalogueElement el, XML xml, Map<String, RelationshipType> types) {
         { String relationshipType, String name ->
+            RelationshipType type = types[relationshipType]
+            def relation = [itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"]
+            switch (incomingOrOutgoing) {
+                case 'relationships':
+                    relation.count = el.countRelationsByType(type)
+                    break
+                case 'incoming':
+                    relation.count = el.countIncomingRelationsByType(type)
+                    break
+                case 'outgoing':
+                    relation.count = el.countOutgoingRelationsByType(type)
+                    break
+            }
             xml. build {
-                "${name}" count: el."count${name.capitalize()}"(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/${incomingOrOutgoing}/${relationshipType}"
+                "${name}" relation
             }
         }
     }

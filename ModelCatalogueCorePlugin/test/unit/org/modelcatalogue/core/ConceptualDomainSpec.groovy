@@ -20,7 +20,7 @@ class ConceptualDomainSpec extends Specification {
         ConceptualDomain.list().isEmpty()
 
         when:
-
+		args.modelCatalogueId = "MC_" + UUID.randomUUID() + "_1"
         def conceptInstance = new ConceptualDomain(args)
 
         conceptInstance.save()

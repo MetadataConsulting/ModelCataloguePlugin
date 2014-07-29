@@ -1,5 +1,6 @@
 # FormsPlugin
 /ModelCatalogueFormsPlugin
 *.iml
-*/web-app/*
-*/.idea/*
+**/web-app/*
+**/.idea/*
+**/atlassian-ide-plugin.xml

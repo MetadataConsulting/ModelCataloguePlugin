@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
@@ -17,19 +17,27 @@ abstract class CatalogueElement {
 
     String name
     String description
+	String modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
 
     static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
+    static relationships = [
+            outgoing: [attachment: 'hasAttachmentOf'],
+            bidirectional: [synonym: 'synonyms']
+    ]
+
     static constraints = {
         name size: 1..255
         description nullable: true, maxSize: 2000
+		modelCatalogueId bindable: false, nullable: true, unique: true, maxSize: 255, matches: '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
     }
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
+		modelCatalogueId boost:10
         name boost:5
         incomingMappings component: true
         except = ['incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
@@ -64,28 +72,34 @@ abstract class CatalogueElement {
     }
 
     Long countIncomingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, getClass().get(this.id)).count
+        CatalogueElement refreshed = getClass().get(this.id)
+        if (!refreshed) return 0
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, refreshed).count
     }
 
     Long countOutgoingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, getClass().get(this.id)).count
+        CatalogueElement refreshed = getClass().get(this.id)
+        if (!refreshed) return 0
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, refreshed).count
     }
 
     Long countRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.BOTH, getClass().get(this.id)).count
+        CatalogueElement refreshed = getClass().get(this.id)
+        if (!refreshed) return 0
+        relationshipService.getRelationships([:], RelationshipDirection.BOTH, refreshed).count
     }
 
 
     List getIncomingRelationsByType(RelationshipType type) {
-        ListAndCount<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type)
-        relationships.list.collect {
+        ListWithTotal<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type)
+        relationships.items.collect {
             it.source
         }
     }
 
     List getOutgoingRelationsByType(RelationshipType type) {
-        ListAndCount<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type)
-        relationships.list.collect {
+        ListWithTotal<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type)
+        relationships.items.collect {
             it.destination
         }
     }
@@ -133,7 +147,7 @@ abstract class CatalogueElement {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${getId()}, name: ${getName()}]"
+        "${getClass().simpleName}[id: ${getId()}, name: ${getName()}, modelCatalogueId: ${modelCatalogueId}]"
     }
 
     Map<String, Object> getInfo() {
@@ -145,6 +159,18 @@ abstract class CatalogueElement {
     }
 
     boolean isArchived() { false }
+
+
+
+    def afterInsert(){
+       if(!getModelCatalogueId()) {
+           createModelCatalogueId()
+       }
+    }
+
+    def createModelCatalogueId(){
+        modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
+    }
 
     def beforeDelete(){
         outgoingRelationships.each{ relationship->
@@ -164,4 +190,21 @@ abstract class CatalogueElement {
             mapping.delete(flush:true)
         }
     }
+
+	def updateModelCatalogueId() {
+		def newCatalogueId = modelCatalogueId.split("_")
+		newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
+		modelCatalogueId = newCatalogueId.join("_")
+	}
+
+
+
+	/**
+	 * Get the Model Catalogue ID excluding any version information suffix.
+	 * @return The model catalogue ID, minus any trailing underscore and version numbers
+	 */
+	def getBareModelCatalogueId() {
+		// Match everything from the ID except the final underscore and integers ('_\d+')
+		(modelCatalogueId =~ /(?i)(MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}))/)[0][1]
+	}
 }

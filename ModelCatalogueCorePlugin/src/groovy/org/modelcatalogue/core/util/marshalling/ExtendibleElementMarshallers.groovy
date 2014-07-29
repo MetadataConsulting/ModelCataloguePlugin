@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.XML
 
-class ExtendibleElementMarshallers extends PublishedElementMarshallers {
+abstract class ExtendibleElementMarshallers extends CatalogueElementMarshallers {
 
     ExtendibleElementMarshallers(Class type) {
         super(type)
@@ -28,6 +28,11 @@ class ExtendibleElementMarshallers extends PublishedElementMarshallers {
                 }
             }
         }
+    }
+
+    @Override
+    protected void addXmlAttributes(el, XML xml) {
+        super.addXmlAttributes(el, xml)
     }
 
 }

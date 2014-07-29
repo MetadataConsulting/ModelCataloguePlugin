@@ -10,13 +10,23 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 * ValueDomain rating with regex "\b[0-5]\b" and DataType Integer,
 * ValueDomain content with regex "^[:;,\-@0-9a-zA-Zâéè'.\s]{1,2000000}$"  and DataType String,
 *
-*  *  * <xs:complexType name="PatientModelA">
-<xs:sequence>
-<xs:element name="name" type="xs:string"/>
-<xs:element name="treatment" type="treatment"/>
-</xs:sequence>
- </xs:complexType>
-
+*  *  * 	<xs:simpleType name="SACTDrugRouteOfAdminType">
+		<xs:restriction base="CodeListType">
+			<xs:enumeration value="01"/>
+			<xs:enumeration value="02"/>
+			<xs:enumeration value="03"/>
+			<xs:enumeration value="04"/>
+			<xs:enumeration value="05"/>
+			<xs:enumeration value="06"/>
+			<xs:enumeration value="07"/>
+			<xs:enumeration value="08"/>
+			<xs:enumeration value="09"/>
+			<xs:enumeration value="10"/>
+			<xs:enumeration value="11"/>
+			<xs:enumeration value="12"/>
+			<xs:enumeration value="99"/>
+		</xs:restriction>
+	</xs:simpleType>
  *
  * !!!!!!!!VALUE DOMAINS Need to be related to at least one conceptual domain.....we need to build this into the
  * constraints
@@ -24,7 +34,7 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
  *
 */
 
-class ValueDomain extends CatalogueElement  {
+class ValueDomain extends ExtendibleElement  {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
@@ -32,12 +42,10 @@ class ValueDomain extends CatalogueElement  {
         name boost:5
         dataType component:true
         unitOfMeasure component:true
-        incomingRelationships component: true
-        outgoingRelationships component: true
-        except = ['includedIn', 'instantiates', 'regexDef']
-    }
+        extensions component:true
 
-    //FIXME valueDomain needs to be unique within a conceptual domain
+        except = ['incomingRelationships', 'outgoingRelationships']
+    }
 
 	MeasurementUnit unitOfMeasure
 	String rule
@@ -56,7 +64,8 @@ class ValueDomain extends CatalogueElement  {
 
 
     static relationships = [
-        incoming: [inclusion: 'includedIn', instantiation: 'instantiates']
+        incoming: [inclusion: 'includedIn', instantiation: 'instantiates', base: 'basedOn'],
+        outgoing: [base: 'isBaseFor']
     ]
 
     void setRegexDef(String regex) {

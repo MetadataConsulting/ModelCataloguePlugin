@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'ui.router']).directive 'catalogueElementView',  [-> {
+angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'ui.router', 'mc.core.ui.catalogueElementProperties']).directive 'catalogueElementView',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -8,8 +8,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'modelCatalogueApiRoot', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, modelCatalogueApiRoot) ->
-      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships']
+    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties) ->
+      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl', 'archived', 'status']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -20,15 +20,51 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           size++
         size
 
+      tabsByName = {}
+
       $scope.property ?= $rootScope?.$stateParams?.property
       $scope.reports  = []
 
+
+      loadTab = (property) ->
+        tab = tabsByName[property]
+
+        return if not tab?.loader?
+
+        if !tab.disabled and (tab.value.empty or tab.search != $state.params.q)
+          promise = null
+
+          if tab.value.empty or tab.search != $state.params.q
+            if $state.params.q
+              promise = tab.loader 'search', {search: $state.params.q}
+            else
+              promise = tab.loader()
+          else
+            promise = $q.when tab.value
+
+          tab.search = $state.params.q
+
+          promise.then (result) ->
+            tab.value       = result
+            $scope.reports  = result.availableReports
+        else
+          $scope.reports    = tab.value?.availableReports
+
+
       onPropertyUpdate = (newProperty, oldProperty) ->
+        loadTab(newProperty)
+
+        propCfg = catalogueElementProperties.getConfigurationFor("#{$scope.element.elementType}.#{newProperty}")
         page    = 1
         options = {}
         isTable = false
-        if $scope.showTabs
+        if $scope.showTabs and not propCfg.hidden(security)
           if newProperty
+
+            $scope.naturalPropertyName = propCfg.label
+
+            $rootScope.$$searchContext = if tabsByName[newProperty]?.loader then propCfg.label else undefined
+
             for tab in $scope.tabs
               tab.active = tab.name == newProperty
               if tab.active
@@ -44,15 +80,17 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 if isTable and tab.value.total
                   page = tab.value.currentPage
                 break
+        else
+          $rootScope.$$searchContext = undefined
 
         page = undefined if page == 1 or isNaN(page)
         options.location = "replace" if newProperty and not oldProperty
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page}, options if $scope.element
+        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
 
       onElementUpdate = (element) ->
         resource = catalogueElementResource(element.elementType) if element and element.elementType
 
-        activeTabSet     = false
+        activeTabSet = false
 
         onPropertyUpdate($scope.property, $rootScope?.$stateParams?.property)
 
@@ -61,25 +99,25 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         for name, fn of element when enhance.isEnhancedBy(fn, 'listReference')
           if name in propExcludes
             continue
+
+          propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.#{name}")
+
+          if propertyConfiguration.hidden(security)
+            continue
+
           tabDefinition =
-            heading:  names.getNaturalName(name)
+            heading:  propertyConfiguration.label
             value:    listEnhancer.createEmptyList(fn.itemType)
             disabled: fn.total == 0
             loader:   fn
             type:     'decorated-list'
-            columns:   columns(fn.itemType)
+            columns:   propertyConfiguration.columns ? columns(fn.itemType)
             actions:  []
             name:     name
             reports:  []
 
 
-          if tabDefinition.name == 'history'
-            tabDefinition.columns = [
-              {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
-              {header: "Name", value: 'name', class: 'col-md-5', show: true}
-              {header: "Model Catalogue Id", value: 'modelCatalogueId', class: 'col-md-6'}
-            ]
-          else if fn.itemType == 'org.modelcatalogue.core.Relationship'
+          if fn.itemType == 'org.modelcatalogue.core.Relationship' and security.hasRole('CURATOR')
             tabDefinition.actions.push {
               title:  'Remove'
               icon:   'remove'
@@ -99,8 +137,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                         messages.error('Error removing relationship', 'Relationship cannot be removed, see application logs for details')
 
                 deferred.promise
-
-
             }
 
           if tabDefinition.name == $scope.property
@@ -115,13 +151,19 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             continue
           unless angular.isObject(obj) and !angular.isArray(obj) and !enhance.isEnhanced(obj)
             continue
+
+          propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.#{name}")
+
+          if propertyConfiguration.hidden(security)
+            continue
+
           tabDefinition =
             name:       name
-            heading:    names.getNaturalName(name)
+            heading:    propertyConfiguration.label
             value:      obj ? {}
             original:   angular.copy(obj ? {})
             properties: []
-            type:       'simple-object-editor'
+            type:       if security.hasRole('CURATOR') then 'simple-object-editor' else 'properties-pane'
             isDirty:    () -> angular.equals(@original, @value)
             reset:      () -> @value = angular.copy @original
             update:     () ->
@@ -180,10 +222,12 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
             activeTabSet = true
-            if element.elementTypeName == 'Model'
-              $scope.reports = [{name: "exportAll COSD", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx&report=COSD"}, {name: "exportAll NHIC", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xlsx&report=NHIC"},{name: "exportAll XML", url: modelCatalogueApiRoot + "/dataArchitect/getSubModelElements/" + element.id + "?format=xml"}]
 
           tabs.unshift tabDefinition
+
+        tabsByName = {}
+        for tab in tabs
+          tabsByName[tab.name] = tab
 
 
         showTabs = false
@@ -202,26 +246,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.tabs   = []
       $scope.select = (tab) ->
-        $scope.property = tab.name
-        return if not tab.loader?
-        if !tab.disabled and tab.value.empty
-          tab.loader().then (result) ->
-            tab.value       = result
-            $scope.reports  = result.availableReports
+        if $state.current.abstract
+          $scope.property = tab.name
+          loadTab(tab.property)
         else
-          $scope.reports    = tab.value?.availableReports
-
-      $scope.createRelationship = () ->
-        messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element})
-
-      $scope.canEdit = ->
-        return false if not $scope.element
-        messages.hasPromptFactory('edit-' + names.getPropertyNameFromType($scope.element.elementType))
-
-      $scope.edit = ->
-        return if not $scope.element
-        messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
-          $scope.element = updated
+          $state.go '.', {property: tab.name, q: tab.search}
 
       # watches
       $scope.$watch 'element', onElementUpdate
@@ -236,9 +265,16 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.$on 'catalogueElementCreated', refreshElement
       $scope.$on 'catalogueElementDeleted', refreshElement
 
+      $rootScope.$on 'userLoggedIn', refreshElement
+      $rootScope.$on 'userLoggedOut', refreshElement
+
+
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
+
         $scope.property = params.property
+
+        loadTab(params.property)
 
       # init
       onElementUpdate($scope.element)

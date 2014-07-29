@@ -10,7 +10,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 *
 * */
 
-class DataElement extends ExtendibleElement {
+class DataElement extends PublishedElement {
 
     static constraints = {}
 
@@ -20,9 +20,7 @@ class DataElement extends ExtendibleElement {
         modelCatalogueId boost:10
         name boost:5
         extensions component:true
-        incomingRelationships component: true
-        outgoingRelationships component: true
-        except =  ['containedIn', 'instantiatedBy']
+        except = ['incomingRelationships', 'outgoingRelationships']
     }
 
     static relationships = [

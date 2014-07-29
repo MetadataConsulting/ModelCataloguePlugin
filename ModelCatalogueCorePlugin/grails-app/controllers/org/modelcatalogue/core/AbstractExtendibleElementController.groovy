@@ -5,7 +5,7 @@ import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 import static org.springframework.http.HttpStatus.OK
 
-class AbstractExtendibleElementController<T> extends AbstractPublishedElementController<T> {
+class AbstractExtendibleElementController<T> extends AbstractCatalogueElementController<T> {
 
     AbstractExtendibleElementController(Class<T> type, boolean readOnly) {
         super(type, readOnly)
@@ -27,23 +27,30 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
             return
         }
 
+        def oldProps = new HashMap(instance.properties)
+
+        oldProps.remove('modelCatalogueId')
+
+        T helper = createResource(oldProps)
+
         def paramsToBind = getParametersToBind()
-
-        instance.properties = paramsToBind
-
         def ext = paramsToBind.ext
+        paramsToBind.remove 'ext'
+
+        helper.properties = paramsToBind
+
+        if (helper.hasErrors()) {
+            reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
-
-
-        if (instance.hasErrors()) {
-            respond instance.errors, view:'edit' // STATUS CODE 422
-            return
-        }
-
+        instance.properties = paramsToBind
         instance.save flush:true
+
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
@@ -54,7 +61,7 @@ class AbstractExtendibleElementController<T> extends AbstractPublishedElementCon
                         g.createLink(
                                 resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
                                 namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: OK]
+                reportCapableRespond instance, [status: OK]
             }
         }
     }

@@ -19,9 +19,7 @@ class DataType extends CatalogueElement {
 
     static searchable = {
         name boost:5
-        incomingRelationships component: true
-        outgoingRelationships component: true
-        except = ['relatedValueDomains']
+        except = ['relatedValueDomains', 'incomingRelationships', 'outgoingRelationships']
     }
 
     static constraints = {
@@ -48,7 +46,7 @@ class DataType extends CatalogueElement {
 
     static initDefaultDataTypes() {
         for (definition in defaultRelationshipTypesDefinitions) {
-            DataType existing = DataType.findByName(definition.name)
+            DataType existing = findByName(definition.name)
             if (!existing) {
                 new DataType(definition).save()
             }

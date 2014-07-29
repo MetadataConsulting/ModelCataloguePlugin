@@ -66,7 +66,25 @@ modelcatalogue.defaults.datatypes = [
         [name: "xs:decimal" , description: "A decimal value"],
         [name: "xs:int", description: "A signed 32-bit integer"],
         [name: "xs:integer", description: "An integer value"],
-        [name: "xs:long", description: "A signed 64-bit integer"]
+        [name: "xs:long", description: "A signed 64-bit integer"],
+        [name: "xs:boolean", description: "A signed 64-bit integer"],
+        [name: "xs:float", description: "A float is single-precision 32-bit floating point value"],
+        [name: "xs:double", description: "A double is single-precision 64-bit floating point value"],
+        [name: "xs:hexBinary", description: "A hexBinary represents arbitrary hex-encoded binary data"],
+        [name: "xs:base64Binary", description: "A base64Binary represents Base64-encoded arbitrary binary data"],
+        [name: "xs:anyURI", description: "A anyURI represents a Uniform Resource Identifier Reference (URI) data"],
+        [name: "xs:QName", description: "QName represents XML qualified names. The value space of QName is the set of tuples {namespace name, local part}, where namespace name is an anyURI and local part is an NCName."],
+        [name: "xs:NOTATION", description: "NOTATION represents the NOTATION attribute type from [XML 1.0 (Second Edition)]. The value space of NOTATION is the set of QNames of notations declared in the current schema."],
+        [name: "xs:token", description: " A token is the set of strings that do not contain the carriage return (#xD), line feed (#xA) nor tab (#x9) characters, that have no leading or trailing spaces (#x20) and that have no internal sequences of two or more spaces."],
+        [name: "xs:nonPositiveInteger", description: "Defines a nonPositive integer"],
+        [name: "xs:negativeInteger", description: "Defines a negative integer"],
+        [name: "xs:short", description: "Defines an integer value between minInclusive -32768 to maxInclusive 32767"],
+        [name: "xs:nonNegativeInteger", description: "Defines an integer value with minInclusive to 0"],
+        [name: "xs:unsignedLong", description: "Defines an nonNegativeInteger value with maxInclusive to 18446744073709551615"],
+        [name: "xs:unsignedInt", description: "Defines an unsignedLong value with maxInclusive to 4294967295"],
+        [name: "xs:unsignedShort", description: "Defines an unsignedInt value with maxInclusive to 65535"],
+        [name: "xs:unsignedByte", description: "Defines an unsignedShort value with maxInclusive to 255"],
+        [name: "xs:positiveInteger", description: "Defines a nonNegativeInteger value with minInclusive to 1"]
 ]
 
 
@@ -131,12 +149,15 @@ modelcatalogue.defaults.relationshiptypes =  [
 
             return true
         '''],
+        [name: 'base', sourceToDestination: 'based on', destinationToSource: 'is base for', sourceClass: ValueDomain, destinationClass: ValueDomain],
+        [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
         [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
-        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: DataElement, destinationClass: DataElement]
+        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: DataElement, destinationClass: DataElement],
+        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true]
 ]
 
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements

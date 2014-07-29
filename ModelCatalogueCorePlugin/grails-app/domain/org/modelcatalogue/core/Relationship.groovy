@@ -29,8 +29,10 @@ class Relationship implements Extendible {
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
-        except = ['source', 'destination', 'ext']
+        extensions component:true
         relationshipType component:true
+        source component: true
+        destination component: true
     }
 
     CatalogueElement source
@@ -49,6 +51,10 @@ class Relationship implements Extendible {
     }
 
     Boolean archived = false
+
+    static mapping = {
+        extensions lazy: false
+    }
 
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 

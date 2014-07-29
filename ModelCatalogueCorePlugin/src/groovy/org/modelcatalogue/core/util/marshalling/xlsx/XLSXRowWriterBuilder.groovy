@@ -1,14 +1,17 @@
 package org.modelcatalogue.core.util.marshalling.xlsx
 
 import grails.rest.render.RenderContext
+import groovy.util.logging.Log4j
 import org.modelcatalogue.core.util.ListWrapper
 
 /**
  * Created by ladin on 09.04.14.
  */
+@Log4j
 class XLSXRowWriterBuilder {
 
     private String name
+    private String title
     private List<String> headers
     private Closure condition   = {container, condition -> true}
     private Closure writer      = {[]}
@@ -43,6 +46,7 @@ class XLSXRowWriterBuilder {
         this.headers = headers
         this
     }
+
 
     /**
      * Specifies the name of the exported file omitting the extension.
@@ -81,6 +85,19 @@ class XLSXRowWriterBuilder {
 
     }
 
+
+    /**
+     * Defines human readable title.
+     *
+     * @param title human readable title
+     * @return the builder with given title
+     */
+    XLSXRowWriterBuilder title(String title) {
+        this.title = title
+        this
+
+    }
+
     /**
      * Synonym for {@code write} method.
      * @see #write(groovy.lang.Closure)
@@ -97,7 +114,12 @@ class XLSXRowWriterBuilder {
         new XLSXRowWriter() {
             @Override
             boolean isApplicableOn(ListWrapper container, RenderContext context) {
-                self.condition(container, context)
+                try {
+                    return self.condition(container, context)
+                } catch (Exception e) {
+                    log.error("Exception testing row writer $name", e)
+                    return false
+                }
             }
 
             @Override
@@ -108,6 +130,11 @@ class XLSXRowWriterBuilder {
             @Override
             List<List<String>> getRows(Object item) {
                 return self.writer(item)
+            }
+
+            @Override
+            String getTitle() {
+                return self.title ?: self.name ?: 'Excel'
             }
 
             @Override

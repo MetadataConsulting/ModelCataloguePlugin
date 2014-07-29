@@ -5,6 +5,7 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
       object:             '='
       hints:              '=?'
       title:              '@?'
+      valueTitle:         '@?'
     templateUrl: 'modelcatalogue/core/ui/simpleObjectEditor.html'
 
     controller: ['$scope', '$filter', ($scope, $filter) ->

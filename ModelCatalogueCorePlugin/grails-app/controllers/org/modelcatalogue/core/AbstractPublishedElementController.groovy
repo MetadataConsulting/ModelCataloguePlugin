@@ -1,8 +1,12 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.Elements
+import grails.transaction.Transactional
+import org.codehaus.groovy.grails.web.servlet.HttpHeaders
+import org.modelcatalogue.core.util.Lists
 
-class AbstractPublishedElementController<T> extends AbstractCatalogueElementController<T> {
+import static org.springframework.http.HttpStatus.OK
+
+class AbstractPublishedElementController<T> extends AbstractExtendibleElementController<T> {
 
     def publishedElementService
 
@@ -12,19 +16,75 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
 
     @Override
     def index(Integer max) {
-        setSafeMax(max)
-        Integer total = publishedElementService.count(params, resource)
-        def list = publishedElementService.list(params, resource)
+        handleParams(max)
 
-        respondWithReports new Elements(
-                base: "/${resourceName}/${params.status ? params.status : ''}",
-                total: total,
-                items: list
-        )
+        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            eq 'status', PublishedElementService.getStatusFromParams(params)
+        }
+    }
+
+    /**
+     * Updates a resource for the given id
+     * @param id
+     */
+    @Override
+    @Transactional
+    def update() {
+        if(handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        def oldProps = new HashMap(instance.properties)
+
+        oldProps.remove('modelCatalogueId')
+
+        T helper = createResource(oldProps)
+
+        def paramsToBind = getParametersToBind()
+        def ext = paramsToBind.ext
+        paramsToBind.remove 'ext'
+
+        helper.properties = paramsToBind
+
+        if (helper.hasErrors()) {
+            reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        if (params.boolean('newVersion')) {
+            publishedElementService.archiveAndIncreaseVersion(instance)
+        }
+
+        if (ext != null) {
+            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
+        }
+
+        instance.properties = paramsToBind
+        instance.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
+                redirect instance
+            }
+            '*'{
+                response.addHeader(HttpHeaders.LOCATION,
+                        g.createLink(
+                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
+                                namespace: hasProperty('namespace') ? this.namespace : null ))
+                reportCapableRespond instance, [status: OK]
+            }
+        }
     }
 
     def history(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         PublishedElement element = queryForResource(params.id)
         if (!element) {
             notFound()
@@ -34,16 +94,12 @@ class AbstractPublishedElementController<T> extends AbstractCatalogueElementCont
         def customParams = [:]
         customParams.putAll params
 
-        customParams.sort = 'versionNumber'
+        customParams.sort   = 'versionNumber'
+        customParams.order  = 'desc'
 
-        int total = resource.countByModelCatalogueIdLike "$element.bareModelCatalogueId%"
-        def list = resource.findAllByModelCatalogueIdLike "$element.bareModelCatalogueId%", customParams
-
-        respondWithReports new Elements(
-                base: "/${resourceName}/${params.id}/history",
-                items: list,
-                total: total
-        )
+        reportCapableRespond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
+            ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
+        }
     }
 
 }

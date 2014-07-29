@@ -8,7 +8,7 @@ class RelationshipMetadata implements Extension {
 
     static searchable = {
         name boost:5
-        except = ['relationship']
+        except = ['relationship', 'incomingRelationships', 'outgoingRelationships']
     }
 
     String name

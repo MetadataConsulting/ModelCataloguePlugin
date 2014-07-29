@@ -45,4 +45,14 @@ class RelationshipTypeSpec extends Specification {
         true     | "ext.test as Boolean"
     }
 
+
+    def "To camel case"() {
+        expect:
+        RelationshipType.toCamelCase(words) == result
+
+        where:
+        words               | result
+        'has attachments'   | 'hasAttachments'
+    }
+
 }

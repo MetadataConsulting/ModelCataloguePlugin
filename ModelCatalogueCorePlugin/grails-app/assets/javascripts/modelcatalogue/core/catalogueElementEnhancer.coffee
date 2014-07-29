@@ -37,7 +37,12 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           self.refresh        = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{self.link}"
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
           self.update         = () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload()
-          self.show           = () -> $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}) ; self
+          self.show           = () ->
+            if(self.elementTypeName=="Data Import")
+              $state.go('mc.dataArchitect.imports.show', {id: self.id}); self
+            else
+              $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}); self
+
 
           self.isInstanceOf   = (type) ->
             # TODO create hierarchy service
@@ -47,7 +52,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             return false  if self.elementType is 'org.modelcatalogue.core.Relationship'     and type isnt 'org.modelcatalogue.core.Relationship'
             return false  if self.elementType is 'org.modelcatalogue.core.Mapping'          and type isnt 'org.modelcatalogue.core.Mapping'
             return true   if type is 'org.modelcatalogue.core.CatalogueElement'
-            return true   if type in ['org.modelcatalogue.core.ExtendibleElement', 'org.modelcatalogue.core.PublishedElement'] and self.elementType in ['org.modelcatalogue.core.Model', 'org.modelcatalogue.core.DataElement']
+            return true   if type is 'org.modelcatalogue.core.ExtendibleElement'            and self.elementType is  'org.modelcatalogue.core.ValueDomain'
+            return true   if type in ['org.modelcatalogue.core.ExtendibleElement', 'org.modelcatalogue.core.PublishedElement'] and self.elementType in ['org.modelcatalogue.core.Asset', 'org.modelcatalogue.core.Model', 'org.modelcatalogue.core.DataElement']
             return self.elementType == type
 
 

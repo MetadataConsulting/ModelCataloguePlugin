@@ -1,6 +1,7 @@
 /*
  *= require bootstrap/dist/css/bootstrap
  *= require modelcatalogue/core/ui/bs/directives
+ *= require angular-loading-bar/build/loading-bar
  */
 
 // this file obviously need to have some content
@@ -14,7 +15,7 @@ body {
   input {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
-    &:focus {
+    &:hover, &:active, &:focus, &.expanded {
       width: 400px;
     }
   }
@@ -34,5 +35,22 @@ body {
       text-overflow: ellipsis;
     }
   }
+}
+
+.clear-selection {
+  font-size: 16px;
+  position: relative;
+  float: right;
+  right: 100px;
+  margin-right: -60px;
+
+  color: #d9534f;
+  opacity: 0.3;
+  
+  &:hover {
+    color: #d9534f;
+    opacity: 1;
+  }
+
 }
 

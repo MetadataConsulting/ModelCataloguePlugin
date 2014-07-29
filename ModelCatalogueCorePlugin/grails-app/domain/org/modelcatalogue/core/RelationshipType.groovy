@@ -5,13 +5,13 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class RelationshipType {
 
-    //static elasticGormSearchable =
+    def relationshipTypeService
 
     static searchable = {
         name boost: 5
         sourceClass converter: RelationshipTypeClassConverter
         destinationClass converter: RelationshipTypeClassConverter
-        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions', 'ext']
+        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions']
     }
 
     //name of the relationship type i.e. parentChild  or synonym
@@ -34,6 +34,9 @@ class RelationshipType {
 
     // comma separated list of metadata hints
     String metadataHints
+
+    // if the direction of the relationship doesn't matter
+    Boolean bidirectional = Boolean.FALSE
 
     /**
      * This is a script which will be evaluated with following binding:
@@ -158,6 +161,32 @@ class RelationshipType {
                 name: name,
                 link: "/${GrailsNameUtils.getPropertyName(getClass())}/$id"
         ]
+    }
+
+    def beforeInsert() {
+        relationshipTypeService.clearCache()
+    }
+
+    def beforeUpdate() {
+        relationshipTypeService.clearCache()
+    }
+
+    def beforeDelete() {
+        relationshipTypeService.clearCache()
+    }
+
+
+    static String toCamelCase(String text) {
+        if (!text) return text
+        def newParts = []
+        text.split(/\s+/).eachWithIndex { it, index ->
+            if (index > 0) {
+                newParts << it.capitalize()
+            } else {
+                newParts << it
+            }
+        }
+        newParts.join('')
     }
 }
 

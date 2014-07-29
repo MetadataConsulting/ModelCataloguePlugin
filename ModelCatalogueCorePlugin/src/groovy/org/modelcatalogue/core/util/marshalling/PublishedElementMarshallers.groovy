@@ -6,7 +6,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by ladin on 14.02.14.
  */
-abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
+abstract class PublishedElementMarshallers extends ExtendibleElementMarshallers {
 
 
     PublishedElementMarshallers(Class type) {
@@ -19,7 +19,6 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
         ret.putAll(
                 versionNumber: el.versionNumber,
                 status: el.status.toString(),
-                modelCatalogueId: el.modelCatalogueId,
                 history: [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history"]
         )
         ret
@@ -30,6 +29,5 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
         super.addXmlAttributes(el, xml)
         addXmlAttribute(el.versionNumber, "versionNumber", xml)
         addXmlAttribute(el.status, "status", xml)
-        addXmlAttribute(el.modelCatalogueId, "modelCatalogueId", xml)
     }
 }

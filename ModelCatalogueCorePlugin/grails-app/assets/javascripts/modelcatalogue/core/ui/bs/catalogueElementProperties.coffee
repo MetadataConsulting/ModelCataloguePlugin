@@ -1,0 +1,86 @@
+angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
+
+  nameAndIdent = -> [
+    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-6', show: "relation.show()"}
+    {header: 'Identification',  value: "relation.elementTypeName + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()"}
+  ]
+
+  nameAndIdAndMetadata = -> [
+    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-4', show: "relation.show()"}
+    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-4', show: "relation.show()"}
+    {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
+  ]
+
+  dataTypes = -> [
+    {header: 'Name',            value: "relation.dataType.name",                                 classes: 'col-md-6', show: "relation.dataType.show()"}
+    {header: 'Identification',  value: "relation.dataType.elementTypeName + ': ' + relation.id", classes: 'col-md-5', show: "relation.dataType.show()"}
+  ]
+
+  printMetadata = (relationship) ->
+    result  = ''
+    ext     = relationship.ext ? {}
+    for key, value of ext
+      result += "#{key}: #{value ? ''}\n"
+    result
+
+  computeBytes = (relationship) ->
+    asset = relationship.relation
+    GIGA = 1024 * 1024 * 1024
+    MEGA = 1024 * 1024
+    KILO = 1024
+    return "#{(asset.size / GIGA).toFixed(2)} GB" if asset.size > GIGA
+    return "#{(asset.size / MEGA).toFixed(2)} MB" if asset.size > MEGA
+    return "#{(asset.size / KILO).toFixed(2)} KB" if asset.size > KILO
+    return "#{(asset.size)} B"
+
+  attachmentColumns = -> [
+    {header: "Name",        value: 'relation.name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: 'relation.show()'}
+    {header: "File Name",   value: 'relation.originalFileName',  class: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
+    {header: "Size",        value: computeBytes,                 class: 'col-md-2', sort: {property: 'size', type: 'order'}}
+    {header: "Mime Type",   value: 'relation.contentType',       class: 'col-md-2', sort: {property: 'contentType', type: 'alphabet'}}
+  ]
+
+
+
+  # global settings
+  catalogueElementPropertiesProvider.configureProperty 'ext',             label: 'Metadata'
+  catalogueElementPropertiesProvider.configureProperty 'parentOf',        label: 'Children',            columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'childOf',         label: 'Parent',              columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'isContextFor',    label: 'Models',              columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Value Domains',          columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy',  label: 'Value Domains',           columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'contains',        label: 'Data Elements',       columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'containedIn',     label: 'Models',              columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments',         columns: attachmentColumns()
+  catalogueElementPropertiesProvider.configureProperty 'hasContextOf',    label: 'Conceptual Domains',  columns: nameAndIdent()
+
+  catalogueElementPropertiesProvider.configureProperty 'includedIn',      label: 'Conceptual Domains',  columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'instantiates',    label: 'Data Elements'     ,  columns: nameAndIdAndMetadata()
+
+  catalogueElementPropertiesProvider.configureProperty 'history', {
+    hidden: (security) ->
+      !security.hasRole('CURATOR')
+    columns: [
+      {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
+      {header: "Name", value: 'name', class: 'col-md-5', show: true}
+      {header: "Description", value: 'description', class: 'col-md-6'}
+    ]
+  }
+  catalogueElementPropertiesProvider.configureProperty 'relationships',   {
+    hidden: true
+  }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.relationships',   {
+    hidden: false
+  }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.synonyms',   {
+    hidden: true
+  }
+
+#  catalogueElementPropertiesProvider.configureProperty 'valueDomains',    hidden: (security) -> !security.hasRole('CURATOR')
+  catalogueElementPropertiesProvider.configureProperty 'supersededBy',    hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'supersedes',      hidden: true
+
+
+]

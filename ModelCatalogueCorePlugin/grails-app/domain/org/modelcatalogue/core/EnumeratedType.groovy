@@ -27,10 +27,12 @@ class EnumeratedType extends DataType {
     static transients = ['enumerations']
 
     static constraints = {
+        name unique:false
         enumAsString nullable: false, /*unique:true,*/ maxSize: 10000, validator: { encodedVal, obj ->
             Map<String, String> val = stringToMap(encodedVal)
             if (!val) return true
             if (val.size() < 1) return false
+           // if (EnumeratedType.findByEnumAsString(encodedVal)) return false
             return true
         }
     }
@@ -40,9 +42,7 @@ class EnumeratedType extends DataType {
     static searchable = {
         name boost:5
         enumAsString converter: EnumAsStringConverter
-        incomingRelationships component: true
-        outgoingRelationships component: true
-        except = ['relatedValueDomains']
+        except = ['relatedValueDomains', 'incomingRelationships', 'outgoingRelationships']
     }
 
 
@@ -106,7 +106,7 @@ class EnumeratedType extends DataType {
         Map<String, String> ret = [:]
         s.split(/\|/).each { String part ->
             if (!part) return
-            String[] pair = part.split(/:/)
+            String[] pair = part.split("(?<!\\\\):")
             if (pair.length != 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
             ret[unquote(pair[0])] = unquote(pair[1])
         }

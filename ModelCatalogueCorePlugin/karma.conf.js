@@ -27,6 +27,9 @@ module.exports = function(config) {
             // Required libraries
             'grails-app/assets/bower_components/jquery/dist/jquery.js',
             'grails-app/assets/bower_components/angular/angular.js',
+            'grails-app/assets/bower_components/angular-cookies/angular-cookies.js',
+            'grails-app/assets/bower_components/angular-sanitize/angular-sanitize.js',
+            'grails-app/assets/bower_components/angular-http-auth/src/http-auth-interceptor.js',
             'grails-app/assets/bower_components/angular-ui-router/release/angular-ui-router.js',
             'grails-app/assets/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
 

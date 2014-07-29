@@ -2,19 +2,28 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
-import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.ListWithTotal
+import org.modelcatalogue.core.util.Lists
 
-class DataArchitectController {
+class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
     def dataArchitectService, modelService
 
+    DataArchitectController(Class<T> resource, boolean readOnly) {
+        super(resource, readOnly)
+    }
+
+    DataArchitectController(Class<T> resource) {
+        super(resource, false)
+    }
+
     def index(){}
 
     def uninstantiatedDataElements(Integer max){
-        setSafeMax(max)
-        ListAndCount results
+        handleParams(max)
+        ListWithTotal results
 
         try{
             results = dataArchitectService.uninstantiatedDataElements(params)
@@ -24,28 +33,21 @@ class DataArchitectController {
         }
 
         def baseLink = "/dataArchitect/uninstantiatedDataElements"
-        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
+        def total = (results.total)?results.total.intValue():0
 
         Elements elements =  new Elements(
                 base: baseLink,
-                total: results.count,
-                items: results.list,
-                itemType: DataElement,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10,
-                sort: params.sort,
-                order: params.order
+                total: total,
+                items: results.items
         )
 
-        respond elements
+        respondWithLinks elements
     }
 
 
     def metadataKeyCheck(Integer max){
-        setSafeMax(max)
-        ListAndCount results
+        handleParams(max)
+        ListWithTotal results
 
         try{
             results = dataArchitectService.metadataKeyCheck(params)
@@ -56,54 +58,37 @@ class DataArchitectController {
 
 
         def baseLink = "/dataArchitect/metadataKeyCheck"
-        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
         Elements elements =  new Elements(
                 base: baseLink,
-                total: results.count,
-                items: results.list,
-                itemType: DataElement,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10,
-                sort: params.sort,
-                order: params.order
+                total: results.total,
+                items: results.items
         )
 
-        respond elements
+        respondWithLinks elements
     }
 
     def getSubModelElements(){
 
-        def results = new ListAndCount(count: 0, list: [])
-        if(params?.modelId){
-            Model model = Model.get(params.modelId)
+        ListWithTotal results = new ListAndCount(count: 0, list: [])
+        if (params.modelId || params.id){
+            Long id = params.long('modelId') ?: params.long('id')
+            Model model = Model.get(id)
             def subModels = modelService.getSubModels(model)
             results = modelService.getDataElementsFromModels(subModels.list)
         }
 
         def baseLink = "/dataArchitect/getSubModelElements"
-        def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
 
-        Elements elements =  new Elements(
+        respondWithLinks DataElement, new Elements(
                 base: baseLink,
-                total: results.count,
-                items: results.list,
-                itemType: DataElement,
-                previous: links.previous,
-                next: links.next,
-                offset: params.int('offset') ?: 0,
-                page: params.int('max') ?: 10,
-                sort: params.sort,
-                order: params.order
+                total: results.total,
+                items: results.items
         )
-
-        respond elements
     }
 
     def findRelationsByMetadataKeys(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         def results
         def keyOne = params.keyOne
         def keyTwo = params.keyTwo
@@ -124,58 +109,19 @@ class DataArchitectController {
             }
 
             def baseLink = "/dataArchitect/findRelationsByMetadataKeys"
-            def links = ListWrapper.nextAndPreviousLinks(params, baseLink, results.count)
-
             Elements elements =  new Elements(
                     base: baseLink,
-                    total: results.count,
+                    total: results.total,
                     items: results.list,
-                    itemType: Relationship,
-                    previous: links.previous,
-                    next: links.next,
-                    offset: params.int('offset') ?: 0,
-                    page: params.int('max') ?: 10,
-                    sort: params.sort,
-                    order: params.order
             )
 
-            respond elements
+            respondWithLinks elements
 
         }else{
-            respond "please enter keys"
+            reportCapableRespond "please enter keys"
         }
 
     }
 
-
-//    def actionRelationships(){
-//
-//        def relations = params.relatedElements
-//
-//        try {
-//            def errors = dataArchitectService.createRelationshipByType(relations, "relatedTo")
-//        }
-//        catch (Exception ex) {
-//            //log.error("Exception in handling excel file: "+ ex.message)
-//            log.error("Exception in handling excel file")
-//            flash.message = "Error while creating relationships`.";
-//        }
-//
-//    }
-
-    protected setSafeMax(Integer max) {
-        withFormat {
-            json {
-                params.max = Math.min(max ?: 10, 10000)
-            }
-            xml {
-                params.max = Math.min(max ?: 10, 10000)
-            }
-            xlsx {
-                params.max = Math.min(max ?: 10000, 10000)
-            }
-        }
-
-    }
 
 }

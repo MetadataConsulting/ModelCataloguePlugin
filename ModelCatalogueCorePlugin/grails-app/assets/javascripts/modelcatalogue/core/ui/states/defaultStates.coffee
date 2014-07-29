@@ -2,6 +2,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
     $scope.element  = element
 ])
+
+.controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+    $scope.element  = element
+])
+
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', ($scope, $stateParams, $state, $log, list, names, enhance) ->
     listEnhancer    = enhance.getEnhancer('list')
 
@@ -9,13 +14,15 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.title                    = names.getNaturalName($stateParams.resource)
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
-    $scope.contained                = {}
-    $scope.contained.elements       = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
-    $scope.selectedElement          = if list.size > 0 then list.list[0] else {name: 'No Selection'}
+    $scope.contained                = $scope.$new(true)
+    $scope.contained.noStatusSwitch = $scope.$new(true)
+    $scope.contained.list           = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
+    $scope.contained.element        = if list.size > 0 then list.list[0]
     $scope.contained.columns        = [
       {header: 'Name',          value: "relation.name",        classes: 'col-md-6', show: "relation.show()"}
       {header: 'Description',   value: "relation.description", classes: 'col-md-6'}
     ]
+
 
     if $scope.resource == 'model'
       for item in list
@@ -25,14 +32,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
         unless element._containedElements_?.empty
           element.contains().then (contained)->
             element._containedElements_ = contained
-            $scope.contained.elements   = contained
-        $scope.selectedElement          = element
-        $scope.contained.elements       = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
+            $scope.contained.list       = contained
+        $scope.contained.element        = element
+        $scope.contained.list           = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
 
     else if $scope.resource == 'newRelationships'
       $scope.columns = [
-        {header: "source",          value: 'source.name',          class: 'col-md-6' }
-        {header: "destination",        value: 'destination.name',        class: 'col-md-6' }
+        {header: "source",          value: 'source.name',           class: 'col-md-6' }
+        {header: "destination",     value: 'destination.name',      class: 'col-md-6' }
       ]
 
   ])
@@ -51,7 +58,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all?page&order&sort'
+    url: '/all?page&order&sort&status&q&max'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
@@ -60,9 +67,15 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
           page = parseInt($stateParams.page ? 1, 10)
           page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only model controller will respond on it
-          params = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
-          params.order = $stateParams.order ? 'asc'
-          params.sort  = $stateParams.sort ? 'name'
+          params        = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true, system: true
+          params.order  = $stateParams.order ? 'asc'
+          params.sort   = $stateParams.sort ? 'name'
+          params.status = $stateParams.status ? 'finalized'
+          params.max    = $stateParams.max ? 10
+
+          if $stateParams.q
+            return catalogueElementResource($stateParams.resource).search($stateParams.q, params)
+
           catalogueElementResource($stateParams.resource).list(params)
         ]
 
@@ -81,15 +94,28 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ShowCtrl'
   }
 
-  $stateProvider.state 'mc.resource.show.property', {url: '/:property?page'}
+  $stateProvider.state 'mc.resource.uuid', {
+    url: '/uuid/:uuid'
+
+    templateUrl: 'modelcatalogue/core/ui/state/show.html'
+
+    resolve:
+      element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
+        catalogueElementResource($stateParams.resource).getByUUID($stateParams.uuid)
+      ]
+
+    controller: 'mc.core.ui.states.ShowCtrl'
+  }
+
+  $stateProvider.state 'mc.resource.show.property', {url: '/:property?page&sort&order&max&q'}
 
   $stateProvider.state('mc.search', {
-      url: "/search/{searchString}",
+      url: "/search/{q}",
       templateUrl: 'modelcatalogue/core/ui/state/list.html'
       resolve: {
         list: ['$stateParams','modelCatalogueSearch', ($stateParams, modelCatalogueSearch) ->
-          $stateParams.resource = "dataElement"
-          return modelCatalogueSearch($stateParams.searchString)
+          $stateParams.resource = "searchResult"
+          return modelCatalogueSearch($stateParams.q)
         ]
       },
       controller: 'mc.core.ui.states.ListCtrl'
@@ -202,7 +228,43 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     controller: 'mc.core.ui.states.ListCtrl'
   }
 
+  $stateProvider.state 'mc.dataArchitect.imports', {
+    abstract: true
+    url: '/imports'
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  }
+
+  $stateProvider.state 'mc.dataArchitect.imports.list', {
+    url: '/all?page&order&sort&status'
+    templateUrl: 'modelcatalogue/core/ui/state/list.html'
+    resolve:
+      list: ['$stateParams','modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        $stateParams.resource = "import"
+        page = parseInt($stateParams.page ? 1, 10)
+        page = 1 if isNaN(page)
+        # it's safe to call top level for each controller, only model controller will respond on it
+        params        = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
+        params.order  = $stateParams.order ? 'asc'
+        params.sort   = $stateParams.sort ? 'name'
+        return modelCatalogueDataArchitect.imports(params)
+      ]
+
+    controller: 'mc.core.ui.states.ListCtrl'
+  }
+
+  $stateProvider.state 'mc.dataArchitect.imports.show', {
+    url: '/{id:\\d+}'
+    templateUrl: 'modelcatalogue/core/ui/state/dataImport.html'
+    resolve:
+      element: ['$stateParams','modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+        $stateParams.resource = "Import"
+        return modelCatalogueDataArchitect.getImport($stateParams.id)
+      ]
+
+    controller: 'mc.core.ui.states.DataImportCtrl'
+  }
 ])
+
 .run(['$rootScope', '$state', '$stateParams', ($rootScope, $state, $stateParams) ->
     # It's very handy to add references to $state and $stateParams to the $rootScope
     # so that you can access them from any scope within your applications.For example,
@@ -217,32 +279,41 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     <ui-view></ui-view>
   '''
 
+  #language=HTML
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
-    <div ng-if="list.total &amp;&amp; resource != 'model'">
+    <div ng-if="resource != 'model'">
       <span class="pull-right">
-        <div class="btn-group btn-group-sm">
-          <button type="button" class="btn btn-primary dropdown-toggle" ng-disabled="list.availableReports &amp;&amp; list.availableReports.length == 0">
-            <span class="glyphicon glyphicon-download-alt"></span> Export <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" role="menu">
-            <li><a ng-href="{{report.url}}" target="_blank" ng-repeat="report in list.availableReports">{{natural(report.name)}}</a></li>
-          </ul>
-        </div>
+        <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
       <h2>{{title}} List</h2>
-      <decorated-list list="list" columns="columns"></decorated-list>
+      <decorated-list list="list" columns="columns" state-driven="true"></decorated-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">
-        <div class="col-md-4"><h2>Model Hierarchy</h2></div>
-        <div class="col-md-8"><h3 ng-show="selectedElement">{{selectedElement.name}} Data Elements</h3></div>
+        <div class="col-md-4">
+          <h2>
+            Model Hierarchy
+            <contextual-actions size="sm" icon-only="true" group="true" no-colors="true"></contextual-actions>
+            </span>
+          </h2>
+        </div>
+        <div class="col-md-8">
+
+          <h3 ng-show="contained.element">{{contained.element.name}} Data Elements
+            <span class="pull-right">
+              <contextual-actions size="sm" no-colors="true" icon-only="true" scope="contained"></contextual-actions>
+            </span>
+          </h3>
+          <h3 ng-hide="contained.element">No Selection</h3>
+        </div>
       </div>
       <div class="row">
         <div class="col-md-4">
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
         <div class="col-md-8">
-          <decorated-list list="contained.elements" columns="contained.columns" stateless="true"></decorated-list>
+          <blockquote class="ce-description" ng-show="contained.element.description">{{contained.element.description}}</blockquote>
+          <decorated-list list="contained.list" columns="contained.columns" stateless="true"></decorated-list>
         </div>
         <hr/>
       </div>
@@ -254,6 +325,13 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       <catalogue-element-view element="element"></catalogue-element-view>
     </div>
   '''
+
+  $templateCache.put 'modelcatalogue/core/ui/state/dataImport.html', '''
+    <div ng-show="element">
+      <import-view element="element"></import-view>
+    </div>
+  '''
+
 ])
 # debug states
 #.run(['$rootScope', '$log', ($rootScope, $log) ->

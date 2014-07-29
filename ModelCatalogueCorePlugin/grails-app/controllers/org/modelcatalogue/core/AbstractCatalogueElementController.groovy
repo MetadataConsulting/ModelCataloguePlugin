@@ -1,9 +1,10 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.ListAndCount
+import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.SimpleListWrapper
 
 import javax.servlet.http.HttpServletResponse
 
@@ -14,6 +15,10 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
     def relationshipService
     def mappingService
+
+	def uuid(String uuid){
+		reportCapableRespond resource.findByModelCatalogueId(uuid)
+	}
 
     AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
         super(resource, readOnly)
@@ -119,7 +124,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType) :  relationshipService.link(destination, source, relationshipType)
 
         if (rel.hasErrors()) {
-            respond rel.errors
+            reportCapableRespond rel.errors
             return
         }
 
@@ -130,7 +135,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         }
 
         response.status = HttpServletResponse.SC_CREATED
-        respond rel
+        reportCapableRespond rel
     }
 
     protected parseOtherSide() {
@@ -150,7 +155,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     }
 
     private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
-        setSafeMax(max)
+        handleParams(max)
 
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
@@ -164,33 +169,66 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        ListAndCount listAndCount = relationshipService.getRelationships(params, direction, element, type)
-        respondWithReports new Relationships(
-                base: "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""),
+        reportCapableRespond new Relationships(
                 owner: element,
-                items: listAndCount.list,
                 direction: direction,
-                total: listAndCount.count,
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type))
         )
+    }
+
+    def searchIncoming(Integer max, String type) {
+        searchWithinRelationshipsInternal(max, type, RelationshipDirection.INCOMING)
+    }
+
+    def searchOutgoing(Integer max, String type) {
+        searchWithinRelationshipsInternal(max, type, RelationshipDirection.OUTGOING)
+    }
+
+
+    def searchRelationships(Integer max, String type) {
+        searchWithinRelationshipsInternal(max, type, RelationshipDirection.BOTH)
+    }
+
+    private searchWithinRelationshipsInternal(Integer max, String type, RelationshipDirection direction){
+        CatalogueElement element = queryForResource(params.id)
+
+        if (!element) {
+            notFound()
+            return
+        }
+
+        RelationshipType relationshipType = RelationshipType.findByName(type)
+
+        handleParams(max)
+        def results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
+
+        if(results.errors){
+            reportCapableRespond results
+            return
+        }
+
+        def total = (results.total)?results.total.intValue():0
+
+        SimpleListWrapper<Relationship> elements = new SimpleListWrapper<Relationship>(
+                base: "/${resourceName}/${params.id}/${direction.actionName}" + (type ? "/${type}" : "") + "/search?search=${params.search?.encodeAsURL() ?: ''}",
+                total: total,
+                items: results.searchResults,
+        )
+        reportCapableRespond new Relationships(owner: element, direction: direction, list: withLinks(elements))
     }
 
 
     def mappings(Integer max){
-        setSafeMax(max)
+        handleParams(max)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
             return
         }
 
-        int total = element.outgoingMappings.size()
-        def list = Mapping.findAllBySource(element, params)
-
-        respondWithReports new Mappings(
-                base: "/${resourceName}/${params.id}/mapping",
-                items: list,
-                total: total
-        )
+        reportCapableRespond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping", "mappings") {
+            eq 'source', element
+        })
     }
 
     def removeMapping() {
@@ -229,11 +267,11 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             }
             Mapping mapping = mappingService.map(element, destination, mappingString)
             if (mapping.hasErrors()) {
-                respond mapping.errors
+                reportCapableRespond mapping.errors
                 return
             }
             response.status = HttpServletResponse.SC_CREATED
-            respond mapping
+            reportCapableRespond mapping
             return
         }
         Mapping old = mappingService.unmap(element, destination)

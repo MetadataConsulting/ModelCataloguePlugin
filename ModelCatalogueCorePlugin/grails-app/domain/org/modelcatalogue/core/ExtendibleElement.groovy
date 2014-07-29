@@ -8,17 +8,20 @@ import org.modelcatalogue.core.util.ExtensionsWrapper
 *
 * */
 
-abstract class ExtendibleElement extends PublishedElement implements Extendible {
+abstract class ExtendibleElement extends CatalogueElement implements Extendible {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
         extensions component:true
-        except = ['ext']
     }
 
     static hasMany = [extensions: ExtensionValue]
     static transients = ['ext']
+
+    static mapping = {
+        extensions lazy: false
+    }
 
     Map<String, String> ext = new ExtensionsWrapper(this)
 
