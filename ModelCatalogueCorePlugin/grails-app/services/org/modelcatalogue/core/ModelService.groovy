@@ -19,7 +19,7 @@ class ModelService {
             select distinct m
             from Model m
             where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-            group by m.name
+            group by m.name, m.id
             order by m.name
         ""","""
             select count(m.id)
