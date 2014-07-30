@@ -6,7 +6,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
         constructor: (element) ->
           angular.extend(@, element)
 
-          @defaultExcludes = ['id','elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
+          @defaultExcludes = ['id','elementTypeName', 'elementType', 'elementTypes', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
           @getUpdatePayload = () ->
             payload = {}
             for name in @updatableProperties
@@ -45,17 +45,9 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
 
           self.isInstanceOf   = (type) ->
-            # TODO create hierarchy service
             return false  if not type?
-            return false  if type.indexOf('org.modelcatalogue.core.') == -1
-            return false  if self.elementType is 'org.modelcatalogue.core.RelationshipType' and type isnt 'org.modelcatalogue.core.RelationshipType'
-            return false  if self.elementType is 'org.modelcatalogue.core.Relationship'     and type isnt 'org.modelcatalogue.core.Relationship'
-            return false  if self.elementType is 'org.modelcatalogue.core.Mapping'          and type isnt 'org.modelcatalogue.core.Mapping'
-            return true   if type is 'org.modelcatalogue.core.CatalogueElement'
-            return true   if type is 'org.modelcatalogue.core.ExtendibleElement'            and self.elementType is  'org.modelcatalogue.core.ValueDomain'
-            return true   if type in ['org.modelcatalogue.core.ExtendibleElement', 'org.modelcatalogue.core.PublishedElement'] and self.elementType in ['org.modelcatalogue.core.Asset', 'org.modelcatalogue.core.Model', 'org.modelcatalogue.core.DataElement']
-            return self.elementType == type
-
+            return false  if not self.elementTypes
+            return type in self.elementTypes
 
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)

@@ -20,4 +20,33 @@ class CatalogueElementFinderSpec extends Specification {
 
     }
 
+
+    def "Find all element types"() {
+        when:
+        def relTypeTypes = CatalogueElementFinder.getAllTypesNames(RelationshipType)
+
+        then:
+        !relTypeTypes
+
+        when:
+        def ceTypes = CatalogueElementFinder.getAllTypesNames(CatalogueElement)
+
+        then:
+        ceTypes == [CatalogueElement.name]
+
+        when:
+        def assetTypes = CatalogueElementFinder.getAllTypesNames(Asset)
+
+        then:
+        assetTypes
+        assetTypes.size() == 4
+
+        CatalogueElement.name in assetTypes
+        ExtendibleElement.name in assetTypes
+        PublishedElement.name in assetTypes
+        Asset.name in assetTypes
+
+
+    }
+
 }

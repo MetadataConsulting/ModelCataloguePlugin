@@ -12,6 +12,7 @@ import org.springframework.core.type.filter.TypeFilter
 class CatalogueElementFinder {
 
     static final Set<String> catalogueElementClasses
+    static final Map<Class, List<String>> allTypesCache = [:]
 
     private static final ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false) {
         protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
@@ -47,6 +48,20 @@ class CatalogueElementFinder {
 
         Set<BeanDefinition> candidates = provider.findCandidateComponents("")
         catalogueElementClasses = Collections.unmodifiableSet(candidates.collect { it.beanClassName } as Set)
+    }
+
+    static List<String> getAllTypesNames(Class cls) {
+        List<String> ret = allTypesCache[cls]
+        if (ret != null) {
+            return ret
+        }
+        if (!cls || !CatalogueElement.isAssignableFrom(cls)) {
+            allTypesCache[cls] = []
+            return []
+        }
+        ret = [cls.name, *getAllTypesNames(cls.superclass)]
+        allTypesCache[cls] = ret
+        ret
     }
 
 

@@ -46,15 +46,25 @@ describe "mc.core.catalogueElementEnhancer", ->
     expect(domain.isInstanceOf).toBeFunction()
     expect(model.isInstanceOf).toBeFunction()
 
-    expect(domain.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeTruthy()
-    expect(domain.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
-    expect(domain.isInstanceOf('org.modelcatalogue.core.Model')).toBeFalsy()
+    describe "test value domain and model", ->
+      it "test value domain is ValueDomain", ->
+        expect(domain.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeTruthy()
+      it "test value domain is CatalogueElement", ->
+        expect(domain.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
+      it "test value domain isn't Model", ->
+        expect(domain.isInstanceOf('org.modelcatalogue.core.Model')).toBeFalsy()
 
-    expect(model.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeFalsy()
-    expect(model.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
-    expect(model.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
-    expect(model.isInstanceOf('org.modelcatalogue.core.Model')).toBeTruthy()
-    expect(model.isInstanceOf('org.modelcatalogue.core.ExtendibleElement')).toBeTruthy()
-    expect(model.isInstanceOf('org.modelcatalogue.core.PublishedElement')).toBeTruthy()
+      it "test model isn't ValueDomain", ->
+        expect(model.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeFalsy()
+      it "test model isn't MeasurementUnit", ->
+        expect(model.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
+      it "test model is CatalogueElement", ->
+        expect(model.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
+      it "test model is Model", ->
+        expect(model.isInstanceOf('org.modelcatalogue.core.Model')).toBeTruthy()
+      it "test model is ExtendibleElement", ->
+        expect(model.isInstanceOf('org.modelcatalogue.core.ExtendibleElement')).toBeTruthy()
+      it "test model is PublishedElement", ->
+        expect(model.isInstanceOf('org.modelcatalogue.core.PublishedElement')).toBeTruthy()
 
 

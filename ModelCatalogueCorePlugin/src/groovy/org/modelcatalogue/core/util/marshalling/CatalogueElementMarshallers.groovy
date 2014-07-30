@@ -9,6 +9,7 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeService
 import org.modelcatalogue.core.reports.ReportDescriptor
 import org.modelcatalogue.core.reports.ReportsRegistry
+import org.modelcatalogue.core.util.CatalogueElementFinder
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
@@ -33,6 +34,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 description: el.description,
                 version: el.version,
                 elementType: el.class.name,
+                elementTypes: CatalogueElementFinder.getAllTypesNames(el.class),
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 relationships: [count: el.countRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],

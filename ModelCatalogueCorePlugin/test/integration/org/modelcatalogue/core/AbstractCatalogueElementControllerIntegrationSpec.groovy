@@ -814,6 +814,11 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.incomingRelationships.count, (item?.incomingRelationships)?item.incomingRelationships.size(): 0, "incomingCount")
         checkProperty(json.incomingRelationships.link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/incoming", "incomingLink")
         checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
+
+        assert json.elementTypes
+        assert CatalogueElement.name in json.elementTypes
+        assert resource.name in json.elementTypes
+
         return true
     }
 
@@ -833,6 +838,11 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.incomingRelationships.count, (outputItem?.incomingRelationships)?outputItem.incomingRelationships.size(): 0, "incomingCount")
         checkProperty(json.incomingRelationships.link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/incoming", "incomingLink")
         checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
+
+        assert json.elementTypes
+        assert CatalogueElement.name in json.elementTypes
+        assert resource.name in json.elementTypes
+
         return true
     }
 
