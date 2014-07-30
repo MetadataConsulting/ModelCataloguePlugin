@@ -82,6 +82,23 @@ grails.project.dependency.resolution = {
                     'spring-security-core', 'spring-test', 'spring-tx', 'spring-web', 'spring-webmvc',
                     'tomcat-servlet-api'
         }
+
+        // Selenium WebDriver, for use in Geb
+        def webDriverVersion = "2.41.0"
+
+        // Testing modules
+        test "org.gebish:geb-spock:0.9.3"
+        test "org.seleniumhq.selenium:selenium-support:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-firefox-driver:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
+
+        // Required because of bug in 2.37.0 of WebDriver:
+        test "org.apache.httpcomponents:httpclient:4.3.1"
+        test("org.seleniumhq.selenium:selenium-htmlunit-driver:${webDriverVersion}") {
+            exclude 'xml-apis'
+        }
+
     }
 
     plugins {
@@ -100,6 +117,8 @@ grails.project.dependency.resolution = {
         //runtime ":jquery:1.10.2.2"
         runtime ":resources:1.2.1"
         compile ":csv:0.3.1"
+
+        test ":geb:0.9.3"
 
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"
