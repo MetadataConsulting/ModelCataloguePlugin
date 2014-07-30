@@ -61,8 +61,8 @@ environments {
             retryInterval = 1
         }
 
-        String username = System.getenv("SAUCE_ONDEMAND_USERNAME");
-        String apiKey = System.getenv("SAUCE_ONDEMAND_ACCESS_KEY");
+        String username = System.getenv("SAUCE_USER_NAME");
+        String apiKey = System.getenv("SAUCE_API_KEY");
         if(username == null || apiKey == null){
             System.err.println("Sauce OnDemand credentials not set.");
         }
