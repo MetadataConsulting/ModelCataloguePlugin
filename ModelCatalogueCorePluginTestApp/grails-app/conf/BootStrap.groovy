@@ -28,6 +28,7 @@ class BootStrap {
 
         xlsxListRenderer.registerRowWriter('reversed') {
             title "Reversed DEMO Export"
+            append metadata
             headers 'Description', 'Name', 'ID'
             when { ListWrapper container, RenderContext context ->
                 context.actionName in ['index', 'search'] && container.itemType && CatalogueElement.isAssignableFrom(container.itemType)

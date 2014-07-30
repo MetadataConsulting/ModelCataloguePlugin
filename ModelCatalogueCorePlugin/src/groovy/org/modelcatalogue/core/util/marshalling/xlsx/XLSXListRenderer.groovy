@@ -9,6 +9,7 @@ import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetService
+import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
@@ -88,17 +89,43 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
                 List<Object> headers = writer.getHeaders()
 
-                if (headers) {
-                    exporter.fillRow(headers, counter++)
-                }
+                if (writer.appendingMetadata) {
+                    Map<String, Integer> headers2index = [:]
+                    List<List<Object>> rowsToWrite     = [headers]
+                    for (item in container.items) {
+                        List<List<Object>> rows = writer.getRows(item)
+                        for (List<Object> row in rows) {
+                            List<Object> extendibleRow = row.withDefault { "" }
+                            if (item instanceof Extendible) {
+                                item.listExtensions().each {
+                                    Integer index = headers2index[it.name]
+                                    if (index == null) {
+                                        index = headers.size()
+                                        headers.add(it.name)
+                                        headers2index.put(it.name, index)
+                                    }
+                                    extendibleRow[index] = it.extensionValue
+                                }
+                            }
+                            rowsToWrite << extendibleRow
+                        }
+                    }
 
-                for (item in container.items) {
-                    List<List<Object>> rows = writer.getRows(item)
-                    for (List<Object> row in rows) {
+                    for (row in rowsToWrite) {
                         exporter.fillRow(row, counter++)
                     }
-                }
+                } else {
+                    if (headers) {
+                        exporter.fillRow(headers, counter++)
+                    }
 
+                    for (item in container.items) {
+                        List<List<Object>> rows = writer.getRows(item)
+                        for (List<Object> row in rows) {
+                            exporter.fillRow(row, counter++)
+                        }
+                    }
+                }
 
                 Asset updated = Asset.get(id)
 
