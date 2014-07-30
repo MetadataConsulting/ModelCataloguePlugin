@@ -19,6 +19,11 @@ abstract class CatalogueElement {
     String description
 	String modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
 
+
+    // time stamping
+    Date dateCreated
+    Date lastUpdated
+
     static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]

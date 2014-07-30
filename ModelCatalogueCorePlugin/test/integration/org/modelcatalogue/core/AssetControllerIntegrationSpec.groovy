@@ -168,6 +168,7 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
     @Override
     def customJsonPropertyCheck(item, json){
         super.customJsonPropertyCheck(item, json)
+        assert item.versionCreated
         checkStringProperty(json.modelCatalogueId , item.modelCatalogueId, "modelCatalogueId")
         checkProperty(json.status , item.status, "status")
         checkProperty(json.ext, item.ext, "extension")
