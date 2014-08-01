@@ -70,10 +70,6 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
               $scope.messages.error 'Empty Name', 'Please fill the name'
               return
 
-            if not $scope.copy.dataType or not angular.isObject($scope.copy.dataType)
-              $scope.messages.error 'Empty Data Type', 'Please fill the data type'
-              return
-
 
             promise = null
 
