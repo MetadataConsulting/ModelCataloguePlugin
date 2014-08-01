@@ -71,6 +71,16 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
       {header: "File Name", value: 'originalFileName',  class: 'col-md-4', show: true}
       {header: "Size",      class: 'col-md-3', value: (it) -> computeBytes({relation: it})}
     ]
+    actions: ['security', '$window', (security, $window) -> [
+      {
+        title:      'Download'
+        icon:       'download'
+        type:       'primary'
+        action:     (element) ->
+          $window.open element.downloadUrl, '_blank'; return true
+
+      }
+    ]]
   }
   catalogueElementPropertiesProvider.configureProperty 'relationships',   {
     hidden: true

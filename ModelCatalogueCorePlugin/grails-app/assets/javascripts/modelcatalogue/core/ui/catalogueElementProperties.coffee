@@ -25,6 +25,7 @@ angular.module('mc.core.ui.catalogueElementProperties', ['mc.util.names']).provi
       propertyName          = names.getPropertyNameFromQualifier(name)
       defaultPropertyConfig = angular.extend({
         hidden: -> false
+        actions: -> []
         label:  names.getNaturalName(propertyName)
       }, propertyConfigurationRegistry[propertyName] ? {})
       propertyConfig = propertyConfigurationRegistry[name] ? defaultPropertyConfig
