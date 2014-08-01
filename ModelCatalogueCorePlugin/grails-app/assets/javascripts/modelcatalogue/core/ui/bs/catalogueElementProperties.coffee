@@ -11,11 +11,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
-  dataTypes = -> [
-    {header: 'Name',            value: "relation.dataType.name",                                 classes: 'col-md-6', show: "relation.dataType.show()"}
-    {header: 'Identification',  value: "relation.dataType.elementTypeName + ': ' + relation.id", classes: 'col-md-5', show: "relation.dataType.show()"}
-  ]
-
   printMetadata = (relationship) ->
     result  = ''
     ext     = relationship.ext ? {}
@@ -64,6 +59,17 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
       {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
       {header: "Name", value: 'name', class: 'col-md-5', show: true}
       {header: "Description", value: 'description', class: 'col-md-6'}
+    ]
+  }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.history', {
+    hidden: (security) ->
+      !security.hasRole('CURATOR')
+    columns: [
+      {header: "Version",   value: 'versionNumber',     class: 'col-md-1', show: true}
+      {header: "Name",      value: 'name',              class: 'col-md-4', show: true}
+      {header: "File Name", value: 'originalFileName',  class: 'col-md-4', show: true}
+      {header: "Size",      class: 'col-md-3', value: (it) -> computeBytes({relation: it})}
     ]
   }
   catalogueElementPropertiesProvider.configureProperty 'relationships',   {
