@@ -12,8 +12,11 @@ class SmokeSpec extends GebSpec {
         then:
         title                       == "Model Catalogue Demo App"
         at ModalTreeViewPage
+        waitFor {
+            viewTitle.displayed
+        }
         viewTitle.text().trim()     == 'Model Hierarchy'
-        subviewTitle.text().trim()  == 'Another root #000 Data Elements'
+        subviewTitle.text().trim()  == 'No Selection'
 
         when:
         loginAdmin()
@@ -37,6 +40,9 @@ class SmokeSpec extends GebSpec {
         description = "New Model's Description"
 
         saveButton.click()
+        waitFor {
+            $('blockquote').displayed
+        }
 
         then:
         $('blockquote').text() == "New Model's Description"
