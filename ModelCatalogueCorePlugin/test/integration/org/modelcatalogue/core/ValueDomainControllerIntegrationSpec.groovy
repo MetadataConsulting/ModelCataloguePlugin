@@ -58,6 +58,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
         super.xmlCustomPropertyCheck(xml, item)
         checkProperty(xml.unitOfMeasure.name, item.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(xml.dataType.@id, item.dataType.id, "dataType")
+        checkProperty(xml.@multiple, item.multiple, "multiple")
         return true
     }
 
@@ -66,6 +67,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
         super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
         checkProperty(xml.unitOfMeasure.name, inputItem.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(xml.dataType.@id, inputItem.dataType.id, "dataType")
+        checkProperty(xml.@multiple, outputItem.multiple, "multiple")
         return true
     }
 
@@ -74,6 +76,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
         super.customJsonPropertyCheck(item, json)
         checkProperty(json.unitOfMeasure.name, item.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(json.dataType.id, item.dataType.id, "dataType")
+        checkProperty(json.multiple, item.multiple, "multiple")
         return true
     }
 
@@ -82,6 +85,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
         super.customJsonPropertyCheck(inputItem, json, outputItem)
         checkProperty(json.unitOfMeasure.name, inputItem.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(json.dataType.id, inputItem.dataType.id, "dataType")
+        checkProperty(json.multiple, outputItem.multiple, "multiple")
         return true
     }
 

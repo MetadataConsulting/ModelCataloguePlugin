@@ -49,6 +49,9 @@ class ValueDomain extends ExtendibleElement  {
 
 	MeasurementUnit unitOfMeasure
 	String rule
+
+    Boolean multiple = Boolean.FALSE
+
     static belongsTo = [dataType: DataType]
     static transients = ['regexDef']
 
