@@ -49,12 +49,17 @@ class ValueDomain extends ExtendibleElement  {
 
 	MeasurementUnit unitOfMeasure
 	String rule
+
+    Boolean multiple = Boolean.FALSE
+
     static belongsTo = [dataType: DataType]
     static transients = ['regexDef']
 
     static constraints = {
-		description nullable:true, maxSize: 2000
-		unitOfMeasure nullable:true, maxSize: 255
+		description     nullable:true, maxSize: 2000
+		unitOfMeasure   nullable:true
+        dataType        nullable: true
+
 		rule nullable:true, maxSize: 200, validator: { val,obj ->
             if(!val){return true}
             SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(x: null, domain: obj).validate(val)
@@ -64,8 +69,8 @@ class ValueDomain extends ExtendibleElement  {
 
 
     static relationships = [
-        incoming: [inclusion: 'includedIn', instantiation: 'instantiates', base: 'basedOn'],
-        outgoing: [base: 'isBaseFor']
+        incoming: [inclusion: 'includedIn', instantiation: 'instantiates', base: 'basedOn', union: 'unitedIn'],
+        outgoing: [base: 'isBaseFor', union: 'unionOf']
     ]
 
     void setRegexDef(String regex) {

@@ -17,6 +17,7 @@ class ValueDomainMarshaller extends ExtendibleElementMarshallers {
         ret.putAll unitOfMeasure: el.unitOfMeasure,
                 rule: el.rule,
                 dataType: el.dataType,
+                multiple: el.multiple ?: false,
                 mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"]
         ret
     }
@@ -31,6 +32,11 @@ class ValueDomainMarshaller extends ExtendibleElementMarshallers {
         }
     }
 
+    @Override
+    protected void addXmlAttributes(Object el, XML xml) {
+        super.addXmlAttributes(el, xml)
+        xml.attribute('multiple', el.multiple ? "true" : "false")
+    }
 }
 
 

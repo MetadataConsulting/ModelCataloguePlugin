@@ -63,6 +63,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         expect:
         author != archived
         author.id != archived.id
+        author.versionCreated != author.dateCreated
         originalVersion != newVersion
         originalVersion == newVersion - 1
         archivedVersion == originalVersion

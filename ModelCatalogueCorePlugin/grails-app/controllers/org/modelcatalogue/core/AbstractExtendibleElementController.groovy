@@ -17,6 +17,11 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
      */
     @Transactional
     def update() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
         if(handleReadOnly()) {
             return
         }

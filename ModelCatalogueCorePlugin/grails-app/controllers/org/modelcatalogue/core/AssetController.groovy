@@ -17,6 +17,10 @@ class AssetController extends AbstractPublishedElementController<Asset> {
     }
 
     def upload() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
         MultipartFile file = request.getFile('asset')
 
         Asset asset = assetService.upload(params.long('id'), params.name, params.description, file)

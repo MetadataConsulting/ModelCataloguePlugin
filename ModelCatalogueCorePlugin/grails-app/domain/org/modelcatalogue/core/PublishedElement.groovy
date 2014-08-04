@@ -11,6 +11,8 @@ abstract class PublishedElement extends ExtendibleElement  {
     //to do this
     PublishedElementStatus status = PublishedElementStatus.DRAFT
 
+    Date versionCreated = new Date()
+
     static searchable = {
         except = ['versionNumber']
     }

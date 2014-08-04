@@ -3,16 +3,20 @@ package org.modelcatalogue.core
 import grails.converters.XML
 import grails.rest.RestfulController
 import grails.transaction.Transactional
+import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
 
+import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.OK
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
@@ -20,6 +24,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     AssetService assetService
     SearchCatalogue modelCatalogueSearchService
+    SecurityService modelCatalogueSecurityService
     ExecutorService executorService
 
     XLSXListRenderer xlsxListRenderer
@@ -98,6 +103,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Override
     @Transactional
     def delete() {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notAuthorized()
+            return
+        }
+
         if(handleReadOnly()) {
             return
         }
@@ -121,6 +131,90 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         render status: NO_CONTENT // NO CONTENT STATUS CODE
+    }
+
+    protected String getRoleForSaveAndEdit() {
+        'CURATOR'
+    }
+
+    /**
+     * Saves a resource
+     */
+    @Transactional
+    def save() {
+        if (!modelCatalogueSecurityService.hasRole(roleForSaveAndEdit)) {
+            notAuthorized()
+            return
+        }
+        if(handleReadOnly()) {
+            return
+        }
+        def instance = createResource(getParametersToBind())
+
+        instance.validate()
+        if (instance.hasErrors()) {
+            respond instance.errors, view:'create' // STATUS CODE 422
+            return
+        }
+
+        instance.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: "${resourceName}.label".toString(), default: resourceClassName), instance.id])
+                redirect instance
+            }
+            '*' {
+                response.addHeader(HttpHeaders.LOCATION,
+                        g.createLink(
+                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
+                                namespace: hasProperty('namespace') ? this.namespace : null ))
+                respond instance, [status: CREATED]
+            }
+        }
+    }
+
+    /**
+     * Updates a resource for the given id
+     * @param id
+     */
+    @Transactional
+    def update() {
+        if (!modelCatalogueSecurityService.hasRole(roleForSaveAndEdit)) {
+            notAuthorized()
+            return
+        }
+        if(handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        instance.properties = getParametersToBind()
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        instance.save flush:true
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
+                redirect instance
+            }
+            '*'{
+                response.addHeader(HttpHeaders.LOCATION,
+                        g.createLink(
+                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
+                                namespace: hasProperty('namespace') ? this.namespace : null ))
+                respond instance, [status: OK]
+            }
+        }
     }
 
 
@@ -184,7 +278,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @param param object to be rendered
      */
     protected void reportCapableRespond(Object param, Map args) {
-        if (params.format == 'xml' && params.boolean('asset')) {
+        if (modelCatalogueSecurityService.isUserLoggedIn() && params.format == 'xml' && params.boolean('asset')) {
             Asset asset = renderXMLAsAsset (param as XML)
 
             webRequest.currentResponse.with {
@@ -236,6 +330,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         asset
+    }
+
+    protected void notAuthorized() {
+        render status: HttpStatus.UNAUTHORIZED
     }
 
 }

@@ -150,4 +150,5 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
             publishedElementService.archiveAndIncreaseVersion(el)
         }
     }
+
 }

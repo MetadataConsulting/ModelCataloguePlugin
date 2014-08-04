@@ -59,6 +59,11 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     }
 
     private removeRelation(Long id, String type, boolean outgoing) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
         def otherSide = parseOtherSide()
 
         CatalogueElement source = resource.get(id)
@@ -95,6 +100,11 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     }
 
     private addRelation(Long id, String type, boolean outgoing) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
         def otherSide = parseOtherSide()
 
         CatalogueElement source = resource.get(id)
@@ -240,6 +250,11 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     }
 
     private addOrRemoveMapping(boolean add) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
         if (!params.destination || !params.id) {
             notFound()
             return

@@ -819,6 +819,8 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
 
         assert json.elementTypes
+        assert json.dateCreated
+        assert json.lastUpdated
         assert CatalogueElement.name in json.elementTypes
         assert resource.name in json.elementTypes
 
@@ -843,6 +845,8 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkProperty(json.incomingRelationships.itemType, Relationship.name, "incomingItemType")
 
         assert json.elementTypes
+        assert json.dateCreated
+        assert json.lastUpdated
         assert CatalogueElement.name in json.elementTypes
         assert resource.name in json.elementTypes
 

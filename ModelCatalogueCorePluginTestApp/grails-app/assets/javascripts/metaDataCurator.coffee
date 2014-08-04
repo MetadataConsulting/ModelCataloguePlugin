@@ -3,6 +3,7 @@
 #= require bootstrap/dist/js/bootstrap
 #= require ng-file-upload-shim/angular-file-upload-shim
 #= require angular/angular
+#= require angular-i18n/angular-locale_en-gb
 #= require angular-animate/angular-animate
 #= require ng-file-upload/angular-file-upload
 #= require angular-http-auth/src/http-auth-interceptor

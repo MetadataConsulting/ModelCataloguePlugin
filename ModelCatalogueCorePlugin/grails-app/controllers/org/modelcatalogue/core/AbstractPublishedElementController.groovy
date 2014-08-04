@@ -30,6 +30,10 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     @Override
     @Transactional
     def update() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
         if(handleReadOnly()) {
             return
         }
@@ -85,6 +89,10 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     }
 
     def history(Integer max){
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
         handleParams(max)
         PublishedElement element = queryForResource(params.id)
         if (!element) {

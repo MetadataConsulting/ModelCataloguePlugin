@@ -52,7 +52,7 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
               type:   'default'
               action: (rel) ->
                 deferred = $q.defer()
-                messages.confirm('Resolve Actions', "Do you really want to resolve all actions : '#{rel.actions}'?").then () ->
+                messages.confirm('Resolve Actions', "Do you really want to resolve all actions : \n\n#{rel.actions.join('\n\n')}?").then () ->
                   rel.action().then ->
                     messages.success('Row actions resolved!', "actions are resolved")
                     # reloads the table

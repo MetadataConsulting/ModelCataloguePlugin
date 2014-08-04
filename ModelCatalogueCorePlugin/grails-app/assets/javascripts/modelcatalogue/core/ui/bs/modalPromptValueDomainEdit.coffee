@@ -33,7 +33,11 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
                 <label for="unitOfMeasure" class="">Unit of Measure</label>
                 <input type="text" id="unitOfMeasure" placeholder="Unit of Measure" ng-model="copy.unitOfMeasure" catalogue-element-picker="measurementUnit" label="el.name + ' (' + el.symbol + ')'">
               </div>
-              <a
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="copy.multiple"> May contain multiple values (e.g. XSD List)
+                </label>
+              </div>
               <div class="form-group">
                 <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
                 <textarea  collapse="ruleCollapsed" rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
@@ -55,6 +59,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             return true if $scope.copy.name != $scope.original.name
             return true if $scope.copy.description != $scope.original.description
             return true if $scope.copy.rule != $scope.original.rule
+            return true if $scope.copy.multiple != $scope.original.multiple
             return true if $scope.copy.unitOfMeasure?.id != $scope.original.unitOfMeasure?.id
             return true if $scope.copy.dataType?.id != $scope.original.dataType?.id
             return false
@@ -63,10 +68,6 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             $scope.messages.clearAllMessages()
             if not $scope.copy.name
               $scope.messages.error 'Empty Name', 'Please fill the name'
-              return
-
-            if not $scope.copy.dataType or not angular.isObject($scope.copy.dataType)
-              $scope.messages.error 'Empty Data Type', 'Please fill the data type'
               return
 
 

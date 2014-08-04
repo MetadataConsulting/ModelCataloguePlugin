@@ -38,6 +38,7 @@ class PublishedElementService {
         }
 
         element.versionNumber++
+        element.versionCreated = new Date()
         element.updateModelCatalogueId()
 
         if (!element.save(flush: true)) {
@@ -46,6 +47,7 @@ class PublishedElementService {
         }
 
         archived.status = PublishedElementStatus.ARCHIVED
+        archived.dateCreated = element.dateCreated // keep the original creation date
         archived.modelCatalogueId = archived.bareModelCatalogueId + "_" + archived.versionNumber
 
 

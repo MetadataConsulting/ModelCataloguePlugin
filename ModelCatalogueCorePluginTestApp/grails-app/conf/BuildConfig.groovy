@@ -23,6 +23,7 @@ grails.project.fork = [
 
 
 grails.plugin.location.'ModelCatalogueCorePlugin' = "../ModelCatalogueCorePlugin"
+grails.plugin.location.'ModelCatalogueSpringSecurity2xPlugin' = "../ModelCatalogueSpringSecurity2xPlugin"
 //grails.plugin.location.'ModelCatalogueElasticSearchPlugin' = "../ModelCatalogueElasticSearchPlugin"
 //grails.plugin.location.'ModelCatalogueDataArchitectPlugin' = "../ModelCatalogueDataArchitectPlugin"
 
@@ -62,26 +63,22 @@ grails.project.dependency.resolution = {
         runtime "org.modelcatalogue:spring-security-ajax-aware:0.1.1"
         runtime 'mysql:mysql-connector-java:5.1.24'
 
-        String springSecurityVersion = '3.2.3.RELEASE'
+        // Selenium WebDriver, for use in Geb
+        def webDriverVersion = "2.41.0"
 
-        compile "org.springframework.security:spring-security-core:$springSecurityVersion", {
-            excludes 'aopalliance', 'aspectjrt', 'cglib-nodep', 'commons-collections', 'commons-logging',
-                    'ehcache', 'fest-assert', 'hsqldb', 'jcl-over-slf4j', 'jsr250-api', 'junit',
-                    'logback-classic', 'mockito-core', 'powermock-api-mockito', 'powermock-api-support',
-                    'powermock-core', 'powermock-module-junit4', 'powermock-module-junit4-common',
-                    'powermock-reflect', 'spring-aop', 'spring-beans', 'spring-context', 'spring-core',
-                    'spring-expression', 'spring-jdbc', 'spring-test', 'spring-tx'
+        // Testing modules
+        test "org.gebish:geb-spock:0.9.3"
+        test "org.seleniumhq.selenium:selenium-support:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-firefox-driver:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-chrome-driver:${webDriverVersion}"
+        test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
+
+        // Required because of bug in 2.37.0 of WebDriver:
+        test "org.apache.httpcomponents:httpclient:4.3.1"
+        test("org.seleniumhq.selenium:selenium-htmlunit-driver:${webDriverVersion}") {
+            exclude 'xml-apis'
         }
 
-        compile "org.springframework.security:spring-security-web:$springSecurityVersion", {
-            excludes 'aopalliance', 'commons-codec', 'commons-logging', 'fest-assert', 'groovy', 'hsqldb',
-                    'jcl-over-slf4j', 'junit', 'logback-classic', 'mockito-core', 'powermock-api-mockito',
-                    'powermock-api-support', 'powermock-core', 'powermock-module-junit4',
-                    'powermock-module-junit4-common', 'powermock-reflect', 'spock-core', 'spring-beans',
-                    'spring-context', 'spring-core', 'spring-expression', 'spring-jdbc',
-                    'spring-security-core', 'spring-test', 'spring-tx', 'spring-web', 'spring-webmvc',
-                    'tomcat-servlet-api'
-        }
     }
 
     plugins {
@@ -92,7 +89,6 @@ grails.project.dependency.resolution = {
         compile ":scaffolding:2.0.1"
         compile ':cache:1.1.1'
 
-        compile ':spring-security-core:2.0-RC4'
 
         // plugins needed at runtime but not for compilation
         runtime ":hibernate:3.6.10.7" // or ":hibernate4:4.1.11.6"
@@ -100,6 +96,8 @@ grails.project.dependency.resolution = {
         //runtime ":jquery:1.10.2.2"
         runtime ":resources:1.2.1"
         compile ":csv:0.3.1"
+
+        test ":geb:0.9.3"
 
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"

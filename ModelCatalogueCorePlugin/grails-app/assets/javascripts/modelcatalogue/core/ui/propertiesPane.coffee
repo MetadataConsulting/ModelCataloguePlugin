@@ -19,9 +19,11 @@ angular.module('mc.core.ui.propertiesPane', []).directive 'propertiesPane',  [->
         target = if angular.isFunction(value) then value(element) else $scope.$eval(value, element)
         target.show() if angular.isObject(target) and target.show? and angular.isFunction(target.show)
 
-      $scope.canShow = (value, element) ->
+      $scope.displayType = (value, element) ->
         target = if angular.isFunction(value) then value(element) else $scope.$eval(value, element)
-        angular.isObject(target) and target.show? and angular.isFunction(target.show)
+        return 'date'     if angular.isDate(target)
+        return 'element'  if angular.isObject(target) and target.show? and angular.isFunction(target.show)
+        return 'text'
     ]
   }
 ]
