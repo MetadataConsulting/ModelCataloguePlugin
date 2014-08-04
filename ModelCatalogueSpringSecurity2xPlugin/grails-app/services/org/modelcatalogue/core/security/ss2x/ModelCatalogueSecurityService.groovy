@@ -1,4 +1,4 @@
-package uk.co.brc.modelcatalogue
+package org.modelcatalogue.core.security.ss2x
 
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.SecurityService
