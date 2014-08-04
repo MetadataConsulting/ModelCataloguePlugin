@@ -89,6 +89,42 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         author.supersedes.contains(anotherArchived)
         anotherArchived.supersedes.contains(archived)
+        author.status == PublishedElementStatus.DRAFT
+    }
+
+    def "create new version of heirachy model"() {
+        Model md1      = Model.findByName("mTest1")
+        Model md2      = Model.findByName("mTest2")
+        Model md3      = Model.findByName("mTest3")
+
+        md1.addToParentOf(md2)
+        md2.addToParentOf(md3)
+
+        int originalVersion     = md2.versionNumber
+        Model archived    = publishedElementService.archiveAndIncreaseVersion(md2)
+        int archivedVersion     = archived.versionNumber
+        int newVersion          = md2.versionNumber
+
+        def archivedrel = relationshipService.getRelationships([:], RelationshipDirection.BOTH, archived, RelationshipType.hierarchyType).list
+
+        expect:
+        md2 != archived
+        md2.id != archived.id
+        originalVersion != newVersion
+        originalVersion == newVersion - 1
+        archivedVersion == originalVersion
+
+        md2.supersedes.contains(archived)
+
+        md2.parentOf.contains(md3)
+        !md2.childOf.contains(md1)
+        md2.parentOf.contains(md3)
+        md1.parentOf.contains(archived)
+        archived.parentOf.contains(md3)
+        archivedrel.size() == 2
+        !archivedrel.get(0).archived
+        !archivedrel.get(1).archived
+
     }
 
 }

@@ -178,7 +178,7 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
         admissions
         demographics
         unit
-        admissions.parentOf.contains(demographics)
+        admissions.parentOf.contains(demographicsOld)
         admissions.parentOf.contains(unit)
         demographics.contains.contains(de1)
         demographics.contains.contains(de1)
@@ -210,6 +210,7 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
         demographicsOld = Model.findByModelCatalogueId("MC_067e6162-3b6f-4ae2-a171-2470b63dff01_2")
         def deTimeOld = DataElement.findByModelCatalogueId("MC_067e6162-3b6f-4ae7-a171-2470b64dff10_1")
         def deTime = DataElement.findByModelCatalogueId("MC_067e6162-3b6f-4ae7-a171-2470b64dff10_2")
+        Model unitOld = Model.findByModelCatalogueId("MC_067e6162-3b6f-4ae2-a171-2470b64dff19_1")
 
         then: "the data element and corresponding model have been updated"
 
@@ -232,8 +233,8 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
         admissions
         demographics
         unit
-        admissions.parentOf.contains(demographics)
-        admissions.parentOf.contains(unit)
+        admissions.parentOf.contains(demographicsOld)
+        admissions.parentOf.contains(unitOld)
         demographics.contains.contains(de1)
         demographics.contains.contains(de1)
         demographics.contains.contains(de2)

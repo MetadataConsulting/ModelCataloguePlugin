@@ -47,6 +47,39 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
         oldVersion.name             != json.name
     }
 
+
+//    def "get archived relationships"() {
+//        if (controller.readOnly) return
+//
+//        String newName                  = "UPDATED NAME WITH NEW VERSION 2"
+//        PublishedElement another1        = PublishedElement.get(anotherLoadItem.id)
+//        PublishedElement another       = PublishedElement.get(loadItem.id)
+//        String currentName              = another.name
+//        String currentModelCatalogueId  = another.modelCatalogueId
+//        Integer currentVersionNumber    = another.versionNumber
+//        Integer numberOfCurrentVersions = another.countVersions()
+//
+//        another.addToRelatedTo(another1)
+//        def archived = publishedElementService.archiveAndIncreaseVersion(another)
+//
+//
+//        when:
+//
+//        controller.params.id            = another1.id
+//        controller.params.archived = 'true'
+//        controller.response.format      = "json"
+//
+//        controller.incoming()
+//
+//        def json = controller.response.json
+//
+//        then:
+//
+//        json.total == 2
+//        json.list.get(1).relation.archived == true
+//
+//    }
+
     @Unroll
     def "get json history: #no where max: #max offset: #offset\""() {
         CatalogueElement first = CatalogueElement.get(loadItem.id)

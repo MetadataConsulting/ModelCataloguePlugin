@@ -54,25 +54,26 @@ class PublishedElementService {
             throw new IllegalArgumentException("Cannot create archived version of $element. See application log for errors.")
         }
 
-        //if the item is a data element contained in a model, update and increase the model version
-        //providing the model isn't pending updates. If the model is pending updates i.e. during an import
-        //we don't want to increase version with every data element change, only at the end of all the changes
+//        //if the item is a data element contained in a model, update and increase the model version
+//        //providing the model isn't pending updates. If the model is pending updates i.e. during an import
+//        //we don't want to increase version with every data element change, only at the end of all the changes
+//
+//        if(element instanceof DataElement) {
+//            if (element.containedIn.size() > 0) {
+//                element.containedIn.each { Model model ->
+//                    if (model.status != PublishedElementStatus.DRAFT && model.status != PublishedElementStatus.UPDATED) {
+//                        Model archivedModel = archiveAndIncreaseVersion(model)
+//                        archivedModel.removeFromContains(element)
+//                        archivedModel.addToContains(archived)
+//                    }
+//
+//                    if (model.status == PublishedElementStatus.DRAFT) {element.status = PublishedElementStatus.DRAFT}
+//                }
+//            }
+//        }
 
-        if(element instanceof DataElement) {
-            if (element.containedIn.size() > 0) {
-                element.containedIn.each { Model model ->
-                    if (model.status != PublishedElementStatus.DRAFT && model.status != PublishedElementStatus.UPDATED) {
-                        Model archivedModel = archiveAndIncreaseVersion(model)
-                        archivedModel.removeFromContains(element)
-                        archivedModel.addToContains(archived)
-                    }
-
-                    if (model.status == PublishedElementStatus.DRAFT) {element.status = PublishedElementStatus.DRAFT}
-                }
-
-                element.save()
-            }
-        }
+        element.status = PublishedElementStatus.DRAFT
+        element.save()
 
         def supersedes = element.supersedes
 
@@ -87,12 +88,28 @@ class PublishedElementService {
 
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
+            if (r.archived || r.relationshipType.name == 'hierarchy') {
+                relationshipService.link(r.source, archived, r.relationshipType)
+                continue
+            }
             relationshipService.link(r.source, archived, r.relationshipType, true)
         }
 
         for (Relationship r in element.outgoingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
+            if (r.archived || r.relationshipType.name == 'hierarchy') {
+                relationshipService.link(archived, r.destination, r.relationshipType)
+                continue
+            }
             relationshipService.link(archived, r.destination, r.relationshipType, true)
+        }
+
+        if(element instanceof Model) {
+            if(element.childOf.size() > 0){
+                element.childOf.each{ Model model ->
+                    model.removeFromParentOf(element)
+                }
+            }
         }
 
         if (element instanceof ExtendibleElement) {

@@ -25,7 +25,7 @@ abstract class CatalogueElement {
 
     static relationships = [
             outgoing: [attachment: 'hasAttachmentOf'],
-            bidirectional: [synonym: 'synonyms']
+            bidirectional: [relatedTo: 'relatedTo']
     ]
 
     static constraints = {

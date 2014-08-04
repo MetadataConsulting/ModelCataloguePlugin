@@ -50,15 +50,16 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         def ext = paramsToBind.ext
         paramsToBind.remove 'ext'
 
+        if (params.boolean('newVersion')) {
+            paramsToBind.remove 'status'
+            publishedElementService.archiveAndIncreaseVersion(instance)
+        }
+
         helper.properties = paramsToBind
 
         if (helper.hasErrors()) {
             reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
             return
-        }
-
-        if (params.boolean('newVersion')) {
-            publishedElementService.archiveAndIncreaseVersion(instance)
         }
 
         if (ext != null) {

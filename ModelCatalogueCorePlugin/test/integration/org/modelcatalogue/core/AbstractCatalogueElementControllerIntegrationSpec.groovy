@@ -746,6 +746,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert item.relation.id == relation.id
     }
 
+
+
+
     @Override
     protected static checkJsonCorrectListValues(JSONElement json, total, size, offset, max, next, previous) {
         assert json.success
