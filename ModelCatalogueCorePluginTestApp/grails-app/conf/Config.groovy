@@ -106,8 +106,8 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'org.modelcatalogue'
-    debug 'org.codehaus.groovy.grails.web.mapping'
+//    debug 'org.modelcatalogue'
+//    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 

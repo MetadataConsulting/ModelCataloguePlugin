@@ -25,6 +25,10 @@ class DataImportController extends AbstractRestfulController{
     }
 
     def upload(Integer max) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
         def response
         DataImport importer
         handleParams(max)

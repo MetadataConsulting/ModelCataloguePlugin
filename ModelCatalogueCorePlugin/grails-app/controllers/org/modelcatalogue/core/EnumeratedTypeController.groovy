@@ -56,6 +56,10 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
     @Transactional
     @Override
     def update() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
         if(handleReadOnly()) {
             return
         }
