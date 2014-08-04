@@ -46,7 +46,6 @@ class SecuredRuleExecutor {
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
         secureASTCustomizer.with {
             packageAllowed = false
-
             importsWhitelist = []
             staticImportsWhitelist = []
             staticStarImportsWhitelist = ['java.lang.Math']
@@ -77,7 +76,7 @@ class SecuredRuleExecutor {
         configuration.addCompilationCustomizers(importCustomizer)
         configuration.addCompilationCustomizers(secureASTCustomizer)
 
-        new GroovyShell(binding, configuration)
+        new GroovyShell(getClass().getClassLoader(), binding, configuration)
     }
 
     SecuredRuleExecutor(Map binding) {

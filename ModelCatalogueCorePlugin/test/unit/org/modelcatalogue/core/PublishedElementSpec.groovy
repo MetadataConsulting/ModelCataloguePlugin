@@ -24,5 +24,4 @@ class PublishedElementSpec extends Specification {
 
     }
 
-
 }

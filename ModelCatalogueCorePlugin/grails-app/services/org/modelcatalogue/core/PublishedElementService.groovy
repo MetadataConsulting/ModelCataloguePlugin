@@ -37,6 +37,43 @@ class PublishedElementService {
             }
         }
 
+        element = createNewVersion(element)
+        archived = populateArchivedProperties(archived, element)
+
+        element.status = PublishedElementStatus.DRAFT
+        element.save()
+
+        def supersedes = element.supersedes
+        def previousSupersedes = supersedes ? supersedes[0] : null
+        if (previousSupersedes) {
+            element.removeFromSupersedes previousSupersedes
+            archived.addToSupersedes previousSupersedes
+        }
+
+        element.addToSupersedes(archived)
+
+        archived = addRelationshipsToArchived(archived, element)
+        archived = elementSpecificActions(archived, element)
+
+        modelCatalogueSearchService.unindex(archived)
+
+        //set archived status from updated to archived
+        archived.status = PublishedElementStatus.ARCHIVED
+        archived.save()
+    }
+
+
+    static PublishedElementStatus getStatusFromParams(params) {
+        if (!params.status) {
+            return PublishedElementStatus.FINALIZED
+        }
+        if (params.status instanceof PublishedElementStatus) {
+            return params.status
+        }
+        return PublishedElementStatus.valueOf(params.status.toString().toUpperCase())
+    }
+
+    private PublishedElement createNewVersion(PublishedElement element){
         element.versionNumber++
         element.versionCreated = new Date()
         element.updateModelCatalogueId()
@@ -45,49 +82,30 @@ class PublishedElementService {
             log.error(element.errors)
             throw new IllegalArgumentException("Cannot update version of $element. See application log for errors.")
         }
+    }
 
-        archived.status = PublishedElementStatus.ARCHIVED
-        archived.dateCreated = element.dateCreated // keep the original creation date
-        archived.modelCatalogueId = archived.bareModelCatalogueId + "_" + archived.versionNumber
+    private PublishedElement elementSpecificActions(PublishedElement archived, PublishedElement element){
 
-
-        if (!archived.save()) {
-            log.error(archived.errors)
-            throw new IllegalArgumentException("Cannot create archived version of $element. See application log for errors.")
+        //don't add parent relationships to new version of model - this should be manually done
+        //children on the other hand should be added
+        if(element instanceof Model) {
+            if(element.childOf.size() > 0){
+                element.childOf.each{ Model model ->
+                    model.removeFromParentOf(element)
+                }
+            }
         }
 
-//        //if the item is a data element contained in a model, update and increase the model version
-//        //providing the model isn't pending updates. If the model is pending updates i.e. during an import
-//        //we don't want to increase version with every data element change, only at the end of all the changes
-//
-//        if(element instanceof DataElement) {
-//            if (element.containedIn.size() > 0) {
-//                element.containedIn.each { Model model ->
-//                    if (model.status != PublishedElementStatus.DRAFT && model.status != PublishedElementStatus.UPDATED) {
-//                        Model archivedModel = archiveAndIncreaseVersion(model)
-//                        archivedModel.removeFromContains(element)
-//                        archivedModel.addToContains(archived)
-//                    }
-//
-//                    if (model.status == PublishedElementStatus.DRAFT) {element.status = PublishedElementStatus.DRAFT}
-//                }
-//            }
-//        }
-
-        element.status = PublishedElementStatus.DRAFT
-        element.save()
-
-        def supersedes = element.supersedes
-
-        def previousSupersedes = supersedes ? supersedes[0] : null
-
-        if (previousSupersedes) {
-            element.removeFromSupersedes previousSupersedes
-            archived.addToSupersedes previousSupersedes
+        //add all the extensions to the archived element as well
+        if (element instanceof ExtendibleElement) {
+            // TODO: this should be more generic
+            archived.ext.putAll element.ext
         }
 
-        element.addToSupersedes(archived)
+        archived
+    }
 
+    private PublishedElement addRelationshipsToArchived(PublishedElement archived, PublishedElement element){
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
             if (r.archived || r.relationshipType.name == 'hierarchy') {
@@ -106,33 +124,21 @@ class PublishedElementService {
             relationshipService.link(archived, r.destination, r.relationshipType, true)
         }
 
-        if(element instanceof Model) {
-            if(element.childOf.size() > 0){
-                element.childOf.each{ Model model ->
-                    model.removeFromParentOf(element)
-                }
-            }
-        }
-
-        if (element instanceof ExtendibleElement) {
-            // TODO: this should be more generic
-            archived.ext.putAll element.ext
-        }
-
-        modelCatalogueSearchService.unindex(archived)
-
         archived
     }
 
+    private PublishedElement populateArchivedProperties(PublishedElement archived, PublishedElement element){
+        //set archived as updated whilst updates are going on (so it doesn't interfere with regular validation rules)
+        archived.status = PublishedElementStatus.UPDATED
+        archived.dateCreated = element.dateCreated // keep the original creation date
+        archived.modelCatalogueId = archived.bareModelCatalogueId + "_" + archived.versionNumber
 
-    static PublishedElementStatus getStatusFromParams(params) {
-        if (!params.status) {
-            return PublishedElementStatus.FINALIZED
+
+        if (!archived.save()) {
+            log.error(archived.errors)
+            throw new IllegalArgumentException("Cannot create archived version of $element. See application log for errors.")
         }
-        if (params.status instanceof PublishedElementStatus) {
-            return params.status
-        }
-        return PublishedElementStatus.valueOf(params.status.toString().toUpperCase())
+        archived
     }
 
 }

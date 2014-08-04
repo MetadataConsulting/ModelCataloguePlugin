@@ -24,15 +24,17 @@ abstract class PublishedElement extends ExtendibleElement  {
     }
     static constraints = {
 //        TODO we need to think about what restrictions we put on publishing elements
-//        status validator: { val , obj->
-//            if(!val){ return true}
-//            def oldStatus = null
-//            if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
-//            if (oldStatus == PublishedElementStatus.FINALIZED && val != PublishedElementStatus.FINALIZED) {
-//                return ['validator.finalized']
-//            }
-//            return true
-//         }
+        status validator: { val , obj->
+            if(!val){ return true}
+            def oldStatus = null
+            if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
+            if (obj.instanceOf(Model) && oldStatus != PublishedElementStatus.FINALIZED && val == PublishedElementStatus.FINALIZED) {
+                if(!checkChildItemsFinalized(obj)) {
+                    return ['org.modelcatalogue.core.PublishedElement.status.validator.children']
+                }
+            }
+            return true
+         }
         versionNumber bindable: false
     }
 
@@ -49,6 +51,20 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     Integer countVersions() {
         getClass().countByModelCatalogueIdLike "$bareModelCatalogueId%"
+    }
+
+    static protected Boolean checkChildItemsFinalized(Model model){
+
+        if(model.contains.any{it.status!=PublishedElementStatus.FINALIZED}) return false
+        def parentOf = model.parentOf
+        if(parentOf) {
+            return model.parentOf.any { Model md ->
+                if (md.status != PublishedElementStatus.FINALIZED) return false
+                if (!checkChildItemsFinalized(md)) return false
+                return true
+            }
+        }
+        return true
     }
 
 }

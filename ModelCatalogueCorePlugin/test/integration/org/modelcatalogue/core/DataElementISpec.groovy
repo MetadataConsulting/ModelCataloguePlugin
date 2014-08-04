@@ -73,7 +73,4 @@ class DataElementISpec extends AbstractIntegrationSpec{
     }
 
 
-
-
-
 }

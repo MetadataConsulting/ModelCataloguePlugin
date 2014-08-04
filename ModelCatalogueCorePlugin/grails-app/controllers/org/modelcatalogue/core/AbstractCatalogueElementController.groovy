@@ -95,6 +95,12 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             notFound()
             return
         }
+
+        if (old.hasErrors()) {
+            reportCapableRespond old.errors
+            return
+        }
+
         response.status = HttpServletResponse.SC_NO_CONTENT
         render "DELETED"
     }
