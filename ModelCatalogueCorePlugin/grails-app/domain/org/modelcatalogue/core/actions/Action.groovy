@@ -20,4 +20,8 @@ class Action {
 
     static mappedBy = [dependsOn: 'dependant', dependencies: 'provider']
 
+    static mapping = {
+        dependsOn lazy: false
+    }
+
 }

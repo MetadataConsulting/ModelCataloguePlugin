@@ -15,7 +15,8 @@ class ActionService {
 
     /**
      * Performs the action in the background thread. Follow the action state to see weather the action has been already
-     * performed.
+     * performed. If the action depends on any other actions they are performed prior executing this action but after
+     * setting this action state to PERFORMING.
      * @param action action to be performed
      * @return future to the outcome of the action or the error message
      */
@@ -26,11 +27,23 @@ class ActionService {
             return msg
         }
 
-        action.state = ActionState.PERFORMING
-        action.save(failOnError: true)
+        ActionDependency failed = action.dependsOn.find { it.provider.state == ActionState.FAILED }
+        if (failed) {
+            action.state = ActionState.FAILED
+            action.outcome = "An action on which this action depends failed with following error: \n$failed.provider.outcome"
+            action.save(failOnError: true)
+            Future<String> msg = new FutureTask<String>({ action.outcome })
+            msg.run()
+            return msg
+        } else {
+            action.state = ActionState.PERFORMING
+            action.save(failOnError: true)
+        }
+
+        List<Future<String>> dependenciesPerformed = []
 
         for(ActionDependency dependency in action.dependsOn) {
-            run dependency.provider
+            dependenciesPerformed << run(dependency.provider)
         }
 
         Long id = action.id
@@ -44,6 +57,11 @@ class ActionService {
                 StringWriter sw = new StringWriter()
                 PrintWriter pw = new PrintWriter(sw)
                 try {
+                    // this will cause waiting for all provider actions to be completed before the execution
+                    for (Future<String> future in dependenciesPerformed) {
+                        future.get()
+                    }
+
                     runner.out = pw
                     runner.run()
                     a.state = ActionState.PERFORMED
