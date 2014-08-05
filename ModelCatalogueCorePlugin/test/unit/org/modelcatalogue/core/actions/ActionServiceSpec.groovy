@@ -13,12 +13,14 @@ import java.util.concurrent.FutureTask
 @Mock([Action, ActionDependency])
 class ActionServiceSpec extends Specification {
 
+    ActionService service = new ActionService()
+
     def "performing action does all necessary steps"() {
         def queue = []
         ExecutorService executorService = Mock(ExecutorService)
         executorService.submit(_ as Runnable) >> { Runnable task -> queue.add task ; new FutureTask<String>({"BLAH"})}
 
-        ActionService service = new ActionService(executorService: executorService)
+        service.executorService =  executorService
 
 
         Action action = createAction()
@@ -45,8 +47,12 @@ class ActionServiceSpec extends Specification {
         action.state == ActionState.PERFORMED
     }
 
-    private static Action createAction(Map<String, String> parameters =  [test: 'ok']) {
+    private static Action createAction(Map<String, String> parameters = [test: 'ok']) {
+        createAction(parameters, ActionState.PENDING)
+    }
+    private static Action createAction(Map<String, String> parameters = [test: 'ok'], ActionState state) {
         Action action = new Action()
+        action.state = state
         action.parameters = parameters
         action.actionClass = TestActionRunner
         action.save(failOnError: true)
@@ -55,7 +61,6 @@ class ActionServiceSpec extends Specification {
 
 
     def "action is dismissed"() {
-        ActionService service = new ActionService()
         Action action = createAction(should: 'dismiss')
 
         expect:
@@ -69,8 +74,6 @@ class ActionServiceSpec extends Specification {
     }
 
     def "create new action using service"() {
-        ActionService service = new ActionService()
-
         Action one = createAction(role: "one")
         Action two = createAction(role: "two")
 
@@ -89,9 +92,7 @@ class ActionServiceSpec extends Specification {
     }
 
     def "action parameters are validated before saving"() {
-        ActionService actionService = new ActionService()
-
-        Action failed = actionService.create(TestActionRunner, fail: "it")
+        Action failed = service.create(TestActionRunner, fail: "it")
 
         expect:
         failed.hasErrors()
@@ -99,6 +100,19 @@ class ActionServiceSpec extends Specification {
         failed.errors.getFieldErrorCount('parameters') == 2
         failed.errors.getFieldError('parameters').defaultMessage == "This would fail!"
         failed.errors.getFieldError('parameters').code == "${TestActionRunner.name}.fail"
+    }
+
+    def "list actions"() {
+        createAction()
+        createAction(ActionState.DISMISSED)
+        createAction(ActionState.PERFORMED)
+
+        expect:
+        service.list(ActionState.PENDING).total == 1
+        service.list(ActionState.DISMISSED).total == 1
+        service.list(ActionState.PERFORMED).total == 1
+        service.list(ActionState.FAILED).total == 0
+        service.list(ActionState.PERFORMING).total == 0
     }
 
 }

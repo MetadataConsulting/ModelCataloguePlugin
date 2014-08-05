@@ -1,6 +1,8 @@
 package org.modelcatalogue.core.actions
 
 import groovy.util.logging.Log4j
+import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.modelcatalogue.core.util.Lists
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
@@ -92,6 +94,15 @@ class ActionService {
         }
 
         created
+    }
+
+    ListWithTotalAndType<Action> list(Map params = [:]) {
+        list(params, ActionState.PENDING)
+    }
+    ListWithTotalAndType<Action> list(Map params = [:], ActionState state) {
+        Lists.fromCriteria(params, Action) {
+            eq 'state', state
+        }
     }
 
 }

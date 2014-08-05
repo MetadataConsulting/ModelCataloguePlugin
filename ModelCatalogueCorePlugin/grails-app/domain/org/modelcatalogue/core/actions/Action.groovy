@@ -14,7 +14,8 @@ class Action {
     String outcome
 
     static constraints = {
-        outcome maxSize: 10000, nullable: true
+        outcome maxSize: 10000, nullable: true, bindable: false
+        state bindable: false
     }
 
     static mappedBy = [dependsOn: 'dependant', dependencies: 'provider']
