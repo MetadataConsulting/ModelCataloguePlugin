@@ -156,8 +156,6 @@ class Lists {
     }
     //<-- not providing wrapper variant because it should be used in service classes
 
-
-
     static Map<String, String> nextAndPreviousLinks(Map params, String baseLink, Long total) {
         def link = baseLink.contains('?') ? "${baseLink}&" : "${baseLink}?"
         if (params.max) {

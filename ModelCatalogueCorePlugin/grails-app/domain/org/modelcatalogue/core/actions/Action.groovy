@@ -5,7 +5,7 @@ package org.modelcatalogue.core.actions
  */
 class Action {
 
-    static hasMany = [dependsOn: Action]
+    static hasMany = [dependsOn: ActionDependency, dependencies: ActionDependency]
 
     Map<String, String> parameters
     Class<? extends ActionRunner> actionClass
@@ -16,5 +16,7 @@ class Action {
     static constraints = {
         outcome maxSize: 10000, nullable: true
     }
+
+    static mappedBy = [dependsOn: 'dependant', dependencies: 'provider']
 
 }

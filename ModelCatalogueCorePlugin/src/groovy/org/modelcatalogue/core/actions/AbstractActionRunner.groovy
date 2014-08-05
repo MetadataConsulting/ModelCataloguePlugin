@@ -11,4 +11,7 @@ abstract class AbstractActionRunner implements ActionRunner {
     void initWith(Map<String, String> params) {
         parameters = params
     }
+
+    @Override
+    Map<String, String> validate(Map<String, String> params) { [:] }
 }

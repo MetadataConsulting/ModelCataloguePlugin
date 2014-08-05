@@ -55,8 +55,43 @@ class ActionService {
             }
 
         })
-
     }
 
+    void dismiss(Action action){
+        if (action.state == ActionState.DISMISSED) {
+            return
+        }
+        action.state = ActionState.DISMISSED
+        action.save(failOnError: true)
+    }
+
+    Action create(Map<String, String> parameters = [:], Class<? extends ActionRunner> runner, Action... dependsOn) {
+        Action created = new Action(parameters: new LinkedHashMap<String, String>(parameters), actionClass: runner)
+        created.save()
+
+        if (created.hasErrors()) {
+            return created
+        }
+
+        ActionRunner runnerInstance = runner.newInstance()
+        Map<String, String> parameterErrors = runnerInstance.validate(parameters)
+
+        parameterErrors.each { key, message ->
+            created.errors.rejectValue('parameters', "${runner.name}.$key", message)
+        }
+
+        if (created.hasErrors()) {
+            return created
+        }
+
+        for (Action action in dependsOn) {
+            ActionDependency dependency = new ActionDependency(dependant: created, provider: action)
+            dependency.save(failOnError: true)
+            created.addToDependsOn(dependency)
+            action.addToDependencies(dependency)
+        }
+
+        created
+    }
 
 }
