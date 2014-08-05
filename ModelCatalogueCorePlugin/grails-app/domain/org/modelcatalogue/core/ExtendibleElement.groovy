@@ -23,7 +23,7 @@ abstract class ExtendibleElement extends CatalogueElement implements Extendible 
         extensions lazy: false
     }
 
-    Map<String, String> ext = new ExtensionsWrapper(this)
+    final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
         this.ext.clear()

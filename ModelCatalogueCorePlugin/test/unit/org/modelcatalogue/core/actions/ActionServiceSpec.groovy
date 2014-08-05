@@ -1,16 +1,13 @@
 package org.modelcatalogue.core.actions
 
 import grails.test.mixin.Mock
+import org.modelcatalogue.core.util.ListWithTotalAndType
 import spock.lang.Specification
 
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
 import java.util.concurrent.FutureTask
 
-/**
- * Created by ladin on 04.08.14.
- */
-@Mock([Action, ActionDependency])
+@Mock([Action, ActionDependency, ActionParameter])
 class ActionServiceSpec extends Specification {
 
     ActionService service = new ActionService()
@@ -53,9 +50,11 @@ class ActionServiceSpec extends Specification {
     private static Action createAction(Map<String, String> parameters = [test: 'ok'], ActionState state) {
         Action action = new Action()
         action.state = state
-        action.parameters = parameters
-        action.actionClass = TestActionRunner
+        action.type = TestActionRunner
         action.save(failOnError: true)
+
+        action.ext.putAll parameters
+
         action
     }
 
@@ -81,9 +80,9 @@ class ActionServiceSpec extends Specification {
 
         expect:
         created
-        created.parameters
-        created.parameters.size() == 1
-        created.parameters.role == 'created'
+        created.ext
+        created.ext.size() == 1
+        created.ext.role == 'created'
         created.dependsOn
         created.dependsOn.size() == 2
         created.dependsOn.any { it.provider == one }
@@ -96,10 +95,10 @@ class ActionServiceSpec extends Specification {
 
         expect:
         failed.hasErrors()
-        failed.errors.hasFieldErrors('parameters')
-        failed.errors.getFieldErrorCount('parameters') == 2
-        failed.errors.getFieldError('parameters').defaultMessage == "This would fail!"
-        failed.errors.getFieldError('parameters').code == "${TestActionRunner.name}.fail"
+        failed.errors.hasFieldErrors('extensions')
+        failed.errors.getFieldErrorCount('extensions') == 2
+        failed.errors.getFieldError('extensions').defaultMessage == "This would fail!"
+        failed.errors.getFieldError('extensions').code == "${TestActionRunner.name}.fail"
     }
 
     def "list actions"() {
@@ -113,6 +112,34 @@ class ActionServiceSpec extends Specification {
         service.list(ActionState.PERFORMED).total == 1
         service.list(ActionState.FAILED).total == 0
         service.list(ActionState.PERFORMING).total == 0
+    }
+
+    def "find by type and params"() {
+        createAction(one: 'one', two: 'two')
+        createAction(one: 'one', two: 'two', ActionState.FAILED)
+        createAction(one: 'one')
+        createAction(two: 'two')
+        createAction(one: 'one', ActionState.DISMISSED)
+        createAction(two: 'two', ActionState.PERFORMED)
+
+        when:
+        ListWithTotalAndType<Action> allTestAndPending = service.listByTypeAndParams(TestActionRunner)
+
+        then:
+        allTestAndPending.total == 3
+
+        when:
+        ListWithTotalAndType<Action> allTestAndOne = service.listByTypeAndParams(TestActionRunner, one: 'one')
+
+        then:
+        allTestAndOne.total == 2
+
+
+        when:
+        ListWithTotalAndType<Action> allTestOneAndTwo = service.listByTypeAndParams(TestActionRunner, one: 'one', two: 'two')
+
+        then:
+        allTestOneAndTwo.total == 1
     }
 
 }

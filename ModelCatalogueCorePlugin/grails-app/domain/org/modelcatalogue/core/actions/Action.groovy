@@ -1,27 +1,54 @@
 package org.modelcatalogue.core.actions
 
-/**
- * Created by ladin on 04.08.14.
- */
-class Action {
+import org.modelcatalogue.core.Extendible
+import org.modelcatalogue.core.Extension
+import org.modelcatalogue.core.util.ExtensionsWrapper
 
-    static hasMany = [dependsOn: ActionDependency, dependencies: ActionDependency]
+class Action implements Extendible {
 
-    Map<String, String> parameters
-    Class<? extends ActionRunner> actionClass
+    Class<? extends ActionRunner> type
 
     ActionState state = ActionState.PENDING
+
     String outcome
+
+    static hasMany = [dependsOn: ActionDependency, dependencies: ActionDependency, extensions: ActionParameter]
+    static mappedBy = [dependsOn: 'dependant', dependencies: 'provider']
 
     static constraints = {
         outcome maxSize: 10000, nullable: true, bindable: false
         state bindable: false
     }
 
-    static mappedBy = [dependsOn: 'dependant', dependencies: 'provider']
-
     static mapping = {
         dependsOn lazy: false
+    }
+
+    static transients = ['ext']
+
+    final Map<String, String> ext = new ExtensionsWrapper(this)
+
+    @Override
+    Set<Extension> listExtensions() {
+        extensions
+    }
+
+    @Override
+    Extension addExtension(String name, String value) {
+        ActionParameter newOne = new ActionParameter(name: name, extensionValue: value, action: this)
+        newOne.save(failOnError: true)
+        addToExtensions(newOne)
+        newOne
+    }
+
+    @Override
+    void removeExtension(Extension extension) {
+        if (extension instanceof ActionParameter) {
+            removeFromExtensions(extension)
+            extension.delete(flush: true)
+        } else {
+            throw new IllegalArgumentException("Only instances of ActionParameter are supported")
+        }
     }
 
 }

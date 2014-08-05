@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.actions
 
+import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
@@ -48,8 +49,8 @@ class ActionService {
 
         Long id = action.id
 
-        ActionRunner runner = action.actionClass.newInstance()
-        runner.initWith(action.parameters)
+        ActionRunner runner = action.type.newInstance()
+        runner.initWith(action.ext)
 
         executorService.submit({
             try {
@@ -73,7 +74,7 @@ class ActionService {
                 a.save(failOnError: true)
                 return a.outcome
             } catch (e) {
-                String message = "Exception executing action $action.actionClass with parameters $action.parameters: ${e}"
+                String message = "Exception executing action $action.type with parameters $action.ext: ${e}"
                 log.warn(message, e)
                 return message
             }
@@ -90,8 +91,8 @@ class ActionService {
     }
 
     Action create(Map<String, String> parameters = [:], Class<? extends ActionRunner> runner, Action... dependsOn) {
-        Action created = new Action(parameters: new LinkedHashMap<String, String>(parameters), actionClass: runner)
-        created.save()
+        Action created = new Action(type: runner)
+        created.validate()
 
         if (created.hasErrors()) {
             return created
@@ -101,11 +102,17 @@ class ActionService {
         Map<String, String> parameterErrors = runnerInstance.validate(parameters)
 
         parameterErrors.each { key, message ->
-            created.errors.rejectValue('parameters', "${runner.name}.$key", message)
+            created.errors.rejectValue('extensions', "${runner.name}.$key", message)
         }
 
         if (created.hasErrors()) {
             return created
+        }
+
+        created.save()
+
+        if (parameters) {
+            created.ext.putAll parameters
         }
 
         for (Action action in dependsOn) {
@@ -121,10 +128,59 @@ class ActionService {
     ListWithTotalAndType<Action> list(Map params = [:]) {
         list(params, ActionState.PENDING)
     }
+
     ListWithTotalAndType<Action> list(Map params = [:], ActionState state) {
         Lists.fromCriteria(params, Action) {
             eq 'state', state
         }
+    }
+
+    /**
+     * Searches for all actions with given type and search params (contained in ext/extensions map).
+     * @param searchParams parameter and their expected values which should be present in ext/extensions map
+     * @param type the action runner type to look for
+     * @param queryParams query parameters such as offset, limit and so on
+     * @return the list with total and type for given search parameters and type
+     */
+    ListWithTotalAndType<Action> listByTypeAndParams(Map<String, String> searchParams = [:], Class<? extends ActionRunner> type, ActionState state = ActionState.PENDING, Map queryParams = [:]) {
+        if (!searchParams) {
+            return Lists.fromCriteria(queryParams, Action) {
+                eq 'type', type
+                if (state) {
+                    eq 'state', state
+                }
+            }
+        }
+
+        Set<Long> ids = null
+
+        for (Map.Entry<String, String> parameter in searchParams.entrySet()) {
+            DetachedCriteria<ActionParameter> parameters = ActionParameter.where {
+                name == parameter.key && extensionValue == parameter.value
+            }
+            if (!parameters.count()) {
+                return Lists.emptyListWithTotalAndType(Action)
+            }
+            if (ids == null) {
+                ids = []
+                parameters.each {
+                    ids << it.action.id
+                }
+            } else {
+                ids = ids.intersect(parameters.collect { it.action.id })
+            }
+        }
+
+        System.out.println ids
+
+        Lists.fromCriteria(queryParams, Action) {
+            inList 'id', ids
+            eq 'type', type
+            if (state) {
+                eq 'state', state
+            }
+        }
+
     }
 
 }
