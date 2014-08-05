@@ -26,13 +26,17 @@ class ActionService {
             return msg
         }
 
+        action.state = ActionState.PERFORMING
+        action.save(failOnError: true)
+
+        for(ActionDependency dependency in action.dependsOn) {
+            run dependency.provider
+        }
+
         Long id = action.id
 
         ActionRunner runner = action.actionClass.newInstance()
         runner.initWith(action.parameters)
-
-        action.state = ActionState.PERFORMING
-        action.save(failOnError: true)
 
         executorService.submit({
             try {

@@ -19,4 +19,12 @@ class ActionDependency {
 
     static belongsTo = [dependant: Action, provider: Action]
 
+    static constraints = {
+        dependant validator: { Action val, ActionDependency obj ->
+            if (obj.provider == val) {
+                return false
+            }
+            return true
+        }
+    }
 }
