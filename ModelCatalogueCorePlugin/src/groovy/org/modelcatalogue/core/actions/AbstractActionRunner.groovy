@@ -5,7 +5,10 @@ package org.modelcatalogue.core.actions
  */
 abstract class AbstractActionRunner implements ActionRunner {
     PrintWriter out
-    protected Map<String,String> parameters
+    protected Map<String,String> parameters = [:]
+
+    private boolean failed = false
+
 
     @Override
     void initWith(Map<String, String> params) {
@@ -14,4 +17,17 @@ abstract class AbstractActionRunner implements ActionRunner {
 
     @Override
     Map<String, String> validate(Map<String, String> params) { [:] }
+
+    @Override
+    boolean isFailed() {
+        return failed
+    }
+
+    protected void fail(String message = null) {
+        if (message && out) {
+            out << message
+            out << '\n\n'
+        }
+        failed = true
+    }
 }

@@ -33,4 +33,10 @@ public interface ActionRunner extends Runnable {
      */
     void initWith(Map<String, String> params)
 
+    /**
+     * Returns true if the run failed.
+     * @return true if the run failed
+     */
+    boolean isFailed()
+
 }
