@@ -101,7 +101,7 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
         headersMap.metadataRow = "Metadata"
         def importer = dataImportService.importData(headers, rows, "NHIC : TRA",  "NHIC : TRA", "NHIC TRA conceptual domain for renal transplantation", headersMap)
         dataImportService.resolveAll(importer)
-        dataImportService.ingestImportQueue(importer)
+//        dataImportService.ingestImportQueue(importer)
         DataElement de1 = DataElement.findByModelCatalogueId("MC_037e6162-3b6f-4ae2-a171-2470b64dff10_1")
         DataElement de2 = DataElement.findByModelCatalogueId("MC_065e6162-3b6f-4ae2-a171-2470b64dff10_1")
         DataElement de3 = DataElement.findByModelCatalogueId("MC_067e6162-3b4f-4ae2-a171-2470b64dff10_1")
@@ -155,7 +155,7 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
         (headers, rows) = parser2.parse()
         def importer2 = dataImportService.importData(headers, rows, "NHIC : TRA", "NHIC : TRA", "NHIC TRA conceptual domain for renal transplantation", headersMap)
         dataImportService.resolveAll(importer2)
-        dataImportService.ingestImportQueue(importer2)
+//        dataImportService.ingestImportQueue(importer2)
         def de1Old = DataElement.findByModelCatalogueId("MC_037e6162-3b6f-4ae2-a171-2470b64dff10_1")
         def demographicsOld = Model.findByModelCatalogueId("MC_067e6162-3b6f-4ae2-a171-2470b63dff01_1")
 
@@ -163,6 +163,7 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
 
         de1.refresh()
         demographics.refresh()
+        demographicsOld.refresh()
         de1.modelCatalogueId=="MC_037e6162-3b6f-4ae2-a171-2470b64dff10_2"
         de1.supersedes.contains(de1Old)
         de2
@@ -205,7 +206,7 @@ class DataImportServiceSpec extends AbstractIntegrationSpec {
         (headers, rows) = parser3.parse()
         def importer3 = dataImportService.importData(headers, rows, "NHIC : TRA", "NHIC : TRA", "NHIC TRA conceptual domain for renal transplantation", headersMap)
         dataImportService.resolveAll(importer3)
-        dataImportService.ingestImportQueue(importer3)
+//        dataImportService.ingestImportQueue(importer3)
         de1Old = DataElement.findByModelCatalogueId("MC_037e6162-3b6f-4ae2-a171-2470b64dff10_2")
         demographicsOld = Model.findByModelCatalogueId("MC_067e6162-3b6f-4ae2-a171-2470b63dff01_2")
         def deTimeOld = DataElement.findByModelCatalogueId("MC_067e6162-3b6f-4ae7-a171-2470b64dff10_1")

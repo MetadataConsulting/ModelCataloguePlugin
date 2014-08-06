@@ -29,8 +29,8 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         de4 = DataElement.findByName("auth4")
         de5 = DataElement.findByName("auth5")
         vd = ValueDomain.findByName("value domain Celsius")
-        md = Model.findByName("book")
-        md2 = Model.findByName("chapter1")
+        md = new Model(name:"testModel").save()
+        md2 = new Model(name:"testModel2").save()
         de1.addToContainedIn(md)
         de3.addToContainedIn(md2)
         de2.addToInstantiatedBy(vd)
@@ -45,7 +45,8 @@ class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
         de1.removeFromContainedIn(md)
         de3.removeFromContainedIn(md2)
         de2.removeFromInstantiatedBy(vd)
-        md.removeFromParentOf(md2)
+        md.delete()
+        md2.delete()
     }
 
     def "json get sub model elements"(){

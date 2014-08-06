@@ -15,6 +15,7 @@ class DataImport {
     private static final QUOTED_CHARS = ["\\": "&#92;", ":": "&#58;", "|": "&#124;", "%": "&#37;"]
     String name
     Collection<Model> models = []
+    Collection<DataElement> updatedDataElements = []
     Collection<String> messages = []
     Set pendingAction = []
     Set importQueue = []

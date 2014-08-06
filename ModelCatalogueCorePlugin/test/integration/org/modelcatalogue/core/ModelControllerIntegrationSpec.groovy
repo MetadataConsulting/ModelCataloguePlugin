@@ -7,6 +7,10 @@ import grails.util.GrailsNameUtils
  */
 class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
+    def setupSpec(){
+        totalCount = 14
+    }
+
     @Override
     Map getPropertiesToEdit(){
         [name: "changedName", description: "edited description "]
@@ -45,12 +49,12 @@ class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerI
 
     @Override
     Model getLoadItem() {
-        Model.findByName("book")
+        Model.findByName("mTest3")
     }
 
     @Override
     Model getAnotherLoadItem() {
-        Model.findByName("chapter1")
+        Model.findByName("mTest4")
     }
 
     @Override

@@ -82,6 +82,8 @@ class PublishedElementService {
             log.error(element.errors)
             throw new IllegalArgumentException("Cannot update version of $element. See application log for errors.")
         }
+
+        element
     }
 
     private PublishedElement elementSpecificActions(PublishedElement archived, PublishedElement element){
@@ -92,6 +94,16 @@ class PublishedElementService {
             if(element.childOf.size() > 0){
                 element.childOf.each{ Model model ->
                     model.removeFromParentOf(element)
+                }
+            }
+        }
+
+
+        //don't add a data element to the model if it's updated (the old model should still reference the archived one)
+        if(element instanceof DataElement) {
+            if(element.containedIn.size() > 0){
+                element.containedIn.each{ Model model ->
+                    model.removeFromContains(element)
                 }
             }
         }
@@ -108,7 +120,7 @@ class PublishedElementService {
     private PublishedElement addRelationshipsToArchived(PublishedElement archived, PublishedElement element){
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
-            if (r.archived || r.relationshipType.name == 'hierarchy') {
+            if (r.archived || r.relationshipType.name == 'hierarchy' || r.relationshipType.name == 'containment') {
                 relationshipService.link(r.source, archived, r.relationshipType)
                 continue
             }
