@@ -171,8 +171,6 @@ class ActionService {
             }
         }
 
-        System.out.println ids
-
         Lists.fromCriteria(queryParams, Action) {
             inList 'id', ids
             eq 'type', type
