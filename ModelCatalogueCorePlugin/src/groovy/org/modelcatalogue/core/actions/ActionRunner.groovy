@@ -39,4 +39,29 @@ public interface ActionRunner extends Runnable {
      */
     boolean isFailed()
 
+    /**
+     * Returns the natural name of action represented by this ActionRunner.
+     * @return the natural name of action represented by this ActionRunner
+     */
+    String getNaturalName()
+
+    /**
+     * Returns the admin (creation) usage description of action represented by this ActionRunner.
+     *
+     * The description is supposed to be fetched from the instance before the #initWith method is called.
+     *
+     * @return the admin (creation) usage description of action represented by this ActionRunner
+     */
+    String getDescription()
+
+    /**
+     * Returns the message to be displayed in the user's prompt. Usually as question which will be in the front end
+     * followed by Yes/Cancel buttons.
+     *
+     * The message is supposed to be fetched from the instance after the #initWith method is called and therefore
+     * it can used the set parameters inside the message body.
+     *
+     * @return the message to be displayed in the user's prompt
+     */
+     String getMessage()
 }

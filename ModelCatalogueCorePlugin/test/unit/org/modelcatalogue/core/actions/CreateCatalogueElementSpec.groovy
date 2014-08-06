@@ -12,6 +12,23 @@ class CreateCatalogueElementSpec extends Specification {
 
     CreateCatalogueElement createAction = new CreateCatalogueElement()
 
+    def "uses default action natural name"() {
+        expect:
+        createAction.naturalName == "Create Catalogue Element"
+        createAction.description == AbstractActionRunner.normalizeDescription(CreateCatalogueElement.description)
+
+        when:
+        createAction.initWith(name: 'The Model', type: Model.name)
+
+        then:
+        createAction.message == """
+            Creates new Model 'The Model' with following parameteres:
+
+            Name: The Model
+        """.stripIndent().trim()
+    }
+
+
     def "the action validates the parameters"() {
         Map<String, String> errorsForEmpty = createAction.validate([:])
 
