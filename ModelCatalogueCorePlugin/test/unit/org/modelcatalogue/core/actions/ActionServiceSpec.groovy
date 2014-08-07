@@ -2,6 +2,7 @@ package org.modelcatalogue.core.actions
 
 import grails.test.mixin.Mock
 import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 import spock.lang.Specification
 
 import java.util.concurrent.ExecutorService
@@ -11,6 +12,10 @@ import java.util.concurrent.FutureTask
 class ActionServiceSpec extends Specification {
 
     ActionService service = new ActionService()
+
+    def setup() {
+        service.autowireBeanFactory = Mock(AutowireCapableBeanFactory)
+    }
 
     def "performing action does all necessary steps"() {
         def queue = []

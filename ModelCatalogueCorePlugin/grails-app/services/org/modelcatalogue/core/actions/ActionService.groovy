@@ -5,6 +5,8 @@ import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
@@ -14,6 +16,8 @@ import java.util.concurrent.FutureTask
 class ActionService {
 
     ExecutorService executorService
+    @Autowired AutowireCapableBeanFactory autowireBeanFactory
+
 
     /**
      * Performs the action in the background thread. Follow the action state to see weather the action has been already
@@ -67,7 +71,7 @@ class ActionService {
                 StringWriter sw = new StringWriter()
                 PrintWriter pw = new PrintWriter(sw)
 
-                ActionRunner runner = a.type.newInstance()
+                ActionRunner runner = createRunner(a.type)
                 runner.initWith(a.ext)
                 runner.out = pw
 
@@ -128,7 +132,7 @@ class ActionService {
             return created
         }
 
-        ActionRunner runnerInstance = runner.newInstance()
+        ActionRunner runnerInstance = createRunner(runner)
         Map<String, String> parameterErrors = runnerInstance.validate(parameters)
 
         parameterErrors.each { key, message ->
@@ -210,6 +214,12 @@ class ActionService {
         }
 
 
+    }
+
+    private <T extends ActionRunner> T createRunner(Class<T> type) {
+        T runner = type.newInstance()
+        autowireBeanFactory.autowireBean(runner)
+        runner
     }
 
 }
