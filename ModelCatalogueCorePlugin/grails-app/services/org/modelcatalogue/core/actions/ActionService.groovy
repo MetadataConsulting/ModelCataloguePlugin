@@ -124,8 +124,8 @@ class ActionService {
         }
     }
 
-    Action create(Map<String, String> parameters = [:], Class<? extends ActionRunner> runner, Action... dependsOn) {
-        Action created = new Action(type: runner)
+    Action create(Map<String, String> parameters = [:], Batch batch, Class<? extends ActionRunner> runner, Action... dependsOn) {
+        Action created = new Action(type: runner, batch: batch)
         created.validate()
 
         if (created.hasErrors()) {
@@ -149,6 +149,8 @@ class ActionService {
             created.ext.putAll parameters
         }
 
+        batch.addToActions(created)
+
         for (Action action in dependsOn) {
             ActionDependency dependency = new ActionDependency(dependant: created, provider: action)
             dependency.save(failOnError: true)
@@ -156,7 +158,13 @@ class ActionService {
             action.addToDependencies(dependency)
         }
 
-        created
+        if (dependsOn) {
+            created.order = dependsOn.sum { it.order } as Long
+        } else {
+            created.order = created.id
+        }
+
+        created.save(failOnError: true)
     }
 
     ListWithTotalAndType<Action> list(Map params = [:]) {

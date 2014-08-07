@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.actions
 
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.Extension
 import org.modelcatalogue.core.util.ExtensionsWrapper
@@ -12,8 +13,15 @@ class Action implements Extendible {
 
     String outcome
 
+    Long order = 0
+
+    // time stamping
+    Date dateCreated
+    Date lastUpdated
+
     static hasMany = [dependsOn: ActionDependency, dependencies: ActionDependency, extensions: ActionParameter]
     static mappedBy = [dependsOn: 'dependant', dependencies: 'provider']
+    static belongsTo = [batch: Batch]
 
     static constraints = {
         outcome maxSize: 10000, nullable: true, bindable: false
@@ -22,6 +30,7 @@ class Action implements Extendible {
 
     static mapping = {
         dependsOn lazy: false
+
     }
 
     static transients = ['ext']

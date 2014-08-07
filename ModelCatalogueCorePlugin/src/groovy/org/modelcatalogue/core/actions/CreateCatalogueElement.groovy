@@ -112,4 +112,8 @@ class CreateCatalogueElement extends AbstractActionRunner {
         type.newInstance()
     }
 
+    @Override
+    List<String> getRequiredParameters() {
+        ['name', 'type']
+    }
 }

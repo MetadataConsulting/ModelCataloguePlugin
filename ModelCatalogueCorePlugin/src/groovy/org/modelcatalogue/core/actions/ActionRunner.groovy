@@ -63,5 +63,14 @@ public interface ActionRunner extends Runnable {
      *
      * @return the message to be displayed in the user's prompt
      */
-     String getMessage()
+    String getMessage()
+
+    /**
+     * Returns list of required parameters.
+     *
+     * The list doesn't have to be complete as some of the parameters are dynamic.
+     *
+     * @return list of required parameters
+     */
+    List<String> getRequiredParameters()
 }

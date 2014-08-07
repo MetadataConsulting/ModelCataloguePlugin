@@ -26,7 +26,15 @@ abstract class AbstractActionRunner implements ActionRunner {
     }
 
     @Override
-    Map<String, String> validate(Map<String, String> params) { [:] }
+    Map<String, String> validate(Map<String, String> params) {
+        def ret = [:]
+        for(name in requiredParameters) {
+            if(!params.containsKey(name)) {
+                ret[name] = "Missing ${GrailsNameUtils.getNaturalName(name)}"
+            }
+        }
+        ret
+    }
 
     @Override
     boolean isFailed() {
@@ -51,10 +59,19 @@ abstract class AbstractActionRunner implements ActionRunner {
     }
 
     String getDescription() {
-        normalizeDescription GrailsClassUtils.getStaticFieldValue(getClass(), 'description')
+        normalizeDescription(GrailsClassUtils.getStaticFieldValue(getClass(), 'description'))
     }
 
-    /**
+    @Override
+    List<String> getRequiredParameters() {
+        []
+    }
+
+    @Override
+    String getMessage() {
+        naturalName
+    }
+/**
      * Simple normalization function which trims, strips the indent, collapses single new lines but keeps new lines
      * with whitespace after them.
      *

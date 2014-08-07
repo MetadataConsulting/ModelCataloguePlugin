@@ -135,4 +135,10 @@ class UpdateCatalogueElement extends AbstractActionRunner {
         type.get(id)
     }
 
+
+    @Override
+    List<String> getRequiredParameters() {
+        ['id', 'type']
+    }
+
 }

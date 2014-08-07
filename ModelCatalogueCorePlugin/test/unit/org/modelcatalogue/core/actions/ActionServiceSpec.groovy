@@ -8,13 +8,15 @@ import spock.lang.Specification
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.FutureTask
 
-@Mock([Action, ActionDependency, ActionParameter])
+@Mock([Action, ActionDependency, ActionParameter, Batch])
 class ActionServiceSpec extends Specification {
 
     ActionService service = new ActionService()
+    Batch batch
 
     def setup() {
         service.autowireBeanFactory = Mock(AutowireCapableBeanFactory)
+        batch = new Batch(name: "Test Batch").save(failOnError: true)
     }
 
     def "performing action does all necessary steps"() {
@@ -96,16 +98,19 @@ class ActionServiceSpec extends Specification {
         service.executorService = executorService
     }
 
-    private static Action createAction(Map<String, String> parameters = [test: 'ok']) {
+    private Action createAction(Map<String, String> parameters = [test: 'ok']) {
         createAction(parameters, ActionState.PENDING)
     }
-    private static Action createAction(Map<String, String> parameters = [test: 'ok'], ActionState state) {
+    private Action createAction(Map<String, String> parameters = [test: 'ok'], ActionState state) {
         Action action = new Action()
         action.state = state
         action.type = TestActionRunner
+        action.batch = batch
         action.save(failOnError: true)
 
         action.ext.putAll parameters
+
+        batch.addToActions(action)
 
         action
     }
@@ -133,7 +138,7 @@ class ActionServiceSpec extends Specification {
         Action one = createAction(role: "one")
         Action two = createAction(role: "two")
 
-        Action created = service.create(TestActionRunner, one, two, role: 'created')
+        Action created = service.create(batch, TestActionRunner, one, two, role: 'created')
 
         expect:
         created
@@ -148,7 +153,7 @@ class ActionServiceSpec extends Specification {
     }
 
     def "action parameters are validated before saving"() {
-        Action failed = service.create(TestActionRunner, fail: "it")
+        Action failed = service.create(batch, TestActionRunner, fail: "it")
 
         expect:
         failed.hasErrors()
@@ -207,16 +212,6 @@ class TestActionRunner extends AbstractActionRunner {
             throw new RuntimeException("Failed!")
         }
         out << "performed with $parameters"
-    }
-
-    @Override
-    String getMessage() {
-        return "Test message"
-    }
-
-    @Override
-    String getDescription() {
-        return "Description"
     }
 
     @Override Map<String, String> validate(Map<String, String> params) {
