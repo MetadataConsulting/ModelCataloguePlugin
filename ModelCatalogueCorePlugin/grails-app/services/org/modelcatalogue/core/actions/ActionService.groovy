@@ -2,6 +2,7 @@ package org.modelcatalogue.core.actions
 
 import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
+import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 
@@ -21,19 +22,29 @@ class ActionService {
      * @param action action to be performed
      * @return future to the outcome of the action or the error message
      */
-    Future<String> run(Action action) {
+    Future<ActionResult> run(Action action, List<Long> executionStack = []) {
+        List<Long> currentExecutionStack = new ArrayList<Long>(executionStack)
+        currentExecutionStack << action.id
+
+        if (action.id in executionStack) {
+            Future<ActionResult> msg = new FutureTask<ActionResult>({new ActionResult(outcome: "Circular dependency found: ${currentExecutionStack.join(' -> ')}", failed: true)})
+            msg.run()
+            return msg
+        }
+
         if (action.state != ActionState.PENDING) {
-            Future<String> msg = new FutureTask<String>({"The action is already pending"})
+            Future<ActionResult> msg = new FutureTask<ActionResult>({new ActionResult(outcome: "The action is already pending", failed: action.state == ActionState.FAILED)})
             msg.run()
             return msg
         }
 
         ActionDependency failed = action.dependsOn.find { it.provider.state == ActionState.FAILED }
         if (failed) {
+            String msgStart = 'An action on which this action depends failed with following error:'
             action.state = ActionState.FAILED
-            action.outcome = "An action on which this action depends failed with following error: \n$failed.provider.outcome"
+            action.outcome = failed.provider.outcome?.startsWith(msgStart) ? failed.provider.outcome : "$msgStart$failed.provider.outcome"
             action.save(failOnError: true)
-            Future<String> msg = new FutureTask<String>({ action.outcome })
+            Future<ActionResult> msg = new FutureTask<ActionResult>({ new ActionResult(outcome: action.outcome, failed: true) })
             msg.run()
             return msg
         } else {
@@ -41,43 +52,57 @@ class ActionService {
             action.save(failOnError: true)
         }
 
-        List<Future<String>> dependenciesPerformed = []
+        Map<Long, Future<ActionResult>> dependenciesPerformed = [:]
 
         for(ActionDependency dependency in action.dependsOn) {
-            dependenciesPerformed << run(dependency.provider)
+            dependenciesPerformed.put dependency.provider.id, run(dependency.provider, currentExecutionStack)
         }
 
         Long id = action.id
 
-        ActionRunner runner = action.type.newInstance()
-        runner.initWith(action.ext)
-
         executorService.submit({
             try {
                 Action a = Action.get(id)
+
                 StringWriter sw = new StringWriter()
                 PrintWriter pw = new PrintWriter(sw)
+
+                ActionRunner runner = a.type.newInstance()
+                runner.initWith(a.ext)
+                runner.out = pw
+
                 try {
                     // this will cause waiting for all provider actions to be completed before the execution
-                    for (Future<String> future in dependenciesPerformed) {
-                        // TODO: if dependency fail, this action should fail as well
-                        future.get()
+                    for (Map.Entry<Long, Future<ActionResult>> future in dependenciesPerformed) {
+                        ActionResult result = future.value.get()
+                        if (result.failed) {
+                            String msgStart = 'Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\n'
+                            a.state = ActionState.FAILED
+                            a.outcome = result.outcome?.startsWith(msgStart) ? result.outcome : "$msgStart$result.outcome"
+                            a.save(failOnError: true)
+                            return new ActionResult(outcome: a.outcome, failed: true)
+                        }
                     }
 
-                    runner.out = pw
                     runner.run()
-                    a.state = ActionState.PERFORMED
+                    if (runner.failed) {
+                        a.state = ActionState.FAILED
+                    } else {
+                        a.state = ActionState.PERFORMED
+                    }
                 } catch (e) {
-                    a.state = ActionState.FAILED
+                    new DefaultStackTraceFilterer(true).filter(e)
                     e.printStackTrace(runner.out)
+                    a.state = ActionState.FAILED
                 }
                 a.outcome = sw.toString()
                 a.save(failOnError: true)
-                return a.outcome
+                return new ActionResult(outcome: a.outcome, failed: a.state == ActionState.FAILED)
             } catch (e) {
+                new DefaultStackTraceFilterer(true).filter(e)
                 String message = "Exception executing action $action.type with parameters $action.ext: ${e}"
                 log.warn(message, e)
-                return message
+                return new ActionResult(outcome: message, failed: true)
             }
 
         })

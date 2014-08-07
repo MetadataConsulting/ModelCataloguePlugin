@@ -15,7 +15,7 @@ class ActionServiceSpec extends Specification {
     def "performing action does all necessary steps"() {
         def queue = []
         ExecutorService executorService = Mock(ExecutorService)
-        executorService.submit(_ as Runnable) >> { Runnable task -> queue.add task ; new FutureTask<String>({"BLAH"})}
+        executorService.submit(_ as Runnable) >> { Runnable task -> queue.add task ; new FutureTask<ActionResult>({ new ActionResult(outcome: "BLAH", failed: false) })}
 
         service.executorService =  executorService
 
@@ -42,6 +42,53 @@ class ActionServiceSpec extends Specification {
         then:
         action.outcome == "performed with [test:ok]"
         action.state == ActionState.PERFORMED
+    }
+
+    def "failing provider action will fails the dependant"() {
+        setupExecutorServiceForImmediateExecution()
+
+        Action ok = createAction()
+        Action fail = createAction(fail: 'true')
+        Action dependant = createAction(role: 'dependant')
+
+        dependant.addToDependsOn(provider: ok, dependant: dependant)
+        dependant.addToDependsOn(provider: fail, dependant: dependant)
+
+        when:
+        service.run dependant
+
+        then:
+        dependant.state == ActionState.FAILED
+    }
+
+    def "circular dependency fails the actions"(){
+        setupExecutorServiceForImmediateExecution()
+
+        Action one = createAction()
+        Action two = createAction()
+        Action three = createAction()
+
+        two.addToDependsOn(provider: one, dependant: two)
+        three.addToDependsOn(provider: two, dependant: three)
+        one.addToDependsOn(provider: three, dependant: one)
+
+        when:
+        service.run one
+
+        then:
+        one.state == ActionState.FAILED
+        one.outcome == "Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\nCircular dependency found: 1 -> 3 -> 2 -> 1"
+    }
+
+    private void setupExecutorServiceForImmediateExecution() {
+        ExecutorService executorService = Mock(ExecutorService)
+        executorService.submit(_ as Runnable) >> { Runnable task ->
+            FutureTask<ActionResult> future = new FutureTask<ActionResult>(task)
+            future.run()
+            future
+        }
+
+        service.executorService = executorService
     }
 
     private static Action createAction(Map<String, String> parameters = [test: 'ok']) {
@@ -151,6 +198,9 @@ class ActionServiceSpec extends Specification {
 
 class TestActionRunner extends AbstractActionRunner {
     @Override void run() {
+        if (parameters.fail) {
+            throw new RuntimeException("Failed!")
+        }
         out << "performed with $parameters"
     }
 
