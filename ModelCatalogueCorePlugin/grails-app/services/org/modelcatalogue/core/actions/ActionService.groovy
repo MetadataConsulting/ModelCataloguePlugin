@@ -161,13 +161,14 @@ class ActionService {
         created
     }
 
-    ListWithTotalAndType<Action> list(Map params = [:]) {
-        list(params, ActionState.PENDING)
+    ListWithTotalAndType<Action> list(Map params = [:], Batch batch) {
+        list(params, batch, ActionState.PENDING)
     }
 
-    ListWithTotalAndType<Action> list(Map params = [:], ActionState state) {
+    ListWithTotalAndType<Action> list(Map params = [:], Batch batch, ActionState state) {
         Lists.fromCriteria(params, Action) {
             eq 'state', state
+            eq 'batch', batch
         }
     }
 
@@ -178,10 +179,11 @@ class ActionService {
      * @param queryParams query parameters such as offset, limit and so on
      * @return the list with total and type for given search parameters and type
      */
-    ListWithTotalAndType<Action> listByTypeAndParams(Map<String, String> searchParams = [:], Class<? extends ActionRunner> type, ActionState state = ActionState.PENDING, Map queryParams = [:]) {
+    ListWithTotalAndType<Action> listByTypeAndParams(Map<String, String> searchParams = [:], Batch batch, Class<? extends ActionRunner> type, ActionState state = ActionState.PENDING, Map queryParams = [:]) {
         if (!searchParams) {
             return Lists.fromCriteria(queryParams, Action) {
                 eq 'type', type
+                eq 'batch', batch
                 if (state) {
                     eq 'state', state
                 }
@@ -210,6 +212,7 @@ class ActionService {
         Lists.fromCriteria(queryParams, Action) {
             inList 'id', ids
             eq 'type', type
+            eq 'batch', batch
             if (state) {
                 eq 'state', state
             }

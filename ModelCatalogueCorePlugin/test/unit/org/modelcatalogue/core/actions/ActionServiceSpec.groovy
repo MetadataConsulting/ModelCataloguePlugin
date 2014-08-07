@@ -168,12 +168,20 @@ class ActionServiceSpec extends Specification {
         createAction(ActionState.DISMISSED)
         createAction(ActionState.PERFORMED)
 
+        Batch other = new Batch(name: "Other batch").save(failOnError: true)
+
         expect:
-        service.list(ActionState.PENDING).total == 1
-        service.list(ActionState.DISMISSED).total == 1
-        service.list(ActionState.PERFORMED).total == 1
-        service.list(ActionState.FAILED).total == 0
-        service.list(ActionState.PERFORMING).total == 0
+        service.list(batch, ActionState.PENDING).total == 1
+        service.list(batch, ActionState.DISMISSED).total == 1
+        service.list(batch, ActionState.PERFORMED).total == 1
+        service.list(batch, ActionState.FAILED).total == 0
+        service.list(batch, ActionState.PERFORMING).total == 0
+
+        service.list(other, ActionState.PENDING).total == 0
+        service.list(other, ActionState.DISMISSED).total == 0
+        service.list(other, ActionState.PERFORMED).total == 0
+        service.list(other, ActionState.FAILED).total == 0
+        service.list(other, ActionState.PERFORMING).total == 0
     }
 
     def "find by type and params"() {
@@ -184,24 +192,32 @@ class ActionServiceSpec extends Specification {
         createAction(one: 'one', ActionState.DISMISSED)
         createAction(two: 'two', ActionState.PERFORMED)
 
+        Batch other = new Batch(name: "Other batch").save(failOnError: true)
+
         when:
-        ListWithTotalAndType<Action> allTestAndPending = service.listByTypeAndParams(TestActionRunner)
+        ListWithTotalAndType<Action> allTestAndPending = service.listByTypeAndParams(batch, TestActionRunner)
+        ListWithTotalAndType<Action> otherTestAndPending = service.listByTypeAndParams(other, TestActionRunner)
 
         then:
         allTestAndPending.total == 3
+        otherTestAndPending.total == 0
 
         when:
-        ListWithTotalAndType<Action> allTestAndOne = service.listByTypeAndParams(TestActionRunner, one: 'one')
+        ListWithTotalAndType<Action> allTestAndOne = service.listByTypeAndParams(batch, TestActionRunner, one: 'one')
+        ListWithTotalAndType<Action> otherTestAndOne = service.listByTypeAndParams(other, TestActionRunner, one: 'one')
 
         then:
         allTestAndOne.total == 2
+        otherTestAndOne.total == 0
 
 
         when:
-        ListWithTotalAndType<Action> allTestOneAndTwo = service.listByTypeAndParams(TestActionRunner, one: 'one', two: 'two')
+        ListWithTotalAndType<Action> allTestOneAndTwo = service.listByTypeAndParams(batch, TestActionRunner, one: 'one', two: 'two')
+        ListWithTotalAndType<Action> otherTestOneAndTwo = service.listByTypeAndParams(other, TestActionRunner, one: 'one', two: 'two')
 
         then:
         allTestOneAndTwo.total == 1
+        otherTestOneAndTwo.total == 0
     }
 
 }
