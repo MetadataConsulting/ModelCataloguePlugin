@@ -2,6 +2,8 @@ package org.modelcatalogue.core.actions
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Extendible
+import org.modelcatalogue.core.Extension
 import org.springframework.validation.ObjectError
 
 class UpdateCatalogueElement extends AbstractActionRunner {
@@ -18,6 +20,8 @@ class UpdateCatalogueElement extends AbstractActionRunner {
             type: the catalogue element class name
 
             any other bindable parameter
+
+            to update metadata, prefix the parameter name with 'ext:' (do not put any space after the colon)
     """
 
     String getMessage() {
@@ -76,6 +80,18 @@ class UpdateCatalogueElement extends AbstractActionRunner {
 
         element.properties = properties
         if (element.save()) {
+            if (element instanceof Extendible) {
+                properties.findAll {key, value -> key.startsWith('ext:')}.each { key, value ->
+                    if (value) {
+                        element.addExtension key.substring(4), value
+                    } else {
+                        Extension ext = element.listExtensions().find { "ext:$it.name" == key }
+                        if (ext) {
+                            element.removeExtension(ext)
+                        }
+                    }
+                }
+            }
             out << "${GrailsNameUtils.getNaturalName(type.simpleName)} '$element.name' updated"
         } else {
             fail("Unable to update ${GrailsNameUtils.getNaturalName(type.simpleName)}:${id} using parameters ${parameters}")

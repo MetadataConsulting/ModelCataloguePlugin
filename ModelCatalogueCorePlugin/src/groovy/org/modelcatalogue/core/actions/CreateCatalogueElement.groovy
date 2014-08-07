@@ -2,6 +2,8 @@ package org.modelcatalogue.core.actions
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Extendible
+import org.modelcatalogue.core.ExtendibleElement
 import org.springframework.validation.ObjectError
 
 class CreateCatalogueElement extends AbstractActionRunner {
@@ -18,6 +20,8 @@ class CreateCatalogueElement extends AbstractActionRunner {
             type: the catalogue element class name
 
             any other bindable parameter
+
+            to assign metadata, prefix the parameter name with 'ext:' (do not put any space after the colon)
     """
 
     String getMessage() {
@@ -62,6 +66,11 @@ class CreateCatalogueElement extends AbstractActionRunner {
         CatalogueElement element = createCatalogueElement()
         element.properties = properties
         if (element.save()) {
+            if (element instanceof Extendible) {
+                properties.findAll {key, value -> key.startsWith('ext:')}.each { key, value ->
+                    element.addExtension key.substring(4), value
+                }
+            }
             out << "New ${GrailsNameUtils.getNaturalName(type.simpleName)} '$name' created"
         } else {
             fail("Unable to create new ${GrailsNameUtils.getNaturalName(type.simpleName)} using parameters ${parameters}")

@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.actions
 
 import grails.test.mixin.Mock
+import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipType
 import spock.lang.Specification
 
 
-@Mock(Model)
+@Mock([Model, ExtensionValue])
 class UpdateCatalogueElementSpec extends Specification {
 
     UpdateCatalogueElement updateAction = new UpdateCatalogueElement()
@@ -14,6 +15,7 @@ class UpdateCatalogueElementSpec extends Specification {
 
     def setup() {
         model = new Model(name: 'The Model').save(failOnError: true)
+        model.ext.bar = 'foo'
     }
 
     def "uses default action natural name"() {
@@ -107,7 +109,7 @@ class UpdateCatalogueElementSpec extends Specification {
         Model.count() == 1
 
         when:
-        updateAction.initWith(name: "The New Model Name", type: Model.name, id: model.id.toString())
+        updateAction.initWith(name: "The New Model Name", type: Model.name, id: model.id.toString(), 'ext:foo': 'bar', 'ext:bar': '')
         updateAction.run()
 
         then:
@@ -116,6 +118,8 @@ class UpdateCatalogueElementSpec extends Specification {
         Model.countByName('The Model') == 0
         Model.countByName('The New Model Name') == 1
         sw.toString() == "Model 'The New Model Name' updated"
+        Model.findByName('The New Model Name').ext.foo == 'bar'
+        Model.findByName('The New Model Name').ext.bar == null
     }
 
     def "error is reported to the output stream"() {

@@ -1,13 +1,14 @@
 package org.modelcatalogue.core.actions
 
 import grails.test.mixin.Mock
+import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.RelationshipType
 import spock.lang.Specification
 
 
-@Mock(Model)
+@Mock([Model, ExtensionValue])
 class CreateCatalogueElementSpec extends Specification {
 
     CreateCatalogueElement createAction = new CreateCatalogueElement()
@@ -85,7 +86,7 @@ class CreateCatalogueElementSpec extends Specification {
         Model.count() == 0
 
         when:
-        createAction.initWith(name: "The Model", type: Model.name, description: "The Description", status: 'DRAFT')
+        createAction.initWith(name: "The Model", type: Model.name, description: "The Description", status: 'DRAFT', 'ext:foo': 'bar')
         createAction.run()
 
         then:
@@ -94,6 +95,7 @@ class CreateCatalogueElementSpec extends Specification {
         Model.countByName('The Model') == 1
         Model.countByStatus(PublishedElementStatus.DRAFT) == 1
         sw.toString() == "New Model 'The Model' created"
+        Model.findByName('The Model').ext.foo == 'bar'
     }
 
     def "error is reported to the output stream"() {
