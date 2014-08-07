@@ -158,13 +158,7 @@ class ActionService {
             action.addToDependencies(dependency)
         }
 
-        if (dependsOn) {
-            created.order = dependsOn.sum { it.order } as Long
-        } else {
-            created.order = created.id
-        }
-
-        created.save(failOnError: true)
+        created
     }
 
     ListWithTotalAndType<Action> list(Map params = [:]) {

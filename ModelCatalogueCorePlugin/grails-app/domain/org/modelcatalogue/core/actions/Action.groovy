@@ -13,8 +13,6 @@ class Action implements Extendible {
 
     String outcome
 
-    Long order = 0
-
     // time stamping
     Date dateCreated
     Date lastUpdated
