@@ -11,6 +11,8 @@ class Batch {
     Date dateCreated
     Date lastUpdated
 
+    Boolean archived = Boolean.FALSE
+
     static hasMany = [actions: Action]
 
     static constraints = {
