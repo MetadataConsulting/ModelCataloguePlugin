@@ -3,10 +3,11 @@ package org.modelcatalogue.core.util.marshalling
 import grails.converters.XML
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.Asset
+import org.springframework.beans.factory.annotation.Autowired
 
 class AssetMarshaller extends PublishedElementMarshallers {
 
-    LinkGenerator linkGenerator
+    @Autowired LinkGenerator linkGenerator
 
     AssetMarshaller() {
         super(Asset)
