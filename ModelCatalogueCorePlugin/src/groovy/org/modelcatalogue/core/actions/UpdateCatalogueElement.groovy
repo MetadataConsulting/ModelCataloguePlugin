@@ -6,6 +6,9 @@ import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.Extension
 import org.springframework.validation.ObjectError
 
+/**
+ * Action runner to update existing catalogue element.
+ */
 class UpdateCatalogueElement extends AbstractActionRunner {
 
     static String description = """
@@ -101,6 +104,10 @@ class UpdateCatalogueElement extends AbstractActionRunner {
         }
     }
 
+    /**
+     * Returns the type parameter converted to class.
+     * @return the type parameter converted to class
+     */
     Class getType() {
         if (!parameters.type) return null
         try {
@@ -110,10 +117,18 @@ class UpdateCatalogueElement extends AbstractActionRunner {
         }
     }
 
+    /**
+     * Returns the ID of the element being updated.
+     * @return the ID of the element being updated
+     */
     Long getId() {
         parameters.id as Long
     }
 
+    /**
+     * Returns the catalogue element fetched by given type and ID.
+     * @return the catalogue element fetched by given type and ID
+     */
     CatalogueElement queryForCatalogueElement() {
         if (!type) throw new IllegalStateException("Type is not set")
         if (!id) throw new IllegalStateException("ID is not set")

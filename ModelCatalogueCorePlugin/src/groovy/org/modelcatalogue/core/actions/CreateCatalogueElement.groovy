@@ -3,9 +3,11 @@ package org.modelcatalogue.core.actions
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Extendible
-import org.modelcatalogue.core.ExtendibleElement
 import org.springframework.validation.ObjectError
 
+/**
+ * Action Runner to create new catalogue elements.
+ */
 class CreateCatalogueElement extends AbstractActionRunner {
 
     static String description = """
@@ -80,6 +82,10 @@ class CreateCatalogueElement extends AbstractActionRunner {
         }
     }
 
+    /**
+     * Returns the type parameter as class.
+     * @return the type parameter as class
+     */
     Class getType() {
         if (!parameters.type) return null
         try {
@@ -89,10 +95,18 @@ class CreateCatalogueElement extends AbstractActionRunner {
         }
     }
 
+    /**
+     * Returns the name of the created element.
+     * @return the name of the created element
+     */
     String getName() {
         parameters.name
     }
 
+    /**
+     * Creates new catalogue element instance.
+     * @return new catalogue element instance
+     */
     CatalogueElement createCatalogueElement() {
         if (!type) throw new IllegalStateException("Type is not set")
         type.newInstance()

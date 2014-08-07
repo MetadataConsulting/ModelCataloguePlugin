@@ -4,7 +4,14 @@ import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 /**
- * Created by ladin on 04.08.14.
+ * Base class for ActionRunner interface.
+ *
+ * The description is taken from static description field of the implementation class.
+ * Parameters are stored in parameters field after initialization.
+ * Natural name is extracted from the name of the class, ignoring any
+ *
+ * To signalize failure, call fail method with optional string message which will be printed into out print writer.
+ *
  */
 abstract class AbstractActionRunner implements ActionRunner {
     PrintWriter out
@@ -26,6 +33,10 @@ abstract class AbstractActionRunner implements ActionRunner {
         return failed
     }
 
+    /**
+     * Signalized failure to the runner executor. The optional message will be written to the out print writer.
+     * @param message optional message to be written to the out print writer
+     */
     protected void fail(String message = null) {
         if (message && out) {
             out << message
@@ -36,7 +47,7 @@ abstract class AbstractActionRunner implements ActionRunner {
 
     @Override
     String getNaturalName() {
-        return GrailsNameUtils.getNaturalName(getClass().simpleName - 'Action')
+        return GrailsNameUtils.getNaturalName(getClass().simpleName - 'Action' - 'Runner')
     }
 
     String getDescription() {
