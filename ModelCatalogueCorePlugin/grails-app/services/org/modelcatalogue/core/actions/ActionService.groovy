@@ -60,6 +60,7 @@ class ActionService {
                 try {
                     // this will cause waiting for all provider actions to be completed before the execution
                     for (Future<String> future in dependenciesPerformed) {
+                        // TODO: if dependency fail, this action should fail as well
                         future.get()
                     }
 
@@ -88,6 +89,10 @@ class ActionService {
         }
         action.state = ActionState.DISMISSED
         action.save(failOnError: true)
+
+        for (ActionDependency dependency in action.dependencies) {
+            dismiss dependency.dependant
+        }
     }
 
     Action create(Map<String, String> parameters = [:], Class<? extends ActionRunner> runner, Action... dependsOn) {
@@ -178,6 +183,7 @@ class ActionService {
                 eq 'state', state
             }
         }
+
 
     }
 

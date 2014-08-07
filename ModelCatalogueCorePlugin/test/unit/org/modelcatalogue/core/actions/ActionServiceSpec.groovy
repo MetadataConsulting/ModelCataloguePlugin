@@ -61,15 +61,20 @@ class ActionServiceSpec extends Specification {
 
     def "action is dismissed"() {
         Action action = createAction(should: 'dismiss')
+        Action dependant = createAction(is: 'dependant')
+
+        action.addToDependencies(dependant: dependant, provider: action)
 
         expect:
         action.state == ActionState.PENDING
+        dependant.state == ActionState.PENDING
 
         when:
         service.dismiss(action)
 
         then:
         action.state == ActionState.DISMISSED
+        dependant.state == ActionState.DISMISSED
     }
 
     def "create new action using service"() {
@@ -145,7 +150,20 @@ class ActionServiceSpec extends Specification {
 }
 
 class TestActionRunner extends AbstractActionRunner {
-    @Override void run() { out << "performed with $parameters" }
+    @Override void run() {
+        out << "performed with $parameters"
+    }
+
+    @Override
+    String getMessage() {
+        return "Test message"
+    }
+
+    @Override
+    String getDescription() {
+        return "Description"
+    }
+
     @Override Map<String, String> validate(Map<String, String> params) {
         if (params.fail) {
             return [fail: "This would fail!", error: "Also emits error"]
