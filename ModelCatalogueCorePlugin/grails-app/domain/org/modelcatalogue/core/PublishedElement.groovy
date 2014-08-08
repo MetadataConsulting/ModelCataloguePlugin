@@ -53,14 +53,19 @@ abstract class PublishedElement extends ExtendibleElement  {
         getClass().countByModelCatalogueIdLike "$bareModelCatalogueId%"
     }
 
-    static protected Boolean checkChildItemsFinalized(Model model){
+    static protected Boolean checkChildItemsFinalized(Model model, Collection<Model> tree = []){
 
-        if(model.contains.any{it.status!=PublishedElementStatus.FINALIZED}) return false
+        if(model.contains.any{it.status!=PublishedElementStatus.FINALIZED && it.status!=PublishedElementStatus.ARCHIVED }) return false
+
+        if(!tree.contains(model)) tree.add(model)
+
         def parentOf = model.parentOf
         if(parentOf) {
             return model.parentOf.any { Model md ->
-                if (md.status != PublishedElementStatus.FINALIZED) return false
-                if (!checkChildItemsFinalized(md)) return false
+                if (md.status != PublishedElementStatus.FINALIZED && md.status != PublishedElementStatus.ARCHIVED) return false
+                if(!tree.contains(md)) {
+                    if (!checkChildItemsFinalized(md, tree)) return false
+                }
                 return true
             }
         }

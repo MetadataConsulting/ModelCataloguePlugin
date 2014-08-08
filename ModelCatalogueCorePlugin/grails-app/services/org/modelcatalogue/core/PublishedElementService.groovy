@@ -62,6 +62,53 @@ class PublishedElementService {
         archived.save()
     }
 
+    public <E extends Model> E finalizeTree(Model model, Collection<Model> tree = []){
+
+        //check that it isn't already finalized
+        if(model.status==PublishedElementStatus.FINALIZED || model.status==PublishedElementStatus.ARCHIVED) return model
+
+        //to avoid infinite loop
+        if(!tree.contains(model)) tree.add(model)
+
+        //finalize data elements
+        model.contains.each{ DataElement dataElement ->
+            if(dataElement.status!=PublishedElementStatus.FINALIZED && dataElement.status!=PublishedElementStatus.ARCHIVED){
+                dataElement.status = PublishedElementStatus.FINALIZED
+                dataElement.save(flush:true)
+            }
+        }
+
+        //finalize child models
+        model.parentOf.each{ Model child ->
+            if(!tree.contains(child)) {
+                finalizeTree(child, tree)
+            }
+        }
+
+        model.status = PublishedElementStatus.FINALIZED
+        model.save(flush:true)
+
+        return model
+
+    }
+
+
+
+
+//    static protected Boolean checkChildItemsFinalized(Model model){
+//
+//        if(model.contains.any{it.status!=PublishedElementStatus.FINALIZED}) return false
+//        def parentOf = model.parentOf
+//        if(parentOf) {
+//            return model.parentOf.any { Model md ->
+//                if (md.status != PublishedElementStatus.FINALIZED) return false
+//                if (!checkChildItemsFinalized(md)) return false
+//                return true
+//            }
+//        }
+//        return true
+//    }
+
 
     static PublishedElementStatus getStatusFromParams(params) {
         if (!params.status) {

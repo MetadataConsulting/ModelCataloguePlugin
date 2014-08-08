@@ -228,15 +228,21 @@ class DataImportService {
     protected Model addModelToImport(DataImport importer, Model model) {
         if (!importer.models.find{it.id == model.id}) {
             //if(model.status != PublishedElementStatus.UPDATED && model.status != PublishedElementStatus.PENDING){model.status = PublishedElementStatus.DRAFT}
-            model.save()
+//            model.save()
             importer.models.add(model)
         }
         return model
     }
 
+    protected void addUpdatedDataElements(DataImport importer, DataElement dataElement, Model model, ConceptualDomain conceptualDomain ){
+        if(model.status==PublishedElementStatus.FINALIZED){
+            model.status = PublishedElementStatus.UPDATED
+            model.save()
+        }
+        importer.updatedDataElements.add([dataElement, model, conceptualDomain])
+    }
+
     def void actionPendingModels(DataImport importer) {
-
-
         importer.models.each { model ->
             def pendingDataElements = importer.updatedDataElements.findAll { it[1] == model }
 
@@ -258,6 +264,12 @@ class DataImportService {
             model.status = PublishedElementStatus.PENDING
             model.save(flush:true, failOnError:true)
         }
+
+        importer.models.each{ Model model->
+            publishedElementService.finalizeTree(model)
+        }
+
+
     }
 
     def importModels(DataImport importer, String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain) {
@@ -374,7 +386,7 @@ class DataImportService {
             dataElement.status = PublishedElementStatus.UPDATED
             dataElement.save()
             dataElement = updateMetadata(metadata, dataElement)
-            importer.updatedDataElements.add([dataElement, model, conceptualDomain])
+            addUpdatedDataElements(importer, dataElement, model, conceptualDomain)
         }
 
         return dataElement
@@ -418,7 +430,8 @@ class DataImportService {
 
             }
 
-            importer.updatedDataElements.add([dataElement, model, conceptualDomain])
+            addUpdatedDataElements(importer, dataElement, model, conceptualDomain)
+
         }
 
         return dataElement
@@ -460,7 +473,7 @@ class DataImportService {
 //            Relationship containedIn = de.addToContainedIn(model)
 //            containedIn.ext.put("Context" , cd.name)
             addModelToImport(importer, model)
-            importer.updatedDataElements.add([de, model, cd])
+            addUpdatedDataElements(importer, de, model, cd)
         }
 
         importValueDomain(vdParams, de, cd)
@@ -493,7 +506,7 @@ class DataImportService {
 //            Relationship  containedIn = de.addToContainedIn(model)
 //            containedIn.ext.put("Context" , cd.name)
             addModelToImport(importer, model)
-            importer.updatedDataElements.add([de, model, cd])
+            addUpdatedDataElements(importer, de, model, cd)
         }
         return de
     }
