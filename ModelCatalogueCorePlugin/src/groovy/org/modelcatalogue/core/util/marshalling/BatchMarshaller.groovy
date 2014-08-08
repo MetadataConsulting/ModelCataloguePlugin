@@ -15,10 +15,13 @@ class BatchMarshaller extends AbstractMarshallers {
         [
                 id: el.id,
                 name: el.name,
+                description: el.description,
                 version: el.version,
                 elementType: el.class.name,
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 archived: el.archived,
+                dateCreated: el.dateCreated,
+                lastUpdated: el.lastUpdated,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id"
         ]
     }
@@ -26,6 +29,7 @@ class BatchMarshaller extends AbstractMarshallers {
     protected void buildXml(el, XML xml) {
         xml.build {
             name el.name
+            description el.description
         }
     }
 

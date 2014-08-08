@@ -306,4 +306,56 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+
+  actionsProvider.registerAction 'switch-archived-batches', ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
+    return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and $stateParams.resource == 'batch'
+
+    {
+    abstract: true
+    position: 500
+
+    type:     (->
+      return 'info'     if $stateParams.status == 'archived'
+      return 'primary'
+    )()
+    icon:     (->
+      return 'time'     if $stateParams.status == 'archived'
+      return 'ok'
+    )()
+    label:    (->
+      return 'Archived'  if $stateParams.status == 'archived'
+      return 'Active'
+    )()
+    }
+  ]
+
+  actionsProvider.registerChildAction 'switch-archived-batches', 'switch-archived-batches-active', ['$state', '$stateParams', ($state, $stateParams) ->
+    {
+    position:   300
+    label:      "Active"
+    icon:       'ok'
+    type:       'primary'
+    active:     !$stateParams.status
+    action:     ->
+      newParams = angular.copy($stateParams)
+      newParams.status = undefined
+      $state.go 'mc.resource.list', newParams
+    }
+  ]
+
+  actionsProvider.registerChildAction 'switch-archived-batches', 'switch-archived-batches-archived', ['$state', '$stateParams', ($state, $stateParams) ->
+    {
+    position:   200
+    label:      "Archived"
+    icon:       'time'
+    type:       'warning'
+    active:     $stateParams.status == 'archived'
+    action:     ->
+      newParams = angular.copy($stateParams)
+      newParams.status = 'archived'
+      $state.go 'mc.resource.list', newParams
+    }
+  ]
+
+
 ]

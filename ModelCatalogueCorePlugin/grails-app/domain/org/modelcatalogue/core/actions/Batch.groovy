@@ -8,6 +8,7 @@ class Batch {
     static searchable = true
 
     String name
+    String description
 
     // time stamping
     Date dateCreated
@@ -19,10 +20,7 @@ class Batch {
 
     static constraints = {
         name size: 1..255
-    }
-
-    static mapping = {
-        sort dateCreated: 'desc'
+        description nullable: true, maxSize: 2000
     }
 
 }

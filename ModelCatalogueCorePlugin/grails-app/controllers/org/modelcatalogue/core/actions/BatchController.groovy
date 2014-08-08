@@ -16,12 +16,13 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     @Override
     def index(Integer max) {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notAuthorized()
+            return
+        }
         handleParams(max)
         reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
-            if (!params.boolean('archived')) {
-                eq 'archived', false
-            }
+            eq 'archived', params.boolean('archived') || params.status == 'archived'
         }
     }
-
 }
