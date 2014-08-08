@@ -23,4 +23,8 @@ class Batch {
         description nullable: true, maxSize: 2000
     }
 
+    static mapping = {
+        sort 'name'
+    }
+
 }
