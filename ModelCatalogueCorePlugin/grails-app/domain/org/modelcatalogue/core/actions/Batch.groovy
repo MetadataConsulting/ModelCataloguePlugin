@@ -5,6 +5,8 @@ package org.modelcatalogue.core.actions
  */
 class Batch {
 
+    static searchable = true
+
     String name
 
     // time stamping
@@ -17,6 +19,10 @@ class Batch {
 
     static constraints = {
         name size: 1..255
+    }
+
+    static mapping = {
+        sort dateCreated: 'desc'
     }
 
 }
