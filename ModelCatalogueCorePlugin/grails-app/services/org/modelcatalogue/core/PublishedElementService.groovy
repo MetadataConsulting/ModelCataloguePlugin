@@ -74,7 +74,7 @@ class PublishedElementService {
         model.contains.each{ DataElement dataElement ->
             if(dataElement.status!=PublishedElementStatus.FINALIZED && dataElement.status!=PublishedElementStatus.ARCHIVED){
                 dataElement.status = PublishedElementStatus.FINALIZED
-                dataElement.save(flush:true)
+                dataElement.save(flush:true, failOnError: true)
             }
         }
 
@@ -86,7 +86,7 @@ class PublishedElementService {
         }
 
         model.status = PublishedElementStatus.FINALIZED
-        model.save(flush:true)
+        model.save(flush:true, failOnError: true)
 
         return model
 

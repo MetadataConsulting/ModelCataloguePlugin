@@ -177,7 +177,7 @@ class DataImportService {
                 }
             }
         }
-         actionPendingModels(importer)
+        actionPendingModels(importer)
     }
 
 
@@ -257,7 +257,7 @@ class DataImportService {
                     def relationship = model.addToContains(dataElement)
                     relationship.ext.put("Context" , it[2].name)
                     dataElement.status = PublishedElementStatus.FINALIZED
-                    dataElement.save()
+                    dataElement.save(flush:true, failOnError:true)
                 }
             }
             model.refresh()
