@@ -19,6 +19,8 @@ class Mapping {
         mapValue(mapping, value)
     }
 
+    static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
+
     static constraints = {
         source nullable: false, unique: ['destination']
         destination nullable: false, validator: { val, obj ->
@@ -44,9 +46,11 @@ class Mapping {
     }
 
     def beforeDelete(){
-        if (source || destination) {
-            destination?.removeFromIncomingMappings(this)
+        if (source) {
             source?.removeFromOutgoingMappings(this)
+        }
+        if(destination){
+            destination?.removeFromIncomingMappings(this)
         }
     }
 

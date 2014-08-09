@@ -8,7 +8,7 @@ import grails.util.GrailsNameUtils
 class PublishedElementControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
     def setupSpec(){
-        totalCount = 38
+        totalCount = 36
     }
 
     @Override

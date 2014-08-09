@@ -26,20 +26,20 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "can supply status as parameter"() {
         expect:
-        publishedElementService.list(status: 'DRAFT').size()                                    == 19
+        publishedElementService.list(status: 'DRAFT').size()                                    == 17
         publishedElementService.list(status: 'DRAFT', max: 10).size()                           == 10
-        publishedElementService.list(status: PublishedElementStatus.DRAFT).size()               == 19
+        publishedElementService.list(status: PublishedElementStatus.DRAFT).size()               == 17
         publishedElementService.list(status: PublishedElementStatus.DRAFT, max: 10).size()      == 10
-        publishedElementService.list(Model, status: 'DRAFT').size()                             == 9
-        publishedElementService.list(Model, status: PublishedElementStatus.DRAFT).size()        == 9
+        publishedElementService.list(Model, status: 'DRAFT').size()                             == 7
+        publishedElementService.list(Model, status: PublishedElementStatus.DRAFT).size()        == 7
         publishedElementService.list(DataElement, status: 'DRAFT').size()                       == 5
         publishedElementService.list(DataElement, status: PublishedElementStatus.DRAFT).size()  == 5
         publishedElementService.list(Asset, status: 'DRAFT').size()                             == 5
         publishedElementService.list(Asset, status: PublishedElementStatus.DRAFT).size()        == 5
-        publishedElementService.count(status: 'DRAFT')                                          == 19
-        publishedElementService.count(status: PublishedElementStatus.DRAFT)                     == 19
-        publishedElementService.count(Model, status: 'DRAFT')                                   == 9
-        publishedElementService.count(Model, status: PublishedElementStatus.DRAFT)              == 9
+        publishedElementService.count(status: 'DRAFT')                                          == 17
+        publishedElementService.count(status: PublishedElementStatus.DRAFT)                     == 17
+        publishedElementService.count(Model, status: 'DRAFT')                                   == 7
+        publishedElementService.count(Model, status: PublishedElementStatus.DRAFT)              == 7
         publishedElementService.count(DataElement, status: 'DRAFT')                             == 5
         publishedElementService.count(DataElement, status: PublishedElementStatus.DRAFT)        == 5
         publishedElementService.count(Asset, status: 'DRAFT')                             == 5

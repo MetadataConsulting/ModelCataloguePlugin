@@ -8,7 +8,7 @@ import grails.util.GrailsNameUtils
 class ExtendibleElementControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
 
     def setupSpec(){
-        totalCount = 50
+        totalCount = 48
     }
 
     @Override
@@ -80,12 +80,12 @@ class ExtendibleElementControllerIntegrationSpec extends AbstractExtendibleEleme
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 50, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, 50, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, 50, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 4, 4, 8, 50, "${baseLink}?max=4&offset=12", "${baseLink}?max=4&offset=4"],
-                [5, 10, 10, 10, 50, "${baseLink}?max=10&offset=20", "${baseLink}?max=10&offset=0"],
-                [6, 2, 2, 10, 50, "${baseLink}?max=2&offset=12", "${baseLink}?max=2&offset=8"]
+                [1, 10, 10, 0, 48, "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, 48, "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, 48, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, 48, "${baseLink}?max=4&offset=12", "${baseLink}?max=4&offset=4"],
+                [5, 10, 10, 10, 48, "${baseLink}?max=10&offset=20", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, 48, "${baseLink}?max=2&offset=12", "${baseLink}?max=2&offset=8"]
         ]
     }
 }

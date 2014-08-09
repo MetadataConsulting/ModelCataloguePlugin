@@ -1,285 +1,122 @@
 package org.modelcatalogue.core
 
-import grails.rest.RestfulController
-import grails.test.spock.IntegrationSpec
 import grails.util.GrailsNameUtils
-import groovy.util.slurpersupport.GPathResult
-import org.codehaus.groovy.grails.web.json.JSONElement
-import org.modelcatalogue.core.util.DefaultResultRecorder
-import org.modelcatalogue.core.util.ResultRecorder
+import org.modelcatalogue.core.util.ListWithTotal
 import spock.lang.Shared
-import spock.lang.Unroll
 
 /**
  * Created by adammilward on 27/02/2014.
  */
-class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec{
+class DataArchitectControllerIntegrationSpec extends AbstractIntegrationSpec {
 
 
     @Shared
-    def relationshipService, de1, de2, de3, de4, de5, vd, md,md2
+    def dataArchitectService, de1, de2, de3, de4, de5, vd, md,md2
 
 
     def setupSpec(){
-        //domainModellerService.modelDomains()
         loadFixtures()
-        de1 = DataElement.findByName("DE_author")
-        de2 = DataElement.findByName("DE_author1")
-        de3 = DataElement.findByName("AUTHOR")
+        de1 = DataElement.findByName("auth9")
+        de2 = DataElement.findByName("auth8")
+        de3 = DataElement.findByName("title")
         de4 = DataElement.findByName("auth4")
         de5 = DataElement.findByName("auth5")
-        vd = ValueDomain.findByName("value domain Celsius")
-        md = new Model(name:"testModel").save()
-        md2 = new Model(name:"testModel2").save()
-        de1.addToContainedIn(md)
-        de3.addToContainedIn(md2)
-        de2.addToInstantiatedBy(vd)
-        relationshipService.link(de3, de2, RelationshipType.findByName("supersession"))
-        md.addToParentOf(md2)
-
         de1.ext.put("Data item No.", "C1031")
         de2.ext.put("Optional_Local_Identifier", "C1031")
+        de2.ext.put("metadata", "blah")
+        de1.save()
+        vd = ValueDomain.findByName("value domain Celsius")
+        md = new Model(name:"testModel1234").save(flush:true)
+        md2 = new Model(name:"testModel2345").save(flush:true)
+        md.addToContains(de1)
+        md.addToContains(de3)
+        de2.addToInstantiatedBy(vd)
+        md.addToParentOf(md2)
+        de2.save(flush:true)
+
     }
+
+
+    def "find relationships and action them"() {
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        def relatedDataElements = dataArchitectService.findRelationsByMetadataKeys("Data item No.","Optional_Local_Identifier", params)
+
+        then:
+        relatedDataElements.each {row ->
+            relatedDataElements.list.collect{it.source}contains(de1)
+            relatedDataElements.list.collect{it.destination}contains(de2)
+        }
+
+        when:
+        dataArchitectService.actionRelationshipList(relatedDataElements.list)
+
+
+        then:
+        de1.relations.contains(de2)
+
+    }
+
+    def "find data elements without particular extension key"(){
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        params.put("key", "metadata")
+        de1.refresh()
+        de2.refresh()
+        de5.refresh()
+        ListWithTotal dataElements = dataArchitectService.metadataKeyCheck(params)
+        then:
+
+        !dataElements.items.contains(de2)
+        dataElements.items.contains(de1)
+        dataElements.items.contains(de5)
+
+    }
+
+    def "find uninstantiatedDataElements"(){
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        ListWithTotal dataElements = dataArchitectService.uninstantiatedDataElements(params)
+        de1.refresh()
+        de2.refresh()
+        de5.refresh()
+
+        then:
+        !dataElements.items.find{ it.modelCatalogueId==de2.modelCatalogueId }
+        dataElements.items.find{ it.modelCatalogueId==de1.modelCatalogueId }
+        dataElements.items.find{ it.modelCatalogueId==de3.modelCatalogueId }
+
+    }
+
+
+
+    def "placeholder"(){
+
+        expect:
+
+        de1
+
+
+    }
+
 
     def cleanupSpec(){
-        de1.removeFromContainedIn(md)
-        de3.removeFromContainedIn(md2)
+        md.refresh()
+        md2.refresh()
+        de1.refresh()
+        de3.refresh()
+        md.removeFromContains(de1)
+        md.removeFromContains(de3)
+        md.removeFromParentOf(md2)
+        de2.refresh()
         de2.removeFromInstantiatedBy(vd)
-        md.delete()
-        md2.delete()
+        md.refresh()
+        md.delete(flush:true)
+        md2.refresh()
+        md2.delete(flush:true)
     }
-
-    def "json get sub model elements"(){
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-
-        when:
-        controller.params.put("modelId", md.id)
-        controller.response.format = "json"
-        controller.getSubModelElements()
-        JSONElement json = controller.response.json
-        String list = "sub_model_elements"
-        recorder.recordResult list, json
-
-        then:
-        json.success
-        json.total == 2
-        json.offset == 0
-        json.page == 10
-        json.list
-        json.list.size() == 2
-        json.next == ""
-        json.previous == ""
-    }
-
-    def "xml get sub model elements"(){
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-
-        when:
-        controller.params.put("modelId", md.id)
-        controller.response.format = "xml"
-        controller.getSubModelElements()
-        GPathResult xml = controller.response.xml
-        String list = "sub_model_elements"
-        recorder.recordResult list, xml
-
-        then:
-
-        xml.@success.text() == "true"
-        xml.@total.text() == "2"
-        xml.@offset.text() == "0"
-        xml.@page.text() =="10"
-        xml.element
-        xml.element.size() == 2
-        xml.next.text() == ""
-        xml.previous.text() == ""
-    }
-
-
-    @Unroll
-    def "json -  get uninstantiated data elements from the catalogue"(){
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-
-        when:
-        controller.response.format = "json"
-        controller.uninstantiatedDataElements()
-        JSONElement json = controller.response.json
-        String list = "metadata_uninstantiated"
-        recorder.recordResult list, json
-
-        then:
-
-        json.success
-        json.total == 11
-        json.offset == 0
-        json.page == 10
-        json.list
-        json.list.size() == 10
-        json.next == "/dataArchitect/uninstantiatedDataElements?max=10&offset=10"
-        json.previous == ""
-
-
-    }
-
-    @Unroll
-    def "json -  get data elements without metadata key from the catalogue"(){
-
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-        when:
-        controller.response.format = "json"
-        controller.params.put("key", "metadata")
-        controller.metadataKeyCheck()
-        JSONElement json = controller.response.json
-        String list = "metadataKey_missing_key_metadata"
-        recorder.recordResult list, json
-
-        then:
-
-        json.success
-        //json.total == 11
-        json.offset == 0
-        json.page == 10
-        json.list
-        json.list.size() == 10
-        //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
-        json.previous == ""
-
-    }
-
-
-    @Unroll
-    def "xml -  get uninstantiated data elements from the catalogue"(){
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-
-        when:
-        controller.response.format = "xml"
-        controller.uninstantiatedDataElements()
-        GPathResult xml = controller.response.xml
-        String list = "metadata_uninstantiated"
-        recorder.recordResult list, xml
-
-        then:
-
-        xml.@success.text() == "true"
-        xml.@offset.text() == "0"
-        xml.@page.text() =="10000"
-        xml.element
-        xml.next.text() == ""
-        xml.previous.text() == ""
-    }
-
-    @Unroll
-    def "xml -  get data elements without metadata key from the catalogue"(){
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-
-        when:
-        controller.response.format = "xml"
-        controller.params.put("key", "metadata")
-        controller.metadataKeyCheck()
-        GPathResult xml = controller.response.xml
-        String list = "metadataKey_missing_key_metadata"
-        recorder.recordResult list, xml
-
-        then:
-
-        xml.@success.text() == "true"
-        //xml.@total.text() == "11"
-        xml.@offset.text() == "0"
-        xml.@page.text() =="10000"
-        xml.element
-//        xml.element.size() == 11
-        //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
-        xml.previous.text() == ""
-    }
-
-    @Unroll
-    def "json -  create dataElement relationships"(){
-
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-        when:
-        controller.response.format = "json"
-        controller.params.put("keyOne", "Data item No.")
-        controller.params.put("keyTwo", "Optional_Local_Identifier")
-        controller.findRelationsByMetadataKeys()
-        JSONElement json = controller.response.json
-        String list = "dataElement_Relationships"
-        recorder.recordResult list, json
-
-        then:
-
-        json.success
-        json.total == 1
-        json.offset == 0
-        json.page == 10
-        json.list
-        json.list.size() == 1
-        //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
-        json.previous == ""
-
-    }
-    @Unroll
-    def "xml -  create dataElement relationships"(){
-        def controller = new DataArchitectController()
-        ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                "dataArchitect"
-        )
-
-        when:
-        controller.response.format = "xml"
-        controller.params.put("keyOne", "Data item No.")
-        controller.params.put("keyTwo", "Optional_Local_Identifier")
-        controller.findRelationsByMetadataKeys()
-        GPathResult xml = controller.response.xml
-        String list = "dataElement_Relationships"
-        recorder.recordResult list, xml
-
-        then:
-
-        xml.@success.text() == "true"
-        xml.@total.text() == "1"
-        xml.@offset.text() == "0"
-        xml.@page.text() =="10000"
-        xml.element
-        xml.element.size() == 1
-        //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
-        xml.previous.text() == ""
-    }
-
 
 }

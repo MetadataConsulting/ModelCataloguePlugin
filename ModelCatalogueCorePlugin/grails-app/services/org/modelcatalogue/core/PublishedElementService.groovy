@@ -74,7 +74,7 @@ class PublishedElementService {
         model.contains.each{ DataElement dataElement ->
             if(dataElement.status!=PublishedElementStatus.FINALIZED && dataElement.status!=PublishedElementStatus.ARCHIVED){
                 dataElement.status = PublishedElementStatus.FINALIZED
-                dataElement.save(flush:true, failOnError: true)
+                dataElement.save(flush:true)
             }
         }
 
@@ -86,29 +86,11 @@ class PublishedElementService {
         }
 
         model.status = PublishedElementStatus.FINALIZED
-        model.save(flush:true, failOnError: true)
+        model.save(flush:true)
 
         return model
 
     }
-
-
-
-
-//    static protected Boolean checkChildItemsFinalized(Model model){
-//
-//        if(model.contains.any{it.status!=PublishedElementStatus.FINALIZED}) return false
-//        def parentOf = model.parentOf
-//        if(parentOf) {
-//            return model.parentOf.any { Model md ->
-//                if (md.status != PublishedElementStatus.FINALIZED) return false
-//                if (!checkChildItemsFinalized(md)) return false
-//                return true
-//            }
-//        }
-//        return true
-//    }
-
 
     static PublishedElementStatus getStatusFromParams(params) {
         if (!params.status) {
