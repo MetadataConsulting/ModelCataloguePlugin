@@ -13,7 +13,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('value domain test5 (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -35,7 +35,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius')
+    expect(element.val()).toBe('value domain test5')
 
 
   it "the resource can be specified as string",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
@@ -50,7 +50,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('value domain test5 (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -72,7 +72,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('value domain test5 (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
