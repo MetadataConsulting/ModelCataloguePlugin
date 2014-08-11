@@ -36,8 +36,8 @@ class SmokeSpec extends GebSpec {
         }
 
         when:
-        name        = "New Model"
-        description = "New Model's Description"
+        name        = "New"
+        description = "Description"
 
         saveButton.click()
         waitFor {
@@ -45,7 +45,7 @@ class SmokeSpec extends GebSpec {
         }
 
         then:
-        $('blockquote').text() == "New Model's Description"
+        $('blockquote').text() == "Description"
 
         cleanup:
         logout()
