@@ -18,9 +18,24 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.contained.noStatusSwitch = $scope.$new(true)
     $scope.contained.list           = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
     $scope.contained.element        = if list.size > 0 then list.list[0]
+
+    printLocalIdentifiers = (relationship) ->
+      result = ''
+      ext     = relationship?.relation?.ext ? {}
+      #local identifiers will be added as extensions (metadata) and may look like these:
+      #"identifier","local identifier","local_identifier","local identifier","optional_local_identifier","optional local identifier"
+      for key, value of ext
+        if key.toLowerCase().indexOf("identifier") != -1
+          result += "#{value ? ''}, "
+
+      if(result.indexOf(",") != -1)
+        result = result.substring(0,result.lastIndexOf(","))
+      result
+
     $scope.contained.columns        = [
-      {header: 'Name',          value: "relation.name",        classes: 'col-md-6', show: "relation.show()"}
+      {header: 'Name',          value: "relation.name",        classes: 'col-md-3', show: "relation.show()"}
       {header: 'Description',   value: "relation.description", classes: 'col-md-6'}
+      {header: 'Local Identifier', value:  printLocalIdentifiers,     classes: 'col-md-2'}
     ]
 
 
