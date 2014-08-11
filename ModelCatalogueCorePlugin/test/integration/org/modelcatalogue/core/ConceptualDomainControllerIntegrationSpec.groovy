@@ -46,7 +46,7 @@ class ConceptualDomainControllerIntegrationSpec extends AbstractCatalogueElement
 
     @Override
     ConceptualDomain getLoadItem() {
-        ConceptualDomain.findByName("public libraries")
+        ConceptualDomain.findByName("university libraries")
     }
 
     @Override

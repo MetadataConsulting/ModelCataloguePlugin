@@ -17,7 +17,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         loadFixtures()
 
-        cd1 =  ConceptualDomain.findByName("public libraries")
+        cd1 =  ConceptualDomain.findByName("university libraries")
         md1 = Model.findByName("book")
         de1 = DataElement.findByName("auth5")
         de2 = DataElement.findByName("title")
