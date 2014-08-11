@@ -111,5 +111,10 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: "Description" , value: "description"                  , class: 'col-md-5' }
   ]
 
+  columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Action', [
+    {header: "Created"     , value: "dateCreated | date:'short'"   , class: 'col-md-2', sort: {property: 'dateCreated', type: 'order'}}
+    {header: "Message"     , value: 'message'                      , class: 'col-md-7' }
+  ]
+
 
 ]

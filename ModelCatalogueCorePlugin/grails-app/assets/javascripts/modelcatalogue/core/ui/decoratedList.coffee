@@ -171,7 +171,8 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
         count
 
       $scope.getActionsClass = () ->
-        ' col-md-1'
+        return ' col-md-1' if $scope.actions.length == 1
+        return ' col-md-2' if $scope.actions.length  > 1
 
       $scope.getActionClass = (action) ->
         return "btn-#{action.type}" if action.type?

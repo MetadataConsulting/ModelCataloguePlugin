@@ -82,7 +82,8 @@ Model catalogue core plugin (metadata registry)
                     new ImportRowsMarshaller(),
                     new DataImportMarshaller(),
                     new ListWithTotalAndTypeWrapperMarshaller(),
-                    new BatchMarshaller()
+                    new BatchMarshaller(),
+                    new ActionMarshaller()
             ]
         }
 

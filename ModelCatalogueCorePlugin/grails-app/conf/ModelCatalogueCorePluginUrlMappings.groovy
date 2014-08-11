@@ -25,6 +25,15 @@ class ModelCatalogueCorePluginUrlMappings {
             "/api/modelCatalogue/core/$controllerName/$id" (controller: controllerName, action: 'update', method: HttpMethod.PUT)
             "/api/modelCatalogue/core/$controllerName/$id" (controller: controllerName, action: 'delete', method: HttpMethod.DELETE)
 
+
+            if (controllerName == 'batch') {
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$state"(controller: controllerName, action: 'listActions', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/dismiss"(controller: controllerName, action: 'dismiss', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/reactivate"(controller: controllerName, action: 'reactivate', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/run"(controller: controllerName, action: 'run', method: HttpMethod.POST)
+            }
+
+
             if (controllerName in catalogueElements) {
                 "/api/modelCatalogue/core/$controllerName/$id/relationships" (controller: controllerName, action: "relationships", method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/relationships/search" (controller: controllerName, action: "searchRelationships", method: HttpMethod.GET)
@@ -66,7 +75,6 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/elementClasses"(controller: controllerName, action: 'elementClasses', method: HttpMethod.GET)
             }
         }
-
 
         group "/api/modelCatalogue/core/dataArchitect", {
             "/uninstantiatedDataElements" (controller: "dataArchitect", action: 'uninstantiatedDataElements', method: HttpMethod.GET)

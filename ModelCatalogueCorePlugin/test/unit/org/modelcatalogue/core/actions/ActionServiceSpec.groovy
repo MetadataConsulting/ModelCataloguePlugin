@@ -121,6 +121,7 @@ class ActionServiceSpec extends Specification {
         Action dependant = createAction(is: 'dependant')
 
         action.addToDependencies(dependant: dependant, provider: action)
+        dependant.addToDependsOn(dependant: dependant, provider: action)
 
         expect:
         action.state == ActionState.PENDING
@@ -132,6 +133,13 @@ class ActionServiceSpec extends Specification {
         then:
         action.state == ActionState.DISMISSED
         dependant.state == ActionState.DISMISSED
+
+        when:
+        service.reactivate(dependant)
+
+        then:
+        dependant.state == ActionState.PENDING
+        action.state == ActionState.PENDING
     }
 
     def "create new action using service"() {

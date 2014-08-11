@@ -1,4 +1,7 @@
 import grails.rest.render.RenderContext
+import org.modelcatalogue.core.actions.Action
+import org.modelcatalogue.core.actions.Batch
+import org.modelcatalogue.core.actions.CreateCatalogueElement
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.core.testapp.UserRole
@@ -15,7 +18,7 @@ class BootStrap {
     def initCatalogueService
     def publishedElementService
     def executorService
-
+    def actionService
 
     XLSXListRenderer xlsxListRenderer
     ReportsRegistry reportsRegistry
@@ -35,6 +38,10 @@ class BootStrap {
             } then { CatalogueElement element ->
                 [[element.description, element.name, element.id]]
             }
+        }
+
+        reportsRegistry.register {
+            creates asset
         }
 
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
@@ -127,13 +134,23 @@ class BootStrap {
                         it.save(failOnError: true)
                     }
 
-//                    println 'Creating history for NHS NUMBER STATUS INDICATOR CODE'
-//                    def withHistory = DataElement.findByName("NHS NUMBER STATUS INDICATOR CODE")
-//
-//                    10.times {
-//                        println "Creating archived version #${it}"
-//                        publishedElementService.archiveAndIncreaseVersion(withHistory)
-//                    }
+                    println "Creating some actions"
+
+                    Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
+
+                    15.times {
+                        Action action
+                        if (it != 7) {
+                            action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
+                        } else {
+                            action = actionService.create(batch, CreateCatalogueElement, Action.get(2), Action.get(5), Action.get(6), name: "Model #${it}", type: Model.name)
+                        }
+                        if (it % 3 == 0) {
+                            actionService.dismiss(action)
+                        }
+                    }
+
+
                     println "Init finished in ${new Date()}"
                 }
                 //domainModellerService.modelDomains()

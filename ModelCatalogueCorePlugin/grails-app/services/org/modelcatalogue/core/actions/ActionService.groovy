@@ -8,6 +8,7 @@ import org.modelcatalogue.core.util.Lists
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
+import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Future
 import java.util.concurrent.FutureTask
@@ -47,13 +48,13 @@ class ActionService {
             String msgStart = 'An action on which this action depends failed with following error:'
             action.state = ActionState.FAILED
             action.outcome = failed.provider.outcome?.startsWith(msgStart) ? failed.provider.outcome : "$msgStart$failed.provider.outcome"
-            action.save(failOnError: true)
+            action.save(failOnError: true, flush: true)
             Future<ActionResult> msg = new FutureTask<ActionResult>({ new ActionResult(outcome: action.outcome, failed: true) })
             msg.run()
             return msg
         } else {
             action.state = ActionState.PERFORMING
-            action.save(failOnError: true)
+            action.save(failOnError: true, flush: true)
         }
 
         Map<Long, Future<ActionResult>> dependenciesPerformed = [:]
@@ -64,9 +65,9 @@ class ActionService {
 
         Long id = action.id
 
-        executorService.submit({
+        Callable<ActionResult> job = {
             try {
-                Action a = Action.get(id)
+                Action a = Action.lock(id)
 
                 StringWriter sw = new StringWriter()
                 PrintWriter pw = new PrintWriter(sw)
@@ -79,11 +80,21 @@ class ActionService {
                     // this will cause waiting for all provider actions to be completed before the execution
                     for (Map.Entry<Long, Future<ActionResult>> future in dependenciesPerformed) {
                         ActionResult result = future.value.get()
-                        if (result.failed) {
+                        if (!result) {
+                            // bug in executor service
+                            // see https://github.com/basejump/grails-executor/issues/12
+                            Action provider = Action.get(future.key)
+                            if (provider.state == ActionState.FAILED) {
+                                a.state = ActionState.FAILED
+                                a.outcome = "Action(${future.key}) doesn't return any result. Considering this as failure."
+                                a.save(failOnError: true, flush: true)
+                                return new ActionResult(outcome: a.outcome, failed: true)
+                            }
+                        } else if (result.failed) {
                             String msgStart = 'Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\n'
                             a.state = ActionState.FAILED
                             a.outcome = result.outcome?.startsWith(msgStart) ? result.outcome : "$msgStart$result.outcome"
-                            a.save(failOnError: true)
+                            a.save(failOnError: true, flush: true)
                             return new ActionResult(outcome: a.outcome, failed: true)
                         }
                     }
@@ -100,7 +111,7 @@ class ActionService {
                     a.state = ActionState.FAILED
                 }
                 a.outcome = sw.toString()
-                a.save(failOnError: true)
+                a.save(failOnError: true, flush: true)
                 return new ActionResult(outcome: a.outcome, failed: a.state == ActionState.FAILED)
             } catch (e) {
                 new DefaultStackTraceFilterer(true).filter(e)
@@ -109,7 +120,8 @@ class ActionService {
                 return new ActionResult(outcome: message, failed: true)
             }
 
-        })
+        }
+        executorService.submit(job as Callable<ActionResult>)
     }
 
     void dismiss(Action action){
@@ -117,10 +129,22 @@ class ActionService {
             return
         }
         action.state = ActionState.DISMISSED
-        action.save(failOnError: true)
+        action.save(failOnError: true, flush: true)
 
         for (ActionDependency dependency in action.dependencies) {
             dismiss dependency.dependant
+        }
+    }
+
+    void reactivate(Action action){
+        if (action.state == ActionState.PENDING) {
+            return
+        }
+        action.state = ActionState.PENDING
+        action.save(failOnError: true, flush: true)
+
+        for (ActionDependency provider in action.dependsOn) {
+            reactivate provider.provider
         }
     }
 
@@ -143,7 +167,7 @@ class ActionService {
             return created
         }
 
-        created.save()
+        created.save(failOnError: true, flush: true)
 
         if (parameters) {
             created.ext.putAll parameters
@@ -153,7 +177,7 @@ class ActionService {
 
         for (Action action in dependsOn) {
             ActionDependency dependency = new ActionDependency(dependant: created, provider: action)
-            dependency.save(failOnError: true)
+            dependency.save(failOnError: true, flush: true)
             created.addToDependsOn(dependency)
             action.addToDependencies(dependency)
         }
@@ -221,7 +245,7 @@ class ActionService {
 
     }
 
-    private <T extends ActionRunner> T createRunner(Class<T> type) {
+    public <T extends ActionRunner> T createRunner(Class<T> type) {
         T runner = type.newInstance()
         autowireBeanFactory.autowireBean(runner)
         runner
