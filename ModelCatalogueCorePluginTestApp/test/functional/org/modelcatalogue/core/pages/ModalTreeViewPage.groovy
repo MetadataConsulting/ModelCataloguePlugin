@@ -15,8 +15,8 @@ class ModalTreeViewPage extends ModelCataloguePage {
 
         basicEditDialog     { $('div.basic-edit-modal-prompt') }
 
-        name                { basicEditDialog.find('#name') }
-        description         { basicEditDialog.find('#description') }
+        name                { basicEditDialog.find('input[id=name]') }
+        description         { basicEditDialog.find('textarea[id=description]') }
         saveButton          { basicEditDialog.find("button.btn-success") }
 
     }
