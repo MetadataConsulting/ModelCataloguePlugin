@@ -70,11 +70,11 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
     def "get data elements from multiple models"() {
-        parent1 = Model.findByName('book')
+        parent1 = new Model(name: "testmodel123").save()
         parent2 = Model.findByName('chapter1')
-        child1 = Model.findByName('chapter2')
+        child1 = new Model(name: "testmodel1234").save()
         child2 = Model.findByName('mTest1')
-        grandChild = Model.findByName('mTest2')
+        grandChild = new Model(name: "testmodel12345").save()
         de1 = DataElement.findByName("DE_author1")
         de2 = DataElement.findByName("AUTHOR")
         de3 = DataElement.findByName("auth")
@@ -93,10 +93,9 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         dataElements.list.contains(de3)
 
         cleanup:
-
-        parent1.removeFromContains(de1)
-        child1.removeFromContains(de2)
-        grandChild.removeFromContains(de3)
+        parent1.delete()
+        child1.delete()
+        grandChild.delete()
 
 
     }

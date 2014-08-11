@@ -49,12 +49,12 @@ class ExtendibleElementControllerIntegrationSpec extends AbstractExtendibleEleme
 
     @Override
     Model getLoadItem() {
-        Model.findByName("book")
+        Model.findByName("mTest3")
     }
 
     @Override
     Model getAnotherLoadItem() {
-        Model.findByName("chapter1")
+        Model.findByName("mTest4")
     }
 
     @Override

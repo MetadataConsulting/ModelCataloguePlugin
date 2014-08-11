@@ -22,7 +22,9 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
         if(CatalogueElement.count()==0){
             fixtures = fixtureLoader.load("assets/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "dataElements/*", "conceptualDomains/*", "models/*", "relationshipTypes/*").load("valueDomains/*", "extensions/*")
         }
-        initCatalogueService.initDefaultRelationshipTypes()
+        if(RelationshipType.count()<7) {
+            initCatalogueService.initDefaultRelationshipTypes()
+        }
     }
 
 }

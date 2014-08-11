@@ -1,8 +1,5 @@
 package org.modelcatalogue.core.dataarchitect
 
-import grails.transaction.Transactional
-
-//import org.hibernate.Criteria
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
@@ -11,8 +8,7 @@ import org.modelcatalogue.core.util.ListWithTotal
 
 class DataArchitectService {
 
-    static transactional = false
-    def modelCatalogueSearchService, publishedElementService, relationshipService
+    def modelCatalogueSearchService, relationshipService
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
         ListWithTotal<DataElement> results = new ListAndCount()
@@ -72,7 +68,6 @@ class DataArchitectService {
         return results
     }
 
-    @Transactional
     ListWithTotal<DataElement> findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
         ListAndCount results = new ListAndCount()
@@ -106,7 +101,6 @@ class DataArchitectService {
         return results
     }
 
-    @Transactional
     def actionRelationshipList(ArrayList<Relationship> list){
         list.each { relationship ->
             relationship.save()

@@ -24,6 +24,12 @@ abstract class CatalogueElement {
     Date dateCreated
     Date lastUpdated
 
+    //stop null pointers (especially deleting new items)
+    Set incomingRelationships = []
+    Set outgoingRelationships = []
+    Set outgoingMappings = []
+    Set incomingMappings = []
+
     static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
@@ -178,19 +184,19 @@ abstract class CatalogueElement {
     }
 
     def beforeDelete(){
-        outgoingRelationships.each{ relationship->
+        outgoingRelationships.each{ Relationship relationship->
             relationship.beforeDelete()
             relationship.delete(flush:true)
         }
-        incomingRelationships.each{ relationship ->
+        incomingRelationships.each{ Relationship relationship ->
             relationship.beforeDelete()
             relationship.delete(flush:true)
         }
-        outgoingMappings.each{ mapping ->
+        outgoingMappings.each{ Mapping mapping ->
             mapping.beforeDelete()
             mapping.delete(flush:true)
         }
-        incomingMappings.each{ mapping ->
+        incomingMappings.each{ Mapping mapping ->
             mapping.beforeDelete()
             mapping.delete(flush:true)
         }

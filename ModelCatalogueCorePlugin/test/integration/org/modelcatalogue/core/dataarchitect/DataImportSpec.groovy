@@ -352,13 +352,15 @@ class DataImportSpec extends AbstractIntegrationSpec {
 
     def "test import data element"(){
 
+        def importer = new DataImport(name:"test1")
         def book = Model.findByName("book")
         def dataType = DataType.findByName("String")
         def cd = ConceptualDomain.findByName("public libraries")
 
 
         when:
-        def de = dataImportService.importDataElement([name: "testDataElement", description: "asdf asdffsda", modelCatalogueId: ""], ['1a':"as", '2a':"adsf"], book, [name: "values", description: "blabh albh",  dataType: dataType, measurementUnit: null], cd)
+        def de = dataImportService.importDataElement(importer, [name: "testDataElement", description: "asdf asdffsda", modelCatalogueId: ""], ['1a':"as", '2a':"adsf"], book, [name: "values", description: "blabh albh",  dataType: dataType, measurementUnit: null], cd)
+        dataImportService.actionPendingModels(importer)
 
         then:
         de

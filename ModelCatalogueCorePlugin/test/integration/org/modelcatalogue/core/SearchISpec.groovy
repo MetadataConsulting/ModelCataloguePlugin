@@ -35,9 +35,6 @@ class SearchISpec extends AbstractIntegrationSpec{
     }
 
     def cleanupSpec() {
-        relationshipService.unlink(cd, mod, RelationshipType.findByName("context"))
-        relationshipService.unlink(de, vd, RelationshipType.findByName("instantiation"))
-        relationshipService.unlink(mod, de, RelationshipType.findByName("containment"))
     }
 
 

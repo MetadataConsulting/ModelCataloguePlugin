@@ -62,6 +62,35 @@ class PublishedElementService {
         archived.save()
     }
 
+    public <E extends Model> E finalizeTree(Model model, Collection<Model> tree = []){
+
+        //check that it isn't already finalized
+        if(model.status==PublishedElementStatus.FINALIZED || model.status==PublishedElementStatus.ARCHIVED) return model
+
+        //to avoid infinite loop
+        if(!tree.contains(model)) tree.add(model)
+
+        //finalize data elements
+        model.contains.each{ DataElement dataElement ->
+            if(dataElement.status!=PublishedElementStatus.FINALIZED && dataElement.status!=PublishedElementStatus.ARCHIVED){
+                dataElement.status = PublishedElementStatus.FINALIZED
+                dataElement.save(flush:true)
+            }
+        }
+
+        //finalize child models
+        model.parentOf.each{ Model child ->
+            if(!tree.contains(child)) {
+                finalizeTree(child, tree)
+            }
+        }
+
+        model.status = PublishedElementStatus.FINALIZED
+        model.save(flush:true)
+
+        return model
+
+    }
 
     static PublishedElementStatus getStatusFromParams(params) {
         if (!params.status) {
@@ -82,6 +111,8 @@ class PublishedElementService {
             log.error(element.errors)
             throw new IllegalArgumentException("Cannot update version of $element. See application log for errors.")
         }
+
+        element
     }
 
     private PublishedElement elementSpecificActions(PublishedElement archived, PublishedElement element){
@@ -92,6 +123,16 @@ class PublishedElementService {
             if(element.childOf.size() > 0){
                 element.childOf.each{ Model model ->
                     model.removeFromParentOf(element)
+                }
+            }
+        }
+
+
+        //don't add a data element to the model if it's updated (the old model should still reference the archived one)
+        if(element instanceof DataElement) {
+            if(element.containedIn.size() > 0){
+                element.containedIn.each{ Model model ->
+                    model.removeFromContains(element)
                 }
             }
         }
@@ -108,7 +149,7 @@ class PublishedElementService {
     private PublishedElement addRelationshipsToArchived(PublishedElement archived, PublishedElement element){
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
-            if (r.archived || r.relationshipType.name == 'hierarchy') {
+            if (r.archived || r.relationshipType.name == 'hierarchy' || r.relationshipType.name == 'containment') {
                 relationshipService.link(r.source, archived, r.relationshipType)
                 continue
             }

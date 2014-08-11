@@ -89,7 +89,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     def findRelationsByMetadataKeys(Integer max){
         handleParams(max)
-        def results
+        ListWithTotal results
         def keyOne = params.keyOne
         def keyTwo = params.keyTwo
         if(keyOne && keyTwo) {

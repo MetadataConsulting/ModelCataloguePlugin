@@ -202,10 +202,10 @@ class DataImportService {
                 measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
                 if (dataType || measurementUnit) {
                     //need to import value domain stuff as well
-                    importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
+                    importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
                 } else {
                     //doesn't have a value domain so easy
-                    importDataElement([name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, conceptualDomain)
+                    importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, conceptualDomain)
                 }
             }
             if(!bulkIngest) importer.removeFromImportQueue(row)
@@ -227,32 +227,49 @@ class DataImportService {
 
     protected Model addModelToImport(DataImport importer, Model model) {
         if (!importer.models.find{it.id == model.id}) {
-            if(model.status != PublishedElementStatus.UPDATED){model.status = PublishedElementStatus.DRAFT}
-            model.save()
+            //if(model.status != PublishedElementStatus.UPDATED && model.status != PublishedElementStatus.PENDING){model.status = PublishedElementStatus.DRAFT}
+//            model.save()
             importer.models.add(model)
         }
         return model
     }
 
+    protected void addUpdatedDataElements(DataImport importer, DataElement dataElement, Model model, ConceptualDomain conceptualDomain ){
+        if(model.status==PublishedElementStatus.FINALIZED){
+            model.status = PublishedElementStatus.UPDATED
+            model.save()
+        }
+        importer.updatedDataElements.add([dataElement, model, conceptualDomain])
+    }
+
     def void actionPendingModels(DataImport importer) {
         importer.models.each { model ->
-            def pendingDataElements = model.contains.findAll { it.status == PublishedElementStatus.UPDATED }
-            if (pendingDataElements|| model.status == PublishedElementStatus.UPDATED ) {
+            def pendingDataElements = importer.updatedDataElements.findAll { it[1] == model }
+
+            if(model.status == PublishedElementStatus.UPDATED) {
                 def archivedModel = publishedElementService.archiveAndIncreaseVersion(model)
                 model.refresh()
-                pendingDataElements.each { DataElement dataElement ->
-                    archivedModel.removeFromContains(dataElement)
-                    archivedModel.addToContains(dataElement.supersedes.first())
-                    archivedModel.save()
-                    model.removeFromContains(dataElement.supersedes.first())
-                    model.save()
+            }
+
+            if (pendingDataElements) {
+                pendingDataElements.each { it ->
+                    def dataElement = it[0]
+                    def relationship = model.addToContains(dataElement)
+                    relationship.ext.put("Context" , it[2].name)
                     dataElement.status = PublishedElementStatus.FINALIZED
-                    dataElement.save()
+                    dataElement.save(flush:true, failOnError:true)
                 }
             }
-            model.status = PublishedElementStatus.FINALIZED
+            model.refresh()
+            model.status = PublishedElementStatus.PENDING
             model.save(flush:true, failOnError:true)
         }
+
+        importer.models.each{ Model model->
+            publishedElementService.finalizeTree(model)
+        }
+
+
     }
 
     def importModels(DataImport importer, String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain) {
@@ -355,29 +372,41 @@ class DataImportService {
     }
 
     //update data element without value domain info
-    protected DataElement updateDataElement(Map params, DataElement dataElement, Map metadata, Model model) {
+    protected DataElement updateDataElement(DataImport importer, Map params, DataElement dataElement, Map metadata, Model model, ConceptualDomain conceptualDomain) {
         if (checkDataElementForChanges(params, metadata, dataElement)) {
+            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
+                model.status = PublishedElementStatus.UPDATED
+                model.save()
+            }
+            addModelToImport(importer, model)
             publishedElementService.archiveAndIncreaseVersion(dataElement)
+            dataElement.refresh()
             dataElement.name = params.name
             dataElement.description = params.description
             dataElement.status = PublishedElementStatus.UPDATED
             dataElement.save()
             dataElement = updateMetadata(metadata, dataElement)
-            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
-                model.status = PublishedElementStatus.DRAFT
-                model.save()
-            }
+            addUpdatedDataElements(importer, dataElement, model, conceptualDomain)
         }
+
         return dataElement
     }
 
     //update data element given value domain info
-    protected DataElement updateDataElement(Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd, Map metadata, Model model) {
+    protected DataElement updateDataElement(DataImport importer, Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd, Map metadata, Model model, ConceptualDomain conceptualDomain) {
         Boolean dataElementChanged = checkDataElementForChanges(params, metadata, dataElement)
         ValueDomain vd = dataElement.instantiatedBy.find { it.includedIn.contains(cd) }
         Boolean valueDomainChanged = checkValueDomainForChanges(vdParams, vd, cd)
 
         if (dataElementChanged || valueDomainChanged) {
+
+            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
+                model.status = PublishedElementStatus.UPDATED
+                model.save()
+            }
+
+            addModelToImport(importer, model)
+
             publishedElementService.archiveAndIncreaseVersion(dataElement)
             dataElement.refresh()
 
@@ -401,11 +430,10 @@ class DataImportService {
 
             }
 
-            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
-                model.status = PublishedElementStatus.DRAFT
-                model.save()
-            }
+            addUpdatedDataElements(importer, dataElement, model, conceptualDomain)
+
         }
+
         return dataElement
     }
 
@@ -418,18 +446,21 @@ class DataImportService {
         vd.save()
     }
 
-    protected DataElement importDataElement(Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd) {
+    protected DataElement importDataElement(DataImport importer, Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd) {
 
         //find out if data element exists using unique code
         DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
-        if (de) { de = updateDataElement(params, de, vdParams, cd, metadata, model) }
+        if (de) {
+            de = updateDataElement(importer, params, de, vdParams, cd, metadata, model, cd)
+
+        }
 
         //find if data element exists using name and containing model
         if (!de) {
             def nameDE = DataElement.findByName(params.name)
             if (nameDE && nameDE.containedIn.contains(model)) {
                 de = nameDE
-                if (de) { de = updateDataElement(params, de, vdParams, cd, metadata, model)  }
+                if (de) { de = updateDataElement(importer, params, de, vdParams, cd, metadata, model, cd)  }
             }
         }
 
@@ -439,28 +470,30 @@ class DataImportService {
             de.modelCatalogueId = params.modelCatalogueId
             de.save()
             de = updateMetadata(metadata, de)
+//            Relationship containedIn = de.addToContainedIn(model)
+//            containedIn.ext.put("Context" , cd.name)
+            addModelToImport(importer, model)
+            addUpdatedDataElements(importer, de, model, cd)
         }
 
         importValueDomain(vdParams, de, cd)
-        Relationship containedIn = de.addToContainedIn(model)
-        containedIn.ext.put("Context" , cd.name)
 
         return de
     }
 
 
-    protected DataElement importDataElement(Map params, Map metadata, Model model, ConceptualDomain cd) {
+    protected DataElement importDataElement(DataImport importer, Map params, Map metadata, Model model, ConceptualDomain cd) {
 
         //find out if data element exists using unique code
         DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
-        if (de) { de = updateDataElement(params, de, metadata, model) }
+        if (de) { de = updateDataElement(importer, params, de, metadata, model, cd) }
 
         //find if data element exists using name and containing model
         if (!de && params.name) {
             def nameDE = DataElement.findByName(params.name)
             if (nameDE && nameDE.containedIn.contains(model)) {
                 de = nameDE
-                if (de) { de = updateDataElement(params, de, metadata, model) }
+                if (de) { de = updateDataElement(importer, params, de, metadata, model, cd) }
             }
         }
 
@@ -470,11 +503,10 @@ class DataImportService {
             de.modelCatalogueId = params.modelCatalogueId
             de.save()
             de = updateMetadata(metadata, de)
-        }
-
-        if(de){
-            Relationship  containedIn = de.addToContainedIn(model)
-            containedIn.ext.put("Context" , cd.name)
+//            Relationship  containedIn = de.addToContainedIn(model)
+//            containedIn.ext.put("Context" , cd.name)
+            addModelToImport(importer, model)
+            addUpdatedDataElements(importer, de, model, cd)
         }
         return de
     }

@@ -20,28 +20,13 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     }
 
-    //TODO: should we make some relationship types read-only and some editable
-//    def "read by name returns read only instance"() {
-//
-//        RelationshipType containment = RelationshipType.readByName("containment")
-//
-//        expect:
-//        containment
-//
-//        when:
-//        containment.name = "foo"
-//        containment.save()
-//
-//        then:
-//        IllegalStateException e = thrown(IllegalStateException)
-//        e
-//        e.message == "Cannot make an immutable entity modifiable."
-//
-//    }
+    def cleanupSpec(){
+
+    }
 
     def "data elements can be contained in models, models can contain data elements"(){
 
-        def model = Model.get(md1.id)
+        def model = new Model(name: "tester12343124").save()
         def element =  DataElement.get(de1.id)
 
         when:
@@ -76,6 +61,9 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
         !model.contains.contains(element)
         !element.containedIn.contains(model)
+
+        cleanup:
+        model.delete()
 
     }
 

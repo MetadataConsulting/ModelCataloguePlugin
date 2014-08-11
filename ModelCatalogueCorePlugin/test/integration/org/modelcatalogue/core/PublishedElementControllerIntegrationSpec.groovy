@@ -49,12 +49,12 @@ class PublishedElementControllerIntegrationSpec extends AbstractPublishedElement
 
     @Override
     Model getLoadItem() {
-        Model.findByName("book")
+        Model.findByName("mTest5")
     }
 
     @Override
     Model getAnotherLoadItem() {
-        Model.findByName("chapter1")
+        Model.findByName("mTest6")
     }
 
     protected CatalogueElement newResourceInstance() {
