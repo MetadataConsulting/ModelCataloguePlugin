@@ -42,7 +42,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         md.refresh()
         de1.refresh()
         md.removeFromContains(de1)
-        md.delete()
+        md.delete(flush:true)
     }
 
     def "find relationships and action them"() {
