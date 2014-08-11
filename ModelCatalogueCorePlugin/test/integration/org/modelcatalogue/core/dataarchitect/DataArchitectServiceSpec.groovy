@@ -12,91 +12,88 @@ import spock.lang.Shared
 
 class DataArchitectServiceSpec extends AbstractIntegrationSpec {
     @Shared
-    def dataArchitectService, publishedElementService, relationshipService, de1, de2, de3, de4, de5, vd, md
+    def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, vd, md
 
 
-    def "placeholder"(){
-        true
+    def setupSpec(){
+        loadFixtures()
+        de1 = DataElement.findByName("DE_author")
+        de2 = DataElement.findByName("DE_author1")
+        de3 = DataElement.findByName("AUTHOR")
+        de4 = DataElement.findByName("auth4")
+        de5 = DataElement.findByName("auth5")
+        vd = ValueDomain.findByName("value domain Celsius")
+        md = new Model(name:"tsdfafsd").save()
+        de1.refresh()
+        de2.refresh()
+        md.refresh()
+        md.addToContains(de1)
+        de2.addToInstantiatedBy(vd)
+        de1.ext.put("localIdentifier", "test")
+        de4.ext.put("test2", "test2")
+        de4.ext.put("metadata", "test2")
+        de4.ext.put("test3", "test2")
+        de4.ext.put("test4", "test2")
+        de1.ext.put("Data item No.", "C1031")  // used in def "find relationships"
+        de2.ext.put("Optional_Local_Identifier", "C1031") // used in def "find relationships"
     }
 
-//    def setupSpec(){
-//        loadFixtures()
-//        de1 = DataElement.findByName("DE_author")
-//        de2 = DataElement.findByName("DE_author1")
-//        de3 = DataElement.findByName("AUTHOR")
-//        de4 = DataElement.findByName("auth4")
-//        de5 = DataElement.findByName("auth5")
-//        vd = ValueDomain.findByName("value domain Celsius")
-//        md = Model.findByName("book")
-//        publishedElementService.archiveAndIncreaseVersion(de1)
-//        publishedElementService.archiveAndIncreaseVersion(de2)
-//        publishedElementService.archiveAndIncreaseVersion(md)
-//        de1.refresh()
-//        de2.refresh()
-//        md.refresh()
-//        de1.addToContainedIn(md)
-//        de2.addToInstantiatedBy(vd)
-//        de1.ext.put("localIdentifier", "test")
-//        de4.ext.put("test2", "test2")
-//        de4.ext.put("metadata", "test2")
-//        de4.ext.put("test3", "test2")
-//        de4.ext.put("test4", "test2")
-//        de1.ext.put("Data item No.", "C1031")  // used in def "find relationships"
-//        de2.ext.put("Optional_Local_Identifier", "C1031") // used in def "find relationships"
-//    }
-//
-//    def cleanupSpec(){
-//    }
-//
-//    def "find relationships and action them"() {
-//        when:
-//        Map params = [:]
-//        params.put("max", 12)
-//        def relatedDataElements = dataArchitectService.findRelationsByMetadataKeys("Data item No.","Optional_Local_Identifier", params)
-//
-//        then:
-//        relatedDataElements.each {row ->
-//            relatedDataElements.list.collect{it.source}contains(de1)
-//            relatedDataElements.list.collect{it.destination}contains(de2)
-//        }
-//
-//        when:
-//        dataArchitectService.actionRelationshipList(relatedDataElements.list)
-//
-//
-//        then:
-//        de1.relations.contains(de2)
-//
-//    }
-//
-//    def "find data elements without particular extension key"(){
-//        when:
-//        Map params = [:]
-//        params.put("max", 12)
-//        params.put("key", "metadata")
-//        de1.refresh()
-//        de5.refresh()
-//        ListWithTotal dataElements = dataArchitectService.metadataKeyCheck(params)
-//        then:
-//
-//        !dataElements.items.contains(de2)
-//        !dataElements.items.contains(de4)
-//        dataElements.items.contains(de1)
-//        dataElements.items.contains(de5)
-//
-//    }
-//
-//    def "find uninstantiatedDataElements"(){
-//        when:
-//        Map params = [:]
-//        params.put("max", 12)
-//        ListWithTotal dataElements = dataArchitectService.uninstantiatedDataElements(params)
-//
-//        then:
-//        !dataElements.items.contains(DataElement.get(de2.id))
-//        dataElements.items.contains(DataElement.get(de1.id))
-//        dataElements.items.contains(DataElement.get(de3.id))
-//
-//    }
+    def cleanupSpec(){
+        md.refresh()
+        de1.refresh()
+        md.removeFromContains(de1)
+        md.delete()
+    }
+
+    def "find relationships and action them"() {
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        def relatedDataElements = dataArchitectService.findRelationsByMetadataKeys("Data item No.","Optional_Local_Identifier", params)
+
+        then:
+        relatedDataElements.each {row ->
+            relatedDataElements.list.collect{it.source}contains(de1)
+            relatedDataElements.list.collect{it.destination}contains(de2)
+        }
+
+        when:
+        dataArchitectService.actionRelationshipList(relatedDataElements.list)
+
+
+        then:
+        de1.relations.contains(de2)
+
+    }
+
+    def "find data elements without particular extension key"(){
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        params.put("key", "metadata")
+        de1.refresh()
+        de5.refresh()
+        ListWithTotal dataElements = dataArchitectService.metadataKeyCheck(params)
+        then:
+
+        !dataElements.items.contains(de2)
+        !dataElements.items.contains(de4)
+        dataElements.items.contains(de1)
+        dataElements.items.contains(de5)
+
+    }
+
+    def "find uninstantiatedDataElements"(){
+        when:
+        Map params = [:]
+        params.put("max", 12)
+        ListWithTotal dataElements = dataArchitectService.uninstantiatedDataElements(params)
+
+        then:
+        !dataElements.items.contains(DataElement.get(de2.id))
+        dataElements.items.contains(DataElement.get(de1.id))
+        dataElements.items.contains(DataElement.get(de3.id))
+
+    }
 
 }
