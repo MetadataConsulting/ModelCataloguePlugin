@@ -7,6 +7,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeService
+import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.reports.ReportDescriptor
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementFinder
@@ -19,6 +20,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
+    @Autowired SecurityService modelCatalogueSecurityService
 
     CatalogueElementMarshallers(Class type) {
         super(type)
@@ -62,7 +64,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         def reports = []
 
         for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
-            reports << [title: descriptor.getTitle(el), url: descriptor.getLink(el), type: descriptor.renderType.toString()]
+            reports << [title: descriptor.getTitle(el), url: descriptor.getLink(el), type: modelCatalogueSecurityService.userLoggedIn ?  descriptor.renderType.toString() : 'LINK']
         }
 
         reports
