@@ -122,7 +122,7 @@ class PublishedElementService {
         if(element instanceof Model) {
             if(element.childOf.size() > 0){
                 element.childOf.each{ Model model ->
-                    model.removeFromParentOf(element)
+                    relationshipService.unlink(model, element, RelationshipType.hierarchyType, true)
                 }
             }
         }
@@ -132,7 +132,7 @@ class PublishedElementService {
         if(element instanceof DataElement) {
             if(element.containedIn.size() > 0){
                 element.containedIn.each{ Model model ->
-                    model.removeFromContains(element)
+                    relationshipService.unlink(model, element, RelationshipType.containmentType, true)
                 }
             }
         }
@@ -150,16 +150,16 @@ class PublishedElementService {
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
             if (r.archived || r.relationshipType.name == 'hierarchy' || r.relationshipType.name == 'containment') {
-                relationshipService.link(r.source, archived, r.relationshipType)
+                relationshipService.link(r.source, archived, r.relationshipType, false, true)
                 continue
             }
-            relationshipService.link(r.source, archived, r.relationshipType, true)
+            relationshipService.link(r.source, archived, r.relationshipType, true, )
         }
 
         for (Relationship r in element.outgoingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
             if (r.archived || r.relationshipType.name == 'hierarchy') {
-                relationshipService.link(archived, r.destination, r.relationshipType)
+                relationshipService.link(archived, r.destination, r.relationshipType, false, true)
                 continue
             }
             relationshipService.link(archived, r.destination, r.relationshipType, true)
