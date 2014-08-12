@@ -104,54 +104,63 @@ class BootStrap {
         environments {
             development {
                 executorService.submit {
-                    println 'Running post init job'
-                    println 'Importing data'
-                    importService.importData()
-                    def de = new DataElement(name: "testera", description: "test data architect").save(failOnError: true)
-                    de.ext.metadata = "test metadata"
 
-                    println 'Creating dummy models'
-                    15.times {
-                        new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
-                    }
+                    try {
+                        println 'Running post init job'
+                        println 'Importing data'
+                        importService.importData()
+                        def de = new DataElement(name: "testera", description: "test data architect").save(failOnError: true)
+                        de.ext.metadata = "test metadata"
 
-                    def parentModel1 = Model.findByName("Another root #001")
-
-                    15.times{
-                        def child = new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
-                        parentModel1.addToParentOf(child)
-                    }
-
-
-                    for (DataElement element in DataElement.list()) {
-                        parentModel1.addToContains element
-                    }
-
-
-                    println 'Finalizing all published elements'
-                    PublishedElement.list().each {
-                        it.status = PublishedElementStatus.FINALIZED
-                        it.save(failOnError: true)
-                    }
-
-                    println "Creating some actions"
-
-                    Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
-
-                    15.times {
-                        Action action
-                        if (it != 7) {
-                            action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
-                        } else {
-                            action = actionService.create(batch, CreateCatalogueElement, Action.get(2), Action.get(5), Action.get(6), name: "Model #${it}", type: Model.name)
+                        println 'Creating dummy models'
+                        15.times {
+                            new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
                         }
-                        if (it % 3 == 0) {
-                            actionService.dismiss(action)
+
+                        def parentModel1 = Model.findByName("Another root #001")
+
+                        15.times{
+                            def child = new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
+                            parentModel1.addToParentOf(child)
                         }
+
+
+                        for (DataElement element in DataElement.list()) {
+                            parentModel1.addToContains element
+                        }
+
+
+                        println 'Finalizing all published elements'
+                        PublishedElement.findAllByStatusNotEqual(PublishedElementStatus.FINALIZED).each {
+                            if (it instanceof Model) {
+                                publishedElementService.finalizeTree(it)
+                            } else {
+                                it.status = PublishedElementStatus.FINALIZED
+                                it.save failOnError: true
+                            }
+                        }
+
+                        println "Creating some actions"
+
+                        Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
+
+                        15.times {
+                            Action action
+                            if (it != 7) {
+                                action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
+                            } else {
+                                action = actionService.create(batch, CreateCatalogueElement, Action.get(2), Action.get(5), Action.get(6), name: "Model #${it}", type: Model.name)
+                            }
+                            if (it % 3 == 0) {
+                                actionService.dismiss(action)
+                            }
+                        }
+
+
+                        println "Init finished in ${new Date()}"
+                    } catch (e) {
+                        e.printStackTrace()
                     }
-
-
-                    println "Init finished in ${new Date()}"
                 }
                 //domainModellerService.modelDomains()
             }
