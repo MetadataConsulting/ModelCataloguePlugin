@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.XML
+import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.reports.ReportDescriptor
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.springframework.beans.factory.annotation.Autowired
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 abstract class ListWrapperMarshaller extends AbstractMarshallers {
 
     @Autowired ReportsRegistry reportsRegistry
+    @Autowired SecurityService modelCatalogueSecurityService
 
     ListWrapperMarshaller(Class cls) {
         super(cls)
@@ -36,7 +38,7 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
         def reports = []
 
         for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
-            reports << [title: descriptor.getTitle(el), url: descriptor.getLink(el), type: descriptor.renderType]
+            reports << [title: descriptor.getTitle(el), url: descriptor.getLink(el), type: modelCatalogueSecurityService.userLoggedIn ?  descriptor.renderType.toString() : 'LINK']
         }
 
         reports

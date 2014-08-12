@@ -178,7 +178,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'export', ['$scope', ($scope)->
+  actionsProvider.registerAction 'export', ['$scope', 'security', ($scope, security)->
+    return undefined unless security.isUserLoggedIn()
     return undefined unless $scope.list or $scope.element
     if $scope.list
       return undefined if $scope.resource == 'import'
@@ -197,10 +198,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       for report in reports
         {
           label:  report.title
+          url:    report.url
           action: ->
             switch report.type
-              when 'LINK' then $window.open(report.url, '_blank')
-              else enhance(rest(method: 'GET', url: report.url)).then (result) ->
+              when 'LINK' then $window.open(@url, '_blank')
+              else enhance(rest(method: 'GET', url: @url)).then (result) ->
                 result.show()
             return true
         }

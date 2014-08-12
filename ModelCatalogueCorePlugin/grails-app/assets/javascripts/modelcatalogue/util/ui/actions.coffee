@@ -67,7 +67,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
                 createdAction.id          = createdAction.id ? "#{generatorAction.id}:#{i}"
                 createdAction.position    = generatorAction.position + (1 + i)
                 createdAction.run         = ->
-                  $rootScope.$broadcast "actionPerformed:#{generatorAction.id}", createdAction.action()
+                  $rootScope.$broadcast "createdAction:#{@id}", @action()
                 ret.push createdAction
 
               if createdActions?.length > 0
