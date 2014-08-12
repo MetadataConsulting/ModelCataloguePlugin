@@ -156,7 +156,9 @@ class Lists {
     }
     //<-- not providing wrapper variant because it should be used in service classes
 
-
+    static <T> ListWithTotalAndType<T> emptyListWithTotalAndType(Class<T> type) {
+        new EmptyListWithTotalAndType<T>(itemType: type)
+    }
 
     static Map<String, String> nextAndPreviousLinks(Map params, String baseLink, Long total) {
         def link = baseLink.contains('?') ? "${baseLink}&" : "${baseLink}?"

@@ -5,58 +5,76 @@ class ModelCatalogueCorePluginUrlMappings {
 
 	static mappings = {
 
-        def allElements         = ['asset', 'catalogueElement', 'conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'extendibleElement', 'measurementUnit', 'model', 'publishedElement', 'relationshipType', 'valueDomain']
-        def publishedElements   = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
+        def resources         = ['batch', 'relationshipType' ]
+        def publishedElements = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
+        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain']
+        def allElements       = catalogueElements + resources
 
         for (String controllerName in allElements) {
             "/api/modelCatalogue/core/$controllerName" (controller: controllerName, action: 'index', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$controllerName" (controller: controllerName, action: 'save', method: HttpMethod.POST)
-			"/api/modelCatalogue/core/$controllerName/uuid/$uuid" (controller: controllerName, action: 'uuid', method: HttpMethod.GET)
+
+            if (controllerName in catalogueElements) {
+                "/api/modelCatalogue/core/$controllerName/uuid/$uuid" (controller: controllerName, action: 'uuid', method: HttpMethod.GET)
+            }
+
             "/api/modelCatalogue/core/$controllerName/search/$search?" (controller: controllerName, action: 'search', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$controllerName/$id/validate" (controller: controllerName, action: 'validate', method: HttpMethod.POST)
             "/api/modelCatalogue/core/$controllerName/validate" (controller: controllerName, action: 'validate', method: HttpMethod.POST)
             "/api/modelCatalogue/core/$controllerName/$id" (controller: controllerName, action: 'show', method: HttpMethod.GET)
             "/api/modelCatalogue/core/$controllerName/$id" (controller: controllerName, action: 'update', method: HttpMethod.PUT)
             "/api/modelCatalogue/core/$controllerName/$id" (controller: controllerName, action: 'delete', method: HttpMethod.DELETE)
-            "/api/modelCatalogue/core/$controllerName/$id/relationships" (controller: controllerName, action: "relationships", method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/relationships/search" (controller: controllerName, action: "searchRelationships", method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/relationships/$type/search" (controller: controllerName, action: "searchRelationships", method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/relationships/$type" (controller: controllerName, action: "relationships", method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/outgoing/search" (controller: controllerName, action: 'searchOutgoing', method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type/search" (controller: controllerName, action: 'searchOutgoing', method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'outgoing', method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'addOutgoing', method: HttpMethod.POST)
-            "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'removeOutgoing', method: HttpMethod.DELETE)
-            "/api/modelCatalogue/core/$controllerName/$id/incoming/search" (controller: controllerName, action: 'searchIncoming', method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/incoming/$type/search" (controller: controllerName, action: 'searchIncoming', method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'incoming', method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'addIncoming', method: HttpMethod.POST)
-            "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'removeIncoming', method: HttpMethod.DELETE)
-            "/api/modelCatalogue/core/$controllerName/$id/incoming" (controller: controllerName, action: "incoming", method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/outgoing" (controller: controllerName, action: "outgoing", method: HttpMethod.GET)
-            "/api/modelCatalogue/core/$controllerName/$id/mapping/$destination" (controller: controllerName, action: 'addMapping', method: HttpMethod.POST)
-            "/api/modelCatalogue/core/$controllerName/$id/mapping/$destination" (controller: controllerName, action: 'removeMapping', method: HttpMethod.DELETE)
-            "/api/modelCatalogue/core/$controllerName/$id/mapping" (controller: controllerName, action: 'mappings', method: HttpMethod.GET)
 
-            if (controllerName in publishedElements) {
-                "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
+
+            if (controllerName == 'batch') {
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$state"(controller: controllerName, action: 'listActions', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/dismiss"(controller: controllerName, action: 'dismiss', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/reactivate"(controller: controllerName, action: 'reactivate', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/run"(controller: controllerName, action: 'run', method: HttpMethod.POST)
             }
 
-            if (controllerName == 'dataType' || controllerName == 'enumeratedType' ) {
-                "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
+
+            if (controllerName in catalogueElements) {
+                "/api/modelCatalogue/core/$controllerName/$id/relationships" (controller: controllerName, action: "relationships", method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/relationships/search" (controller: controllerName, action: "searchRelationships", method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/relationships/$type/search" (controller: controllerName, action: "searchRelationships", method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/relationships/$type" (controller: controllerName, action: "relationships", method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/outgoing/search" (controller: controllerName, action: 'searchOutgoing', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type/search" (controller: controllerName, action: 'searchOutgoing', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'outgoing', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'addOutgoing', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'removeOutgoing', method: HttpMethod.DELETE)
+                "/api/modelCatalogue/core/$controllerName/$id/incoming/search" (controller: controllerName, action: 'searchIncoming', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/incoming/$type/search" (controller: controllerName, action: 'searchIncoming', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'incoming', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'addIncoming', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'removeIncoming', method: HttpMethod.DELETE)
+                "/api/modelCatalogue/core/$controllerName/$id/incoming" (controller: controllerName, action: "incoming", method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/outgoing" (controller: controllerName, action: "outgoing", method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/mapping/$destination" (controller: controllerName, action: 'addMapping', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/mapping/$destination" (controller: controllerName, action: 'removeMapping', method: HttpMethod.DELETE)
+                "/api/modelCatalogue/core/$controllerName/$id/mapping" (controller: controllerName, action: 'mappings', method: HttpMethod.GET)
+
+                if (controllerName in publishedElements) {
+                    "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
+                }
+
+                if (controllerName == 'dataType' || controllerName == 'enumeratedType' ) {
+                    "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
+                }
+
+                if (controllerName == 'asset') {
+                    "/api/modelCatalogue/core/$controllerName/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$controllerName/$id/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$controllerName/$id/download"(controller: controllerName, action: 'download', method: HttpMethod.GET)
+                }
             }
+
 
             if (controllerName == 'relationshipType') {
                 "/api/modelCatalogue/core/$controllerName/elementClasses"(controller: controllerName, action: 'elementClasses', method: HttpMethod.GET)
             }
-
-            if (controllerName == 'asset') {
-                "/api/modelCatalogue/core/$controllerName/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
-                "/api/modelCatalogue/core/$controllerName/$id/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
-                "/api/modelCatalogue/core/$controllerName/$id/download"(controller: controllerName, action: 'download', method: HttpMethod.GET)
-            }
         }
-
 
         group "/api/modelCatalogue/core/dataArchitect", {
             "/uninstantiatedDataElements" (controller: "dataArchitect", action: 'uninstantiatedDataElements', method: HttpMethod.GET)

@@ -82,6 +82,67 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
       }
     ]]
   }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.actions.Batch.pending', {
+    actions: ['$http', '$state', ($http, $state) -> [
+      {
+        title:      'Perform'
+        icon:       'play'
+        type:       'success'
+        action:     (action) ->
+          action.run().then ->
+            $state.go '.', {property: 'performed', sort: 'lastUpdated', order: 'desc'}, {reload: true}
+      }
+      {
+        title:      'Dismiss'
+        icon:       'pause'
+        type:       'danger'
+        action:     (action) ->
+          action.dismiss().then ->
+            $state.go '.', {property: 'dismissed', sort: 'lastUpdated', order: 'desc'}, {reload: true}
+      }
+    ]]
+  }
+
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.actions.Batch.failed', {
+    columns: [
+      {header: "Created"     , value: "dateCreated | date:'short'"           , class: 'col-md-2', sort: {property: 'dateCreated', type: 'order'}}
+      {header: "Message"     , value: 'message + "\n\nOutput:\n" + outcome'  , class: 'col-md-7' }
+    ]
+    actions: ['$http', '$state', ($http, $state) -> [
+      {
+        title:      'Queue Again'
+        icon:       'play'
+        type:       'success'
+        action:     (action) ->
+          action.reactivate().then ->
+            $state.go '.', {property: 'pending', sort: 'lastUpdated', order: 'desc'}, {reload: true}
+      }
+    ]]
+  }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.actions.Batch.performed', {
+    columns: [
+      {header: "Created"     , value: "dateCreated | date:'short'"          , class: 'col-md-2', sort: {property: 'dateCreated', type: 'order'}}
+      {header: "Message"     , value: 'message + "\n\nOutput:\n" + outcome' , class: 'col-md-7' }
+    ]
+  }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.actions.Batch.dismissed', {
+    actions: ['$http', '$state', ($http, $state) -> [
+      {
+        title:      'Reactivate'
+        icon:       'play'
+        type:       'success'
+        action:     (action) ->
+          action.reactivate().then ->
+            $state.go '.', {property: 'pending', sort: 'lastUpdated', order: 'desc'}, {reload: true}
+      }
+    ]]
+  }
+
+
   catalogueElementPropertiesProvider.configureProperty 'relationships',   {
     hidden: true
   }

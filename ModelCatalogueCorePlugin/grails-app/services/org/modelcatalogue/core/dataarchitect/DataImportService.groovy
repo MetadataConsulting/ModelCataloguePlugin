@@ -82,7 +82,7 @@ class DataImportService {
     def void addRow(DataImport importer, ImportRow row) {
         if(!importer.pendingAction.contains(row) && !importer.importQueue.contains(row))
             row = validateAndActionRow(row)
-        (row.rowActions) ? importer.addToPendingAction(row) : importer.addToPendingAction(row)
+        importer.addToPendingAction(row)
     }
 
     def ImportRow validateAndActionRow(ImportRow row){
@@ -90,15 +90,16 @@ class DataImportService {
             RowAction action = new RowAction(field: "conceptualDomainName", action: "please enter conceptual domain name to import row", actionType: ActionType.RESOLVE_ERROR).save()
             row.addToRowActions(action)
         }
+
         if (!row.containingModelName) {
             RowAction action = new RowAction(field: "containingModelName", action: "please complete the containing model name to import row", actionType: ActionType.RESOLVE_ERROR).save()
             row.addToRowActions(action)
         }
+
         if (!row.containingModelCode) {
             RowAction action = new RowAction(field: "containingModelCode", action: "Containing model does not have model catalogue code. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL).save()
             row.addToRowActions(action)
-        }
-        if (row.containingModelCode) {
+        } else {
             def md = Model.findByModelCatalogueId(row.containingModelCode)
             if(!md){
                 RowAction action = new RowAction(field: "containingModelCode", action: "Containing Model Id does not match an existing element. New model will be created.", actionType: ActionType.CREATE_CONTAINING_MODEL).save()
@@ -110,11 +111,13 @@ class DataImportService {
                 row.addToRowActions(action)
             }
         }
-        if (!row.parentModelCode && row.parentModelName) {
-            RowAction action = new RowAction(field: "parentModelCode", action: "Parent model does not have model catalogue code. New model will be created.", actionType: ActionType.CREATE_PARENT_MODEL).save()
-            row.addToRowActions(action)
-        }
-        if (row.parentModelCode) {
+
+        if (!row.parentModelCode) {
+            if (row.parentModelName) {
+                RowAction action = new RowAction(field: "parentModelCode", action: "Parent model does not have model catalogue code. New model will be created.", actionType: ActionType.CREATE_PARENT_MODEL).save()
+                row.addToRowActions(action)
+            }
+        } else {
             def md = Model.findByModelCatalogueId(row.parentModelCode)
             if(!md){
                 RowAction action = new RowAction(field: "parentModelCode", action: "Parent Model Id does not match an existing element. New model will be created.", actionType: ActionType.CREATE_PARENT_MODEL).save()
@@ -125,16 +128,16 @@ class DataImportService {
                 row.addToRowActions(action)
             }
         }
+
         if (!row.dataElementName) {
             RowAction action = new RowAction(field: "dataElementName", action: "No data element in row. Only Model information imported", actionType: ActionType.MODEL_ONLY_ROW).save()
             row.addToRowActions(action)
-        }else{
+        } else {
             //we are importing a data element so we need to do these additional checks
             if (!row.dataElementCode) {
                 RowAction action = new RowAction(field: "dataElementCode", action: "Data element does not have model catalogue code. New data element will be created.", actionType: ActionType.CREATE_DATA_ELEMENT).save()
                 row.addToRowActions(action)
-            }
-            if (row.dataElementCode) {
+            } else {
                 def de = DataElement.findByModelCatalogueId(row.dataElementCode)
                 if (!row.dataElementCode.matches(REGEX)) {
                     RowAction action = new RowAction(field: "dataElementCode", action: "the model catalogue code for the data element is invalid, please action to import row", actionType: ActionType.RESOLVE_ERROR).save()
@@ -180,7 +183,10 @@ class DataImportService {
         actionPendingModels(importer)
     }
 
-
+    /**
+     * Clean up the session to speed up the import.
+     * @see http://naleid.com/blog/2009/10/01/batch-import-performance-with-grails-and-mysql
+     */
     def cleanUpGorm() {
         def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
         def session = sessionFactory.currentSession

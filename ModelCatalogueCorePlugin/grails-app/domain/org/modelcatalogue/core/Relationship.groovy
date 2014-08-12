@@ -43,7 +43,7 @@ class Relationship implements Extendible {
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
 
-    Map<String, String> ext = new ExtensionsWrapper(this)
+    final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
         this.ext.clear()

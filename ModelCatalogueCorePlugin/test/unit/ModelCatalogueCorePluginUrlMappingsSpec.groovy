@@ -4,6 +4,8 @@ import junit.framework.AssertionFailedError
 import org.codehaus.groovy.grails.commons.GrailsControllerClass
 import org.codehaus.groovy.grails.web.mapping.UrlMappingsHolder
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.actions.*
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -16,7 +18,8 @@ import spock.lang.Unroll
     MeasurementUnitController,
     ModelController,
     ValueDomainController,
-    SearchController
+    SearchController,
+    BatchController
 ])
 @Unroll
 class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
@@ -59,6 +62,16 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         assertRestForwardUrlMapping("GET", "/api/modelCatalogue/core/search/author", controller: "search", action: "index", { search = "author"} )
         assertRestForwardUrlMapping("GET", "/api/modelCatalogue/core/search", controller: "search", action: "index", {} )
 
+    }
+
+
+    @Ignore
+    def "batch controller url mapping"() {
+        expect:
+        assertRestForwardUrlMapping("GET", "/api/modelCatalogue/core/batch/1/actions/pending", controller: "batch", action: "listActions", {
+            id = '1'
+            state = 'pending'
+        })
     }
 
 
