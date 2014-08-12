@@ -79,25 +79,28 @@ grails.project.dependency.resolution = {
             exclude 'xml-apis'
         }
 
+        test "org.grails:grails-datastore-test-support:1.0-grails-2.4"
+
     }
 
     plugins {
-        // plugins for the build system only
-        build ":tomcat:7.0.50"
+
+
+        build ":tomcat:7.0.55"
 
         // plugins for the compile step
-        compile ":scaffolding:2.0.1"
-        compile ':cache:1.1.1'
-
+        compile ":scaffolding:2.1.2"
+        compile ':cache:1.1.7'
+        compile ":asset-pipeline:1.9.6"
 
         // plugins needed at runtime but not for compilation
-        runtime ":hibernate:3.6.10.7" // or ":hibernate4:4.1.11.6"
-        runtime ":database-migration:1.3.8"
-        //runtime ":jquery:1.10.2.2"
-        runtime ":resources:1.2.1"
-        compile ":csv:0.3.1"
+        runtime  ":hibernate:3.6.10.17" //":hibernate4:4.3.5.5" // or
+        runtime ":database-migration:1.4.0"
+        runtime ":jquery:1.11.1"
 
         test ":geb:0.9.3"
+
+        compile ":csv:0.3.1"
 
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"
