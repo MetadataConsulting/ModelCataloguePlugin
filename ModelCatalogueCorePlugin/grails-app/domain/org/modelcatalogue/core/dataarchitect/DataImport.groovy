@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
 import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataElement
 
 class DataImport {
 
