@@ -689,7 +689,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     abstract Object getAnotherLoadItem()
 
-    @Override
+
     RelationshipType getRelationshipType(){
         RelationshipType.findByName("relationship")
     }
@@ -747,9 +747,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
 
-
-
-    @Override
     protected static checkJsonCorrectListValues(JSONElement json, total, size, offset, max, next, previous) {
         assert json.success
         assert json.total == total

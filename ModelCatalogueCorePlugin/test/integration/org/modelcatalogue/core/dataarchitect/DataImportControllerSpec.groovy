@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.dataarchitect
 
+import grails.converters.XML
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.AbstractIntegrationSpec
@@ -73,6 +74,16 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
 
     @Override
     File recordInputXML(String fixtureName, String xml) {
+        recorder.recordInputXML(fixtureName, xml)
+    }
+
+    @Override
+    File recordInputXML(String fixtureName, Map xml) {
+        recorder.recordInputXML(fixtureName, xml)
+    }
+
+    @Override
+    File recordInputXML(String fixtureName, XML xml) {
         recorder.recordInputXML(fixtureName, xml)
     }
 

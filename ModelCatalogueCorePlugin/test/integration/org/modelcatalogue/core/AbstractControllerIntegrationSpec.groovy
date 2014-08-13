@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.converters.XML
 import grails.rest.RestfulController
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
@@ -622,6 +623,16 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
     @Override
     File recordInputXML(String fixtureName, String xml) {
+        recorder.recordInputXML(fixtureName, xml)
+    }
+
+    @Override
+    File recordInputXML(String fixtureName, Map xml) {
+        recorder.recordInputXML(fixtureName, xml)
+    }
+
+    @Override
+    File recordInputXML(String fixtureName, XML xml) {
         recorder.recordInputXML(fixtureName, xml)
     }
 

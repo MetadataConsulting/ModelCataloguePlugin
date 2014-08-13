@@ -220,9 +220,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     protected Map getParametersToBind() {
         Map ret = params
-        if (response.format == 'json') {
-            ret = request.getJSON()
-        }
+        if (response.format == 'json') ret = request.getJSON()
+        if (response.format == 'xml') ret = request.getXML()
         ret
     }
 

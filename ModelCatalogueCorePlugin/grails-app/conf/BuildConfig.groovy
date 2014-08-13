@@ -60,8 +60,8 @@ grails.project.dependency.resolution = {
         compile ":excel-export:0.2.1"
         compile ":executor:0.3"
 
-        //test ':build-test-data:1.1.1'
-        //test ':fixtures:1.2'
+        test ':build-test-data:2.1.2'
+        test ':fixtures:1.3'
 
         // codenarc static analysis
         build ":codenarc:0.20"
