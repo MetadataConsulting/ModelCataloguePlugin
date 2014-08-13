@@ -378,7 +378,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
   actionsProvider.registerAction 'dismiss-action', ['$scope', ($scope) ->
-    return undefined unless $scope.action and ($scope.action.state == 'PENDING' or $scope.action.state == 'FAILED')
+    return undefined unless $scope.action and $scope.action.state == 'PENDING'
 
     {
       position: 500
@@ -407,22 +407,56 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-
-
-  actionsProvider.registerAction 'run-action', ['$scope', ($scope) ->
-    return undefined unless $scope.action and $scope.action.state == 'PENDING'
+  actionsProvider.registerAction 'repeat-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and $scope.action.state == 'FAILED'
 
     {
-      position: 100
+      position: 900
       type:     'success'
-      icon:     'play'
-      label:    'Run'
+      icon:     'repeat'
+      label:    'Retry'
       action:   ->
-        $scope.action.run().then ->
+        $scope.action.reactivate().then ->
           $scope.reload() if angular.isFunction($scope.reload)
     }
   ]
 
+
+  actionsProvider.registerAction 'reload-actions', ['$scope', ($scope) ->
+    return undefined unless angular.isFunction($scope.reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
+
+    {
+      position: 900
+      type:     'success'
+      icon:     'refresh'
+      label:    'Reload'
+      action:   ->
+        $scope.reload()
+    }
+  ]
+
+
+  actionsProvider.registerAction 'run-all-actions-in-batch', ['$scope', '$q', ($scope, $q) ->
+    return undefined unless $scope.pendingActions and not $scope.action
+
+    runAllAction = {
+      position: 100
+      type:     'success'
+      icon:     'play'
+      label:    'Run All Pending'
+      action:   ->
+        promises = []
+        for action in $scope.pendingActions
+          promises.push action.run()
+        $q.all(promises).then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+
+    $scope.$watch 'pendingActions', (pendingActions) ->
+      runAllAction.disabled = pendingActions.length == 0
+
+    runAllAction
+  ]
 
 
 

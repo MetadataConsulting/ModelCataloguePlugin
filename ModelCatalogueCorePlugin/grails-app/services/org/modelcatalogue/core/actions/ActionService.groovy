@@ -155,7 +155,7 @@ class ActionService {
         }
     }
 
-    Action create(Map<String, String> parameters = [:], Batch batch, Class<? extends ActionRunner> runner, Action... dependsOn) {
+    Action create(Map<String, Object> parameters = [:], Batch batch, Class<? extends ActionRunner> runner, Action... dependsOn) {
         Action created = new Action(type: runner, batch: batch)
         created.validate()
 
@@ -164,7 +164,7 @@ class ActionService {
         }
 
         ActionRunner runnerInstance = createRunner(runner)
-        Map<String, String> parameterErrors = runnerInstance.validate(parameters)
+        Map<String, String> parameterErrors = runnerInstance.validate(parameters.collectEntries {key, value -> [key, value?.toString()]} as Map<String, String>)
 
         parameterErrors.each { key, message ->
             created.errors.rejectValue('extensions', "${runner.name}.$key", message)
@@ -177,7 +177,9 @@ class ActionService {
         created.save(failOnError: true, flush: true)
 
         if (parameters) {
-            created.ext.putAll parameters
+            parameters.each { key, value ->
+                created.addExtension(key, value?.toString())
+            }
         }
 
         batch.addToActions(created)

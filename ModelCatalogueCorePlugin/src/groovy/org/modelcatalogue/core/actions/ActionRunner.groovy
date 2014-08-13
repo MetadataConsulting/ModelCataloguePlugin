@@ -3,13 +3,19 @@ package org.modelcatalogue.core.actions
 public interface ActionRunner extends Runnable {
 
     /**
-     * Returns the print writer where can the action record it's progress or errors.
+     * Returns the print writer where can the action record it's results or errors.
+     *
+     * The text written to out writer is the only text displayed for actions performed.
+     *
      * @return the print writer where can the action record it's progress or errors
      */
     PrintWriter getOut()
 
     /**
-     * Sets the print writer where can the action record it's progress or errors.
+     * Sets the print writer where can the action record it's results or errors.
+     *
+     * The text written to out writer is the only text displayed for actions performed.
+     *
      * @param writer the print writer where can the action record it's progress or errors
      */
     void setOut(PrintWriter writer)

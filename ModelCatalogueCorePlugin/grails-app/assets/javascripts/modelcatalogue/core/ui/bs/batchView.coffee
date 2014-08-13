@@ -22,7 +22,11 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
           <alert type="'info'" ng-hide="loading || performedActions.length > 0">There no actions performed or failed</alert>
           <alert ng-repeat="action in performedActions" type="getType(action)" ng-show="action">
             <div class="pull-right"><contextual-actions group="true" icon-only="true" size="sm" no-colors="true"/></div>
-            <div class="preserve-new-lines">{{action.outcome}}</div>
+            <div class="preserve-new-lines" ng-show="action.state == 'PERFORMING'">{{action.message}}</div>
+            <div class="preserve-new-lines" ng-show="action.state == 'FAILED'">Failed to "{{action.message}}"</div>
+            <br ng-show="action.outcome &amp;&amp; action.state == 'FAILED' &amp;&amp; action.message"/>
+            <div class="preserve-new-lines" ng-show="action.outcome &amp;&amp; action.state == 'PERFORMED'">{{action.outcome}}</div>
+            <pre ng-show="action.outcome &amp;&amp; action.state == 'FAILED'">{{action.outcome}}</pre>
           </alert>
         </div>
       </div>

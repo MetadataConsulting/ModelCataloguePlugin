@@ -10,6 +10,7 @@ import org.modelcatalogue.core.testapp.User
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.actions.TestAction
 
 class BootStrap {
 
@@ -156,6 +157,10 @@ class BootStrap {
                             }
                         }
 
+                        assert !actionService.create(batch, TestAction).hasErrors()
+                        assert !actionService.create(batch, TestAction, fail: true).hasErrors()
+                        assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
+                        assert !actionService.create(batch, TestAction, timeout: 5000).hasErrors()
 
                         println "Init finished in ${new Date()}"
                     } catch (e) {
@@ -168,7 +173,6 @@ class BootStrap {
 
     }
 
-    def destroy = {
-    }
+    def destroy = {}
 
 }

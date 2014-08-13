@@ -19,12 +19,10 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
 
       $scope.pendingActions = []
       $scope.performedActions = []
+      $scope.loading = true
 
-      loadActions = (loader) ->
-        pendingActions = []
-        performedActions = []
+      loadActions = (loader, pendingActions = [], performedActions = []) ->
         deferred = $q.defer()
-        $scope.loading = true
         loader().then (list) ->
           for action in list.list
             if action.state == 'PENDING' or action.state == 'DISMISSED'
@@ -32,10 +30,10 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
             else
               performedActions.unshift action
           if list.total > list.offset + list.size
-            loadActions(list.next)
             deferred.notify pendingActions: pendingActions, performedActions: performedActions
+            loadActions(list.next, pendingActions, performedActions).then ->
+              deferred.resolve pendingActions: pendingActions, performedActions: performedActions
           else
-            $scope.loading = false
             deferred.resolve pendingActions: pendingActions, performedActions: performedActions
         deferred.promise
 
@@ -43,7 +41,8 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
         $scope.pendingActions = result.pendingActions
         $scope.performedActions = result.performedActions
 
-      loadActions($scope.batch.actions).then assignActions, (->), assignActions
+      loadActions($scope.batch.actions).then(assignActions, (->), assignActions).then ->
+        $scope.loading = false
 
       $scope.reload = ->
         loadActions($scope.batch.actions).then assignActions
