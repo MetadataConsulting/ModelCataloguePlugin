@@ -26,8 +26,8 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
           <alert type="'info'" ng-hide="loading || performedActions.length > 0">There no actions performed or failed</alert>
           <alert ng-repeat="action in performedActions" type="getType(action)" id="action-{{action.id}}">
             <div class="pull-right">
-              <a ng-click="highlight(action.dependsOn)" class="btn btn-warning btn-sm" ng-show="action.dependsOn" title="Depends on {{action.dependsOn.length}} action(s)"><span class="glyphicon glyphicon-open"></span> {{action.dependsOn.length}} </a>
-              <a ng-click="highlight(action.dependencies)" class="btn btn-warning btn-sm" ng-show="action.dependencies" title="{{action.dependencies.length}} other action(s) depends on this action"><span class="glyphicon glyphicon-save"></span> {{action.dependencies.length}} </a>
+              <a ng-click="highlight(action.dependsOn)" class="btn btn-warning btn-sm" ng-show="action.dependsOn" title="Depends on {{action.dependsOn.length}} action(s)"><span class="glyphicon glyphicon-save"></span> {{action.dependsOn.length}} </a>
+              <a ng-click="highlight(action.dependencies)" class="btn btn-warning btn-sm" ng-show="action.dependencies" title="{{action.dependencies.length}} other action(s) depends on this action"><span class="glyphicon glyphicon-open"></span> {{action.dependencies.length}} </a>
               <contextual-actions group="true" icon-only="true" size="sm" no-colors="true"/>
             </div>
             <div class="preserve-new-lines" ng-show="action.state == 'PERFORMING'">{{action.message}}</div>

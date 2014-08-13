@@ -27,7 +27,11 @@ class ActionService {
      * @param action action to be performed
      * @return future to the outcome of the action or the error message
      */
-    Future<ActionResult> run(Action action, List<Long> executionStack = []) {
+    Future<ActionResult> run(Action action) {
+        runInternal(action, true, false, [])
+    }
+
+    private Future<ActionResult> runInternal(Action action, boolean async, boolean ignorePerforming, List<Long> executionStack) {
         List<Long> currentExecutionStack = new ArrayList<Long>(executionStack)
         currentExecutionStack << action.id
 
@@ -37,8 +41,8 @@ class ActionService {
             return msg
         }
 
-        if (action.state != ActionState.PENDING) {
-            Future<ActionResult> msg = new FutureTask<ActionResult>({new ActionResult(outcome: "The action is already pending", failed: action.state == ActionState.FAILED)})
+        if (!(ignorePerforming && action.state == ActionState.PERFORMING) && action.state != ActionState.PENDING) {
+            Future<ActionResult> msg = new FutureTask<ActionResult>({new ActionResult(outcome: "The action is not pending", failed: action.state == ActionState.FAILED)})
             msg.run()
             return msg
         }
@@ -55,12 +59,6 @@ class ActionService {
         } else {
             action.state = ActionState.PERFORMING
             action.save(failOnError: true, flush: true)
-        }
-
-        Map<Long, Future<ActionResult>> dependenciesPerformed = [:]
-
-        for(ActionDependency dependency in action.dependsOn) {
-            dependenciesPerformed.put dependency.provider.id, run(dependency.provider, currentExecutionStack)
         }
 
         Long id = action.id
@@ -84,20 +82,15 @@ class ActionService {
                 runner.out = pw
 
                 try {
-                    // this will cause waiting for all provider actions to be completed before the execution
-                    for (Map.Entry<Long, Future<ActionResult>> future in dependenciesPerformed) {
-                        ActionResult result = future.value.get()
-                        if (!result) {
-                            // bug in executor service
-                            // see https://github.com/basejump/grails-executor/issues/12
-                            Action provider = Action.get(future.key)
-                            if (provider.state == ActionState.FAILED) {
-                                a.state = ActionState.FAILED
-                                a.outcome = "Action(${future.key}) doesn't return any result. Considering this as failure."
-                                a.save(failOnError: true, flush: true)
-                                return new ActionResult(outcome: a.outcome, failed: true)
-                            }
-                        } else if (result.failed) {
+                    // first set all deps as pending
+                    for(ActionDependency dependency in a.dependsOn) {
+                        dependency.provider.state = ActionState.PERFORMING
+                        dependency.provider.save(failOnError: true, flush: true)
+                    }
+                    // than actually run, but ignoring the pending check
+                    for(ActionDependency dependency in a.dependsOn) {
+                        ActionResult result = runInternal(dependency.provider, false, true, currentExecutionStack).get()
+                        if (result.failed) {
                             String msgStart = 'Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\n'
                             a.state = ActionState.FAILED
                             a.outcome = result.outcome?.startsWith(msgStart) ? result.outcome : "$msgStart$result.outcome"
@@ -128,7 +121,12 @@ class ActionService {
             }
 
         }
-        executorService.submit(job as Callable<ActionResult>)
+        if (async) {
+            return executorService.submit(job as Callable<ActionResult>)
+        }
+        FutureTask<ActionResult> task = new FutureTask(job)
+        task.run()
+        task
     }
 
     void dismiss(Action action){

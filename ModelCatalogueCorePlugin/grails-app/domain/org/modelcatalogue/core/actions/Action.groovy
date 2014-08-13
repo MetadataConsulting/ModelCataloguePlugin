@@ -26,12 +26,6 @@ class Action implements Extendible {
         state bindable: false
     }
 
-    static mapping = {
-        dependsOn lazy: false
-        dependencies lazy: false
-        extensions lazy: false
-    }
-
     static transients = ['ext']
 
     final Map<String, String> ext = new ExtensionsWrapper(this)

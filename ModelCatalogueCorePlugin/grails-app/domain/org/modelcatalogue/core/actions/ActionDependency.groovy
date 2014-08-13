@@ -24,7 +24,7 @@ class ActionDependency {
             if (obj.provider == val) {
                 return false
             }
-            if (obj.provider && obj.provider.batch != val.batch) {
+            if (obj.provider && obj.provider.batch?.id != val.batch?.id) {
                 return "Actions must be from same batch"
             }
             return true
