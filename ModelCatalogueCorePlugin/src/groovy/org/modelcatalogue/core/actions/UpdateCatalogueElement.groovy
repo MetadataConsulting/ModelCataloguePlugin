@@ -95,7 +95,7 @@ class UpdateCatalogueElement extends AbstractActionRunner {
                     }
                 }
             }
-            out << "${GrailsNameUtils.getNaturalName(type.simpleName)} '$element.name' updated"
+            out << "<a href='#/catalogue/${GrailsNameUtils.getPropertyName(type)}/${element.id}'>${GrailsNameUtils.getNaturalName(type.simpleName)} '$element.name'</a> updated"
         } else {
             fail("Unable to update ${GrailsNameUtils.getNaturalName(type.simpleName)}:${id} using parameters ${parameters}")
             for (ObjectError error in element.errors.allErrors) {

@@ -5,7 +5,8 @@ public interface ActionRunner extends Runnable {
     /**
      * Returns the print writer where can the action record it's results or errors.
      *
-     * The text written to out writer is the only text displayed for actions performed.
+     * The text written to out writer is the only text displayed for actions performed (in pre tag for failures and
+     * as HTML for successful results).
      *
      * @return the print writer where can the action record it's progress or errors
      */
@@ -14,7 +15,8 @@ public interface ActionRunner extends Runnable {
     /**
      * Sets the print writer where can the action record it's results or errors.
      *
-     * The text written to out writer is the only text displayed for actions performed.
+     * The text written to out writer is the only text displayed for actions performed (in pre tag for failures and
+     * as HTML for successful results).
      *
      * @param writer the print writer where can the action record it's progress or errors
      */

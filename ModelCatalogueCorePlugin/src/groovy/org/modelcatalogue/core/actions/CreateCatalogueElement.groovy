@@ -73,7 +73,7 @@ class CreateCatalogueElement extends AbstractActionRunner {
                     element.addExtension key.substring(4), value
                 }
             }
-            out << "New ${GrailsNameUtils.getNaturalName(type.simpleName)} '$name' created"
+            out << "New <a href='#/catalogue/${GrailsNameUtils.getPropertyName(type)}/${element.id}'>${GrailsNameUtils.getNaturalName(type.simpleName)} '$name'</a> created"
         } else {
             fail("Unable to create new ${GrailsNameUtils.getNaturalName(type.simpleName)} using parameters ${parameters}")
             for (ObjectError error in element.errors.allErrors) {
