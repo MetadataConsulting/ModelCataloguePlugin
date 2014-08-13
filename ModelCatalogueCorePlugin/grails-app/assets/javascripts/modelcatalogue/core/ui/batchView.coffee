@@ -8,13 +8,15 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
 
     templateUrl: 'modelcatalogue/core/ui/batchView.html'
 
-    controller: ['$scope','$q', ($scope, $q) ->
+    controller: ['$scope','$q', '$window', ($scope, $q, $window) ->
       $scope.getType = (action) ->
         return 'info'    if not action
-        return 'warning' if action.state == 'PERFORMING'
-        return 'warning' if action.state == 'DISMISSED'
+        return 'warning' if action.higlighted
+        return 'info'    if action.state == 'PERFORMING'
+        return 'danger'  if action.state == 'DISMISSED'
         return 'success' if action.state == 'PERFORMED'
         return 'danger'  if action.state == 'FAILED'
+        return 'success' if action.state == 'PENDING'
         return 'info'
 
       $scope.pendingActions = []
@@ -46,6 +48,16 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
 
       $scope.reload = ->
         loadActions($scope.batch.actions).then assignActions
+
+
+      $scope.highlight = (ids)->
+        for action in $scope.pendingActions
+          action.higlighted = action.id in ids
+        for action in $scope.performedActions
+          action.higlighted = action.id in ids
+
+        if ids.length > 0
+          $window.scrollTo 0, $("#action-#{Math.min(ids...)}").offset().top - 70
     ]
   }
 ]

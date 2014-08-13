@@ -147,20 +147,22 @@ class BootStrap {
 
                         15.times {
                             Action action
-                            if (it != 7) {
-                                action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
-                            } else {
+                            if (it == 7) {
                                 action = actionService.create(batch, CreateCatalogueElement, Action.get(2), Action.get(5), Action.get(6), name: "Model #${it}", type: Model.name)
+                            } else if (it == 4) {
+                                action = actionService.create(batch, CreateCatalogueElement, Action.get(2), name: "Model #${it}", type: Model.name)
+                            } else {
+                                action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
                             }
                             if (it % 3 == 0) {
                                 actionService.dismiss(action)
                             }
                         }
 
-                        assert !actionService.create(batch, TestAction).hasErrors()
                         assert !actionService.create(batch, TestAction, fail: true).hasErrors()
                         assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
                         assert !actionService.create(batch, TestAction, timeout: 5000).hasErrors()
+                        assert !actionService.create(batch, TestAction).hasErrors()
 
                         println "Init finished in ${new Date()}"
                     } catch (e) {

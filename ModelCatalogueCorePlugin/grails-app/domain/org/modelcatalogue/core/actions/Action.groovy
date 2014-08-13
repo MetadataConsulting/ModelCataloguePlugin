@@ -28,7 +28,8 @@ class Action implements Extendible {
 
     static mapping = {
         dependsOn lazy: false
-
+        dependencies lazy: false
+        extensions lazy: false
     }
 
     static transients = ['ext']

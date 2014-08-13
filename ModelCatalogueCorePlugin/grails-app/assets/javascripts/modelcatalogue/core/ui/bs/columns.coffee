@@ -107,8 +107,10 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Batch', [
     {header: "Created"     , value: "dateCreated | date:'short'"   , class: 'col-md-2',               sort: {property: 'dateCreated', type: 'order'}}
-    {header: "Name"        , value: 'name'                         , class: 'col-md-5', show: true  , sort: {property: 'name', type: 'alphabet'}}
-    {header: "Description" , value: "description"                  , class: 'col-md-5' }
+    {header: "Name"        , value: 'name'                         , class: 'col-md-4', show: true  , sort: {property: 'name', type: 'alphabet'}}
+    {header: "Pending"     , value: "pending.total"                , class: 'col-md-2'}
+    {header: "Performed"   , value: "performed.total"              , class: 'col-md-2'}
+    {header: "Failed"      , value: "failed.total"                 , class: 'col-md-2'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Action', [

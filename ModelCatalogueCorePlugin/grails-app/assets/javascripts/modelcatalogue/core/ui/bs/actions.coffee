@@ -399,7 +399,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position: 100
       type:     'success'
-      icon:     'ok'
+      icon:     'repeat'
       label:    'Reactivate'
       action:   ->
         $scope.action.reactivate().then ->
@@ -447,7 +447,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:   ->
         promises = []
         for action in $scope.pendingActions
-          promises.push action.run()
+          promises.push action.run() if action.state == 'PENDING'
         $q.all(promises).then ->
           $scope.reload() if angular.isFunction($scope.reload)
     }
