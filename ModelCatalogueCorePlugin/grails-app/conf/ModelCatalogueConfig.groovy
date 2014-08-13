@@ -23,6 +23,8 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 
+grails.databinding.dateFormats = ['MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', "yyyy-MM-dd'T'hh:mm:sss'Z'"]
+
 grails.mime.types = [
         json:          ['application/json', 'text/json'],
         xml:           ['text/xml', 'application/xml'],

@@ -53,6 +53,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         def paramsToBind = getParametersToBind()
         def ext = paramsToBind.ext
         paramsToBind.remove 'ext'
+        paramsToBind.remove 'versionCreated'
 
         if (params.boolean('newVersion')) {
             paramsToBind.remove 'status'
