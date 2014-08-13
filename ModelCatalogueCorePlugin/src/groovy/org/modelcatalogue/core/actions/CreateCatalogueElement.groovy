@@ -28,7 +28,7 @@ class CreateCatalogueElement extends AbstractActionRunner {
 
     String getMessage() {
         normalizeDescription """
-            Creates new ${GrailsNameUtils.getNaturalName(type.simpleName)} '$name' with following parameteres:
+            Create new ${GrailsNameUtils.getNaturalName(type.simpleName)} '$name' with following parameters:
 
 
 

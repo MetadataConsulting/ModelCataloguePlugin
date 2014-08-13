@@ -28,7 +28,7 @@ class UpdateCatalogueElementSpec extends Specification {
 
         then:
         updateAction.message == """
-            Updates the Model 'The Model' with following paramteres:
+            Update the Model 'The Model' with following parameters:
 
             Name: The Updated Model
         """.stripIndent().trim()

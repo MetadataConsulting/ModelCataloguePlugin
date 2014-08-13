@@ -360,4 +360,70 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
+
+  actionsProvider.registerAction 'run-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and $scope.action.state == 'PENDING'
+
+    {
+      position: 100
+      type:     'success'
+      icon:     'play'
+      label:    'Run'
+      action:   ->
+        $scope.action.run().then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+  ]
+
+
+
+  actionsProvider.registerAction 'dismiss-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and ($scope.action.state == 'PENDING' or $scope.action.state == 'FAILED')
+
+    {
+      position: 500
+      type:     'danger'
+      icon:     'remove'
+      label:    'Dismiss'
+      action:   ->
+        $scope.action.dismiss().then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+  ]
+
+
+
+  actionsProvider.registerAction 'reactivate-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and $scope.action.state == 'DISMISSED'
+
+    {
+      position: 100
+      type:     'success'
+      icon:     'ok'
+      label:    'Reactivate'
+      action:   ->
+        $scope.action.reactivate().then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+  ]
+
+
+
+  actionsProvider.registerAction 'run-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and $scope.action.state == 'PENDING'
+
+    {
+      position: 100
+      type:     'success'
+      icon:     'play'
+      label:    'Run'
+      action:   ->
+        $scope.action.run().then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+  ]
+
+
+
+
 ]

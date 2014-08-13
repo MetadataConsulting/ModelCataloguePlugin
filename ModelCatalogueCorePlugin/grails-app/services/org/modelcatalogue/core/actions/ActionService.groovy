@@ -193,13 +193,24 @@ class ActionService {
     }
 
     ListWithTotalAndType<Action> list(Map params = [:], Batch batch) {
-        list(params, batch, ActionState.PENDING)
+        list(params, batch, null)
     }
 
     ListWithTotalAndType<Action> list(Map params = [:], Batch batch, ActionState state) {
         Lists.fromCriteria(params, Action) {
-            eq 'state', state
+            if (state) {
+                eq 'state', state
+            }
             eq 'batch', batch
+            sort 'lastUpdated', 'asc'
+        }
+    }
+
+    ListWithTotalAndType<Action> listActive(Map params = [:], Batch batch) {
+        Lists.fromCriteria(params, Action) {
+            ne 'state', ActionState.DISMISSED
+            eq 'batch', batch
+            sort 'lastUpdated', 'asc'
         }
     }
 

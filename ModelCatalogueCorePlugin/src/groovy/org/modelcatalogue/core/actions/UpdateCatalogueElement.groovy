@@ -30,7 +30,7 @@ class UpdateCatalogueElement extends AbstractActionRunner {
     String getMessage() {
         CatalogueElement fetched = queryForCatalogueElement()
         normalizeDescription """
-            Updates the ${GrailsNameUtils.getNaturalName(type.simpleName)} '$fetched.name' with following paramteres:
+            Update the ${GrailsNameUtils.getNaturalName(type.simpleName)} '$fetched.name' with following parameters:
 
 
 

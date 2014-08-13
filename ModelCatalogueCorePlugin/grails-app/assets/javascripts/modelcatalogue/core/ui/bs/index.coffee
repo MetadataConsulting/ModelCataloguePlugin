@@ -7,6 +7,7 @@
 #= require modelcatalogue/util/ui/bs/index
 #= require catalogueElementView
 #= require importView
+#= require batchView
 #= require catalogueElementTreeview
 #= require catalogueElementTreeviewItem
 #= require catalogueElementProperties
@@ -42,6 +43,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.decoratedListTable'
   'mc.core.ui.bs.catalogueElementView'
   'mc.core.ui.bs.importView'
+  'mc.core.ui.bs.batchView'
   'mc.core.ui.bs.catalogueElementTreeview'
   'mc.core.ui.bs.catalogueElementTreeviewItem'
   'mc.core.ui.bs.catalogueElementProperties'

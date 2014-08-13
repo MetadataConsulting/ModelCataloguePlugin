@@ -23,7 +23,7 @@ class CreateCatalogueElementSpec extends Specification {
 
         then:
         createAction.message == """
-            Creates new Model 'The Model' with following parameteres:
+            Create new Model 'The Model' with following parameteres:
 
             Name: The Model
         """.stripIndent().trim()
