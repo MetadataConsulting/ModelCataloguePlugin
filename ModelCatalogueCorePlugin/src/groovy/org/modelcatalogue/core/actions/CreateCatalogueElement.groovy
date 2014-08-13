@@ -18,7 +18,7 @@ class CreateCatalogueElement extends AbstractActionRunner {
         performing the action.
 
         Parameters:
-            id: the id of the element to be updated
+            name: the name of the newly created element
             type: the catalogue element class name
 
             any other bindable parameter

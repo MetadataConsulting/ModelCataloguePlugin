@@ -26,6 +26,7 @@
 #= require modalPromptBasicEdit
 #= require modalPromptLogin
 #= require modalPromptMeasurementUnitEdit
+#= require modalPromptActionParametersEdit
 #= require modalPromptValueDomainEdit
 #= require modalPromptEnumeratedTypeEdit
 #= require modalPromptPublishedElement
@@ -63,6 +64,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptMeasurementUnitEdit'
   'mc.core.ui.bs.modalPromptValueDomainEdit'
   'mc.core.ui.bs.modalPromptEnumeratedTypeEdit'
+  'mc.core.ui.bs.modalPromptActionParametersEdit'
   'mc.core.ui.bs.modalPromptPublishedElement'
   'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
 ])

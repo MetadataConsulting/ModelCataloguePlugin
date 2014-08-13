@@ -31,6 +31,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/dismiss"(controller: controllerName, action: 'dismiss', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/reactivate"(controller: controllerName, action: 'reactivate', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/run"(controller: controllerName, action: 'run', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/parameters"(controller: controllerName, action: 'updateActionParameters', method: HttpMethod.PUT)
             }
 
 

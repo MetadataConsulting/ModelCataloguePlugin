@@ -153,6 +153,24 @@ class ActionService {
         }
     }
 
+    Action updateParameters(Action action, Map<String, String> parameters) {
+        ActionRunner runnerInstance = createRunner(action.type)
+        Map<String, String> parameterErrors = runnerInstance.validate(parameters.collectEntries {key, value -> [key, value?.toString()]} as Map<String, String>)
+
+        parameterErrors.each { key, message ->
+            action.errors.rejectValue('extensions', "${action.type.name}.$key", message)
+        }
+
+        if (action.hasErrors()) {
+            return action
+        }
+
+        action.ext.clear()
+        action.ext.putAll parameters
+
+        action
+    }
+
     Action create(Map<String, Object> parameters = [:], Batch batch, Class<? extends ActionRunner> runner, Action... dependsOn) {
         Action created = new Action(type: runner, batch: batch)
         created.validate()

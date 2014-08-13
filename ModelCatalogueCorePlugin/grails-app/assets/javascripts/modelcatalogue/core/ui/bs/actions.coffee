@@ -365,7 +365,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined unless $scope.action and $scope.action.state == 'PENDING'
 
     {
-      position: 100
+      position: 200
       type:     'success'
       icon:     'play'
       label:    'Run'
@@ -397,7 +397,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined unless $scope.action and $scope.action.state == 'DISMISSED'
 
     {
-      position: 100
+      position: 200
       type:     'success'
       icon:     'repeat'
       label:    'Reactivate'
@@ -440,7 +440,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined unless $scope.pendingActions and not $scope.action
 
     runAllAction = {
-      position: 100
+      position: 200
       type:     'success'
       icon:     'play'
       label:    'Run All Pending'
@@ -459,5 +459,29 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
+
+  actionsProvider.registerAction 'update-action-parameters', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+    return undefined if not $scope.action
+    return undefined if not security.hasRole('CURATOR')
+
+    action =
+      position:   100
+      label:      'Update Action Parameters'
+      icon:       'edit'
+      type:       'primary'
+      action:     ->
+        messages.prompt('Update Action Parameters', '', {type: 'update-action-parameters', action: $scope.action}).then (updated)->
+          $scope.action = updated
+
+    updateAction = ->
+      action.disabled = $scope.action.state in ['PERFORMING', 'PERFORMED']
+
+    $scope.$watch 'action.state', updateAction
+
+    updateAction()
+
+    return action
+
+  ]
 
 ]
