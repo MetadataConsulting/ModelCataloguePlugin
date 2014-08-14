@@ -22,6 +22,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     def "Link existing elements using add to #direction endpoint with JSON result"(){
 
         controller.response.format = 'json'
+        controller.request.method       = 'POST'
         controller.request.json = loadItem as JSON
         controller."add${direction.capitalize()}"(anotherLoadItem.id, relationshipType.name)
         def json = controller.response.json
@@ -46,6 +47,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     @Unroll
     def "Link existing elements using add to #direction endpoint with XML result"(){
 
+        controller.request.method       = 'POST'
         controller.response.format = 'xml'
         controller.request.xml = anotherLoadItem.encodeAsXML()
         controller."add${direction.capitalize()}"(loadItem.id, relationshipType.name)
@@ -72,6 +74,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     @Unroll
     def "Unlink non existing elements using add to #direction endpoint with #format result"(){
 
+        controller.request.method       = 'DELETE'
         if (direction == "outgoing") {
             controller.relationshipService.unlink(loadItem, anotherLoadItem, relationshipType)
         } else {
@@ -103,7 +106,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "Unlink existing elements using add to #direction endpoint with #format result"(){
-
+        controller.request.method       = 'DELETE'
         if (direction == "outgoing") {
             controller.relationshipService.link(loadItem, anotherLoadItem, relationshipType)
         } else {
@@ -136,7 +139,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "Link existing elements using add to #direction endpoint with failing constraint as JSON result"(){
-
+        controller.request.method       = 'POST'
         RelationshipType relationshipType = RelationshipType.findByName("falseRuleReturn")
         controller.response.format = 'json'
         controller.request.json = anotherLoadItem as JSON
@@ -158,7 +161,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "Link existing elements using add to #direction endpoint with failing constraint as XML result"(){
-
+        controller.request.method       = 'POST'
         RelationshipType relationshipType = RelationshipType.findByName("falseRuleReturn")
         controller.response.format = 'xml'
         controller.request.xml = anotherLoadItem.encodeAsXML()
@@ -179,6 +182,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "#action with non-existing one to #direction endpoint with #format result"(){
+        controller.request.method       = 'POST'
         controller.response.format = format.toLowerCase()
         def item = newResourceInstance()
         item.id = 1000000
@@ -215,6 +219,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "#action with not-existing type to #direction endpoint with #format result"(){
+        controller.request.method       = 'POST'
         controller.response.format = format.toLowerCase()
         def input = anotherLoadItem."encodeAs$format"()
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"

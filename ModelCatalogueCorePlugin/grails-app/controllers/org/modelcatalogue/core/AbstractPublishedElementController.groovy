@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.OK
 
 class AbstractPublishedElementController<T> extends AbstractExtendibleElementController<T> {
 
-    def publishedElementService
+    def publishedElementService, relationshipTypeService
 
     AbstractPublishedElementController(Class<T> type, boolean readOnly) {
         super(type, readOnly)
@@ -45,33 +45,44 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         }
 
         def oldProps = new HashMap(instance.properties)
-
         oldProps.remove('modelCatalogueId')
+
+//        T helper = resource.newInstance()
 
         T helper = createResource(oldProps)
 
-        def paramsToBind = getParametersToBind()
-        def ext = paramsToBind.ext
-        paramsToBind.remove 'ext'
-        paramsToBind.remove 'versionCreated'
+
+        def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
+        def excludeParams = ['ext', 'versionCreated', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations']
+        excludeParams.addAll(relationshipDirections)
+//        def paramsToBind = getParametersToBind()
+//        def ext = paramsToBind.ext
+//        paramsToBind.remove 'ext'
+//        paramsToBind.remove 'versionCreated'
 
         if (params.boolean('newVersion')) {
-            paramsToBind.remove 'status'
-            publishedElementService.archiveAndIncreaseVersion(instance)
+            excludeParams.add('status')
+//            paramsToBind.remove 'status'
         }
 
-        helper.properties = paramsToBind
+//        helper.properties = paramsToBind
+        bindData(helper, getObjectToBind(), [exclude: excludeParams])
+
 
         if (helper.hasErrors()) {
             reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
             return
         }
 
-        if (ext != null) {
+        if (params.boolean('newVersion')) {
+            publishedElementService.archiveAndIncreaseVersion(instance)
+        }
+
+        if (params.ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
-        instance.properties = paramsToBind
+        bindData(instance, getObjectToBind(), [exclude: excludeParams])
         instance.save flush:true
 
         request.withFormat {

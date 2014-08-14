@@ -38,6 +38,8 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
 
         T helper = createResource(oldProps)
 
+//        bindData(p, params)
+
         def paramsToBind = getParametersToBind()
         def ext = paramsToBind.ext
         paramsToBind.remove 'ext'
@@ -53,7 +55,7 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
-        instance.properties = paramsToBind
+        instance.properties = objectToBind
         instance.save flush:true
 
         request.withFormat {

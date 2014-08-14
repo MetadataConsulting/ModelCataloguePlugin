@@ -20,6 +20,7 @@ abstract class AbstractExtendibleElementControllerIntegrationSpec extends Abstra
         keyValue.put('testKey', 'testValue')
 
         when:
+        controller.request.method       = 'PUT'
         controller.params.id            = another.id
         controller.params.newVersion    = true
         controller.request.json         = [name: newName, ext: keyValue]

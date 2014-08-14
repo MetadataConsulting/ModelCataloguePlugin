@@ -89,7 +89,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if(handleReadOnly()) {
             return
         }
-        def instance = createResource(getParametersToBind())
+        def instance = createResource()
 
         instance.validate()
         if (instance.hasErrors()) {
@@ -149,7 +149,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if(handleReadOnly()) {
             return
         }
-        def instance = createResource(getParametersToBind())
+        def instance = createResource()
 
         instance.validate()
         if (instance.hasErrors()) {
@@ -194,7 +194,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        instance.properties = getParametersToBind()
+        instance.properties = getObjectToBind()
 
         if (instance.hasErrors()) {
             respond instance.errors, view:'edit' // STATUS CODE 422
@@ -216,15 +216,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             }
         }
     }
-
-
-    protected Map getParametersToBind() {
-        Map ret = params
-        if (response.format == 'json') ret = request.getJSON()
-        if (response.format == 'xml') ret = request.getXML()
-        ret
-    }
-
 
 
     /**
