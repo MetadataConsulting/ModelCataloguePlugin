@@ -23,7 +23,7 @@ class CreateCatalogueElementSpec extends Specification {
 
         then:
         createAction.message == """
-            Create new Model 'The Model' with following parameteres:
+            Create new Model 'The Model' with following parameters:
 
             Name: The Model
         """.stripIndent().trim()
@@ -94,7 +94,7 @@ class CreateCatalogueElementSpec extends Specification {
         Model.count() == 1
         Model.countByName('The Model') == 1
         Model.countByStatus(PublishedElementStatus.DRAFT) == 1
-        sw.toString() == "New Model 'The Model' created"
+        sw.toString() == "New <a href='#/catalogue/model/1'>Model 'The Model'</a> created"
         Model.findByName('The Model').ext.foo == 'bar'
     }
 

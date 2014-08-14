@@ -117,7 +117,7 @@ class UpdateCatalogueElementSpec extends Specification {
         Model.count() == 1
         Model.countByName('The Model') == 0
         Model.countByName('The New Model Name') == 1
-        sw.toString() == "Model 'The New Model Name' updated"
+        sw.toString() == "<a href='#/catalogue/model/1'>Model 'The New Model Name'</a> updated"
         Model.findByName('The New Model Name').ext.foo == 'bar'
         Model.findByName('The New Model Name').ext.bar == null
     }
