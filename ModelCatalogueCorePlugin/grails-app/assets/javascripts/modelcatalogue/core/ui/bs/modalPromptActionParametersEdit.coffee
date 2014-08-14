@@ -24,7 +24,7 @@ angular.module('mc.core.ui.bs.modalPromptActionParametersEdit', ['mc.util.messag
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="updateParameters()"><span class="glyphicon glyphicon-link"></span> Update Parameters</button>
+            <button class="btn btn-primary" id="update-parameters" ng-click="updateParameters()"><span class="glyphicon glyphicon-save"></span> Update Parameters</button>
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''

@@ -7,7 +7,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
       <h3 class="ce-name">{{batch.name}} <small ng-show="batch.elementTypeName"><span class="label" ng-show="batch.archived" ng-class="{'label-danger': batch.archived}">{{batch.status}}</span> (created {{batch.dateCreated | date:'short'}})</small></h3>
       <blockquote class="ce-description" ng-show="batch.description" ng-bind-html="'' + batch.description | linky:'_blank'"></blockquote>
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-6 pending-actions">
           <h4>Pending Actions</h4>
           <alert type="'info'" ng-hide="loading || pendingActions.length > 0">There no pending actions</alert>
           <alert ng-repeat="action in pendingActions" type="getType(action)" id="action-{{action.id}}">
@@ -27,7 +27,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
             <pre ng-show="action.outcome">{{action.outcome}}</pre>
           </alert>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 performed-actions">
           <h4>Performed Actions</h4>
           <alert type="'info'" ng-hide="loading || performedActions.length > 0">There no actions performed or failed</alert>
           <alert ng-repeat="action in performedActions" type="getType(action)" id="action-{{action.id}}">
