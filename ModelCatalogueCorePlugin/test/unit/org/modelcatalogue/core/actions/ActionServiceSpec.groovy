@@ -58,8 +58,8 @@ class ActionServiceSpec extends Specification {
         Action fail = createAction(fail: 'true')
         Action dependant = createAction(role: 'dependant')
 
-        dependant.addToDependsOn(provider: ok, dependant: dependant)
-        dependant.addToDependsOn(provider: fail, dependant: dependant)
+        dependant.addToDependsOn(provider: ok, dependant: dependant, role: 'test')
+        dependant.addToDependsOn(provider: fail, dependant: dependant, role: 'blah')
 
         when:
         service.run dependant
@@ -75,9 +75,9 @@ class ActionServiceSpec extends Specification {
         Action two = createAction()
         Action three = createAction()
 
-        two.addToDependsOn(provider: one, dependant: two)
-        three.addToDependsOn(provider: two, dependant: three)
-        one.addToDependsOn(provider: three, dependant: one)
+        two.addToDependsOn(provider: one, dependant: two, role: 'two')
+        three.addToDependsOn(provider: two, dependant: three, role: 'three')
+        one.addToDependsOn(provider: three, dependant: one, role: 'one')
 
         when:
         service.run one
@@ -120,8 +120,8 @@ class ActionServiceSpec extends Specification {
         Action action = createAction(should: 'dismiss')
         Action dependant = createAction(is: 'dependant')
 
-        action.addToDependencies(dependant: dependant, provider: action)
-        dependant.addToDependsOn(dependant: dependant, provider: action)
+        action.addToDependencies(dependant: dependant, provider: action, role: 'test')
+        dependant.addToDependsOn(dependant: dependant, provider: action, role: 'foo')
 
         expect:
         action.state == ActionState.PENDING
@@ -146,7 +146,7 @@ class ActionServiceSpec extends Specification {
         Action one = createAction(role: "one")
         Action two = createAction(role: "two")
 
-        Action created = service.create(batch, TestActionRunner, one, two, role: 'created')
+        Action created = service.create(batch, TestActionRunner, one: one, two: two, role: 'created')
 
         expect:
         created

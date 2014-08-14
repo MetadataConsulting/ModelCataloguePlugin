@@ -8,10 +8,10 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
 
     templateUrl: 'modelcatalogue/core/ui/batchView.html'
 
-    controller: ['$scope','$q', '$window', ($scope, $q, $window) ->
+    controller: ['$scope','$q', '$window', 'names', ($scope, $q, $window, names) ->
       $scope.getType = (action) ->
         return 'info'    if not action
-        return 'warning' if action.higlighted
+        return 'warning' if action.highlighted
         return 'info'    if action.state == 'PERFORMING'
         return 'danger'  if action.state == 'DISMISSED'
         return 'success' if action.state == 'PERFORMED'
@@ -22,6 +22,10 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
       $scope.pendingActions = []
       $scope.performedActions = []
       $scope.loading = true
+
+      $scope.natural = (name)->
+        console.log name
+        names.getNaturalName(name)
 
       loadActions = (loader, pendingActions = [], performedActions = []) ->
         deferred = $q.defer()
@@ -50,11 +54,18 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
         loadActions($scope.batch.actions).then assignActions
 
 
-      $scope.highlight = (ids)->
+      $scope.highlight = (idsToRoles)->
         for action in $scope.pendingActions
-          action.higlighted = action.id in ids
+          action.highlighted = idsToRoles[action.id]
+          console.log action
         for action in $scope.performedActions
-          action.higlighted = action.id in ids
+          action.highlighted = idsToRoles[action.id]
+          console.log action
+
+        ids = []
+
+        for id, ignored of idsToRoles when id != 'length'
+          ids.push parseInt(id, 10)
 
         if ids.length > 0
           $window.scrollTo 0, $("#action-#{Math.min(ids...)}").offset().top - 70

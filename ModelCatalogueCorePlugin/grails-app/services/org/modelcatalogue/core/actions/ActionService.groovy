@@ -171,7 +171,18 @@ class ActionService {
         action
     }
 
-    Action create(Map<String, Object> parameters = [:], Batch batch, Class<? extends ActionRunner> runner, Action... dependsOn) {
+    /**
+     * Creates new action.
+     *
+     * If you pass actions as parameters values the become dependencies with role given by the key
+     * in the parameters map.
+     *
+     * @param parameters
+     * @param batch
+     * @param runner
+     * @return new action
+     */
+    Action create(Map<String, Object> parameters = [:], Batch batch, Class<? extends ActionRunner> runner) {
         Action created = new Action(type: runner, batch: batch)
         created.validate()
 
@@ -180,7 +191,7 @@ class ActionService {
         }
 
         ActionRunner runnerInstance = createRunner(runner)
-        Map<String, String> parameterErrors = runnerInstance.validate(parameters.collectEntries {key, value -> [key, value?.toString()]} as Map<String, String>)
+        Map<String, String> parameterErrors = runnerInstance.validate(parameters.findAll{ key, value -> !(value instanceof Action)}.collectEntries {key, value -> [key, value?.toString()]} as Map<String, String>)
 
         parameterErrors.each { key, message ->
             created.errors.rejectValue('extensions', "${runner.name}.$key", message)
@@ -194,14 +205,17 @@ class ActionService {
 
         if (parameters) {
             parameters.each { key, value ->
+                if (value instanceof Action) {
+                    return
+                }
                 created.addExtension(key, value?.toString())
             }
         }
 
         batch.addToActions(created)
 
-        for (Action action in dependsOn) {
-            ActionDependency dependency = new ActionDependency(dependant: created, provider: action)
+        parameters.findAll{ key, value -> value instanceof Action }.each { String role, Action action ->
+            ActionDependency dependency = new ActionDependency(dependant: created, provider: action, role: role)
             dependency.save(failOnError: true, flush: true)
             created.addToDependsOn(dependency)
             action.addToDependencies(dependency)

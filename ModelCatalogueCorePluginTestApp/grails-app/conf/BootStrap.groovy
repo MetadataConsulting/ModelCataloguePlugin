@@ -146,9 +146,9 @@ class BootStrap {
                     15.times {
                         Action action
                         if (it == 7) {
-                            action = actionService.create(batch, CreateCatalogueElement, Action.get(2), Action.get(5), Action.get(6), name: "Model #${it}", type: Model.name)
+                            action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: Model.name)
                         } else if (it == 4) {
-                            action = actionService.create(batch, CreateCatalogueElement, Action.get(2), name: "Model #${it}", type: Model.name)
+                            action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: Model.name)
                         } else {
                             action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
                         }
@@ -160,7 +160,7 @@ class BootStrap {
                     assert !actionService.create(batch, TestAction, fail: true).hasErrors()
                     assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
                     assert !actionService.create(batch, TestAction, timeout: 5000).hasErrors()
-                    assert !actionService.create(batch, TestAction, actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
+                    assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
 
                     println "Init finished in ${new Date()}"
                 } catch (e) {

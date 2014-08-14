@@ -7,6 +7,8 @@ import org.modelcatalogue.core.CatalogueElement
  */
 class ActionDependency {
 
+    String role
+
     /**
      * The action which depends on performing the action specified as provider.
      */
@@ -29,5 +31,6 @@ class ActionDependency {
             }
             return true
         }
+        role size: 1..100
     }
 }
