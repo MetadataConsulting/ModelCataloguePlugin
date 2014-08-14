@@ -447,7 +447,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:   ->
         promises = []
         for action in $scope.pendingActions
-          promises.push action.run() if action.state == 'PENDING'
+          promises.push action.run() if action.state == 'PENDING' and action.dependencies.length == 0
         $q.all(promises).then ->
           $scope.reload() if angular.isFunction($scope.reload)
     }
