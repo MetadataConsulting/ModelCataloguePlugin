@@ -84,7 +84,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         def input = anotherLoadItem."encodeAs$format"()
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
         if(format=="JSON"){
-            recordInputJSON fixtureName, input
+            recordInputJSON fixtureName, input.toString()
         }
         if(format=="XML"){
             recordInputXML fixtureName, input
@@ -116,7 +116,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         def input = anotherLoadItem."encodeAs$format"()
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
         if(format=="JSON"){
-            recordInputJSON fixtureName, input
+            recordInputJSON fixtureName, input.toString()
         }
         if(format=="XML"){
             recordInputXML fixtureName, input
@@ -182,14 +182,14 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "#action with non-existing one to #direction endpoint with #format result"(){
-        controller.request.method       = 'POST'
+        controller.request.method       = method
         controller.response.format = format.toLowerCase()
         def item = newResourceInstance()
         item.id = 1000000
         def input = item."encodeAs$format"()
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
         if(format=="JSON"){
-            recordInputJSON fixtureName, input
+            recordInputJSON fixtureName, input.toString()
         }
         if(format=="XML"){
             recordInputXML fixtureName, input
@@ -202,15 +202,15 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        action   | format | direction
-        "add"    | "XML"  | "outgoing"
-        "add"    | "JSON" | "outgoing"
-        "add"    | "XML"  | "incoming"
-        "add"    | "JSON" | "incoming"
-        "remove" | "XML"  | "outgoing"
-        "remove" | "JSON" | "outgoing"
-        "remove" | "XML"  | "incoming"
-        "remove" | "JSON" | "incoming"
+        action   | format | direction  | method
+        "add"    | "XML"  | "outgoing" | "POST"
+        "add"    | "JSON" | "outgoing" | "POST"
+        "add"    | "XML"  | "incoming" | "POST"
+        "add"    | "JSON" | "incoming" | "POST"
+        "remove" | "XML"  | "outgoing" | "DELETE"
+        "remove" | "JSON" | "outgoing" | "DELETE"
+        "remove" | "XML"  | "incoming" | "DELETE"
+        "remove" | "JSON" | "incoming" | "DELETE"
     }
 
     protected CatalogueElement newResourceInstance() {
@@ -219,12 +219,12 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "#action with not-existing type to #direction endpoint with #format result"(){
-        controller.request.method       = 'POST'
+        controller.request.method       = httpMethod
         controller.response.format = format.toLowerCase()
         def input = anotherLoadItem."encodeAs$format"()
         String fixtureName = "removeNonExisting${direction.capitalize()}$format"
         if(format=="JSON"){
-            recordInputJSON fixtureName, input
+            recordInputJSON fixtureName, input.toString()
         }
         if(format=="XML"){
             recordInputXML fixtureName, input
@@ -237,15 +237,15 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        action   | format | direction
-        "add"    | "XML"  | "outgoing"
-        "add"    | "JSON" | "outgoing"
-        "add"    | "XML"  | "incoming"
-        "add"    | "JSON" | "incoming"
-        "remove" | "XML"  | "outgoing"
-        "remove" | "JSON" | "outgoing"
-        "remove" | "XML"  | "incoming"
-        "remove" | "JSON" | "incoming"
+        action   | format | direction  | httpMethod
+        "add"    | "XML"  | "outgoing" | "POST"
+        "add"    | "JSON" | "outgoing" | "POST"
+        "add"    | "XML"  | "incoming" | "POST"
+        "add"    | "JSON" | "incoming" | "POST"
+        "remove" | "XML"  | "outgoing" | "DELETE"
+        "remove" | "JSON" | "outgoing" | "DELETE"
+        "remove" | "XML"  | "incoming" | "DELETE"
+        "remove" | "JSON" | "incoming" | "DELETE"
 
     }
 
@@ -943,6 +943,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "return 404 for non existing domain calling #method method with #format format"() {
+        controller.request.method = httpMethod
         controller.response.format = format
         controller.params.id = 1000000
 
@@ -953,17 +954,18 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
 
         where:
-        format | method
-        "json" | "mappings"
-        "xml"  | "mappings"
-        "json" | "addMapping"
-        "xml"  | "addMapping"
-        "json" | "removeMapping"
-        "xml"  | "removeMapping"
+        format | httpMethod | method
+        "json" | "GET"      |"mappings"
+        "xml"  | "GET"      |"mappings"
+        "json" | "POST"      |"addMapping"
+        "xml"  | "POST"      |"addMapping"
+        "json" | "DELETE"      |"removeMapping"
+        "xml"  | "DELETE"      |"removeMapping"
     }
 
     @Unroll
     def "return 404 for non existing other side calling #method method with #format format"() {
+        controller.request.method = httpMethod
         controller.response.format = format
         controller.params.id = loadItem.id
         controller.params.destination = 10000000
@@ -977,17 +979,18 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
 
         where:
-        format | method          | payload
-        "json" | "addMapping"    | """{"mapping":"x"}"""
-        "json" | "removeMapping" | """{"mapping":"x"}"""
-        "xml"  | "addMapping"    | """<mapping>x</mapping>"""
-        "xml"  | "removeMapping" | """<mapping>x</mapping>"""
+        format | httpMethod | method          | payload
+        "json" | "POST"     | "addMapping"    | """{"mapping":"x"}"""
+        "json" | "DELETE"   | "removeMapping" | """{"mapping":"x"}"""
+        "xml"  | "POST"     | "addMapping"    | """<mapping>x</mapping>"""
+        "xml"  | "DELETE"   | "removeMapping" | """<mapping>x</mapping>"""
     }
 
     @Unroll
     def "Map existing domains with failing constraint #format"(){
         controller.response.format = format
         controller.request."$format" = payload
+        controller.request.method = "POST"
         controller.params.id           = loadItem.id
         controller.params.destination  = anotherLoadItem.id
         controller.addMapping()
@@ -1007,6 +1010,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     @Unroll
     def "unmap non existing mapping will return 404 for #format request"(){
         controller.response.format = format
+        controller.request.method = "DELETE"
         controller.mappingService.unmap(loadItem, anotherLoadItem)
         controller.params.id           = loadItem.id
         controller.params.destination  = anotherLoadItem.id
@@ -1023,7 +1027,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     @Unroll
     def "unmap existing mapping will return 204 for #format request"(){
         controller.response.format = format
-
+        controller.request.method = "DELETE"
         controller.mappingService.map(loadItem, anotherLoadItem, [one: "one"])
         controller.params.id           = loadItem.id
         controller.params.destination  = anotherLoadItem.id
@@ -1037,6 +1041,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def "map valid domains with json"() {
+        controller.request.method = "POST"
         controller.response.format = "json"
         controller.request.json = """{"mapping":"x"}"""
         controller.params.id           = loadItem.id
@@ -1057,6 +1062,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     def "map valid domains with xml"() {
+        controller.request.method = "POST"
         controller.response.format = "xml"
         controller.request.xml = """<mapping>x</mapping>"""
         controller.params.id           = loadItem.id

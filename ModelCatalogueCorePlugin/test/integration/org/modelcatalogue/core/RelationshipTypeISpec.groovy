@@ -192,7 +192,8 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
     def "data elements can be instantiated by valueDomain, valueDomains can instantiate in data elements"(){
 
 
-        def course = DataElement.get(de1.id)
+        setup:
+        def course = new DataElement(name:"testDataElement41351545423").save()
         def subjects = ValueDomain.get(vd.id)
 
         when:
@@ -228,6 +229,9 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         then:
         !course.instantiatedBy.contains(subjects)
         !subjects.instantiates.contains(course)
+
+        cleanup:
+        course.delete(flush:true)
     }
 
 }

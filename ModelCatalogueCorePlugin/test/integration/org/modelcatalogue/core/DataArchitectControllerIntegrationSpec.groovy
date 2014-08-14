@@ -21,7 +21,7 @@ def setupSpec(){
     //domainModellerService.modelDomains()
     loadFixtures()
     de1 = DataElement.findByName("DE_author")
-    de2 = DataElement.findByName("DE_author1")
+    de2 = DataElement.findByName("auth9")
     de3 = DataElement.findByName("AUTHOR")
     de4 = DataElement.findByName("auth4")
     de5 = DataElement.findByName("auth5")
@@ -123,12 +123,12 @@ def "json -  get uninstantiated data elements from the catalogue"(){
     then:
 
     json.success
-    json.total == 11
+    json.total == 10
     json.offset == 0
     json.page == 10
     json.list
     json.list.size() == 10
-    json.next == "/dataArchitect/uninstantiatedDataElements?max=10&offset=10"
+    json.next == ""
     json.previous == ""
 
 
@@ -241,11 +241,11 @@ def "json -  create dataElement relationships"(){
     then:
 
     json.success
-    json.total == 1
+    json.total == 2
     json.offset == 0
     json.page == 10
     json.list
-    json.list.size() == 1
+    json.list.size() == 2
     //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
     json.previous == ""
 
@@ -271,11 +271,11 @@ def "xml -  create dataElement relationships"(){
     then:
 
     xml.@success.text() == "true"
-    xml.@total.text() == "1"
+    xml.@total.text() == "2"
     xml.@offset.text() == "0"
     xml.@page.text() =="10000"
     xml.element
-    xml.element.size() == 1
+    xml.element.size() == 2
     //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
     xml.previous.text() == ""
 }

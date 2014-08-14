@@ -10,11 +10,12 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
 
 class DataImportService {
     static transactional = false
-    def publishedElementService, sessionFactory
+    def publishedElementService, sessionFactory, relationshipService
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
     private static final REGEX = '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
 
@@ -447,7 +448,7 @@ class DataImportService {
         ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, vdParams.unitOfMeasure)
         if (!vd) { vd = new ValueDomain(vdParams).save() }
         vd.addToIncludedIn(cd)
-        Relationship instantiated = vd.addToInstantiates(dataElement)
+        def instantiated = relationshipService.link(dataElement, vd, RelationshipType.instantiationType, false, true)
         instantiated.ext.put("Context" , cd.name)
         vd.save()
     }

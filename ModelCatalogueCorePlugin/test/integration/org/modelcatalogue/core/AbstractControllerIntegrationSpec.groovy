@@ -195,7 +195,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         created
         created.errors
         created.errors.size() >= 1
-        created.errors.first().field == "name"
+        created.errors.find{it.field == "name"}
         resource.count() == totalCount
 
         where:

@@ -30,6 +30,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     @Override
     @Transactional
     def update() {
+
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
             return
@@ -44,6 +45,8 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
             return
         }
 
+        def newVersion = params?.newVersion
+        def ext = params?.ext
         def oldProps = new HashMap(instance.properties)
         oldProps.remove('modelCatalogueId')
 
@@ -60,10 +63,29 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
 //        paramsToBind.remove 'ext'
 //        paramsToBind.remove 'versionCreated'
 
-        if (params.boolean('newVersion')) {
-            excludeParams.add('status')
-//            paramsToBind.remove 'status'
+
+        switch(response.format){
+
+            case "json":
+                if(!newVersion) newVersion = (request.JSON?.newVersion)?request.JSON?.newVersion.toBoolean():false
+                if(!ext) ext = request.JSON?.ext
+                break
+
+            case "xml":
+                if(!newVersion) newVersion = (request.XML?.newVersion)?request.XML?.newVersion.toBoolean():false
+                if(!ext) ext = request.XML?.ext
+                break
+
+            default:
+                newVersion = false
+                break
+
         }
+
+
+        if (newVersion) excludeParams.add('status')
+//            paramsToBind.remove 'status'
+
 
 //        helper.properties = paramsToBind
         bindData(helper, getObjectToBind(), [exclude: excludeParams])
@@ -74,11 +96,13 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
             return
         }
 
-        if (params.boolean('newVersion')) {
+
+
+        if (newVersion) {
             publishedElementService.archiveAndIncreaseVersion(instance)
         }
 
-        if (params.ext != null) {
+        if (ext) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
