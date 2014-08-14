@@ -10,6 +10,7 @@ class TestAction extends AbstractActionRunner {
         Parameters:
             fail: if set to 'true' the action will fail
             timeout: timeout to wait before finishing the execution
+            result: the result to be send to the dependant actions
     """
 
     @Override
@@ -19,6 +20,7 @@ class TestAction extends AbstractActionRunner {
 
     @Override
     void run() {
+        out << "Parameters were: $parameters"
         if (parameters.timeout) {
             Long timeout = parameters.timeout as Long
             out << "Waiting for $parameters.timeout as set in parameters\n"
@@ -29,5 +31,6 @@ class TestAction extends AbstractActionRunner {
         } else {
             out << "Test action finished successfully for $parameters"
         }
+        result = parameters.result
     }
 }

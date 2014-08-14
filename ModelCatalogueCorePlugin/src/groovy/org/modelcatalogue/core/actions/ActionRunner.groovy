@@ -81,4 +81,10 @@ public interface ActionRunner extends Runnable {
      * @return list of required parameters
      */
     List<String> getRequiredParameters()
+
+    /**
+     * Returns the result of the execution encoded as String.
+     * @return the result of the execution encoded as String
+     */
+    String getResult()
 }

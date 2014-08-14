@@ -159,7 +159,7 @@ class BootStrap {
 
                     assert !actionService.create(batch, TestAction, fail: true).hasErrors()
                     assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
-                    assert !actionService.create(batch, TestAction, timeout: 5000).hasErrors()
+                    assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
                     assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
 
                     println "Init finished in ${new Date()}"
