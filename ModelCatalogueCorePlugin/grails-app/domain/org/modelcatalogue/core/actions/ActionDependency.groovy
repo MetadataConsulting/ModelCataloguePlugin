@@ -7,6 +7,8 @@ import org.modelcatalogue.core.CatalogueElement
  */
 class ActionDependency {
 
+    String role
+
     /**
      * The action which depends on performing the action specified as provider.
      */
@@ -24,10 +26,11 @@ class ActionDependency {
             if (obj.provider == val) {
                 return false
             }
-            if (obj.provider && obj.provider.batch != val.batch) {
+            if (obj.provider && obj.provider.batch?.id != val.batch?.id) {
                 return "Actions must be from same batch"
             }
             return true
         }
+        role size: 1..100
     }
 }

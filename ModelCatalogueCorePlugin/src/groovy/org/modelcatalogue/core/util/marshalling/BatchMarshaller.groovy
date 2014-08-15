@@ -39,6 +39,8 @@ class BatchMarshaller extends AbstractMarshallers {
             ret[state.name().toLowerCase()] = [count: actionService.list(el as Batch, state).total, itemType: Action.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/actions/${state.name().toLowerCase()}"]
         }
 
+        ret['actions'] = [count: actionService.list(el as Batch).total, itemType: Action.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/actions/"]
+
         ret
     }
 

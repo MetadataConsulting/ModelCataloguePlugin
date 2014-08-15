@@ -15,4 +15,8 @@ class ActionParameter implements Extension {
         name size: 1..255
         extensionValue maxSize: 1000, nullable: true
     }
+
+    static mapping = {
+        sort 'name'
+    }
 }

@@ -7,6 +7,7 @@
 #= require modelcatalogue/util/ui/bs/index
 #= require catalogueElementView
 #= require importView
+#= require batchView
 #= require catalogueElementTreeview
 #= require catalogueElementTreeviewItem
 #= require catalogueElementProperties
@@ -25,6 +26,7 @@
 #= require modalPromptBasicEdit
 #= require modalPromptLogin
 #= require modalPromptMeasurementUnitEdit
+#= require modalPromptActionParametersEdit
 #= require modalPromptValueDomainEdit
 #= require modalPromptEnumeratedTypeEdit
 #= require modalPromptPublishedElement
@@ -42,6 +44,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.decoratedListTable'
   'mc.core.ui.bs.catalogueElementView'
   'mc.core.ui.bs.importView'
+  'mc.core.ui.bs.batchView'
   'mc.core.ui.bs.catalogueElementTreeview'
   'mc.core.ui.bs.catalogueElementTreeviewItem'
   'mc.core.ui.bs.catalogueElementProperties'
@@ -61,6 +64,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptMeasurementUnitEdit'
   'mc.core.ui.bs.modalPromptValueDomainEdit'
   'mc.core.ui.bs.modalPromptEnumeratedTypeEdit'
+  'mc.core.ui.bs.modalPromptActionParametersEdit'
   'mc.core.ui.bs.modalPromptPublishedElement'
   'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
 ])

@@ -19,7 +19,7 @@ class UpdateCatalogueElement extends AbstractActionRunner {
         performing the action.
 
         Parameters:
-            name: the name of the newly created element
+            id: the id of the element to be updated
             type: the catalogue element class name
 
             any other bindable parameter
@@ -30,7 +30,7 @@ class UpdateCatalogueElement extends AbstractActionRunner {
     String getMessage() {
         CatalogueElement fetched = queryForCatalogueElement()
         normalizeDescription """
-            Updates the ${GrailsNameUtils.getNaturalName(type.simpleName)} '$fetched.name' with following paramteres:
+            Update the ${GrailsNameUtils.getNaturalName(type.simpleName)} '$fetched.name' with following parameters:
 
 
 
@@ -95,7 +95,7 @@ class UpdateCatalogueElement extends AbstractActionRunner {
                     }
                 }
             }
-            out << "${GrailsNameUtils.getNaturalName(type.simpleName)} '$element.name' updated"
+            out << "<a href='#/catalogue/${GrailsNameUtils.getPropertyName(type)}/${element.id}'>${GrailsNameUtils.getNaturalName(type.simpleName)} '$element.name'</a> updated"
         } else {
             fail("Unable to update ${GrailsNameUtils.getNaturalName(type.simpleName)}:${id} using parameters ${parameters}")
             for (ObjectError error in element.errors.allErrors) {

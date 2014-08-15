@@ -7,6 +7,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.element  = element
 ])
 
+.controller('mc.core.ui.states.BatchCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+    $scope.element  = element
+])
+
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', ($scope, $stateParams, $state, $log, list, names, enhance) ->
     listEnhancer    = enhance.getEnhancer('list')
 
@@ -67,6 +71,25 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     url: '/catalogue'
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
+
+  $stateProvider.state('mc.actions', {
+    abstract: true,
+    url: "/actions/batch"
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  })
+
+  $stateProvider.state 'mc.actions.show', {
+    url: '/{id:\\d+}'
+    templateUrl: 'modelcatalogue/core/ui/state/batch.html'
+    resolve:
+      element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
+        $stateParams.resource = "batch"
+        return catalogueElementResource('batch').get($stateParams.id)
+      ]
+
+    controller: 'mc.core.ui.states.BatchCtrl'
+  }
+
   $stateProvider.state 'mc.resource', {
     abstract: true
     url: '/:resource'
@@ -344,6 +367,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
   $templateCache.put 'modelcatalogue/core/ui/state/dataImport.html', '''
     <div ng-show="element">
       <import-view element="element"></import-view>
+    </div>
+  '''
+
+  $templateCache.put 'modelcatalogue/core/ui/state/batch.html', '''
+    <div ng-show="element">
+      <batch-view batch="element"></batch-view>
     </div>
   '''
 
