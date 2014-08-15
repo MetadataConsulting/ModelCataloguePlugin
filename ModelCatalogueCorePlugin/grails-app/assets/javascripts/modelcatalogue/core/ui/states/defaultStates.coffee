@@ -30,7 +30,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       #"identifier","local identifier","local_identifier","local identifier","optional_local_identifier","optional local identifier"
       for key, value of ext
         if key.toLowerCase().indexOf("identifier") != -1
-          result += "#{value ? ''}, "
+          if value?.length   #if value is not empty or null
+            result += "#{value ? ''}, "
 
       if(result.indexOf(",") != -1)
         result = result.substring(0,result.lastIndexOf(","))
