@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 import static org.springframework.http.HttpStatus.OK
@@ -71,7 +72,7 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
 
         }
 
-        bindData(helper, getObjectToBind(), [exclude: excludeParams])
+        bindData(helper, getObjectToBind(), [include: includeFields])
 
         if (helper.hasErrors()) {
             reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
@@ -84,7 +85,7 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
 
         //instance.properties = objectToBind
 
-        bindData(instance, getObjectToBind(), [exclude: excludeParams])
+        bindData(instance, getObjectToBind(), [include: includeFields])
 
         instance.save flush:true
 
@@ -101,6 +102,13 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
                 reportCapableRespond instance, [status: OK]
             }
         }
+    }
+
+    @Override
+    protected getIncludeFields(){
+        def fields = super.includeFields
+        fields.removeAll(['extensions'])
+        fields
     }
 
 }

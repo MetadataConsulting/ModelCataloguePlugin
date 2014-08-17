@@ -306,4 +306,5 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     protected getDefaultSort()  { actionName == 'index' ? 'name'  : null }
     protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
+
 }

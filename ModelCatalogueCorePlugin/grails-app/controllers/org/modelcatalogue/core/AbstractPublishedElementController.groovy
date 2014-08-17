@@ -54,14 +54,18 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
 
         T helper = createResource(oldProps)
 
-
-        def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
-        def excludeParams = ['ext', 'versionCreated', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations']
-        excludeParams.addAll(relationshipDirections)
+//
+//        def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
+//        def excludeParams = ['ext', 'versionCreated', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations','elementType', 'elementTypes', 'elementTypeName', 'dateCreated', 'lastUpdated', 'link', 'availableReports', 'defaultExcludes', 'updatableProperties', '__enhancedBy']
+//        excludeParams.addAll(relationshipDirections)
 //        def paramsToBind = getParametersToBind()
 //        def ext = paramsToBind.ext
 //        paramsToBind.remove 'ext'
 //        paramsToBind.remove 'versionCreated'
+
+
+
+        def includeParams = includeFields
 
 
         switch(response.format){
@@ -82,13 +86,14 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
 
         }
 
+        if (newVersion) includeParams.remove('status')
 
-        if (newVersion) excludeParams.add('status')
+//        if (newVersion) excludeParams.add('status')
 //            paramsToBind.remove 'status'
 
 
 //        helper.properties = paramsToBind
-        bindData(helper, getObjectToBind(), [exclude: excludeParams])
+        bindData(helper, getObjectToBind(), [include: includeParams])
 
 
         if (helper.hasErrors()) {
@@ -106,7 +111,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
-        bindData(instance, getObjectToBind(), [exclude: excludeParams])
+        bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
 
         request.withFormat {
@@ -145,6 +150,13 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         reportCapableRespond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
             ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
         }
+    }
+
+    @Override
+    protected getIncludeFields(){
+        def fields = super.includeFields
+        fields.removeAll(['versionCreated'])
+        fields
     }
 
 }
