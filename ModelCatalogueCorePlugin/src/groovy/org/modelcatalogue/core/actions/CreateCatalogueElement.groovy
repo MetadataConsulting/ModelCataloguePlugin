@@ -18,7 +18,7 @@ class CreateCatalogueElement extends AbstractActionRunner {
         performing the action.
 
         Parameters:
-            id: the id of the element to be updated
+            name: the name of the newly created element
             type: the catalogue element class name
 
             any other bindable parameter
@@ -28,7 +28,7 @@ class CreateCatalogueElement extends AbstractActionRunner {
 
     String getMessage() {
         normalizeDescription """
-            Creates new ${GrailsNameUtils.getNaturalName(type.simpleName)} '$name' with following parameteres:
+            Create new ${GrailsNameUtils.getNaturalName(type.simpleName)} '$name' with following parameters:
 
 
 
@@ -73,7 +73,7 @@ class CreateCatalogueElement extends AbstractActionRunner {
                     element.addExtension key.substring(4), value
                 }
             }
-            out << "New ${GrailsNameUtils.getNaturalName(type.simpleName)} '$name' created"
+            out << "New <a href='#/catalogue/${GrailsNameUtils.getPropertyName(type)}/${element.id}'>${GrailsNameUtils.getNaturalName(type.simpleName)} '$name'</a> created"
         } else {
             fail("Unable to create new ${GrailsNameUtils.getNaturalName(type.simpleName)} using parameters ${parameters}")
             for (ObjectError error in element.errors.allErrors) {

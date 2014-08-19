@@ -27,7 +27,11 @@ class ActionService {
      * @param action action to be performed
      * @return future to the outcome of the action or the error message
      */
-    Future<ActionResult> run(Action action, List<Long> executionStack = []) {
+    Future<ActionResult> run(Action action) {
+        runInternal(action, true, false, [])
+    }
+
+    private Future<ActionResult> runInternal(Action action, boolean async, boolean ignorePerforming, List<Long> executionStack) {
         List<Long> currentExecutionStack = new ArrayList<Long>(executionStack)
         currentExecutionStack << action.id
 
@@ -37,8 +41,8 @@ class ActionService {
             return msg
         }
 
-        if (action.state != ActionState.PENDING) {
-            Future<ActionResult> msg = new FutureTask<ActionResult>({new ActionResult(outcome: "The action is already pending", failed: action.state == ActionState.FAILED)})
+        if (!(ignorePerforming && action.state == ActionState.PERFORMING) && action.state != ActionState.PENDING) {
+            Future<ActionResult> msg = new FutureTask<ActionResult>({new ActionResult(outcome: "The action is not pending", failed: action.state == ActionState.FAILED, result: action.result)})
             msg.run()
             return msg
         }
@@ -55,12 +59,6 @@ class ActionService {
         } else {
             action.state = ActionState.PERFORMING
             action.save(failOnError: true, flush: true)
-        }
-
-        Map<Long, Future<ActionResult>> dependenciesPerformed = [:]
-
-        for(ActionDependency dependency in action.dependsOn) {
-            dependenciesPerformed.put dependency.provider.id, run(dependency.provider, currentExecutionStack)
         }
 
         Long id = action.id
@@ -80,31 +78,36 @@ class ActionService {
                 PrintWriter pw = new PrintWriter(sw)
 
                 ActionRunner runner = createRunner(a.type)
-                runner.initWith(a.ext)
                 runner.out = pw
 
                 try {
-                    // this will cause waiting for all provider actions to be completed before the execution
-                    for (Map.Entry<Long, Future<ActionResult>> future in dependenciesPerformed) {
-                        ActionResult result = future.value.get()
-                        if (!result) {
-                            // bug in executor service
-                            // see https://github.com/basejump/grails-executor/issues/12
-                            Action provider = Action.get(future.key)
-                            if (provider.state == ActionState.FAILED) {
-                                a.state = ActionState.FAILED
-                                a.outcome = "Action(${future.key}) doesn't return any result. Considering this as failure."
-                                a.save(failOnError: true, flush: true)
-                                return new ActionResult(outcome: a.outcome, failed: true)
-                            }
-                        } else if (result.failed) {
+                    // first set all deps as pending
+                    for(ActionDependency dependency in a.dependsOn) {
+                        if (dependency.provider.state == ActionState.PENDING){
+                            dependency.provider.state = ActionState.PERFORMING
+                            dependency.provider.save(failOnError: true, flush: true)
+                        }
+                    }
+
+                    Map<String, String> parameters = [:]
+
+                    // than actually run, but ignoring the pending check
+                    for(ActionDependency dependency in a.dependsOn) {
+                        ActionResult result = runInternal(dependency.provider, false, true, currentExecutionStack).get()
+                        if (result.failed) {
                             String msgStart = 'Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\n'
                             a.state = ActionState.FAILED
                             a.outcome = result.outcome?.startsWith(msgStart) ? result.outcome : "$msgStart$result.outcome"
                             a.save(failOnError: true, flush: true)
                             return new ActionResult(outcome: a.outcome, failed: true)
+                        } else {
+                            parameters[dependency.role] = result.result
                         }
                     }
+
+                    parameters.putAll a.ext
+
+                    runner.initWith(parameters)
 
                     runner.run()
                     if (runner.failed) {
@@ -118,8 +121,9 @@ class ActionService {
                     a.state = ActionState.FAILED
                 }
                 a.outcome = sw.toString()
+                a.result = runner.result
                 a.save(failOnError: true, flush: true)
-                return new ActionResult(outcome: a.outcome, failed: a.state == ActionState.FAILED)
+                return new ActionResult(outcome: a.outcome, failed: a.state == ActionState.FAILED, result: runner.result)
             } catch (e) {
                 new DefaultStackTraceFilterer(true).filter(e)
                 String message = "Exception executing action $action.type with parameters $action.ext: ${e}"
@@ -128,7 +132,12 @@ class ActionService {
             }
 
         }
-        executorService.submit(job as Callable<ActionResult>)
+        if (async) {
+            return executorService.submit(job as Callable<ActionResult>)
+        }
+        FutureTask<ActionResult> task = new FutureTask(job)
+        task.run()
+        task
     }
 
     void dismiss(Action action){
@@ -155,7 +164,36 @@ class ActionService {
         }
     }
 
-    Action create(Map<String, String> parameters = [:], Batch batch, Class<? extends ActionRunner> runner, Action... dependsOn) {
+    Action updateParameters(Action action, Map<String, String> parameters) {
+        ActionRunner runnerInstance = createRunner(action.type)
+        Map<String, String> parameterErrors = runnerInstance.validate(parameters.collectEntries {key, value -> [key, value?.toString()]} as Map<String, String>)
+
+        parameterErrors.each { key, message ->
+            action.errors.rejectValue('extensions', "${action.type.name}.$key", message)
+        }
+
+        if (action.hasErrors()) {
+            return action
+        }
+
+        action.ext.clear()
+        action.ext.putAll parameters
+
+        action
+    }
+
+    /**
+     * Creates new action.
+     *
+     * If you pass actions as parameters values the become dependencies with role given by the key
+     * in the parameters map.
+     *
+     * @param parameters
+     * @param batch
+     * @param runner
+     * @return new action
+     */
+    Action create(Map<String, Object> parameters = [:], Batch batch, Class<? extends ActionRunner> runner) {
         Action created = new Action(type: runner, batch: batch)
         created.validate()
 
@@ -164,7 +202,7 @@ class ActionService {
         }
 
         ActionRunner runnerInstance = createRunner(runner)
-        Map<String, String> parameterErrors = runnerInstance.validate(parameters)
+        Map<String, String> parameterErrors = runnerInstance.validate(parameters.findAll{ key, value -> !(value instanceof Action)}.collectEntries {key, value -> [key, value?.toString()]} as Map<String, String>)
 
         parameterErrors.each { key, message ->
             created.errors.rejectValue('extensions', "${runner.name}.$key", message)
@@ -177,13 +215,18 @@ class ActionService {
         created.save(failOnError: true, flush: true)
 
         if (parameters) {
-            created.ext.putAll parameters
+            parameters.each { key, value ->
+                if (value instanceof Action) {
+                    return
+                }
+                created.addExtension(key, value?.toString())
+            }
         }
 
         batch.addToActions(created)
 
-        for (Action action in dependsOn) {
-            ActionDependency dependency = new ActionDependency(dependant: created, provider: action)
+        parameters.findAll{ key, value -> value instanceof Action }.each { String role, Action action ->
+            ActionDependency dependency = new ActionDependency(dependant: created, provider: action, role: role)
             dependency.save(failOnError: true, flush: true)
             created.addToDependsOn(dependency)
             action.addToDependencies(dependency)
@@ -193,13 +236,24 @@ class ActionService {
     }
 
     ListWithTotalAndType<Action> list(Map params = [:], Batch batch) {
-        list(params, batch, ActionState.PENDING)
+        list(params, batch, null)
     }
 
     ListWithTotalAndType<Action> list(Map params = [:], Batch batch, ActionState state) {
         Lists.fromCriteria(params, Action) {
-            eq 'state', state
+            if (state) {
+                eq 'state', state
+            }
             eq 'batch', batch
+            sort 'lastUpdated', 'asc'
+        }
+    }
+
+    ListWithTotalAndType<Action> listActive(Map params = [:], Batch batch) {
+        Lists.fromCriteria(params, Action) {
+            ne 'state', ActionState.DISMISSED
+            eq 'batch', batch
+            sort 'lastUpdated', 'asc'
         }
     }
 

@@ -11,7 +11,15 @@ class Action implements Extendible {
 
     ActionState state = ActionState.PENDING
 
+    /**
+     * The text to be shown to the users.
+     */
     String outcome
+
+    /**
+     * Result to be consumed by dependant actions.
+     */
+    String result
 
     // time stamping
     Date dateCreated
@@ -24,11 +32,7 @@ class Action implements Extendible {
     static constraints = {
         outcome maxSize: 10000, nullable: true, bindable: false
         state bindable: false
-    }
-
-    static mapping = {
-        dependsOn lazy: false
-
+        result maxSize: 1000, nullable: true, bindable: false
     }
 
     static transients = ['ext']

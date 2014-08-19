@@ -3,13 +3,21 @@ package org.modelcatalogue.core.actions
 public interface ActionRunner extends Runnable {
 
     /**
-     * Returns the print writer where can the action record it's progress or errors.
+     * Returns the print writer where can the action record it's results or errors.
+     *
+     * The text written to out writer is the only text displayed for actions performed (in pre tag for failures and
+     * as HTML for successful results).
+     *
      * @return the print writer where can the action record it's progress or errors
      */
     PrintWriter getOut()
 
     /**
-     * Sets the print writer where can the action record it's progress or errors.
+     * Sets the print writer where can the action record it's results or errors.
+     *
+     * The text written to out writer is the only text displayed for actions performed (in pre tag for failures and
+     * as HTML for successful results).
+     *
      * @param writer the print writer where can the action record it's progress or errors
      */
     void setOut(PrintWriter writer)
@@ -73,4 +81,10 @@ public interface ActionRunner extends Runnable {
      * @return list of required parameters
      */
     List<String> getRequiredParameters()
+
+    /**
+     * Returns the result of the execution encoded as String.
+     * @return the result of the execution encoded as String
+     */
+    String getResult()
 }

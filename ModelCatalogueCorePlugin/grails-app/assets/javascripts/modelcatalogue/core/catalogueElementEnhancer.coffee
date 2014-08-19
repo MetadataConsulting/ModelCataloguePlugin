@@ -38,7 +38,9 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
           self.update         = () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload()
           self.show           = () ->
-            if(self.elementTypeName=="Data Import")
+            if self.elementType == "org.modelcatalogue.core.actions.Batch"
+              $state.go('mc.actions.show', {id: self.id}); self
+            else if self.elementTypeName == "Data Import"
               $state.go('mc.dataArchitect.imports.show', {id: self.id}); self
             else
               $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}); self

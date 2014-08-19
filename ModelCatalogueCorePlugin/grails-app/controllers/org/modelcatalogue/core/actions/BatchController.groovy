@@ -8,7 +8,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def actionService
 
-    static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST']
+    static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT']
 
     @Override
     protected String getRoleForSaveAndEdit() {
@@ -32,6 +32,38 @@ class BatchController extends AbstractRestfulController<Batch> {
     }
 
 
+    def updateActionParameters() {
+
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (!params.actionId) {
+            notFound()
+            return
+        }
+
+        Action action = Action.lock(params.long('actionId'))
+
+        if (!action) {
+            notFound()
+            return
+        }
+
+        if (action.state in [ActionState.PERFORMING, ActionState.PERFORMED]) {
+            render status: HttpStatus.METHOD_NOT_ALLOWED
+            return
+        }
+        actionService.updateParameters(action, request.getJSON())
+
+        if (action.hasErrors()) {
+            respond action.errors
+            return
+        }
+        respond action
+    }
+
     def listActions(Integer max) {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
@@ -53,7 +85,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
         ActionState state = params.state ? ActionState.valueOf(params.state.toString().toUpperCase()) : null
 
-        reportCapableRespond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params.state ?: 'pending'}", "actions", actionService.list(params, batch, state))
+        reportCapableRespond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params.state ?: ''}", "actions", actionService.list(params, batch, state))
     }
 
     def dismiss() {

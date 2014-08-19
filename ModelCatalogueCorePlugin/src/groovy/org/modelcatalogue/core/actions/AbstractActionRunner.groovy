@@ -19,6 +19,8 @@ abstract class AbstractActionRunner implements ActionRunner {
 
     private boolean failed = false
 
+    String result
+
 
     @Override
     void initWith(Map<String, String> params) {

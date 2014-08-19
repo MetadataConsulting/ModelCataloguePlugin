@@ -360,4 +360,128 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
+
+  actionsProvider.registerAction 'run-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and $scope.action.state == 'PENDING'
+
+    {
+      position: 200
+      type:     'success'
+      icon:     'play'
+      label:    'Run'
+      action:   ->
+        $scope.action.run().then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+  ]
+
+
+
+  actionsProvider.registerAction 'dismiss-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and $scope.action.state == 'PENDING'
+
+    {
+      position: 500
+      type:     'danger'
+      icon:     'remove'
+      label:    'Dismiss'
+      action:   ->
+        $scope.action.dismiss().then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+  ]
+
+
+
+  actionsProvider.registerAction 'reactivate-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and $scope.action.state == 'DISMISSED'
+
+    {
+      position: 200
+      type:     'success'
+      icon:     'repeat'
+      label:    'Reactivate'
+      action:   ->
+        $scope.action.reactivate().then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+  ]
+
+  actionsProvider.registerAction 'repeat-action', ['$scope', ($scope) ->
+    return undefined unless $scope.action and $scope.action.state == 'FAILED'
+
+    {
+      position: 900
+      type:     'success'
+      icon:     'repeat'
+      label:    'Retry'
+      action:   ->
+        $scope.action.reactivate().then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+  ]
+
+
+  actionsProvider.registerAction 'reload-actions', ['$scope', ($scope) ->
+    return undefined unless angular.isFunction($scope.reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
+
+    {
+      position: 900
+      type:     'success'
+      icon:     'refresh'
+      label:    'Reload'
+      action:   ->
+        $scope.reload()
+    }
+  ]
+
+
+  actionsProvider.registerAction 'run-all-actions-in-batch', ['$scope', '$q', ($scope, $q) ->
+    return undefined unless $scope.pendingActions and not $scope.action
+
+    runAllAction = {
+      position: 200
+      type:     'success'
+      icon:     'play'
+      label:    'Run All Pending'
+      action:   ->
+        promises = []
+        for action in $scope.pendingActions
+          promises.push action.run() if action.state == 'PENDING' and action.dependencies.length == 0
+        $q.all(promises).then ->
+          $scope.reload() if angular.isFunction($scope.reload)
+    }
+
+    $scope.$watch 'pendingActions', (pendingActions) ->
+      runAllAction.disabled = pendingActions.length == 0
+
+    runAllAction
+  ]
+
+
+
+  actionsProvider.registerAction 'update-action-parameters', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+    return undefined if not $scope.action
+    return undefined if not security.hasRole('CURATOR')
+
+    action =
+      position:   100
+      label:      'Update Action Parameters'
+      icon:       'edit'
+      type:       'primary'
+      action:     ->
+        messages.prompt('Update Action Parameters', '', {type: 'update-action-parameters', action: $scope.action}).then (updated)->
+          $scope.action = updated
+
+    updateAction = ->
+      action.disabled = $scope.action.state in ['PERFORMING', 'PERFORMED']
+
+    $scope.$watch 'action.state', updateAction
+
+    updateAction()
+
+    return action
+
+  ]
+
 ]

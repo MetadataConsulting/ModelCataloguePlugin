@@ -29,7 +29,10 @@ class ActionMarshaller extends AbstractMarshallers {
                 elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
-                state: el.state?.toString()
+                state: el.state?.toString(),
+                result: el.result,
+                dependsOn: el.dependsOn.collectEntries { [it.provider.id, it.role] } + [length: el.dependsOn.size()],
+                dependencies: el.dependencies.collectEntries { [it.dependant.id, it.role] } + [length: el.dependencies.size()] ,
         ]
 
         if (el.batch) {
