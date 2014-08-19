@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
+import grails.converters.JSON
 import grails.util.GrailsNameUtils
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * Created by adammilward on 27/02/2014.
@@ -98,6 +100,35 @@ class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerI
                 [1, 5, 10, 0, 5, "", ""],
                 [2, 5, 5, 0, 5, "", ""],
         ]
+    }
+
+    def "new Test for json"(){
+
+        def x = new Model(name:"test").save(flush:true)
+
+        when:
+
+//        def string2 = '{"modelCatalogueId":" ' + x.modelCatalogueId + '", "name":"adam123123","description":"test","version":0,"elementType":"org.modelcatalogue.core.Model","elementTypes":["org.modelcatalogue.core.Model","org.modelcatalogue.core.PublishedElement","org.modelcatalogue.core.ExtendibleElement","org.modelcatalogue.core.CatalogueElement"],"elementTypeName":"Model","dateCreated":"2014-08-15T13:02:27.000Z","lastUpdated":"2014-08-15T13:02:27.000Z","link":"/model/ ' + x.id + '","availableReports":[{"title":"Export All Elements of test to XML","url":"/ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/dataArchitect/getSubModelElements?format=xml&asset=true&name=Export+All+Elements+of+test+to+XML&id=182","type":"ASSET"},{"title":"","url":"/ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/model?asset=true&name=","type":"ASSET"}],"ext":{},"versionNumber":1,"status":"DRAFT","versionCreated":"2014-08-15T13:02:27.000Z","defaultExcludes":["id","elementTypeName","elementType","elementTypes","incomingRelationships","outgoingRelationships","link","mappings"],"updatableProperties":["modelCatalogueId","archived","name","description","version","dateCreated","lastUpdated","relationships","hasContextOf","childOf","hasAttachmentOf","contains","parentOf","relatedTo","availableReports","ext","versionNumber","status","versionCreated","history"],"__enhancedBy":["catalogueElement"]}'
+
+        def string2 = '{"modelCatalogueId":"' + x.modelCatalogueId + '","archived":false,"name":"adam123123","description":"test","version":0,"elementType":"org.modelcatalogue.core.Model","elementTypes":["org.modelcatalogue.core.Model","org.modelcatalogue.core.PublishedElement","org.modelcatalogue.core.ExtendibleElement","org.modelcatalogue.core.CatalogueElement"],"elementTypeName":"Model","dateCreated":"2014-08-15T13:02:27.000Z","lastUpdated":"2014-08-15T13:02:27.000Z","link":"/model/182","availableReports":[{"title":"Export All Elements of test to XML","url":"/ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/dataArchitect/getSubModelElements?format=xml&asset=true&name=Export+All+Elements+of+test+to+XML&id=182","type":"ASSET"},{"title":"","url":"/ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/model?asset=true&name=","type":"ASSET"}],"ext":{},"versionNumber":1,"status":"DRAFT","versionCreated":"2014-08-15T13:02:27.000Z","defaultExcludes":["id","elementTypeName","elementType","elementTypes","incomingRelationships","outgoingRelationships","link","mappings"],"updatableProperties":["modelCatalogueId","archived","name","description","version","dateCreated","lastUpdated","relationships","hasContextOf","childOf","hasAttachmentOf","contains","parentOf","relatedTo","availableReports","ext","versionNumber","status","versionCreated","history"],"__enhancedBy":["catalogueElement"]}'
+
+        def json2 =  new JSONObject(string2)
+
+        controller.params.id  = x.id
+        controller.request.method = "PUT"
+        controller.request.format = "json"
+        controller.request.content = string2.getBytes()
+        controller.request.makeAjaxRequest()
+
+        controller.update()
+
+        def response2 = controller.response.json
+
+        then:
+        response2.name == "adam123123"
+
+
+
     }
 
 }

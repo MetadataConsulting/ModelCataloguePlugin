@@ -22,6 +22,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
         Integer numberOfCurrentVersions = another.countVersions()
 
         when:
+        controller.request.method       = 'PUT'
         controller.params.id            = another.id
         controller.params.newVersion    = true
         controller.request.json         = [name: newName]
@@ -150,5 +151,8 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
             publishedElementService.archiveAndIncreaseVersion(el)
         }
     }
+
+
+
 
 }

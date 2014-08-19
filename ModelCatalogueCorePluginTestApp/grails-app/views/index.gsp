@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +41,7 @@
 </head>
 
 <body>
-<div id="metadataCurator" ng-app="metadataCurator">
+<div id="metadataCurator" ng-app="metadataCurator" >
 
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">

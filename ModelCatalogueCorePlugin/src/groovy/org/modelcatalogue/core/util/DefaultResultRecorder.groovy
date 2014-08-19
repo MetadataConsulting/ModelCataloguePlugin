@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.util
 
 import grails.converters.JSON
+import grails.converters.XML
 import groovy.util.slurpersupport.GPathResult
 import groovy.xml.XmlUtil
 import org.codehaus.groovy.grails.web.json.JSONElement
@@ -30,6 +31,16 @@ class DefaultResultRecorder implements ResultRecorder {
 
         @Override
         File recordInputXML(String fixtureName, String xml) {
+            return null
+        }
+
+        @Override
+        File recordInputXML(String fixtureName, Map xml) {
+            return null
+        }
+
+        @Override
+        File recordInputXML(String fixtureName, XML xml) {
             return null
         }
     }
@@ -91,6 +102,19 @@ class DefaultResultRecorder implements ResultRecorder {
         fixtureFile.text = getXmlFixtureText(xml)
         fixtureFile
     }
+
+    File recordInputXML(String fixtureName, Map xml) {
+        File fixtureFile = newFixture(xmlFixturesRoot, domainClass, fixtureName, xmlFixturesSuffix)
+        fixtureFile.text = getXmlFixtureText(new XML(xml).toString())
+        fixtureFile
+    }
+
+    File recordInputXML(String fixtureName, XML xml) {
+        File fixtureFile = newFixture(xmlFixturesRoot, domainClass, fixtureName, xmlFixturesSuffix)
+        fixtureFile.text = getXmlFixtureText(xml.toString())
+        fixtureFile
+    }
+
 
 
     private static File newFixture(String filePath, prefix, fixtureName, suffix){

@@ -42,7 +42,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        test "org.modelcatalogue:simple-fixtures:0.1.3"
+        //test "org.modelcatalogue:simple-fixtures:0.1.3"
     }
 
     plugins {
@@ -54,13 +54,14 @@ grails.project.dependency.resolution = {
         compile ":asset-pipeline:1.9.4"
         compile ":coffee-asset-pipeline:1.8.0"
         compile ":less-asset-pipeline:1.9.0"
-        compile ":hibernate:3.6.10.8"
+//        runtime ":hibernate4:4.3.5.5"
+        runtime  ":hibernate:3.6.10.17"
 
         compile ":excel-export:0.2.1"
         compile ":executor:0.3"
 
-        test ':build-test-data:1.1.1'
-        test ':fixtures:1.2'
+        test ':build-test-data:2.1.2'
+        test ':fixtures:1.3'
 
         // codenarc static analysis
         build ":codenarc:0.20"
@@ -68,7 +69,7 @@ grails.project.dependency.resolution = {
         // test coverage
         test ":code-coverage:1.2.7"
 
-        build ":tomcat:7.0.50"
+        build ":tomcat:7.0.55"
 
     }
 }
