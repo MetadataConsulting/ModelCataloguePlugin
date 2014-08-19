@@ -334,4 +334,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         fields
     }
 
+    @Override
+    protected getObjectToBind(){
+        if(request.format=='json') return request.JSON
+        request
+    }
+
 }

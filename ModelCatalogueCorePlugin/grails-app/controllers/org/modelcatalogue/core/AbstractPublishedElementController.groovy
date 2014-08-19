@@ -45,7 +45,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
             return
         }
 
-        def newVersion = params?.newVersion
+        def newVersion = Boolean.valueOf(params?.newVersion)
         def ext = params?.ext
         def oldProps = new HashMap(instance.properties)
         oldProps.remove('modelCatalogueId')
@@ -155,7 +155,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     @Override
     protected getIncludeFields(){
         def fields = super.includeFields
-        fields.removeAll(['versionCreated'])
+        fields.removeAll(['versionCreated', 'versionNumber'])
         fields
     }
 
