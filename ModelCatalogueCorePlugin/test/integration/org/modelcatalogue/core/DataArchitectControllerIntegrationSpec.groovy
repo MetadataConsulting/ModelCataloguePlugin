@@ -33,8 +33,8 @@ def setupSpec(){
     de2.addToInstantiatedBy(vd)
     md.addToParentOf(md2)
 
-    de1.ext.put("Data item No.", "C1031")
-    de2.ext.put("Optional_Local_Identifier", "C1031")
+    de1.ext.put("Data item No.", "C10311")
+    de2.ext.put("Optional_Local_Identifier", "C10311")
 }
 
 def cleanupSpec(){
@@ -46,6 +46,7 @@ def cleanupSpec(){
     md.delete(flush:true)
     md2.refresh()
     md2.delete(flush:true)
+    de2.removeFromInstantiatedBy(vd)
 }
 
 def "json get sub model elements"(){
@@ -123,12 +124,12 @@ def "json -  get uninstantiated data elements from the catalogue"(){
     then:
 
     json.success
-    json.total == 10
+    json.total == 11
     json.offset == 0
     json.page == 10
     json.list
     json.list.size() == 10
-    json.next == ""
+    json.next == "/dataArchitect/uninstantiatedDataElements?max=10&offset=10"
     json.previous == ""
 
 
@@ -241,11 +242,11 @@ def "json -  create dataElement relationships"(){
     then:
 
     json.success
-    json.total == 2
+    json.total == 1
     json.offset == 0
     json.page == 10
     json.list
-    json.list.size() == 2
+    json.list.size() == 1
     //json.next == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
     json.previous == ""
 
@@ -271,11 +272,11 @@ def "xml -  create dataElement relationships"(){
     then:
 
     xml.@success.text() == "true"
-    xml.@total.text() == "2"
+    xml.@total.text() == "1"
     xml.@offset.text() == "0"
     xml.@page.text() =="10000"
     xml.element
-    xml.element.size() == 2
+    xml.element.size() == 1
     //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
     xml.previous.text() == ""
 }
