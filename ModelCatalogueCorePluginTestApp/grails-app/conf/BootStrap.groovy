@@ -93,7 +93,7 @@ class BootStrap {
         new Requestmap(url: '/asset/download/*',             configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY',   httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
         new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.POST).save(failOnError: true)
         new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.PUT).save(failOnError: true)
-
+        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.DELETE).save(failOnError: true)
 //        new Requestmap(url: '/api/modelCatalogue/core/model/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save(failOnError: true)
 //        new Requestmap(url: '/api/modelCatalogue/core/dataElement/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 //        new Requestmap(url: '/api/modelCatalogue/core/dataType/**', configAttribute: 'ROLE_USER').save(failOnError: true)
