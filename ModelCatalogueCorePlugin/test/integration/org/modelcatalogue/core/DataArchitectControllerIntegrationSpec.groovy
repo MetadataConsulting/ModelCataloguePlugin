@@ -124,11 +124,11 @@ def "json -  get uninstantiated data elements from the catalogue"(){
     then:
 
     json.success
-    json.total > 10
+    json.total >= 10
     json.offset == 0
     json.page == 10
     json.list
-    json.list.size() > 10
+    json.list.size() >= 10
     json.next == "/dataArchitect/uninstantiatedDataElements?max=10&offset=10"
     json.previous == ""
 
