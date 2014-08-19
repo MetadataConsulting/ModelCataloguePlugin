@@ -124,11 +124,11 @@ def "json -  get uninstantiated data elements from the catalogue"(){
     then:
 
     json.success
-    json.total >= 10
+    json.total == 11
     json.offset == 0
     json.page == 10
     json.list
-    json.list.size() >= 10
+    json.list.size() == 10
     json.next == "/dataArchitect/uninstantiatedDataElements?max=10&offset=10"
     json.previous == ""
 
@@ -251,36 +251,34 @@ def "json -  create dataElement relationships"(){
     json.previous == ""
 
 }
+@Unroll
+def "xml -  create dataElement relationships"(){
+    def controller = new DataArchitectController()
+    ResultRecorder recorder = DefaultResultRecorder.create(
+            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+            "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+            "dataArchitect"
+    )
 
+    when:
+    controller.response.format = "xml"
+    controller.params.put("keyOne", "Data item No.")
+    controller.params.put("keyTwo", "Optional_Local_Identifier")
+    controller.findRelationsByMetadataKeys()
+    GPathResult xml = controller.response.xml
+    String list = "dataElement_Relationships"
+    recorder.recordResult list, xml
 
-//@Unroll
-//def "xml -  create dataElement relationships"(){
-//    def controller = new DataArchitectController()
-//    ResultRecorder recorder = DefaultResultRecorder.create(
-//            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-//            "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-//            "dataArchitect"
-//    )
-//
-//    when:
-//    controller.response.format = "xml"
-//    controller.params.put("keyOne", "Data item No.")
-//    controller.params.put("keyTwo", "Optional_Local_Identifier")
-//    controller.findRelationsByMetadataKeys()
-//    GPathResult xml = controller.response.xml
-//    String list = "dataElement_Relationships"
-//    recorder.recordResult list, xml
-//
-//    then:
-//
-//    xml.@success.text() == "true"
-//    xml.@total.text() == "1"
-//    xml.@offset.text() == "0"
-//    xml.@page.text() =="10000"
-//    xml.element
-//    xml.element.size() == 1
-//    //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
-//    xml.previous.text() == ""
-//}
+    then:
+
+    xml.@success.text() == "true"
+    xml.@total.text() == "1"
+    xml.@offset.text() == "0"
+    xml.@page.text() =="10000"
+    xml.element
+    xml.element.size() == 1
+    //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
+    xml.previous.text() == ""
+}
 
 }
