@@ -2,6 +2,8 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.PublishedElements
+import org.modelcatalogue.core.util.Relationships
+import org.modelcatalogue.core.util.SimpleListWrapper
 
 
 class ClassificationController extends AbstractCatalogueElementController<Classification> {
@@ -17,8 +19,18 @@ class ClassificationController extends AbstractCatalogueElementController<Classi
             notFound()
             return
         }
+//        List<PublishedElement> items
+//        items.addAll(classification.classifies)
+//
+//        SimpleListWrapper<PublishedElement> elements = new SimpleListWrapper<PublishedElement>(
+//                base: "/${resourceName}/${params.id}/classifies",
+//                total: items.size(),
+//                items: items,
+//        )
+//        reportCapableRespond new PublishedElements(list: withLinks(elements))
 
-        reportCapableRespond new PublishedElements(list: Lists.fromCriteria(params, PublishedElement, "/${resourceName}/${params.id}/classifies", "classifies"){
+
+        reportCapableRespond new PublishedElements(list: Lists.fromCriteria(params, PublishedElement, , "classifies"){
             eq "classifications", classification
         })
 
