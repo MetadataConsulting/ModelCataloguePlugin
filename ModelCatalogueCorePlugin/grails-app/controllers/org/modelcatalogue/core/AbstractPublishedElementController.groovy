@@ -50,20 +50,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         def oldProps = new HashMap(instance.properties)
         oldProps.remove('modelCatalogueId')
 
-//        T helper = resource.newInstance()
-
         T helper = createResource(oldProps)
-
-//
-//        def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
-//        def excludeParams = ['ext', 'versionCreated', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations','elementType', 'elementTypes', 'elementTypeName', 'dateCreated', 'lastUpdated', 'link', 'availableReports', 'defaultExcludes', 'updatableProperties', '__enhancedBy']
-//        excludeParams.addAll(relationshipDirections)
-//        def paramsToBind = getParametersToBind()
-//        def ext = paramsToBind.ext
-//        paramsToBind.remove 'ext'
-//        paramsToBind.remove 'versionCreated'
-
-
 
         def includeParams = includeFields
 
@@ -88,11 +75,6 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
 
         if (newVersion) includeParams.remove('status')
 
-//        if (newVersion) excludeParams.add('status')
-//            paramsToBind.remove 'status'
-
-
-//        helper.properties = paramsToBind
         bindData(helper, getObjectToBind(), [include: includeParams])
 
 

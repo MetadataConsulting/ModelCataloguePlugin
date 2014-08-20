@@ -65,6 +65,7 @@ Model catalogue core plugin (metadata registry)
             marshallers = [
                     new AssetMarshaller(),
                     new ConceptualDomainMarshaller(),
+                    new ClassificationMarshaller(),
                     new DataElementMarshaller(),
                     new DataTypeMarshaller(),
                     new ElementsMarshaller(),

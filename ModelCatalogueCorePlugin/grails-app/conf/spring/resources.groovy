@@ -4,6 +4,7 @@ beans = {
     customObjectMarshallers( ModelCatalogueCorePluginCustomObjectMarshallers ) {
         marshallers = [
                             new ConceptualDomainMarshaller(),
+                            new ClassificationMarshaller(),
                             new DataElementMarshaller(),
                             new DataTypeMarshaller(),
                             new ElementsMarshaller(),
