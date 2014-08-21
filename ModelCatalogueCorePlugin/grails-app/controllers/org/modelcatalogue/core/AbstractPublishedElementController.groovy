@@ -83,8 +83,6 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
             return
         }
 
-
-
         if (newVersion) {
             publishedElementService.archiveAndIncreaseVersion(instance)
         }

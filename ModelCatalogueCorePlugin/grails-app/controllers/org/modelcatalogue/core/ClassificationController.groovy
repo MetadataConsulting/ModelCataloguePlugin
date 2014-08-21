@@ -37,18 +37,18 @@ class ClassificationController extends AbstractCatalogueElementController<Classi
 //        }
 
 
-        def c = PublishedElement.createCriteria()
-        def results = c.list {
-            classifications{
-                idEq(classification.id)
-            }
-        }
-
+//        def c = PublishedElement.createCriteria()
+//        def results = c.list {
+//            classifications{
+//                idEq(classification.id)
+//            }
+//        }
+//
 
 
         reportCapableRespond new PublishedElements(list: Lists.fromCriteria(params, PublishedElement, "/${resourceName}/${params.id}/classifies", "classifies"){
             classifications{
-                idEq(classification.id)
+                eq 'id', classification.id
             }
         })
 
