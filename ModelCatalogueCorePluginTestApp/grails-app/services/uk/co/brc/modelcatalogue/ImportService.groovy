@@ -96,7 +96,7 @@ class ImportService {
                         de.ext.put("E2", tokens[17].take(255))
 
 
-                        de.addToInstantiatedBy(vd)
+                        de.valueDomain = vd
                         de.addToContainedIn(models)
 
                         //de.addToDataElementValueDomains(vd);

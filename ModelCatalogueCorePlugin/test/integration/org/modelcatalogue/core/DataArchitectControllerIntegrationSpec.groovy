@@ -30,7 +30,7 @@ def setupSpec(){
     md2 = new Model(name:"testModel2").save()
     md.addToContains(de1)
     md2.addToContains(de3)
-    de2.addToInstantiatedBy(vd)
+    de2.valueDomain = vd
     md.addToParentOf(md2)
 
     de1.ext.put("Data item No.", "C10311")
@@ -46,7 +46,6 @@ def cleanupSpec(){
     md.delete(flush:true)
     md2.refresh()
     md2.delete(flush:true)
-    de2.removeFromInstantiatedBy(vd)
 }
 
 def "json get sub model elements"(){

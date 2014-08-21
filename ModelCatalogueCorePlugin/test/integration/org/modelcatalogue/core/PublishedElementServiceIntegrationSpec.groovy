@@ -53,7 +53,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
         author.ext.something = 'anything'
-        author.addToInstantiatedBy(domain)
+        author.valueDomain = domain
 
         int originalVersion     = author.versionNumber
         DataElement archived    = publishedElementService.archiveAndIncreaseVersion(author)
