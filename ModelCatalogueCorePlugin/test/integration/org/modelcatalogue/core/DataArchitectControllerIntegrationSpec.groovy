@@ -21,7 +21,7 @@ def setupSpec(){
     //domainModellerService.modelDomains()
     loadFixtures()
     de1 = DataElement.findByName("DE_author")
-    de2 = DataElement.findByName("DE_author1")
+    de2 = DataElement.findByName("auth9")
     de3 = DataElement.findByName("AUTHOR")
     de4 = DataElement.findByName("auth4")
     de5 = DataElement.findByName("auth5")
@@ -33,8 +33,8 @@ def setupSpec(){
     de2.addToInstantiatedBy(vd)
     md.addToParentOf(md2)
 
-    de1.ext.put("Data item No.", "C1031")
-    de2.ext.put("Optional_Local_Identifier", "C1031")
+    de1.ext.put("Data item No.", "C10311")
+    de2.ext.put("Optional_Local_Identifier", "C10311")
 }
 
 def cleanupSpec(){
@@ -46,6 +46,7 @@ def cleanupSpec(){
     md.delete(flush:true)
     md2.refresh()
     md2.delete(flush:true)
+    de2.removeFromInstantiatedBy(vd)
 }
 
 def "json get sub model elements"(){

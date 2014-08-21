@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.OK
 
 class AbstractPublishedElementController<T> extends AbstractExtendibleElementController<T> {
 
-    def publishedElementService
+    def publishedElementService, relationshipTypeService
 
     AbstractPublishedElementController(Class<T> type, boolean readOnly) {
         super(type, readOnly)
@@ -30,6 +30,7 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
     @Override
     @Transactional
     def update() {
+
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
             return
@@ -44,34 +45,73 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
             return
         }
 
+        def newVersion = Boolean.valueOf(params?.newVersion)
+        def ext = params?.ext
         def oldProps = new HashMap(instance.properties)
-
         oldProps.remove('modelCatalogueId')
+
+//        T helper = resource.newInstance()
 
         T helper = createResource(oldProps)
 
-        def paramsToBind = getParametersToBind()
-        def ext = paramsToBind.ext
-        paramsToBind.remove 'ext'
-        paramsToBind.remove 'versionCreated'
+//
+//        def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
+//        def excludeParams = ['ext', 'versionCreated', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations','elementType', 'elementTypes', 'elementTypeName', 'dateCreated', 'lastUpdated', 'link', 'availableReports', 'defaultExcludes', 'updatableProperties', '__enhancedBy']
+//        excludeParams.addAll(relationshipDirections)
+//        def paramsToBind = getParametersToBind()
+//        def ext = paramsToBind.ext
+//        paramsToBind.remove 'ext'
+//        paramsToBind.remove 'versionCreated'
 
-        if (params.boolean('newVersion')) {
-            paramsToBind.remove 'status'
-            publishedElementService.archiveAndIncreaseVersion(instance)
+
+
+        def includeParams = includeFields
+
+
+        switch(response.format){
+
+            case "json":
+                if(!newVersion) newVersion = (request.JSON?.newVersion)?request.JSON?.newVersion.toBoolean():false
+                if(!ext) ext = request.JSON?.ext
+                break
+
+            case "xml":
+                if(!newVersion) newVersion = (request.XML?.newVersion)?request.XML?.newVersion.toBoolean():false
+                if(!ext) ext = request.XML?.ext
+                break
+
+            default:
+                newVersion = false
+                break
+
         }
 
-        helper.properties = paramsToBind
+        if (newVersion) includeParams.remove('status')
+
+//        if (newVersion) excludeParams.add('status')
+//            paramsToBind.remove 'status'
+
+
+//        helper.properties = paramsToBind
+        bindData(helper, getObjectToBind(), [include: includeParams])
+
 
         if (helper.hasErrors()) {
             reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
             return
         }
 
-        if (ext != null) {
+
+
+        if (newVersion) {
+            publishedElementService.archiveAndIncreaseVersion(instance)
+        }
+
+        if (ext) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
-        instance.properties = paramsToBind
+        bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
 
         request.withFormat {
@@ -110,6 +150,13 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         reportCapableRespond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
             ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
         }
+    }
+
+    @Override
+    protected getIncludeFields(){
+        def fields = super.includeFields
+        fields.removeAll(['versionCreated', 'versionNumber'])
+        fields
     }
 
 }

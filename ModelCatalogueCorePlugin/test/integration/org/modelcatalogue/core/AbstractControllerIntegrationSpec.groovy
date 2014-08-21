@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.converters.XML
 import grails.rest.RestfulController
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
@@ -194,7 +195,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         created
         created.errors
         created.errors.size() >= 1
-        created.errors.first().field == "name"
+        created.errors.find{it.field == "name"}
         resource.count() == totalCount
 
         where:
@@ -233,9 +234,10 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
         when:
         controller.response.format = "xml"
-        def xml = resource.newInstance(newInstance).encodeAsXML()
-        recordInputXML "createInput", xml
-        controller.request.xml = xml
+        controller.request.method = 'POST'
+        def xml = resource.newInstance(newInstance)
+        recordInputXML "createInput", xml.encodeAsXML()
+        controller.request.setXML(xml as XML)
         controller.save()
         GPathResult created = controller.response.xml
         def stored = resource.findByName(newInstance.name)
@@ -270,6 +272,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         controller.response.format = "json"
         controller.params.id = loadItem.id
         controller.request.json = json
+        controller.request.method = 'PUT'
         recordInputJSON 'updateInput', json
         controller.update()
         JSONObject updated = controller.response.json
@@ -295,11 +298,12 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         loadItem
 
         when:
+        controller.request.method = 'PUT'
         controller.response.format = "xml"
         controller.params.id = loadItem.id
-        def xml = instance.encodeAsXML()
-        controller.request.xml = xml
-        recordInputXML "updateInput", xml
+        def xml = instance
+        recordInputXML "updateInput", xml.encodeAsXML()
+        controller.request.setXML(xml as XML)
         controller.update()
         GPathResult updated = controller.response.xml
         recordResult 'updateOk', updated
@@ -318,6 +322,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         !resource.findByName("")
 
         when:
+        controller.request.method = 'PUT'
         controller.response.format = "xml"
         def xml = resource.newInstance(badInstance).encodeAsXML()
         controller.request.xml = xml
@@ -346,6 +351,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         instance
 
         when:
+        controller.request.method = 'PUT'
         controller.response.format = "json"
         controller.params.id = instance.id
         controller.request.json = [name: "g" * 256]
@@ -372,6 +378,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         instance
 
         when:
+        controller.request.method = 'PUT'
         controller.response.format = "xml"
         controller.params.id = instance.id
         def xml = resource.newInstance(badInstance).encodeAsXML()
@@ -389,6 +396,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
     def "Return 404 for non-existing item as JSON"() {
+
         controller.response.format = "json"
         controller.params.id = "1000000"
         controller.show()
@@ -622,6 +630,16 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
     @Override
     File recordInputXML(String fixtureName, String xml) {
+        recorder.recordInputXML(fixtureName, xml)
+    }
+
+    @Override
+    File recordInputXML(String fixtureName, Map xml) {
+        recorder.recordInputXML(fixtureName, xml)
+    }
+
+    @Override
+    File recordInputXML(String fixtureName, XML xml) {
         recorder.recordInputXML(fixtureName, xml)
     }
 

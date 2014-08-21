@@ -6,34 +6,32 @@ import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 
 import static org.springframework.http.HttpStatus.OK
 
-//TODO implement custom resource binding for xml enumerated type
-//at present we clear the errors
 
 class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
+
+    def relationshipTypeService
 
     EnumeratedTypeController() {
         super(EnumeratedType)
     }
 
     @Override
-    protected EnumeratedType createResource(Map params) {
+    protected EnumeratedType createResource() {
+        EnumeratedType instance = resource.newInstance()
+        def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
+        def excludeParams = ['ext', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations']
+        excludeParams.addAll(relationshipDirections)
 
-        def json = request.getJSON()
-        if(json){
-            def instance = super.createResource(json)
-            return instance
-        }
-
-        def xml = request.getXML()
-        if(xml){
-            EnumeratedType instance = super.createResource(params)
-            //TODO implement
-            instance.clearErrors()
-            instance.enumerations = getXMLEnumerations(xml)
+        if(request.format=='xml'){
+            excludeParams.add('enumerations')
+            bindData instance, getObjectToBind(), [exclude: excludeParams]
+            instance.enumerations = getXMLEnumerations(request.getXML())
             instance.save()
-            return instance
+            instance
+        }else{
+            bindData instance, getObjectToBind(), [exclude: excludeParams]
+            instance
         }
-
     }
 
     private static Map getXMLEnumerations(GPathResult xml){
@@ -71,17 +69,17 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
         }
 
 
-        if(request.format == "json"){
-            instance.properties = request.getJSON()
-        }else{
-            instance.properties = getParametersToBind()
-        }
+        def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
+        def excludeParams = ['ext', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations']
+        excludeParams.addAll(relationshipDirections)
 
         if(request.format == "xml"){
-            instance.clearErrors()
-            def xml = request.getXML()
-            instance.enumerations = getXMLEnumerations(xml)
+            excludeParams.add('enumerations')
+            bindData(instance, getObjectToBind(), [exclude: excludeParams])
+            instance.enumerations = getXMLEnumerations(request.getXML())
             instance.save()
+        }else{
+            bindData(instance, getObjectToBind(), [exclude: excludeParams])
         }
 
         if (instance.hasErrors()) {

@@ -231,6 +231,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
         showTabs = false
+
         if not activeTabSet
           for tab in tabs
             if not tab.disabled
@@ -240,6 +241,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               break
         else
           showTabs = true
+          loadTab($scope.property)
 
         $scope.tabs = tabs
         $scope.showTabs = showTabs

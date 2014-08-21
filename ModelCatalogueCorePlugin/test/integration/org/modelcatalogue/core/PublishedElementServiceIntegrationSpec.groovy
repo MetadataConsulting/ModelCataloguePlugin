@@ -48,7 +48,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
     def "create new version"() {
-        DataElement author      = DataElement.findByName('DE_author')
+        DataElement author      = DataElement.findByName('auth8')
         ValueDomain domain      = ValueDomain.findByName('value domain test1')
 
 
@@ -59,6 +59,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         DataElement archived    = publishedElementService.archiveAndIncreaseVersion(author)
         int archivedVersion     = archived.versionNumber
         int newVersion          = author.versionNumber
+        author.refresh()
 
         expect:
         author != archived

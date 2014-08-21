@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.converters.XML
 import grails.rest.RestfulController
 import grails.transaction.Transactional
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
@@ -89,7 +90,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if(handleReadOnly()) {
             return
         }
-        def instance = createResource(getParametersToBind())
+        def instance = createResource()
 
         instance.validate()
         if (instance.hasErrors()) {
@@ -149,7 +150,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if(handleReadOnly()) {
             return
         }
-        def instance = createResource(getParametersToBind())
+        def instance = createResource()
 
         instance.validate()
         if (instance.hasErrors()) {
@@ -194,7 +195,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        instance.properties = getParametersToBind()
+        bindData instance, getObjectToBind(), [include: includeFields]
 
         if (instance.hasErrors()) {
             respond instance.errors, view:'edit' // STATUS CODE 422
@@ -216,16 +217,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             }
         }
     }
-
-
-    protected Map getParametersToBind() {
-        Map ret = params
-        if (response.format == 'json') {
-            ret = request.getJSON()
-        }
-        ret
-    }
-
 
 
     /**
@@ -334,6 +325,19 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     protected void notAuthorized() {
         render status: HttpStatus.UNAUTHORIZED
+    }
+
+    protected getIncludeFields(){
+        GrailsDomainClass clazz = grailsApplication.getDomainClass(resource.name)
+        def fields = clazz.persistentProperties.collect{it.name}
+        fields.removeAll(['dateCreated','lastUpdated','incomingMappings', 'incomingRelationships', 'modelCatalogueId', 'outgoingMappings', 'outgoingRelationships'])
+        fields
+    }
+
+    @Override
+    protected getObjectToBind(){
+        if(request.format=='json') return request.JSON
+        request
     }
 
 }

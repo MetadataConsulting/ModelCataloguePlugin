@@ -36,7 +36,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     }
 
     @Override
-    protected RelationshipType createResource(Map params) {
+    protected RelationshipType createResource() {
 
         def json = request.getJSON()
         if(json){

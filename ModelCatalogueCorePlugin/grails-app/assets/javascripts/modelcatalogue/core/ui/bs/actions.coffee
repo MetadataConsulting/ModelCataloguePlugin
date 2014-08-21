@@ -86,7 +86,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerAction 'edit-catalogue-element', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerAction 'edit-catalogue-element', ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if $scope.element.elementTypeName == 'Data Import'
     return undefined if not security.hasRole('CURATOR')
@@ -106,13 +106,14 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
+    $rootScope.$on 'newVersionCreated', updateAction
 
     return action
 
   ]
 
 
-  actionsProvider.registerAction 'create-new-version', ['$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($scope, messages, names, security, catalogueElementResource) ->
+  actionsProvider.registerAction 'create-new-version', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -127,6 +128,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true}).then (updated) ->
           $scope.element = updated
           messages.success("New version created for #{$scope.element.name}")
+          $rootScope.$broadcast 'newVersionCreated', $scope.element
     }
   ]
 

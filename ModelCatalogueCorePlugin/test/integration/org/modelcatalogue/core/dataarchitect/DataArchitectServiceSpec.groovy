@@ -18,7 +18,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
     def setupSpec(){
         loadFixtures()
         de1 = DataElement.findByName("DE_author")
-        de2 = DataElement.findByName("DE_author1")
+        de2 = DataElement.findByName("auth7")
         de3 = DataElement.findByName("AUTHOR")
         de4 = DataElement.findByName("auth4")
         de5 = DataElement.findByName("auth5")
@@ -43,6 +43,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         de1.refresh()
         md.removeFromContains(de1)
         md.delete(flush:true)
+        de2.removeFromInstantiatedBy(vd)
     }
 
     def "find relationships and action them"() {

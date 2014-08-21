@@ -35,6 +35,12 @@ class RelationshipService {
                     relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new data elements to {0} models. Please create a new version before adding any additional elements")
                     return relationshipInstance
                 }
+
+                if (relationshipType.name == "instantiation" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED) {
+                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new value domain elements to {0} data element. Please create a new version before adding any additional values")
+                    return relationshipInstance
+                }
+
             }
         }
 
@@ -54,10 +60,16 @@ class RelationshipService {
             if(!ignoreRules) {
                 if (source.instanceOf(PublishedElement) || destination.instanceOf(PublishedElement)) {
                     if (relationshipType.name == "containment" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED) {
-                        relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version before removing any additional elements")
+                        relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version before removing any additional elements")
                         return relationshipInstance
                     }
                 }
+
+                if (relationshipType.name == "instantiation" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED) {
+                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add new value domain elements to {0} data element. Please create a new version before adding any additional values")
+                    return relationshipInstance
+                }
+
             }
 
             if (relationshipInstance && source && destination) {
