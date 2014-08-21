@@ -136,8 +136,7 @@ class DomainModellerService {
             println "contains"
             def dataElements = model.contains
             dataElements.each{ DataElement dataElement->
-                def instantiatedBy = dataElement.instantiatedBy
-                println " -- ${dataElement.name} (${instantiatedBy[0].dataType.name}) (${instantiatedBy[0].description})"
+                println " -- ${dataElement.name} (${dataElement.valueDomain.name}) (${dataElement.valueDomain.description})"
             }
         }
     }

@@ -9,17 +9,23 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
     }
 
 
-    def valueDomains(Integer max){
+    def dataElements(Integer max){
         handleParams(max)
-        DataType dataType = queryForResource(params.id)
-        if (!dataType) {
+
+        Boolean all = params.boolean('all')
+
+        ValueDomain valueDomain = queryForResource(params.id)
+        if (!valueDomain) {
             notFound()
             return
         }
 
-        reportCapableRespond new DataElements(list: Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain", "valueDomains"){
-            eq "dataType", dataType
-        })
+        reportCapableRespond Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement", "dataElements"){
+            eq "valueDomain", valueDomain
+            if (!all) {
+                'in'('status', [PublishedElementStatus.FINALIZED, PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING])
+            }
+        }
 
     }
 

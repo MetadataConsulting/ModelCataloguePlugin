@@ -21,7 +21,7 @@ def setupSpec(){
     //domainModellerService.modelDomains()
     loadFixtures()
     de1 = DataElement.findByName("DE_author")
-    de2 = DataElement.findByName("auth9")
+    de2 = DataElement.findByName("auth7")
     de3 = DataElement.findByName("AUTHOR")
     de4 = DataElement.findByName("auth4")
     de5 = DataElement.findByName("auth5")
@@ -30,7 +30,6 @@ def setupSpec(){
     md2 = new Model(name:"testModel2").save()
     md.addToContains(de1)
     md2.addToContains(de3)
-    de2.valueDomain = vd
     md.addToParentOf(md2)
 
     de1.ext.put("Data item No.", "C10311")

@@ -23,14 +23,15 @@ class SearchISpec extends AbstractIntegrationSpec{
 
     def setupSpec(){
         loadFixtures()
-        de = DataElement.findByName("DE_author1")
+        de = DataElement.findByName("auth7")
         vd = ValueDomain.findByName("value domain Celsius")
         cd = ConceptualDomain.findByName("public libraries")
         mod = Model.findByName("book")
         relationshipService = new RelationshipService()
 
+
+
         relationshipService.link(cd, mod, RelationshipType.findByName("context"))
-        relationshipService.link(de, vd, RelationshipType.findByName("instantiation"))
         relationshipService.link(mod, de, RelationshipType.findByName("containment"))
     }
 

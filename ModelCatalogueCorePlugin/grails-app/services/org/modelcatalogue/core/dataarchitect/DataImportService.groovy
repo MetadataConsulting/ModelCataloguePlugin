@@ -402,7 +402,7 @@ class DataImportService {
     //update data element given value domain info
     protected DataElement updateDataElement(DataImport importer, Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd, Map metadata, Model model, ConceptualDomain conceptualDomain) {
         Boolean dataElementChanged = checkDataElementForChanges(params, metadata, dataElement)
-        ValueDomain vd = dataElement.instantiatedBy.find { it.includedIn.contains(cd) }
+        ValueDomain vd = dataElement.valueDomain
         Boolean valueDomainChanged = checkValueDomainForChanges(vdParams, vd, cd)
 
         if (dataElementChanged || valueDomainChanged) {
@@ -448,8 +448,8 @@ class DataImportService {
         ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, vdParams.unitOfMeasure)
         if (!vd) { vd = new ValueDomain(vdParams).save() }
         vd.addToIncludedIn(cd)
-        def instantiated = relationshipService.link(dataElement, vd, RelationshipType.instantiationType, false, true)
-        instantiated.ext.put("Context" , cd.name)
+        dataElement.valueDomain = vd
+        vd.addToDataElements(dataElement)
         vd.save()
     }
 
