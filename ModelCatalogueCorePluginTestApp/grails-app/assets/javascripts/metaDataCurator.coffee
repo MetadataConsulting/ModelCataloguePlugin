@@ -28,7 +28,7 @@ metadataCurator = angular.module('metadataCurator', [
 ])
 
 metadataCurator.config ['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider)->
-  $urlRouterProvider.otherwise("/catalogue/model/all")
+  $urlRouterProvider.otherwise("/dashboard")
 ]
 
 metadataCurator.run ['$templateCache', ($templateCache) ->

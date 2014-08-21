@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.hibernate.Criteria
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.PublishedElements
 import org.modelcatalogue.core.util.Relationships
@@ -19,8 +20,9 @@ class ClassificationController extends AbstractCatalogueElementController<Classi
             notFound()
             return
         }
-//        List<PublishedElement> items
-//        items.addAll(classification.classifies)
+//        List items = []
+//        def classifications = classification.classifies
+//        items.addAll(classifications)
 //
 //        SimpleListWrapper<PublishedElement> elements = new SimpleListWrapper<PublishedElement>(
 //                base: "/${resourceName}/${params.id}/classifies",
@@ -30,8 +32,24 @@ class ClassificationController extends AbstractCatalogueElementController<Classi
 //        reportCapableRespond new PublishedElements(list: withLinks(elements))
 
 
-        reportCapableRespond new PublishedElements(list: Lists.fromCriteria(params, PublishedElement, , "classifies"){
-            eq "classifications", classification
+//        def x = PublishedElement.withCriteria {
+//            ", classification
+//        }
+
+
+        def c = PublishedElement.createCriteria()
+        def results = c.list {
+            classifications{
+                idEq(classification.id)
+            }
+        }
+
+
+
+        reportCapableRespond new PublishedElements(list: Lists.fromCriteria(params, PublishedElement, "/${resourceName}/${params.id}/classifies", "classifies"){
+            classifications{
+                idEq(classification.id)
+            }
         })
 
     }

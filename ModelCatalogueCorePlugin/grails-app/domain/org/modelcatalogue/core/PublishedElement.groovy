@@ -13,6 +13,8 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     Date versionCreated = new Date()
 
+    Set classifications = []
+
     static searchable = {
         except = ['versionNumber']
     }

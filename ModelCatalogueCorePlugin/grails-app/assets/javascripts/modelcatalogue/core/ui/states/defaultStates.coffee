@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
+angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.security'])
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
     $scope.element  = element
 ])
@@ -11,6 +11,30 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.element  = element
 ])
 
+.controller('mc.core.ui.states.DashboardCtrl', ['$scope', '$stateParams', '$state', '$log', 'user', ($scope, $stateParams, $state, $log, user) ->
+    $scope.user  = user
+    $scope.totalDataElementCount = 512
+    $scope.draftDataElementCount = 12
+    $scope.finalizedDataElementCount = 500
+    $scope.totalDataSetCount = 5
+    $scope.draftDataSetCount = 1
+    $scope.finalizedDataSetCount = 4
+    $scope.totalModelCount = 10
+    $scope.draftModelCount = 1
+    $scope.finalizedModelCount = 9
+    $scope.pendingActions = 0
+    $scope.failedActions = 0
+    $scope.batches = 1
+    $scope.uninstantiatedDataElements = 12
+    $scope.relationshipTypes = 14
+    $scope.suggestedRelationships = 0
+    $scope.measurementUnits = 0
+    $scope.dataTypes = 0
+    $scope.valueDomains = 0
+
+])
+
+
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', ($scope, $stateParams, $state, $log, list, names, enhance) ->
     listEnhancer    = enhance.getEnhancer('list')
 
@@ -18,6 +42,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.title                    = names.getNaturalName($stateParams.resource)
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
+    $scope.status                   = if $stateParams.status then $stateParams.status.charAt(0).toUpperCase() + $stateParams.status.slice(1) else 'Finalized'
     $scope.contained                = $scope.$new(true)
     $scope.contained.noStatusSwitch = $scope.$new(true)
     $scope.contained.list           = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
@@ -66,6 +91,17 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
 .config(['$stateProvider', ($stateProvider) ->
 
   DEFAULT_ITEMS_PER_PAGE = 10
+
+
+  $stateProvider.state 'dashboard', {
+      url: '/dashboard'
+      templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
+      controller: 'mc.core.ui.states.DashboardCtrl'
+      resolve:
+        user: ['security', (security) ->
+          if security.getCurrentUser() then return security.getCurrentUser().displayName else return ''
+        ]
+  }
 
   $stateProvider.state 'mc', {
     abstract: true
@@ -330,15 +366,15 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     <div ng-if="resource == 'model'">
       <div class="row">
         <div class="col-md-4">
-          <h2>
-            Model Hierarchy
-            <contextual-actions size="sm" icon-only="true" group="true" no-colors="true"></contextual-actions>
+          <h3>
+            {{status}} Models
+            <contextual-actions class="pull-right" size="sm" icon-only="true" group="true" no-colors="true"></contextual-actions>
             </span>
-          </h2>
+          </h3>
         </div>
         <div class="col-md-8">
 
-          <h3 ng-show="contained.element">{{contained.element.name}} Data Elements
+          <h3 ng-show="contained.element">Data Elements contained in {{contained.element.name}}
             <span class="pull-right">
               <contextual-actions size="sm" no-colors="true" icon-only="true" scope="contained"></contextual-actions>
             </span>
@@ -376,6 +412,277 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       <batch-view batch="element"></batch-view>
     </div>
   '''
+
+  $templateCache.put 'modelcatalogue/core/ui/state/dashboard.html', '''
+    		<!-- Jumbotron -->
+  <div hide-if-logged-in>
+		<div class="jumbotron">
+			<h1>Model Catalogue</h1>
+			<p class="lead">
+				<b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b>
+				new pathways, forms, data storage, studies. <b><em>Generate</em></b> better
+				software components
+			</p>
+
+      <form ng-submit="login()" ng-controller="metadataCurator.loginCtrl">
+         <button class="btn btn-large btn-primary" type="submit">Login <i class="glyphicon glyphicon-log-in"></i></button>
+         <a href="" class="btn btn-large btn-primary" >Sign Up <i class="glyphicon glyphicon-pencil"></i></a>
+      </form>
+    </div>
+
+		<!-- Example row of columns -->
+		<div id="info" class="row">
+      <div class="col-sm-4">
+				<h2>Architecture</h2>
+				<p>Track your data elements from collection - model services,
+					databases and warehouses. Generate your own feeds, and generate
+					components for integration engines.</p>
+				<p>
+					<a href="#">More info&hellip;</a>
+				</p>
+			</div>
+			<div class="col-sm-4">
+				<h2>Forms</h2>
+				<p>Build forms from standard data elements in our friendly
+					drag-n-drop interface. Export your forms to your favourite tool.</p>
+				<p>
+					<a href="#">Coming soon&hellip;</a>
+				</p>
+			</div>
+      <div class="col-sm-4">
+				<h2>Pathways</h2>
+				<p>Design your workflows and visualise your patient pathways.
+					Annotate nodes with data elements, forms, and decisions.
+					Automatically build databases, dashboard interfaces and reporting
+					data.</p>
+				<p>
+					<a href="#">Coming soon&hellip;</a>
+				</p>
+			</div>
+
+		</div>
+</div>
+
+<div show-for-role="ADMIN" >
+    <div class="jumbotron">
+      <h1>Welcome back {{user}}</h1>
+      <p class="lead"> this is your dashboard </p>
+    </div>
+      <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-cubes fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a href="#"> Finalized Data Sets</a> {{finalizedDataSetCount}} </div>
+                                        <div>  <a href="#">Draft Data Sets</a> {{draftDataSetCount}}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create New Data Set</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-cube fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Finalized Models</a> {{finalizedModelCount}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Models</a> {{draftModelCount}}</div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create New Model</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-tasks fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
+                                        <div><a id="modelsLink" ui-sref="mc.dataArchitect.uninstantiatedDataElements" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElements}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create Data Elements</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+      </div>
+      <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-bell-o fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"> Batches </a> {{batches}} </div>
+                                        <div>Pending Actions {{pendingActions}} </div>
+                                        <div>Failed Actions {{failedActions}} </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create New Batch</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-book fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedModelCount}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftModelCount}}</div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create New Asset</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-exchange fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypes}}</div>
+                                        <div><a href="#">Suggested Relationships</a> {{suggestedRelationships}} </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create Relationships</span>
+                                    <span class="pull-right"><i class="fa fa-magic"s></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+      </div>
+<div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-cubes fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a href="#"> Finalized Data Sets</a> {{finalizedDataSetCount}} </div>
+                                        <div>  <a href="#">Draft Data Sets</a> {{draftDataSetCount}}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create New Data Set</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-cube fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Finalized Models</a> {{finalizedModelCount}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Models</a> {{draftModelCount}}</div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create New Model</span>
+                                    <span class="pull-right"><i class="fa fa-money"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <i class="fa fa-tasks fa-5x" style="color:#428bca"></i>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Measurement Units</a> {{measurementUnits}} </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="#">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create Measurement Unit</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+      </div>
+    </div>
+  '''
+
+
 
 ])
 # debug states
