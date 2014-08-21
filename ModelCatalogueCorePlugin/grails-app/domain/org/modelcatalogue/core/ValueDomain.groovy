@@ -53,6 +53,9 @@ class ValueDomain extends ExtendibleElement  {
     Boolean multiple = Boolean.FALSE
 
     static belongsTo = [dataType: DataType]
+
+    static hasMany = [dataElements: DataElement]
+
     static transients = ['regexDef']
 
     static constraints = {
@@ -69,7 +72,7 @@ class ValueDomain extends ExtendibleElement  {
 
 
     static relationships = [
-        incoming: [inclusion: 'includedIn', instantiation: 'instantiates', base: 'basedOn', union: 'unitedIn'],
+        incoming: [inclusion: 'includedIn', base: 'basedOn', union: 'unitedIn'],
         outgoing: [base: 'isBaseFor', union: 'unionOf']
     ]
 
