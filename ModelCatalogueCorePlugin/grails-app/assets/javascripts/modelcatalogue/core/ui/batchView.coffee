@@ -24,7 +24,6 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
       $scope.loading = true
 
       $scope.natural = (name)->
-        console.log name
         names.getNaturalName(name)
 
       loadActions = (loader, pendingActions = [], performedActions = []) ->
@@ -57,10 +56,8 @@ angular.module('mc.core.ui.batchView', ['mc.core.catalogueElementEnhancer', 'mc.
       $scope.highlight = (idsToRoles)->
         for action in $scope.pendingActions
           action.highlighted = idsToRoles[action.id]
-          console.log action
         for action in $scope.performedActions
           action.highlighted = idsToRoles[action.id]
-          console.log action
 
         ids = []
 

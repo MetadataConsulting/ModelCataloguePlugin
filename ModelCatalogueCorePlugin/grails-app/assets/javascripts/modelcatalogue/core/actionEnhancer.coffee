@@ -8,6 +8,10 @@ angular.module('mc.core.actionEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc
         enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{action.link}/dismiss"
       action.reactivate = ->
         enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{action.link}/reactivate"
+      action.addDependency = (providerId, role)->
+        enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{action.link}/dependsOn", params: { providerId: providerId, role: role }
+      action.removeDependency = (role)->
+        enhance rest method: 'DELETE', url: "#{modelCatalogueApiRoot}#{action.link}/dependsOn", params: { role: role }
       action.updateParameters = ->
         enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{action.link}/parameters", data: @parameters
       action

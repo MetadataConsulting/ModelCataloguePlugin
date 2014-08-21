@@ -8,7 +8,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
     def actionService
 
-    static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT']
+    static allowedMethods = [index: 'GET', actions: 'GET', run: 'POST', reactivate: 'POST', dismiss: 'POST', updateActionParameters: 'PUT', addDependency: 'POST', removeDependency: 'DELETE']
 
     @Override
     protected String getRoleForSaveAndEdit() {
@@ -152,5 +152,71 @@ class BatchController extends AbstractRestfulController<Batch> {
 
         actionService.run(action)
         respond status: HttpStatus.OK
+    }
+
+    def addDependency() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (!params.actionId || !params.providerId || !params.role) {
+            notFound()
+            return
+        }
+
+        Action action = Action.get(params.long('actionId'))
+
+        if (!action) {
+            notFound()
+            return
+        }
+
+
+
+        Action provider = Action.get(params.long('providerId'))
+
+        if (!provider) {
+            notFound()
+            return
+        }
+
+
+        ActionDependency dependency = actionService.addDependency(action, provider, params.role.toString())
+
+        if (!dependency) {
+            respond status: HttpStatus.METHOD_NOT_ALLOWED
+        }
+
+        respond action
+    }
+
+    def removeDependency() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (!params.actionId || !params.role) {
+            notFound()
+            return
+        }
+
+        Action action = Action.get(params.long('actionId'))
+
+        if (!action) {
+            notFound()
+            return
+        }
+
+
+        ActionDependency dependency = actionService.removeDependency(action, params.role.toString())
+
+        if (!dependency) {
+            notFound()
+            return
+        }
+
+        respond action
     }
 }

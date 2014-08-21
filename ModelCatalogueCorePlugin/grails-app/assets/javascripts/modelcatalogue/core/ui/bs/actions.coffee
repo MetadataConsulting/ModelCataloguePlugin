@@ -435,6 +435,62 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerAction 'link-actions', ['$scope', '$rootScope', 'messages',($scope, $rootScope, messages) ->
+    return undefined unless $scope.action and not ($scope.action.state == 'PERFORMING' or $scope.action.state == 'PERFORMED')
+
+    action = {
+      position: 950
+      type:     'primary'
+      icon:     'open'
+      label:    'Add or Remove Dependency'
+      action:   ->
+        if $rootScope.selectedAction == $scope.action
+          $rootScope.selectedAction = undefined
+        else
+          if @mode == 'select'
+            $rootScope.selectedAction = $scope.action
+          else
+            selected = $rootScope.selectedAction
+            if @mode == 'add'
+              messages.prompt('Add Dependency', 'Please, provide the name of the role for the new dependency').then (role) ->
+                selected.addDependency($scope.action.id, role).then ->
+                  $scope.reload() if angular.isFunction($scope.reload)
+            else if @mode == 'remove'
+              messages.confirm('Remove Dependency', 'Do you really want to remove dependency between these two actions? This may cause problems executing given action!').then ->
+                selected.removeDependency(selected.dependsOn['' + $scope.action.id]).then ->
+                  $scope.reload() if angular.isFunction($scope.reload)
+            $rootScope.selectedAction = undefined
+
+
+    }
+
+    $rootScope.$watch 'selectedAction', (selectedAction) ->
+      if selectedAction
+        if selectedAction == $scope.action
+          action.active = true
+          action.icon = 'open'
+          action.label = 'Add or Remove Dependency'
+          action.mode = 'select'
+        else
+          action.active = false
+          if selectedAction.dependsOn.hasOwnProperty('' + $scope.action.id)
+            action.icon = 'remove-circle'
+            action.label = 'Remove Dependency'
+            action.mode = 'remove'
+          else
+            action.icon = 'save'
+            action.label = 'Select as Dependency'
+            action.mode = 'add'
+
+      else
+        action.icon = 'open'
+        action.active = false
+        action.label = 'Add or Remove Dependency'
+        action.mode = 'select'
+
+    action
+  ]
+
 
   actionsProvider.registerAction 'run-all-actions-in-batch', ['$scope', '$q', ($scope, $q) ->
     return undefined unless $scope.pendingActions and not $scope.action
@@ -462,6 +518,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   actionsProvider.registerAction 'update-action-parameters', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.action
+    return undefined if $scope.action.state in ['PERFORMING', 'PERFORMED']
     return undefined if not security.hasRole('CURATOR')
 
     action =

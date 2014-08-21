@@ -235,6 +235,28 @@ class ActionService {
         created
     }
 
+    ActionDependency addDependency(Action dependant, Action provider, String role) {
+        if (dependant.state in [ActionState.PERFORMED, ActionState.PERFORMING]) {
+            return null
+        }
+        ActionDependency dependency = new ActionDependency(dependant: dependant, provider: provider, role: role)
+        dependency.save(failOnError: true, flush: true)
+        dependant.addToDependsOn(dependency)
+        provider.addToDependencies(dependency)
+        dependency
+    }
+
+    ActionDependency removeDependency(Action dependant, String role) {
+        ActionDependency dependency = ActionDependency.findByDependantAndRole(dependant, role)
+        if (!dependency || dependant.state in [ActionState.PERFORMED, ActionState.PERFORMING]) {
+            return null
+        }
+        dependant.removeFromDependsOn(dependency)
+        dependency.provider.removeFromDependencies(dependency)
+        dependency.delete(flush: true)
+        dependency
+    }
+
     ListWithTotalAndType<Action> list(Map params = [:], Batch batch) {
         list(params, batch, null)
     }
