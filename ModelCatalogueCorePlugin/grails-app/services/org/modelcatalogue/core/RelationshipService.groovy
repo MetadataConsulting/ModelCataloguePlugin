@@ -29,6 +29,7 @@ class RelationshipService {
         )
 
         //specific rules when creating links to and from published elements
+        // TODO: it doesn't seem to be good idea place it here. would be nice if you can put it somewhere where it is more pluggable
         if(!ignoreRules) {
             if (source.instanceOf(PublishedElement) || destination.instanceOf(PublishedElement)) {
                 if (relationshipType.name == "containment" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED) {

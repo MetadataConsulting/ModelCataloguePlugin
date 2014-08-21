@@ -119,7 +119,21 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           if fn.itemType == 'org.modelcatalogue.core.Relationship' and security.hasRole('CURATOR')
             tabDefinition.actions.push {
-              title:  'Remove'
+              icon:   'edit'
+              type:   'primary'
+              action: (rel) ->
+                args = {relationshipType: rel.type, direction: rel.direction, type: 'new-relationship', update: true}
+                if rel.direction == 'destinationToSource'
+                  args.element = element
+                  args.relation = rel.relation
+                else
+                  args.element = rel.relation
+                  args.relation = element
+                messages.prompt('Update Relationship', '', args).then (updated)->
+                  console.log 'updated relationship:', updated
+#                  $scope.element = updated
+            }
+            tabDefinition.actions.push {
               icon:   'remove'
               type:   'danger'
               action: (rel) ->

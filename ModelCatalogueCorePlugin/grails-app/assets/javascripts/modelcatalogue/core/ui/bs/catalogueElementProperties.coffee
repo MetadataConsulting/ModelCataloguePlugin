@@ -1,13 +1,13 @@
 angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
   nameAndIdent = -> [
-    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-6', show: "relation.show()"}
+    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-5', show: "relation.show()"}
     {header: 'Identification',  value: "relation.elementTypeName + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()"}
   ]
 
   nameAndIdAndMetadata = -> [
-    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-4', show: "relation.show()"}
-    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-4', show: "relation.show()"}
+    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()"}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 

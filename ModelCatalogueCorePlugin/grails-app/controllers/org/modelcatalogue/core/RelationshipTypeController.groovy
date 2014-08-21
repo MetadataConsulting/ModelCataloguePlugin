@@ -125,7 +125,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
             }
             instance.properties = props
         }else{
-            instance.properties = getParametersToBind()
+            instance.properties = getObjectToBind()
         }
 
         if (instance.hasErrors()) {
