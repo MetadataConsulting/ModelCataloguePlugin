@@ -146,8 +146,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         6  | true  | [source: md1, destination: de1, relationshipType: RelationshipType.containmentType]
         7  | false | [source: new DataElement(name: 'parentModel'), destination: md1, relationshipType: RelationshipType.hierarchyType]
         8  | true  | [source: md1, destination: md1, relationshipType: RelationshipType.hierarchyType]
-        9  | false | [source: new DataElement(name: 'parentModel'), destination: md1, relationshipType: RelationshipType.inclusionType]
-        10 | true  | [source: cd1, destination: vd1, relationshipType: RelationshipType.inclusionType]
         14 | true  | [source: de1, destination: de2, relationshipType: reltype]
         15 | false | [source: cd1, destination: md1, relationshipType: RelationshipType.supersessionType]
         16 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType]

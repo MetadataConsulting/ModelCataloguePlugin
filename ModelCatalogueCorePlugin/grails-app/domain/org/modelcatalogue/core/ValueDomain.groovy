@@ -47,14 +47,15 @@ class ValueDomain extends ExtendibleElement  {
         except = ['incomingRelationships', 'outgoingRelationships']
     }
 
-	MeasurementUnit unitOfMeasure
-	String rule
+    DataType dataType
+    MeasurementUnit unitOfMeasure
 
+	String rule
     Boolean multiple = Boolean.FALSE
 
-    static belongsTo = [dataType: DataType]
+    static belongsTo = ConceptualDomain
 
-    static hasMany = [dataElements: DataElement]
+    static hasMany = [dataElements: DataElement, includedIn: ConceptualDomain]
 
     static transients = ['regexDef']
 
@@ -70,9 +71,8 @@ class ValueDomain extends ExtendibleElement  {
         }
     }
 
-
     static relationships = [
-        incoming: [inclusion: 'includedIn', base: 'basedOn', union: 'unitedIn'],
+        incoming: [base: 'basedOn', union: 'unitedIn'],
         outgoing: [base: 'isBaseFor', union: 'unionOf']
     ]
 

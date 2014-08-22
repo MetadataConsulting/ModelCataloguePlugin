@@ -61,7 +61,7 @@ class ImportServiceSpec extends Specification {
         def icodeEnumerations = new HashMap<String, String>(indicatorCode.enumerations)
         assert icodehash.entrySet().containsAll(icodeEnumerations.entrySet())
 
-        valueDomain.includedIn == [NHICConceptualDomain]
+        valueDomain.includedIn as Set == [NHICConceptualDomain] as Set
         valueDomain.dataElements as Set == [dataElement] as Set
 
     }

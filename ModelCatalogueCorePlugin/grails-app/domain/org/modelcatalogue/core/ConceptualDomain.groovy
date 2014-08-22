@@ -28,8 +28,10 @@ class ConceptualDomain extends CatalogueElement {
     }
 
     static relationships = [
-            outgoing: [context: 'isContextFor', inclusion: 'includes']
+            outgoing: [context: 'isContextFor']
     ]
+
+    static hasMany = [includes: ValueDomain]
 
 
     String toString() {

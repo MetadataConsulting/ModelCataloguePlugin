@@ -40,14 +40,12 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         RelationshipType dt2 = RelationshipType.findByName("context")
         RelationshipType dt3 = RelationshipType.findByName("supersession")
         RelationshipType dt4 = RelationshipType.findByName("hierarchy")
-        RelationshipType dt5 = RelationshipType.findByName("inclusion")
 
         then:
         dt1
         dt2
         dt3
         dt4
-        dt5
     }
 
 
@@ -109,21 +107,6 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         loaded.sourceToDestination == "parent of"
         loaded.destinationToSource == "child of"
         loaded.name == "hierarchy"
-
-    }
-
-    def "The inclusion is present withing default relations types"(){
-        when:
-        initCatalogueService.initDefaultRelationshipTypes()
-        RelationshipType loaded = RelationshipType.inclusionType
-
-        then:
-        loaded
-        loaded.sourceClass == ConceptualDomain
-        loaded.destinationClass == ValueDomain
-        loaded.sourceToDestination == "includes"
-        loaded.destinationToSource == "included in"
-        loaded.name == "inclusion"
 
     }
 
