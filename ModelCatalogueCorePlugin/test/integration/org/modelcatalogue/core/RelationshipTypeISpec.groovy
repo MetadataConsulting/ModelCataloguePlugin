@@ -155,27 +155,27 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         def subjects = ValueDomain.get(vd.id)
 
         when:
-        university.addToIncludes(subjects)
+        university.addToValueDomains(subjects)
 
         then:
-        university.includes
-        university.includes.contains(subjects)
+        university.valueDomains
+        university.valueDomains.contains(subjects)
         subjects.includedIn
         subjects.includedIn.contains(university)
 
         when:
-        university.removeFromIncludes(subjects)
+        university.removeFromValueDomains(subjects)
 
         then:
-        !university.includes
+        !university.valueDomains
         !subjects.includedIn
 
         when:
         subjects.addToIncludedIn(university)
 
         then:
-        university.includes
-        university.includes.contains(subjects)
+        university.valueDomains
+        university.valueDomains.contains(subjects)
         subjects.includedIn
         subjects.includedIn.contains(university)
 
@@ -183,7 +183,7 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
         subjects.removeFromIncludedIn(university)
 
         then:
-        !university.includes
+        !university.valueDomains
         !subjects.includedIn
 
     }

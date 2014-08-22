@@ -31,7 +31,7 @@ class ConceptualDomain extends CatalogueElement {
             outgoing: [context: 'isContextFor']
     ]
 
-    static hasMany = [includes: ValueDomain]
+    static hasMany = [valueDomains: ValueDomain]
 
 
     String toString() {
