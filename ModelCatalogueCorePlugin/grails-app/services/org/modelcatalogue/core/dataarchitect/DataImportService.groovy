@@ -9,8 +9,6 @@ import org.modelcatalogue.core.ExtendibleElement
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
 
 class DataImportService {
@@ -356,7 +354,7 @@ class DataImportService {
     protected Boolean checkValueDomainForChanges(Map params, ValueDomain valueDomain, ConceptualDomain cd){
         //ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, params.unitOfMeasure)
         if(valueDomain) {
-            if (!valueDomain.includedIn.contains(cd)) { return true }
+            if (!valueDomain.conceptualDomains.contains(cd)) { return true }
             if (valueDomain.unitOfMeasure != params.unitOfMeasure) { return true }
             if (params.dataType instanceof EnumeratedType && valueDomain.dataType instanceof EnumeratedType) {
                 if (valueDomain.dataType.enumAsString != params.dataType.enumAsString) { return true }
@@ -447,7 +445,7 @@ class DataImportService {
     protected ValueDomain importValueDomain(Map vdParams, DataElement dataElement, ConceptualDomain cd) {
         ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, vdParams.unitOfMeasure)
         if (!vd) { vd = new ValueDomain(vdParams).save() }
-        vd.addToIncludedIn(cd)
+        vd.addToConceptualDomains(cd)
         dataElement.valueDomain = vd
         vd.addToDataElements(dataElement)
         vd.save()

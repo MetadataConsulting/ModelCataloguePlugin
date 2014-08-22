@@ -148,44 +148,4 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     }
 
-
-    def "conceptualDomain can include valueDomain, valueDomains can be included in conceptual domains"(){
-
-        def university = ConceptualDomain.get(cd1.id)
-        def subjects = ValueDomain.get(vd.id)
-
-        when:
-        university.addToValueDomains(subjects)
-
-        then:
-        university.valueDomains
-        university.valueDomains.contains(subjects)
-        subjects.includedIn
-        subjects.includedIn.contains(university)
-
-        when:
-        university.removeFromValueDomains(subjects)
-
-        then:
-        !university.valueDomains
-        !subjects.includedIn
-
-        when:
-        subjects.addToIncludedIn(university)
-
-        then:
-        university.valueDomains
-        university.valueDomains.contains(subjects)
-        subjects.includedIn
-        subjects.includedIn.contains(university)
-
-        when:
-        subjects.removeFromIncludedIn(university)
-
-        then:
-        !university.valueDomains
-        !subjects.includedIn
-
-    }
-
 }

@@ -55,7 +55,7 @@ class ValueDomain extends ExtendibleElement  {
 
     static belongsTo = ConceptualDomain
 
-    static hasMany = [dataElements: DataElement, includedIn: ConceptualDomain]
+    static hasMany = [dataElements: DataElement, conceptualDomains: ConceptualDomain]
 
     static transients = ['regexDef']
 

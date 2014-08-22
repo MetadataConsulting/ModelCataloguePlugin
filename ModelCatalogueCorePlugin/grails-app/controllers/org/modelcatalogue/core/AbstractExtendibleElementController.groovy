@@ -89,6 +89,8 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
 
         instance.save flush:true
 
+        bindRelations instance
+
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])

@@ -222,6 +222,9 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         stored
         created
         customJsonPropertyCheck newInstance, created, stored
+
+        removeAllRelations stored
+
         stored.delete()
         resource.count() == totalCount
     }
@@ -548,10 +551,15 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
     def customJsonPropertyCheck(inputItem, json, outputItem){
         checkProperty(json.id , outputItem.id, "id")
-        checkProperty(json.version , outputItem.version, "version")
+
+        if (checkVersion) {
+            checkProperty(json.version , outputItem.version, "version")
+        }
         //jsonPropertyCheck json, outputItem
         return true
     }
+
+    boolean isCheckVersion() { true }
 
 
     def checkProperty(property, value, String propertyName){
@@ -642,5 +650,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     File recordInputXML(String fixtureName, XML xml) {
         recorder.recordInputXML(fixtureName, xml)
     }
+
+    boolean removeAllRelations(CatalogueElement instance) { true }
 
 }

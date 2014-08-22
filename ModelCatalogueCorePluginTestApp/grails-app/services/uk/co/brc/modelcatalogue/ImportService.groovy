@@ -72,7 +72,7 @@ class ImportService {
                                 dataType: dataType,
                                 description: tokens[5]).save(failOnError: true);
 
-                        vd.addToIncludedIn(cd)
+                        vd.addToConceptualDomains(cd)
 
                         def de = new DataElement(name: tokens[3],
                                 description: tokens[4], code: tokens[0])

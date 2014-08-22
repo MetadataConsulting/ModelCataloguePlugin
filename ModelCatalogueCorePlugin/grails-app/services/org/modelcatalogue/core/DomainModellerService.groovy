@@ -93,7 +93,7 @@ class DomainModellerService {
 
                     dataElement.addToContainedIn(model)
                     dataElement.valueDomain = valueDomain
-                    valueDomain.addToIncludedIn(conceptualDomain)
+                    valueDomain.addToConceptualDomains(conceptualDomain)
                 }
 
             }

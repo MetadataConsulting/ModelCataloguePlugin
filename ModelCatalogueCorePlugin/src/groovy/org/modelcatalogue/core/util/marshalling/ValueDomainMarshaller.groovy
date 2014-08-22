@@ -19,6 +19,7 @@ class ValueDomainMarshaller extends ExtendibleElementMarshallers {
                 rule: el.rule,
                 dataType: el.dataType,
                 multiple: el.multiple ?: false,
+                conceptualDomains: el.conceptualDomains,
                 mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"],
                 dataElements: [count: el.dataElements?.size() ?: 0, itemType: DataElement.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/dataElement"]
         ret
