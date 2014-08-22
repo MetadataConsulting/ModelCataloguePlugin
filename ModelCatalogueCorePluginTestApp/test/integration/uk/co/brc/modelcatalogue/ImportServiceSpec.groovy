@@ -62,7 +62,7 @@ class ImportServiceSpec extends Specification {
         assert icodehash.entrySet().containsAll(icodeEnumerations.entrySet())
 
         valueDomain.includedIn == [NHICConceptualDomain]
-        valueDomain.instantiates == [dataElement]
+        valueDomain.dataElements as Set == [dataElement] as Set
 
     }
 
