@@ -94,10 +94,16 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: 'Destination Class', value: 'destinationClass', classes: 'col-md-3', sort: {property: 'destinationClass', type: 'alphabet'}}
   ]
 
+  getConceptualDomains = (valueDomain) ->
+    domainNames = for domain in valueDomain.conceptualDomains
+      "<a href='#/catalogue/conceptualDomain/#{domain.id}'>#{domain.name}</a>"
+    domainNames.join(', ')
+
   columnsProvider.registerColumns 'org.modelcatalogue.core.ValueDomain', [
-    {header: 'Name',        value: 'name',          classes: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
-    {header: 'Unit',        value: 'unitOfMeasure.name', classes: 'col-md-4', show: 'unitOfMeasure.show()', sort: {property: 'unitOfMeasure.name', type: 'alphabet'}}
-    {header: 'Data Type',   value: 'dataType.name', classes: 'col-md-4', show: 'dataType.show()', sort: {property: 'dataType.name', type: 'alphabet'}}
+    {header: 'Conceptual Domains',  value: getConceptualDomains,  classes: 'col-md-3'}
+    {header: 'Name',                value: 'name',                classes: 'col-md-3', show: true, sort: {property: 'name', type: 'alphabet'}}
+    {header: 'Unit',                value: 'unitOfMeasure.name',  classes: 'col-md-3', show: 'unitOfMeasure.show()', sort: {property: 'unitOfMeasure.name', type: 'alphabet'}}
+    {header: 'Data Type',           value: 'dataType.name',       classes: 'col-md-3', show: 'dataType.show()', sort: {property: 'dataType.name', type: 'alphabet'}}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', [
