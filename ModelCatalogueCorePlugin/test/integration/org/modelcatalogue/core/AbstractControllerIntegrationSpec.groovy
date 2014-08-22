@@ -651,6 +651,6 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         recorder.recordInputXML(fixtureName, xml)
     }
 
-    boolean removeAllRelations(CatalogueElement instance) { true }
+    boolean removeAllRelations(Object instance) { true }
 
 }
