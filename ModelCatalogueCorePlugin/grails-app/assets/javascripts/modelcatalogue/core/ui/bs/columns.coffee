@@ -10,13 +10,28 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     { header: "Description", value: "description" }
   ]
 
+  getConceptualDomainsForValueDomain = (valueDomain) ->
+    domainNames = for domain in valueDomain.conceptualDomains
+      "<a href='#/catalogue/conceptualDomain/#{domain.id}'>#{domain.name}</a>"
+    domainNames.join(', ')
+
+  getConceptualDomainsForDataElement = (dataElement) ->
+    return '' unless dataElement and dataElement.valueDomain
+    return getConceptualDomainsForValueDomain(dataElement.valueDomain)
+
   # default
   columnsProvider.registerColumns 'org.modelcatalogue.core.ConceptualDomain', nameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', nameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.PublishedElement', publishedElementColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.ExtendibleElement', publishedElementColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', publishedElementColumns()
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
+    { header: 'Conceptual Domains',  value: getConceptualDomainsForDataElement,  classes: 'col-md-2'}
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true }
+    { header: "Name", value: "name", classes: "col-md-3", show: true, sort: {property: 'name', type: 'alphabet'} }
+    { header: "Description", value: "description" , classes: "col-md-4"}
+  ]
 
   # special
 
@@ -94,13 +109,8 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: 'Destination Class', value: 'destinationClass', classes: 'col-md-3', sort: {property: 'destinationClass', type: 'alphabet'}}
   ]
 
-  getConceptualDomains = (valueDomain) ->
-    domainNames = for domain in valueDomain.conceptualDomains
-      "<a href='#/catalogue/conceptualDomain/#{domain.id}'>#{domain.name}</a>"
-    domainNames.join(', ')
-
   columnsProvider.registerColumns 'org.modelcatalogue.core.ValueDomain', [
-    {header: 'Conceptual Domains',  value: getConceptualDomains,  classes: 'col-md-3'}
+    {header: 'Conceptual Domains',  value: getConceptualDomainsForValueDomain,  classes: 'col-md-3'}
     {header: 'Name',                value: 'name',                classes: 'col-md-3', show: true, sort: {property: 'name', type: 'alphabet'}}
     {header: 'Unit',                value: 'unitOfMeasure.name',  classes: 'col-md-3', show: 'unitOfMeasure.show()', sort: {property: 'unitOfMeasure.name', type: 'alphabet'}}
     {header: 'Data Type',           value: 'dataType.name',       classes: 'col-md-3', show: 'dataType.show()', sort: {property: 'dataType.name', type: 'alphabet'}}
