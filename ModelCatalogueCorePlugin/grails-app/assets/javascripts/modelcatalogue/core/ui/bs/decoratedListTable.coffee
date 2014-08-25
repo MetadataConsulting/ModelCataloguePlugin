@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList']).run [ '$templateCache', ($templateCache) ->
+angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/decoratedList.html', '''
       <table class="dl-table table">
         <thead>
