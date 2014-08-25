@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptPublishedElement', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       deferred = $q.defer()
