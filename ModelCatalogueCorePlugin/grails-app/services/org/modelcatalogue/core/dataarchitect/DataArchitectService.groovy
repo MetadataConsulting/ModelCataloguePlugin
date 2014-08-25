@@ -5,38 +5,16 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
+import org.modelcatalogue.core.util.Lists
 
 class DataArchitectService {
 
     def modelCatalogueSearchService, relationshipService
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
-        ListWithTotal<DataElement> results = new ListAndCount()
-        def uninstantiatedDataElements, totalCount
-        def instantiation = RelationshipType.findByName("instantiation")
-        def searchParams = getParams(params)
-
-            totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
-                    "WHERE a.outgoingRelationships IS EMPTY " +
-                    "OR a NOT IN " +
-                    "(SELECT a2 from DataElement a2 " +
-                    "JOIN a2.outgoingRelationships e2 " +
-                    "WHERE e2.relationshipType = ?)", [instantiation], [cache:true]
-            )
-
-            uninstantiatedDataElements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
-                    "WHERE a.outgoingRelationships IS EMPTY " +
-                    "OR a NOT IN " +
-                    "(SELECT a2 from DataElement a2 " +
-                    "JOIN a2.outgoingRelationships e2 " +
-                    "WHERE e2.relationshipType = ?)", [instantiation], [max: searchParams.max, offset: searchParams.offset]
-            )
-
-        results.count = (totalCount.get(0))?totalCount.get(0):0
-        results.list = uninstantiatedDataElements
-
-
-        return results
+        Lists.fromCriteria(params, DataElement) {
+            isNull 'valueDomain'
+        }
     }
 
     ListWithTotal<DataElement> metadataKeyCheck(Map params){

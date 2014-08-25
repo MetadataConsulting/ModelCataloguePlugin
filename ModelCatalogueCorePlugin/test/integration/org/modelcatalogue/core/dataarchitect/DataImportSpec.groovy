@@ -392,7 +392,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
         dataImportService.ingestImportQueue(importer)
         dataImportService.actionPendingModels(importer)
         def dataElement1 = DataElement.findByName("testDataItem")
-        def valueDomain1 = dataElement1.instantiatedBy
+        def valueDomain1 = dataElement1.valueDomain
         def dataElement2 = DataElement.findByName("testDataItem2")
         def parentModel = Model.findByModelCatalogueId("MC_037e6162-3b6f-4ae4-a171-2570b64dff10_1")
         def archivedContainingModel = Model.findByModelCatalogueId("MC_037e6162-5b6f-4ae4-a171-2570b64dff10_1")
@@ -416,7 +416,7 @@ class DataImportSpec extends AbstractIntegrationSpec {
         archivedContainingModel.contains.contains(dataElement1)
         containingModel.supersedes.contains(archivedContainingModel)
         dataElement2.supersedes.contains(dataElement1)
-        dataElement2.instantiatedBy == valueDomain1
+        dataElement2.valueDomain == valueDomain1
 
         cleanup:
         importer.delete()

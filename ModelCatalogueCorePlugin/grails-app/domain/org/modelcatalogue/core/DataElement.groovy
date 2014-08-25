@@ -12,7 +12,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class DataElement extends PublishedElement {
 
-    static constraints = {}
+    ValueDomain valueDomain
+
+    static constraints = {
+        valueDomain nullable: true
+    }
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
@@ -25,7 +29,6 @@ class DataElement extends PublishedElement {
 
     static relationships = [
             incoming: [containment: 'containedIn'],
-            outgoing: [instantiation: 'instantiatedBy']
     ]
 
     String toString() {

@@ -49,7 +49,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments',         columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf',    label: 'Conceptual Domains',  columns: nameAndIdent()
 
-  catalogueElementPropertiesProvider.configureProperty 'includedIn',      label: 'Conceptual Domains',  columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'conceptualDomains',      label: 'Conceptual Domains',  columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'instantiates',    label: 'Data Elements'     ,  columns: nameAndIdAndMetadata()
 
   catalogueElementPropertiesProvider.configureProperty 'history', {

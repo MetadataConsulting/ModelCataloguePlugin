@@ -135,6 +135,9 @@ class PublishedElementService {
                     relationshipService.unlink(model, element, RelationshipType.containmentType, true)
                 }
             }
+            if (element.valueDomain) {
+                archived.valueDomain = element.valueDomain
+            }
         }
 
         //add all the extensions to the archived element as well

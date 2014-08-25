@@ -1,10 +1,10 @@
-angular.module('mc.core.ui.bs.modalPromptPublishedElement', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       deferred = $q.defer()
 
       if not args?.element? and not args?.create?
-        messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
+        messages.error('Cannot create relationship dialog.', 'The element to be edited is missing.')
         deferred.reject('Missing element argument!')
         return deferred.promise
 
@@ -24,6 +24,10 @@ angular.module('mc.core.ui.bs.modalPromptPublishedElement', ['mc.util.messages']
               <div class="form-group">
                 <label for="description" class="">Description</label>
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="valueDomain" class="">Value Domain</label>
+                <input type="text" id="valueDomain" placeholder="Value Domain" ng-model="copy.valueDomain" catalogue-element-picker="valueDomain" label="el.name">
               </div>
             </form>
         </div>
@@ -79,5 +83,5 @@ angular.module('mc.core.ui.bs.modalPromptPublishedElement', ['mc.util.messages']
       deferred.promise
   ]
 
-  messagesProvider.setPromptFactory 'edit-model', factory
+  messagesProvider.setPromptFactory 'edit-dataElement', factory
 ]

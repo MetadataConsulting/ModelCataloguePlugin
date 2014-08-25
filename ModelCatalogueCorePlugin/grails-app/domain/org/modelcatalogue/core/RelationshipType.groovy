@@ -139,10 +139,6 @@ class RelationshipType {
         readByName("inclusion")
     }
 
-    static getInstantiationType() {
-        readByName("instantiation")
-    }
-
     static getSupersessionType() {
         readByName("supersession")
     }

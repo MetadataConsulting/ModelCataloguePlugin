@@ -160,6 +160,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.save flush:true
 
+        bindRelations(instance)
+
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.created.message', args: [message(code: "${resourceName}.label".toString(), default: resourceClassName), instance.id])
@@ -339,5 +341,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if(request.format=='json') return request.JSON
         request
     }
+
+    protected bindRelations(T instance) { }
 
 }

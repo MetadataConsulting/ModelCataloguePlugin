@@ -16,7 +16,7 @@ class SmokeSpec extends GebSpec {
             viewTitle.displayed
         }
         viewTitle.text().trim()     == 'Model Hierarchy'
-        subviewTitle.text().trim()  == 'No Selection'
+        subviewTitle.text().trim()  == 'Another root #000 Data Elements'
 
         when:
         loginAdmin()

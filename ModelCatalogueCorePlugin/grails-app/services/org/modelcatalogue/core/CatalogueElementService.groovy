@@ -20,10 +20,7 @@ class CatalogueElementService {
     }
 
     def getValueDomain(DataElement dataElement){
-        if(dataElement.instantiatedBy) {
-            return dataElement.instantiatedBy.first()
-        }
-        return
+        dataElement.valueDomain
     }
 
     def getDataType(DataElement dataElement){

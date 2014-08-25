@@ -72,13 +72,14 @@ class ImportService {
                                 dataType: dataType,
                                 description: tokens[5]).save(failOnError: true);
 
-                        vd.addToIncludedIn(cd)
+                        vd.addToConceptualDomains(cd)
 
                         def de = new DataElement(name: tokens[3],
                                 description: tokens[4], code: tokens[0])
                         //dataElementConcept: models,
                         //extension: ext).save(failOnError: true)
 
+                        de.valueDomain = vd
                         de.save()
 
                         de.ext.put("NHIC_Identifier:", tokens[0].take(255));
@@ -96,7 +97,7 @@ class ImportService {
                         de.ext.put("E2", tokens[17].take(255))
 
 
-                        de.addToInstantiatedBy(vd)
+                        vd.addToDataElements(de)
                         de.addToContainedIn(models)
 
                         //de.addToDataElementValueDomains(vd);
