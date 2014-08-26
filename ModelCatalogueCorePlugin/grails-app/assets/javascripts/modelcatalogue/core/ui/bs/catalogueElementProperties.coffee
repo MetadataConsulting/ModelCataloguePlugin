@@ -12,10 +12,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   ]
 
   publishedElement = ->  [
-    { header: 'Classifications',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
     { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true }
     { header: "Name", value: "name", classes: "col-md-3", show: true, sort: {property: 'name', type: 'alphabet'} }
     { header: "Description", value: "description" , classes: "col-md-4"}
+    { header: "Value Domain", value: "valueDomain.name", classes: "col-md-3", show: true}
   ]
 
 
