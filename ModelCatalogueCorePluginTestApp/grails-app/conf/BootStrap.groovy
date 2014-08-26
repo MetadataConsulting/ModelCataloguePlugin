@@ -109,7 +109,8 @@ class BootStrap {
                     println 'Running post init job'
                     println 'Importing data'
                     importService.importData()
-                    def de = new DataElement(name: "testera", description: "test data architect").save(failOnError: true)
+                    def classification =  new Classification(name: "dataSet1").save(failOnError: true)
+                    def de = new DataElement(name: "testera", description: "test data architect", classifications: [classification]).save(failOnError: true)
                     de.ext.metadata = "test metadata"
 
                     println 'Creating dummy models'
@@ -125,7 +126,7 @@ class BootStrap {
                     }
 
 
-                    def classification =  new Classification(name: "dataSet1").save(failOnError: true)
+
 
                     for (DataElement element in DataElement.list()) {
                         parentModel1.addToContains element

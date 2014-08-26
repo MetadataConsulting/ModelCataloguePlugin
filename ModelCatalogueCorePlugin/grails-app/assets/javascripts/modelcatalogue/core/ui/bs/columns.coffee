@@ -15,9 +15,14 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
       "<a href='#/catalogue/conceptualDomain/#{domain.id}'>#{domain.name}</a>"
     domainNames.join(', ')
 
-  getConceptualDomainsForDataElement = (dataElement) ->
-    return '' unless dataElement and dataElement.valueDomain
-    return getConceptualDomainsForValueDomain(dataElement.valueDomain)
+  getClassificationsForDataElement = (dataElement) ->
+    classificationNames = for classification in dataElement.classifications
+      "<a href='#/catalogue/conceptualDomain/#{classification.id}'>#{classification.name}</a>"
+    classificationNames.join(', ')
+
+#  getConceptualDomainsForDataElement = (dataElement) ->
+#    return '' unless dataElement and dataElement.valueDomain
+#    return getConceptualDomainsForValueDomain(dataElement.valueDomain)
 
   # default
   columnsProvider.registerColumns 'org.modelcatalogue.core.ConceptualDomain', nameAndDescription()
@@ -27,11 +32,12 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
-    { header: 'Conceptual Domains',  value: getConceptualDomainsForDataElement,  classes: 'col-md-2'}
+    { header: 'Classifications',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
     { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true }
     { header: "Name", value: "name", classes: "col-md-3", show: true, sort: {property: 'name', type: 'alphabet'} }
     { header: "Description", value: "description" , classes: "col-md-4"}
   ]
+
 
   # special
 

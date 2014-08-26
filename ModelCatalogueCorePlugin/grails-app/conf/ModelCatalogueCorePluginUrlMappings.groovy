@@ -7,7 +7,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def resources         = ['batch', 'relationshipType' ]
         def publishedElements = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
-        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain']
+        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'classification']
         def allElements       = catalogueElements + resources
 
         for (String controllerName in allElements) {

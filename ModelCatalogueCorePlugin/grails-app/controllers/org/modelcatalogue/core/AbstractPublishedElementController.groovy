@@ -94,6 +94,8 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
 
+        bindRelations(instance)
+
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
@@ -131,6 +133,22 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
             ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
         }
     }
+
+    // classifications are marshalled with the published element so no need for special method to fetch them
+    protected bindRelations(PublishedElement instance) {
+        if (objectToBind.classifications != null) {
+            for (classification in instance.classifications.findAll { !(it.id in objectToBind.classifications*.id) }) {
+                instance.removeFromClassifications classification
+                classification.removeFromClassifies instance
+            }
+            for (domain in objectToBind.classifications) {
+                Classification classification = Classification.get(domain.id as Long)
+                instance.addToClassifications classification
+                classification.addToClassifies instance
+            }
+        }
+    }
+
 
     @Override
     protected getIncludeFields(){

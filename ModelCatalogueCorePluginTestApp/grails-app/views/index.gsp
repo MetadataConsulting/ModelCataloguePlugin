@@ -61,6 +61,10 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogue Elements<b
                                 class="caret"></b></a>
                         <ul class="dropdown-menu">
+                            <li ui-sref-active="active"><a id="classificationsLink"
+                                                           ui-sref="mc.resource.list({resource: 'classification'})"
+                                                           ui-sref-opts="{inherit: false}">Data Sets / Classifications</a>
+                            </li>
                             <li ui-sref-active="active"><a id="assetLink"
                                                                                    ui-sref="mc.resource.list({resource: 'asset'})"
                                                                                    ui-sref-opts="{inherit: false}">Assets</a>

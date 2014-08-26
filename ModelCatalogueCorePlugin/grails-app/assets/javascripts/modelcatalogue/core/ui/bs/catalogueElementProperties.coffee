@@ -11,6 +11,15 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
+  publishedElement = ->  [
+    { header: 'Classifications',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true }
+    { header: "Name", value: "name", classes: "col-md-3", show: true, sort: {property: 'name', type: 'alphabet'} }
+    { header: "Description", value: "description" , classes: "col-md-4"}
+  ]
+
+
+
   printMetadata = (relationship) ->
     result  = ''
     ext     = relationship.ext ? {}
@@ -48,6 +57,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'containedIn',     label: 'Models',              columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments',         columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf',    label: 'Conceptual Domains',  columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'classifies',    label: 'Classifies',  columns: publishedElement()
 
   catalogueElementPropertiesProvider.configureProperty 'conceptualDomains',      label: 'Conceptual Domains',  columns: nameAndIdent()
   catalogueElementPropertiesProvider.configureProperty 'instantiates',    label: 'Data Elements'     ,  columns: nameAndIdAndMetadata()
