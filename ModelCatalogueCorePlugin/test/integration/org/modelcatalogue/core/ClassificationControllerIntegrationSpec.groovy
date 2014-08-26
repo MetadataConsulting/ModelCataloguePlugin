@@ -31,7 +31,7 @@ class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementCo
 
         then:
         item.id == classifies.id
-        item.dataType.id == classifies.dataType.id
+        item.id == classifies.id
         resource.count() == totalCount
 
         cleanup:
@@ -58,15 +58,15 @@ class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementCo
 
         then:
         checkXmlCorrectListValues(xml, total, size, offset, max, next, previous)
-        xml.classifies.size() == size
+        xml.children().size() - 2 == size
 
         when:
-        def item  = xml.classifies[0]
+        def item  = xml.children().getAt(0)
         def classifies = first.classifies.find {it.id == item.@id.text() as Long}
 
         then:
         item.@id == classifies.id
-        item.dataType.@id == classifies.dataType.id
+        item.@id == classifies.id
         resource.count() == totalCount
 
         cleanup:

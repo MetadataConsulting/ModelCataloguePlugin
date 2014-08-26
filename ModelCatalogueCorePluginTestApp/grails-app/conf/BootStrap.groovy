@@ -124,8 +124,11 @@ class BootStrap {
                     }
 
 
+                    def classification =  new Classification(name: "dataSet1").save(failOnError: true)
+
                     for (DataElement element in DataElement.list()) {
                         parentModel1.addToContains element
+                        classification.addToClassifies(element)
                     }
 
 

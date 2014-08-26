@@ -7,7 +7,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def resources         = ['batch', 'relationshipType' ]
         def publishedElements = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
-        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain']
+        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'classification']
         def allElements       = catalogueElements + resources
 
         for (String controllerName in allElements) {
@@ -62,6 +62,10 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName == 'dataType' || controllerName == 'enumeratedType' ) {
                     "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
+                }
+
+                if (controllerName == 'classification') {
+                    "/api/modelCatalogue/core/$controllerName/$id/classifies"(controller: controllerName, action: 'classifies', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'asset') {
