@@ -15,8 +15,6 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               if angular.isObject(value)
                 if value.hasOwnProperty('id')
                   value = {id: value.id}
-                else
-                  continue
               payload[name] = value
             payload
 

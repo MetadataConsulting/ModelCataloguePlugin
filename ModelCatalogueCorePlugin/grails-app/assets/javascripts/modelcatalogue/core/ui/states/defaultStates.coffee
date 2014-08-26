@@ -79,6 +79,24 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   })
 
+  $stateProvider.state('mc.wizards', {
+    abstract: true,
+    url: "/wizard"
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  })
+
+  $stateProvider.state('mc.wizards.model', {
+    url: "/model"
+    onEnter: ['$state', 'messages', ($state, messages)->
+      messages.prompt('Model Tutorial', '', {type: 'create-model-wizard'}).then (model)->
+        model.show()
+      , ->
+        $state.go('mc.resource.list', {resource: 'model'})
+
+    ]
+
+  })
+
   $stateProvider.state 'mc.actions.show', {
     url: '/{id:\\d+}'
     templateUrl: 'modelcatalogue/core/ui/state/batch.html'
