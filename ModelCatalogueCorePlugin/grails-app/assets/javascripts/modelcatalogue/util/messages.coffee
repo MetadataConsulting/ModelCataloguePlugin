@@ -27,7 +27,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
   # factory method
   @$get = [ '$injector', '$q', '$log', '$window', '$timeout', ($injector, $q, $log, $window, $timeout) ->
-    createNewMessages = () ->
+    createNewMessages = (timeout) ->
       messagesStack = []
 
       messages = {}
@@ -86,9 +86,11 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
         messagesStack.push msg
 
-        afterTimeout = $timeout((-> msg.remove()), hideAfter)
-
-        msg.noTimeout = -> $timeout.cancel(afterTimeout)
+        if timeout
+          afterTimeout = $timeout((-> msg.remove()), hideAfter)
+          msg.noTimeout = -> $timeout.cancel(afterTimeout)
+        else
+          msg.noTimeout = ->
 
         msg
 
@@ -165,15 +167,17 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
         removed
 
-      messages.createNewMessages = ->
-        createNewMessages()
+      # by default custom messages does not timeout
+      messages.createNewMessages = (timeout) ->
+        createNewMessages(timeout)
 
       messages.hasPromptFactory = (type) ->
         messagesProvider.hasPromptFactory(type)
 
       messages
 
-    createNewMessages()
+    # messages timeouts by default
+    createNewMessages(true)
   ]
 
   # Always return this from CoffeeScript AngularJS factory functions!

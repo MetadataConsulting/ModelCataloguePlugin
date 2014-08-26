@@ -1,3 +1,16 @@
+.clearfix() {
+  &:before,
+  &:after {
+    content: " "; // 1
+    display: table; // 2
+  }
+  &:after {
+    clear: both;
+  }
+}
+
+
+
 // preserve new lines in blockquotes
 blockquote, .dl-table-item-cell, .pp-table-property-value {
   white-space: pre-line;
@@ -180,4 +193,67 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
 .tags {
   padding-bottom: 10px;
 }
+
+.create-model-wizard {
+  .modal-dialog {
+    width: 800px;
+  }
+}
+
+.tutorial-steps {
+  float: left;
+  width: 100%;
+  position: relative;
+  padding-left: 0;
+  list-style: none;
+  text-align: center;
+
+  .clearfix();
+
+  li {
+    display: table-cell;
+    width: 1%;
+    > a,
+    > span {
+      display: inline-block;
+      padding: 5px 14px;
+    }
+
+    > a:hover,
+    > a:focus {
+      text-decoration: none;
+    }
+  }
+
+  .next {
+    > a,
+    > span {
+      float: right;
+    }
+  }
+
+  .previous {
+    > a,
+    > span {
+      float: left;
+    }
+  }
+
+  .disabled {
+    > a,
+    > a:hover,
+    > a:focus,
+    > span {
+      cursor: not-allowed;
+    }
+  }
+
+  .btn {
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+  }
+
+}
+
 

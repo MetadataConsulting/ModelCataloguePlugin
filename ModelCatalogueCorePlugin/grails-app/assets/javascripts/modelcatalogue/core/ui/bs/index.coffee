@@ -33,6 +33,7 @@
 #= require modalPromptRelationshipTypeEdit
 #= require modalPromptDataElementEdit
 #= require saveOrUpdatePublishedElementCtrl
+#= require modelWizard
 
 
 angular.module('mc.core.ui.bs', [
@@ -71,4 +72,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
   'mc.core.ui.bs.modalPromptDataElementEdit'
   'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
+  'mc.core.ui.bs.modelWizard'
 ])
