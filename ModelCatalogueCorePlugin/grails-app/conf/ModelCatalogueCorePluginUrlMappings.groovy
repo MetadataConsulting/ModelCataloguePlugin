@@ -7,7 +7,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def resources         = ['batch', 'relationshipType' ]
         def publishedElements = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
-        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'classification']
+        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain']
         def allElements       = catalogueElements + resources
 
         for (String controllerName in allElements) {
@@ -32,6 +32,8 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/reactivate"(controller: controllerName, action: 'reactivate', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/run"(controller: controllerName, action: 'run', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/parameters"(controller: controllerName, action: 'updateActionParameters', method: HttpMethod.PUT)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/dependsOn"(controller: controllerName, action: 'removeDependency', method: HttpMethod.DELETE)
+                "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/dependsOn"(controller: controllerName, action: 'addDependency', method: HttpMethod.POST)
             }
 
 
@@ -66,6 +68,14 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName == 'classification') {
                     "/api/modelCatalogue/core/$controllerName/$id/classifies"(controller: controllerName, action: 'classifies', method: HttpMethod.GET)
+                }
+
+                if (controllerName == 'valueDomain') {
+                    "/api/modelCatalogue/core/$controllerName/$id/dataElement"(controller: controllerName, action: 'dataElements', method: HttpMethod.GET)
+                }
+
+                if (controllerName == 'conceptualDomain') {
+                    "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'asset') {

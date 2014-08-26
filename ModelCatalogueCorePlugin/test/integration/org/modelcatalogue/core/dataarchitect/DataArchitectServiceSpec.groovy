@@ -28,7 +28,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         de2.refresh()
         md.refresh()
         md.addToContains(de1)
-        de2.addToInstantiatedBy(vd)
+        de2.valueDomain = vd
         de1.ext.put("localIdentifier", "test")
         de4.ext.put("test2", "test2")
         de4.ext.put("metadata", "test2")
@@ -43,7 +43,6 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         de1.refresh()
         md.removeFromContains(de1)
         md.delete(flush:true)
-        de2.removeFromInstantiatedBy(vd)
     }
 
     def "find relationships and action them"() {

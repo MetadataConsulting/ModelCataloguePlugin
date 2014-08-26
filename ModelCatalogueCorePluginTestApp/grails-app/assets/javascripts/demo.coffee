@@ -92,7 +92,7 @@ angular.module('demo', [
     else
       $scope.descend = path
 
-  $scope.descendPath = 'includes, instantiates'
+  $scope.descendPath = 'valueDomains, instantiates'
   $scope.selectedInTreeview = null
 
   $scope.$watch 'descendPath', onDescendPathChange

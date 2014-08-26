@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * Created by adammilward on 27/02/2014.
@@ -14,7 +15,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
 
     @Override
     Map getNewInstance(){
-        [name: "ground_speed2", unitOfMeasure: MeasurementUnit.findByName("Miles per hour"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: DataType.findByName("integer")]
+        [name: "ground_speed2", unitOfMeasure: MeasurementUnit.findByName("Miles per hour"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: DataType.findByName("integer"), conceptualDomains: [ConceptualDomain.findByName("public libraries")]]
     }
 
     @Override
@@ -77,6 +78,9 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
         checkProperty(json.unitOfMeasure.name, item.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(json.dataType.id, item.dataType.id, "dataType")
         checkProperty(json.multiple, item.multiple, "multiple")
+
+        assert json.conceptualDomains
+
         return true
     }
 
@@ -86,7 +90,24 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
         checkProperty(json.unitOfMeasure.name, inputItem.unitOfMeasure.name, "unitOfMeasure")
         checkProperty(json.dataType.id, inputItem.dataType.id, "dataType")
         checkProperty(json.multiple, outputItem.multiple, "multiple")
+
+        assert outputItem.conceptualDomains
+
         return true
+    }
+
+    boolean isCheckVersion() {
+        false
+    }
+
+    boolean removeAllRelations(CatalogueElement instance) {
+        ValueDomain domain = instance
+
+        for (ConceptualDomain conceptualDomain in domain.conceptualDomains) {
+            conceptualDomain.removeFromValueDomains(domain)
+            domain.removeFromConceptualDomains(conceptualDomain)
+        }
+        true
     }
 
 }

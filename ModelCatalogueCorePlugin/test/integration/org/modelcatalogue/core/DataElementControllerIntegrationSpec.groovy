@@ -9,7 +9,7 @@ class DataElementControllerIntegrationSpec extends AbstractPublishedElementContr
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", code: "AA123"]
+        [name: "changedName", description: "edited description ", code: "AA123", valueDomain: ValueDomain.get(1)]
     }
 
     @Override

@@ -53,7 +53,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
         author.ext.something = 'anything'
-        author.addToInstantiatedBy(domain)
+        author.valueDomain = domain
 
         int originalVersion     = author.versionNumber
         DataElement archived    = publishedElementService.archiveAndIncreaseVersion(author)
@@ -73,13 +73,9 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         author.supersedes.contains(archived)
 
-        author.instantiatedBy.size()    == 1
-        archived.instantiatedBy.size()  == 1
-        domain.instantiates.size()      == 1
-
-        relationshipService.getRelationships([:], RelationshipDirection.BOTH, author, RelationshipType.instantiationType).list.size() == 1
-        relationshipService.getRelationships([:], RelationshipDirection.BOTH, archived, RelationshipType.instantiationType).list.size() == 1
-        relationshipService.getRelationships([:], RelationshipDirection.BOTH, domain, RelationshipType.instantiationType).list.size() == 1
+        author.valueDomain
+        archived.valueDomain
+        domain.dataElements.size() == 1
 
         when:
         def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)

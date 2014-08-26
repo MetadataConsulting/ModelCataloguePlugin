@@ -210,10 +210,7 @@ Model catalogue core plugin (metadata registry)
     }
 
     def static getValueDomain(DataElement dataElement){
-        if(dataElement.instantiatedBy) {
-            return dataElement.instantiatedBy.first()
-        }
-        return null
+        return dataElement.valueDomain
     }
 
     def static getDataType(DataElement dataElement){

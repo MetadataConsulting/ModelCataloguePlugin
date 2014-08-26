@@ -29,8 +29,10 @@
 #= require modalPromptActionParametersEdit
 #= require modalPromptValueDomainEdit
 #= require modalPromptEnumeratedTypeEdit
-#= require modalPromptPublishedElement
+#= require modalPromptModel
 #= require modalPromptRelationshipTypeEdit
+#= require modalPromptDataElementEdit
+#= require saveOrUpdatePublishedElementCtrl
 
 
 angular.module('mc.core.ui.bs', [
@@ -65,6 +67,8 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptValueDomainEdit'
   'mc.core.ui.bs.modalPromptEnumeratedTypeEdit'
   'mc.core.ui.bs.modalPromptActionParametersEdit'
-  'mc.core.ui.bs.modalPromptPublishedElement'
+  'mc.core.ui.bs.modalPromptModel'
   'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
+  'mc.core.ui.bs.modalPromptDataElementEdit'
+  'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
 ])
