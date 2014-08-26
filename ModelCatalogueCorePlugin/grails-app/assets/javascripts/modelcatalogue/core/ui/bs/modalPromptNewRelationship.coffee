@@ -1,12 +1,9 @@
 angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
   messagesProvider.setPromptFactory 'new-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', ($modal, $q, messages, catalogueElementResource) ->
     (title, body, args) ->
-      deferred = $q.defer()
-
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')
-        deferred.reject('Missing element argument!')
-        return deferred.promise
+        return $q.reject('Missing element argument!')
 
       dialog = $modal.open {
         windowClass: 'new-relationship-modal-prompt'
@@ -124,18 +121,10 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
           catalogueElementResource('relationshipType').list(max: 100).then(appendToRelationshipTypes)
 
-
         ]
 
       }
 
-
-
-      dialog.result.then (result) ->
-        deferred.resolve(result)
-      , (reason) ->
-        deferred.reject(reason)
-
-      deferred.promise
+      dialog.result
   ]
 ]

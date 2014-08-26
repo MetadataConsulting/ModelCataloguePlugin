@@ -132,6 +132,35 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerAction 'finalize', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.status
+    return undefined if not security.hasRole('CURATOR')
+
+    action = {
+      position:   150
+      label:      'Finalize'
+      icon:       'check'
+      type:       'primary'
+      action:     ->
+        messages.confirm("Do you want to finalize #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be finalized").then ->
+          $scope.element.status = 'FINALIZED'
+          catalogueElementResource($scope.element.elementType).update($scope.element).then (updated) ->
+            $scope.element = updated
+            messages.success("#{$scope.element.name} finalized")
+            $rootScope.$broadcast 'newVersionCreated', $scope.element
+    }
+
+    updateAction = ->
+      action.disabled = $scope.element.archived or $scope.element?.status == 'FINALIZED'
+
+    $scope.$watch 'element.status', updateAction
+    $scope.$watch 'element.archived', updateAction
+    $rootScope.$on 'newVersionCreated', updateAction
+
+    action
+  ]
+
   actionsProvider.registerAction 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.isInstanceOf('org.modelcatalogue.core.CatalogueElement')
@@ -542,5 +571,56 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return action
 
   ]
+
+  actionsProvider.registerAction 'modal-cancel', ['$scope', ($scope) ->
+    return undefined if not $scope.$dismiss
+
+    {
+      position:   10000
+      label:      'Cancel'
+      icon:       'ban-circle'
+      type:       'warning'
+      action: -> $scope.$dismiss()
+    }
+  ]
+
+  actionsProvider.registerAction 'modal-save-element', ['$scope', ($scope) ->
+    return undefined unless $scope.hasChanged and $scope.saveElement
+
+    action = {
+      position:   1000
+      label:      'Save'
+      icon:       'ok'
+      type:       'success'
+      action: ->
+       $scope.saveElement() if $scope.hasChanged()
+    }
+
+    $scope.$watch 'hasChanged()', (changed)->
+      action.disabled = not changed
+
+    action
+  ]
+
+
+  actionsProvider.registerChildAction 'modal-save-element', 'modal-save-element-as-new-version', ['$scope', ($scope) ->
+    return undefined unless $scope.hasChanged and $scope.saveElement and not $scope.create and $scope.original and $scope.original.isInstanceOf and $scope.original.isInstanceOf 'org.modelcatalogue.core.PublishedElement'
+
+    action = {
+      position:   1000
+      label:      'Save as New Version'
+      icon:       'circle-arrow-up'
+      type:       'success'
+      action: ->
+        $scope.saveElement(true) if $scope.hasChanged()
+    }
+
+    $scope.$watch 'hasChanged()', (changed)->
+      action.disabled = not changed
+
+    action
+  ]
+
+
 
 ]

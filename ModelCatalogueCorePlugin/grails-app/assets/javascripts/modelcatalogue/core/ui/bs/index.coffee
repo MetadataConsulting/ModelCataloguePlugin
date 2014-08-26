@@ -32,6 +32,7 @@
 #= require modalPromptModel
 #= require modalPromptRelationshipTypeEdit
 #= require modalPromptDataElementEdit
+#= require saveOrUpdatePublishedElementCtrl
 
 
 angular.module('mc.core.ui.bs', [
@@ -69,4 +70,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptModel'
   'mc.core.ui.bs.modalPromptRelationshipTypeEdit'
   'mc.core.ui.bs.modalPromptDataElementEdit'
+  'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
 ])

@@ -1,12 +1,9 @@
 angular.module('mc.core.ui.bs.modalPromptActionParametersEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
-      deferred = $q.defer()
-
       if not args?.action? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The action to be edited is missing.')
-        deferred.reject('Missing action argument!')
-        return deferred.promise
+        return $q.reject('Missing action argument!')
 
       dialog = $modal.open {
         windowClass: 'new-relationship-modal-prompt'
@@ -49,12 +46,7 @@ angular.module('mc.core.ui.bs.modalPromptActionParametersEdit', ['mc.util.messag
       }
 
 
-      dialog.result.then (result) ->
-        deferred.resolve(result)
-      , (reason) ->
-        deferred.reject(reason)
-
-      deferred.promise
+      dialog.result
   ]
 
   messagesProvider.setPromptFactory 'update-action-parameters', factory

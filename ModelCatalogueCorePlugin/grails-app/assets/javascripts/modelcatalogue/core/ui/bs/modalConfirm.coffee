@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalConfirm', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setConfirmFactory [ '$modal', '$q', ($modal, $q) ->
+ messagesProvider.setConfirmFactory [ '$modal', ($modal) ->
    (title, body) ->
       dialog = $modal.open {
         windowClass: 'messages-modal-confirm'
@@ -18,12 +18,6 @@ angular.module('mc.core.ui.bs.modalConfirm', ['mc.util.messages']).config ['mess
       }
 
 
-      deferred = $q.defer()
-      dialog.result.then () ->
-        deferred.resolve()
-      , () ->
-        deferred.reject()
-
-      deferred.promise
+      dialog.result
  ]
 ]

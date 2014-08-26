@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPrompt', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setDefaultPromptFactory [ '$modal', '$q', ($modal, $q) ->
+ messagesProvider.setDefaultPromptFactory [ '$modal', ($modal) ->
    (title, body, args) ->
       dialog = $modal.open {
         windowClass: 'messages-modal-prompt'
@@ -21,13 +21,6 @@ angular.module('mc.core.ui.bs.modalPrompt', ['mc.util.messages']).config ['messa
         '''
       }
 
-
-      deferred = $q.defer()
-      dialog.result.then (result) ->
-        deferred.resolve(result)
-      , (reason) ->
-        deferred.reject(reason)
-
-      deferred.promise
+      dialog.result
  ]
 ]

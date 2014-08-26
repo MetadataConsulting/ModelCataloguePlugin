@@ -1,11 +1,9 @@
 angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angularFileUpload']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
-      deferred = $q.defer()
       if not args?.element? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The element to be created is missing.')
-        deferred.reject('Missing element argument!')
-        return deferred.promise
+        return $q.reject('Missing element argument!')
 
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
@@ -99,12 +97,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
 
       }
 
-      dialog.result.then (result) ->
-        deferred.resolve(result)
-      , (reason) ->
-        deferred.reject(reason)
-
-      deferred.promise
+      dialog.result
   ]
   messagesProvider.setPromptFactory 'new-import', factory
 ]

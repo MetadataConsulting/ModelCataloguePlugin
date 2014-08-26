@@ -1,15 +1,15 @@
 angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
-      deferred = $q.defer()
 
       if not args?.element? and not args?.create?
-        messages.error('Cannot create relationship dialog.', 'The element to be edited is missing.')
-        deferred.reject('Missing element argument!')
-        return deferred.promise
+        messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
+        return $q.reject('Missing element argument!')
 
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
+        resolve:
+          args: -> args
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>
@@ -32,55 +32,14 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="saveElement(false)" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
-            <button class="btn btn-success" ng-hide="create" ng-click="saveElement(true)"><span class="glyphicon glyphicon-circle-arrow-up"></span> Save as New Version</button>
-            <button class="btn btn-success" ng-hide="create" ng-click="copy.status = 'FINALIZED' ; saveElement(false)"><span class="glyphicon glyphicon-check"></span> Finalize</button>
-            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+            <contextual-actions></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', ($scope, messages, names, catalogueElementResource, $modalInstance) ->
-          $scope.copy     = angular.copy(args.element ? {})
-          $scope.original = args.element ? {}
-          $scope.messages = messages.createNewMessages()
-          $scope.create   = args.create
-
-          $scope.hasChanged   = ->
-            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
-
-          $scope.saveElement = (newVersion)->
-            $scope.messages.clearAllMessages()
-            if not $scope.copy.name
-              $scope.messages.error 'Empty Name', 'Please fill the name'
-              return
-
-
-            promise = null
-
-            if args?.create
-              promise = catalogueElementResource(args.create).save($scope.copy)
-            else
-              promise = catalogueElementResource($scope.copy.elementType).update($scope.copy, {newVersion: newVersion})
-
-            promise.then (result) ->
-              if args?.create
-                messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
-              else
-                messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
-              $modalInstance.close(result)
-            , (response) ->
-              for err in response.data.errors
-                $scope.messages.error err.message
-
-        ]
+        controller: 'saveOrUpdatePublishedElementCtrl'
 
       }
 
-      dialog.result.then (result) ->
-        deferred.resolve(result)
-      , (reason) ->
-        deferred.reject(reason)
-
-      deferred.promise
+      dialog.result
   ]
 
   messagesProvider.setPromptFactory 'edit-dataElement', factory
