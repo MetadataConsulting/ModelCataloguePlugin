@@ -4,7 +4,10 @@ angular.module('mc.core.ui.bs.simpleObjectEditor', ['mc.core.ui.simpleObjectEdit
         <thead ng-if="title || valueTitle">
           <th class="col-md-4 soe-table-property-key">{{title}}</th>
           <th class="col-md-7 soe-table-property-value ">{{valueTitle}}</th>
-          <th class="col-md-1 soe-table-property-actions">&nbsp;</th>
+          <th class="col-md-1 soe-table-property-actions">
+            <!-- to allow submitting forms with only this editor within -->
+            <input type="submit" class="hide">
+          </th>
         </thead>
         <tbody>
           <tr class="soe-table-property-row" ng-repeat="property in editableProperties" ng-class="{'has-error': !isKeyUnique(property.key)}">
