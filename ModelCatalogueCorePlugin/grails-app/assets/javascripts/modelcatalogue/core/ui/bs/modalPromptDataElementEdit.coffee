@@ -18,13 +18,9 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
             <messages-panel messages="messages"></messages-panel>
             <form role="form">
               <div class="form-group">
-                <label for="classification-{{$index}}"> Classifications</label>
-                <div class="tags">
-                  <span ng-repeat="classification in copy.classifications">
-                      <span class="label label-default">{{classification.name}} <a ng-click="removeClassification($index)" class="remove-tag"><span class="glyphicon glyphicon-remove"></span></a></span>
-                  </span>
-                </div>
-                <input id="classification-{{$index}}" placeholder="Classification" ng-model="classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addClassification(classification);classification = null">
+                <label for="classification"> Classifications</label>
+                <elements-as-tags elemnts="copy.classifications"></elements-as-tags>
+                <input id="classification" placeholder="Classification" ng-model="classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addClassification(classification);classification = null">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
