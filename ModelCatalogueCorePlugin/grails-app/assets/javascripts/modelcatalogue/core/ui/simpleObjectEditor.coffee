@@ -8,7 +8,7 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
       valueTitle:         '@?'
     templateUrl: 'modelcatalogue/core/ui/simpleObjectEditor.html'
 
-    controller: ['$scope', '$filter', ($scope, $filter) ->
+    controller: ['$scope', ($scope) ->
       # default values
       $scope.editableProperties = []
 
@@ -74,6 +74,8 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
 
       onObjectOrHintsChanged($scope.object, $scope.hints ? [])
 
+      $scope.addNewRowOnTab = ($event, index)->
+        $scope.addProperty(index, {key: '', value: ''}) if $event.keyCode == 9
 
       $scope.$watch 'object', (newObject) ->
         onObjectOrHintsChanged(newObject, $scope.hints ? [])

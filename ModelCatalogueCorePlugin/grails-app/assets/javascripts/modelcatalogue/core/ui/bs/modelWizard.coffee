@@ -1,10 +1,20 @@
-angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+modelWizard = angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages'])
+
+#http://stackoverflow.com/questions/14833326/how-to-set-focus-on-input-field-in-angularjs
+modelWizard.directive 'focusMe', ['$timeout', '$parse', ($timeout, $parse) -> {
+  link: (scope, element, attrs) ->
+    scope.$watch $parse(attrs.focusMe), (value) ->
+      $timeout (-> element[0].focus()) if value
+}]
+
+modelWizard.config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
     (title, body, args) ->
 
       $rootScope.createModelWizard ?= $modal.open {
         windowClass: 'create-model-wizard'
         backdrop: 'static'
+        keyboard: false
         resolve:
           args: -> args
 
@@ -15,148 +25,102 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages']).config ['messa
             <h4>Model Wizard</h4>
             <ul class="tutorial-steps">
               <li>
-                <button ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                <button id="step-previous" ng-disabled="step == 'model'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
               </li>
               <li>
-                <button ng-click="select('model')" class="btn btn-default" ng-class="{'btn-primary': step == 'model'}">1. Model</button>
+                <button id="step-model" ng-click="select('model')" class="btn btn-default" ng-class="{'btn-primary': step == 'model'}">1. Model</button>
               </li>
               <li>
-                <button ng-disabled="!model.name" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata'}">2. Metadata</button>
+                <button id="step-metadata" ng-disabled="!model.name" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata'}">2. Metadata</button>
               </li>
               <li>
-                <button ng-disabled="!model.name" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents'}">3. Parents</button>
+                <button id="step-parents" ng-disabled="!model.name" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents'}">3. Parents</button>
               </li>
               <li>
-                <button ng-disabled="!model.name" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children'}">4. Children</button>
+                <button id="step-children" ng-disabled="!model.name" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children'}">4. Children</button>
               </li>
               <li>
-                <button ng-disabled="!model.name" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">5. Elements</button>
+                <button id="step-elements" ng-disabled="!model.name" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">5. Elements</button>
               </li>
               <li>
-                <button ng-disabled="!model.name" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+                <button id="step-next" ng-disabled="!model.name || step == 'elements'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
               </li>
               <li>
-                <button ng-disabled="!model.name" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
+                <button id="step-finish" ng-disabled="!model.name" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
               </li>
             </ul>
         </div>
         <div class="modal-body" ng-switch="step">
-          <div ng-switch-when="model">
-              <messages-panel messages="messages"></messages-panel>
-              <form role="form">
+          <div ng-switch-when="model" id="model">
+              <form role="form" ng-submit="select('metadata')">
                 <div class="form-group">
                   <label for="name" class="">Name</label>
-                  <input type="text" class="form-control" id="name" placeholder="Name" ng-model="model.name">
+                  <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="model.name" focus-me="step=='model'" required>
                 </div>
                 <div class="form-group">
                   <label for="description" class="">Description</label>
-                  <textarea rows="10" ng-model="model.description" placeholder="Description" class="form-control" id="description"></textarea>
+                  <textarea rows="10" ng-model="model.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'metadata')"></textarea>
                 </div>
               </form>
           </div>
-          <div ng-switch-when="metadata">
-              <messages-panel messages="messages"></messages-panel>
-              <simple-object-editor title="Key" value-title="Value" object="metadata"></simple-object-editor>
+          <div ng-switch-when="metadata" id="metadata">
+              <form ng-submit="select('parents')">
+                <simple-object-editor title="Key" value-title="Value" object="metadata"></simple-object-editor>
+              </form>
           </div>
-          <div ng-switch-when="parents">
+          <div ng-switch-when="parents" id="parents">
               <br/>
-              <messages-panel messages="messages"></messages-panel>
               <form role="form">
                 <div class="form-group">
                   <label for="name" class="">Parent Model</label>
-                  <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" catalogue-element-picker="model">
+                  <elements-as-tags elements="parents"></elements-as-tags>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="model">
+                    <span class="input-group-btn">
+                      <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element) || isString(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                    </span>
+                  </div>
                   <p class="help-block">Parent model is source for the hierarchy relationship</p>
                 </div>
                 <simple-object-editor object="parent.ext" title="Relationship Metadata"></simple-object-editor>
-                <button class="btn btn-sm btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element) || isString(parent.element)"><span class="glyphicon glyphicon-plus"></span> Add Parent</button>
               </form>
-              <hr/>
-              <div class="panel panel-default" ng-repeat="r in parents">
-                <div class="panel-heading">
-                  <h3 class="panel-title"><a ng-click="openElementInNewWindow(r.element)">{{r.element.name}}</a></h3>
-                </div>
-                <div class="panel-body">
-                  <blockquote ng-show="r.element.description" class="preserve-new-lines">{{r.element.description}}</blockquote>
-                  <blockquote ng-show="!r.element.description" class="preserve-new-lines"><em>No description</em></blockquote>
-                  <h5 ng-hide="isEmpty(r.ext)">Realtionship Metadata</h5>
-                  <table ng-hide="isEmpty(r.ext)" class="table table-condensed">
-                    <tbody>
-                      <tr ng-repeat="(key, value) in r.ext">
-                        <td class="col-md-6">{{key}}</td>
-                        <td class="col-md-6">{{value}}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
           </div>
-          <div ng-switch-when="children">
+          <div ng-switch-when="children" id="children">
               <br/>
-              <messages-panel messages="messages"></messages-panel>
               <form role="form">
                 <div class="form-group">
                   <label for="name" class="">Child Model</label>
-                  <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" catalogue-element-picker="model">
+                  <elements-as-tags elements="children"></elements-as-tags>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="model">
+                    <span class="input-group-btn">
+                      <button class="btn btn-success" ng-click="push('children', 'child')" ng-disabled="isEmpty(child.element) || isString(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                    </span>
+                  </div>
                   <p class="help-block">Child model is destination for the hierarchy relationship</p>
                 </div>
                 <simple-object-editor object="child.ext" title="Relationship Metadata"></simple-object-editor>
-                <button class="btn btn-sm btn-success" ng-click="push('children', 'child')" ng-disabled="isEmpty(child.element) || isString(child.element)"><span class="glyphicon glyphicon-plus"></span> Add Child</button>
               </form>
-              <hr/>
-              <div class="panel panel-default" ng-repeat="r in children">
-                <div class="panel-heading">
-                  <h3 class="panel-title"><a ng-click="openElementInNewWindow(r.element)">{{r.element.name}}</a></h3>
-                </div>
-                <div class="panel-body">
-                  <blockquote ng-show="r.element.description" class="preserve-new-lines">{{r.element.description}}</blockquote>
-                  <blockquote ng-show="!r.element.description" class="preserve-new-lines"><em>No description</em></blockquote>
-                  <h5 ng-hide="isEmpty(r.ext)">Relationship Metadata</h5>
-                  <table ng-hide="isEmpty(r.ext)" class="table table-condensed">
-                    <tbody>
-                      <tr ng-repeat="(key, value) in r.ext">
-                        <td class="col-md-6">{{key}}</td>
-                        <td class="col-md-6">{{value}}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
           </div>
-          <div ng-switch-when="elements">
+          <div ng-switch-when="elements" id="elements">
               <br/>
-              <messages-panel messages="messages"></messages-panel>
               <form role="form">
                 <div class="form-group">
                   <label for="name" class="">Data Element</label>
-                  <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" catalogue-element-picker="dataElement">
+                  <elements-as-tags elements="dataElements"></elements-as-tags>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
+                    <span class="input-group-btn">
+                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element) || isString(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                    </span>
+                  </div>
                   <p class="help-block">Data element is destination for the containment relationship</p>
                 </div>
                 <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Source Min Occurs', 'Source Max Occurs', 'Destination Min Occurs', 'Destination Max Occurs']"></simple-object-editor>
-                <button class="btn btn-sm btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element) || isString(dataElement.element)"><span class="glyphicon glyphicon-plus"></span> Add Data Element</button>
               </form>
-              <hr/>
-              <div class="panel panel-default" ng-repeat="r in dataElements">
-                <div class="panel-heading">
-                  <h3 class="panel-title"><a ng-click="openElementInNewWindow(r.element)">{{r.element.name}}</a></h3>
-                </div>
-                <div class="panel-body">
-                  <blockquote ng-show="r.element.description" class="preserve-new-lines">{{r.element.description}}</blockquote>
-                  <blockquote ng-show="!r.element.description" class="preserve-new-lines"><em>No description</em></blockquote>
-                  <h5 ng-hide="isEmpty(r.ext)">Relationship Metadata</h5>
-                  <table ng-hide="isEmpty(r.ext)" class="table table-condensed">
-                    <tbody>
-                      <tr ng-repeat="(key, value) in r.ext">
-                        <td class="col-md-6">{{key}}</td>
-                        <td class="col-md-6">{{value}}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
             </tab>
           </div>
-          <div ng-switch-when="summary">
-              <messages-panel messages="messages"></messages-panel>
+          <div ng-switch-when="summary" id="summary">
               <div>
               </div>
               <h4 ng-show="model.name">Crating new model <strong>{{model.name}}</strong></h4>
@@ -174,7 +138,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages']).config ['messa
           $scope.dataElement = {ext: {}}
           $scope.dataElements = []
           $scope.messages = messages.createNewMessages()
-          $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements', 'summary']
+          $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements']
           $scope.step = 'model'
           $scope.pendingActions = []
           $scope.pendingActionsCount = 0
@@ -190,6 +154,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages']).config ['messa
             angular.isString object
 
           $scope.push = (arrayName, propertyName) ->
+            $scope[propertyName].name = $scope[propertyName].element.name
             $scope[arrayName].push $scope[propertyName]
             $scope[propertyName] = {ext: {}}
 
@@ -245,7 +210,9 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages']).config ['messa
                 $modalInstance.close(fresh)
 
           $scope.select = (step) ->
+            return if step != 'model' and not $scope.model.name
             $scope.step = step
+            return
 
           $scope.next = ->
             return if not $scope.model.name
@@ -264,6 +231,11 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages']).config ['messa
               if step == $scope.step and i != 0
                 $scope.step = $scope.steps[i - 1]
                 break
+
+          $scope.navigateOnKey = ($event, key, step) ->
+            $scope.select(step) if $event.keyCode == key
+
+          $scope.select('model')
 
         ]
 
