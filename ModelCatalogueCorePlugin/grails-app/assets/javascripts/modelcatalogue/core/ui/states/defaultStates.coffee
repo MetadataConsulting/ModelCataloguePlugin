@@ -11,26 +11,54 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
     $scope.element  = element
 ])
 
-.controller('mc.core.ui.states.DashboardCtrl', ['$scope', '$stateParams', '$state', '$log', 'user', ($scope, $stateParams, $state, $log, user) ->
-    $scope.user  = user
-    $scope.totalDataElementCount = 512
-    $scope.draftDataElementCount = 12
-    $scope.finalizedDataElementCount = 500
-    $scope.totalDataSetCount = 5
-    $scope.draftDataSetCount = 1
-    $scope.finalizedDataSetCount = 4
-    $scope.totalModelCount = 10
-    $scope.draftModelCount = 1
-    $scope.finalizedModelCount = 9
-    $scope.pendingActions = 0
-    $scope.failedActions = 0
-    $scope.batches = 1
-    $scope.uninstantiatedDataElements = 12
-    $scope.relationshipTypes = 14
-    $scope.suggestedRelationships = 0
-    $scope.measurementUnits = 0
-    $scope.dataTypes = 0
-    $scope.valueDomains = 0
+.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', '$log', 'security', 'rest', 'modelCatalogueApiRoot', 'user', ($rootScope, $scope, $stateParams, $state, $log, security, rest, modelCatalogueApiRoot, user) ->
+
+  updateDashboard = (userName) ->
+    $scope.user  = userName
+    rest(method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard").then ((result)->
+      $scope.totalDataElementCount = result.totalDataElementCount
+      $scope.draftDataElementCount = result.draftDataElementCount
+      $scope.finalizedDataElementCount = result.finalizedDataElementCount
+      $scope.totalDataSetCount = result.totalDataSetCount
+      $scope.totalModelCount = result.totalModelCount
+      $scope.draftModelCount = result.draftModelCount
+      $scope.finalizedModelCount = result.finalizedModelCount
+      $scope.pendingActionCount = result.pendingActionCount
+      $scope.failedActionCount = result.failedActionCount
+      $scope.batchCount = result.batchCount
+      $scope.uninstantiatedDataElementCount = result.uninstantiatedDataElementCount
+      $scope.relationshipTypeCount = result.relationshipTypeCount
+      $scope.measurementUnitCount = result.measurementUnitCount
+      $scope.dataTypeCount = result.dataTypeCount
+      $scope.measurementUnitCount = result.valueDomainCount
+    )
+
+  $rootScope.$on('userLoggedIn', (event, user) ->
+    updateDashboard(user.data.displayName)
+  )
+
+  if user!=''
+    updateDashboard(user)
+  else
+    $scope.user = user
+    $scope.totalDataElementCount = ''
+    $scope.draftDataElementCount = ''
+    $scope.finalizedDataElementCount = ''
+    $scope.totalDataSetCount = ''
+    $scope.draftDataSetCount = ''
+    $scope.finalizedDataSetCount = ''
+    $scope.totalModelCount = ''
+    $scope.draftModelCount = ''
+    $scope.finalizedModelCount = ''
+    $scope.pendingActionCount = ''
+    $scope.failedActionCount = ''
+    $scope.batchCount = ''
+    $scope.uninstantiatedDataElements = ''
+    $scope.relationshipTypeCount = ''
+    $scope.measurementUnitCount = ''
+    $scope.dataTypeCount = ''
+    $scope.valueDomainCount = ''
+
 
 ])
 
@@ -495,8 +523,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                                         <i class="fa fa-cubes fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a href="#"> Finalized Data Sets</a> {{finalizedDataSetCount}} </div>
-                                        <div>  <a href="#">Draft Data Sets</a> {{draftDataSetCount}}</div>
+                                        <div><a href="#"> Finalized Data Sets</a> {{totalDataSetCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -543,7 +570,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
-                                        <div><a id="modelsLink" ui-sref="mc.dataArchitect.uninstantiatedDataElements" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElements}}</div>
+                                        <div><a id="modelsLink" ui-sref="mc.dataArchitect.uninstantiatedDataElements" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElementCount}}</div>
                                     </div>
                                 </div>
                             </div>
@@ -566,9 +593,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                                         <i class="fa fa-bell-o fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"> Batches </a> {{batches}} </div>
-                                        <div>Pending Actions {{pendingActions}} </div>
-                                        <div>Failed Actions {{failedActions}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"> Batches </a> {{batchCount}} </div>
+                                        <div>Pending Actions {{pendingActionCount}} </div>
+                                        <div>Failed Actions {{failedActionCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -613,8 +640,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                                         <i class="fa fa-exchange fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypes}}</div>
-                                        <div><a href="#">Suggested Relationships</a> {{suggestedRelationships}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypeCount}}</div>
                                     </div>
                                 </div>
                             </div>
@@ -683,7 +709,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                                         <i class="fa fa-tasks fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Measurement Units</a> {{measurementUnits}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Measurement Units</a> {{measurementUnitCount}} </div>
                                     </div>
                                 </div>
                             </div>
