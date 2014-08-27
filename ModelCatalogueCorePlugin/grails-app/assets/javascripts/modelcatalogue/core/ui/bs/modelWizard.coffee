@@ -245,5 +245,5 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
         $rootScope.createModelWizard = undefined
   ]
 
-  messagesProvider.setPromptFactory 'create-model-wizard', factory
+  messagesProvider.setPromptFactory 'create-model', factory
 ]

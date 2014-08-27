@@ -3,7 +3,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerAction 'create-catalogue-element', ['$scope', 'names', 'security', 'messages', ($scope, names, security, messages) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.resource
-    return undefined if not messages.hasPromptFactory('edit-' + $scope.resource)
+    return undefined if not messages.hasPromptFactory('create-' + $scope.resource) and not messages.hasPromptFactory('edit-' + $scope.resource)
 
     {
     position:   100
@@ -11,7 +11,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     icon:       'plus-sign'
     type:       'success'
     action:     ->
-      messages.prompt('Create ' + names.getNaturalName($scope.resource), '', {type: 'edit-' + $scope.resource, create: ($scope.resource)}).then (created)->
+      modalType = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
+      messages.prompt('Create ' + names.getNaturalName($scope.resource), '', {type: modalType, create: ($scope.resource)}).then (created)->
         created.show()
     }
   ]
