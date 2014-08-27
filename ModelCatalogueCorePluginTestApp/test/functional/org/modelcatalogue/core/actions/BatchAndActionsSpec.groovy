@@ -52,13 +52,13 @@ class BatchAndActionsSpec extends GebSpec {
         pendingActions[0].find('.glyphicon-edit').click()
 
         when:
-        nameProperty = 'Brand New Model'
+        nameProperty = 'BrandNewModel'
         $('button#update-parameters').click()
 
 
         then:
         waitFor {
-            pendingActions[0].text().contains('Brand New Model')
+            pendingActions[0].text().contains('BrandNewModel')
         }
 
         when:

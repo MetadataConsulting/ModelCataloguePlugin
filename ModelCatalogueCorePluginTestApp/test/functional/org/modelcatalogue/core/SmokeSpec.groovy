@@ -32,7 +32,7 @@ class SmokeSpec extends GebSpec {
 
         then:
         waitFor {
-            basicEditDialog.displayed
+            modelWizard.displayed
         }
 
         when:

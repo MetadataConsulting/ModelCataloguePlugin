@@ -13,11 +13,11 @@ class ModalTreeViewPage extends ModelCataloguePage {
 
         addModelButton      { $('span.glyphicon.glyphicon-plus-sign') }
 
-        basicEditDialog     { $('div.basic-edit-modal-prompt') }
+        modelWizard         { $('div.create-model-wizard') }
 
-        name                { basicEditDialog.find('input[id=name]') }
-        description         { basicEditDialog.find('textarea[id=description]') }
-        saveButton          { basicEditDialog.find("button.btn-success") }
+        name                { modelWizard.find('input[id=name]') }
+        description         { modelWizard.find('textarea[id=description]') }
+        saveButton          { modelWizard.find("button.btn-success") }
 
     }
 }

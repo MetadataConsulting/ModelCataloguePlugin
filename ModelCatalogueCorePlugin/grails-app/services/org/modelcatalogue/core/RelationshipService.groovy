@@ -45,6 +45,12 @@ class RelationshipService {
             }
         }
 
+        relationshipInstance.validate()
+
+        if (relationshipInstance.hasErrors()) {
+            return relationshipInstance
+        }
+
         source?.addToOutgoingRelationships(relationshipInstance)
         destination?.addToIncomingRelationships(relationshipInstance)
         relationshipInstance.save(flush: true)

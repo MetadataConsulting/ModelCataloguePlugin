@@ -207,6 +207,7 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   padding-left: 0;
   list-style: none;
   text-align: center;
+  z-index: 10000;
 
   .clearfix();
 
@@ -225,20 +226,6 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
     }
   }
 
-  .next {
-    > a,
-    > span {
-      float: right;
-    }
-  }
-
-  .previous {
-    > a,
-    > span {
-      float: left;
-    }
-  }
-
   .disabled {
     > a,
     > a:hover,
@@ -249,9 +236,14 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   }
 
   .btn {
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
+    -webkit-border-radius: 15px;
+    -moz-border-radius: 15px;
+    border-radius: 15px;
+
+    &:hover, &:focus {
+      outline: none!important;
+    }
+
   }
 
 }

@@ -13,7 +13,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
-            <form role="form">
+            <form role="form" ng-submit="createRelation()">
               <table ng-hide="update">
                 <tbody>
                   <tr>
@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="createRelation()"><span class="glyphicon" ng-class="{'glyphicon-link' : !update, 'glyphicon-edit': update}"></span> {{update ? 'Update' : 'Create'}} Relationship</button>
+            <button class="btn btn-primary" ng-click="createRelation()" type="submit"><span class="glyphicon" ng-class="{'glyphicon-link' : !update, 'glyphicon-edit': update}"></span> {{update ? 'Update' : 'Create'}} Relationship</button>
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
@@ -75,7 +75,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
           $scope.messages = messages.createNewMessages()
 
-          $scope.metadata = {}
+          $scope.metadata = args.metadata ? {}
 
           $scope.createRelation = ->
             $scope.messages.clearAllMessages()
@@ -106,7 +106,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
 
           if args.relation and args.direction and args.relationshipType
-            info = { type: args.relationshipType }
+            info = { type: args.relationshipType}
 
             if args.direction == 'sourceToDestination'
               info.relation = 'destination'
