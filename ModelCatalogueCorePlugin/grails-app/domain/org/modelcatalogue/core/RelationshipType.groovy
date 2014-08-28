@@ -167,10 +167,6 @@ class RelationshipType {
         relationshipTypeService.clearCache()
     }
 
-    def beforeDelete() {
-        relationshipTypeService.clearCache()
-    }
-
 
     static String toCamelCase(String text) {
         if (!text) return text

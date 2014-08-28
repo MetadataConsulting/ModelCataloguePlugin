@@ -183,31 +183,11 @@ abstract class CatalogueElement {
         modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
     }
 
-    def beforeDelete(){
-        outgoingRelationships.each{ Relationship relationship->
-            relationship.beforeDelete()
-            relationship.delete(flush:true)
-        }
-        incomingRelationships.each{ Relationship relationship ->
-            relationship.beforeDelete()
-            relationship.delete(flush:true)
-        }
-        outgoingMappings.each{ Mapping mapping ->
-            mapping.beforeDelete()
-            mapping.delete(flush:true)
-        }
-        incomingMappings.each{ Mapping mapping ->
-            mapping.beforeDelete()
-            mapping.delete(flush:true)
-        }
-    }
-
 	def updateModelCatalogueId() {
 		def newCatalogueId = modelCatalogueId.split("_")
 		newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
 		modelCatalogueId = newCatalogueId.join("_")
 	}
-
 
 
 	/**

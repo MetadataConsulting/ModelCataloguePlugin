@@ -75,15 +75,6 @@ class Relationship implements Extendible {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}, type: ${relationshipType?.name}]"
     }
 
-    def beforeDelete(){
-        if (source) {
-            source?.removeFromOutgoingRelationships(this)
-        }
-        if(destination){
-            destination?.removeFromIncomingRelationships(this)
-        }
-    }
-
     @Override
     Set<Extension> listExtensions() {
         extensions
