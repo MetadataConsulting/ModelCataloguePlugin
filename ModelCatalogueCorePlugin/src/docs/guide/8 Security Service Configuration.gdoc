@@ -1,0 +1,36 @@
+h2. Security Service Configuration
+
+Model Catalogue provides very lightweight [security service|api:org.modelcatalogue.core.SecurityService] which is only based on checking if user is logged in and
+what role does the user have. The service expects three basic roles of users - VIEWER, CURATOR, ADMIN. VIEWER users
+are allowed to read-only view catalogue elements, CURATOR can also create and update catalogue elements and ADMIN can
+view, create and update relationship types as well and also can delete any catalogue element.
+
+{warning}
+Base plugin ships with void security service which doesn't provide any security constraints at all and user
+is always logged in and has any role you ask for. Use one of Model Catalogue Spring Security plugins or write your own
+security service implementation.
+{warning}
+
+h3. Spring Security
+There are two implementation of the security service for Spring Security Core 1.x and Spring Security Core 2.x versions.
+The versions delegates the current user and role checks to Spring Security services. The roles translated so the has role VIEWER
+inquiry returns true for any of roles ROLE_USER, ROLE_CURATOR, ROLE_ADMIN, ROLE_VIEWER, for role CURATOR returns true for
+any of roles ROLE_CURATOR, ROLE_ADMIN and role ADMIN returns true only for roles ROLE_ADMIN. Any role not prefixed by ROLE_
+is prefixed automatically while checking for the role.
+
+
+h3. Custom Security Service
+
+If you are not using Spring Security to secure your application or the plugins shipped doesn't meet your needs you can use your own
+implementation of [SecurityService|api:org.modelcatalogue.core.SecurityService] and override the definition of @modelCatalogueSecurityService@
+bean.
+
+{code}
+import com.example.yourapp.YourSecurityService
+
+// Place your Spring DSL code here
+beans = {
+    // ...
+    modelCatalogueSecurityService(YourSecurityService)
+}
+{code}
