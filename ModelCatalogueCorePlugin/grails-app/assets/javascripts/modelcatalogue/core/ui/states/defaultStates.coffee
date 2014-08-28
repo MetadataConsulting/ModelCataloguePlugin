@@ -11,7 +11,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
     $scope.element  = element
 ])
 
-.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', '$log', 'security', 'rest', 'modelCatalogueApiRoot', 'user', ($rootScope, $scope, $stateParams, $state, $log, security, rest, modelCatalogueApiRoot, user) ->
+.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', '$log', 'security', 'rest', 'modelCatalogueApiRoot', 'user', 'messages', ($rootScope, $scope, $stateParams, $state, $log, security, rest, modelCatalogueApiRoot, user, messages) ->
 
   updateDashboard = (userName) ->
     $scope.user  = userName
@@ -39,6 +39,20 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
   $rootScope.$on('userLoggedIn', (event, user) ->
     updateDashboard(user.data.displayName)
   )
+
+
+  $scope.createModel = ()->
+    messages.prompt('Model Tutorial', '', {type: 'create-model'}).then (model)->
+      model.show()
+    , ->
+      $state.go('mc.resource.list', {resource: 'model'})
+
+  $scope.createClassification = ()->
+    messages.prompt('Classification Tutorial', '', {type: 'create-classification'}).then (model)->
+      model.show()
+    , ->
+      $state.go('mc.resource.list', {resource: 'classification'})
+
 
   if user!=''
     updateDashboard(user)
@@ -518,7 +532,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
 
                             <a href="#">
                                 <div class="panel-footer">
-                                    <span class="pull-left">Create New Data Set</span>
+                                    <span class="pull-left" ng-click="createClassification()">Create New Data Set</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -541,7 +555,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                             </div>
                             <a href="#">
                                 <div class="panel-footer">
-                                    <span class="pull-left">Create New Model</span>
+                                    <span class="pull-left" ng-click="createModel()">Create New Model</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -679,7 +693,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                             </div>
                             <a href="#">
                                 <div class="panel-footer">
-                                    <span class="pull-left">Create New Data Type</span>
+                                    <span class="pull-left" >Create New Data Type</span>
                                     <span class="pull-right"><i class="fa fa-money"></i></span>
                                     <div class="clearfix"></div>
                                 </div>

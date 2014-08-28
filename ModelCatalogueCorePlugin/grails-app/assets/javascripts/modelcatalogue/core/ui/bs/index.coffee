@@ -34,6 +34,7 @@
 #= require modalPromptDataElementEdit
 #= require saveOrUpdatePublishedElementCtrl
 #= require modelWizard
+#= require classificationWizard
 #= require elementsAsTags
 
 
@@ -74,5 +75,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptDataElementEdit'
   'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
   'mc.core.ui.bs.modelWizard'
+  'mc.core.ui.bs.classificationWizard'
   'mc.core.ui.bs.elementsAsTags'
 ])
