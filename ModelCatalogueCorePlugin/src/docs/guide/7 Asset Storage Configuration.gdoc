@@ -1,7 +1,7 @@
 h2. Asset Storage Configuration
 
 Model Catalogue provides special published element of type [Asset|api:org.modelcatalogue.core.Asset] which serves for
-storing files with additional metadata. By default the uploaded files are stored on the disc. You can custimize the
+storing files with additional metadata. By default the uploaded files are stored on the disc. You can customize the
 default storage in @Config.groovy@:
 
 {code}

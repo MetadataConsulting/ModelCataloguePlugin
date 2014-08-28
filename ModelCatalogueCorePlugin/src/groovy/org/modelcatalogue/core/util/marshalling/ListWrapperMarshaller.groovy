@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired
 abstract class ListWrapperMarshaller extends AbstractMarshallers {
 
     @Autowired ReportsRegistry reportsRegistry
-    @Autowired SecurityService modelCatalogueSecurityService
 
     ListWrapperMarshaller(Class cls) {
         super(cls)
@@ -32,16 +31,6 @@ abstract class ListWrapperMarshaller extends AbstractMarshallers {
                 sort: elements.sort,
                 order: elements.order
         ]
-    }
-
-    protected getAvailableReports(el) {
-        def reports = []
-
-        for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
-            reports << [title: descriptor.getTitle(el), url: descriptor.getLink(el), type: modelCatalogueSecurityService.userLoggedIn ?  descriptor.renderType.toString() : 'LINK']
-        }
-
-        reports
     }
 
     @Override

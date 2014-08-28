@@ -20,7 +20,6 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
-    @Autowired SecurityService modelCatalogueSecurityService
 
     CatalogueElementMarshallers(Class type) {
         super(type)
@@ -58,16 +57,6 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
         ret
 
-    }
-
-    protected getAvailableReports(CatalogueElement el) {
-        def reports = []
-
-        for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
-            reports << [title: descriptor.getTitle(el), url: descriptor.getLink(el), type: modelCatalogueSecurityService.userLoggedIn ?  descriptor.renderType.toString() : 'LINK']
-        }
-
-        reports
     }
 
     protected getRelationshipTypesFor(Class elementClass){

@@ -2,6 +2,9 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.JSON
 import grails.converters.XML
+import org.modelcatalogue.core.SecurityService
+import org.modelcatalogue.core.reports.ReportDescriptor
+import org.springframework.beans.factory.annotation.Autowired
 
 /**
  * Interface for the classes providing custom marshallers.
@@ -9,6 +12,8 @@ import grails.converters.XML
  * The marshallers are registered in the {@link AbstractMarshallers#register()} method.
  */
 abstract class AbstractMarshallers {
+
+    @Autowired SecurityService modelCatalogueSecurityService
 
     final Class type
 
@@ -48,5 +53,21 @@ abstract class AbstractMarshallers {
 
     protected String getElementName(element) { return null }
     protected boolean isSupportingCustomElementName() { return false }
+
+    protected getAvailableReports(el) {
+        def reports = []
+
+        for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {
+            if (modelCatalogueSecurityService.userLoggedIn) {
+                // for users logged in render all links
+                reports << [title: descriptor.getTitle(el) ?: "Generic Report", url: descriptor.getLink(el), type: descriptor.renderType.toString()]
+            } else if (descriptor.renderType != ReportDescriptor.RenderType.ASSET) {
+                // for users not logged in only let non-asset reports to render
+                reports << [title: descriptor.getTitle(el) ?: "Generic Report", url: descriptor.getLink(el), type: descriptor.renderType.toString()]
+            }
+        }
+
+        reports
+    }
 
 }
