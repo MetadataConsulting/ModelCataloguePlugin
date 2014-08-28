@@ -19,6 +19,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
       $scope.totalDataElementCount = result.totalDataElementCount
       $scope.draftDataElementCount = result.draftDataElementCount
       $scope.finalizedDataElementCount = result.finalizedDataElementCount
+      $scope.totalAssetCount = result.totalDataElementCount
+      $scope.draftAssetCount = result.draftAssetCount
+      $scope.finalizedAssetCount = result.finalizedAssetCount
       $scope.totalDataSetCount = result.totalDataSetCount
       $scope.totalModelCount = result.totalModelCount
       $scope.draftModelCount = result.draftModelCount
@@ -30,7 +33,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
       $scope.relationshipTypeCount = result.relationshipTypeCount
       $scope.measurementUnitCount = result.measurementUnitCount
       $scope.dataTypeCount = result.dataTypeCount
-      $scope.measurementUnitCount = result.valueDomainCount
+      $scope.valueDomainCount = result.valueDomainCount
     )
 
   $rootScope.$on('userLoggedIn', (event, user) ->
@@ -58,6 +61,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
     $scope.measurementUnitCount = ''
     $scope.dataTypeCount = ''
     $scope.valueDomainCount = ''
+    $scope.totalAssetCount = ''
+    $scope.draftAssetCount = ''
+    $scope.finalizedAssetCount = ''
 
 
 ])
@@ -492,7 +498,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
 </div>
 
 <div show-for-role="ADMIN" >
-    <div class="jumbotron">
+    <div class="page-header">
       <h1>Welcome back {{user}}</h1>
       <p class="lead"> this is your dashboard </p>
     </div>
@@ -505,7 +511,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                                         <i class="fa fa-cubes fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a href="#"> Finalized Data Sets</a> {{totalDataSetCount}} </div>
+                                        <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"> Data Sets</a> {{totalDataSetCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -599,8 +605,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                                         <i class="fa fa-book fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedModelCount}} </div>
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftModelCount}}</div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftAssetCount}}</div>
 
                                     </div>
                                 </div>
@@ -642,18 +648,17 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-cubes fa-5x" style="color:#428bca"></i>
+                                        <i class="fa fa-cogs fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a href="#"> Finalized Data Sets</a> {{finalizedDataSetCount}} </div>
-                                        <div>  <a href="#">Draft Data Sets</a> {{draftDataSetCount}}</div>
+                                        <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} </div>
                                     </div>
                                 </div>
                             </div>
 
                             <a href="#">
                                 <div class="panel-footer">
-                                    <span class="pull-left">Create New Data Set</span>
+                                    <span class="pull-left">Create New Value Domain</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -665,18 +670,16 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-cube fa-5x" style="color:#428bca"></i>
+                                        <i class="fa fa-sort-numeric-asc fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Finalized Models</a> {{finalizedModelCount}} </div>
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Models</a> {{draftModelCount}}</div>
-
+                                        <div><a id="dataTypesLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Data Types</a> {{dataTypeCount}} </div>
                                     </div>
                                 </div>
                             </div>
                             <a href="#">
                                 <div class="panel-footer">
-                                    <span class="pull-left">Create New Model</span>
+                                    <span class="pull-left">Create New Data Type</span>
                                     <span class="pull-right"><i class="fa fa-money"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
@@ -688,7 +691,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-tasks fa-5x" style="color:#428bca"></i>
+                                        <i class="fa fa-gbp fa-5x" style="color:#428bca"></i>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Measurement Units</a> {{measurementUnitCount}} </div>
