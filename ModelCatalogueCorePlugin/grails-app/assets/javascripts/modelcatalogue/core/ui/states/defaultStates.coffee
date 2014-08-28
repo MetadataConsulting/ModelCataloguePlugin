@@ -331,8 +331,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
       <div class="row">
         <div class="col-md-4">
           <h2>
-            Model Hierarchy
-            <contextual-actions size="sm" icon-only="true" group="true" no-colors="true"></contextual-actions>
+            Models
+            <span class="pull-right">
+            <contextual-actions size="sm" icon-only="true" no-colors="true"></contextual-actions>
             </span>
           </h2>
         </div>
