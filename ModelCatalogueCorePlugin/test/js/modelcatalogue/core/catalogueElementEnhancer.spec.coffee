@@ -36,7 +36,7 @@ describe "mc.core.catalogueElementEnhancer", ->
     expect(event).not.toBeNull()
     expect(toState).not.toBeNull()
     expect(toState.name).toEqual('mc.resource.show')
-    expect(toParams).toEqual({resource: 'valueDomain', id: "#{enhanced.id}"})
+    expect(angular.equals(toParams, {resource: 'valueDomain', id: "#{enhanced.id}"})).toBeTruthy()
     expect(self).toEqual(enhanced)
 
   it "returns expected results for instance of", inject (enhance) ->
