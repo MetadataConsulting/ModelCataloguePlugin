@@ -19,6 +19,7 @@ class RelationshipMarshallers extends AbstractMarshallers {
                 source: rel.source.info,
                 destination: rel.destination.info,
                 type: rel.relationshipType.info,
+                archived: rel.archived,
                 ext: rel.ext
         ]
     }
@@ -44,6 +45,7 @@ class RelationshipMarshallers extends AbstractMarshallers {
     protected void addXmlAttributes(rel, XML xml) {
         super.addXmlAttributes(rel, xml)
         addXmlAttribute(rel.id, "id", xml)
+        addXmlAttribute(rel.archived, "archived", xml)
     }
 
     static void renderInfo(String what, Map info, XML xml) {

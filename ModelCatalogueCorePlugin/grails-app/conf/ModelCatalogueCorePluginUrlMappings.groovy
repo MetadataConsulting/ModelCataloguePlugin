@@ -60,6 +60,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName in publishedElements) {
                     "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
                 }
 
                 if (controllerName == 'dataType' || controllerName == 'enumeratedType' ) {

@@ -119,7 +119,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
 
-    {
+    action = {
     position:   150
     label:      'New Version'
     icon:       'circle-arrow-up'
@@ -131,6 +131,15 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           messages.success("New version created for #{$scope.element.name}")
           $rootScope.$broadcast 'newVersionCreated', $scope.element
     }
+
+    updateAction = ->
+      action.disabled = $scope.element.archived
+
+    $scope.$watch 'element.status', updateAction
+    $scope.$watch 'element.archived', updateAction
+    $rootScope.$on 'newVersionCreated', updateAction
+
+    action
   ]
 
   actionsProvider.registerAction 'finalize', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
@@ -162,13 +171,41 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
+  actionsProvider.registerAction 'acrhive', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.status
+    return undefined if not security.hasRole('CURATOR')
+
+    action = {
+      position:   150
+      label:      'Archive'
+      icon:       'compressed'
+      type:       'danger'
+      action:     ->
+        messages.confirm("Do you want to archive #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be archived").then ->
+          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
+            $scope.element = archived
+    }
+
+    updateAction = ->
+      action.disabled = $scope.element.archived
+
+    $scope.$watch 'element.status', updateAction
+    $scope.$watch 'element.archived', updateAction
+    $rootScope.$on 'newVersionCreated', updateAction
+
+    action
+  ]
+
+
+
   actionsProvider.registerAction 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.isInstanceOf('org.modelcatalogue.core.CatalogueElement')
     return undefined if $scope.element.elementTypeName == 'Data Import'
     return undefined if not security.hasRole('CURATOR')
 
-    {
+    action = {
     position:   200
     label:      'Create Relationship'
     icon:       'link'
@@ -177,6 +214,14 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element}).then (updated)->
         $scope.element = updated
     }
+
+    updateAction = ->
+      action.disabled = $scope.element.archived
+
+    $scope.$watch 'element.status', updateAction
+    $scope.$watch 'element.archived', updateAction
+
+    action
   ]
 
   actionsProvider.registerAction 'download-asset', [ '$scope', '$window', ($scope, $window) ->
