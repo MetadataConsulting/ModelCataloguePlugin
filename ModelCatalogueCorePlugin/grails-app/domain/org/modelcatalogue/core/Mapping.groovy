@@ -45,4 +45,13 @@ class Mapping {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}]"
     }
 
+    def beforeDelete(){
+        if (source) {
+            source?.removeFromOutgoingMappings(this)
+        }
+        if(destination){
+            destination?.removeFromIncomingMappings(this)
+        }
+    }
+
 }
