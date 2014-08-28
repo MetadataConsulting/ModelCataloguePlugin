@@ -7,7 +7,7 @@ import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.SimpleListWrapper
 
 
-class ClassificationController extends AbstractCatalogueElementController<Classification> {
+class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
 
     ClassificationController() {
         super(Classification)
@@ -20,31 +20,6 @@ class ClassificationController extends AbstractCatalogueElementController<Classi
             notFound()
             return
         }
-//        List items = []
-//        def classifications = classification.classifies
-//        items.addAll(classifications)
-//
-//        SimpleListWrapper<PublishedElement> elements = new SimpleListWrapper<PublishedElement>(
-//                base: "/${resourceName}/${params.id}/classifies",
-//                total: items.size(),
-//                items: items,
-//        )
-//        reportCapableRespond new PublishedElements(list: withLinks(elements))
-
-
-//        def x = PublishedElement.withCriteria {
-//            ", classification
-//        }
-
-
-//        def c = PublishedElement.createCriteria()
-//        def results = c.list {
-//            classifications{
-//                idEq(classification.id)
-//            }
-//        }
-//
-
 
         reportCapableRespond new PublishedElements(list: Lists.fromCriteria(params, PublishedElement, "/${resourceName}/${params.id}/classifies", "classifies"){
             classifications{
@@ -53,5 +28,35 @@ class ClassificationController extends AbstractCatalogueElementController<Classi
         })
 
     }
+
+    @Override
+    protected bindRelations(Classification instance) {
+        if (objectToBind.classifies != null) {
+            for (domain in instance.classifies.findAll { !(it.id in objectToBind.classifies*.id) }) {
+                instance.removeFromClassifies(domain)
+                domain.removeFromClassifications(instance)
+            }
+            for (domain in objectToBind.classifies) {
+                PublishedElement publishedElement = PublishedElement.get(domain.element.id as Long)
+                instance.addToClassifies publishedElement
+                publishedElement.addToClassifications instance
+            }
+        }
+    }
+
+    @Override
+    protected getIncludeFields(){
+        def fields = super.includeFields
+        fields.removeAll(['classifies'])
+        fields
+    }
+
+    @Override
+    protected Classification createResource() {
+        Classification instance = resource.newInstance()
+        bindData instance, getObjectToBind(), [include: includeFields]
+        instance
+    }
+
 
 }

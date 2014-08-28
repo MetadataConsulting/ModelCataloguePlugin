@@ -46,11 +46,11 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
               <form role="form" ng-submit="select('elements')">
                 <div class="form-group">
                   <label for="name" class="">Name</label>
-                  <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-classification="classification.name" focus-me="step=='classification'" required>
+                  <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="classification.name" focus-me="step=='classification'" required>
                 </div>
                 <div class="form-group">
                   <label for="description" class="">Description</label>
-                  <textarea rows="10" ng-classification="classification.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'elements')"></textarea>
+                  <textarea rows="10" ng-model="classification.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'elements')"></textarea>
                 </div>
               </form>
           </div>
@@ -61,7 +61,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
                   <label for="name" class="">Data Element</label>
                   <elements-as-tags elements="dataElements"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-classification="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element) || isString(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
@@ -73,27 +73,18 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
           <div ng-switch-when="summary" id="summary">
               <div>
               </div>
-              <h4 ng-show="classification.name">Crating new classification <strong>{{classification.name}}</strong></h4>
-              <progressbar class="progress-striped active" value="pendingActionsCount == 0 ? 100 : Math.round(100 * (totalActions - pendingActionsCount) / totalActions)">{{totalActions - pendingActionsCount}} / {{totalActions}}({{pendingActionsCount == 0 ? 100 : Math.round(100 * (totalActions - pendingActionsCount) / totalActions)}})</progressbar>
+              <h4 ng-show="classification.name">Creating new classification <strong>{{classification.name}}</strong></h4>
           </div>
         </div>
         '''
         controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout) ->
-          $scope.classification = {}
-          $scope.metadata = {}
-          $scope.parent = {ext: {}}
-          $scope.parents = []
-          $scope.child = {ext: {}}
-          $scope.children = []
-          $scope.dataElement = {ext: {}}
+          $scope.classification = {classifies:{}}
+          $scope.dataElement = {}
           $scope.dataElements = []
           $scope.messages = messages.createNewMessages()
           $scope.steps = ['classification', 'elements']
 #          'metadata', 'parents', 'children',
           $scope.step = 'classification'
-          $scope.pendingActions = []
-          $scope.pendingActionsCount = 0
-          $scope.totalActions = 0
           $scope.finishInProgress = false
 
 
@@ -107,7 +98,6 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
           $scope.push = (arrayName, propertyName) ->
             $scope[propertyName].name = $scope[propertyName].element.name
             $scope[arrayName].push $scope[propertyName]
-            $scope[propertyName] = {ext: {}}
 
           $scope.openElementInNewWindow = (element) ->
             url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
@@ -118,25 +108,11 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             return if $scope.finishInProgress
             $scope.finishInProgress = true
 
-            angular.forEach $scope.dataElements, (element) ->
-              $scope.pendingActions.push (classification) ->
-                classification.contains.add element.element
-                classification
+            $scope.classification.classifies = $scope.dataElements
 
-            $scope.totalActions = $scope.pendingActionsCount = $scope.pendingActions.length + 1
             $scope.step = 'summary'
 
-            decreasePendingActionsCount = (classification) ->
-              $scope.pendingActionsCount--
-              # not very effective but otherwise lot of "entity updated by another transactions" occurs
-              classification.refresh().then (fresh) ->
-                $timeout((-> fresh), 200)
-
-
-            promise = catalogueElementResource('classification').save($scope.classification).then decreasePendingActionsCount
-
-            for action in $scope.pendingActions
-             promise = promise.then(action).then decreasePendingActionsCount
+            promise = catalogueElementResource('classification').save($scope.classification)
 
             promise.then (classification) ->
               classification.refresh().then (fresh) ->
@@ -148,7 +124,6 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             return
 
           $scope.next = ->
-            debugger
             return if not $scope.classification.name
             for step, i in $scope.steps
               if step == $scope.step and i < $scope.steps.length - 1
