@@ -29,7 +29,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       loadTab = (property) ->
         tab = tabsByName[property]
 
-        return if not tab?.loader?
+        if not tab?.loader?
+          $scope.reports  = []
+          return
 
         if !tab.disabled and (tab.value.empty or tab.search != $state.params.q)
           promise = null
