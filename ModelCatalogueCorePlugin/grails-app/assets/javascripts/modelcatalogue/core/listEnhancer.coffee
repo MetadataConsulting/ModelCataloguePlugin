@@ -101,12 +101,12 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
       # return new list decorator
       new ListDecorator(list)
 
-    listEnhancer.createEmptyList = (itemType = null) -> listEnhancer {
+    listEnhancer.createEmptyList = (itemType = null, total = 0) -> listEnhancer {
       list: []
       size: 0
       next: ''
       previous: ''
-      total: 0
+      total: total
       empty: true
       itemType: itemType
 

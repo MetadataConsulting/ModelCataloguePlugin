@@ -109,7 +109,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           tabDefinition =
             heading:  propertyConfiguration.label
-            value:    listEnhancer.createEmptyList(fn.itemType)
+            value:    listEnhancer.createEmptyList(fn.itemType, fn.total)
             disabled: fn.total == 0
             loader:   fn
             type:     'decorated-list'
