@@ -50,20 +50,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
         def oldProps = new HashMap(instance.properties)
         oldProps.remove('modelCatalogueId')
 
-//        T helper = resource.newInstance()
-
         T helper = createResource(oldProps)
-
-//
-//        def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
-//        def excludeParams = ['ext', 'versionCreated', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations','elementType', 'elementTypes', 'elementTypeName', 'dateCreated', 'lastUpdated', 'link', 'availableReports', 'defaultExcludes', 'updatableProperties', '__enhancedBy']
-//        excludeParams.addAll(relationshipDirections)
-//        def paramsToBind = getParametersToBind()
-//        def ext = paramsToBind.ext
-//        paramsToBind.remove 'ext'
-//        paramsToBind.remove 'versionCreated'
-
-
 
         def includeParams = includeFields
 
@@ -88,11 +75,6 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
 
         if (newVersion) includeParams.remove('status')
 
-//        if (newVersion) excludeParams.add('status')
-//            paramsToBind.remove 'status'
-
-
-//        helper.properties = paramsToBind
         bindData(helper, getObjectToBind(), [include: includeParams])
 
 
@@ -100,8 +82,6 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
             reportCapableRespond helper.errors, view:'edit' // STATUS CODE 422
             return
         }
-
-
 
         if (newVersion) {
             publishedElementService.archiveAndIncreaseVersion(instance)
@@ -113,6 +93,8 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
 
         bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
+
+        bindRelations(instance)
 
         request.withFormat {
             form multipartForm {
@@ -183,6 +165,22 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
             ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
         }
     }
+
+    // classifications are marshalled with the published element so no need for special method to fetch them
+    protected bindRelations(PublishedElement instance) {
+        if (objectToBind.classifications != null) {
+            for (classification in instance.classifications.findAll { !(it.id in objectToBind.classifications*.id) }) {
+                instance.removeFromClassifications classification
+                classification.removeFromClassifies instance
+            }
+            for (domain in objectToBind.classifications) {
+                Classification classification = Classification.get(domain.id as Long)
+                instance.addToClassifications classification
+                classification.addToClassifies instance
+            }
+        }
+    }
+
 
     @Override
     protected getIncludeFields(){

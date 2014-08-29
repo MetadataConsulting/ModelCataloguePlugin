@@ -7,7 +7,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def resources         = ['batch', 'relationshipType' ]
         def publishedElements = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
-        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain']
+        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'classification']
         def allElements       = catalogueElements + resources
 
         for (String controllerName in allElements) {
@@ -67,6 +67,10 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                 }
 
+                if (controllerName == 'classification') {
+                    "/api/modelCatalogue/core/$controllerName/$id/classifies"(controller: controllerName, action: 'classifies', method: HttpMethod.GET)
+                }
+
                 if (controllerName == 'valueDomain') {
                     "/api/modelCatalogue/core/$controllerName/$id/dataElement"(controller: controllerName, action: 'dataElements', method: HttpMethod.GET)
                 }
@@ -106,6 +110,7 @@ class ModelCatalogueCorePluginUrlMappings {
         }
 
         "/"(view:"index")
+        "/api/modelCatalogue/core/dashboard" (controller:"dashboard", action : 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
 	}
 }

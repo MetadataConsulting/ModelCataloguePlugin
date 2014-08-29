@@ -1,13 +1,21 @@
 angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', []).controller 'saveOrUpdatePublishedElementCtrl', ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', 'args', ($scope, messages, names, catalogueElementResource, $modalInstance, args) ->
   $scope.$modalInstance = $modalInstance
-  $scope.copy           = angular.copy(args.element ? {})
+  $scope.copy           = angular.copy(args.element ? {classifications: []})
   $scope.original       = args.element ? {}
   $scope.messages       = messages.createNewMessages()
   $scope.create         = args.create
 
   # required by save and update action
   $scope.hasChanged   = ->
-    $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
+    $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.classifications != $scope.original.classifications
+
+  $scope.addClassification = (classification) ->
+    for inArray in $scope.copy.classifications
+      return if angular.equals inArray, classification
+    $scope.copy.classifications.push classification
+
+  $scope.removeClassification = (index) ->
+    $scope.copy.classifications.splice index, 1
 
   $scope.saveElement = (newVersion)->
     $scope.messages.clearAllMessages()

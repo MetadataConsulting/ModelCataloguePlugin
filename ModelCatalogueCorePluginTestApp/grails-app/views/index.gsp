@@ -14,7 +14,7 @@
     %{--</ul>--}%
     %{--</div>--}%
     %{--</script>--}%
-
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <asset:stylesheet href="metaDataCurator.css"/>
     <asset:javascript src="metaDataCurator.js"/>
     <script type="text/javascript">
@@ -25,7 +25,7 @@
                 roles: {
                     VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
                     CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
-                    ADMIN:      ['ROLE_ADMIN'],
+                    ADMIN:      ['ROLE_ADMIN']
                 },
                 <sec:ifLoggedIn>
                 currentUser: {
@@ -61,6 +61,10 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Catalogue Elements<b
                                 class="caret"></b></a>
                         <ul class="dropdown-menu">
+                            <li ui-sref-active="active"><a id="classificationsLink"
+                                                           ui-sref="mc.resource.list({resource: 'classification'})"
+                                                           ui-sref-opts="{inherit: false}">Data Sets / Classifications</a>
+                            </li>
                             <li ui-sref-active="active"><a id="assetLink"
                                                                                    ui-sref="mc.resource.list({resource: 'asset'})"
                                                                                    ui-sref-opts="{inherit: false}">Assets</a>
@@ -115,7 +119,7 @@
 
                 <form hide-if-logged-in class="navbar-form navbar-right" ng-submit="login()"
                       ng-controller="metadataCurator.loginCtrl">
-                    <button class="btn btn-success" type="submit"><i class="glyphicon glyphicon-log-in"></i></button>
+                    <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-log-in"></i></button>
                 </form>
 
                 <form class="navbar-form navbar-right navbar-input-group search-form" role="search" autocomplete="off"

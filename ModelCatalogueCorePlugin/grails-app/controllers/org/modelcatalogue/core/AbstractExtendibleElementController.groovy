@@ -42,20 +42,9 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
 
         T helper = createResource(oldProps)
 
-//        bindData(p, params)
-
         def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
         def excludeParams = ['ext', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations', 'basedOn', 'unitedIn', 'isBaseFor', 'unionOf']
         excludeParams.addAll(relationshipDirections)
-
-
-//        outgoing: [base: 'isBaseFor', union: 'unionOf']
-//        def paramsToBind = getParametersToBind()
-//        def ext = paramsToBind.ext
-//        paramsToBind.remove 'ext'
-
-       // helper.properties = paramsToBind
-
 
         switch(response.format){
 
@@ -82,8 +71,6 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
-
-        //instance.properties = objectToBind
 
         bindData(instance, getObjectToBind(), [include: includeFields])
 

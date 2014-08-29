@@ -105,27 +105,31 @@ class BootStrap {
                     println 'Running post init job'
                     println 'Importing data'
                     importService.importData()
-                    def de = new DataElement(name: "testera", description: "test data architect").save(failOnError: true)
-                    de.ext.metadata = "test metadata"
-
-                    println 'Creating dummy models'
-                    15.times {
-                        new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
-                    }
-
-                    def parentModel1 = Model.findByName("Another root #001")
-
-                    15.times{
-                        def child = new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
-                        parentModel1.addToParentOf(child)
-                    }
-
-
-                    for (DataElement element in DataElement.list()) {
-                        parentModel1.addToContains element
-                    }
-
-
+                    def classification =  new Classification(name: "dataSet1").save(failOnError: true)
+//                    def de = new DataElement(name: "testera", description: "test data architect", classifications: [classification]).save(failOnError: true)
+//                    de.ext.metadata = "test metadata"
+//
+//                    println 'Creating dummy models'
+//                    15.times {
+//                        new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
+//                    }
+//
+//                    def parentModel1 = Model.findByName("Another root #001")
+//
+//                    15.times{
+//                        def child = new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
+//                        parentModel1.addToParentOf(child)
+//                    }
+//
+//
+//
+//
+//                    for (DataElement element in DataElement.list()) {
+//                        parentModel1.addToContains element
+//                        classification.addToClassifies(element)
+//                    }
+//
+//
                     println 'Finalizing all published elements'
                     PublishedElement.findAllByStatusNotEqual(PublishedElementStatus.FINALIZED).each {
                         if (it instanceof Model) {

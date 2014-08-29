@@ -1,6 +1,7 @@
 angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/decoratedList.html', '''
-      <table class="dl-table table">
+    <div>
+      <table ng-show="list.total>0" class="dl-table table">
         <thead>
           <tr class="dl-table-header-row" ng-switch="hasSelection()">
             <th class="dl-table-select-all-cell col-md-1" ng-switch-when="true">
@@ -48,5 +49,9 @@ angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList', 
           </tr>
         </tfoot>
       </table>
+      <div ng-show="list.total==0">
+        <p><span class="label label-warning">empty</span></p>
+      </div>
+    </div>
     '''
   ]

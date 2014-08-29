@@ -13,9 +13,15 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     Date versionCreated = new Date()
 
+    Set classifications = []
+
     static searchable = {
         except = ['versionNumber']
     }
+
+    static hasMany = [classifications: Classification]
+
+    static belongsTo = Classification
 
     @Override
     boolean isArchived() {
@@ -23,7 +29,7 @@ abstract class PublishedElement extends ExtendibleElement  {
         !status.modificable
     }
     static constraints = {
-//        TODO we need to think about what restrictions we put on publishing elements
+
         status validator: { val , obj->
             if(!val){ return true}
             def oldStatus = null
