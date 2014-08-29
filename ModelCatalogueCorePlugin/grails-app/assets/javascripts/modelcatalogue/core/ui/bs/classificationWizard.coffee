@@ -98,6 +98,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
           $scope.push = (arrayName, propertyName) ->
             $scope[propertyName].name = $scope[propertyName].element.name
             $scope[arrayName].push $scope[propertyName]
+            $scope[propertyName] = {}
 
           $scope.openElementInNewWindow = (element) ->
             url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})

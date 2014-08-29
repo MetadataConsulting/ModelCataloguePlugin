@@ -44,14 +44,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.securit
   $scope.createModel = ()->
     messages.prompt('Model Tutorial', '', {type: 'create-model'}).then (model)->
       model.show()
-    , ->
-      $state.go('mc.resource.list', {resource: 'model'})
 
   $scope.createClassification = ()->
     messages.prompt('Classification Tutorial', '', {type: 'create-classification'}).then (model)->
       model.show()
-    , ->
-      $state.go('mc.resource.list', {resource: 'classification'})
 
 
   if user!=''
