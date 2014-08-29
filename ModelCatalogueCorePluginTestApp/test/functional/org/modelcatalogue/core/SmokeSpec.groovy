@@ -15,7 +15,7 @@ class SmokeSpec extends GebSpec {
         waitFor {
             viewTitle.displayed
         }
-        viewTitle.text().trim()     == 'Model Hierarchy'
+        viewTitle.text().trim()     == 'Models'
         subviewTitle.text().trim()  == 'Another root #000 Data Elements'
 
         when:

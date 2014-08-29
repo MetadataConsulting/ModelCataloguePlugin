@@ -146,7 +146,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name)
 
         for (GrailsDomainClassProperty property in domainClass.persistentProperties) {
-            if (property.oneToMany || property.manyToMany) {
+            if ((property.oneToMany || property.manyToMany) && instance.hasProperty(property.name) ){
                 def value = instance[property.name]
                 if (value) {
                     instance.errors.rejectValue property.name, "delete.association.before.delete.entity.${property.name}", "You must remove all ${property.naturalName.toLowerCase()} before you delete this element"
