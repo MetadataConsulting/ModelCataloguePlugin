@@ -139,7 +139,13 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                       # reloads the table
                       deferred.resolve(true)
                     , (response) ->
-                      if response.status == 404
+                      if response.data.errors
+                        if angular.isString response.data.errors
+                          messages.error response.data.errors
+                        else
+                          for err in response.data.errors
+                            messages.error err.message
+                      else if response.status == 404
                         messages.error('Error removing relationship', 'Relationship cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
                         deferred.resolve(true)
                       else
@@ -189,8 +195,15 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 $scope.element = updated
                 messages.success("Property #{names.getNaturalName(self.name)} of #{element.name} successfully updated")
                 updated
-              ,  ->
-                messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
+              ,  (response) ->
+                  if response.data.errors
+                    if angular.isString response.data.errors
+                      messages.error response.data.errors
+                    else
+                      for err in response.data.errors
+                        messages.error err.message
+                  else
+                    messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
 
 
           for key, value of obj when not angular.isObject(value)

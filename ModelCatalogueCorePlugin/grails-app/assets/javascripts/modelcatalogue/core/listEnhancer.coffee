@@ -70,7 +70,7 @@ angular.module('mc.core.listEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc.c
           @currentPage = Math.floor(@offset / @page) + 1
 
           @goto = (page) ->
-            return $q.when(@) if @total == 0 or @total <= @page
+            return $q.when(@) if @total == 0 or @total <= @page or not (@previous.url and $next.url)
             theOffset = (page - 1) * @page
             theLink   = "#{modelCatalogueApiRoot}#{@previous.url ? @next.url}"
 

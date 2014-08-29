@@ -171,7 +171,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'acrhive', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerAction 'archive', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -196,6 +196,41 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     action
   ]
+
+  actionsProvider.registerAction 'delete', ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
+    return undefined if not $scope.element
+    return undefined if not security.hasRole('ADMIN')
+
+    action = {
+      position:   150
+      label:      'Delete'
+      icon:       'remove'
+      type:       'danger'
+      action:     ->
+        messages.confirm("Do you really want to delete #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be deleted permanently. This action cannot be undone.").then ->
+          $scope.element.delete()
+          .then ->
+            messages.success "#{$scope.element.elementTypeName} #{$scope.element.name} deleted."
+            $state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
+          .catch (response) ->
+            if response.data.errors
+              if angular.isString response.data.errors
+                messages.error response.data.errors
+              else
+                for err in response.data.errors
+                  messages.error err.message
+    }
+
+    updateAction = ->
+      action.disabled = $scope.element.archived
+
+    $scope.$watch 'element.status', updateAction
+    $scope.$watch 'element.archived', updateAction
+    $rootScope.$on 'newVersionCreated', updateAction
+
+    action
+  ]
+
 
 
 

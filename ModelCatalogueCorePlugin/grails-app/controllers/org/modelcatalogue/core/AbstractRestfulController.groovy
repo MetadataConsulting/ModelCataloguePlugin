@@ -4,6 +4,7 @@ import grails.converters.XML
 import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
@@ -119,11 +120,18 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+        checkAssociationsBeforeDelete(instance)
+
+        if (instance.hasErrors()) {
+            reportCapableRespond instance.errors
+            return
+        }
+
         try{
             instance.delete flush:true
         }catch (DataIntegrityViolationException ignored){
             response.status = HttpServletResponse.SC_CONFLICT
-            reportCapableRespond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"]) // STATUS CODE 409
+            reportCapableRespond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, ignored.message]) // STATUS CODE 409
             return
         } catch (Exception ignored){
             response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
@@ -132,6 +140,19 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         render status: NO_CONTENT // NO CONTENT STATUS CODE
+    }
+
+    protected checkAssociationsBeforeDelete(T instance) {
+        GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name)
+
+        for (GrailsDomainClassProperty property in domainClass.persistentProperties) {
+            if (property.oneToMany || property.manyToMany) {
+                def value = instance[property.name]
+                if (value) {
+                    instance.errors.rejectValue property.name, "delete.association.before.delete.entity.${property.name}", "You must remove all ${property.naturalName.toLowerCase()} before you delete this element"
+                }
+            }
+        }
     }
 
     protected String getRoleForSaveAndEdit() {
