@@ -16,7 +16,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             <form role="form">
               <div class="form-group">
                 <label for="conceptualDomain"> Conceptual Domains</label>
-                <elements-as-tags elemnts="copy.conceptualDomains"></elements-as-tags>
+                <elements-as-tags elements="copy.conceptualDomains"></elements-as-tags>
                 <input id="conceptualDomain" placeholder="Conceptual Domain" ng-model="conceptualDomain" catalogue-element-picker="conceptualDomain" label="el.name" typeahead-on-select="addConceptualDomain(conceptualDomain);conceptualDomain = null">
               </div>
               <div class="form-group">
