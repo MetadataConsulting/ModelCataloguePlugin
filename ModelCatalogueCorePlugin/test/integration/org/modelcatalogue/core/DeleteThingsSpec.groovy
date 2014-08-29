@@ -37,7 +37,7 @@ class DeleteThingsSpec extends IntegrationSpec{
     @Unroll
     def "json bad delete i.e. MU used in another resource, returns errors"(){
 
-        def m, et, vd1
+        def m, et
         expect:
 
         assert(m = new MeasurementUnit(name:"cm per hour", symbol: "cmph").save())
@@ -59,7 +59,8 @@ class DeleteThingsSpec extends IntegrationSpec{
 
         then:
 
-        json.errors == "Cannot delete cm per hour due to referential integrity constraint violation (/measurementUnit/delete/${m.id})"
+        json.errors
+        json.errors.startsWith "Cannot delete cm per hour due to referential integrity constraint violation"
         controller.response.status == HttpServletResponse.SC_CONFLICT
 
     }
@@ -67,7 +68,7 @@ class DeleteThingsSpec extends IntegrationSpec{
     @Unroll
     def "xml bad delete i.e. MU used in another resource, returns errors"(){
 
-        def m, et, vd1
+        def m, et
         expect:
 
         def controller = new MeasurementUnitController()
@@ -91,7 +92,7 @@ class DeleteThingsSpec extends IntegrationSpec{
 
         then:
 
-        xml == "Cannot delete cm per hour due to referential integrity constraint violation (/measurementUnit/delete/${m.id})"
+        xml.text().startsWith "Cannot delete cm per hour due to referential integrity constraint violation"
         controller.response.status == HttpServletResponse.SC_CONFLICT
 
     }

@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 
+import javax.servlet.http.HttpServletResponse
+
 /**
  * Created by adammilward on 27/02/2014.
  */

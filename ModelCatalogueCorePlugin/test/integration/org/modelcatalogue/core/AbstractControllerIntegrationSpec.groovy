@@ -453,6 +453,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         if (controller.readOnly) return
 
         def elementToDelete = resource.newInstance(newInstance).save()
+        removeAllRelations(elementToDelete)
         controller.response.format = "json"
         controller.params.id = elementToDelete.id
         controller.delete()
@@ -468,6 +469,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         if (controller.readOnly) return
 
         def elementToDelete = resource.newInstance(newInstance).save()
+        removeAllRelations(elementToDelete)
         controller.response.format = "xml"
         controller.params.id = elementToDelete.id
         controller.delete()

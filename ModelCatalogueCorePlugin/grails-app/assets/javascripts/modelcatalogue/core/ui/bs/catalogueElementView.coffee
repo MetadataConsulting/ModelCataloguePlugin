@@ -2,12 +2,13 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView.html', '''
     <div>
       <span class="pull-right">
-        <contextual-actions size="sm" no-colors="true"></contextual-actions>
+        <contextual-actions size="sm" no-colors="true" icon-only="true"></contextual-actions>
       </span>
       <h3 class="ce-name">{{element.name}} <small ng-show="element.elementTypeName"><span class="label" ng-show="element.status" ng-class="{'label-warning': element.status == 'DRAFT', 'label-info': element.status == 'PENDING', 'label-primary': element.status == 'FINALIZED', 'label-danger': element.status == 'ARCHIVED'}">{{element.status}}</span> ({{element.elementTypeName}}: {{element.modelCatalogueId}})</small></h3>
       <blockquote class="ce-description" ng-show="element.description" ng-bind-html="'' + element.description | linky:'_blank'"></blockquote>
       <tabset ng-show="showTabs">
-        <tab heading="{{tab.heading}}" disabled="tab.disabled" ng-repeat="tab in tabs" active="tab.active" select="select(tab)">
+        <tab disabled="tab.disabled" ng-repeat="tab in tabs" active="tab.active" select="select(tab)">
+            <tab-heading>{{tab.heading}}<span ng-show="tab.value.total"> <span class="badge">{{tab.value.total}}</span></span></tab-heading>
             <div ng-switch="tab.type">
               <div ng-switch-when="simple-object-editor">
                 <simple-object-editor object="tab.value" title="Key" value-title="Value"></simple-object-editor>

@@ -62,6 +62,25 @@ class PublishedElementService {
         archived.save()
     }
 
+    public <E extends PublishedElement> E archive(PublishedElement archived) {
+        if (archived.archived) throw new IllegalArgumentException("You cannot archive already archived element $element")
+
+        archived.incomingRelationships.each {
+            it.archived = true
+            it.save(failOnError: true)
+        }
+
+        archived.outgoingRelationships.each {
+            it.archived = true
+            it.save(failOnError: true)
+        }
+
+        modelCatalogueSearchService.unindex(archived)
+
+        archived.status = PublishedElementStatus.ARCHIVED
+        archived.save()
+    }
+
     public <E extends Model> E finalizeTree(Model model, Collection<Model> tree = []){
 
         //check that it isn't already finalized

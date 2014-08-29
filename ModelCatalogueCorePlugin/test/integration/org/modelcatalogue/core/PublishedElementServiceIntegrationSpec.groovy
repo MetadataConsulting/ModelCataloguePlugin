@@ -90,6 +90,33 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.status == PublishedElementStatus.DRAFT
     }
 
+    def "archive"() {
+        DataElement author      = DataElement.findByName('auth8')
+        ValueDomain domain      = ValueDomain.findByName('value domain test1')
+
+
+        author.ext.something = 'anything'
+        author.valueDomain = domain
+        author.save(failOnError: true)
+
+        int originalVersion     = author.versionNumber
+        DataElement archived    = publishedElementService.archive(author)
+        int archivedVersion     = archived.versionNumber
+        author.refresh()
+
+        expect:
+        author == archived
+        author.id == archived.id
+        originalVersion == archivedVersion
+        archived.incomingRelationships.every { it.archived }
+        archived.outgoingRelationships.every { it.archived }
+
+        archived.ext.something == 'anything'
+
+        !archived.valueDomain
+        !(archived in domain.dataElements)
+    }
+
     def "create new version of heirachy model"() {
 
         setup:

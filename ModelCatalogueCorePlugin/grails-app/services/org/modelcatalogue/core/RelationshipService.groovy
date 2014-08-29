@@ -63,20 +63,15 @@ class RelationshipService {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
 
-            //specific rules when creating links to and from published elements
+            // specific rules when creating links to and from published elements
+            // XXX: this should be in the relationship type!
             if(!ignoreRules) {
                 if (source.instanceOf(PublishedElement) || destination.instanceOf(PublishedElement)) {
-                    if (relationshipType.name == "containment" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED) {
-                        relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version before removing any additional elements")
+                    if (relationshipType.name == "containment" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED && source.status != PublishedElementStatus.ARCHIVED) {
+                        relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version of the MODEL before removing any additional elements or archive the element first if you want to delete it.")
                         return relationshipInstance
                     }
                 }
-
-                if (relationshipType.name == "instantiation" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED) {
-                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add new value domain elements to {0} data element. Please create a new version before adding any additional values")
-                    return relationshipInstance
-                }
-
             }
 
             if (relationshipInstance && source && destination) {

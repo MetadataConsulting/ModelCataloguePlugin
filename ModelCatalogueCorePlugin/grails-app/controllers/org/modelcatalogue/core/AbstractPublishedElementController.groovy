@@ -6,7 +6,7 @@ import org.modelcatalogue.core.util.Lists
 
 import static org.springframework.http.HttpStatus.OK
 
-class AbstractPublishedElementController<T> extends AbstractExtendibleElementController<T> {
+class AbstractPublishedElementController<T extends PublishedElement> extends AbstractExtendibleElementController<T> {
 
     def publishedElementService, relationshipTypeService
 
@@ -58,12 +58,12 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
         switch(response.format){
 
             case "json":
-                if(!newVersion) newVersion = (request.JSON?.newVersion)?request.JSON?.newVersion.toBoolean():false
+                if(!newVersion) newVersion = (request.JSON?.newVersion)?request.JSON?.newVersion?.toBoolean():false
                 if(!ext) ext = request.JSON?.ext
                 break
 
             case "xml":
-                if(!newVersion) newVersion = (request.XML?.newVersion)?request.XML?.newVersion.toBoolean():false
+                if(!newVersion) newVersion = (request.XML?.newVersion)?request.XML?.newVersion?.toBoolean():false
                 if(!ext) ext = request.XML?.ext
                 break
 
@@ -109,6 +109,38 @@ class AbstractPublishedElementController<T> extends AbstractExtendibleElementCon
                 reportCapableRespond instance, [status: OK]
             }
         }
+    }
+
+    /**
+     * Archive element
+     * @param id
+     */
+    @Transactional
+    def archive() {
+
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if(handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        instance = publishedElementService.archive(instance)
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        reportCapableRespond instance, [status: OK]
     }
 
     def history(Integer max){
