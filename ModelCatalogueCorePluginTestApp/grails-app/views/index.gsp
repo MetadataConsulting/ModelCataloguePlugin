@@ -14,7 +14,7 @@
     %{--</ul>--}%
     %{--</div>--}%
     %{--</script>--}%
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    %{--<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">--}%
     <asset:stylesheet href="metaDataCurator.css"/>
     <asset:javascript src="metaDataCurator.js"/>
     <script type="text/javascript">
