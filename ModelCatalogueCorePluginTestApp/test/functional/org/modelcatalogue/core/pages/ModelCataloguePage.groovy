@@ -26,13 +26,6 @@ abstract class ModelCataloguePage extends Page {
     def loginViewer() { loginUser("viewer", "viewer") }
     def loginCurator() { loginUser("curator", "curator") }
 
-    def logout() {
-        if (!showLogoutButton.displayed) {
-            return
-        }
-        showLogoutButton.click()
-    }
-
     def loginUser(String user, String pwd) {
         if (!showLoginButton.displayed) {
             showLogoutButton.click()

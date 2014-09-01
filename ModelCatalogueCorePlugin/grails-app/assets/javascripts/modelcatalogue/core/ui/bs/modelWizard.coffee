@@ -11,6 +11,8 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
     (title, body, args) ->
 
+      # TODO: add add classifications step
+
       $rootScope.createModelWizard ?= $modal.open {
         windowClass: 'create-model-wizard'
         backdrop: 'static'
@@ -128,7 +130,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
         </div>
         <div class="modal-footer" ng-if="step == 'summary'">
           <button ng-disabled="!finished" class="btn btn-success" ng-click="reset()"><span class="glyphicon glyphicon-plus"></span> Create Another</button>
-          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Close</button>
+          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
         controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout) ->
