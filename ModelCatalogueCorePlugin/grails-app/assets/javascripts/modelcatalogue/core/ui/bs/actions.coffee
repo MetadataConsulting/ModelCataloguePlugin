@@ -8,7 +8,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   100
     label:      "New #{names.getNaturalName($scope.resource)}"
-    icon:       'plus-sign'
+    icon:       'glyphicon glyphicon-plus-sign'
     type:       'success'
     action:     ->
       modalType = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
@@ -25,7 +25,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   100
     label:      "New Enumerated Type"
-    #icon:      'plus-sign'
+    #icon:      'glyphicon glyphicon-plus-sign'
     type:       'success'
     action:     ->
       messages.prompt('Create Enumerated Type', '', {type: 'edit-enumeratedType', create: ($scope.resource)}).then (created)->
@@ -38,7 +38,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   100
     label:      "New Import"
-    icon:       'plus-sign'
+    icon:       'glyphicon glyphicon-plus-sign'
     type:       'success'
     action:     ->
       messages.prompt('Create Import', '', {type: 'new-import', create: ($scope.resource)}).then (created)->
@@ -53,7 +53,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
     position:   1000
     label:      'Resolve All'
-    icon:       'thumbs-up'
+    icon:       'glyphicon glyphicon-thumbs-up'
     type:       'primary'
     action:     ->
       modelCatalogueDataArchitect.resolveAll($scope.element.id).then ->
@@ -73,7 +73,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
       position:   1000
       label:      'Ingest Queue'
-      icon:       'ok-circle'
+      icon:       'glyphicon glyphicon-ok-circle'
       type:       'primary'
       action:     ->
         modelCatalogueDataArchitect.ingestQueue($scope.element.id).then ->
@@ -95,7 +95,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action =
       position:   100
       label:      'Edit'
-      icon:       'edit'
+      icon:       'glyphicon glyphicon-edit'
       type:       'primary'
       disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
       action:     ->
@@ -122,7 +122,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
     position:   150
     label:      'New Version'
-    icon:       'circle-arrow-up'
+    icon:       'glyphicon glyphicon-circle-arrow-up'
     type:       'primary'
     action:     ->
       messages.confirm('Do you want to create new version?', "New version will be created for #{$scope.element.elementTypeName} #{$scope.element.name}").then ->
@@ -150,7 +150,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
       position:   150
       label:      'Finalize'
-      icon:       'check'
+      icon:       'glyphicon glyphicon-check'
       type:       'primary'
       action:     ->
         messages.confirm("Do you want to finalize #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be finalized").then ->
@@ -179,7 +179,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
       position:   150
       label:      'Archive'
-      icon:       'compressed'
+      icon:       'glyphicon glyphicon-compressed'
       type:       'danger'
       action:     ->
         messages.confirm("Do you want to archive #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be archived").then ->
@@ -204,7 +204,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
       position:   150
       label:      'Delete'
-      icon:       'remove'
+      icon:       'glyphicon glyphicon-remove'
       type:       'danger'
       action:     ->
         messages.confirm("Do you really want to delete #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be deleted permanently. This action cannot be undone.").then ->
@@ -243,7 +243,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
     position:   200
     label:      'Create Relationship'
-    icon:       'link'
+    icon:       'glyphicon glyphicon-link'
     type:       'success'
     action:     ->
       messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element}).then (updated)->
@@ -265,7 +265,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position:   0
       label:      'Download'
-      icon:       'download'
+      icon:       'glyphicon glyphicon-download'
       type:       'primary'
       action:     ->
         $window.open $scope.element.downloadUrl, '_blank'; return true
@@ -280,7 +280,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position:   0
       label:      'Refresh'
-      icon:       'refresh'
+      icon:       'glyphicon glyphicon-refresh'
       type:       'primary'
       action:     ->
         catalogueElementResource($scope.element.elementType).get($scope.element.id).then (refreshed) ->
@@ -300,7 +300,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   1000
     label:      'Export'
-    icon:       'download-alt'
+    icon:       'glyphicon glyphicon-download-alt'
     type:       'primary'
     }
   ]
@@ -382,7 +382,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   300
     label:      "Finalized"
-    icon:       'ok'
+    icon:       'glyphicon glyphicon-ok'
     type:       'primary'
     active:     !$stateParams.status or $stateParams.status == 'finalized'
     action:     ->
@@ -396,7 +396,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position:   200
       label:      "Pending"
-      icon:       'time'
+      icon:       'glyphicon glyphicon-time'
       type:       'warning'
       active:     $stateParams.status == 'pending'
       action:     ->
@@ -410,7 +410,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   100
     label:      "Draft"
-    icon:       'pencil'
+    icon:       'glyphicon glyphicon-pencil'
     type:       'info'
     active:     $stateParams.status == 'draft'
     action:     ->
@@ -433,8 +433,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       return 'primary'
     )()
     icon:     (->
-      return 'time'     if $stateParams.status == 'archived'
-      return 'ok'
+      return 'glyphicon glyphicon-time'     if $stateParams.status == 'archived'
+      return 'glyphicon glyphicon-ok'
     )()
     label:    (->
       return 'Archived'  if $stateParams.status == 'archived'
@@ -447,7 +447,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   300
     label:      "Active"
-    icon:       'ok'
+    icon:       'glyphicon glyphicon-ok'
     type:       'primary'
     active:     !$stateParams.status
     action:     ->
@@ -461,7 +461,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   200
     label:      "Archived"
-    icon:       'time'
+    icon:       'glyphicon glyphicon-time'
     type:       'warning'
     active:     $stateParams.status == 'archived'
     action:     ->
@@ -479,7 +479,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position: 200
       type:     'success'
-      icon:     'play'
+      icon:     'glyphicon glyphicon-play'
       label:    'Run'
       action:   ->
         $scope.action.run().then ->
@@ -495,7 +495,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position: 500
       type:     'danger'
-      icon:     'remove'
+      icon:     'glyphicon glyphicon-remove'
       label:    'Dismiss'
       action:   ->
         $scope.action.dismiss().then ->
@@ -511,7 +511,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position: 200
       type:     'success'
-      icon:     'repeat'
+      icon:     'glyphicon glyphicon-repeat'
       label:    'Reactivate'
       action:   ->
         $scope.action.reactivate().then ->
@@ -525,7 +525,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position: 900
       type:     'success'
-      icon:     'repeat'
+      icon:     'glyphicon glyphicon-repeat'
       label:    'Retry'
       action:   ->
         $scope.action.reactivate().then ->
@@ -540,7 +540,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position: 900
       type:     'success'
-      icon:     'refresh'
+      icon:     'glyphicon glyphicon-refresh'
       label:    'Reload'
       action:   ->
         $scope.reload()
@@ -553,7 +553,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
       position: 950
       type:     'primary'
-      icon:     'open'
+      icon:     'glyphicon glyphicon-open'
       label:    'Add or Remove Dependency'
       action:   ->
         if $rootScope.selectedAction == $scope.action
@@ -580,22 +580,22 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       if selectedAction
         if selectedAction == $scope.action
           action.active = true
-          action.icon = 'open'
+          action.icon = 'glyphicon glyphicon-open'
           action.label = 'Add or Remove Dependency'
           action.mode = 'select'
         else
           action.active = false
           if selectedAction.dependsOn.hasOwnProperty('' + $scope.action.id)
-            action.icon = 'remove-circle'
+            action.icon = 'glyphicon glyphicon-remove-circle'
             action.label = 'Remove Dependency'
             action.mode = 'remove'
           else
-            action.icon = 'save'
+            action.icon = 'glyphicon glyphicon-save'
             action.label = 'Select as Dependency'
             action.mode = 'add'
 
       else
-        action.icon = 'open'
+        action.icon = 'glyphicon glyphicon-open'
         action.active = false
         action.label = 'Add or Remove Dependency'
         action.mode = 'select'
@@ -610,7 +610,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     runAllAction = {
       position: 200
       type:     'success'
-      icon:     'play'
+      icon:     'glyphicon glyphicon-play'
       label:    'Run All Pending'
       action:   ->
         promises = []
@@ -636,7 +636,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action =
       position:   100
       label:      'Update Action Parameters'
-      icon:       'edit'
+      icon:       'glyphicon glyphicon-edit'
       type:       'primary'
       action:     ->
         messages.prompt('Update Action Parameters', '', {type: 'update-action-parameters', action: $scope.action}).then (updated)->
@@ -659,7 +659,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position:   10000
       label:      'Cancel'
-      icon:       'ban-circle'
+      icon:       'glyphicon glyphicon-ban-circle'
       type:       'warning'
       action: -> $scope.$dismiss()
     }
@@ -671,7 +671,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
       position:   1000
       label:      'Save'
-      icon:       'ok'
+      icon:       'glyphicon glyphicon-ok'
       type:       'success'
       action: ->
        $scope.saveElement() if $scope.hasChanged()
@@ -690,7 +690,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
       position:   1000
       label:      'Save as New Version'
-      icon:       'circle-arrow-up'
+      icon:       'glyphicon glyphicon-circle-arrow-up'
       type:       'success'
       action: ->
         $scope.saveElement(true) if $scope.hasChanged()
