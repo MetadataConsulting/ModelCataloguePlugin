@@ -112,7 +112,7 @@ metadataCurator.controller('metadataCurator.searchCtrl',
           modelCatalogueSearch(term).then (searchResults)->
             for searchResult in searchResults.list
               results.push {
-                label:      searchResult.name
+                label:      if searchResult.getLabel then searchResult.getLabel() else searchResult.name
                 action:     searchResult.show
                 icon:       'file'
                 term:       term
