@@ -71,22 +71,26 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             </tab>
           </div>
           <div ng-switch-when="summary" id="summary">
-              <div>
-              </div>
-              <h4 ng-show="classification.name">Creating new classification <strong>{{classification.name}}</strong></h4>
+              <h4 ng-show="classification.name &amp;&amp;  finished">Classification <strong>{{classification.name}} created</strong></h4>
           </div>
         </div>
+        <div class="modal-footer" ng-if="step == 'summary'">
+          <button ng-disabled="!finished" class="btn btn-success" ng-click="reset()"><span class="glyphicon glyphicon-plus"></span> Create Another</button>
+          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Close</button>
+        </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout) ->
-          $scope.classification = {classifies:{}}
-          $scope.dataElement = {}
-          $scope.dataElements = []
-          $scope.messages = messages.createNewMessages()
-          $scope.steps = ['classification', 'elements']
-#          'metadata', 'parents', 'children',
-          $scope.step = 'classification'
-          $scope.finishInProgress = false
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', ($scope, $state, $window, messages, names, catalogueElementResource) ->
+          $scope.reset = ->
+            $scope.classification = {classifies:{}}
+            $scope.dataElement = {}
+            $scope.dataElements = []
+            $scope.messages = messages.createNewMessages()
+            $scope.steps = ['classification', 'elements']
+            $scope.step = 'classification'
+            $scope.finishInProgress = false
+            $scope.finished = false
 
+          $scope.reset()
 
           $scope.isEmpty = (object) ->
             return true if not object
@@ -116,8 +120,9 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             promise = catalogueElementResource('classification').save($scope.classification)
 
             promise.then (classification) ->
-              classification.refresh().then (fresh) ->
-                $modalInstance.close(fresh)
+                messages.success "Classification #{classification.name} created"
+                $scope.finished = true
+                classification.show()
 
           $scope.select = (step) ->
             return if step != 'classification' and not $scope.classification.name

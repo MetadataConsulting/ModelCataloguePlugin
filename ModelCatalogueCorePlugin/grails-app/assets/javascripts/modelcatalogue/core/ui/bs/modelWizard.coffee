@@ -25,25 +25,25 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             <h4>Model Wizard</h4>
             <ul class="tutorial-steps">
               <li>
-                <button id="step-previous" ng-disabled="step == 'model'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                <button id="step-previous" ng-disabled="step == 'model' || step == 'summary'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
               </li>
               <li>
-                <button id="step-model" ng-click="select('model')" class="btn btn-default" ng-class="{'btn-primary': step == 'model'}">1. Model</button>
+                <button id="step-model" ng-disabled="step == 'summary'" ng-click="select('model')" class="btn btn-default" ng-class="{'btn-primary': step == 'model'}">1. Model</button>
               </li>
               <li>
-                <button id="step-metadata" ng-disabled="!model.name" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata'}">2. Metadata</button>
+                <button id="step-metadata" ng-disabled="!model.name || step == 'summary'" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata'}">2. Metadata</button>
               </li>
               <li>
-                <button id="step-parents" ng-disabled="!model.name" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents'}">3. Parents</button>
+                <button id="step-parents" ng-disabled="!model.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents'}">3. Parents</button>
               </li>
               <li>
-                <button id="step-children" ng-disabled="!model.name" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children'}">4. Children</button>
+                <button id="step-children" ng-disabled="!model.name || step == 'summary'" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children'}">4. Children</button>
               </li>
               <li>
-                <button id="step-elements" ng-disabled="!model.name" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">5. Elements</button>
+                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">5. Elements</button>
               </li>
               <li>
-                <button id="step-next" ng-disabled="!model.name || step == 'elements'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
+                <button id="step-next" ng-disabled="!model.name || step == 'elements' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
               </li>
               <li>
                 <button id="step-finish" ng-disabled="!model.name" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
@@ -121,29 +121,36 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             </tab>
           </div>
           <div ng-switch-when="summary" id="summary">
-              <div>
-              </div>
-              <h4 ng-show="model.name">Crating new model <strong>{{model.name}}</strong></h4>
-              <progressbar class="progress-striped active" value="pendingActionsCount == 0 ? 100 : Math.round(100 * (totalActions - pendingActionsCount) / totalActions)">{{totalActions - pendingActionsCount}} / {{totalActions}}({{pendingActionsCount == 0 ? 100 : Math.round(100 * (totalActions - pendingActionsCount) / totalActions)}})</progressbar>
+              <h4 ng-show="model.name &amp;&amp; !finished">Crating new model <strong>{{model.name}}</strong></h4>
+              <h4 ng-show="model.name &amp;&amp;  finished">Model <strong>{{model.name}} created</strong></h4>
+              <progressbar type="{{finished ? 'success' : 'primary'}}" value="pendingActionsCount == 0 ? 100 : Math.round(100 * (totalActions - pendingActionsCount) / totalActions)">{{totalActions - pendingActionsCount}} / {{totalActions}}</progressbar>
           </div>
+        </div>
+        <div class="modal-footer" ng-if="step == 'summary'">
+          <button ng-disabled="!finished" class="btn btn-success" ng-click="reset()"><span class="glyphicon glyphicon-plus"></span> Create Another</button>
+          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
         controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout) ->
-          $scope.model = {}
-          $scope.metadata = {}
-          $scope.parent = {ext: {}}
-          $scope.parents = []
-          $scope.child = {ext: {}}
-          $scope.children = []
-          $scope.dataElement = {ext: {}}
-          $scope.dataElements = []
-          $scope.messages = messages.createNewMessages()
-          $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements']
-          $scope.step = 'model'
-          $scope.pendingActions = []
-          $scope.pendingActionsCount = 0
-          $scope.totalActions = 0
-          $scope.finishInProgress = false
+          $scope.reset = ->
+            $scope.model = {}
+            $scope.metadata = {}
+            $scope.parent = {ext: {}}
+            $scope.parents = []
+            $scope.child = {ext: {}}
+            $scope.children = []
+            $scope.dataElement = {ext: {}}
+            $scope.dataElements = []
+            $scope.messages = messages.createNewMessages()
+            $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements']
+            $scope.step = 'model'
+            $scope.pendingActions = []
+            $scope.pendingActionsCount = 0
+            $scope.totalActions = 0
+            $scope.finishInProgress = false
+            $scope.finished = false
+
+          $scope.reset()
 
 
           $scope.isEmpty = (object) ->
@@ -206,8 +213,9 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
              promise = promise.then(action).then decreasePendingActionsCount
 
             promise.then (model) ->
-              model.refresh().then (fresh) ->
-                $modalInstance.close(fresh)
+              messages.success "Model #{model.name} created"
+              $scope.finished = true
+              model.show()
 
           $scope.select = (step) ->
             return if step != 'model' and not $scope.model.name
