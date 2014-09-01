@@ -9,7 +9,7 @@ class BatchAndActionsSpec extends GebSpec {
 
     def "execute few actions"() {
         when:
-        go ""
+        go "#/catalogue/model/all"
 
         then:
         title == "Model Catalogue Demo App"
@@ -77,9 +77,6 @@ class BatchAndActionsSpec extends GebSpec {
         waitFor {
             performedActions.size() == 1
         }
-
-        cleanup:
-        logout()
     }
 
 }

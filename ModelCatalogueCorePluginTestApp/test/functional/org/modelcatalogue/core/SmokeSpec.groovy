@@ -7,16 +7,15 @@ class SmokeSpec extends GebSpec {
 
     def "go to login"() {
         when:
-        go ""
+        go "#/catalogue/model/all"
 
         then:
-        title                       == "Model Catalogue Demo App"
         at ModalTreeViewPage
         waitFor {
             viewTitle.displayed
         }
         viewTitle.text().trim()     == 'Models'
-        subviewTitle.text().trim()  == 'Another root #000 Data Elements'
+        subviewTitle.text().trim()  == 'NHIC Datasets Data Elements'
 
         when:
         loginAdmin()
@@ -40,6 +39,7 @@ class SmokeSpec extends GebSpec {
         description = "Description"
 
         saveButton.click()
+
         waitFor {
             $('blockquote').displayed
         }
@@ -47,8 +47,6 @@ class SmokeSpec extends GebSpec {
         then:
         $('blockquote').text() == "Description"
 
-        cleanup:
-        logout()
     }
 
 }
