@@ -47,8 +47,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
-            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+          <contextual-actions></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', ($scope, messages, names, catalogueElementResource, $modalInstance) ->
@@ -56,7 +55,6 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.ruleCollapsed = true
-
 
           $scope.hasChanged   = ->
             return true if $scope.copy.name != $scope.original.name

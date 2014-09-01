@@ -26,8 +26,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             <simple-object-editor object="copy.enumerations" title="Enumerations"></simple-object-editor>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
-            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+          <contextual-actions></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', ($scope, messages, names, catalogueElementResource, $modalInstance) ->

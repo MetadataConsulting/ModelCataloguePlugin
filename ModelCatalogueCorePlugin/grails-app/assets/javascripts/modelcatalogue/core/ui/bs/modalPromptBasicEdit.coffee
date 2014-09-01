@@ -25,8 +25,7 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages']).confi
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
-            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+          <contextual-actions></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', ($scope, messages, names, catalogueElementResource, $modalInstance) ->
