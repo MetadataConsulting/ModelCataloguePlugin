@@ -29,7 +29,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       loadTab = (property) ->
         tab = tabsByName[property]
 
-        applicationTitle "#{names.getNaturalName(property)} of #{$scope.element.getLabel()}"
+        applicationTitle "#{if tab and tab.heading then tab.heading else names.getNaturalName(property)} of #{$scope.element.getLabel()}"
 
         if not tab?.loader?
           $scope.reports  = []
