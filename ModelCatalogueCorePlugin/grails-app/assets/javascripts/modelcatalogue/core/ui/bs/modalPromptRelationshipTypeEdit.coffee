@@ -64,7 +64,7 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
             $http.get("#{modelCatalogueApiRoot}/relationshipType/elementClasses").then (response) -> response.data
           ]
 
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', 'elementClasses', ($scope, messages, names, catalogueElementResource, $modalInstance, elementClasses) ->
+        controller: ['$scope', 'messages', '$controller', '$modalInstance', 'elementClasses', ($scope, messages, $controller, $modalInstance, elementClasses) ->
           $scope.copy     = angular.copy(args.element ? {})
           $scope.create   = args.create
           $scope.original = args.element ? {}
@@ -72,52 +72,38 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
           $scope.ruleCollapsed = true
           $scope.elementClasses = elementClasses
 
+          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+
           $scope.hasChanged   = ->
             $scope.copy.metadataHints = ($scope.copy.metadataHints ? '').split(/\s*,\s*/) ? [] if angular.isString($scope.copy.metadataHints)
             for prop in ['name', 'sourceToDestination', 'destinationToSource', 'sourceClass', 'destinationClass', 'system', 'bidirectional', 'rule', 'metadataHints']
               return true if !angular.equals($scope.copy[prop], $scope.original[prop])
             return false
 
-          $scope.saveElement = ->
+          $scope.beforeSave = ->
             $scope.copy.metadataHints = $scope.copy.metadataHints.join(',') if angular.isArray($scope.copy.metadataHints)
-            $scope.messages.clearAllMessages()
+
+          $scope.validate = ->
             if not $scope.copy.name
               $scope.messages.error 'Empty Name', 'Please fill the name'
-              return
+              return false
 
             if not $scope.copy.sourceToDestination
               $scope.messages.error 'Empty Source to Destination', 'Please fill the Source to Destination'
-              return
+              return false
 
             if not $scope.copy.destinationToSource
               $scope.messages.error 'Empty Destination to Source', 'Please fill the Destination to Source'
-              return
+              return false
 
             if not $scope.copy.sourceClass
               $scope.messages.error 'Empty Source Class', 'Please fill the Source Class'
-              return
+              return false
 
             if not $scope.copy.destinationClass
               $scope.messages.error 'Empty Destination Class', 'Please fill the Destination Class'
-              return
-
-            promise = null
-
-            if args?.create
-              promise = catalogueElementResource(args.create).save($scope.copy)
-            else
-              promise = catalogueElementResource($scope.copy.elementType).update($scope.copy)
-
-            promise.then (result) ->
-              if args?.create
-                messages.success('Created Relationship Type', "You have created Relationship Type #{result.name}.")
-              else
-                messages.success('Updated Relationship Type', "You have updated Relationship Type #{result.name}.")
-              $modalInstance.close(result)
-            , (response) ->
-              for err in response.data.errors
-                $scope.messages.error err.message
-
+              return false
+            return true
         ]
 
       }

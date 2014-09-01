@@ -683,6 +683,24 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
+  actionsProvider.registerAction 'modal-save-and-add-another', ['$scope', ($scope) ->
+    return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother
+
+    action = {
+      position:   2000
+      label:      'Save and Create Another'
+      icon:       'glyphicon glyphicon-ok'
+      type:       'success'
+      action: ->
+        $scope.saveAndCreateAnother() if $scope.hasChanged()
+    }
+
+    $scope.$watch 'hasChanged()', (changed)->
+      action.disabled = not changed
+
+    action
+  ]
+
 
   actionsProvider.registerChildAction 'modal-save-element', 'modal-save-element-as-new-version', ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveElement and not $scope.create and $scope.original and $scope.original.isInstanceOf and $scope.original.isInstanceOf 'org.modelcatalogue.core.PublishedElement'
