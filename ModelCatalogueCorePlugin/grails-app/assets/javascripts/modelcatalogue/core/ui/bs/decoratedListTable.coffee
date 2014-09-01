@@ -50,7 +50,7 @@ angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList', 
         </tfoot>
       </table>
       <div ng-show="list.total==0">
-        <p><span class="label label-warning">empty</span></p>
+        <div class="alert alert-warning">Empty</div>
       </div>
     </div>
     '''
