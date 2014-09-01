@@ -100,6 +100,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
       action:     ->
         messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
+          messages.success("#{updated.elementTypeName} #{updated.name} updated")
           $scope.element = updated
 
     updateAction = ->
@@ -366,9 +367,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       return 'primary'
     )()
     icon:     (->
-      return 'pencil'   if $stateParams.status == 'draft'
-      return 'time'     if $stateParams.status == 'pending'
-      return 'ok'
+      return 'glyphicon glyphicon-pencil'   if $stateParams.status == 'draft'
+      return 'glyphicon glyphicon-time'     if $stateParams.status == 'pending'
+      return 'glyphicon glyphicon-ok'
     )()
     label:    (->
       return 'Draft'    if $stateParams.status == 'draft'

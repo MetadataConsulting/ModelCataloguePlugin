@@ -32,11 +32,9 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       action.id       = id
 
       if action.action
-        unless action.disabled
-          action.run = ->
+        action.run = ->
+          unless action.disabled
             $rootScope.$broadcast "actionPerformed:#{action.id}", action.action()
-        else
-          action.run = ->
       else
         action.run = action.run ? ->
 
