@@ -74,8 +74,8 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
 
       onObjectOrHintsChanged($scope.object, $scope.hints ? [])
 
-      $scope.addNewRowOnTab = ($event, index)->
-        $scope.addProperty(index, {key: '', value: ''}) if $event.keyCode == 9
+      $scope.addNewRowOnTab = ($event, index, last)->
+        $scope.addProperty(index, {key: '', value: ''}) if $event.keyCode == 9 if last
 
       $scope.$watch 'object', (newObject) ->
         onObjectOrHintsChanged(newObject, $scope.hints ? [])
