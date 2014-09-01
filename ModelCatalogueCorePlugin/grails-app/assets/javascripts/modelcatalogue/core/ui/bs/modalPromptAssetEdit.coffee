@@ -32,10 +32,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged() || uploading"><span class="glyphicon glyphicon-ok"></span> Save</button>
-            <button class="btn btn-success" ng-hide="create" ng-click="saveElement(true)"><span class="glyphicon glyphicon-circle-arrow-up"></span> Save as New Version</button>
-            <button class="btn btn-success" ng-hide="create" ng-click="copy.status = 'FINALIZED' ; saveElement(true)"><span class="glyphicon glyphicon-check"></span> Finalize</button>
-            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+          <contextual-actions></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance) ->

@@ -152,14 +152,14 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
   $rootScope.$on 'event:auth-loginRequired', ->
     if security.mock
       messages.error('You are trying to access protected resource',
-        'The application will not work as expected. Please, set up the security properly.')
+        'The application will not work as expected. Please, set up the security properly.').noTimeout()
     else
       messages.prompt('Login', null, type: 'login').then (success)->
         authService.loginConfirmed(success)
         messages.clearAllMessages()
       , ->
         messages.warning('You are trying to access protected resource',
-          if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in')
+          if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in').noTimeout()
   $rootScope.$security = security
 
 ]

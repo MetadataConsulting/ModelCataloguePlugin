@@ -1,5 +1,6 @@
 describe "mc.core.ui.catalogueElementPicker", ->
   beforeEach module 'mc.core.ui.catalogueElementPicker'
+  beforeEach module 'mc.core.catalogueElementEnhancer'
 
   it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
     catEl = enhance angular.copy(fixtures.valueDomain.showOne)
@@ -13,7 +14,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain test5 (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('value domain test5 (Value Domain in public libraries)')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -50,7 +51,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain test5 (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('value domain test5 (Value Domain in public libraries)')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -72,7 +73,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain test5 (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('value domain test5 (Value Domain in public libraries)')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 

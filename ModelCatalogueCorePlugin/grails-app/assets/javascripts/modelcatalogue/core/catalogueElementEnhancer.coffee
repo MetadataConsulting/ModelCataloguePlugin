@@ -1,4 +1,11 @@
 angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot']).config [ 'enhanceProvider', (enhanceProvider) ->
+  commaSeparatedList = (things)->
+    names = []
+    angular.forEach(things, (thing)->
+      names.push thing.name
+    )
+    names.join(', ')
+
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
   factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance) ->
     (element) ->
@@ -48,6 +55,18 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             return false  if not type?
             return false  if not self.elementTypes
             return type in self.elementTypes
+
+          self.getLabel = ->
+              if @classifications? && @classifications.length > 0
+                classificationNames = commaSeparatedList(@classifications)
+                return "#{@name} (#{@elementTypeName} in #{classificationNames})"
+              else if(@conceptualDomains? && @conceptualDomains.length>0)
+                conceptualDomains = commaSeparatedList(@conceptualDomains)
+                return "#{@name} (#{@elementTypeName} in #{conceptualDomains})"
+              else if (@elementTypeName?)
+                return "#{@name} (#{@elementTypeName})"
+              else
+                return @name
 
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)

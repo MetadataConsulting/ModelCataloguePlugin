@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
+angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
     $scope.element  = element
 ])
@@ -7,12 +7,16 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router'])
     $scope.element  = element
 ])
 
-.controller('mc.core.ui.states.BatchCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+.controller('mc.core.ui.states.BatchCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', 'applicationTitle', ($scope, $stateParams, $state, $log, element, applicationTitle) ->
     $scope.element  = element
+    applicationTitle "Actions in batch #{element.name}"
 ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', ($scope, $stateParams, $state, $log, list, names, enhance) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle) ->
     listEnhancer    = enhance.getEnhancer('list')
+
+    if $stateParams.resource
+      applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
     $scope.list                     = list
     $scope.title                    = names.getNaturalName($stateParams.resource)

@@ -17,7 +17,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
               <div class="form-group">
                 <label for="conceptualDomain"> Conceptual Domains</label>
                 <elements-as-tags elements="copy.conceptualDomains"></elements-as-tags>
-                <input id="conceptualDomain" placeholder="Conceptual Domain" ng-model="conceptualDomain" catalogue-element-picker="conceptualDomain" label="el.name" typeahead-on-select="addConceptualDomain(conceptualDomain);conceptualDomain = null">
+                <input id="conceptualDomain" placeholder="Conceptual Domain" ng-model="conceptualDomain" catalogue-element-picker="conceptualDomain" label="el.name" typeahead-on-select="copy.conceptualDomains.push(conceptualDomain);conceptualDomain = null">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -47,16 +47,18 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged()"><span class="glyphicon glyphicon-ok"></span> Save</button>
-            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
+          <contextual-actions></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', ($scope, messages, names, catalogueElementResource, $modalInstance) ->
-          $scope.copy     = angular.copy(args.element ? {conceptualDomains: []})
-          $scope.original = args.element ? {}
-          $scope.messages = messages.createNewMessages()
-          $scope.ruleCollapsed = true
+        controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->
+          $scope.newEntity      = -> {conceptualDomains: []}
+          $scope.copy           = angular.copy(args.element ? $scope.newEntity())
+          $scope.original       = args.element ? $scope.newEntity()
+          $scope.messages       = messages.createNewMessages()
+          $scope.create         = args.create
+          $scope.ruleCollapsed  = true
 
+          angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
           $scope.hasChanged   = ->
             return true if $scope.copy.name != $scope.original.name
@@ -67,39 +69,6 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             return true if $scope.copy.dataType?.id != $scope.original.dataType?.id
             return true if not angular.equals($scope.copy.conceptualDomains, $scope.original.conceptualDomains)
             return false
-
-          $scope.addConceptualDomain = (domain) ->
-            for inArray in $scope.copy.conceptualDomains
-              return if angular.equals inArray, domain
-            $scope.copy.conceptualDomains.push domain
-
-          $scope.removeConceptualDomain = (index) ->
-            $scope.copy.conceptualDomains.splice index, 1
-
-          $scope.saveElement = ->
-            $scope.messages.clearAllMessages()
-            if not $scope.copy.name
-              $scope.messages.error 'Empty Name', 'Please fill the name'
-              return
-
-
-            promise = null
-
-            if args?.create
-              promise = catalogueElementResource(args.create).save($scope.copy)
-            else
-              promise = catalogueElementResource($scope.copy.elementType).update($scope.copy)
-
-            promise.then (result) ->
-              if args?.create
-                messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
-              else
-                messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
-              $modalInstance.close(result)
-            , (response) ->
-              for err in response.data.errors
-                $scope.messages.error err.message
-
         ]
 
       }
