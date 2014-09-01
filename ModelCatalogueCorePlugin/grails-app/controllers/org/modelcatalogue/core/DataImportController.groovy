@@ -170,16 +170,19 @@ class DataImportController extends AbstractRestfulController{
 
     protected static HeadersMap populateHeaders(){
         HeadersMap headersMap = new HeadersMap()
-        headersMap.dataElementCodeRow = "Data Item Unique Code"
-        headersMap.dataElementNameRow = "Data Item Name"
-        headersMap.dataElementDescriptionRow = "Data Item Description"
-        headersMap.dataTypeRow = "Data type"
-        headersMap.parentModelNameRow = "Parent Model"
-        headersMap.parentModelCodeRow = "Parent Model Unique Code"
-        headersMap.containingModelNameRow = "Model"
-        headersMap.containingModelCodeRow = "Model Unique Code"
-        headersMap.measurementUnitNameRow = "Measurement Unit"
-        headersMap.metadataRow = "Metadata"
+        headersMap.dataElementCode = "Data Item Unique Code"
+        headersMap.dataElementName = "Data Item Name"
+        headersMap.dataElementDescription = "Data Item Description"
+        headersMap.dataType = "Data type"
+        headersMap.parentModelName = "Parent Model"
+        headersMap.parentModelCode = "Parent Model Unique Code"
+        headersMap.containingModelName = "Model"
+        headersMap.containingModelCode = "Model Unique Code"
+        headersMap.measurementUnitName = "Measurement Unit"
+        headersMap.measurementSymbol = "Measurement Unit Symbol"
+        headersMap.classification = "Classification"
+        headersMap.conceptualDomainName = "Conceptual Domain"
+        headersMap.metadata = "Metadata"
         return headersMap
     }
 }

@@ -16,6 +16,7 @@ class ImportRow {
     String containingModelCode
     String measurementUnitName
     String measurementSymbol
+    String classification
     Map metadata
     Boolean imported = false
     Set<RowAction> rowActions = []
@@ -35,6 +36,7 @@ class ImportRow {
         containingModelCode nullable: true, maxSize: 255
         measurementUnitName nullable: true, maxSize: 255
         measurementSymbol nullable: true, maxSize: 255
+        classification nullable: true, maxSize: 255
         metadata nullable: true
         rowActions  nullable: true
         imported nulable: true

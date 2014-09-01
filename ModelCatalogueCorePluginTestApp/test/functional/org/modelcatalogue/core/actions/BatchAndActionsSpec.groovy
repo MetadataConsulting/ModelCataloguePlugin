@@ -12,7 +12,7 @@ class BatchAndActionsSpec extends GebSpec {
         go "#/catalogue/model/all"
 
         then:
-        title == "Model Catalogue Demo App"
+        title == "Models"
         at ModalTreeViewPage
         waitFor {
             viewTitle.displayed

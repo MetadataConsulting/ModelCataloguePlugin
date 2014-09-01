@@ -16,7 +16,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
             <form role="form">
-            <div class="form-group">
+              <div class="form-group">
                 <label for="name" class="">Conceptual Domain</label>
                 <input type="text" class="form-control" id="conceptualDomain" ng-model="copy.conceptualDomain">
               </div>

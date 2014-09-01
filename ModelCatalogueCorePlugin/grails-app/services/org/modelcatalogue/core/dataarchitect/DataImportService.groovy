@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
+import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
@@ -21,16 +22,19 @@ class DataImportService {
     def importData(ArrayList headers, ArrayList rows, String name, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap) {
         //get indexes of the appropriate sections
         DataImport newImporter = new DataImport(name: name)
-        def dataItemNameIndex = headers.indexOf(headersMap.dataElementNameRow)
-        def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCodeRow)
-        def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescriptionRow)
-        def parentModelIndex = headers.indexOf(headersMap.parentModelNameRow)
-        def modelIndex = headers.indexOf(headersMap.containingModelNameRow)
-        def parentModelCodeIndex = headers.indexOf(headersMap.parentModelCodeRow)
-        def modelCodeIndex = headers.indexOf(headersMap.containingModelCodeRow)
-        def unitsIndex = headers.indexOf(headersMap.measurementUnitNameRow)
-        def dataTypeIndex = headers.indexOf(headersMap.dataTypeRow)
-        def metadataStartIndex = headers.indexOf(headersMap.metadataRow) + 1
+        def dataItemNameIndex = headers.indexOf(headersMap.dataElementName)
+        def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCode)
+        def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescription)
+        def parentModelIndex = headers.indexOf(headersMap.parentModelName)
+        def modelIndex = headers.indexOf(headersMap.containingModelName)
+        def parentModelCodeIndex = headers.indexOf(headersMap.parentModelCode)
+        def modelCodeIndex = headers.indexOf(headersMap.containingModelCode)
+        def unitsIndex = headers.indexOf(headersMap.measurementUnitName)
+        def symbolsIndex = headers.indexOf(headersMap.measurementSymbol)
+        def classificationsIndex = headers.indexOf(headersMap.classification)
+        def dataTypeIndex = headers.indexOf(headersMap.dataType)
+        def metadataStartIndex = headers.indexOf(headersMap.metadata) + 1
+        def conceptualDomainIndex = headers.indexOf(headersMap.conceptualDomainName)
         def metadataEndIndex = headers.size() - 1
         def elements = []
         if (dataItemNameIndex == -1) throw new Exception("Can not find 'Data Item Name' column")
@@ -46,8 +50,10 @@ class DataImportService {
             importRow.dataType =   (dataTypeIndex!=-1)?row[dataTypeIndex]:null
             importRow.dataElementDescription =   (dataItemDescriptionIndex!=-1)?row[dataItemDescriptionIndex]:null
             importRow.measurementUnitName =   (unitsIndex!=-1)?row[unitsIndex]:null
-            importRow.conceptualDomainName = conceptualDomain
-            importRow.conceptualDomainDescription = conceptualDomainDescription
+            importRow.conceptualDomainName = (conceptualDomainIndex!=-1)?row[conceptualDomainIndex]:conceptualDomain
+            importRow.conceptualDomainDescription = (conceptualDomainIndex!=-1)?row[conceptualDomainIndex]:conceptualDomain
+            importRow.classification = (classificationsIndex!=-1)?row[classificationsIndex]:null
+            importRow.measurementSymbol = (symbolsIndex!=-1)?row[symbolsIndex]:null
             def counter = metadataStartIndex
             def metadataColumns = [:]
             while (counter <= metadataEndIndex) {
@@ -196,21 +202,22 @@ class DataImportService {
 
     def void ingestRow(DataImport importer, ImportRow row, Boolean bulkIngest = false) {
         if(row.rowActions.isEmpty()) {
-            def conceptualDomain, model, dataType, measurementUnit
+            def conceptualDomain, model, dataType, measurementUnit, classification
             conceptualDomain = importConceptualDomain(row.conceptualDomainName, row.conceptualDomainDescription)
+            classification = importClassification(row.classification)
             if(!row.dataElementName){
                 //only need to import the model information
-                importModels(importer, row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
+                importModels(importer, row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain, classification)
             }else {
                 dataType = (row.dataType) ? importDataType(row.dataElementName, row.dataType) : null
-                model = importModels(importer, row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain)
+                model = importModels(importer, row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain, classification)
                 measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
                 if (dataType || measurementUnit) {
                     //need to import value domain stuff as well
-                    importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain)
+                    importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain, classification)
                 } else {
                     //doesn't have a value domain so easy
-                    importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, conceptualDomain)
+                    importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, conceptualDomain, classification)
                 }
             }
             if(!bulkIngest) importer.removeFromImportQueue(row)
@@ -277,7 +284,7 @@ class DataImportService {
 
     }
 
-    def importModels(DataImport importer, String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain) {
+    def importModels(DataImport importer, String parentCode, String parentName, String modelCode, String modelName, ConceptualDomain conceptualDomain, Classification classification) {
         if (parentCode) { parentCode = parentCode.trim() }
         if (modelCode) { modelCode = modelCode.trim() }
         if (parentName) { parentName = parentName.trim() }
@@ -286,9 +293,9 @@ class DataImportService {
         Model parentModel = Model.findByModelCatalogueId(parentCode)
 
         //if there are no models or an id hasn't been specified then try to match the model
-        if (!model) { model = matchOrCreateModel(importer, [name: modelName, modelCatalogueId: (modelCode) ? modelCode : null], conceptualDomain)
+        if (!model) { model = matchOrCreateModel(importer, [name: modelName, modelCatalogueId: (modelCode) ? modelCode : null], conceptualDomain, classification)
         }else{ updateModel(model, modelName) }
-        if(!parentModel){ parentModel = matchOrCreateModel(importer, [name: parentName, modelCatalogueId: (parentCode) ? parentCode : null], conceptualDomain)
+        if(!parentModel){ parentModel = matchOrCreateModel(importer, [name: parentName, modelCatalogueId: (parentCode) ? parentCode : null], conceptualDomain, classification)
         }else{updateModel( parentModel, parentName) }
 
         if(model){ model = addModelToImport(importer, model) }
@@ -297,14 +304,17 @@ class DataImportService {
         return model
     }
 
-    protected Model matchOrCreateModel(DataImport importer, Map modelParams, ConceptualDomain conceptualDomain) {
+    protected Model matchOrCreateModel(DataImport importer, Map modelParams, ConceptualDomain conceptualDomain, Classification classification) {
         //check cache of models to see if it has already been created
         Model model = importer.models.find{it.name == modelParams.name}
         if(!model && modelParams.name){
             model = new Model(modelParams)
             model.modelCatalogueId = modelParams.modelCatalogueId
             model.save()
+            model.addToClassifications(classification)
             model.addToHasContextOf(conceptualDomain)
+        }else{
+            model.addToClassifications(classification)
         }
         return model
     }
@@ -315,6 +325,13 @@ class DataImportService {
         ConceptualDomain conceptualDomain = ConceptualDomain.findByName(name)
         if (!conceptualDomain) { conceptualDomain = new ConceptualDomain(name: name, description: description).save() }
         return conceptualDomain
+    }
+
+    def importClassification(String name) {
+        name = name.trim()
+        Classification classification = Classification.findByName(name)
+        if (!classification) { classification = new Classification(name: name).save() }
+        return classification
     }
 
 
@@ -365,9 +382,10 @@ class DataImportService {
         return false
     }
 
-    protected Boolean checkDataElementForChanges(Map params, Map metadata, DataElement dataElement) {
+    protected Boolean checkDataElementForChanges(Map params, Map metadata, DataElement dataElement, Classification classification) {
         Boolean hasDataElementChanged = false
-        if (dataElement.name != params.name || dataElement.description != params.description) { return true }
+        if (dataElement.name != params.name || dataElement.description != params.description || !dataElement.classifications.contains(classification)) { return true }
+
         metadata.each { key, value ->
             if (key) { key = key.toString().take(255) }
             value = (value && value != "") ? value.toString().take(255) : null
@@ -377,8 +395,8 @@ class DataImportService {
     }
 
     //update data element without value domain info
-    protected DataElement updateDataElement(DataImport importer, Map params, DataElement dataElement, Map metadata, Model model, ConceptualDomain conceptualDomain) {
-        if (checkDataElementForChanges(params, metadata, dataElement)) {
+    protected DataElement updateDataElement(DataImport importer, Map params, DataElement dataElement, Map metadata, Model model, ConceptualDomain conceptualDomain, Classification classification) {
+        if (checkDataElementForChanges(params, metadata, dataElement, classification)) {
             if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
                 model.status = PublishedElementStatus.UPDATED
                 model.save()
@@ -390,6 +408,7 @@ class DataImportService {
             dataElement.description = params.description
             dataElement.status = PublishedElementStatus.UPDATED
             dataElement.save()
+            dataElement.addToClassifications(classification)
             dataElement = updateMetadata(metadata, dataElement)
             addUpdatedDataElements(importer, dataElement, model, conceptualDomain)
         }
@@ -398,8 +417,8 @@ class DataImportService {
     }
 
     //update data element given value domain info
-    protected DataElement updateDataElement(DataImport importer, Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd, Map metadata, Model model, ConceptualDomain conceptualDomain) {
-        Boolean dataElementChanged = checkDataElementForChanges(params, metadata, dataElement)
+    protected DataElement updateDataElement(DataImport importer, Map params, DataElement dataElement, Map vdParams, ConceptualDomain cd, Map metadata, Model model, ConceptualDomain conceptualDomain, Classification classification) {
+        Boolean dataElementChanged = checkDataElementForChanges(params, metadata, dataElement, classification)
         ValueDomain vd = dataElement.valueDomain
         Boolean valueDomainChanged = checkValueDomainForChanges(vdParams, vd, cd)
 
@@ -420,6 +439,7 @@ class DataImportService {
                 dataElement.description = params.description
                 dataElement.status = PublishedElementStatus.UPDATED
                 dataElement.save()
+                dataElement.addToClassifications(classification)
                 dataElement = updateMetadata(metadata, dataElement)
             }
 
@@ -451,12 +471,12 @@ class DataImportService {
         vd.save()
     }
 
-    protected DataElement importDataElement(DataImport importer, Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd) {
+    protected DataElement importDataElement(DataImport importer, Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd, Classification classification) {
 
         //find out if data element exists using unique code
         DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
         if (de) {
-            de = updateDataElement(importer, params, de, vdParams, cd, metadata, model, cd)
+            de = updateDataElement(importer, params, de, vdParams, cd, metadata, model, cd, classification)
 
         }
 
@@ -465,7 +485,7 @@ class DataImportService {
             def nameDE = DataElement.findByName(params.name)
             if (nameDE && nameDE.containedIn.contains(model)) {
                 de = nameDE
-                if (de) { de = updateDataElement(importer, params, de, vdParams, cd, metadata, model, cd)  }
+                if (de) { de = updateDataElement(importer, params, de, vdParams, cd, metadata, model, cd, classification)  }
             }
         }
 
@@ -475,6 +495,7 @@ class DataImportService {
             de.modelCatalogueId = params.modelCatalogueId
             de.save()
             de = updateMetadata(metadata, de)
+            de.addToClassifications(classification)
 //            Relationship containedIn = de.addToContainedIn(model)
 //            containedIn.ext.put("Context" , cd.name)
             addModelToImport(importer, model)
@@ -487,18 +508,18 @@ class DataImportService {
     }
 
 
-    protected DataElement importDataElement(DataImport importer, Map params, Map metadata, Model model, ConceptualDomain cd) {
+    protected DataElement importDataElement(DataImport importer, Map params, Map metadata, Model model, ConceptualDomain cd, Classification classification) {
 
         //find out if data element exists using unique code
         DataElement de = DataElement.findByModelCatalogueId(params.modelCatalogueId)
-        if (de) { de = updateDataElement(importer, params, de, metadata, model, cd) }
+        if (de) { de = updateDataElement(importer, params, de, metadata, model, cd, classification) }
 
         //find if data element exists using name and containing model
         if (!de && params.name) {
             def nameDE = DataElement.findByName(params.name)
             if (nameDE && nameDE.containedIn.contains(model)) {
                 de = nameDE
-                if (de) { de = updateDataElement(importer, params, de, metadata, model, cd) }
+                if (de) { de = updateDataElement(importer, params, de, metadata, model, cd, classification) }
             }
         }
 
@@ -507,6 +528,7 @@ class DataImportService {
             de = new DataElement(params)
             de.modelCatalogueId = params.modelCatalogueId
             de.save()
+            de.addToClassifications(classification)
             de = updateMetadata(metadata, de)
 //            Relationship  containedIn = de.addToContainedIn(model)
 //            containedIn.ext.put("Context" , cd.name)
@@ -529,6 +551,7 @@ class DataImportService {
                 mu = MeasurementUnit.findByNameIlike(params.name)
             }
         }
+        if(!mu && params.name) new MeasurementUnit(name: params.name, symbol: params.symbol).save()
         return mu
     }
 
