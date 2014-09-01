@@ -214,7 +214,7 @@ class DataImportService {
                 measurementUnit = importMeasurementUnit([name: row.measurementUnitName, symbol: row.measurementSymbol])
                 if (dataType || measurementUnit) {
                     //need to import value domain stuff as well
-                    importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, measurementUnit: measurementUnit], conceptualDomain, classification)
+                    importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, [name: row.dataElementName.replaceAll("\\s", "_"), description: row.dataType.toString().take(2000), dataType: dataType, unitOfMeasure: measurementUnit], conceptualDomain, classification)
                 } else {
                     //doesn't have a value domain so easy
                     importDataElement(importer, [name: row.dataElementName, description: row.dataElementDescription, modelCatalogueId: row.dataElementCode], row.metadata, model, conceptualDomain, classification)
@@ -377,7 +377,7 @@ class DataImportService {
                 if (valueDomain.dataType.enumAsString != params.dataType.enumAsString) { return true }
             } else if (valueDomain.dataType != params.dataType) { return true }
         }else{
-            if(params.dataType||params.measurementUnit){return true}
+            if(params.dataType||params.unitOfMeasure){return true}
         }
         return false
     }
@@ -551,7 +551,7 @@ class DataImportService {
                 mu = MeasurementUnit.findByNameIlike(params.name)
             }
         }
-        if(!mu && params.name) new MeasurementUnit(name: params.name, symbol: params.symbol).save()
+        if(!mu && params.name) mu = new MeasurementUnit(name: params.name, symbol: params.symbol).save()
         return mu
     }
 
