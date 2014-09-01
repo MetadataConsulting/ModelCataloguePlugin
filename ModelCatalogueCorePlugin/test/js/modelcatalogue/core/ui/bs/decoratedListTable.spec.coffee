@@ -35,8 +35,8 @@ describe "mc.core.ui.decoratedListTable", ->
 
 
     # table gets dl-table class
-    expect(element.prop('tagName').toLowerCase()).toBe('table')
-    expect(element.hasClass('dl-table')).toBeTruthy()
+    expect(element.prop('tagName').toLowerCase()).toBe('div')
+    expect(element.find('table').hasClass('dl-table')).toBeTruthy()
 
     # well formed table head and body with expected classes
     expect(element.find('thead').length).toBe(1)

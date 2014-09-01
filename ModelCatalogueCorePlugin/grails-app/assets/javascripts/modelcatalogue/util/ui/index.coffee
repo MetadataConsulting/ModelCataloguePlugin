@@ -7,6 +7,7 @@
 #= require actions
 #= require actionButtonSingle
 #= require actionButtonDropdown
+#= require applicationTitle
 #= require contextualActions
 
 angular.module 'mc.util.ui', [
@@ -22,5 +23,6 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.actions'
   'mc.util.ui.actionButtonSingle'
   'mc.util.ui.actionButtonDropdown'
+  'mc.util.ui.applicationTitle'
   'mc.util.ui.contextualActions'
 ]

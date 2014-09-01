@@ -8,7 +8,7 @@ describe "mc.util.ui.bs.contextualActions", ->
       {
         position:   100
         label:      'Edit'
-        icon:       'edit'
+        icon:       'glyphicon glyphicon-edit'
         type:       'primary'
         action:     ->
           $scope.element.name = 'The Earth Element'
@@ -18,7 +18,7 @@ describe "mc.util.ui.bs.contextualActions", ->
     actionsProvider.registerChildAction 'edit-catalogue-element-3', 'edit-catalogue-element-nested-3', ['$scope', ($scope)->
       {
          label:      'Edit as Admin'
-         icon:       'edit'
+         icon:       'glyphicon glyphicon-edit'
          action:  ->
            $scope.element.name = 'The Element Edited'
       }

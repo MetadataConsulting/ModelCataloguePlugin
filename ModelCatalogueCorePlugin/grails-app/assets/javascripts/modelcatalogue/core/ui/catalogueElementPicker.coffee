@@ -21,31 +21,16 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
         deferred.resolve(result.list)
       deferred.promise
 
-
-    commaSeparatedList = (things)->
-      out = ''
-      angular.forEach(things, (thing)->
-        out = out + "#{thing.name} "
-        return
-      )
-      out
-
-
-    $scope.label = (element)->
-      if(element)
-        if (element.classifications? && element.classifications.length>0)
-          classificationNames = commaSeparatedList(element.classifications)
-          return "#{element.name} ( #{element.elementTypeName} in #{classificationNames})"
-        else if(element.conceptualDomains? && element.conceptualDomains.length>0)
-          conceptualDomains = commaSeparatedList(element.conceptualDomains)
-          return "#{element.name} ( #{element.elementTypeName} in #{conceptualDomains})"
-        else
-          return "#{element.name} ( #{element.elementTypeName} )"
-
+    $scope.label = (el, customLabel) ->
+      return ''                  if not el
+      return '' + customLabel    if customLabel
+      return '' + el.getLabel()  if angular.isFunction(el.getLabel)
+      return '' + el
   ]
 
   compile: (element, attrs) ->
-    element.attr('typeahead', "el as label(el) for el in searchForElement($viewValue, '" + (attrs.catalogueElementPicker ? '') + "', '" + (attrs.resource ? '') + "')" )
+    label = if attrs.label then attrs.label else 'null'
+    element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, '" + (attrs.catalogueElementPicker ? '') + "', '" + (attrs.resource ? '') + "')" )
     element.removeAttr('catalogue-element-picker')
     element.removeAttr('catalogueElementPicker')
     element.removeAttr('data-catalogue-element-picker')

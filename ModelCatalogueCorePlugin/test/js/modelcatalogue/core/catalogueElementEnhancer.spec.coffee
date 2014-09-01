@@ -39,6 +39,15 @@ describe "mc.core.catalogueElementEnhancer", ->
     expect(angular.equals(toParams, {resource: 'valueDomain', id: "#{enhanced.id}"})).toBeTruthy()
     expect(self).toEqual(enhanced)
 
+  it "returns expected results for getLabel()", inject (enhance) ->
+    domain  = enhance angular.copy(fixtures.valueDomain.showOne)
+    model   = enhance angular.copy(fixtures.model.showOne)
+    element = enhance angular.copy(fixtures.dataElement.showOne)
+
+    expect(domain.getLabel()) .toBe("value domain test5 (Value Domain in public libraries)")
+    expect(model.getLabel())  .toBe("mTest3 (Model)")
+    expect(element.getLabel()).toBe("DE_author (Data Element)")
+
   it "returns expected results for instance of", inject (enhance) ->
     domain  = enhance angular.copy(fixtures.valueDomain.showOne)
     model   = enhance angular.copy(fixtures.model.showOne)

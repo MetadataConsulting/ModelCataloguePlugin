@@ -8,7 +8,7 @@ describe "mc.util.ui.actionButtonSingle", ->
       {
         position:   100
         label:      'Edit'
-        icon:       'edit'
+        icon:       'glyphicon glyphicon-edit'
         type:       'primary'
         action:     ->
           $scope.element.name = 'The Earth Element'

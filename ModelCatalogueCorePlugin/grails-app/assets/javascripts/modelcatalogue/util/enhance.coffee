@@ -12,6 +12,7 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
   # factory method
   @$get = [ '$injector', '$q', ($injector, $q) ->
     enhance = (result) ->
+      return result unless result
       if result.then? and angular.isFunction(result.then)
         deferred = $q.defer()
         result.then(
