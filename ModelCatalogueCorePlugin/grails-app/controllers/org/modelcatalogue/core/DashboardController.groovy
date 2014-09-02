@@ -26,12 +26,14 @@ class DashboardController {
                 totalDataSetCount:Classification.count(),
                 pendingActionCount:Action.countByState(ActionState.PENDING),
                 failedActionCount:Action.countByState(ActionState.FAILED),
-                batchCount:Batch.count(),
+                activeBatchCount:Batch.countByArchived(false),
+                archivedBatchCount:Batch.countByArchived(true),
                 uninstantiatedDataElementCount: uninstantiatedDataElements.total,
                 relationshipTypeCount:RelationshipType.count(),
                 measurementUnitCount:MeasurementUnit.count(),
                 dataTypeCount:DataType.count(),
-                valueDomainCount:ValueDomain.count()
+                valueDomainCount:ValueDomain.count(),
+                conceptualDomainCount:ConceptualDomain.count(),
                 ]
         respond model
     }
