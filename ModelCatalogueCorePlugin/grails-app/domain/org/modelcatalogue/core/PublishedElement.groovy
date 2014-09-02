@@ -23,6 +23,10 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     static belongsTo = Classification
 
+    static mapping = {
+        tablePerHierarchy false
+    }
+
     @Override
     boolean isArchived() {
         if (!status) return false

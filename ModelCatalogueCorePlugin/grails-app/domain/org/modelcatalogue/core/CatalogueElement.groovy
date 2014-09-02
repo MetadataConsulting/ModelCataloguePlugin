@@ -55,6 +55,7 @@ abstract class CatalogueElement {
     }
 
     static mapping = {
+        tablePerHierarchy false
         sort "name"
         description type: "text"
     }
