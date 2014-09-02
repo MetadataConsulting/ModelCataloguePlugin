@@ -114,10 +114,6 @@
                         <a show-if-logged-in ng-click="logout()" type="submit">Log out</a>
                         <a hide-if-logged-in ng-click="login()"  type="submit">Log in</a>
                     </li>
-                    <li class="hidden-sm hidden-md hidden-lg" ng-controller="metadataCurator.userCtrl">
-                        <a show-if-logged-in ng-click="logout()" type="submit">Log out</a>
-                        <a hide-if-logged-in ng-click="login()"  type="submit">Log in</a>
-                    </li>
 
                 </ul>
 
