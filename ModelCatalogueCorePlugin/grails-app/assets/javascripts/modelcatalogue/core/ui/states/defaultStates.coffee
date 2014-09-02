@@ -443,6 +443,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </div>
   '''
 
+  #language=HTML
   $templateCache.put 'modelcatalogue/core/ui/state/dashboard.html', '''
     		<!-- Jumbotron -->
   <div hide-if-logged-in>
@@ -500,7 +501,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-database fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"><i class="fa fa-database fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"> Data Sets</a> {{totalDataSetCount}} </div>
@@ -522,7 +523,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-cubes fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Finalized Models</a> {{finalizedModelCount}} </div>
@@ -545,7 +546,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-cube fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cube fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
@@ -568,7 +569,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-cogs fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'conceptualDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cogs fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="conceptualDomainLink" ui-sref="mc.resource.list({resource: 'conceptualDomain'})" ui-sref-opts="{inherit: false}"> Conceptual Domains</a> {{conceptualDomainCount}} </div>
@@ -590,7 +591,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-cog fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cog fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} </div>
@@ -612,7 +613,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-list-alt fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-list-alt fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="dataTypesLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Data Types</a> {{dataTypeCount}} </div>
@@ -633,7 +634,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-tachometer fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tachometer fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Measurement Units</a> {{measurementUnitCount}} </div>
@@ -654,7 +655,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-file-o fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}"><i class="fa fa-file-o fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>
@@ -677,7 +678,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-link fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-link fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypeCount}}</div>
@@ -698,7 +699,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <i class="fa fa-flash fa-5x fa-fw" style="color:#428bca"></i>
+                                        <a ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"><i class="fa fa-flash fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}">Active Batches</a> {{activeBatchCount}}</div>
