@@ -68,6 +68,22 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               else
                 return @name
 
+          self.getIcon = ->
+            # TODO: move to bs package
+            switch @elementType
+              when 'org.modelcatalogue.core.Classification' then return "fa fa-fw fa-database"
+              when 'org.modelcatalogue.core.Model' then return "fa fa-fw fa-cubes"
+              when 'org.modelcatalogue.core.DataElement' then return "fa fa-fw fa-cube"
+              when 'org.modelcatalogue.core.ConceptualDomain' then return "fa fa-fw fa-cogs"
+              when 'org.modelcatalogue.core.ValueDomain' then return "fa fa-fw fa-cog"
+              when 'org.modelcatalogue.core.EnumeratedType' then return "fa fa-fw fa-list-alt"
+              when 'org.modelcatalogue.core.DataType' then return "fa fa-fw fa-list-alt"
+              when 'org.modelcatalogue.core.MeasurementUnit' then return "fa fa-fw fa-tachometer"
+              when 'org.modelcatalogue.core.Asset' then return "fa fa-fw fa-file-o"
+              when 'org.modelcatalogue.core.RelationshipType' then return "fa fa-fw fa-link"
+              when 'org.modelcatalogue.core.action.Action' then return "fa fa-fw fa-flash"
+              else 'glyphicon glyphicon-file'
+
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)
       # wrap original element

@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
 .controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', '$log', 'security', 'rest', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', ($rootScope, $scope, $stateParams, $state, $log, security, rest, modelCatalogueApiRoot, user, messages, applicationTitle, names) ->
-    applicationTitle "Dashboard"
+    applicationTitle "Model Catalogue"
 
     updateDashboard = (userName) ->
       $scope.user  = userName
@@ -454,8 +454,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 				software components
 			</p>
 
-      <form ng-submit="login()" ng-controller="metadataCurator.loginCtrl">
-         <button class="btn btn-large btn-primary" type="submit">Login <i class="glyphicon glyphicon-log-in"></i></button>
+      <form ng-controller="metadataCurator.userCtrl">
+         <button ng-click="login()" class="btn btn-large btn-primary" type="submit">Login <i class="glyphicon glyphicon-log-in"></i></button>
          <a href="" class="btn btn-large btn-primary" >Sign Up <i class="glyphicon glyphicon-pencil"></i></a>
       </form>
     </div>
@@ -493,11 +493,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 		</div>
 </div>
 
-<div show-for-role="ADMIN" >
-    <!--<div class="page-header">
-      <h1>Welcome back {{user}}</h1>
-      <p class="lead"> this is your dashboard </p>
-    </div>-->
+<div show-if-logged-in>
       <div class="row">
                     <div class="col-lg-4 col-sm-6 col-md-4">
                         <div class="panel panel-default">
@@ -512,7 +508,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                 </div>
                             </div>
 
-                            <a ng-click="create('classification')">
+                            <a show-for-role="CURATOR" ng-click="create('classification')">
                                 <div class="panel-footer">
                                     <span class="pull-left">Create Data Set</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
@@ -535,7 +531,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                 </div>
                             </div>
-                            <a ng-click="create('model')">
+                            <a show-for-role="CURATOR" ng-click="create('model')">
                                 <div class="panel-footer">
                                     <span class="pull-left">Create Model</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
@@ -558,7 +554,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                 </div>
                             </div>
-                            <a ng-click="create('dataElement')">
+                            <a show-for-role="CURATOR" ng-click="create('dataElement')">
                                 <div class="panel-footer">
                                     <span class="pull-left">Create Data Element</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
@@ -580,7 +576,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                 </div>
                             </div>
 
-                            <a ng-click="create('conceptualDomain')">
+                            <a show-for-role="CURATOR" ng-click="create('conceptualDomain')">
                                 <div class="panel-footer">
                                     <span class="pull-left">Create Conceptual Domain</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
@@ -602,7 +598,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                 </div>
                             </div>
 
-                            <a ng-click="create('valueDomain')">
+                            <a show-for-role="CURATOR" ng-click="create('valueDomain')">
                                 <div class="panel-footer">
                                     <span class="pull-left">Create Value Domain</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
@@ -623,7 +619,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                 </div>
                             </div>
-                            <a ng-click="create('dataType')">
+                            <a show-for-role="CURATOR" ng-click="create('dataType')">
                                 <div class="panel-footer">
                                     <span class="pull-left" >Create Data Type</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
@@ -644,7 +640,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                 </div>
                             </div>
-                            <a ng-click="create('measurementUnit')">
+                            <a show-for-role="CURATOR" ng-click="create('measurementUnit')">
                                 <div class="panel-footer">
                                     <span class="pull-left">Create Measurement Unit</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
@@ -667,7 +663,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                 </div>
                             </div>
-                            <a ng-click="create('asset')">
+                            <a show-for-role="CURATOR" ng-click="create('asset')">
                                 <div class="panel-footer">
                                     <span class="pull-left">Create Asset</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
@@ -676,7 +672,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
-                  <div class="col-lg-4 col-sm-6 col-md-4">
+                  <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <div class="row">
@@ -697,7 +693,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-md-4">
+                    <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <div class="row">
