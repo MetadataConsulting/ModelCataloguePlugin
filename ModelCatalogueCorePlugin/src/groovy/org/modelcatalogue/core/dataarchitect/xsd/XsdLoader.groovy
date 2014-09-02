@@ -6,13 +6,12 @@ package org.modelcatalogue.core.dataarchitect.xsd
 
 class XsdLoader {
 
-    ArrayList< XsdElement> allElements = []
     String logErrors =""
-    ArrayList<XsdElement> sactDataElements =[]
+    ArrayList<XsdAttribute> allAttributes = []
+    ArrayList<XsdElement> allElements = []
     ArrayList<XsdSimpleType> sactSimpleDataTypes =[]
     ArrayList<XsdComplexType>  sactComplexDataTypes =[]
     ArrayList<XsdGroup> sactGroups =[]
-    ArrayList<XsdElement> sactAllDataElements =[]
     XmlParser parser
     def sact
 
@@ -46,13 +45,11 @@ class XsdLoader {
                     break
                 case "element":
                     XsdElement element =  readSACTElement(valueNode, "root")
-                    sactDataElements << element
                     allElements << element
                     break
                 case "attribute":
-                    XsdSimpleType element =  readSACTElement(valueNode, "root")
-                    sactDataElements << element
-                    allElements << element
+                    XsdAttribute attribute =  readSACTSimpleType(valueNode, "")
+                    allAttributes << attribute
                     break
                 case "complexType":
                     XsdComplexType complexDataType = readComplexType (valueNode, "")
@@ -71,8 +68,7 @@ class XsdLoader {
                     break
             }
         }
-        sactAllDataElements.addAll(allElements)
-        [sactDataElements, sactSimpleDataTypes, sactComplexDataTypes, sactGroups, sactAllDataElements, logErrors]
+        [allElements, sactSimpleDataTypes, sactComplexDataTypes, sactGroups, logErrors]
     }
 
 
