@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:UML="omg.org/UML1.3"
+           xmlns:fn="http://www.w3.org/2005/xpath-functions"
+           xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
+           xmlns="http://www.datadictionary.nhs.uk/messages/SACT-v2-0"
+           xmlns:SACT="http://www.datadictionary.nhs.uk/messages/SACT-v2-0"
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified"
+           blockDefault="#all"
+           finalDefault="extension"
+           version="2-0"
+           id="SACTSACT_XMLSchema-v2-0"
+           targetNamespace="http://www.datadictionary.nhs.uk/messages/SACT-v2-0">
+   <xs:include schemaLocation="SACT_XMLDataTypes_EXAMPLE.xsd"/>
+   <xs:element name="SACT" type="SACTSACTType"/>
+   <xs:complexType name="SACTSACTType">
+      <xs:sequence>
+         <xs:element name="SACTRecord" type="SACTSACTRecordType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="SACTSACTRecordType">
+      <xs:sequence>
+         <xs:element name="DemographicsAndConsultant" type="SACTDemographicsAndConsultantType"
+                     minOccurs="1"
+                     maxOccurs="1"/>
+         <xs:element name="ProgrammeAndRegimen" type="SACTProgrammeAndRegimenType" minOccurs="1"
+                     maxOccurs="unbounded"/>
+         <xs:element name="Cycle" type="SACTCycleType" minOccurs="1" maxOccurs="unbounded"/>
+         <xs:element name="ClinicalStatus" type="SACTClinicalStatusType" minOccurs="1" maxOccurs="1"/>
+         <xs:element name="DrugDetails" type="SACTDrugDetailsType" minOccurs="1"
+                     maxOccurs="unbounded"/>
+         <xs:element name="Outcome" type="SACTOutcomeType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+   </xs:complexType>
+    <xs:complexType name="SACTDemographicsAndConsultantType">
+    <xs:sequence>
+    <xs:element name="NHSNumber" type="ST.GB-en-NHS.StringType6" minOccurs="1" maxOccurs="1">
+        <xs:annotation>
+            <xs:appinfo>NHS NUMBER</xs:appinfo>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="NHSNumberStatus" minOccurs="1" maxOccurs="1">
+        <xs:simpleType>
+            <xs:restriction base="st">
+                <xs:enumeration value="01"/>
+                <xs:enumeration value="02"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:element>
+    <xs:element name="PersonBirthDate" type="ST.GB-en-NHS.StringType1" minOccurs="1"
+                maxOccurs="1"/>
+    </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
