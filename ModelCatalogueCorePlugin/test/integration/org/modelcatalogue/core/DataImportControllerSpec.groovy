@@ -24,6 +24,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         fileName = "test/integration/resources/DataTemplate.xls"
         filenameXsd = "test/unit/resources/SACT/XSD_Example.xsd"
         loadMarshallers()
+        loadFixtures()
         recorder = DefaultResultRecorder.create(
                 "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
                 "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
@@ -54,8 +55,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
 //
 //    }
 
-        def "Test the dataImportService in the ImporterController"()
-    {
+    def "Test the dataImportService in the ImporterController"(){
         def controller = new DataImportController()
         when: "The dataImportService is called"
         def numElements = DataElement.count()
@@ -63,20 +63,24 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         controller.metaClass.request = new MockMultipartHttpServletRequest()
         controller.params.conceptualDomain = 'test'
         controller.params.name = 'testImport123'
-//        .parameters = ['conceptualDomain' : 'test', 'name' : 'testImport123']
         InputStream inputStream = new FileInputStream(filenameXsd)
         controller.request.addFile(new MockMultipartFile('file', filenameXsd,"application/octet-stream" , inputStream))
         controller.upload()
         JSONElement json = controller.response.json
         String list = "list1"
         recordResult list, json
+        def model = Model.findByName("qualifier")
+        def group = Model.findByName("group")
+        def cd = Model.findByName("CR")
+        def parents = model.parentOf
+        def children = model.childOf
 
         then: "The an importer is created and there are items in the importQueue and actions"
         ValueDomain.findByName("ts")
+        Model.findByName("TS.GB-en-NHS.Date")
+        parents.contains(cd)
+        children.contains(group)
         json
-        json.pendingAction
-        DataImport.list().size()>0
-
     }
 
     @Override

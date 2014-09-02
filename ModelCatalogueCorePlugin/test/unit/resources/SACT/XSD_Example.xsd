@@ -118,7 +118,7 @@
         <xs:complexContent>
             <xs:extension base="CD">
                 <xs:sequence>
-                    <xs:element name="value" type="CD" minOccurs="0"/>
+                    <xs:element name="value" type="cs" minOccurs="0"/>
                 </xs:sequence>
             </xs:extension>
         </xs:complexContent>

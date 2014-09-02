@@ -61,15 +61,18 @@ class DataImportController extends AbstractRestfulController{
                 }
                 else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd"))
                 {
+                    importer = new DataImport(name: "xsd import" + params.conceptualDomain)
                     XsdLoader parserSACT = new XsdLoader(file.inputStream)
                     def (elements, simpleDataTypes, complexDataTypes, groups, attributes, logErrorsSACT) = parserSACT.parse()
                     // Create the Conceptual Domain
                     def conceptualDomain = dataImportService.importConceptualDomain(params.conceptualDomain, '')
-
-
+                    def classification = dataImportService.importClassification(params.conceptualDomain)
                     //Create DataTypes and ValueDomains for SimpleTypes
                     dataImportService.createDataTypesAndValueDomains(importer, conceptualDomain, simpleDataTypes)
+                    dataImportService.createModels(importer, conceptualDomain, complexDataTypes, groups, classification)
+                    dataImportService.createCatalogueElements(importer, elements, conceptualDomain, classification)
 
+                    response = ['test':'test']
 
                 }
                 else {

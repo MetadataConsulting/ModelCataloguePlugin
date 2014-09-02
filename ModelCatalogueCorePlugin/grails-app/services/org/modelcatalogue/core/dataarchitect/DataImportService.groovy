@@ -10,6 +10,7 @@ import org.modelcatalogue.core.ExtendibleElement
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.dataarchitect.xsd.*
 
@@ -383,6 +384,20 @@ class DataImportService {
         return false
     }
 
+    protected Boolean checkValueDomainForChanges(ValueDomain newVD, ValueDomain valueDomain, ConceptualDomain cd){
+        if(valueDomain) {
+            if (!valueDomain.conceptualDomains.contains(cd)) { return true }
+            if (valueDomain.unitOfMeasure != newVD.unitOfMeasure) { return true }
+            if (newVD.dataType instanceof EnumeratedType && valueDomain.dataType instanceof EnumeratedType) {
+                if (valueDomain.dataType.enumAsString != newVD.dataType.enumAsString) { return true }
+            } else if (valueDomain.dataType != newVD.dataType) { return true }
+        }else{
+            if(newVD.dataType||newVD.unitOfMeasure){return true}
+        }
+        return false
+    }
+
+
     protected Boolean checkDataElementForChanges(Map params, Map metadata, DataElement dataElement, Classification classification) {
         Boolean hasDataElementChanged = false
         if (dataElement.name != params.name || dataElement.description != params.description || !dataElement.classifications.contains(classification)) { return true }
@@ -463,14 +478,80 @@ class DataImportService {
         return dataElement
     }
 
+
+    //update data element given value domain info
+    protected DataElement updateDataElement(DataImport importer, XsdElement element, DataElement dataElement, ValueDomain valueDomain, ConceptualDomain cd, Model model, ConceptualDomain conceptualDomain, Classification classification) {
+
+        def params = [name: element.name, description: element.description]
+        def metadata = []
+        Boolean dataElementChanged = checkDataElementForChanges(params, metadata, dataElement, classification)
+        ValueDomain vd = dataElement.valueDomain
+        Boolean valueDomainChanged = checkValueDomainForChanges(valueDomain, vd, cd)
+
+        if (dataElementChanged || valueDomainChanged) {
+
+            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
+                model.status = PublishedElementStatus.UPDATED
+                model.save()
+            }
+
+            addModelToImport(importer, model)
+
+            publishedElementService.archiveAndIncreaseVersion(dataElement)
+            dataElement.refresh()
+
+            if(dataElementChanged) {
+                dataElement.name = element.name
+                dataElement.description = element.description
+                dataElement.status = PublishedElementStatus.UPDATED
+                dataElement.save()
+                dataElement.addToClassifications(classification)
+                dataElement = updateMetadata(metadata, dataElement)
+            }
+
+            if (valueDomainChanged) {
+                if(dataElement.status != PublishedElementStatus.UPDATED) {
+                    dataElement.status = PublishedElementStatus.UPDATED
+                    dataElement.valueDomain = valueDomain
+                    dataElement.save()
+                }
+
+            }
+
+            addUpdatedDataElements(importer, dataElement, model, conceptualDomain)
+
+        }
+
+        return dataElement
+    }
+
     protected ValueDomain importValueDomain(Map vdParams, DataElement dataElement, ConceptualDomain cd) {
         ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, vdParams.unitOfMeasure)
         if (!vd) { vd = new ValueDomain(vdParams).save() }
         vd.addToConceptualDomains(cd)
         dataElement.valueDomain = vd
-        vd.addToDataElements(dataElement)
         vd.save()
     }
+
+
+    protected  importValueDomain(String name, String description, DataType dataType, String regexDef, ConceptualDomain cd, Boolean multiple=Boolean.FALSE) {
+        ValueDomain vd = ValueDomain.findByDataTypeAndName(dataType, name)
+        if (!vd) {
+            vd = new ValueDomain(name: name, description: description, dataType: dataType, multiple: multiple).save()
+            if (regexDef!=""){
+                vd.setRegexDef(regexDef)
+                vd.save()
+            }
+        }
+        if (vd) {
+            vd.addToConceptualDomains(cd)
+            vd.save()
+        }
+        else {
+            println("Value Domain: " + name + " not imported.")
+        }
+    }
+
 
     protected DataElement importDataElement(DataImport importer, Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd, Classification classification) {
 
@@ -711,7 +792,6 @@ class DataImportService {
                         addMetadataToValueDomain(enumeratedVD, simpleType)
                         enumeratedVD.save()
                         enumeratedVD.addToBasedOn(vd)
-                        vd.addToIsBaseFor(enumeratedVD)
                         vd.save()
                         enumeratedVD.save()
                         return [enumeratedVD, dataType]
@@ -798,6 +878,82 @@ class DataImportService {
 
 
         vd = updateMetadata(metadata, vd)
+
+
+    }
+
+
+
+    def createModels(DataImport importer, ConceptualDomain cd, ArrayList<XsdComplexType> complexDataTypes, ArrayList<XsdGroup> groups, Classification classification){
+
+        complexDataTypes.each { XsdComplexType complexDataType ->
+            //Create Model for each Group, Choice and Sequence.
+            Model model = matchOrCreateModel(importer, [name:complexDataType.name, description: complexDataType.description], cd, classification).save()
+            if (model != null) println("Model: " + complexDataType.name)
+            addModelToImport(importer, model)
+        }
+
+        groups.each{ XsdGroup group ->
+            Model model = matchOrCreateModel(importer, [name:group.name, description: group.description], cd, classification).save()
+            addModelToImport(importer, model)
+        }
+
+    }
+
+    def createCatalogueElements(DataImport importer, ArrayList<XsdElement> elements, ConceptualDomain conceptualDomain, Classification classification){
+
+
+        // Extract all the DataElements
+        elements.each { XsdElement element ->
+
+            Model complexTypeModel = Model.findByName(element.type)
+            if  (complexTypeModel == null) {
+
+                //find or create the data element
+                ValueDomain valueDomain = ValueDomain.findByName(element.type)
+                def containingModels = Model.findAllWhere(name:element.section)
+                def containingModel = containingModels.find{it.classifications.contains(classification)}
+
+                def dataElements = DataElement.findByName(element.name)
+                def dataElement = dataElements.find{it.classifications.contains(classification)}
+                if (dataElement) dataElement = updateDataElement(importer, element, dataElement, valueDomain, conceptualDomain, containingModel, classification)
+
+                if (!dataElement) {
+                    dataElement = new DataElement(name: element.name, description: element.description).save()
+                    dataElement.addToClassifications(classification)
+                    Relationship containedIn = dataElement.addToContainedIn(containingModel)
+                    containedIn.ext.put("Min Occurs", element.minOccurs)
+                    containedIn.ext.put("Max Occurs", element.maxOccurs)
+                    containedIn.ext.put("type", "xs:element")
+                    addModelToImport(importer, containingModel)
+                    addUpdatedDataElements(importer, dataElement, containingModel, conceptualDomain)
+                }
+
+                dataElement.valueDomain = valueDomain
+                dataElement.save()
+
+                return dataElement
+
+            }
+            else
+            {
+                //create the model
+                Model model = Model.findByName(element.name)
+                if (model ==null) model = matchOrCreateModel(importer, [name:element.name, description: element.description], conceptualDomain, classification)
+                Model parentNode = Model.findByName(element.section)
+                if (parentNode!=null && model !=null) {
+                    parentNode.addToParentOf(model)
+                    model.addToParentOf(complexTypeModel)
+                    model.save(flush:true)
+                    println("ParentModel: " + element.section +  " Model: " + element.name + " ComplexModel: " + element.type)
+                }
+            }
+        }
+
+    }
+
+    def createCatalogueElements(ArrayList<XsdAttribute> attributes){
+
 
 
     }
