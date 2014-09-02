@@ -12,10 +12,14 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
 
   # factory function
-  catalogueProvider.$get = [->
+  catalogueProvider.$get = ['rest', 'modelCatalogueApiRoot', (rest, modelCatalogueApiRoot)->
     catalogue = {}
+
     catalogue.getIcon = (type) ->
       icons[names.getPropertyNameFromType(type)]
+
+    catalogue.getStatistics = ->
+      rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard"
 
     catalogue
   ]

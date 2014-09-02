@@ -1,11 +1,13 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
-.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', '$log', 'security', 'rest', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', ($rootScope, $scope, $stateParams, $state, $log, security, rest, modelCatalogueApiRoot, user, messages, applicationTitle, names) ->
+.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', '$log', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', ($rootScope, $scope, $stateParams, $state, $log, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics) ->
     applicationTitle "Model Catalogue"
+
+    angular.extend $scope, statistics
 
     updateDashboard = (userName) ->
       $scope.user  = userName
-      rest(method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard").then ((result)->
+      catalogue.getStatistics().then ((result)->
         angular.extend $scope,  result
       )
 
@@ -129,6 +131,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       resolve:
         user: ['security', (security) ->
           if security.getCurrentUser() then return security.getCurrentUser().displayName else return ''
+        ]
+        statistics: ['catalogue', (catalogue) ->
+          catalogue.getStatistics()
         ]
   }
 
