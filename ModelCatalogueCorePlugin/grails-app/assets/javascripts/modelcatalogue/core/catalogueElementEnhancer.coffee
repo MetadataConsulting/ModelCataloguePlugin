@@ -1,4 +1,4 @@
-angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot']).config [ 'enhanceProvider', (enhanceProvider) ->
+angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue']).config [ 'enhanceProvider', (enhanceProvider) ->
   commaSeparatedList = (things)->
     names = []
     angular.forEach(things, (thing)->
@@ -7,7 +7,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     names.join(', ')
 
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance) ->
+  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', 'catalogue', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, catalogue) ->
     (element) ->
       class CatalogueElement
         constructor: (element) ->
@@ -69,20 +69,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
                 return @name
 
           self.getIcon = ->
-            # TODO: move to bs package
-            switch @elementType
-              when 'org.modelcatalogue.core.Classification' then return "fa fa-fw fa-database"
-              when 'org.modelcatalogue.core.Model' then return "fa fa-fw fa-cubes"
-              when 'org.modelcatalogue.core.DataElement' then return "fa fa-fw fa-cube"
-              when 'org.modelcatalogue.core.ConceptualDomain' then return "fa fa-fw fa-cogs"
-              when 'org.modelcatalogue.core.ValueDomain' then return "fa fa-fw fa-cog"
-              when 'org.modelcatalogue.core.EnumeratedType' then return "fa fa-fw fa-list-alt"
-              when 'org.modelcatalogue.core.DataType' then return "fa fa-fw fa-list-alt"
-              when 'org.modelcatalogue.core.MeasurementUnit' then return "fa fa-fw fa-tachometer"
-              when 'org.modelcatalogue.core.Asset' then return "fa fa-fw fa-file-o"
-              when 'org.modelcatalogue.core.RelationshipType' then return "fa fa-fw fa-link"
-              when 'org.modelcatalogue.core.action.Action' then return "fa fa-fw fa-flash"
-              else 'glyphicon glyphicon-file'
+            catalogue.getIcon(@elementType)
 
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)

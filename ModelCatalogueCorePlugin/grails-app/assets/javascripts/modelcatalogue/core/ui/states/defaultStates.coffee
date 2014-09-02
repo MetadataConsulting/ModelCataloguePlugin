@@ -389,14 +389,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <span class="pull-right">
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
-      <h2>{{title}} List</h2>
+      <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp; {{title}} List</h2>
       <decorated-list list="list" columns="columns" state-driven="true"></decorated-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">
         <div class="col-md-4">
           <h2>
-            Models
+            <small ng-class="catalogue.getIcon('model')"></small>&nbsp; Models
             <span class="pull-right">
             <contextual-actions size="sm" icon-only="true" no-colors="true"></contextual-actions>
             </span>

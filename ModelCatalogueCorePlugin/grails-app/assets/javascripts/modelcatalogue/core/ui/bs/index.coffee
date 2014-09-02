@@ -15,6 +15,7 @@
 #= require propertiesPane
 #= require actions
 #= require columns
+#= require catalogue
 #= require columnsConfiguration
 #= require messagesPanel
 #= require modalConfirm
@@ -57,6 +58,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.propertiesPane'
   'mc.core.ui.bs.actions'
   'mc.core.ui.bs.columns'
+  'mc.core.ui.bs.catalogue'
   'mc.core.ui.bs.columnsConfiguration'
   'mc.core.ui.bs.messagesPanel'
   'mc.core.ui.bs.modalConfirm'
