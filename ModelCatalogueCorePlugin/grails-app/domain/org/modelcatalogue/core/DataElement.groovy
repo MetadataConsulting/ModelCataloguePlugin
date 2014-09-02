@@ -24,7 +24,7 @@ class DataElement extends PublishedElement {
         modelCatalogueId boost:10
         name boost:5
         extensions component:true
-        except = ['incomingRelationships', 'outgoingRelationships']
+        except = ['incomingRelationships', 'outgoingRelationships', 'valueDomain']
     }
 
     static relationships = [

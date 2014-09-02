@@ -24,7 +24,7 @@ class ConceptualDomain extends CatalogueElement {
 
     static searchable = {
         name boost:5
-        except = ['incomingRelationships', 'outgoingRelationships']
+        except = ['incomingRelationships', 'outgoingRelationships', 'valueDomains']
     }
 
     static relationships = [

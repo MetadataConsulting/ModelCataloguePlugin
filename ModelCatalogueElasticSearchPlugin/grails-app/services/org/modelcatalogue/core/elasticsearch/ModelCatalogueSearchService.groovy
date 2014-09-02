@@ -45,12 +45,11 @@ class ModelCatalogueSearchService implements SearchCatalogue{
                         case RelationshipDirection.BOTH:
                             should {
                                 terms(['destination.id': [element.id]])
+                                query_string(query: params.search , fields: ['source.name', 'source.description'])
                             }
                             should {
                                 terms(['source.id': [element.id]])
-                            }
-                            must {
-                                query_string(query: params.search , fields: ['source.name', 'source.description', 'destination.name', 'destination.description'])
+                                query_string(query: params.search , fields: ['destination.name', 'destination.description'])
                             }
                             minimum_should_match = 1
                             break
