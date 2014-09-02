@@ -11,6 +11,7 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.dataarchitect.xsd.*
 
 class DataImportService {
     static transactional = false
@@ -651,6 +652,155 @@ class DataImportService {
     }
 
 
+    def createDataTypesAndValueDomains(DataImport importer, ConceptualDomain cd, ArrayList<XsdSimpleType> simpleDataTypes){
+        DataType dataType
+        ValueDomain vd
+        // Add all the simple data types
+        simpleDataTypes.each { XsdSimpleType simpleType ->
+            (vd, dataType) = createSimpleType(importer, cd, simpleType, simpleDataTypes)
+            addRulesToSimpleType(simpleType, vd)
+            if (vd!=null && dataType!=null) println("SimpleType: " + simpleType.name)
+        }
+    }
+
+
+    private addRulesToSimpleType( XsdSimpleType simpleType, ValueDomain vd){
+        //Check the rules/patterns that apply to this type
+        String rule = ""
+        simpleType.restriction?.patterns?.each { XsdPattern pattern ->
+            def patternLength = pattern.value.length()
+            if (simpleType.restriction.minLength != "" && simpleType.restriction.maxLength == "" && pattern.value.charAt(patternLength - 1) == "]") {
+                if (rule =="") rule += pattern.value ("{" + simpleType.restriction.minLength + "," + simpleType.restriction.maxLength + "}")
+                else rule += ("|" + pattern.value ("{" + simpleType.restriction.minLength + "," + simpleType.restriction.maxLength + "}"))
+            }
+        }
+        vd.setRegexDef(rule)
+        vd.save()
+    }
+
+    private createSimpleType(DataImport importer, ConceptualDomain cd, XsdSimpleType simpleType, ArrayList<XsdSimpleType> simpleDataTypes){
+        String type
+        String description= simpleType.description
+        ValueDomain vd
+        DataType dataType
+        String name = simpleType.name
+        if (simpleType.restriction!= null && simpleType.restriction.base != null) {
+            type = simpleType.restriction.base
+            if (simpleType.restriction.base.contains("xs:")) {
+                dataType = DataType.findByName(simpleType.restriction.base)
+                if (dataType == null) {
+                    dataType = new DataType(name: simpleType.restriction.base).save()
+                }
+                vd = importValueDomain(name, description, dataType, "", cd)
+                addMetadataToValueDomain(vd, simpleType)
+                vd.save()
+                return [vd, dataType]
+            }
+            else {
+
+                //Check if the value domain already exists
+                vd = ValueDomain.findByNameAndDescription(name, description)
+                if (vd == null) {
+
+                    XsdSimpleType simpleDataType = simpleDataTypes.find { it.name == type }
+                    (vd, dataType) = createSimpleType(importer, cd, simpleDataType, simpleDataTypes)
+                    // Check enumerated elements
+                    if (simpleType.restriction.enumeration != "") {
+                        DataType enumeratedDataType = importDataType(simpleType.name, simpleType.restriction.enumeration)
+                        ValueDomain enumeratedVD = importValueDomain(simpleType.name, simpleType.description, enumeratedDataType, "", cd)
+                        addMetadataToValueDomain(enumeratedVD, simpleType)
+                        enumeratedVD.save()
+                        enumeratedVD.addToBasedOn(vd)
+                        vd.addToIsBaseFor(enumeratedVD)
+                        vd.save()
+                        enumeratedVD.save()
+                        return [enumeratedVD, dataType]
+                    }
+                    else return [vd,dataType]
+                } else {
+                    return [vd, vd.dataType]
+                }
+            }
+        }
+        else
+        {
+            //Check for union
+            if (simpleType.union!=null)
+            {
+                //get datatypes of union
+                String [] dataTypes =  simpleType.union.memberTypes.split(" ")
+                if (dataTypes.size()>0)
+                {
+                    ArrayList<ValueDomain> valueDomains = []
+                    dataTypes.each {String base ->
+                        dataType = DataType.findByName(base)
+                        if (dataType == null) {
+                            dataType = new DataType(name: base).save()
+                        }
+                        ValueDomain valueDomain = importValueDomain(base, base, dataType, "", cd)
+                        valueDomain.save()
+                        valueDomains << valueDomain
+                    }
+
+                    if (valueDomains.size()>0)
+                    {
+                        //Create the root value domain
+                        vd = importValueDomain(name, description, null, "", cd)
+                        //Add union of relationships
+                        valueDomains.each {ValueDomain valueDomain ->
+                            vd.addToUnionOf(valueDomain)
+                            valueDomain.addToUnionOf(vd)
+                            vd.save()
+                            valueDomain.save()
+                        }
+                    }
+                }
+                return [vd, null]
+            }
+            else
+            {
+                //Check for list
+                if ( simpleType.list != null)
+                {
+                    String base = simpleType.list.itemType
+                    dataType = DataType.findByName(base)
+                    if (dataType == null) {
+                        dataType = new DataType(name: base).save()
+                    }
+                    vd = importValueDomain(name, description, dataType, "", cd, Boolean.TRUE)
+                    vd.save()
+                    return [vd, dataType]
+                }
+            }
+        }
+
+    }
+    private addMetadataToValueDomain (vd, XsdSimpleType simpleType){
+
+        String pattern=""
+        simpleType.restriction?.patterns?.each { XsdPattern xsdPattern ->
+            if (pattern == "") {
+                pattern += xsdPattern.value
+            } else {
+                pattern += ("|" + xsdPattern.value)
+
+            }
+        }
+        def metadata = [minLength: simpleType.restriction?.minLength,
+                        maxLength: simpleType.restriction?.maxLength,
+                        lenght: simpleType.restriction?.length,
+                        minInclusive: simpleType.restriction?.minInclusive,
+                        maxInclusive: simpleType.restriction?.maxInclusive,
+                        minExclusive: simpleType.restriction?.minExclusive,
+                        maxExclusive: simpleType.restriction?.maxExclusive,
+                        pattern: pattern
+        ]
+
+
+        vd = updateMetadata(metadata, vd)
+
+
+    }
 
 
 }

@@ -9,9 +9,9 @@ class XsdLoader {
     String logErrors =""
     ArrayList<XsdAttribute> allAttributes = []
     ArrayList<XsdElement> allElements = []
-    ArrayList<XsdSimpleType> sactSimpleDataTypes =[]
-    ArrayList<XsdComplexType>  sactComplexDataTypes =[]
-    ArrayList<XsdGroup> sactGroups =[]
+    ArrayList<XsdSimpleType> simpleDataTypes =[]
+    ArrayList<XsdComplexType>  complexDataTypes =[]
+    ArrayList<XsdGroup> groups =[]
     XmlParser parser
     def sact
 
@@ -48,27 +48,27 @@ class XsdLoader {
                     allElements << element
                     break
                 case "attribute":
-                    XsdAttribute attribute =  readSACTSimpleType(valueNode, "")
+                    XsdAttribute attribute =  readAttribute(valueNode, "")
                     allAttributes << attribute
                     break
                 case "complexType":
                     XsdComplexType complexDataType = readComplexType (valueNode, "")
-                    sactComplexDataTypes << complexDataType
+                    complexDataTypes << complexDataType
                     break
                 case "simpleType":
                     XsdSimpleType sactSimpleType =  readSACTSimpleType(valueNode, "")
-                    sactSimpleDataTypes << sactSimpleType
+                    simpleDataTypes << sactSimpleType
                     break
                 case "group":
                     XsdGroup sactGroup = readGroup(valueNode, "")
-                    sactGroups << sactGroup
+                    groups << sactGroup
                     break
                 default:
                     logErrors += valueNode.name().localPart
                     break
             }
         }
-        [allElements, sactSimpleDataTypes, sactComplexDataTypes, sactGroups, logErrors]
+        [allElements, simpleDataTypes, complexDataTypes, groups, allAttributes, logErrors]
     }
 
 
@@ -114,12 +114,12 @@ class XsdLoader {
                 case "simpleType":
                     simpleType =  readSACTSimpleType(valueNode, dataItemName)
                     dataItemType = simpleType.name
-                    sactSimpleDataTypes << simpleType
+                    simpleDataTypes << simpleType
                     break
                 case "complexType":
                     complexDataType = readComplexType (valueNode, dataItemName)
                     dataItemType = complexDataType.name
-                    sactComplexDataTypes << complexDataType
+                    complexDataTypes << complexDataType
                     break
                 default:
                     logErrors += ("Loader does not loads this valueNode: " + valueNode.name().localPart + "\r\n")
@@ -207,7 +207,7 @@ class XsdLoader {
                 case "simpleType":
                     XsdSimpleType simpleType = readSACTSimpleType(valueNode, dataItemName)
                     simpleTypes<<simpleType
-                    sactSimpleDataTypes << simpleType
+                    simpleDataTypes << simpleType
                     break
                 default:
                     logErrors +=  valueNode.name().localPart + " : " + dataTypeName
@@ -246,7 +246,7 @@ class XsdLoader {
                     break
                 case "simpleType":
                     simpleType = readSACTSimpleType(valueNode, elementName)
-                    sactSimpleDataTypes << simpleType
+                    simpleDataTypes << simpleType
                     break
                 default:
                     logErrors +=  valueNode.name().localPart + " : "
@@ -313,6 +313,7 @@ class XsdLoader {
                 case "attribute":
                     XsdAttribute attribute = readAttribute(valueNode, dataTypeName)
                     attributes << attribute
+                    allAttributes<<attribute
                     break
                 default:
                     logErrors += valueNode.name().localPart
@@ -367,6 +368,7 @@ class XsdLoader {
                 case "attribute":
                     XsdAttribute attribute = readAttribute(valueNode,elementName)
                     attributes << attribute
+                    allAttributes<<attribute
                     break
                 case "choice" :
                     choice = readChoice (valueNode, section)
@@ -422,6 +424,7 @@ class XsdLoader {
                 case "attribute":
                     XsdAttribute attribute = readAttribute(valueNode, elementName)
                     attributes << attribute
+                    allAttributes<<attribute
                     break
                 case "extension": extension = readExtension(valueNode, section, elementName)
                     break
@@ -490,7 +493,7 @@ class XsdLoader {
                     break
                 case "simpleType":
                     simpleType =  readSACTSimpleType(valueNode, elementName)
-                    sactSimpleDataTypes << simpleType
+                    simpleDataTypes << simpleType
                     break
                 default:
                     logErrors += valueNode.name().localPart
@@ -773,6 +776,7 @@ class XsdLoader {
                 case "attribute":
                     XsdAttribute attribute = readAttribute(valueNode, elementName)
                     attributes << attribute
+                    allAttributes<<attribute
                     break
                 case "sequence":
                     sequence = readSequence(valueNode, "")

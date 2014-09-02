@@ -26,120 +26,40 @@ class XsdlLoaderSpec extends Specification {
         ArrayList<XsdSimpleType> sactSimpleDataTypes =[]
         ArrayList<XsdComplexType>  sactComplexDataTypes =[]
         ArrayList<XsdGroup> sactGroups =[]
-        ArrayList<XsdElement> sactAllDataElements =[]
+        ArrayList<XsdAttribute> allAttributes = []
 
         when:"An XSD file is loaded and the file is parsed"
-        (sactElements, sactSimpleDataTypes, sactComplexDataTypes, sactGroups, sactAllDataElements, logErrors) = loader.parse()
+        (sactElements, sactSimpleDataTypes, sactComplexDataTypes, sactGroups, allAttributes, logErrors) = loader.parse()
 
         then: "File content is loaded"
 
-        assert sactElements.size() == 1
-        assert sactSimpleDataTypes.size() == 4
-        assert sactComplexDataTypes.size() == 4
+
+        assert sactSimpleDataTypes.size() == 5
+        assert sactComplexDataTypes.size() == 7
         assert sactGroups.size() == 0
-        assert sactAllDataElements.size() == 8
+        assert sactElements.size() == 4
+        assert allAttributes.size() == 5
         assert logErrors == ""
 
-        def elementNames = ["SACT", "SACTRecord", "DemographicsAndConsultant", "Outcome", "NHSNumber", "NHSNumberStatus", "FinalSACTStartDate", "PersonDeathDate" ]
-        def complexTypes = ["SACTSACTType", "SACTSACTRecordType", "SACTDemographicsAndConsultantType", "SACTOutcomeType"]
-        def simpleTypes = ["NHSNumberStatus", "st", "ST.GB-en-NHS.StringType6", "ST.GB-en-NHS.StringType1"]
+        sactElements[2].name == "translation"
+        sactElements[2].type == "CD"
+        sactElements[2].maxOccurs == "unbounded"
+        sactElements[2].minOccurs == "0"
 
+        sactSimpleDataTypes[1].name == "ts"
+        sactSimpleDataTypes[1].description == "This data type supports the representation of a timestamp."
+        sactSimpleDataTypes[1].restriction.base == "xs:string"
+        sactSimpleDataTypes[1].restriction.patterns[0].value == "[0-9]{1,8}|([0-9]{9,14}|[0-9]{14,14}\\.[0-9]+)([+\\-][0-9]{1,4})?"
 
-        sactAllDataElements.eachWithIndex{ XsdElement xsdElement, int index ->
-            assert xsdElement.name == elementNames[index]
+        sactComplexDataTypes[0].name == "TS.GB-en-NHS.Date"
+        sactComplexDataTypes[0].description == "This data type supports the representation of a date of the form: yyyy-mm-dd."
+        sactComplexDataTypes[0].complexContent.restriction.base == "TS"
+        sactComplexDataTypes[0].complexContent.restriction.attributes[0].name == "value"
+        sactComplexDataTypes[0].complexContent.restriction.attributes[0].use == "required"
 
-            switch (index){
-                case 0:
-                    assert xsdElement.type == "SACTSACTType"
-                    break
-                case 1:
-                    assert xsdElement.type == "SACTSACTRecordType"
-                    assert xsdElement.minOccurs == "1"
-                    assert xsdElement.maxOccurs == "unbounded"
-                    break
-                case 2:
-                    assert  xsdElement.type == "SACTDemographicsAndConsultantType"
-                    assert  xsdElement.minOccurs == "1"
-                    assert  xsdElement.maxOccurs =="1"
-                    break
-                case 3:
-                    assert xsdElement.type == "SACTOutcomeType"
-                    assert xsdElement.minOccurs == "0"
-                    assert xsdElement.maxOccurs == "1"
-                    break
-                case 4:
-                    assert xsdElement.type == "ST.GB-en-NHS.StringType6"
-                    assert xsdElement.minOccurs == "1"
-                    assert xsdElement.maxOccurs == "1"
-                    assert xsdElement.description == "NHS NUMBER"
-                    break
-                case 5:
-                    assert xsdElement.minOccurs == "1"
-                    assert xsdElement.maxOccurs == "1"
-                    assert xsdElement.simpleType.name == "NHSNumberStatus"
-                    assert xsdElement.simpleType.restriction.base == "st"
-                    assert xsdElement.simpleType.restriction.enumeration=="01:01\r\n08:08\r\n"
-                    break
-                case 6:
-                    assert xsdElement.type == "ST.GB-en-NHS.StringType1"
-                    assert xsdElement.minOccurs == "0"
-                    assert xsdElement.maxOccurs == "1"
-                    break
-                case 7:
-                    assert xsdElement.type == "ST.GB-en-NHS.StringType1"
-                    assert xsdElement.minOccurs == "0"
-                    assert xsdElement.maxOccurs == "1"
-                    break
-            }
-
-        }
-
-        sactSimpleDataTypes.eachWithIndex{ XsdSimpleType xsdSimpleType, int index ->
-            assert xsdSimpleType.name == simpleTypes[index]
-            switch (index){
-                case 0:
-                    assert xsdSimpleType.name == "NHSNumberStatus"
-                    assert xsdSimpleType.restriction.base == "st"
-                    assert xsdSimpleType.restriction.enumeration == "01:01\r\n08:08\r\n"
-                    break
-                case 1:
-                    assert xsdSimpleType.restriction.base == "xs:string"
-                    break
-                case 2:
-                    assert xsdSimpleType.restriction.base == "st"
-                    assert xsdSimpleType.restriction.length == "10"
-                    assert xsdSimpleType.restriction.patterns[0].value == "[0-9]{10}"
-                    break
-                case 3:
-                    assert xsdSimpleType.description == "This data type supports the representation of dictionary dates."
-                    assert xsdSimpleType.restriction.base == "st"
-                    assert xsdSimpleType.restriction.patterns[0].value == "(19|20)\\d\\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])"
-                    break
-            }
-
-
-        }
-
-        sactComplexDataTypes.eachWithIndex {XsdComplexType xsdComplexType, int index ->
-            assert xsdComplexType.name == complexTypes[index]
-            switch (index) {
-                case 0:
-                    assert xsdComplexType.sequence.elements[0].name == "SACTRecord"
-                    break
-                case 1:
-                    assert xsdComplexType.sequence.elements[0].name == "DemographicsAndConsultant"
-                    assert xsdComplexType.sequence.elements[1].name == "Outcome"
-                    break
-                case 2:
-                    assert xsdComplexType.sequence.elements[0].name == "NHSNumber"
-                    assert xsdComplexType.sequence.elements[1].name == "NHSNumberStatus"
-                    break
-                case 3:
-                    assert xsdComplexType.sequence.elements[0].name == "FinalSACTStartDate"
-                    assert xsdComplexType.sequence.elements[1].name == "PersonDeathDate"
-                    break
-            }
-        }
+        allAttributes[1].name == "value"
+        allAttributes[1].type == "ts"
+        allAttributes[1].use == "optional"
     }
 
     void "Test that readSACTElement successfully reads an element with attributes only"(){
