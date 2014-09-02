@@ -45,7 +45,10 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                 <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">5. Elements</button>
               </li>
               <li>
-                <button id="step-next" ng-disabled="!model.name || step == 'elements' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
+                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications'}">6. Classifications</button>
+              </li>
+              <li>
+                <button id="step-next" ng-disabled="!model.name || step == 'classifications' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
               </li>
               <li>
                 <button id="step-finish" ng-disabled="!model.name" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
@@ -122,6 +125,22 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
               </form>
             </tab>
           </div>
+          <div ng-switch-when="classifications" id="classifications">
+              <br/>
+              <form role="form">
+                <div class="form-group">
+                  <label for="name" class="">Classifications</label>
+                  <elements-as-tags elements="model.classifications"></elements-as-tags>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification" focus-me="step=='classifications'" catalogue-element-picker="classification">
+                    <span class="input-group-btn">
+                      <button class="btn btn-success" ng-click="model.classifications.push(classification);classification = null" ng-disabled="isEmpty(classification) || isString(classification)"><span class="glyphicon glyphicon-plus"></span></button>
+                    </span>
+                  </div>
+                </div>
+              </form>
+            </tab>
+          </div>
           <div ng-switch-when="summary" id="summary">
               <h4 ng-show="model.name &amp;&amp; !finished">Crating new model <strong>{{model.name}}</strong></h4>
               <h4 ng-show="model.name &amp;&amp;  finished">Model <strong>{{model.name}} created</strong></h4>
@@ -135,7 +154,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
         '''
         controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout) ->
           $scope.reset = ->
-            $scope.model = {}
+            $scope.model = {classifications: []}
             $scope.metadata = {}
             $scope.parent = {ext: {}}
             $scope.parents = []
@@ -143,8 +162,9 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             $scope.children = []
             $scope.dataElement = {ext: {}}
             $scope.dataElements = []
+            $scope.classification = null
             $scope.messages = messages.createNewMessages()
-            $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements']
+            $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements', 'classifications']
             $scope.step = 'model'
             $scope.pendingActions = []
             $scope.pendingActionsCount = 0
