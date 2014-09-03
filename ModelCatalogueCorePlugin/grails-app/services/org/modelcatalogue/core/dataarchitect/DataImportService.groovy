@@ -269,7 +269,7 @@ class DataImportService {
                 pendingDataElements.each { it ->
                     def dataElement = it[0]
                     def relationship = model.addToContains(dataElement)
-                    relationship.ext.put("Context" , it[2].name)
+//                    relationship.ext.put("Context" , it[2].name)
                     dataElement.status = PublishedElementStatus.FINALIZED
                     dataElement.save(flush:true, failOnError:true)
                 }
@@ -759,17 +759,25 @@ class DataImportService {
 
     private createSimpleType(DataImport importer, ConceptualDomain cd, XsdSimpleType simpleType, ArrayList<XsdSimpleType> simpleDataTypes){
         String type
-        String description= simpleType.description
+        String description= simpleType?.description
         ValueDomain vd
-        DataType dataType
+        def dataType
         String name = simpleType.name
         if (simpleType.restriction!= null && simpleType.restriction.base != null) {
             type = simpleType.restriction.base
             if (simpleType.restriction.base.contains("xs:")) {
                 dataType = DataType.findByName(simpleType.restriction.base)
+
                 if (dataType == null) {
-                    dataType = new DataType(name: simpleType.restriction.base).save()
+                    dataType = simpleDataTypes.find{it.name==simpleType.restriction.base}
+                    if(dataType){
+                        createSimpleType(importer, cd, dataType, simpleDataTypes)
+                        dataType = DataType.findByName(simpleType.restriction.base)
+                    }else {
+                        dataType = new DataType(name: simpleType.restriction.base).save()
+                    }
                 }
+
                 vd = importValueDomain(name, description, dataType, "", cd)
                 addMetadataToValueDomain(vd, simpleType)
                 vd.save()
@@ -778,9 +786,9 @@ class DataImportService {
             else {
 
                 //Check if the value domain already exists
-                vd = ValueDomain.findByNameAndDescription(name, description)
+                vd = ValueDomain.findByName(name)
+                if(vd && !vd.conceptualDomains.contains(cd)) vd = null
                 if (vd == null) {
-
                     XsdSimpleType simpleDataType = simpleDataTypes.find { it.name == type }
                     (vd, dataType) = createSimpleType(importer, cd, simpleDataType, simpleDataTypes)
                     // Check enumerated elements
@@ -812,9 +820,17 @@ class DataImportService {
                     ArrayList<ValueDomain> valueDomains = []
                     dataTypes.each {String base ->
                         dataType = DataType.findByName(base)
+
                         if (dataType == null) {
-                            dataType = new DataType(name: base).save()
+                            dataType = simpleDataTypes.find{it.name==base}
+                            if(dataType){
+                                createSimpleType(importer, cd, dataType, simpleDataTypes)
+                                dataType = DataType.findByName(base)
+                            }else {
+                                dataType = new DataType(name: base).save()
+                            }
                         }
+
                         ValueDomain valueDomain = importValueDomain(base, base, dataType, "", cd)
                         valueDomain.save()
                         valueDomains << valueDomain
@@ -843,7 +859,13 @@ class DataImportService {
                     String base = simpleType.list.itemType
                     dataType = DataType.findByName(base)
                     if (dataType == null) {
-                        dataType = new DataType(name: base).save()
+                        dataType = simpleDataTypes.find{it.name==base}
+                        if(dataType){
+                            createSimpleType(importer, cd, dataType, simpleDataTypes)
+                            dataType = DataType.findByName(base)
+                        }else {
+                            dataType = new DataType(name: base).save()
+                        }
                     }
                     vd = importValueDomain(name, description, dataType, "", cd, Boolean.TRUE)
                     vd.save()
@@ -919,7 +941,19 @@ class DataImportService {
                     if(classifications.find{it.id==classification.id} && de.valueDomain.id == valueDomain.id) dataElement = de
                 }
 
-//                if (dataElement) dataElement = updateDataElement(importer, element, dataElement, valueDomain, conceptualDomain, containingModel, classification)
+
+                if (dataElement){
+                    if(checkDataElementForChanges([name: element.name, description: element.description], [:],dataElement, classification)) {
+                        dataElement = null
+                    }else{
+                        dataElement.addToClassifications(classification)
+                        Relationship containedIn = dataElement.addToContainedIn(containingModel)
+                        containedIn.ext.put("Min Occurs", element.minOccurs)
+                        containedIn.ext.put("Max Occurs", element.maxOccurs)
+                        containedIn.ext.put("type", "xs:element")
+                        addModelToImport(importer, containingModel)
+                    }
+                }
 
                 if (!dataElement) {
                     dataElement = new DataElement(name: element.name, description: element.description).save()
@@ -972,7 +1006,24 @@ class DataImportService {
                 if(classifications.find{it.id==classification.id}) dataElement = de
             }
 
-//            if (dataElement) dataElement = updateDataElement(importer, attribute, dataElement, valueDomain, conceptualDomain, containingModel, classification)
+
+            def metaDataParams = [:]
+            if(attribute?.defaultValue) metaDataParams.put("defaultValue", attribute?.defaultValue)
+            if(attribute?.fixed) metaDataParams.put("fixed", attribute?.fixed)
+            if(attribute?.form) metaDataParams.put("form", attribute?.form)
+            if(attribute?.id) metaDataParams.put("id", attribute?.id)
+            if(attribute?.ref) metaDataParams.put("ref", attribute?.ref)
+
+            if (dataElement){
+                if(checkDataElementForChanges([name: attribute.name, description: attribute.description], metaDataParams,dataElement, classification)) {
+                    dataElement = null
+                }else{
+                    dataElement.addToClassifications(classification)
+                    Relationship containedIn = dataElement.addToContainedIn(containingModel)
+                    containedIn.ext.put("type", "xs:attribute")
+                    if(attribute?.use) containedIn.ext.put("use", attribute?.use)
+                }
+            }
 
             if (!dataElement) {
                 dataElement = new DataElement(name: attribute.name, description: attribute.description).save()
@@ -981,7 +1032,6 @@ class DataImportService {
                 if(attribute?.form) dataElement.ext.put("form", attribute?.form)
                 if(attribute?.id) dataElement.ext.put("id", attribute?.id)
                 if(attribute?.ref) dataElement.ext.put("ref", attribute?.ref)
-
                 dataElement.save()
                 dataElement.addToClassifications(classification)
                 Relationship containedIn = dataElement.addToContainedIn(containingModel)

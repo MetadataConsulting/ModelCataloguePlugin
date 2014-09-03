@@ -61,7 +61,7 @@ class DataImportController extends AbstractRestfulController{
                 }
                 else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd"))
                 {
-                    importer = new DataImport(name: "xsd import" + params.conceptualDomain)
+                    importer = new DataImport(name: "xsd import" + params.conceptualDomain).save()
                     XsdLoader parserSACT = new XsdLoader(file.inputStream)
                     def (elements, simpleDataTypes, complexDataTypes, groups, attributes, logErrorsSACT) = parserSACT.parse()
                     // Create the Conceptual Domain

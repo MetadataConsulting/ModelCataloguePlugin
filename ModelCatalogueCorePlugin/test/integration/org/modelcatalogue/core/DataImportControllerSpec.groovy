@@ -19,10 +19,11 @@ import spock.lang.Shared
 
 class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder{
     @Shared
-    def fileName, recorder, filenameXsd
+    def fileName, recorder, filenameXsd, filenameXsd2
     def setupSpec(){
         fileName = "test/integration/resources/DataTemplate.xls"
         filenameXsd = "test/unit/resources/SACT/SACT_XMLDataTypes-v2-0.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
+        filenameXsd2 = "test/unit/resources/SACT/SACTSACT_XMLSchema_EXAMPLE.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
         loadMarshallers()
         loadFixtures()
         recorder = DefaultResultRecorder.create(
@@ -81,6 +82,31 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         parents.contains(cd)
         children.contains(group)
         nhsDate.contains.collect{it.name=="value"}
+        json
+
+        when: "The dataImportService is called"
+        controller = new DataImportController()
+        numElements = DataElement.count()
+        controller.response.format = 'json'
+        controller.metaClass.request = new MockMultipartHttpServletRequest()
+        controller.params.conceptualDomain = 'test2'
+        controller.params.name = 'testImport1234'
+        InputStream inputStream2 = new FileInputStream(filenameXsd2)
+        controller.request.addFile(new MockMultipartFile('file', filenameXsd2,"application/octet-stream" , inputStream2))
+        controller.upload()
+        json = controller.response.json
+//        def model = Model.findByName("qualifier")
+//        def group = Model.findByName("group")
+//        def cd = Model.findByName("CR")
+//        def nhsDate = Model.findByName("TS.GB-en-NHS.Date")
+//        def parents = model.parentOf
+//        def children = model.childOf
+
+        then: "The an importer is created and there are items in the importQueue and actions"
+//        ValueDomain.findByName("ts")
+//        parents.contains(cd)
+//        children.contains(group)
+//        nhsDate.contains.collect{it.name=="value"}
         json
     }
 
