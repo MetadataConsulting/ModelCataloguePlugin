@@ -44,7 +44,7 @@ class XsdLoader {
                 case "include":
                     break
                 case "element":
-                    XsdElement element =  readElement(valueNode, "root")
+                    XsdElement element =  readElement(valueNode, "")
                     allElements << element
                     break
                 case "attribute":

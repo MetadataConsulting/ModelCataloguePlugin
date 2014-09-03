@@ -371,7 +371,6 @@ class DataImportService {
     }
 
     protected Boolean checkValueDomainForChanges(Map params, ValueDomain valueDomain, ConceptualDomain cd){
-        //ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, params.unitOfMeasure)
         if(valueDomain) {
             if (!valueDomain.conceptualDomains.contains(cd)) { return true }
             if (valueDomain.unitOfMeasure != params.unitOfMeasure) { return true }
@@ -478,12 +477,11 @@ class DataImportService {
         return dataElement
     }
 
-
     //update data element given value domain info
-    protected DataElement updateDataElement(DataImport importer, XsdElement element, DataElement dataElement, ValueDomain valueDomain, ConceptualDomain cd, Model model, ConceptualDomain conceptualDomain, Classification classification) {
+    protected DataElement updateDataElement(DataImport importer, element, DataElement dataElement, ValueDomain valueDomain, ConceptualDomain cd, Model model, Classification classification) {
 
         def params = [name: element.name, description: element.description]
-        def metadata = []
+        Map metadata = [:]
         Boolean dataElementChanged = checkDataElementForChanges(params, metadata, dataElement, classification)
         ValueDomain vd = dataElement.valueDomain
         Boolean valueDomainChanged = checkValueDomainForChanges(valueDomain, vd, cd)
@@ -786,7 +784,7 @@ class DataImportService {
                     XsdSimpleType simpleDataType = simpleDataTypes.find { it.name == type }
                     (vd, dataType) = createSimpleType(importer, cd, simpleDataType, simpleDataTypes)
                     // Check enumerated elements
-                    if (simpleType.restriction.enumeration != "") {
+//                    if (simpleType.restriction.enumeration != "") {
                         DataType enumeratedDataType = importDataType(simpleType.name, simpleType.restriction.enumeration)
                         ValueDomain enumeratedVD = importValueDomain(simpleType.name, simpleType.description, enumeratedDataType, "", cd)
                         addMetadataToValueDomain(enumeratedVD, simpleType)
@@ -795,8 +793,8 @@ class DataImportService {
                         vd.save()
                         enumeratedVD.save()
                         return [enumeratedVD, dataType]
-                    }
-                    else return [vd,dataType]
+//                    }
+//                    else return [vd,dataType]
                 } else {
                     return [vd, vd.dataType]
                 }
@@ -921,7 +919,7 @@ class DataImportService {
                     if(classifications.find{it.id==classification.id} && de.valueDomain.id == valueDomain.id) dataElement = de
                 }
 
-                if (dataElement) dataElement = updateDataElement(importer, element, dataElement, valueDomain, conceptualDomain, containingModel, classification)
+//                if (dataElement) dataElement = updateDataElement(importer, element, dataElement, valueDomain, conceptualDomain, containingModel, classification)
 
                 if (!dataElement) {
                     dataElement = new DataElement(name: element.name, description: element.description).save()
@@ -974,7 +972,7 @@ class DataImportService {
                 if(classifications.find{it.id==classification.id}) dataElement = de
             }
 
-            if (dataElement) dataElement = updateDataElement(importer, attribute, dataElement, valueDomain, conceptualDomain, containingModel, classification)
+//            if (dataElement) dataElement = updateDataElement(importer, attribute, dataElement, valueDomain, conceptualDomain, containingModel, classification)
 
             if (!dataElement) {
                 dataElement = new DataElement(name: attribute.name, description: attribute.description).save()
