@@ -44,7 +44,7 @@ class XsdLoader {
                 case "include":
                     break
                 case "element":
-                    XsdElement element =  readSACTElement(valueNode, "root")
+                    XsdElement element =  readElement(valueNode, "root")
                     allElements << element
                     break
                 case "attribute":
@@ -56,8 +56,8 @@ class XsdLoader {
                     complexDataTypes << complexDataType
                     break
                 case "simpleType":
-                    XsdSimpleType sactSimpleType =  readSACTSimpleType(valueNode, "")
-                    simpleDataTypes << sactSimpleType
+                    XsdSimpleType simpleType =  readSimpleType(valueNode, "")
+                    simpleDataTypes << simpleType
                     break
                 case "group":
                     XsdGroup sactGroup = readGroup(valueNode, "")
@@ -72,7 +72,7 @@ class XsdLoader {
     }
 
 
-    def readSACTElement(Node node, String section){
+    def readElement(Node node, String section){
         String dataItemName=""
         String dataItemType = ""
         String dataItemMinOccurs = ""
@@ -112,7 +112,7 @@ class XsdLoader {
                     dataItemDescription = readAnnotation(valueNode)
                     break
                 case "simpleType":
-                    simpleType =  readSACTSimpleType(valueNode, dataItemName)
+                    simpleType =  readSimpleType(valueNode, dataItemName)
                     dataItemType = simpleType.name
                     simpleDataTypes << simpleType
                     break
@@ -129,7 +129,7 @@ class XsdLoader {
         XsdElement result = new XsdElement(name: dataItemName, description: dataItemDescription, type: dataItemType, minOccurs: dataItemMinOccurs, maxOccurs: dataItemMaxOccurs, section: section, simpleType: simpleType, complexType: complexDataType )
         return result
     }
-    def readSACTSimpleType(Node node, String elementName){
+    def readSimpleType(Node node, String elementName){
         // data type can be enumeration
         // have restriction
         // minInclusive
@@ -205,7 +205,7 @@ class XsdLoader {
                     description =  readAnnotation(valueNode)
                     break
                 case "simpleType":
-                    XsdSimpleType simpleType = readSACTSimpleType(valueNode, dataItemName)
+                    XsdSimpleType simpleType = readSimpleType(valueNode, dataItemName)
                     simpleTypes<<simpleType
                     simpleDataTypes << simpleType
                     break
@@ -245,7 +245,7 @@ class XsdLoader {
                     description =  readAnnotation(valueNode)
                     break
                 case "simpleType":
-                    simpleType = readSACTSimpleType(valueNode, elementName)
+                    simpleType = readSimpleType(valueNode, elementName)
                     simpleDataTypes << simpleType
                     break
                 default:
@@ -492,7 +492,7 @@ class XsdLoader {
                     description =  readAnnotation(valueNode)
                     break
                 case "simpleType":
-                    simpleType =  readSACTSimpleType(valueNode, elementName)
+                    simpleType =  readSimpleType(valueNode, elementName)
                     simpleDataTypes << simpleType
                     break
                 default:
@@ -500,7 +500,7 @@ class XsdLoader {
                     break
             }
         }
-        XsdAttribute result = new XsdAttribute (name:name, defaultValue: defaultValue, fixed: fixed, form: form, id: id, ref: ref, type: type, use:use, description: description, simpleType: simpleType )
+        XsdAttribute result = new XsdAttribute (name:name, defaultValue: defaultValue, fixed: fixed, form: form, id: id, ref: ref, type: type, use:use, description: description, simpleType: simpleType, section: elementName)
         return result
     }
 
@@ -546,7 +546,7 @@ class XsdLoader {
         values.eachWithIndex{ Node valueNode, int valueNodeIndex ->
             switch (valueNode.name().localPart){
                 case "element":
-                    XsdElement element= readSACTElement(valueNode, section)
+                    XsdElement element= readElement(valueNode, section)
                     elements << element
                     allElements << element
                     break
@@ -632,7 +632,7 @@ class XsdLoader {
         values.eachWithIndex{ Node valueNode, int valueNodeIndex ->
             switch (valueNode.name().localPart){
                 case "element":
-                    XsdElement element= readSACTElement(valueNode, section)
+                    XsdElement element= readElement(valueNode, section)
                     elements << element
                     allElements << element
                     break

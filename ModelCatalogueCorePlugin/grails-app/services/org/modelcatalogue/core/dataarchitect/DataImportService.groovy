@@ -915,7 +915,12 @@ class DataImportService {
                 def containingModel = containingModels.find{it.classifications.contains(classification)}
 
                 def dataElements = DataElement.findByName(element.name)
-                def dataElement = dataElements.find{it.classifications.contains(classification)}
+                def dataElement
+                dataElements.each{ DataElement de->
+                    def classifications = de.classifications
+                    if(classifications.find{it.id==classification.id} && de.valueDomain.id == valueDomain.id) dataElement = de
+                }
+
                 if (dataElement) dataElement = updateDataElement(importer, element, dataElement, valueDomain, conceptualDomain, containingModel, classification)
 
                 if (!dataElement) {
@@ -952,10 +957,49 @@ class DataImportService {
 
     }
 
-    def createCatalogueElements(ArrayList<XsdAttribute> attributes){
+    def createCatalogueAttributes(DataImport importer, ArrayList<XsdAttribute> attributes, ConceptualDomain conceptualDomain, Classification classification){
+
+        // Extract all the DataElements
+        attributes.each { XsdAttribute attribute ->
+
+            //find or create the data attribute
+            ValueDomain valueDomain = ValueDomain.findByName(attribute.type)
+            def containingModels = Model.findAllWhere(name: attribute.section)
+            def containingModel = containingModels.find { it.classifications.contains(classification) }
+
+            def dataElements = DataElement.findByNameAndValueDomain(attribute.name, valueDomain)
+            def dataElement
+            dataElements.each{ DataElement de->
+                def classifications = de.classifications
+                if(classifications.find{it.id==classification.id}) dataElement = de
+            }
+
+            if (dataElement) dataElement = updateDataElement(importer, attribute, dataElement, valueDomain, conceptualDomain, containingModel, classification)
+
+            if (!dataElement) {
+                dataElement = new DataElement(name: attribute.name, description: attribute.description).save()
+                if(attribute?.defaultValue) dataElement.ext.put("defaultValue", attribute?.defaultValue)
+                if(attribute?.fixed) dataElement.ext.put("fixed", attribute?.fixed)
+                if(attribute?.form) dataElement.ext.put("form", attribute?.form)
+                if(attribute?.id) dataElement.ext.put("id", attribute?.id)
+                if(attribute?.ref) dataElement.ext.put("ref", attribute?.ref)
+
+                dataElement.save()
+                dataElement.addToClassifications(classification)
+                Relationship containedIn = dataElement.addToContainedIn(containingModel)
+                containedIn.ext.put("type", "xs:attribute")
+                if(attribute?.use) containedIn.ext.put("use", attribute?.use)
+                addModelToImport(importer, containingModel)
+                addUpdatedDataElements(importer, dataElement, containingModel, conceptualDomain)
+            }
+
+            dataElement.valueDomain = valueDomain
+            dataElement.save()
+
+            return dataElement
 
 
-
+        }
     }
 
 

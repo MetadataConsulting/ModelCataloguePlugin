@@ -71,8 +71,9 @@ class DataImportController extends AbstractRestfulController{
                     dataImportService.createDataTypesAndValueDomains(importer, conceptualDomain, simpleDataTypes)
                     dataImportService.createModels(importer, conceptualDomain, complexDataTypes, groups, classification)
                     dataImportService.createCatalogueElements(importer, elements, conceptualDomain, classification)
-
-                    response = ['test':'test']
+                    dataImportService.createCatalogueAttributes(importer, attributes, conceptualDomain, classification)
+                    dataImportService.actionPendingModels(importer)
+                    response = importer
 
                 }
                 else {

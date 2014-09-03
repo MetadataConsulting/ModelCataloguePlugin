@@ -22,7 +22,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     def fileName, recorder, filenameXsd
     def setupSpec(){
         fileName = "test/integration/resources/DataTemplate.xls"
-        filenameXsd = "test/unit/resources/SACT/XSD_Example.xsd"
+        filenameXsd = "test/unit/resources/SACT/SACT_XMLDataTypes-v2-0.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
         loadMarshallers()
         loadFixtures()
         recorder = DefaultResultRecorder.create(
@@ -72,14 +72,15 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         def model = Model.findByName("qualifier")
         def group = Model.findByName("group")
         def cd = Model.findByName("CR")
+        def nhsDate = Model.findByName("TS.GB-en-NHS.Date")
         def parents = model.parentOf
         def children = model.childOf
 
         then: "The an importer is created and there are items in the importQueue and actions"
         ValueDomain.findByName("ts")
-        Model.findByName("TS.GB-en-NHS.Date")
         parents.contains(cd)
         children.contains(group)
+        nhsDate.contains.collect{it.name=="value"}
         json
     }
 

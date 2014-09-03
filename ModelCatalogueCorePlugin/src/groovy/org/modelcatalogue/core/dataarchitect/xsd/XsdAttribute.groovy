@@ -14,4 +14,5 @@ class XsdAttribute {
     String use
     String description
     XsdSimpleType simpleType
+    String section
 }

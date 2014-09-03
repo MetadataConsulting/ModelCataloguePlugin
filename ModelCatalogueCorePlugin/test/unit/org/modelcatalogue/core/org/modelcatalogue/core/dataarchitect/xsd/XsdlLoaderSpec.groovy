@@ -62,13 +62,13 @@ class XsdlLoaderSpec extends Specification {
         allAttributes[1].use == "optional"
     }
 
-    void "Test that readSACTElement successfully reads an element with attributes only"(){
+    void "Test that readElement successfully reads an element with attributes only"(){
         String elementText = "<element name=\"SACTRecord\" type=\"SACTSACTRecordType\" minOccurs=\"1\" maxOccurs=\"unbounded\"/>"
-        when: "I have a valueNode for an Element and I call the readSACTElement"
+        when: "I have a valueNode for an Element and I call the readElement"
 
         XmlParser parser = new XmlParser()
         def elementParser = parser.parseText(elementText)
-        XsdElement xsdElement = loader.readSACTElement(elementParser, "")
+        XsdElement xsdElement = loader.readElement(elementParser, "")
 
         then: "I get the associated XsdElement structure for the given valueNode"
         assert xsdElement.name == "SACTRecord"
@@ -487,7 +487,7 @@ class XsdlLoaderSpec extends Specification {
                 "</xs:schema>"
         XmlParser parser = new XmlParser()
         def simpleTypeParser = parser.parseText(simpleTypeText)
-        XsdSimpleType simpleType = loader.readSACTSimpleType(simpleTypeParser.value()[0], "")
+        XsdSimpleType simpleType = loader.readSimpleType(simpleTypeParser.value()[0], "")
 
         then: "I get the associated XsdSimpleType structure for the given valueNode"
 
@@ -515,7 +515,7 @@ class XsdlLoaderSpec extends Specification {
                 "</xs:schema>"
         XmlParser parser = new XmlParser()
         def simpleTypeParser = parser.parseText(simpleTypeText)
-        XsdSimpleType simpleType = loader.readSACTSimpleType(simpleTypeParser.value()[0], "")
+        XsdSimpleType simpleType = loader.readSimpleType(simpleTypeParser.value()[0], "")
 
         then: "I get the associated XsdSimpleType structure for the given valueNode"
 
@@ -540,7 +540,7 @@ class XsdlLoaderSpec extends Specification {
                 "</xs:schema>"
         XmlParser parser = new XmlParser()
         def simpleTypeParser = parser.parseText(simpleTypeText)
-        XsdSimpleType simpleType = loader.readSACTSimpleType(simpleTypeParser.value()[0], "")
+        XsdSimpleType simpleType = loader.readSimpleType(simpleTypeParser.value()[0], "")
 
         then: "I get the associated XsdSimpleType structure for the given valueNode"
 
