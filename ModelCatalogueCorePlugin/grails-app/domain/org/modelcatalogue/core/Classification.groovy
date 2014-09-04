@@ -20,6 +20,13 @@ class Classification extends CatalogueElement {
 
     static constraints = {
         urlName size: 1..255, bindable: false
+        name validator: { val, obj ->
+            if (!val) return true
+            if (GrailsNameUtils.getPropertyName(val) in ['catalogue', 'all']) {
+                return "$val is prohibited name of the Classification"
+            }
+            return true
+        }
     }
 
     String toString() {
