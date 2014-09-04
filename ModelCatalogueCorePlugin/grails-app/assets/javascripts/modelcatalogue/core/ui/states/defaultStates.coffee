@@ -506,17 +506,17 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"><i class="fa fa-database fa-5x fa-fw"></i></a>
+                                        <a ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"> Data Sets</a> {{totalDataSetCount}} </div>
+                                        <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"> Classifications</a> {{totalDataSetCount}} </div>
                                     </div>
                                 </div>
                             </div>
 
                             <a show-for-role="CURATOR" ng-click="create('classification')">
                                 <div class="panel-footer">
-                                    <span class="pull-left">Create Data Set</span>
+                                    <span class="pull-left">Create Classification</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
                                     <div class="clearfix"></div>
                                 </div>

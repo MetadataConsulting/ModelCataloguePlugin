@@ -63,7 +63,7 @@
                         <ul class="dropdown-menu">
                             <li ui-sref-active="active"><a id="classificationsLink"
                                                            ui-sref="mc.resource.list({resource: 'classification'})"
-                                                           ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-database"></span>&nbsp; Data Sets / Classifications</a>
+                                                           ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-tags"></span>&nbsp; Classifications</a>
                             </li>
                             <li ui-sref-active="active"><a id="modelLink"
                                                            ui-sref="mc.resource.list({resource: 'model'})"

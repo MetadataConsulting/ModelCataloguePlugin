@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalogueProvider', (catalogueProvider)->
-  catalogueProvider.setIcon 'org.modelcatalogue.core.Classification',   "fa fa-fw fa-database"
+  catalogueProvider.setIcon 'org.modelcatalogue.core.Classification',   "fa fa-fw fa-tags"
   catalogueProvider.setIcon 'org.modelcatalogue.core.Model',            "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'org.modelcatalogue.core.DataElement',      "fa fa-fw fa-cube"
   catalogueProvider.setIcon 'org.modelcatalogue.core.ConceptualDomain', "fa fa-fw fa-cogs"
