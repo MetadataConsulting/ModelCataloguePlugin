@@ -1,11 +1,7 @@
 package org.modelcatalogue.core
 
-import org.hibernate.Criteria
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.PublishedElements
-import org.modelcatalogue.core.util.Relationships
-import org.modelcatalogue.core.util.SimpleListWrapper
-
 
 class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
 
