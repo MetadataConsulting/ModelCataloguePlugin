@@ -94,7 +94,7 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://mcc-testapp.metadata.eu.cloudbees.net/"
+        grails.serverURL = "http://mcc-testapp.metadata.eu.cloudbees.net"
     }
 }
 
