@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'saveAndCreateAnotherCtrlMixin', ['$scope', '$modalInstance', 'messages', 'catalogueElementResource',  ($scope, $modalInstance, messages, catalogueElementResource) ->
+angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'saveAndCreateAnotherCtrlMixin', ['$scope', '$modalInstance', 'messages', 'catalogueElementResource', '$q',  ($scope, $modalInstance, messages, catalogueElementResource, $q) ->
   $scope.newEntity ?= -> {}
 
   if $scope.create
@@ -24,16 +24,16 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
 
   $scope.save ?= (newVersion) ->
     $scope.messages.clearAllMessages()
-    $scope.beforeSave()
+
+    promise = $q.when $scope.beforeSave()
 
     return unless $scope.validate()
 
-    promise = null
 
     if $scope.create
-      promise = catalogueElementResource($scope.create).save($scope.copy)
+      promise = promise.then -> catalogueElementResource($scope.create).save($scope.copy)
     else
-      promise = catalogueElementResource($scope.copy.elementType).update($scope.copy, {newVersion: newVersion})
+      promise = promise.then -> catalogueElementResource($scope.copy.elementType).update($scope.copy, {newVersion: newVersion})
 
     promise.then (result) ->
       if $scope.create
