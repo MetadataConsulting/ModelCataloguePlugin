@@ -121,17 +121,6 @@ class PublishedElementService {
         return PublishedElementStatus.valueOf(params.status.toString().toUpperCase())
     }
 
-    static Classification getClassificationFromParams(params) {
-       if (!params.classification) {
-           return null
-       }
-       if (params.classification instanceof Classification) {
-           return params.classification
-       }
-       Classification.findByUrlName(params.classification)
-    }
-
-
     private PublishedElement createNewVersion(PublishedElement element){
         element.versionNumber++
         element.versionCreated = new Date()

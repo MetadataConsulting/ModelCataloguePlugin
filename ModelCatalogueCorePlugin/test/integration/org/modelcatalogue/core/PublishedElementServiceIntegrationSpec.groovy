@@ -243,15 +243,4 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     }
 
-
-    def "get classification from params"() {
-        Classification dataSet1 = Classification.findByName("data set 1")
-
-        Classification classification = publishedElementService.getClassificationFromParams(classification: 'dataSet1')
-
-        expect:
-        classification == dataSet1
-    }
-
-
 }
