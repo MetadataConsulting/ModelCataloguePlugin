@@ -63,7 +63,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element) || isString(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                 </div>
@@ -79,7 +79,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', ($scope, $state, $window, messages, names, catalogueElementResource) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', ($scope, $state, $window, messages, names, catalogueElementResource, $q) ->
           $scope.reset = ->
             $scope.classification = {classifies:{}}
             $scope.dataElement = {}
@@ -100,8 +100,14 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             angular.isString object
 
           $scope.push = (arrayName, propertyName) ->
-            $scope[propertyName].name = $scope[propertyName].element.name
-            $scope[arrayName].push $scope[propertyName]
+            value = $scope[propertyName]
+
+            if angular.isString(value.element)
+              value = {name: value.element}
+            else
+              value.name = value.element.name
+
+            $scope[arrayName].push value
             $scope[propertyName] = {}
 
           $scope.openElementInNewWindow = (element) ->
@@ -113,13 +119,24 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             return if $scope.finishInProgress
             $scope.finishInProgress = true
 
-            $scope.classification.classifies = $scope.dataElements
-
             $scope.step = 'summary'
 
-            promise = catalogueElementResource('classification').save($scope.classification)
+            promise = $q.when {}
 
-            promise.then (classification) ->
+            angular.forEach $scope.dataElements, (element, i)->
+              unless element.element and element.name
+                promise = promise.then ->
+                  catalogueElementResource('dataElement').save({name: element.name}).then (newElement) ->
+                    $scope.dataElements[i] = newElement
+              else
+                $scope.dataElements[i] = element.element
+
+            promise = promise.then ->
+              console.log $scope.dataElements
+              $scope.classification.classifies = $scope.dataElements
+              catalogueElementResource('classification').save($scope.classification)
+
+            promise = promise.then (classification) ->
                 messages.success "Classification #{classification.name} created"
                 $scope.finished = true
                 classification.show()
