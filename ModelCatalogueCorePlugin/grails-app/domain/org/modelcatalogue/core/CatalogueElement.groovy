@@ -172,18 +172,6 @@ abstract class CatalogueElement {
 
     boolean isArchived() { false }
 
-
-
-    def afterInsert(){
-       if(!getModelCatalogueId()) {
-           createModelCatalogueId()
-       }
-    }
-
-    def createModelCatalogueId(){
-        modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
-    }
-
     def beforeDelete(){
         outgoingRelationships.each{ Relationship relationship->
             relationship.beforeDelete()
