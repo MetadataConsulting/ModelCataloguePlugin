@@ -82,7 +82,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="model">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element) || isString(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Parent model is source for the hierarchy relationship</p>
@@ -99,7 +99,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="model">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('children', 'child')" ng-disabled="isEmpty(child.element) || isString(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('children', 'child')" ng-disabled="isEmpty(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Child model is destination for the hierarchy relationship</p>
@@ -116,7 +116,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element) || isString(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Data element is destination for the containment relationship</p>
@@ -130,11 +130,11 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
               <form role="form">
                 <div class="form-group">
                   <label for="name" class="">Classifications</label>
-                  <elements-as-tags elements="model.classifications"></elements-as-tags>
+                  <elements-as-tags elements="classifications"></elements-as-tags>
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification" focus-me="step=='classifications'" catalogue-element-picker="classification">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="model.classifications.push(classification);classification = null" ng-disabled="isEmpty(classification) || isString(classification)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="classifications.push(classification);classification = null" ng-disabled="isEmpty(classification)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                 </div>
@@ -163,6 +163,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             $scope.dataElement = {ext: {}}
             $scope.dataElements = []
             $scope.classification = null
+            $scope.classifications = []
             $scope.messages = messages.createNewMessages()
             $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements', 'classifications']
             $scope.step = 'model'
@@ -183,8 +184,13 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             angular.isString object
 
           $scope.push = (arrayName, propertyName) ->
-            $scope[propertyName].name = $scope[propertyName].element.name
-            $scope[arrayName].push $scope[propertyName]
+            value = $scope[propertyName]
+            if angular.isString value.element
+              value.name = value.element
+              value.create = true
+            else
+              value.name = value.element.name
+            $scope[arrayName].push value
             $scope[propertyName] = {ext: {}}
 
           $scope.openElementInNewWindow = (element) ->
@@ -202,22 +208,48 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                 catalogueElementResource('model').update(model)
 
             angular.forEach $scope.parents, (parent) ->
+              if angular.isString parent.element
+                $scope.pendingActions.push (model) ->
+                  catalogueElementResource("model").save({name: parent.element}).then (parentModel) ->
+                    parent.element = parentModel
+                    model
               $scope.pendingActions.push (model) ->
                 parent.element.metadata = parent.ext
                 model.childOf.add parent.element
                 model
 
             angular.forEach $scope.children, (child) ->
+              if angular.isString child.element
+                $scope.pendingActions.push (model) ->
+                  catalogueElementResource("model").save({name: child.element}).then (childModel) ->
+                    child.element = childModel
+                    model
               $scope.pendingActions.push (model) ->
                 child.element.metadata = child.ext
                 model.parentOf.add child.element
                 model
 
             angular.forEach $scope.dataElements, (element) ->
+              if angular.isString element.element
+                $scope.pendingActions.push (model) ->
+                  catalogueElementResource("dataElement").save({name: element.element}).then (newElement) ->
+                    element.element = newElement
+                    model
               $scope.pendingActions.push (model) ->
                 element.element.metadata = element.ext
                 model.contains.add element.element
                 model
+
+            angular.forEach $scope.classifications, (classification) ->
+              if angular.isString classification
+                $scope.pendingActions.push (model) ->
+                  catalogueElementResource('classification').save({name: classification}).then (newClassification) ->
+                    model.classifications.push newClassification
+                    model
+              else
+                $scope.pendingActions.push (model) ->
+                    model.classifications.push classification
+                    model
 
             $scope.totalActions = $scope.pendingActionsCount = $scope.pendingActions.length + 1
             $scope.step = 'summary'

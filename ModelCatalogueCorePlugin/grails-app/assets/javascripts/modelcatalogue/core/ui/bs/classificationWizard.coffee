@@ -103,7 +103,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             value = $scope[propertyName]
 
             if angular.isString(value.element)
-              value = {name: value.element}
+              value = {name: value.element, create: true}
             else
               value.name = value.element.name
 
@@ -132,7 +132,6 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
                 $scope.dataElements[i] = element.element
 
             promise = promise.then ->
-              console.log $scope.dataElements
               $scope.classification.classifies = $scope.dataElements
               catalogueElementResource('classification').save($scope.classification)
 
