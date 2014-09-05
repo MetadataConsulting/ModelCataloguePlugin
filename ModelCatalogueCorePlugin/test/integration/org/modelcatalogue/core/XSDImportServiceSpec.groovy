@@ -23,7 +23,16 @@ class XSDImportServiceSpec extends IntegrationSpec {
 
         when:
         service.createValueDomainsAndDataTypes(simpleDataTypes)
-        service.createModels(complexDataTypes)
+        service.createModelsAndElements(complexDataTypes)
+
+
+        def cs_NullFlavor = ValueDomain.findByName("cs_NullFlavor")
+        def cs_UpdateMode = ValueDomain.findByName("cs_UpdateMode")
+        def cs = ValueDomain.findByName("cs")
+        def ts = ValueDomain.findByName("ts")
+        def valueDomain = ValueDomain.findByNameIlike("value")
+        def cs_UpdateModeType = EnumeratedType.findByName("cs_UpdateMode")
+        def cs_NullFlavorType = EnumeratedType.findByName("cs_NullFlavor")
 
         def nhsDateModel = Model.findByName("TS.GB-en-NHS.Date")
         def tsModel = Model.findByName("TS")
@@ -33,15 +42,30 @@ class XSDImportServiceSpec extends IntegrationSpec {
         def value2 = DataElement.findByNameAndDescription("value","TS.GB-en-NHS.Date.value")
         def nullFlavor = DataElement.findByName("nullFlavor")
         def updateMode = DataElement.findByName("updateMode")
-        def cs_NullFlavor = ValueDomain.findByName("cs_NullFlavor")
-        def cs_UpdateMode = ValueDomain.findByName("cs_UpdateMode")
-        def cs = ValueDomain.findByName("cs")
-        def ts = ValueDomain.findByName("ts")
-        def valueDomain = ValueDomain.findByNameIlike("value")
-        def cs_UpdateModeType = EnumeratedType.findByName("cs_UpdateMode")
-        def cs_NullFlavorType = EnumeratedType.findByName("cs_NullFlavor")
 
         then:
+
+        cs_NullFlavor
+        cs_UpdateMode
+        cs
+        ts
+        valueDomain
+        cs_UpdateModeType
+        cs_NullFlavorType
+
+        cs.dataType.name == "xs:token"
+        ts.dataType.name == "xs:string"
+        cs_UpdateMode.dataType == cs_UpdateModeType
+        cs_NullFlavor.dataType == cs_NullFlavorType
+
+        nhsDateModel.isBasedOn.contains(tsModel)
+        tsModel.isBasedOn.contains(qty)
+        qty.isBasedOn.contains(any)
+
+        cs_NullFlavor.isBasedOn.contains(cs)
+        cs_UpdateMode.isBasedOn.contains(cs)
+        valueDomain.isBasedOn.contains(ts)
+
 
         nhsDateModel
         tsModel
@@ -51,13 +75,7 @@ class XSDImportServiceSpec extends IntegrationSpec {
         value2
         nullFlavor
         updateMode
-        cs_NullFlavor
-        cs_UpdateMode
-        cs
-        ts
-        valueDomain
-        cs_UpdateModeType
-        cs_NullFlavorType
+
 
         nhsDateModel.countRelations() == 4
         tsModel.countRelations() == 3
@@ -82,18 +100,6 @@ class XSDImportServiceSpec extends IntegrationSpec {
         nullFlavor.valueDomain == cs_NullFlavor
         updateMode.valueDomain == cs_UpdateMode
 
-        cs.dataType.name == "xs:token"
-        ts.dataType.name == "xs:string"
-        cs_UpdateMode.dataType == cs_UpdateModeType
-        cs_NullFlavor.dataType == cs_NullFlavorType
-
-        nhsDateModel.isBasedOn.contains(tsModel)
-        tsModel.isBasedOn.contains(qty)
-        qty.isBasedOn.contains(any)
-
-        cs_NullFlavor.isBasedOn.contains(cs)
-        cs_UpdateMode.isBasedOn.contains(cs)
-        valueDomain.isBasedOn.contains(ts)
 
 
     }
