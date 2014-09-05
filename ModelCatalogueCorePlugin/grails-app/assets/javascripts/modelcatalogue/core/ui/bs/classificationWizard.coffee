@@ -21,7 +21,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
         #language=HTML
         template: '''
         <div class="modal-header">
-            <button type="button" class="close" ng-click="$dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
+            <button type="button" class="close" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
             <h4>Classification Wizard</h4>
             <ul class="tutorial-steps">
               <li>
@@ -79,7 +79,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', ($scope, $state, $window, messages, names, catalogueElementResource, $q) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', '$modalInstance', ($scope, $state, $window, messages, names, catalogueElementResource, $q, $modalInstance) ->
           $scope.reset = ->
             $scope.classification = {classifies:{}}
             $scope.dataElement = {}
@@ -167,6 +167,13 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             $scope.select(step) if $event.keyCode == key
 
           $scope.select('classification')
+
+          $scope.dismiss = (reason) ->
+            if $scope.classification.name or $scope.dataElements.length > 0
+              messages.confirm("Close Classification Wizard", "Do you want to discard all changes?").then ->
+                $modalInstance.dismiss(reason)
+            else
+              $modalInstance.dismiss(reason)
 
         ]
 

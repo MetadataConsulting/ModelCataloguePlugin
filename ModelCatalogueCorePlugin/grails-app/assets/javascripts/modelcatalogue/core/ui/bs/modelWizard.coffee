@@ -23,7 +23,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
         #language=HTML
         template: '''
         <div class="modal-header">
-            <button type="button" class="close" ng-click="$dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
+            <button type="button" class="close" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
             <h4>Model Wizard</h4>
             <ul class="tutorial-steps">
               <li>
@@ -298,6 +298,13 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             $scope.select(step) if $event.keyCode == key
 
           $scope.select('model')
+
+          $scope.dismiss = (reason) ->
+            if $scope.model.name or $scope.model.description or not $scope.isEmpty($scope.metadata) or $scope.parents.length > 0 or $scope.children.length > 0 or $scope.dataElements.length > 0 or $scope.classifications.length > 0
+              messages.confirm("Close Classification Wizard", "Do you want to discard all changes?").then ->
+                $modalInstance.dismiss(reason)
+            else
+              $modalInstance.dismiss(reason)
 
         ]
 
