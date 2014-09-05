@@ -28,6 +28,15 @@
         </xs:complexContent>
     </xs:complexType>
 
+    <xs:complexType name="QTY" abstract="true">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of a quantity.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ANY"/>
+        </xs:complexContent>
+    </xs:complexType>
+
     <xs:simpleType name="ts">
         <xs:annotation>
             <xs:documentation>This data type supports the representation of a timestamp.</xs:documentation>
@@ -37,14 +46,7 @@
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:complexType name="QTY" abstract="true">
-        <xs:annotation>
-            <xs:documentation>This data type supports the representation of a quantity.</xs:documentation>
-        </xs:annotation>
-        <xs:complexContent>
-            <xs:extension base="ANY"/>
-        </xs:complexContent>
-    </xs:complexType>
+
 
     <xs:complexType name="ANY" abstract="true">
         <xs:annotation>

@@ -310,14 +310,19 @@ class DataImportService {
         //check cache of models to see if it has already been created
         Model model = importer.models.find{it.name == modelParams.name}
         if(!model && modelParams.name){
-            model = new Model(modelParams)
-            model.modelCatalogueId = modelParams.modelCatalogueId
-            model.save()
-            model.addToClassifications(classification)
-            model.addToHasContextOf(conceptualDomain)
+            model = createModel(modelParams, classification, conceptualDomain)
         }else{
             model.addToClassifications(classification)
         }
+        return model
+    }
+
+    protected createModel(Map modelParams, Classification classification, ConceptualDomain conceptualDomain){
+        Model model = new Model(modelParams)
+        model.modelCatalogueId = modelParams.modelCatalogueId
+        model.save()
+        model.addToClassifications(classification)
+        model.addToHasContextOf(conceptualDomain)
         return model
     }
 
@@ -789,8 +794,11 @@ class DataImportService {
                 vd = ValueDomain.findByName(name)
                 if(vd && !vd.conceptualDomains.contains(cd)) vd = null
                 if (vd == null) {
-                    XsdSimpleType simpleDataType = simpleDataTypes.find { it.name == type }
-                    (vd, dataType) = createSimpleType(importer, cd, simpleDataType, simpleDataTypes)
+                    vd = ValueDomain.findByName(type)
+                    if(!vd) {
+                        XsdSimpleType simpleDataType = simpleDataTypes.find { it.name == type }
+                        (vd, dataType) = createSimpleType(importer, cd, simpleDataType, simpleDataTypes)
+                    }
                     // Check enumerated elements
 //                    if (simpleType.restriction.enumeration != "") {
                         DataType enumeratedDataType = importDataType(simpleType.name, simpleType.restriction.enumeration)
@@ -800,7 +808,7 @@ class DataImportService {
                         enumeratedVD.addToBasedOn(vd)
                         vd.save()
                         enumeratedVD.save()
-                        return [enumeratedVD, dataType]
+                        return [enumeratedVD, enumeratedDataType]
 //                    }
 //                    else return [vd,dataType]
                 } else {
@@ -904,17 +912,19 @@ class DataImportService {
 
 
 
-    def createModels(DataImport importer, ConceptualDomain cd, ArrayList<XsdComplexType> complexDataTypes, ArrayList<XsdGroup> groups, Classification classification){
+    def createModels(DataImport importer, ConceptualDomain conceptualDomain, ArrayList<XsdComplexType> complexDataTypes, ArrayList<XsdGroup> groups, Classification classification){
 
         complexDataTypes.each { XsdComplexType complexDataType ->
             //Create Model for each Group, Choice and Sequence.
-            Model model = matchOrCreateModel(importer, [name:complexDataType.name, description: complexDataType.description], cd, classification).save()
+            //Model model = matchOrCreateModel(importer, [name:complexDataType.name, description: complexDataType.description], cd, classification).save()
+            def model = createModel([name:complexDataType.name, description: complexDataType.description], classification, conceptualDomain)
             if (model != null) println("Model: " + complexDataType.name)
             addModelToImport(importer, model)
         }
 
         groups.each{ XsdGroup group ->
-            Model model = matchOrCreateModel(importer, [name:group.name, description: group.description], cd, classification).save()
+            //Model model = matchOrCreateModel(importer, [name:group.name, description: group.description], cd, classification).save()
+            def model = createModel([name:group.name, description: group.description], classification, conceptualDomain)
             addModelToImport(importer, model)
         }
 

@@ -64,7 +64,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         controller.metaClass.request = new MockMultipartHttpServletRequest()
         controller.params.conceptualDomain = 'test'
         controller.params.name = 'testImport123'
-        InputStream inputStream = new FileInputStream(filenameXsd)
+
         controller.request.addFile(new MockMultipartFile('file', filenameXsd,"application/octet-stream" , inputStream))
         controller.upload()
         JSONElement json = controller.response.json

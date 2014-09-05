@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.dataarchitect.xsd
 
+import org.modelcatalogue.core.ValueDomain
+
 /**
  * Created by sus_avi on 17/06/2014.
  */
@@ -14,6 +16,7 @@ class XsdLoader {
     ArrayList<XsdGroup> groups =[]
     XmlParser parser
     def sact
+    Random random = new Random()
 
     protected static fileInputStream
 
@@ -173,9 +176,20 @@ class XsdLoader {
                     break
             }
         }
-        if (dataTypeName=="") dataTypeName = elementName
+        if (dataTypeName=="") {
+            dataTypeName = elementName + random.nextInt()
+            dataTypeName = checkSimpleTypeName(dataTypeName)
+        }
 
         XsdSimpleType result = new XsdSimpleType(name: dataTypeName,description: sactElementAnnotation, restriction: sactRestriction, list: list, union: union )
+    }
+
+    def checkSimpleTypeName(dataTypeName){
+        if(ValueDomain.findByName(dataTypeName)){
+            dataTypeName = dataTypeName + random.nextInt()
+            checkSimpleTypeName(dataTypeName)
+        }
+        return dataTypeName
     }
 
     def readUnion (Node node, String elementName){
