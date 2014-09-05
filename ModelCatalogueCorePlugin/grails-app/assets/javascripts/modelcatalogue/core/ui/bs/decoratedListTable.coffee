@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.decoratedListTable', ['mc.core.ui.decoratedList', 
           </tr>
         </thead>
         <tbody>
-             <tr class="dl-table-item-row" ng-repeat="element in list.list" ng-switch="hasSelection()">
+             <tr class="dl-table-item-row" ng-repeat="element in list.list" ng-switch="hasSelection()" ng-class="{'warning': element.status == 'DRAFT' || element.relation.status == 'DRAFT', 'info': element.status == 'PENDING' || element.relation.status == 'PENDING', 'danger': element.status == 'ARCHIVED' || element.relation.status == 'ARCHIVED'}">
               <td class="dl-table-select-item-cell" ng-switch-when="true">
                 <input type="checkbox" ng-change="updateSelection()" ng-model="element._selected">
               </td>
