@@ -60,6 +60,8 @@ grails.project.dependency.resolution = {
         compile ":excel-export:0.2.1"
         compile ":executor:0.3"
 
+        compile ":csv:0.3.1"
+
         test ':build-test-data:2.1.2'
         test ':fixtures:1.3'
 

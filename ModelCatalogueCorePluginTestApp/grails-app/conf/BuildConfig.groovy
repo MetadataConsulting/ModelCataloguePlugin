@@ -100,8 +100,6 @@ grails.project.dependency.resolution = {
 
         test ":geb:0.9.3"
 
-        compile ":csv:0.3.1"
-
         // Uncomment these (or add new ones) to enable additional resources capabilities
         //runtime ":zipped-resources:1.0.1"
         //runtime ":cached-resources:1.1"
