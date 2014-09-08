@@ -306,9 +306,16 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
 
           $scope.importFromCSV = ->
             messages.prompt("Import Data Elements", null, {type: 'data-element-suggestions-from-csv'}).then (result) ->
-              $scope.dataElements = $scope.dataElements.concat result
+              angular.forEach result, (element) ->
+                value = {element : element}
+                if angular.isString(value.element)
+                  value = {name: value.element, create: true}
+                else
+                  value.name = value.element.name
+                $scope.dataElements.push value
 
           $scope.dismiss = (reason) ->
+            return $modalInstance.dismiss(reason) if $scope.finished
             if $scope.model.name or $scope.model.description or not $scope.isEmpty($scope.metadata) or $scope.parents.length > 0 or $scope.children.length > 0 or $scope.dataElements.length > 0 or $scope.classifications.length > 0
               messages.confirm("Close Classification Wizard", "Do you want to discard all changes?").then ->
                 $modalInstance.dismiss(reason)
