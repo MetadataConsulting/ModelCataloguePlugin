@@ -250,11 +250,11 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                 $scope.pendingActions.push (model) ->
                   catalogueElementResource('classification').save({name: classification}).then (newClassification) ->
                     model.classifications.push newClassification
-                    model
+                    catalogueElementResource('model').update(model)
               else
                 $scope.pendingActions.push (model) ->
                     model.classifications.push classification
-                    model
+                    catalogueElementResource('model').update(model)
 
             $scope.totalActions = $scope.pendingActionsCount = $scope.pendingActions.length + 1
             $scope.step = 'summary'
