@@ -15,11 +15,12 @@ class ValueDomainMarshaller extends ExtendibleElementMarshallers {
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
-        ret.putAll unitOfMeasure: el.unitOfMeasure,
+
+        ret.putAll unitOfMeasure: minimalCatalogueElementJSON(el.unitOfMeasure),
                 rule: el.rule,
-                dataType: el.dataType,
+                dataType: minimalCatalogueElementJSON(el.dataType),
                 multiple: el.multiple ?: false,
-                conceptualDomains: el.conceptualDomains,
+                conceptualDomains: el.conceptualDomains.collect(CatalogueElementMarshallers.&minimalCatalogueElementJSON),
                 mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"],
                 dataElements: [count: el.dataElements?.size() ?: 0, itemType: DataElement.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/dataElement"]
         ret
