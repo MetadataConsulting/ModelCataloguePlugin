@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import groovy.util.slurpersupport.GPathResult
+import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ListWithTotal
@@ -278,5 +279,35 @@ def "xml -  create dataElement relationships"(){
     //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
     xml.previous.text() == ""
 }
+
+    def "find some elements and return just string for not found from elementsFromCSV"(){
+        def controller = new DataArchitectController()
+        ResultRecorder recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                "dataArchitect"
+        )
+
+
+        GrailsMockMultipartFile mockFile = new GrailsMockMultipartFile('csv', 'headers.txt', 'text/plain', 'DE AUTHOR;auth5;auth8;whatever'.bytes)
+
+        when:
+        controller.request.addFile mockFile
+        controller.response.format = "json"
+        controller.params.put("separator", ";")
+        controller.elementsFromCSV()
+        JSONElement json = controller.response.json
+        recorder.recordResult "elementsFromCSV", json
+
+        then:
+
+        json.size() == 4
+        !(json[0] instanceof String)
+        !(json[1] instanceof String)
+        !(json[2] instanceof String)
+          json[3] instanceof String
+
+
+    }
 
 }

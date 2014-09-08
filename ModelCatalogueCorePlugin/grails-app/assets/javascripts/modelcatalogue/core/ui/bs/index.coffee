@@ -25,6 +25,7 @@
 #= require simpleObjectEditor
 #= require modalPromptAssetEdit
 #= require modalPromptBasicEdit
+#= require modalPromptCsvHeaders
 #= require modalPromptLogin
 #= require modalPromptMeasurementUnitEdit
 #= require modalPromptActionParametersEdit
@@ -63,6 +64,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.messagesPanel'
   'mc.core.ui.bs.modalConfirm'
   'mc.core.ui.bs.modalPrompt'
+  'mc.core.ui.bs.modalPromptCsvHeaders'
   'mc.core.ui.bs.modalPromptNewRelationship'
   'mc.core.ui.bs.modalPromptNewImport'
   'mc.core.ui.bs.simpleObjectEditor'

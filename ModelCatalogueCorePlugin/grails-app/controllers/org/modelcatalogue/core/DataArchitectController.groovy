@@ -1,15 +1,20 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.dataarchitect.CSVService
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
-import org.modelcatalogue.core.util.Lists
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.web.multipart.MultipartFile
 
 class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
-    def dataArchitectService, modelService
+    def dataArchitectService
+    def modelService
+    @Autowired CSVService csvService
 
     DataArchitectController(Class<T> resource, boolean readOnly) {
         super(resource, readOnly)
@@ -121,6 +126,50 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
             reportCapableRespond "please enter keys"
         }
 
+    }
+
+    def elementsFromCSV(){
+        MultipartFile file = request.getFile('csv')
+
+        if (!file) {
+            respond status: HttpStatus.BAD_REQUEST
+            return
+        }
+
+        List<Object> elements = []
+
+        file.inputStream.withReader {
+            String[] headers = csvService.readHeaders(it, params.separator ?: ';')
+
+            for (String header in headers) {
+                def element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.FINALIZED)
+                if (!element) {
+                    if (header.contains('_')) {
+                        element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.FINALIZED)
+                    } else {
+                        element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.FINALIZED)
+                    }
+                }
+                if (!element) {
+                    element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.DRAFT)
+                }
+                if (!element) {
+                    if (header.contains('_')) {
+                        element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.DRAFT)
+                    } else {
+                        element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.DRAFT)
+                    }
+                }
+                if (element) {
+                    elements << element
+                } else {
+                    elements << header
+                }
+            }
+
+        }
+
+        respond elements
     }
 
 

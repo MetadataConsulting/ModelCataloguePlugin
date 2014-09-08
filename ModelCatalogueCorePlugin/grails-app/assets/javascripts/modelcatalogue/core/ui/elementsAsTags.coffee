@@ -5,11 +5,16 @@ angular.module('mc.core.ui.elementsAsTags', []).directive 'elementsAsTags',  [->
       elements: '='
     templateUrl: 'modelcatalogue/core/ui/elementsAsTags.html'
 
-    controller: ['$scope', ($scope) ->
-        $scope.removeItem = (index) ->
-          $scope.elements.splice index, 1
+    controller: ['$scope', 'names', '$state', '$window', ($scope, names, $state, $window) ->
+      $scope.openElementInNewWindow = (element) ->
+        url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
+        $window.open(url,'_blank')
+        return
 
-        $scope.isString = angular.isString
+      $scope.removeItem = (index) ->
+        $scope.elements.splice index, 1
+
+      $scope.isString = angular.isString
     ]
 
   }

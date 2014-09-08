@@ -121,6 +121,11 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                   </div>
                   <p class="help-block">Data element is destination for the containment relationship</p>
                 </div>
+                <div>
+                  <alert type="'info'">
+                    <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link" ng-click="importFromCSV()">CSV file headers</a>.
+                  </alert>
+                </div>
                 <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Source Min Occurs', 'Source Max Occurs', 'Destination Min Occurs', 'Destination Max Occurs']"></simple-object-editor>
               </form>
             </tab>
@@ -298,6 +303,10 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             $scope.select(step) if $event.keyCode == key
 
           $scope.select('model')
+
+          $scope.importFromCSV = ->
+            messages.prompt("Import Data Elements", null, {type: 'data-element-suggestions-from-csv'}).then (result) ->
+              $scope.dataElements = $scope.dataElements.concat result
 
           $scope.dismiss = (reason) ->
             if $scope.model.name or $scope.model.description or not $scope.isEmpty($scope.metadata) or $scope.parents.length > 0 or $scope.children.length > 0 or $scope.dataElements.length > 0 or $scope.classifications.length > 0

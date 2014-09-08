@@ -68,7 +68,11 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
                   </div>
                 </div>
               </form>
-            </tab>
+              <div>
+                <alert type="'info'">
+                  <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link" ng-click="importFromCSV()">CSV file headers</a>.
+                </alert>
+              </div>
           </div>
           <div ng-switch-when="summary" id="summary">
               <h4 ng-show="classification.name &amp;&amp;  finished">Classification <strong>{{classification.name}} created</strong></h4>
@@ -174,6 +178,10 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
                 $modalInstance.dismiss(reason)
             else
               $modalInstance.dismiss(reason)
+
+          $scope.importFromCSV = ->
+            messages.prompt("Import Data Elements", null, {type: 'data-element-suggestions-from-csv'}).then (result) ->
+              $scope.dataElements = $scope.dataElements.concat result
 
         ]
 
