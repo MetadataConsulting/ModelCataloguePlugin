@@ -82,7 +82,7 @@
                             </li>
                             <li ui-sref-active="active"><a id="dataTypeLink"
                                                                                   ui-sref="mc.resource.list({resource: 'dataType'})"
-                                                                                  ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-list-alt"></span>&nbsp; Data Types</a>
+                                                                                  ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-th-large"></span>&nbsp; Data Types</a>
                             </li>
                             <li ui-sref-active="active"><a id="measurementUnitLink"
                                                                                    ui-sref="mc.resource.list({resource: 'measurementUnit'})"

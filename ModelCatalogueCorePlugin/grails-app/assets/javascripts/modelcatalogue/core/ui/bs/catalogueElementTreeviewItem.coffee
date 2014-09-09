@@ -19,11 +19,11 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
           <a ng-if="currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="collapseOrExpand(element)">
             <span class="glyphicon glyphicon-folder-close"  ng-if="collapsed &amp;&amp; numberOfChildren &amp;&amp; !loadingChildren"></span>
             <span class="glyphicon glyphicon-folder-open"   ng-if="!collapsed &amp;&amp; numberOfChildren &amp;&amp; !loadingChildren"></span>
-            <span class="glyphicon glyphicon-file"          ng-if="!numberOfChildren"></span>
+            <span ng-class="element.getIcon()"              ng-if="!numberOfChildren"></span>
             <span class="glyphicon glyphicon-refresh"       ng-if="loadingChildren" ></span>
           </a>
           <a ng-if="!currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="select(element)">
-            <span class="glyphicon glyphicon-file"></span>
+            <span ng-class="element.getIcon()"></span>
           </a>
           <span class="catalogue-element-treeview-name" ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': element.status == 'ARCHIVED'}" ng-click="select(element)">{{element.name}}</span>
           <a ng-click="element.show()" class="btn btn-link btn-xs" title="Show" ng-if="element.elementType"><span class="glyphicon glyphicon-link"></span></a>
