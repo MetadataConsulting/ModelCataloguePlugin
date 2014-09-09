@@ -11,7 +11,8 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
             <tab-heading>{{tab.heading}}<span ng-show="tab.value.total"> <span class="badge">{{tab.value.total}}</span></span></tab-heading>
             <div ng-switch="tab.type">
               <div ng-switch-when="simple-object-editor">
-                <simple-object-editor object="tab.value" title="Key" value-title="Value"></simple-object-editor>
+                <simple-object-editor ng-if="tab.name != 'enumerations'" object="tab.value" title="Key" value-title="Value"></simple-object-editor>
+                <simple-object-editor ng-if="tab.name == 'enumerations'" object="tab.value" title="Value" value-title="Description" key-placeholder="Value" value-placeholder="Description"></simple-object-editor>
                 <div class="row">
                   <div class="col-md-12">
                     <div class=" text-center">
@@ -23,7 +24,8 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
                   </div>
                 </div>
               </div>
-              <properties-pane id="{{tab.heading}}" item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name != 'properties'" title="Key" value-title="Value"></properties-pane>
+              <properties-pane id="{{tab.heading}}" item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'enumerations'" title="Value" value-title="Description"></properties-pane>
+              <properties-pane id="{{tab.heading}}" item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name != 'properties' &amp;&amp; tab.name != 'enumerations' " title="Key" value-title="Value"></properties-pane>
               <properties-pane id="{{tab.heading}}" item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'properties'"></properties-pane>
               <decorated-list list="tab.value" columns="tab.columns" actions="tab.actions" ng-switch-when="decorated-list" id="{{id + '-' + tab.name}}" reports="tab.reports"></decorated-list>
             </div>

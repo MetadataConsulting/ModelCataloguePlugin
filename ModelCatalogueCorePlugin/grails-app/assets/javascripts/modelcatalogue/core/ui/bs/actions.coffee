@@ -26,10 +26,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   100
     label:      "New Enumerated Type"
-    #icon:      'glyphicon glyphicon-plus-sign'
     type:       'success'
     action:     ->
-      messages.prompt('Create Enumerated Type', '', {type: 'edit-enumeratedType', create: ($scope.resource)}).then (created)->
+      messages.prompt('Create Enumerated Type', '', {type: 'edit-enumeratedType', create: 'enumeratedType'}).then (created)->
         created.show()
     }
   ]

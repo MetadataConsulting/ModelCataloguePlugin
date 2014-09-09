@@ -23,7 +23,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
             </form>
-            <simple-object-editor object="copy.enumerations" title="Enumerations"></simple-object-editor>
+            <simple-object-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></simple-object-editor>
         </div>
         <div class="modal-footer">
           <contextual-actions></contextual-actions>
