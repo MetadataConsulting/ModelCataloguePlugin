@@ -96,7 +96,7 @@
                                                                                  ui-sref="mc.resource.list({resource: 'relationshipType'})"
                                                                                  ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-link"></span>&nbsp; Relationship Types</a>
                             </li>
-                            <li show-for-role="CURATOR" ui-sref-active="active"><a id="batchLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-flash"></span>&nbsp; Actions</a></li>
+                            <li class="hide" show-for-role="CURATOR" ui-sref-active="active"><a id="batchLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-flash"></span>&nbsp; Actions</a></li>
                         </ul>
                     </li>
                     <li show-for-role="ADMIN" class="dropdown" ui-sref-active="active">

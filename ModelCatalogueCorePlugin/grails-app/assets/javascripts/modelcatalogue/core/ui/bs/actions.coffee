@@ -3,6 +3,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerAction 'create-catalogue-element', ['$scope', 'names', 'security', 'messages', ($scope, names, security, messages) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.resource
+    return undefined if $scope.resource == 'batch'
     return undefined if not messages.hasPromptFactory('create-' + $scope.resource) and not messages.hasPromptFactory('edit-' + $scope.resource)
 
     {

@@ -695,13 +695,13 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <a ng-click="create('relationshipType')">
                                 <div class="panel-footer">
                                     <span class="pull-left">Create Relationship Type</span>
-                                    <span class="pull-right"><i class="fa fa-magic"s></i></span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
                                     <div class="clearfix"></div>
                                 </div>
                             </a>
                         </div>
                     </div>
-                    <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4">
+                    <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4 hide">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <div class="row">
