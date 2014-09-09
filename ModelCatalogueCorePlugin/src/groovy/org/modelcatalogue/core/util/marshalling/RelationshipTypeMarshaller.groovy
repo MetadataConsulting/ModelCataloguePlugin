@@ -17,7 +17,6 @@ class RelationshipTypeMarshaller extends AbstractMarshallers {
                 name: el.name,
                 version: el.version,
                 elementType: el.class.name,
-                elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 sourceToDestination: el.sourceToDestination,
                 destinationToSource: el.destinationToSource,
                 sourceClass: el.sourceClass,
@@ -49,7 +48,6 @@ class RelationshipTypeMarshaller extends AbstractMarshallers {
         addXmlAttribute(el.metadataHints, "metadataHints", xml)
         addXmlAttribute(el.bidirectional, "bidirectional", xml)
         addXmlAttribute(el.system, "system", xml)
-        addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }
 
 }

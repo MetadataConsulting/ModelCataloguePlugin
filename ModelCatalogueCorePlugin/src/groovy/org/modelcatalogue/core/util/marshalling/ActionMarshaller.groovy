@@ -26,7 +26,6 @@ class ActionMarshaller extends AbstractMarshallers {
                 outcome: el.outcome,
                 version: el.version,
                 elementType: el.class.name,
-                elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
                 state: el.state?.toString(),
@@ -82,7 +81,6 @@ class ActionMarshaller extends AbstractMarshallers {
         addXmlAttribute("/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id", "link", xml)
         addXmlAttribute(el.class.name, "elementType", xml)
         addXmlAttribute(el.state?.toString(), "state", xml)
-        addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }
 
 }

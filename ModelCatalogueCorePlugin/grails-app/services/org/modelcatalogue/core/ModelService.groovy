@@ -1,12 +1,9 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
-import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListCountAndType
-import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
-import org.modelcatalogue.core.util.QueryListWithTotalAndType
 
 @Transactional
 class ModelService {

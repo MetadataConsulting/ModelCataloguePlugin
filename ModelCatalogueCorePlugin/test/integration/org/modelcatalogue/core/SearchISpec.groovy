@@ -94,9 +94,8 @@ class SearchISpec extends AbstractIntegrationSpec{
         2 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "json"    | "boolean"                 | 1
         3 | "DataType"          | new DataTypeController()            | "boolean"                       | "xml"     | "boolean"                 | 1
         4 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "xml"     | "boolean"                 | 1
-// search for symbol, not supported for the default implementation
-//        5 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "json"    | "DE_author1"              | 1
-//        6 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "xml"     | "DE_author1"              | 1
+        5 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "json"    | "DE_author1"              | 1
+        6 | "DataElement"       | new DataElementController()         | "XXX_1"                         | "xml"     | "DE_author1"              | 1
         7 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "json"    | "public libraries"        | 1
         8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 1
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1

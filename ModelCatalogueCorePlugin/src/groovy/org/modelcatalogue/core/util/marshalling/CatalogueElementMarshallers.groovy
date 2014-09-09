@@ -137,7 +137,6 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         addXmlAttribute(el.lastUpdated, "lastUpdated", xml)
         addXmlAttribute("/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id", "link", xml)
         addXmlAttribute(el.class.name, "elementType", xml)
-        addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }
 
     private static Closure addRelationsJson(String incomingOrOutgoing, CatalogueElement el, Map ret, Map<String, RelationshipType> types) {

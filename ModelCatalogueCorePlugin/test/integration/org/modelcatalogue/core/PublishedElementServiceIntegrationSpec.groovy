@@ -132,7 +132,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         int archivedVersion     = archived.versionNumber
         int newVersion          = md2.versionNumber
 
-        def archivedrel = relationshipService.getRelationships([:], RelationshipDirection.BOTH, archived, RelationshipType.hierarchyType).list
+        def archivedrel = relationshipService.getRelationships([:], RelationshipDirection.BOTH, archived, RelationshipType.hierarchyType).items
 
         expect:
         md2 != archived

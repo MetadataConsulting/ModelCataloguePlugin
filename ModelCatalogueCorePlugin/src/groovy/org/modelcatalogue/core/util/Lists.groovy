@@ -120,8 +120,35 @@ class Lists {
         DetachedListWithTotalAndType.create(params, criteria)
     }
 
+    /**
+     * Creates new ListWithTotalAndType which items will initialized by itemsClosure closure.
+     * @param params            url parameters used to determine pagination and sort settings
+     * @param type              type to be used as wrapper's itemType
+     * @param itemsClosure      closure returning the items of the list
+     * @param totalClosure      closure returning the total count of the items
+     * @return new ListWithTotalAndType which items will initialized by itemsClosure closure
+     */
+    static <T> ListWithTotalAndType<T> lazy(Map params, Class<T> type, Closure<List<T>> itemsClosure, Closure<Long> totalClosure = null){
+        LazyListWithTotalAndType.create(params, type, itemsClosure, totalClosure)
+    }
 
-    //>-- not providing wrapper variant because it should be used in service classes
+    /**
+     * Creates new ListWrapper for lazily evaluated list.
+     * @param params            url parameters used to determine pagination and sort settings
+     * @param type              type to be used as wrapper's itemType
+     * @param base              base url of the list returned
+     * @param name              name of the root element
+     * @param itemsClosure      closure returning the items of the list
+     * @param totalClosure      closure returning the total count of the items
+     * @return new ListWrapper for lazy evaluated list
+     *
+     * @see DetachedCriteria
+     */
+    static <T> ListWrapper<T> lazy(Map params, Class<T> type, String base, String name = null, Closure<List<T>> itemsClosure, Closure<Long> totalClosure = null){
+        wrap(params, base, name, LazyListWithTotalAndType.create(params, type, itemsClosure, totalClosure))
+    }
+
+
     /**
      * Creates new ListWithTotalAndType from HQL query.
      *

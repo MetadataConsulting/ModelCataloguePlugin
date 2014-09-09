@@ -17,7 +17,6 @@ class DataImportMarshaller extends AbstractMarshallers {
                 id: el.id,
                 name: el.name,
                 elementType: el.class.name,
-                elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 imported: [count: el?.imported ? el.imported.size() : 0 , itemType: ImportRow.name, link: "/dataArchitect/imports/$el.id/imported"],
                 pendingAction: [count: el?.pendingAction ? el.pendingAction.size() : 0 , itemType: ImportRow.name, link: "/dataArchitect/imports/$el.id/pendingAction"],
                 importQueue: [count: el?.importQueue ? el.importQueue.size() : 0 , itemType: ImportRow.name, link: "/dataArchitect/imports/$el.id/importQueue"],

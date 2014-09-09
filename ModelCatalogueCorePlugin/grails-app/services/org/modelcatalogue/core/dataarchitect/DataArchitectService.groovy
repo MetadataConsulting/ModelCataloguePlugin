@@ -18,32 +18,19 @@ class DataArchitectService {
     }
 
     ListWithTotal<DataElement> metadataKeyCheck(Map params){
-
-        def missingMetadataKey, totalCount
-        ListAndCount results = new ListAndCount()
         def searchParams = getParams(params)
 
-        totalCount = DataElement.executeQuery("SELECT DISTINCT COUNT(a) FROM DataElement a " +
+        return Lists.fromQuery(searchParams, DataElement, "SELECT DISTINCT a FROM DataElement a " +
                 "WHERE a.extensions IS EMPTY " +
                 "OR a NOT IN " +
                 "(SELECT a2 from DataElement a2 " +
                 "JOIN a2.extensions e2 " +
-                "WHERE e2.name = ?)", [searchParams.key], [cache:true]
-        )
-
-        missingMetadataKey = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
+                "WHERE e2.name = :key)" ,"SELECT COUNT(a) FROM DataElement a " +
                 "WHERE a.extensions IS EMPTY " +
                 "OR a NOT IN " +
                 "(SELECT a2 from DataElement a2 " +
                 "JOIN a2.extensions e2 " +
-                "WHERE e2.name = ?)", [searchParams.key], [max: searchParams.max, offset: searchParams.offset]
-        )
-
-        results.count = (totalCount.get(0))?totalCount.get(0):0
-        results.list = missingMetadataKey
-
-
-        return results
+                "WHERE e2.name = :key)", [key: searchParams.key])
     }
 
     ListWithTotal<DataElement> findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
