@@ -177,7 +177,7 @@ class XsdLoader {
             }
         }
         if (dataTypeName=="") {
-            dataTypeName = elementName + random.nextInt()
+            dataTypeName = node.parent().attributes().get("name")
             dataTypeName = checkSimpleTypeName(dataTypeName)
         }
 
@@ -187,7 +187,7 @@ class XsdLoader {
     def checkSimpleTypeName(dataTypeName){
         if(ValueDomain.findByName(dataTypeName)){
             dataTypeName = dataTypeName + random.nextInt()
-            checkSimpleTypeName(dataTypeName)
+            dataTypeName = checkSimpleTypeName(dataTypeName)
         }
         return dataTypeName
     }

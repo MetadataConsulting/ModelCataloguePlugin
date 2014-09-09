@@ -9,21 +9,26 @@ import spock.lang.Shared
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(XSDImportService)
 class XSDImportServiceSpec extends IntegrationSpec {
 
+    def initCatalogueService, XSDImportService
 
     def "ingest XML schema"(){
 
         setup:
+        initCatalogueService.initDefaultDataTypes()
+        initCatalogueService.initDefaultRelationshipTypes()
+        initCatalogueService.initDefaultMeasurementUnits()
         def filenameXsd = "test/unit/resources/SACT/XSD_Example.xsd"
         InputStream inputStream = new FileInputStream(filenameXsd)
         XsdLoader parserXSD = new XsdLoader(inputStream)
         def (elements, simpleDataTypes, complexDataTypes, groups, attributes, logErrorsSACT) = parserXSD.parse()
+        ConceptualDomain conceptualDomain = new ConceptualDomain(name: "test conceptual domain").save()
+        Classification classification = new Classification(name: "dataSet1").save()
 
         when:
-        service.createValueDomainsAndDataTypes(simpleDataTypes)
-        service.createModelsAndElements(complexDataTypes)
+        XSDImportService.createValueDomainsAndDataTypes(simpleDataTypes, conceptualDomain)
+        XSDImportService.createModelsAndElements(complexDataTypes, classification, conceptualDomain)
 
 
         def cs_NullFlavor = ValueDomain.findByName("cs_NullFlavor")
@@ -58,13 +63,15 @@ class XSDImportServiceSpec extends IntegrationSpec {
         cs_UpdateMode.dataType == cs_UpdateModeType
         cs_NullFlavor.dataType == cs_NullFlavorType
 
-        nhsDateModel.isBasedOn.contains(tsModel)
-        tsModel.isBasedOn.contains(qty)
-        qty.isBasedOn.contains(any)
+        valueDomain.dataType.name == "xs:string"
 
-        cs_NullFlavor.isBasedOn.contains(cs)
-        cs_UpdateMode.isBasedOn.contains(cs)
-        valueDomain.isBasedOn.contains(ts)
+        cs_NullFlavor.basedOn.contains(cs)
+        cs_UpdateMode.basedOn.contains(cs)
+        valueDomain.basedOn.contains(ts)
+
+        nhsDateModel.basedOn.contains(tsModel)
+        tsModel.basedOn.contains(qty)
+        qty.basedOn.contains(any)
 
 
         nhsDateModel
