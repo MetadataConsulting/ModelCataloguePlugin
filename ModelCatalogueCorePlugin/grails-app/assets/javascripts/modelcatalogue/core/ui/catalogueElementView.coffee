@@ -42,7 +42,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             if $state.params.q
               promise = tab.loader 'search', {search: $state.params.q}
             else
-              promise = tab.loader()
+              if not tab.promise
+                promise = tab.loader()
+                tab.promise = promise
+              else
+                promise = tab.promise
           else
             promise = $q.when tab.value
 
@@ -91,7 +95,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         options.location = "replace" if newProperty and not oldProperty
         $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
 
-      onElementUpdate = (element) ->
+      onElementUpdate = (element, oldEl) ->
+        return if angular.equals element, oldEl
         applicationTitle "#{$scope.element.getLabel()}"
 
         resource = catalogueElementResource(element.elementType) if element and element.elementType
@@ -280,10 +285,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         else
           $state.go '.', {property: tab.name, q: tab.search}
 
-      # watches
-      $scope.$watch 'element', onElementUpdate
-      $scope.$watch 'property', onPropertyUpdate
-
 
       refreshElement = () ->
         if $scope.element
@@ -299,13 +300,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
-
         $scope.property = params.property
-
-        loadTab(params.property)
 
       # init
       onElementUpdate($scope.element)
+
+      # watches
+      $scope.$watch 'element', onElementUpdate
+      $scope.$watch 'property', onPropertyUpdate
     ]
   }
 ]
