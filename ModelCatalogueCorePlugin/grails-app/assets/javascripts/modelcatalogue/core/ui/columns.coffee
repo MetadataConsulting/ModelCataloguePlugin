@@ -4,7 +4,7 @@ angular.module('mc.core.ui.columns', []).provider 'columns', ->
     {header: "ID",          value: 'id',          class: 'col-md-2', show: true}
     {header: "Name",        value: 'name',        class: 'col-md-4', show: true}
     {header: "Description", value: 'description', class: 'col-md-6'}
-    {header: "Type", value: 'elementTypeName', class: 'col-md-6'}
+    {header: "Type", value: 'getElementTypeName()', class: 'col-md-6'}
   ]
 
   registerColumns = (type, cols) ->

@@ -83,9 +83,9 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
                     $scope.messages.error err.message
                 else
                   if args?.create
-                    messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
+                    messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
                   else
-                    messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
+                    messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
                   $modalInstance.close(enhance result)
               ).error((data) ->
                 for err in data.errors
@@ -103,9 +103,9 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
 
               promise.then (result) ->
                 if args?.create
-                  messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
+                  messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
                 else
-                  messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
+                  messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
                 $modalInstance.close(enhance result)
               , (response) ->
                 for err in response.data.errors

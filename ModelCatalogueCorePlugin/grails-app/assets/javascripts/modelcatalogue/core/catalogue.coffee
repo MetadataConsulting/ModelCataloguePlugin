@@ -50,6 +50,7 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
       supertype = names.getPropertyNameFromType(supertype)
       return true if type == supertype
       supertypes = readMetadata(type, 'supertypes')
+      return false if not supertypes
       for theSuperType in supertypes
         return true if theSuperType == supertype
       return false

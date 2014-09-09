@@ -48,7 +48,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   actionsProvider.registerAction 'resolveAll', ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
     return undefined unless $scope.element
-    return undefined unless $scope.element.elementTypeName == 'Data Import'
+    return undefined unless $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
     action = {
     position:   1000
@@ -68,7 +68,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   actionsProvider.registerAction 'ingestQueue', ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
     return undefined unless $scope.element
-    return undefined unless $scope.element.elementTypeName == 'Data Import'
+    return undefined unless $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
     action = {
       position:   1000
@@ -89,7 +89,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   actionsProvider.registerAction 'edit-catalogue-element', ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
     return undefined if not $scope.element
-    return undefined if $scope.element.elementTypeName == 'Data Import'
+    return undefined if $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
 
     action =
@@ -99,7 +99,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:       'primary'
       disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
       action:     ->
-        messages.prompt('Edit ' + $scope.element.elementTypeName, '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
+        messages.prompt('Edit ' + $scope.element.getElementTypeName(), '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
           $scope.element = updated
 
     updateAction = ->
@@ -125,7 +125,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     icon:       'glyphicon glyphicon-circle-arrow-up'
     type:       'primary'
     action:     ->
-      messages.confirm('Do you want to create new version?', "New version will be created for #{$scope.element.elementTypeName} #{$scope.element.name}").then ->
+      messages.confirm('Do you want to create new version?', "New version will be created for #{$scope.element.getElementTypeName()} #{$scope.element.name}").then ->
         catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true}).then (updated) ->
           $scope.element = updated
           messages.success("New version created for #{$scope.element.name}")
@@ -153,7 +153,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:       'glyphicon glyphicon-check'
       type:       'primary'
       action:     ->
-        messages.confirm("Do you want to finalize #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be finalized").then ->
+        messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be finalized").then ->
           $scope.element.status = 'FINALIZED'
           catalogueElementResource($scope.element.elementType).update($scope.element).then (updated) ->
             $scope.element = updated
@@ -182,7 +182,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:       'glyphicon glyphicon-compressed'
       type:       'danger'
       action:     ->
-        messages.confirm("Do you want to archive #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be archived").then ->
+        messages.confirm("Do you want to archive #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
             $scope.element = archived
     }
@@ -207,10 +207,10 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:       'glyphicon glyphicon-remove'
       type:       'danger'
       action:     ->
-        messages.confirm("Do you really want to delete #{$scope.element.elementTypeName} #{$scope.element.name} ?", "The #{$scope.element.elementTypeName} #{$scope.element.name} will be deleted permanently. This action cannot be undone.").then ->
+        messages.confirm("Do you really want to delete #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be deleted permanently. This action cannot be undone.").then ->
           $scope.element.delete()
           .then ->
-            messages.success "#{$scope.element.elementTypeName} #{$scope.element.name} deleted."
+            messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
             $state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
           .catch (response) ->
             if response.data.errors
@@ -237,7 +237,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerAction 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.isInstanceOf('org.modelcatalogue.core.CatalogueElement')
-    return undefined if $scope.element.elementTypeName == 'Data Import'
+    return undefined if $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
 
     action = {
@@ -296,7 +296,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     if $scope.list
       return undefined if $scope.resource == 'import'
     if $scope.element
-      return undefined if $scope.element.elementTypeName == 'Data Import'
+      return undefined if $scope.element.isInstanceOf 'dataImport'
     {
     position:   1000
     label:      'Export'

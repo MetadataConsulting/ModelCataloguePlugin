@@ -10,8 +10,14 @@ names = {
 
   getPropertyNameFromType: (type) ->
     return null if not type
-    simpleName = if type.indexOf('.') > -1 then type.substring(type.lastIndexOf('.') + 1) else type
-    propertyNamesFromTypes[type] = propertyNamesFromTypes[type] ? simpleName[0].toLowerCase() + simpleName[1..-1]
+    cached = propertyNamesFromTypes[type]
+    return cached if cached
+    simpleName = type
+    simpleName = simpleName.substring(simpleName.lastIndexOf('.') + 1)  if simpleName.indexOf('.') > -1
+    # javassist fix
+    simpleName = simpleName.substring(0, simpleName.indexOf('_'))       if simpleName.indexOf('_') > -1
+    simpleName = simpleName[0].toLowerCase() + simpleName[1..-1]
+    propertyNamesFromTypes[type] = simpleName
 
   getPropertyNameFromQualifier: (type) ->
     return null if not type

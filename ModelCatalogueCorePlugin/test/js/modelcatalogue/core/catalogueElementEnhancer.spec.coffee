@@ -2,6 +2,7 @@ describe "mc.core.catalogueElementEnhancer", ->
 
   beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.catalogueElementEnhancer'
+  beforeEach module 'mc.core.ui.bs.catalogue'
 
   xit "changes the state on show() method", inject (enhance, $rootScope, $httpBackend, modelCatalogueApiRoot) ->
     $httpBackend

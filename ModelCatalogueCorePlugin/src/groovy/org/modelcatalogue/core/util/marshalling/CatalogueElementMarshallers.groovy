@@ -34,8 +34,6 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 description: el.description,
                 version: el.version,
                 elementType: el.class.name,
-                elementTypes: CatalogueElementFinder.getAllTypesNames(el.class),
-                elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",

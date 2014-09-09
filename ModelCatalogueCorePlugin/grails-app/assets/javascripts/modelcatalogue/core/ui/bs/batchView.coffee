@@ -4,7 +4,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
       <span class="pull-right">
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
-      <h3 class="ce-name">{{batch.name}} <small ng-show="batch.elementTypeName"><span class="label" ng-show="batch.archived" ng-class="{'label-danger': batch.archived}">{{batch.status}}</span> (created {{batch.dateCreated | date:'short'}})</small></h3>
+      <h3 class="ce-name">{{batch.name}} <small ng-show="batch.getElementTypeName()"><span class="label" ng-show="batch.archived" ng-class="{'label-danger': batch.archived}">{{batch.status}}</span> (created {{batch.dateCreated | date:'short'}})</small></h3>
       <blockquote class="ce-description" ng-show="batch.description" ng-bind-html="'' + batch.description | linky:'_blank'"></blockquote>
       <div class="row">
         <div class="col-md-6 pending-actions">
