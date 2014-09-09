@@ -144,6 +144,9 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
             for (String header in headers) {
                 def element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.FINALIZED)
                 if (!element) {
+                    element = DataElement.findByModelCatalogueId(header)
+                }
+                if (!element) {
                     if (header.contains('_')) {
                         element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.FINALIZED)
                     } else {
@@ -163,7 +166,13 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
                 if (element) {
                     elements << element
                 } else {
-                    elements << header
+                    def searchResult = modelCatalogueSearchService.search(DataElement, [search: header])
+                    // only if we have single hit
+                    if (searchResult.total == 1) {
+                        elements << searchResult.searchResults[0]
+                    } else {
+                        elements << header
+                    }
                 }
             }
 

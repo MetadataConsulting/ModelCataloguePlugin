@@ -188,6 +188,8 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
                   value = {name: value.element, create: true}
                 else
                   value.name = value.element.name
+                  value.elementType = value.element.elementType
+                  value.id = value.element.id
                 $scope.dataElements.push value
 
         ]

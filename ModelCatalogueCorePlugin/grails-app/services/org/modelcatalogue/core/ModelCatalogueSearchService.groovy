@@ -69,13 +69,36 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 or {
                     ilike('name', query)
                     ilike('description', query)
+                    ilike('modelCatalogueId', query)
+                    extensions {
+                        ilike('extensionValue', query)
+                    }
                 }
             }
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
+        } else if (ExtendibleElement.isAssignableFrom(resource)) {
+            DetachedCriteria criteria = new DetachedCriteria(resource)
+            criteria.or {
+                ilike('name', query)
+                ilike('description', query)
+                ilike('modelCatalogueId', query)
+                extensions {
+                    ilike('extensionValue', query)
+                }
+            }
+
+            searchResults.searchResults = criteria.list(params)
+            searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
-            searchResults.searchResults = resource.findAllByNameIlikeOrDescriptionIlike(query, query, params)
-            searchResults.total = resource.countByNameIlikeOrDescriptionIlike(query, query, params)
+            DetachedCriteria criteria = new DetachedCriteria(resource)
+            criteria.or {
+                ilike('name', query)
+                ilike('description', query)
+                ilike('modelCatalogueId', query)
+            }
+            searchResults.searchResults = criteria.list(params)
+            searchResults.total = criteria.count()
         } else if (RelationshipType.isAssignableFrom(resource)) {
             searchResults.searchResults = resource.findAllByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query, params)
             searchResults.total = resource.countByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query, params)
