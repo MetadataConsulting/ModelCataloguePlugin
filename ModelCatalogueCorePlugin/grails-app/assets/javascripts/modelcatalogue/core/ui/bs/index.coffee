@@ -27,6 +27,7 @@
 #= require modalPromptBasicEdit
 #= require modalPromptCsvHeaders
 #= require modalPromptLogin
+#= require modalPromptForCatalogueElement
 #= require modalPromptMeasurementUnitEdit
 #= require modalPromptActionParametersEdit
 #= require modalPromptValueDomainEdit
@@ -67,6 +68,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptCsvHeaders'
   'mc.core.ui.bs.modalPromptNewRelationship'
   'mc.core.ui.bs.modalPromptNewImport'
+  'mc.core.ui.bs.modalPromptForCatalogueElement'
   'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'
   'mc.core.ui.bs.modalPromptLogin'

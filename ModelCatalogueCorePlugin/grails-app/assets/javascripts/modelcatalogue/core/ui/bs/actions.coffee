@@ -720,6 +720,33 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
+  actionsProvider.registerAction 'filter-by-classification', ['$scope', '$state', '$stateParams', 'messages', 'catalogueElementResource', 'catalogue', ($scope, $state, $stateParams, messages, catalogueElementResource, catalogue) ->
+    return undefined unless $scope.list and not $scope.element and catalogue.isInstanceOf($scope.list.itemType, 'publishedElement')
 
+    action = {
+      position:   100
+      label:      'Filter by Classification'
+      icon:       'fa fa-tag'
+      type:       'success'
+      active:     $stateParams.classification?
+      action: ->
+        if action.active
+          newParams = angular.copy($stateParams)
+          newParams.classification = undefined
+          $state.go 'mc.resource.list', newParams
+        else
+          messages.prompt('Filter by Classification', 'Please, select classification you want to filter results by.', {type: 'catalogue-element', resource: 'classification'}).then (classification)->
+            return unless classification or angular.isString(classification)
+            newParams = angular.copy($stateParams)
+            newParams.classification = classification.id
+            $state.go 'mc.resource.list', newParams
+    }
+
+    if $stateParams.classification
+      catalogueElementResource('classification').get($stateParams.classification).then (c)->
+        action.label = "Filtered by #{c.name}"
+
+    action
+  ]
 
 ]

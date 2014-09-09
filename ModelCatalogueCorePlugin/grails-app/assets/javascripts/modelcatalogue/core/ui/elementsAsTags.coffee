@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.elementsAsTags', []).directive 'elementsAsTags',  [-> {
+angular.module('mc.core.ui.elementsAsTags', ['mc.util.names', 'ui.router']).directive 'elementsAsTags',  [-> {
     restrict: 'E'
     replace: true
     scope:
