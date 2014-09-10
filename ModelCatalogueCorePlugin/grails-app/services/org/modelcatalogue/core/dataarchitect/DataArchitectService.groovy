@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
@@ -14,6 +15,7 @@ class DataArchitectService {
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
         Lists.fromCriteria(params, DataElement) {
+            'in'('status', PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED)
             isNull 'valueDomain'
         }
     }
