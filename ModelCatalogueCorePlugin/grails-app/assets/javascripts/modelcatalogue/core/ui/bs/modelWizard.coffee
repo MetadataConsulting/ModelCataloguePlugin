@@ -316,7 +316,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               angular.forEach result, (element) ->
                 value = {element : element}
                 if angular.isString(value.element)
-                  value = {name: value.element, create: true}
+                  value = {name: value.element, create: true, element: value.element}
                 else
                   value.name = value.element.name
                   value.elementType = value.element.elementType
