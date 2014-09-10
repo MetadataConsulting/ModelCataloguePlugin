@@ -1,13 +1,4 @@
-classificationWizard = angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages'])
-
-#http://stackoverflow.com/questions/14833326/how-to-set-focus-on-input-field-in-angularjs
-classificationWizard.directive 'focusMe', ['$timeout', '$parse', ($timeout, $parse) -> {
-  link: (scope, element, attrs) ->
-    scope.$watch $parse(attrs.focusMe), (value) ->
-      $timeout (-> element[0].focus()) if value
-}]
-
-classificationWizard.config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
     (title, body, args) ->
 
@@ -21,7 +12,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
         #language=HTML
         template: '''
         <div class="modal-header">
-            <button type="button" class="close" ng-click="$dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
+            <button type="button" class="close" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
             <h4>Classification Wizard</h4>
             <ul class="tutorial-steps">
               <li>
@@ -63,12 +54,16 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element) || isString(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                 </div>
               </form>
-            </tab>
+              <div>
+                <alert type="'info'">
+                  <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link" ng-click="importFromCSV()">CSV file headers</a>.
+                </alert>
+              </div>
           </div>
           <div ng-switch-when="summary" id="summary">
               <h4 ng-show="classification.name &amp;&amp;  finished">Classification <strong>{{classification.name}} created</strong></h4>
@@ -79,7 +74,7 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', ($scope, $state, $window, messages, names, catalogueElementResource) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$q', '$modalInstance', ($scope, $state, $window, messages, names, catalogueElementResource, $q, $modalInstance) ->
           $scope.reset = ->
             $scope.classification = {classifies:{}}
             $scope.dataElement = {}
@@ -100,8 +95,14 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             angular.isString object
 
           $scope.push = (arrayName, propertyName) ->
-            $scope[propertyName].name = $scope[propertyName].element.name
-            $scope[arrayName].push $scope[propertyName]
+            value = $scope[propertyName]
+
+            if angular.isString(value.element)
+              value = {name: value.element, create: true}
+            else
+              value.name = value.element.name
+
+            $scope[arrayName].push value
             $scope[propertyName] = {}
 
           $scope.openElementInNewWindow = (element) ->
@@ -113,13 +114,23 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             return if $scope.finishInProgress
             $scope.finishInProgress = true
 
-            $scope.classification.classifies = $scope.dataElements
-
             $scope.step = 'summary'
 
-            promise = catalogueElementResource('classification').save($scope.classification)
+            promise = $q.when {}
 
-            promise.then (classification) ->
+            angular.forEach $scope.dataElements, (element, i)->
+              unless element.element and element.name
+                promise = promise.then ->
+                  catalogueElementResource('dataElement').save({name: element.name}).then (newElement) ->
+                    $scope.dataElements[i] = newElement
+              else
+                $scope.dataElements[i] = element.element
+
+            promise = promise.then ->
+              $scope.classification.classifies = $scope.dataElements
+              catalogueElementResource('classification').save($scope.classification)
+
+            promise = promise.then (classification) ->
                 messages.success "Classification #{classification.name} created"
                 $scope.finished = true
                 classification.show()
@@ -151,6 +162,26 @@ classificationWizard.config ['messagesProvider', (messagesProvider)->
             $scope.select(step) if $event.keyCode == key
 
           $scope.select('classification')
+
+          $scope.dismiss = (reason) ->
+            return $modalInstance.dismiss(reason) if $scope.finished
+            if $scope.classification.name or $scope.dataElements.length > 0
+              messages.confirm("Close Classification Wizard", "Do you want to discard all changes?").then ->
+                $modalInstance.dismiss(reason)
+            else
+              $modalInstance.dismiss(reason)
+
+          $scope.importFromCSV = ->
+            messages.prompt("Import Data Elements", null, {type: 'data-element-suggestions-from-csv'}).then (result) ->
+              angular.forEach result, (element) ->
+                value = {element : element}
+                if angular.isString(value.element)
+                  value = {name: value.element, create: true}
+                else
+                  value.name = value.element.name
+                  value.elementType = value.element.elementType
+                  value.id = value.element.id
+                $scope.dataElements.push value
 
         ]
 

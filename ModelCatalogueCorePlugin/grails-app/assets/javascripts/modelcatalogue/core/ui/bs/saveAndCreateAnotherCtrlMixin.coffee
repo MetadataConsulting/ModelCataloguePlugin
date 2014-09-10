@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'saveAndCreateAnotherCtrlMixin', ['$scope', '$modalInstance', 'messages', 'catalogueElementResource',  ($scope, $modalInstance, messages, catalogueElementResource) ->
+angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'saveAndCreateAnotherCtrlMixin', ['$scope', '$modalInstance', 'messages', 'catalogueElementResource', '$q',  ($scope, $modalInstance, messages, catalogueElementResource, $q) ->
   $scope.newEntity ?= -> {}
 
   if $scope.create
@@ -9,6 +9,7 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
 
   $scope.saveElement ?= (newVersion) ->
      $scope.save(newVersion).then (result)->
+       result.show() if result.show
        $modalInstance.close(result)
 
   $scope.hasChanged ?= ->
@@ -24,25 +25,26 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
 
   $scope.save ?= (newVersion) ->
     $scope.messages.clearAllMessages()
-    $scope.beforeSave()
+
+    promise = $q.when $scope.beforeSave()
 
     return unless $scope.validate()
 
-    promise = null
 
     if $scope.create
-      promise = catalogueElementResource($scope.create).save($scope.copy)
+      promise = promise.then -> catalogueElementResource($scope.create).save($scope.copy)
     else
-      promise = catalogueElementResource($scope.copy.elementType).update($scope.copy, {newVersion: newVersion})
+      promise = promise.then -> catalogueElementResource($scope.copy.elementType).update($scope.copy, {newVersion: newVersion})
 
     promise.then (result) ->
       if $scope.create
-        messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
+        messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
       else
-        messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
+        messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
       result
     , (response) ->
       for err in response.data.errors
         $scope.messages.error err.message
+      $q.reject response
 
 ]

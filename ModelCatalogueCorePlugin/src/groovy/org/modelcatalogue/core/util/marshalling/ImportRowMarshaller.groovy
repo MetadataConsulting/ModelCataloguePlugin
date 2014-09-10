@@ -14,7 +14,6 @@ class ImportRowMarshaller extends AbstractMarshallers {
         def ret = [
                 id: el.id,
                 elementType: el.class.name,
-                elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 conceptualDomainDescription: el.conceptualDomainDescription,
                 conceptualDomainName: el.conceptualDomainName,
                 containingModelCode: el.containingModelCode,

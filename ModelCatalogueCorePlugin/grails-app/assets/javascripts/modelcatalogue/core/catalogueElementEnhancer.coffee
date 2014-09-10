@@ -1,4 +1,4 @@
-angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot']).config [ 'enhanceProvider', (enhanceProvider) ->
+angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue']).config [ 'enhanceProvider', (enhanceProvider) ->
   commaSeparatedList = (things)->
     names = []
     angular.forEach(things, (thing)->
@@ -7,13 +7,13 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     names.join(', ')
 
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance) ->
+  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', 'catalogue', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, catalogue) ->
     (element) ->
       class CatalogueElement
         constructor: (element) ->
           angular.extend(@, element)
 
-          @defaultExcludes = ['id','elementTypeName', 'elementType', 'elementTypes', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
+          @defaultExcludes = ['id','elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
           @getUpdatePayload = () ->
             payload = {}
             for name in @updatableProperties
@@ -43,30 +43,35 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
           self.update         = () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload()
           self.show           = () ->
-            if self.elementType == "org.modelcatalogue.core.actions.Batch"
+            if self.isInstanceOf "batch"
               $state.go('mc.actions.show', {id: self.id}); self
-            else if self.elementTypeName == "Data Import"
+            else if self.isInstanceOf "dataImport"
               $state.go('mc.dataArchitect.imports.show', {id: self.id}); self
             else
               $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}); self
 
 
           self.isInstanceOf   = (type) ->
-            return false  if not type?
-            return false  if not self.elementTypes
-            return type in self.elementTypes
+            catalogue.isInstanceOf @elementType, type
 
           self.getLabel = ->
               if @classifications? && @classifications.length > 0
                 classificationNames = commaSeparatedList(@classifications)
-                return "#{@name} (#{@elementTypeName} in #{classificationNames})"
+                return "#{@name} (#{@getElementTypeName()} in #{classificationNames})"
               else if(@conceptualDomains? && @conceptualDomains.length>0)
                 conceptualDomains = commaSeparatedList(@conceptualDomains)
-                return "#{@name} (#{@elementTypeName} in #{conceptualDomains})"
-              else if (@elementTypeName?)
-                return "#{@name} (#{@elementTypeName})"
+                return "#{@name} (#{@getElementTypeName()} in #{conceptualDomains})"
+              else if (@elementType?)
+                return "#{@name} (#{@getElementTypeName()})"
               else
                 return @name
+
+          self.getIcon = ->
+            catalogue.getIcon(@elementType)
+
+          self.getElementTypeName = ->
+            return @elementTypeName if @elementTypeName
+            @elementTypeName = names.getNaturalName(names.getPropertyNameFromType(@elementType))
 
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)

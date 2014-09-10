@@ -1,8 +1,8 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
-import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
+import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 
 class RelationshipService {
@@ -10,8 +10,7 @@ class RelationshipService {
     static transactional = true
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type)
-        new ListAndCount(list: criteria.list([sort: 'id'] << params), count: criteria.count())
+        Lists.fromCriteria([sort: 'id'] << params, direction.composeWhere(element, type))
     }
 
 

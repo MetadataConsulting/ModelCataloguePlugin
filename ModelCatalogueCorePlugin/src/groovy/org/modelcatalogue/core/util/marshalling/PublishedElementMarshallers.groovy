@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.XML
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.Classification
 
 /**
  * Created by ladin on 14.02.14.
@@ -17,7 +18,7 @@ abstract class PublishedElementMarshallers extends ExtendibleElementMarshallers 
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
         ret.putAll(
-                classifications: el.classifications,
+                classifications: el.classifications.collect(CatalogueElementMarshallers.&minimalCatalogueElementJSON),
                 versionNumber: el.versionNumber,
                 status: el.status.toString(),
                 versionCreated: el.versionCreated,

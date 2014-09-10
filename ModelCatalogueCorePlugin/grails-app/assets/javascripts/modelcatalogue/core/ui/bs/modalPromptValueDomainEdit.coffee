@@ -17,7 +17,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
               <div class="form-group">
                 <label for="conceptualDomain"> Conceptual Domains</label>
                 <elements-as-tags elements="copy.conceptualDomains"></elements-as-tags>
-                <input id="conceptualDomain" placeholder="Conceptual Domain" ng-model="conceptualDomain" catalogue-element-picker="conceptualDomain" label="el.name" typeahead-on-select="copy.conceptualDomains.push(conceptualDomain);conceptualDomain = null">
+                <input id="conceptualDomain" placeholder="Conceptual Domain" ng-model="pending.conceptualDomain" catalogue-element-picker="conceptualDomain" label="el.name" typeahead-on-select="copy.conceptualDomains.push(pending.conceptualDomain);pending.conceptualDomain = null">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -50,15 +50,34 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
           <contextual-actions></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->
-          $scope.newEntity      = -> {conceptualDomains: []}
+        controller: ['$scope', 'messages', '$controller', '$modalInstance', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, catalogueElementResource) ->
+          $scope.newEntity      = -> {conceptualDomains: $scope.copy?.conceptualDomains ? []}
           $scope.copy           = angular.copy(args.element ? $scope.newEntity())
           $scope.original       = args.element ? $scope.newEntity()
           $scope.messages       = messages.createNewMessages()
+          $scope.pending        = {}
           $scope.create         = args.create
           $scope.ruleCollapsed  = true
 
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
+
+          $scope.beforeSave = ->
+            promise = $q.when {}
+
+            if angular.isString($scope.pending.conceptualDomain)
+              promise = promise.then -> catalogueElementResource('conceptualDomain').save({name: $scope.pending.conceptualDomain}).then (newDomain) ->
+                $scope.copy.conceptualDomains.push newDomain
+                $scope.pending.conceptualDomain = null
+
+            if angular.isString($scope.copy.dataType)
+              promise = promise.then -> catalogueElementResource('dataType').save({name: $scope.copy.dataType}).then (newType) ->
+                $scope.copy.dataType = newType
+
+            if angular.isString($scope.copy.unitOfMeasure)
+              promise = promise.then -> catalogueElementResource('measurementUnit').save({name: $scope.copy.unitOfMeasure}).then (newUnit) ->
+                $scope.copy.unitOfMeasure = newUnit
+
+            promise
 
           $scope.hasChanged   = ->
             return true if $scope.copy.name != $scope.original.name

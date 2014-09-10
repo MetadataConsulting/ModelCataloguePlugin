@@ -4,11 +4,10 @@ import grails.converters.XML
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeService
-import org.modelcatalogue.core.SecurityService
-import org.modelcatalogue.core.reports.ReportDescriptor
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementFinder
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,8 +34,6 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 description: el.description,
                 version: el.version,
                 elementType: el.class.name,
-                elementTypes: CatalogueElementFinder.getAllTypesNames(el.class),
-                elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
@@ -140,7 +137,6 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         addXmlAttribute(el.lastUpdated, "lastUpdated", xml)
         addXmlAttribute("/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id", "link", xml)
         addXmlAttribute(el.class.name, "elementType", xml)
-        addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }
 
     private static Closure addRelationsJson(String incomingOrOutgoing, CatalogueElement el, Map ret, Map<String, RelationshipType> types) {
@@ -182,6 +178,12 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 "${name}" relation
             }
         }
+    }
+
+
+    static Map<String, Object> minimalCatalogueElementJSON(CatalogueElement element) {
+        if (!element) return null
+        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id"]
     }
 
 }

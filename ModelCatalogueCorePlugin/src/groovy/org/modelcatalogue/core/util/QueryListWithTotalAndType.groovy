@@ -34,7 +34,7 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     }
 
     public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery, Map<String, Object> arguments){
-        if (!countQuery.trim().startsWith("select count(")) {
+        if (!countQuery.trim().toLowerCase().startsWith("select count(")) {
             throw new IllegalArgumentException("Query must start with 'select count(<alias>)' but was ${countQuery.trim()}")
         }
         new QueryListWithTotalAndType<T>(listQuery, countQuery, type, new HashMap(params), arguments)

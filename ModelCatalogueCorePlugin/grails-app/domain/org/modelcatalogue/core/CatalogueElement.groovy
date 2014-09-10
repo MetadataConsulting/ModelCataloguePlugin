@@ -44,6 +44,9 @@ abstract class CatalogueElement {
         name size: 1..255
         description nullable: true, maxSize: 2000
 		modelCatalogueId bindable: false, nullable: true, unique: true, maxSize: 255, matches: '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
+        dateCreated bindable: false
+        lastUpdated bindable: false
+        archived bindable: false
     }
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
@@ -56,6 +59,7 @@ abstract class CatalogueElement {
     }
 
     static mapping = {
+        tablePerHierarchy false
         sort "name"
         description type: "text"
     }
@@ -76,29 +80,29 @@ abstract class CatalogueElement {
     }
 
     List getIncomingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).list.collect { it.source }
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).items.collect { it.source }
     }
 
     List getOutgoingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).list.collect { it.destination }
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).items.collect { it.destination }
     }
 
     Long countIncomingRelations() {
         CatalogueElement refreshed = getClass().get(this.id)
         if (!refreshed) return 0
-        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, refreshed).count
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, refreshed).total
     }
 
     Long countOutgoingRelations() {
         CatalogueElement refreshed = getClass().get(this.id)
         if (!refreshed) return 0
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, refreshed).count
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, refreshed).total
     }
 
     Long countRelations() {
         CatalogueElement refreshed = getClass().get(this.id)
         if (!refreshed) return 0
-        relationshipService.getRelationships([:], RelationshipDirection.BOTH, refreshed).count
+        relationshipService.getRelationships([:], RelationshipDirection.BOTH, refreshed).total
     }
 
 

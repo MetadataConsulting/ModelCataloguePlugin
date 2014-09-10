@@ -4,10 +4,21 @@ import org.modelcatalogue.core.util.Lists
 
 class ValueDomainController extends AbstractExtendibleElementController<ValueDomain> {
 
+    def dataArchitectService
+
     ValueDomainController() {
         super(ValueDomain, false)
     }
 
+    @Override
+    def index(Integer max) {
+        if (params.status == 'incomplete') {
+            handleParams(max)
+            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.incompleteValueDomains(params))
+            return
+        }
+        super.index(max)
+    }
 
     def dataElements(Integer max){
         handleParams(max)

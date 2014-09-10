@@ -17,7 +17,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
   getClassificationsForDataElement = (dataElement) ->
     classificationNames = for classification in dataElement.classifications
-      "<a href='#/catalogue/conceptualDomain/#{classification.id}'>#{classification.name}</a>"
+      "<a href='#/catalogue/classification/#{classification.id}'>#{classification.name}</a>"
     classificationNames.join(', ')
 
 #  getConceptualDomainsForDataElement = (dataElement) ->
@@ -84,7 +84,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   columnsProvider.registerColumns 'org.modelcatalogue.core.Mapping', [
     {header: 'Destination',     value: "destination.name",                                    classes: 'col-md-4', show: 'destination.show()', sort: {property: 'destination.name', type: 'alphabet'}}
     {header: 'Mapping',         value: 'mapping',                                             classes: 'col-md-5'}
-    {header: 'Identification',  value: "destination.elementTypeName + ': ' + destination.id", classes: 'col-md-3', show: 'destination.show()'}
+    {header: 'Identification',  value: "destination.getElementTypeName() + ': ' + destination.id", classes: 'col-md-3', show: 'destination.show()'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.MeasurementUnit', [

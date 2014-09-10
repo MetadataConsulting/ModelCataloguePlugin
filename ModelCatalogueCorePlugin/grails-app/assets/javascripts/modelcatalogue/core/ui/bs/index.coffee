@@ -15,6 +15,7 @@
 #= require propertiesPane
 #= require actions
 #= require columns
+#= require catalogue
 #= require columnsConfiguration
 #= require messagesPanel
 #= require modalConfirm
@@ -24,7 +25,9 @@
 #= require simpleObjectEditor
 #= require modalPromptAssetEdit
 #= require modalPromptBasicEdit
+#= require modalPromptCsvHeaders
 #= require modalPromptLogin
+#= require modalPromptForCatalogueElement
 #= require modalPromptMeasurementUnitEdit
 #= require modalPromptActionParametersEdit
 #= require modalPromptValueDomainEdit
@@ -57,12 +60,15 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.propertiesPane'
   'mc.core.ui.bs.actions'
   'mc.core.ui.bs.columns'
+  'mc.core.ui.bs.catalogue'
   'mc.core.ui.bs.columnsConfiguration'
   'mc.core.ui.bs.messagesPanel'
   'mc.core.ui.bs.modalConfirm'
   'mc.core.ui.bs.modalPrompt'
+  'mc.core.ui.bs.modalPromptCsvHeaders'
   'mc.core.ui.bs.modalPromptNewRelationship'
   'mc.core.ui.bs.modalPromptNewImport'
+  'mc.core.ui.bs.modalPromptForCatalogueElement'
   'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'
   'mc.core.ui.bs.modalPromptLogin'

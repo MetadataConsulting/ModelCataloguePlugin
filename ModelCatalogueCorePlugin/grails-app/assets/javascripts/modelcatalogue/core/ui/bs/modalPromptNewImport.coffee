@@ -83,7 +83,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
                 $modalInstance.close()
               else
                 if args?.create
-                  messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
+                  messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
                   $modalInstance.close(enhance result)
             ).error((data) ->
               for err in data.errors

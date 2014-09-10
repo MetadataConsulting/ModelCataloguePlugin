@@ -31,6 +31,8 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
   compile: (element, attrs) ->
     label = if attrs.label then attrs.label else 'null'
     element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, '" + (attrs.catalogueElementPicker ? '') + "', '" + (attrs.resource ? '') + "')" )
+    element.attr('autocomplete', "off")
+    element.attr('typeahead-wait-ms', "500") unless element.attr('typeahead-wait-ms')
     element.removeAttr('catalogue-element-picker')
     element.removeAttr('catalogueElementPicker')
     element.removeAttr('data-catalogue-element-picker')

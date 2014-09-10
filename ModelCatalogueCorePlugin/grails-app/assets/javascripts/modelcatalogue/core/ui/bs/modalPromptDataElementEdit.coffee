@@ -10,6 +10,10 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
         windowClass: 'basic-edit-modal-prompt'
         resolve:
           args: -> args
+          classificationInUse: ['$stateParams', 'catalogueElementResource',  ($stateParams, catalogueElementResource)->
+            return undefined if not $stateParams.classification
+            catalogueElementResource('classification').get($stateParams.classification)
+          ]
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>
@@ -20,7 +24,7 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
               <div class="form-group">
                 <label for="classification"> Classifications</label>
                 <elements-as-tags elements="copy.classifications"></elements-as-tags>
-                <input id="classification-{{$index}}" placeholder="Classification" ng-model="classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(classification);classification = null">
+                <input id="classification-{{$index}}" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(pending.classification);pending.classification = null">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>

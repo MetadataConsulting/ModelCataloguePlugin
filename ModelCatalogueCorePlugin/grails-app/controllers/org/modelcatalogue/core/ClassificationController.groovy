@@ -1,11 +1,7 @@
 package org.modelcatalogue.core
 
-import org.hibernate.Criteria
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.PublishedElements
-import org.modelcatalogue.core.util.Relationships
-import org.modelcatalogue.core.util.SimpleListWrapper
-
 
 class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
 
@@ -37,7 +33,7 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
                 domain.removeFromClassifications(instance)
             }
             for (domain in objectToBind.classifies) {
-                PublishedElement publishedElement = PublishedElement.get(domain.element.id as Long)
+                PublishedElement publishedElement = PublishedElement.get(domain.id as Long)
                 instance.addToClassifies publishedElement
                 publishedElement.addToClassifications instance
             }

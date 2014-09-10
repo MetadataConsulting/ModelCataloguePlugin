@@ -46,7 +46,6 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.co
       dialog.result
   ]
 
-  messagesProvider.setPromptFactory 'edit-dataType', factory
   messagesProvider.setPromptFactory 'edit-conceptualDomain', factory
   messagesProvider.setPromptFactory 'edit-classification', factory
   messagesProvider.setPromptFactory 'edit-batch', factory

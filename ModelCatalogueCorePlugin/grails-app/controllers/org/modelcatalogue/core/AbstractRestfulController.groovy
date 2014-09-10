@@ -293,7 +293,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      */
     protected void reportCapableRespond(Object param, Map args) {
         if (modelCatalogueSecurityService.isUserLoggedIn() && params.format == 'xml' && params.boolean('asset')) {
-            Asset asset = renderXMLAsAsset (param as XML)
+            Asset asset = renderXMLAsAsset(param)
 
             webRequest.currentResponse.with {
                 def location = g.createLink(controller: 'asset', id: asset.id, action: 'show')
@@ -307,7 +307,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
     }
 
-    protected Asset renderXMLAsAsset(XML xml) {
+    protected Asset renderXMLAsAsset(object) {
         String theName = (params.name ?: params.action)
 
         String uri = request.forwardURI + '?' + request.queryString
@@ -330,7 +330,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 Asset updated = Asset.get(id)
 
                 assetService.storeAssetWithSteam(updated, 'application/xml') { OutputStream out ->
-                    xml.render(new OutputStreamWriter(out, 'UTF-8'))
+                    (object as XML).render(new OutputStreamWriter(out, 'UTF-8'))
                 }
 
                 updated.status = PublishedElementStatus.FINALIZED

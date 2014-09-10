@@ -12,7 +12,7 @@ class DataElementMarshaller extends PublishedElementMarshallers {
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
-        ret.putAll valueDomain: el.valueDomain
+        ret.putAll valueDomain: minimalCatalogueElementJSON(el.valueDomain)
         ret
     }
 

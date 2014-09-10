@@ -9,6 +9,7 @@
 #= require actionButtonDropdown
 #= require applicationTitle
 #= require contextualActions
+#= require focusMe
 
 angular.module 'mc.util.ui', [
   # dependencies
@@ -21,6 +22,7 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.showIfLoggedIn'
   'mc.util.ui.contextualActions'
   'mc.util.ui.actions'
+  'mc.util.ui.focusMe'
   'mc.util.ui.actionButtonSingle'
   'mc.util.ui.actionButtonDropdown'
   'mc.util.ui.applicationTitle'

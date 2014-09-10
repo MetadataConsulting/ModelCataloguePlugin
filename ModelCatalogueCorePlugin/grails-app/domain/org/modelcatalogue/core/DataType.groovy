@@ -27,6 +27,7 @@ class DataType extends CatalogueElement {
     }
 
     static mapping = {
+        tablePerHierarchy false
         relatedValueDomains cascade: "all-delete-orphan"
     }
 

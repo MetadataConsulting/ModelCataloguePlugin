@@ -6,7 +6,7 @@ angular.module('mc.core.ui.bs.importView', ['mc.core.ui.importView', 'mc.core.ui
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
      </span>
 
-          <h3 class="ce-name">{{element.name}} <small ng-show="element.elementTypeName">({{element.elementTypeName}}: {{element.id}})</small></h3>
+          <h3 class="ce-name">{{element.name}} <small ng-show="element.getElementTypeName()">({{element.getElementTypeName()}}: {{element.id}})</small></h3>
           <blockquote class="ce-description" ng-show="element.description">{{element.description}}</blockquote>
           <tabset ng-show="showTabs">
             <tab heading="{{tab.heading}}" disabled="tab.disabled" ng-repeat="tab in tabs" active="tab.active" select="select(tab)">

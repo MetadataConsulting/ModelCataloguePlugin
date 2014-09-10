@@ -20,6 +20,11 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
 
         reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', PublishedElementService.getStatusFromParams(params)
+            if (params.classification) {
+                classifications {
+                    eq 'id', params.long('classification')
+                }
+            }
         }
     }
 

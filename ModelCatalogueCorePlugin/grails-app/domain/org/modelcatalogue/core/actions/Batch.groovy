@@ -5,8 +5,6 @@ package org.modelcatalogue.core.actions
  */
 class Batch {
 
-    static searchable = true
-
     String name
     String description
 

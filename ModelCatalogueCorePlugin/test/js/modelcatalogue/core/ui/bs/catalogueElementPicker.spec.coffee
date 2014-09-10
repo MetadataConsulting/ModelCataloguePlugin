@@ -8,7 +8,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.element = catEl
 
     element = $compile('''
-        <input ng-model="element" catalogue-element-picker>
+        <input ng-model="element" catalogue-element-picker typeahead-wait-ms="0">
       ''')($rootScope)
 
     $rootScope.$digest()
@@ -30,7 +30,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.element = catEl
 
     element = $compile('''
-        <input ng-model="element" catalogue-element-picker label="el.name">
+        <input ng-model="element" catalogue-element-picker label="el.name" typeahead-wait-ms="0">
       ''')($rootScope)
 
     $rootScope.$digest()
@@ -45,7 +45,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.element = catEl
 
     element = $compile('''
-          <input ng-model="element" catalogue-element-picker="valueDomain">
+          <input ng-model="element" catalogue-element-picker="valueDomain" typeahead-wait-ms="0">
         ''')($rootScope)
 
     $rootScope.$digest()
@@ -67,7 +67,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.resource = 'valueDomain'
 
     element = $compile('''
-          <input ng-model="element" catalogue-element-picker resource="resource">
+          <input ng-model="element" catalogue-element-picker resource="resource" typeahead-wait-ms="0">
         ''')($rootScope)
 
     $rootScope.$digest()

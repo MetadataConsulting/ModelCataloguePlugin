@@ -27,7 +27,6 @@ class BatchMarshaller extends AbstractMarshallers {
                 description: el.description,
                 version: el.version,
                 elementType: el.class.name,
-                elementTypeName: GrailsNameUtils.getNaturalName(el.class.simpleName),
                 archived: el.archived,
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
@@ -57,7 +56,6 @@ class BatchMarshaller extends AbstractMarshallers {
         addXmlAttribute("/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id", "link", xml)
         addXmlAttribute(el.class.name, "elementType", xml)
         addXmlAttribute(el.archived, "archived", xml)
-        addXmlAttribute(GrailsNameUtils.getNaturalName(el.class.simpleName), "elementTypeName", xml)
     }
 
 }

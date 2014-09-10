@@ -11,8 +11,10 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
     compile: recursiveCompile.compile
 
-    controller: ['$scope', '$rootScope', '$log', ($scope, $rootScope, $log) ->
+    controller: ['$scope', '$rootScope', ($scope, $rootScope) ->
       $scope.loadingChildren = false
+
+      endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
 
       isEqual = (a, b) ->
         return false if not a? or not b?
@@ -23,12 +25,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       createShowMore  = (list) ->
         ->
-          $log.info "this is ", this
           list.next().then (nextList) ->
-            $log.info "adding items to children ", $scope.children, " from ", nextList
             for item in nextList.list
               $scope.children.push(item.relation)
-            $log.info "new children are", $scope.children
             $scope.hasMore  = $scope.numberOfChildren > $scope.children.length
             $scope.showMore = createShowMore(nextList)
 
@@ -77,10 +76,23 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         for item, i in $scope.children when element.relation and item.id == element.relation.id and item.elementType == element.relation.elementType
           indexesToRemove.push i
 
-
         for index, i in indexesToRemove
           $scope.children.splice index - i, 1
           $scope.numberOfChildren--
+
+
+      $rootScope.$on 'catalogueElementCreated', (_, __, result) ->
+        if result and result.destination and result.source and result.type
+          currentDescend = $scope.element[$scope.currentDescend]
+          if result.destination.link == $scope.element.link and endsWith(currentDescend.link, "/incoming/#{result.type.name}")
+            $scope.numberOfChildren++
+            result.source.refresh().then (newOne) ->
+              $scope.children = [newOne].concat $scope.children
+          if result.source.link == $scope.element.link and endsWith(currentDescend.link, "/outgoing/#{result.type.name}")
+            $scope.numberOfChildren++
+            result.destination.refresh().then (newOne) ->
+              $scope.children = [newOne].concat $scope.children
+
 
       $scope.collapseOrExpand = ->
         return if $scope.loadingChildren

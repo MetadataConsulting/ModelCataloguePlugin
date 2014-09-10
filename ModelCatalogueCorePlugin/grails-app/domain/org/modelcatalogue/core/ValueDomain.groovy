@@ -44,7 +44,7 @@ class ValueDomain extends ExtendibleElement  {
         unitOfMeasure component:true
         extensions component:true
 
-        except = ['incomingRelationships', 'outgoingRelationships']
+        except = ['incomingRelationships', 'outgoingRelationships', 'dataElements', 'conceptualDomains']
     }
 
     DataType dataType

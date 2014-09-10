@@ -9,6 +9,10 @@ angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['
         windowClass: 'basic-edit-modal-prompt'
         resolve:
           args: -> args
+          classificationInUse: ['$stateParams', 'catalogueElementResource',  ($stateParams, catalogueElementResource)->
+            return undefined if not $stateParams.classification
+            catalogueElementResource('classification').get($stateParams.classification)
+          ]
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>

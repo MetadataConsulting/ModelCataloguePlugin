@@ -13,9 +13,7 @@ describe "mc.core.ui.elementsAsTags", ->
 
     $rootScope.$digest()
 
-    # table gets dl-table class
     expect(element.prop('tagName').toLowerCase()).toBe('div')
     expect(element.hasClass('tags')).toBeTruthy()
 
-    # having only table body
-    expect(element.find('span.label').length).toBe($rootScope.elements.length)
+    expect(element.find('span.label:not(.ng-hide)').length).toBe($rootScope.elements.length)

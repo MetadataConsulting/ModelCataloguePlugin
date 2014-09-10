@@ -4,14 +4,15 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
       <span class="pull-right">
         <contextual-actions size="sm" no-colors="true" icon-only="true"></contextual-actions>
       </span>
-      <h3 class="ce-name">{{element.name}} <small ng-show="element.elementTypeName"><span class="label" ng-show="element.status" ng-class="{'label-warning': element.status == 'DRAFT', 'label-info': element.status == 'PENDING', 'label-primary': element.status == 'FINALIZED', 'label-danger': element.status == 'ARCHIVED'}">{{element.status}}</span> ({{element.elementTypeName}}: {{element.modelCatalogueId}})</small></h3>
+      <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> {{element.name}} <small><span class="label" ng-show="element.status" ng-class="{'label-warning': element.status == 'DRAFT', 'label-info': element.status == 'PENDING', 'label-primary': element.status == 'FINALIZED', 'label-danger': element.status == 'ARCHIVED'}">{{element.status}}</span></small></h3>
       <blockquote class="ce-description" ng-show="element.description" ng-bind-html="'' + element.description | linky:'_blank'"></blockquote>
       <tabset ng-show="showTabs">
         <tab disabled="tab.disabled" ng-repeat="tab in tabs" active="tab.active" select="select(tab)">
             <tab-heading>{{tab.heading}}<span ng-show="tab.value.total"> <span class="badge">{{tab.value.total}}</span></span></tab-heading>
             <div ng-switch="tab.type">
               <div ng-switch-when="simple-object-editor">
-                <simple-object-editor object="tab.value" title="Key" value-title="Value"></simple-object-editor>
+                <simple-object-editor ng-if="tab.name != 'enumerations'" object="tab.value" title="Key" value-title="Value"></simple-object-editor>
+                <simple-object-editor ng-if="tab.name == 'enumerations'" object="tab.value" title="Value" value-title="Description" key-placeholder="Value" value-placeholder="Description"></simple-object-editor>
                 <div class="row">
                   <div class="col-md-12">
                     <div class=" text-center">
@@ -23,7 +24,8 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
                   </div>
                 </div>
               </div>
-              <properties-pane id="{{tab.heading}}" item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name != 'properties'" title="Key" value-title="Value"></properties-pane>
+              <properties-pane id="{{tab.heading}}" item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'enumerations'" title="Value" value-title="Description"></properties-pane>
+              <properties-pane id="{{tab.heading}}" item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name != 'properties' &amp;&amp; tab.name != 'enumerations' " title="Key" value-title="Value"></properties-pane>
               <properties-pane id="{{tab.heading}}" item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'properties'"></properties-pane>
               <decorated-list list="tab.value" columns="tab.columns" actions="tab.actions" ng-switch-when="decorated-list" id="{{id + '-' + tab.name}}" reports="tab.reports"></decorated-list>
             </div>

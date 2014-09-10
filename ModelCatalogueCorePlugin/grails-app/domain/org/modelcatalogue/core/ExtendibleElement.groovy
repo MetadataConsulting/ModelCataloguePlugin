@@ -20,6 +20,7 @@ abstract class ExtendibleElement extends CatalogueElement implements Extendible 
     static transients = ['ext']
 
     static mapping = {
+        tablePerHierarchy false
         extensions lazy: false
     }
 

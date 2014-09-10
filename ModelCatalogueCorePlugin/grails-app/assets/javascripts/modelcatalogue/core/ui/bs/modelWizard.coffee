@@ -1,13 +1,4 @@
-modelWizard = angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages'])
-
-#http://stackoverflow.com/questions/14833326/how-to-set-focus-on-input-field-in-angularjs
-modelWizard.directive 'focusMe', ['$timeout', '$parse', ($timeout, $parse) -> {
-  link: (scope, element, attrs) ->
-    scope.$watch $parse(attrs.focusMe), (value) ->
-      $timeout (-> element[0].focus()) if value
-}]
-
-modelWizard.config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
     (title, body, args) ->
 
@@ -19,12 +10,16 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
         keyboard: false
         resolve:
           args: -> args
+          classificationInUse: ['$stateParams', 'catalogueElementResource',  ($stateParams, catalogueElementResource)->
+            return undefined if not $stateParams.classification
+            catalogueElementResource('classification').get($stateParams.classification)
+          ]
 
         #language=HTML
         template: '''
         <div class="modal-header">
-            <button type="button" class="close" ng-click="$dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
-            <h4>Model Wizard</h4>
+            <button type="button" class="close" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
+            <h4>Model Wizard</span></h4>
             <ul class="tutorial-steps">
               <li>
                 <button id="step-previous" ng-disabled="step == 'model' || step == 'summary'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
@@ -36,7 +31,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                 <button id="step-metadata" ng-disabled="!model.name || step == 'summary'" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata'}">2. Metadata</button>
               </li>
               <li>
-                <button id="step-parents" ng-disabled="!model.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents'}">3. Parents</button>
+                <button id="step-parents" ng-disabled="!model.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents', 'btn-info': args.parent &amp;&amp; !parentsVisited}">3. Parents</button>
               </li>
               <li>
                 <button id="step-children" ng-disabled="!model.name || step == 'summary'" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children'}">4. Children</button>
@@ -45,7 +40,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                 <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">5. Elements</button>
               </li>
               <li>
-                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications'}">6. Classifications</button>
+                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications', 'btn-info': classificationInUse &amp;&amp; !classificationsVisited}">6. Classifications</button>
               </li>
               <li>
                 <button id="step-next" ng-disabled="!model.name || step == 'classifications' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -82,7 +77,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="model">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element) || isString(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Parent model is source for the hierarchy relationship</p>
@@ -99,7 +94,7 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="model">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('children', 'child')" ng-disabled="isEmpty(child.element) || isString(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('children', 'child')" ng-disabled="isEmpty(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Child model is destination for the hierarchy relationship</p>
@@ -116,10 +111,15 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element) || isString(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Data element is destination for the containment relationship</p>
+                </div>
+                <div>
+                  <alert type="'info'">
+                    <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link" ng-click="importFromCSV()">CSV file headers</a>.
+                  </alert>
                 </div>
                 <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Source Min Occurs', 'Source Max Occurs', 'Destination Min Occurs', 'Destination Max Occurs']"></simple-object-editor>
               </form>
@@ -130,11 +130,11 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
               <form role="form">
                 <div class="form-group">
                   <label for="name" class="">Classifications</label>
-                  <elements-as-tags elements="model.classifications"></elements-as-tags>
+                  <elements-as-tags elements="classifications"></elements-as-tags>
                   <div class="input-group">
                     <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification" focus-me="step=='classifications'" catalogue-element-picker="classification">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="model.classifications.push(classification);classification = null" ng-disabled="isEmpty(classification) || isString(classification)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="classifications.push(classification);classification = null" ng-disabled="isEmpty(classification)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                 </div>
@@ -149,20 +149,23 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
         </div>
         <div class="modal-footer" ng-if="step == 'summary'">
           <button ng-disabled="!finished" class="btn btn-success" ng-click="reset()"><span class="glyphicon glyphicon-plus"></span> Create Another</button>
-          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
+          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args) ->
           $scope.reset = ->
+            $scope.args = args
             $scope.model = {classifications: []}
             $scope.metadata = {}
             $scope.parent = {ext: {}}
             $scope.parents = []
             $scope.child = {ext: {}}
             $scope.children = []
-            $scope.dataElement = {ext: {}}
+            $scope.dataElement = args.dataElement ? {ext: {}}
             $scope.dataElements = []
             $scope.classification = null
+            $scope.classifications = []
+            $scope.classificationInUse = classificationInUse
             $scope.messages = messages.createNewMessages()
             $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements', 'classifications']
             $scope.step = 'model'
@@ -172,8 +175,16 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             $scope.finishInProgress = false
             $scope.finished = false
 
-          $scope.reset()
+            $scope.parentsVisited = false
+            $scope.classificationsVisited = false
 
+            if classificationInUse
+              $scope.classifications.push classificationInUse
+
+            if args.parent
+              $scope.parents.push {element: args.parent, name: args.parent.name, metadata: {}}
+
+          $scope.reset()
 
           $scope.isEmpty = (object) ->
             return true if not object
@@ -183,8 +194,13 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             angular.isString object
 
           $scope.push = (arrayName, propertyName) ->
-            $scope[propertyName].name = $scope[propertyName].element.name
-            $scope[arrayName].push $scope[propertyName]
+            value = $scope[propertyName]
+            if angular.isString value.element
+              value.name = value.element
+              value.create = true
+            else
+              value.name = value.element.name
+            $scope[arrayName].push value
             $scope[propertyName] = {ext: {}}
 
           $scope.openElementInNewWindow = (element) ->
@@ -202,22 +218,48 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
                 catalogueElementResource('model').update(model)
 
             angular.forEach $scope.parents, (parent) ->
+              if angular.isString parent.element
+                $scope.pendingActions.push (model) ->
+                  catalogueElementResource("model").save({name: parent.element}).then (parentModel) ->
+                    parent.element = parentModel
+                    model
               $scope.pendingActions.push (model) ->
                 parent.element.metadata = parent.ext
                 model.childOf.add parent.element
                 model
 
             angular.forEach $scope.children, (child) ->
+              if angular.isString child.element
+                $scope.pendingActions.push (model) ->
+                  catalogueElementResource("model").save({name: child.element}).then (childModel) ->
+                    child.element = childModel
+                    model
               $scope.pendingActions.push (model) ->
                 child.element.metadata = child.ext
                 model.parentOf.add child.element
                 model
 
             angular.forEach $scope.dataElements, (element) ->
+              if angular.isString element.element
+                $scope.pendingActions.push (model) ->
+                  catalogueElementResource("dataElement").save({name: element.element}).then (newElement) ->
+                    element.element = newElement
+                    model
               $scope.pendingActions.push (model) ->
                 element.element.metadata = element.ext
                 model.contains.add element.element
                 model
+
+            angular.forEach $scope.classifications, (classification) ->
+              if angular.isString classification
+                $scope.pendingActions.push (model) ->
+                  catalogueElementResource('classification').save({name: classification}).then (newClassification) ->
+                    model.classifications.push newClassification
+                    catalogueElementResource('model').update(model)
+              else
+                $scope.pendingActions.push (model) ->
+                    model.classifications.push classification
+                    catalogueElementResource('model').update(model)
 
             $scope.totalActions = $scope.pendingActionsCount = $scope.pendingActions.length + 1
             $scope.step = 'summary'
@@ -237,9 +279,11 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             promise.then (model) ->
               messages.success "Model #{model.name} created"
               $scope.finished = true
-              model.show()
+              $scope.model = model
 
           $scope.select = (step) ->
+            $scope.parentsVisited |= step == 'parents'
+            $scope.classificationsVisited |= step == 'classifications'
             return if step != 'model' and not $scope.model.name
             $scope.step = step
             return
@@ -266,6 +310,26 @@ modelWizard.config ['messagesProvider', (messagesProvider)->
             $scope.select(step) if $event.keyCode == key
 
           $scope.select('model')
+
+          $scope.importFromCSV = ->
+            messages.prompt("Import Data Elements", null, {type: 'data-element-suggestions-from-csv'}).then (result) ->
+              angular.forEach result, (element) ->
+                value = {element : element}
+                if angular.isString(value.element)
+                  value = {name: value.element, create: true, element: value.element}
+                else
+                  value.name = value.element.name
+                  value.elementType = value.element.elementType
+                  value.id = value.element.id
+                $scope.dataElements.push value
+
+          $scope.dismiss = (reason) ->
+            return $modalInstance.dismiss(reason) if $scope.finished
+            if $scope.model.name or $scope.model.description or not $scope.isEmpty($scope.metadata) or $scope.parents.length > 0 or $scope.children.length > 0 or $scope.dataElements.length > 0 or $scope.classifications.length > 0
+              messages.confirm("Close Classification Wizard", "Do you want to discard all changes?").then ->
+                $modalInstance.dismiss(reason)
+            else
+              $modalInstance.dismiss(reason)
 
         ]
 
