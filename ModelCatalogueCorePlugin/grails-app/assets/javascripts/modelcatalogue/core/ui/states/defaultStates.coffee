@@ -44,6 +44,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       $scope.measurementUnitCount = ''
       $scope.dataTypeCount = ''
       $scope.valueDomainCount = ''
+      $scope.incompleteValueDomainsCount = ''
       $scope.conceptualDomainCount = ''
       $scope.totalAssetCount = ''
       $scope.draftAssetCount = ''
@@ -602,6 +603,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} </div>
+                                        <div><a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}"> Incomplete Value Domains</a> {{incompleteValueDomainsCount}} </div>
                                     </div>
                                 </div>
                             </div>

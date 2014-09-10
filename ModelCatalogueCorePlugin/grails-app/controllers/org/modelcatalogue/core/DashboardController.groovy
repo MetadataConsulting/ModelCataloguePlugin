@@ -33,6 +33,7 @@ class DashboardController {
                 measurementUnitCount:MeasurementUnit.count(),
                 dataTypeCount:DataType.count(),
                 valueDomainCount:ValueDomain.count(),
+                incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
                 conceptualDomainCount:ConceptualDomain.count(),
                 ]
         respond model

@@ -3,6 +3,7 @@ package org.modelcatalogue.core.dataarchitect
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
@@ -14,6 +15,12 @@ class DataArchitectService {
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
         Lists.fromCriteria(params, DataElement) {
             isNull 'valueDomain'
+        }
+    }
+
+    ListWithTotal<ValueDomain> incompleteValueDomains(Map params){
+        Lists.fromCriteria(params, ValueDomain) {
+            isNull 'dataType'
         }
     }
 
