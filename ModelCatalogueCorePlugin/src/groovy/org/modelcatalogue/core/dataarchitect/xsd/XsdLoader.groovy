@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.dataarchitect.xsd
 
+import grails.test.mixin.Mock
 import org.modelcatalogue.core.ValueDomain
 
 /**

@@ -152,14 +152,14 @@ class XSDImportService {
     protected getElementsFromModel(Model model){
         ArrayList<Element> elements = []
         ListWithTotal<Relationship> containedElements = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, model, RelationshipType.containmentType)
-        containedElements.list.each{ Relationship relationship ->
+        containedElements.items.each{ Relationship relationship ->
             def element = new Element()
             element.dataElement  = relationship.destination
             element.metadata = relationship.ext
             elements.add(element)
         }
         ListWithTotal<Relationship> childElements = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, model, RelationshipType.hierarchyType)
-        childElements.list.each{ Relationship relationship ->
+        childElements.items.each{ Relationship relationship ->
             def element = new Element()
             element.model  = relationship.destination
             element.metadata = relationship.ext

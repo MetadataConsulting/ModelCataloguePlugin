@@ -36,7 +36,7 @@ describe "mc.core.ui.propertiesPane", ->
     # appropriate rows and cells count with expected classes
     expect(element.find('tr.pp-table-property-row').length).toBe(4)
     expect(element.find('th.pp-table-property-label').length).toBe(4)
-    expect(element.find('td.pp-table-property-value').length).toBe(4)
+    expect(element.find('td.pp-table-property-value').length).toBe(3)
 
     # appropriate cells with expected classes and content
     expect(element.find('tbody tr:nth-child(1) th.pp-table-property-label').text()).toBe('ID')

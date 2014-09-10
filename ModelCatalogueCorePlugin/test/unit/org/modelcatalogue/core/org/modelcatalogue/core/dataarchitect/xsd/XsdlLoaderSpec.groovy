@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.org.modelcatalogue.core.dataarchitect.xsd
 
+import grails.test.mixin.Mock
+import org.modelcatalogue.core.ValueDomain
 import spock.lang.Specification
 import org.modelcatalogue.core.dataarchitect.xsd.*
 
@@ -7,7 +9,7 @@ import org.modelcatalogue.core.dataarchitect.xsd.*
  * Created by sus_avi on 11/07/2014.
  */
 
-
+@Mock(ValueDomain)
 class XsdlLoaderSpec extends Specification {
 
 
@@ -22,44 +24,32 @@ class XsdlLoaderSpec extends Specification {
 
 
         String logErrors =""
-        ArrayList<XsdElement> sactElements =[]
-        ArrayList<XsdSimpleType> sactSimpleDataTypes =[]
-        ArrayList<XsdComplexType>  sactComplexDataTypes =[]
-        ArrayList<XsdGroup> sactGroups =[]
-        ArrayList<XsdAttribute> allAttributes = []
+        ArrayList<XsdSimpleType> simpleDataTypes =[]
+        ArrayList<XsdComplexType>  complexDataTypes =[]
+        ArrayList<XsdGroup> topLevelElements =[]
+        def schema
 
         when:"An XSD file is loaded and the file is parsed"
-        (sactElements, sactSimpleDataTypes, sactComplexDataTypes, sactGroups, allAttributes, logErrors) = loader.parse()
+        (topLevelElements, simpleDataTypes, complexDataTypes, schema, logErrors) = loader.parse()
 
         then: "File content is loaded"
 
 
-        assert sactSimpleDataTypes.size() == 5
-        assert sactComplexDataTypes.size() == 7
-        assert sactGroups.size() == 0
-        assert sactElements.size() == 4
-        assert allAttributes.size() == 5
+        assert simpleDataTypes.size() == 9
+        assert complexDataTypes.size() == 19
         assert logErrors == ""
 
-        sactElements[2].name == "translation"
-        sactElements[2].type == "CD"
-        sactElements[2].maxOccurs == "unbounded"
-        sactElements[2].minOccurs == "0"
+        simpleDataTypes[1].name == "ts"
+        simpleDataTypes[1].description == "This data type supports the representation of a timestamp."
+        simpleDataTypes[1].restriction.base == "xs:string"
+        simpleDataTypes[1].restriction.patterns[0].value == "[0-9]{1,8}|([0-9]{9,14}|[0-9]{14,14}\\.[0-9]+)([+\\-][0-9]{1,4})?"
 
-        sactSimpleDataTypes[1].name == "ts"
-        sactSimpleDataTypes[1].description == "This data type supports the representation of a timestamp."
-        sactSimpleDataTypes[1].restriction.base == "xs:string"
-        sactSimpleDataTypes[1].restriction.patterns[0].value == "[0-9]{1,8}|([0-9]{9,14}|[0-9]{14,14}\\.[0-9]+)([+\\-][0-9]{1,4})?"
+        complexDataTypes[0].name == "TS.GB-en-NHS.Date"
+        complexDataTypes[0].description == "This data type supports the representation of a date of the form: yyyy-mm-dd."
+        complexDataTypes[0].complexContent.restriction.base == "TS"
+        complexDataTypes[0].complexContent.restriction.attributes[0].name == "value"
+        complexDataTypes[0].complexContent.restriction.attributes[0].use == "required"
 
-        sactComplexDataTypes[0].name == "TS.GB-en-NHS.Date"
-        sactComplexDataTypes[0].description == "This data type supports the representation of a date of the form: yyyy-mm-dd."
-        sactComplexDataTypes[0].complexContent.restriction.base == "TS"
-        sactComplexDataTypes[0].complexContent.restriction.attributes[0].name == "value"
-        sactComplexDataTypes[0].complexContent.restriction.attributes[0].use == "required"
-
-        allAttributes[1].name == "value"
-        allAttributes[1].type == "ts"
-        allAttributes[1].use == "optional"
     }
 
     void "Test that readElement successfully reads an element with attributes only"(){
