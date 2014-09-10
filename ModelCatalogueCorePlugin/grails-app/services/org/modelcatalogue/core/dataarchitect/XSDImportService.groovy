@@ -75,16 +75,20 @@ class XSDImportService {
 
     }
 
-    def createModelsAndElements(Collection<XsdComplexType> complexDataTypes, Collection<Classification> classifications, Collection<ConceptualDomain> conceptualDomains, Collection<XsdElement> topLevelElements, String containerModelName = "TypeContainer"){
+    def createModelsAndElements(Collection<XsdComplexType> complexDataTypes, Collection<Classification> classifications, Collection<ConceptualDomain> conceptualDomains, Collection<XsdElement> topLevelElements, String containerModelName = ""){
 
-        Model containerModel = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish").save()
+        if(!containerModelName) containerModelName = classifications.first()?.name + " types"
+        Model containerModel = new Model(name:  containerModelName , description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish").save()
         containerModel = addClassifications(containerModel, classifications)
+        Collection<Model> models = []
 
         complexDataTypes.each{ XsdComplexType complexType ->
-            def model = matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes)
-            model.addToChildOf(containerModel)
+            models.add(matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes))
         }
 
+        models.each{ Model model->
+            if(!model.childOf) model.addToChildOf(containerModel)
+        }
 
 
         topLevelElements.each{ XsdElement element ->
