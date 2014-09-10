@@ -11,11 +11,13 @@ class XsdLoader {
     String logErrors =""
     ArrayList<XsdAttribute> allAttributes = []
     ArrayList<XsdElement> allElements = []
+    ArrayList<XsdElement> topLevelElements = []
     ArrayList<XsdSimpleType> simpleDataTypes =[]
     ArrayList<XsdComplexType>  complexDataTypes =[]
     ArrayList<XsdGroup> groups =[]
     XmlParser parser
-    def sact
+    XsdSchema schema
+    def xsd
     Random random = new Random()
 
     protected static fileInputStream
@@ -23,23 +25,24 @@ class XsdLoader {
     public XsdLoader(String path){
         fileInputStream = new FileInputStream(path)
         parser = new XmlParser()
-        sact = parser.parse (fileInputStream)
+        xsd = parser.parse (fileInputStream)
     }
 
     public XsdLoader(InputStream inputStream){
         fileInputStream  = inputStream
         parser = new XmlParser()
-        sact = parser.parse (fileInputStream)
+        xsd = parser.parse (fileInputStream)
     }
 
     public XsdLoader(String xsdText, Boolean test)
     {
         parser = new XmlParser()
-        sact = parser.parse (xsdText)
+        xsd = parser.parse (xsdText)
     }
 
     def parse(){
-        sact.eachWithIndex{ Node valueNode, int nodeIndex ->
+        schema = readSchema(xsd)
+        xsd.eachWithIndex{ Node valueNode, int nodeIndex ->
             switch (valueNode.name().localPart)
             {
                 case "schema":
@@ -48,11 +51,7 @@ class XsdLoader {
                     break
                 case "element":
                     XsdElement element =  readElement(valueNode, "")
-                    allElements << element
-                    break
-                case "attribute":
-                    XsdAttribute attribute =  readAttribute(valueNode, "")
-                    allAttributes << attribute
+                    if(!element.section) topLevelElements << element
                     break
                 case "complexType":
                     XsdComplexType complexDataType = readComplexType (valueNode, "")
@@ -62,16 +61,87 @@ class XsdLoader {
                     XsdSimpleType simpleType =  readSimpleType(valueNode, "")
                     simpleDataTypes << simpleType
                     break
-                case "group":
-                    XsdGroup sactGroup = readGroup(valueNode, "")
-                    groups << sactGroup
-                    break
                 default:
                     logErrors += valueNode.name().localPart
                     break
             }
         }
-        [allElements, simpleDataTypes, complexDataTypes, groups, allAttributes, logErrors]
+        [topLevelElements, simpleDataTypes, complexDataTypes, schema, logErrors]
+    }
+
+
+
+
+//    def parseAll(){
+//        xsd.eachWithIndex{ Node valueNode, int nodeIndex ->
+//            switch (valueNode.name().localPart)
+//            {
+//                case "schema":
+//                    break
+//                case "include":
+//                    break
+//                case "element":
+//                    XsdElement element =  readElement(valueNode, "")
+//                    allElements << element
+//                    break
+//                case "attribute":
+//                    XsdAttribute attribute =  readAttribute(valueNode, "")
+//                    allAttributes << attribute
+//                    break
+//                case "complexType":
+//                    XsdComplexType complexDataType = readComplexType (valueNode, "")
+//                    complexDataTypes << complexDataType
+//                    break
+//                case "simpleType":
+//                    XsdSimpleType simpleType =  readSimpleType(valueNode, "")
+//                    simpleDataTypes << simpleType
+//                    break
+//                case "group":
+//                    XsdGroup xsdGroup = readGroup(valueNode, "")
+//                    groups << xsdGroup
+//                    break
+//                default:
+//                    logErrors += valueNode.name().localPart
+//                    break
+//            }
+//        }
+//        [allElements, simpleDataTypes, complexDataTypes, groups, allAttributes, logErrors]
+//    }
+
+    def readSchema(Node node){
+        def attributes = node.attributes()
+        XsdSchema schema = new XsdSchema()
+        attributes.eachWithIndex{ def attribute, int attributeIndex ->
+            switch (attribute.key){
+                case "targetNamespace":
+                    schema.targetNamespace = attribute.value
+                    break
+                case "elementFormDefault":
+                    schema.elementFormDefault = attribute.value
+                    break
+                case "attributeFormDefault":
+                    schema.attributeFormDefault  = attribute.value
+                    break
+                case "blockDefault":
+                    schema.blockDefault  = attribute.value
+                    break
+                case "finalDefault":
+                    schema.finalDefault  = attribute.value
+                    break
+                case "version":
+                    schema.version  = attribute.value
+                    break
+                case "id":
+                    schema.id  = attribute.value
+                    break
+                default:
+                    logErrors += ("Loader does not loads this attribute: " + attribute.key + "\r\n")
+                    break
+            }
+        }
+
+        return schema
+
     }
 
 
@@ -138,8 +208,8 @@ class XsdLoader {
         // minInclusive
         // restriction base => look into CommonTypes_20110810.xsd
 
-        String sactElementAnnotation
-        XsdRestriction sactRestriction
+        String xsdElementAnnotation
+        XsdRestriction xsdRestriction
         XsdList list
         XsdUnion union
         String dataTypeName = ""
@@ -160,10 +230,10 @@ class XsdLoader {
         values.eachWithIndex{ Node valueNode, int valueNodeIndex ->
             switch (valueNode.name().localPart){
                 case "annotation":
-                    sactElementAnnotation =  readAnnotation(valueNode)
+                    xsdElementAnnotation =  readAnnotation(valueNode)
                     break
                 case "restriction":
-                    sactRestriction = readRestriction(valueNode, elementName)
+                    xsdRestriction = readRestriction(valueNode, elementName)
                     break
                 case "list":
                     list = readList(valueNode,elementName)
@@ -181,7 +251,7 @@ class XsdLoader {
             dataTypeName = checkSimpleTypeName(dataTypeName)
         }
 
-        XsdSimpleType result = new XsdSimpleType(name: dataTypeName,description: sactElementAnnotation, restriction: sactRestriction, list: list, union: union )
+        XsdSimpleType result = new XsdSimpleType(name: dataTypeName,description: xsdElementAnnotation, restriction: xsdRestriction, list: list, union: union )
     }
 
     def checkSimpleTypeName(dataTypeName){
@@ -310,7 +380,7 @@ class XsdLoader {
         }
 
 
-        if (dataTypeName=="") dataTypeName = elementName
+        if (dataTypeName=="") dataTypeName = elementName + "_abstract_complexType"
 
         def values = node.value()
         values.eachWithIndex{ Node valueNode, int valueNodeIndex ->

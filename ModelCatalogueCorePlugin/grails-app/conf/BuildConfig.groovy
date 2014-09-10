@@ -38,11 +38,15 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
         mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
+        mavenRepo "http://dl.dropbox.com/u/326301/repository"
+
+
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
         //test "org.modelcatalogue:simple-fixtures:0.1.3"
+        //compile "jlibs:jlibs-xml:1.0"
     }
 
     plugins {

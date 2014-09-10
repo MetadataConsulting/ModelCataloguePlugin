@@ -6,8 +6,8 @@ class XsdComplexType {
     String name
     String description
     String abstractAttr
-//    String minOccurs
-//    String maxOccurs
+    String minOccurs
+    String maxOccurs
     String mixed
     XsdRestriction restriction
     XsdComplexContent complexContent

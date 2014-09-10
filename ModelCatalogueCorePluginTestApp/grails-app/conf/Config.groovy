@@ -1,5 +1,9 @@
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.ConceptualDomain
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.PublishedElement
 import org.modelcatalogue.core.ValueDomain
 
 // locations to search for config files that get merged into the main config;
@@ -167,48 +171,36 @@ modelcatalogue.defaults.measurementunits = [
 ]
 
 
-modelcatalogue.defaults.relationshiptypes = [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
-            Integer sourceMinOccurs = ext['Source Min Occurs'] as Integer
-            Integer sourceMaxOccurs = ext['Source Max Occurs'] as Integer
-            Integer destinationMinOccurs = ext['Destination Min Occurs'] as Integer
-            Integer destinationMaxOccurs = ext['Destination Max Occurs'] as Integer
+modelcatalogue.defaults.relationshiptypes =  [
+        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
 
-            if (sourceMinOccurs != null) {
-                if (sourceMinOccurs < 0) {
+            Integer minOccurs = ext['Min Occurs'] as Integer
+            Integer maxOccurs = ext['Max Occurs'] as Integer
+
+            if (minOccurs != null) {
+                if (minOccurs < 0) {
                     return false
                 }
-                if (sourceMaxOccurs != null && sourceMaxOccurs < sourceMinOccurs) {
+                if (maxOccurs != null && maxOccurs < minOccurs) {
                     return false
                 }
             } else {
-                if (sourceMaxOccurs != null && sourceMaxOccurs < 1) {
-                    return false
-                }
-            }
-
-            if (destinationMinOccurs != null) {
-                if (destinationMinOccurs < 0) {
-                    return false
-                }
-                if (destinationMaxOccurs != null && destinationMaxOccurs < destinationMinOccurs) {
-                    return false
-                }
-            } else {
-                if (destinationMaxOccurs != null && destinationMaxOccurs < 1) {
+                if (maxOccurs != null && maxOccurs < 1) {
                     return false
                 }
             }
 
             return true
         '''],
-        [name: 'base', sourceToDestination: 'based on', destinationToSource: 'is base for', sourceClass: ValueDomain, destinationClass: ValueDomain],
-        [name: "attachment", sourceToDestination: "attachments", destinationToSource: "owners", sourceClass: CatalogueElement, destinationClass: Asset],
+        [name: 'base', sourceToDestination: 'based on', destinationToSource: 'is base for', sourceClass: CatalogueElement, destinationClass: CatalogueElement],
+        [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
-        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
-        [name: "union", sourceToDestination: "is union of", destinationToSource: "is united in", sourceClass: ValueDomain, destinationClass: ValueDomain]
+        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
+        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: DataElement, destinationClass: DataElement, bidirectional: true],
+        [name: "union", sourceToDestination: "is union of", destinationToSource: "is united in", sourceClass: CatalogueElement, destinationClass: CatalogueElement]
+
 ]
 
 // configure the default storage
