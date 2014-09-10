@@ -16,8 +16,8 @@ class RelationshipMarshallers extends AbstractMarshallers {
         if (!rel) return [:]
         [
                 id: rel.id,
-                source: rel.source.info,
-                destination: rel.destination.info,
+                source: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.source),
+                destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.destination),
                 type: rel.relationshipType.info,
                 archived: rel.archived,
                 ext: rel.ext

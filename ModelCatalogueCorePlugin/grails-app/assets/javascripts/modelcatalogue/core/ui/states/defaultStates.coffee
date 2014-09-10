@@ -106,7 +106,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         item._containedElements_ = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
 
       $scope.$on 'treeviewElementSelected', (event, element) ->
-        unless element._containedElements_?.empty
+        unless element._containedElements_?.size?
           element.contains().then (contained)->
             element._containedElements_ = contained
             $scope.contained.list       = contained
@@ -410,8 +410,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           </h2>
         </div>
         <div class="col-md-8">
-
-          <h3 ng-show="contained.element">{{contained.element.name}} Data Elements
+          <h3 ng-show="contained.element">{{contained.element.name}}
             <span class="pull-right">
               <contextual-actions size="sm" no-colors="true" icon-only="true" scope="contained"></contextual-actions>
             </span>
@@ -423,8 +422,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <div class="col-md-4">
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-8" ng-show="contained.element">
           <blockquote class="ce-description" ng-show="contained.element.description">{{contained.element.description}}</blockquote>
+          <h4>Data Elements</h4>
           <decorated-list list="contained.list" columns="contained.columns" stateless="true"></decorated-list>
         </div>
         <hr/>

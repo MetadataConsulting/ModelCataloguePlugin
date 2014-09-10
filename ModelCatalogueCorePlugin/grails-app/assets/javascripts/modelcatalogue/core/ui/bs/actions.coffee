@@ -12,9 +12,15 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     icon:       'glyphicon glyphicon-plus-sign'
     type:       'success'
     action:     ->
-      modalType = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
-      messages.prompt('Create ' + names.getNaturalName($scope.resource), '', {type: modalType, create: ($scope.resource)}).then (created)->
-        created.show()
+      args      = {create: ($scope.resource)}
+      args.type = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
+
+      if $scope.resource == 'model' and $scope.contained?.element
+        args.parent = $scope.contained.element
+
+      messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then (created)->
+        unless args.parent
+          created.show()
     }
   ]
 

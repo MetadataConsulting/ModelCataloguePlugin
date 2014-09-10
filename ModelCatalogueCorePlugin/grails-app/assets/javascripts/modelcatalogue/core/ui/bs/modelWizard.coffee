@@ -10,12 +10,16 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
         keyboard: false
         resolve:
           args: -> args
+          classificationInUse: ['$stateParams', 'catalogueElementResource',  ($stateParams, catalogueElementResource)->
+            return undefined if not $stateParams.classification
+            catalogueElementResource('classification').get($stateParams.classification)
+          ]
 
         #language=HTML
         template: '''
         <div class="modal-header">
             <button type="button" class="close" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
-            <h4>Model Wizard</h4>
+            <h4>Model Wizard</span></h4>
             <ul class="tutorial-steps">
               <li>
                 <button id="step-previous" ng-disabled="step == 'model' || step == 'summary'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
@@ -27,7 +31,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 <button id="step-metadata" ng-disabled="!model.name || step == 'summary'" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata'}">2. Metadata</button>
               </li>
               <li>
-                <button id="step-parents" ng-disabled="!model.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents'}">3. Parents</button>
+                <button id="step-parents" ng-disabled="!model.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents', 'btn-info': args.parent &amp;&amp; !parentsVisited}">3. Parents</button>
               </li>
               <li>
                 <button id="step-children" ng-disabled="!model.name || step == 'summary'" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children'}">4. Children</button>
@@ -36,7 +40,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">5. Elements</button>
               </li>
               <li>
-                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications'}">6. Classifications</button>
+                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications', 'btn-info': classificationInUse &amp;&amp; !classificationsVisited}">6. Classifications</button>
               </li>
               <li>
                 <button id="step-next" ng-disabled="!model.name || step == 'classifications' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -145,21 +149,23 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
         </div>
         <div class="modal-footer" ng-if="step == 'summary'">
           <button ng-disabled="!finished" class="btn btn-success" ng-click="reset()"><span class="glyphicon glyphicon-plus"></span> Create Another</button>
-          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$dismiss()" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
+          <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args) ->
           $scope.reset = ->
+            $scope.args = args
             $scope.model = {classifications: []}
             $scope.metadata = {}
             $scope.parent = {ext: {}}
             $scope.parents = []
             $scope.child = {ext: {}}
             $scope.children = []
-            $scope.dataElement = {ext: {}}
+            $scope.dataElement = args.dataElement ? {ext: {}}
             $scope.dataElements = []
             $scope.classification = null
             $scope.classifications = []
+            $scope.classificationInUse = classificationInUse
             $scope.messages = messages.createNewMessages()
             $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements', 'classifications']
             $scope.step = 'model'
@@ -169,8 +175,16 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.finishInProgress = false
             $scope.finished = false
 
-          $scope.reset()
+            $scope.parentsVisited = false
+            $scope.classificationsVisited = false
 
+            if classificationInUse
+              $scope.classifications.push classificationInUse
+
+            if args.parent
+              $scope.parents.push {element: args.parent, name: args.parent.name, metadata: {}}
+
+          $scope.reset()
 
           $scope.isEmpty = (object) ->
             return true if not object
@@ -265,9 +279,11 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             promise.then (model) ->
               messages.success "Model #{model.name} created"
               $scope.finished = true
-              model.show()
+              $scope.model = model
 
           $scope.select = (step) ->
+            $scope.parentsVisited |= step == 'parents'
+            $scope.classificationsVisited |= step == 'classifications'
             return if step != 'model' and not $scope.model.name
             $scope.step = step
             return

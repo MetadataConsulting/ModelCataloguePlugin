@@ -10,10 +10,7 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
         <span
             class="catalogue-element-treeview-labels"
             ng-dblclick="element.show()"
-            tooltip="{{element.name}}"
-            tooltip-trigger="mouseover"
-            tooltip-placement="bottom"
-            tooltip-popup-delay="1000"
+
           >
           <span ng-if="!element.elementType"><a class="btn btn-link"><span class="glyphicon glyphicon-ban-circle"></span></a> No Data</span>
           <a ng-if="currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="collapseOrExpand(element)">
@@ -26,7 +23,6 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
             <span ng-class="element.getIcon()"></span>
           </a>
           <span class="catalogue-element-treeview-name" ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': element.status == 'ARCHIVED'}" ng-click="select(element)">{{element.name}}</span>
-          <a ng-click="element.show()" class="btn btn-link btn-xs" title="Show" ng-if="element.elementType"><span class="glyphicon glyphicon-link"></span></a>
         </span>
       </div>
       <ul ng-if="children" ng-hide="collapsed" class="catalogue-element-treeview-list">
