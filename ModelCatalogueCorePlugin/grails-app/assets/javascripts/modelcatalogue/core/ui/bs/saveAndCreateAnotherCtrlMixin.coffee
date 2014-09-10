@@ -9,6 +9,7 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
 
   $scope.saveElement ?= (newVersion) ->
      $scope.save(newVersion).then (result)->
+       result.show() if result.show
        $modalInstance.close(result)
 
   $scope.hasChanged ?= ->
@@ -44,5 +45,6 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
     , (response) ->
       for err in response.data.errors
         $scope.messages.error err.message
+      $q.reject response
 
 ]

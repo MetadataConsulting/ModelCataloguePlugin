@@ -23,7 +23,12 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
             </form>
-            <simple-object-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></simple-object-editor>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" ng-model="settings.enumerated" ng-disabled="!create"> Enumerated
+              </label>
+            </div>
+            <div collapse="!settings.enumerated"><simple-object-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></simple-object-editor></div>
         </div>
         <div class="modal-footer">
           <contextual-actions></contextual-actions>
@@ -36,10 +41,20 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
 
+          $scope.settings = {enumerated: args.create == 'enumeratedType' || args?.element?.isInstanceOf('enumeratedType')}
+
+          if $scope.create
+            $scope.$watch 'settings.enumerated', (enumerated) ->
+              if enumerated
+                $scope.create = 'enumeratedType'
+              else
+                $scope.create = 'dataType'
+
+
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
           $scope.hasChanged   = ->
-            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
+            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {})
 
 
 
@@ -50,5 +65,6 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
       dialog.result
   ]
 
+  messagesProvider.setPromptFactory 'edit-dataType', factory
   messagesProvider.setPromptFactory 'edit-enumeratedType', factory
 ]

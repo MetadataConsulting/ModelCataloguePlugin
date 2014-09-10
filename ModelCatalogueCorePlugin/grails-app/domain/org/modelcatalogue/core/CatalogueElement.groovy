@@ -43,6 +43,9 @@ abstract class CatalogueElement {
         name size: 1..255
         description nullable: true, maxSize: 2000
 		modelCatalogueId bindable: false, nullable: true, unique: true, maxSize: 255, matches: '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
+        dateCreated bindable: false
+        lastUpdated bindable: false
+        archived bindable: false
     }
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable

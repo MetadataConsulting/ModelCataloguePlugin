@@ -18,21 +18,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerChildAction 'create-catalogue-element', 'create-enumerated-type', ['security', '$scope', 'messages', (security, $scope, messages)->
-    return undefined if not security.hasRole('CURATOR')
-    return undefined if not messages.hasPromptFactory('edit-enumeratedType')
-    return undefined if $scope.resource != 'dataType'
-
-    {
-    position:   100
-    label:      "New Enumerated Type"
-    type:       'success'
-    action:     ->
-      messages.prompt('Create Enumerated Type', '', {type: 'edit-enumeratedType', create: 'enumeratedType'}).then (created)->
-        created.show()
-    }
-  ]
-
   actionsProvider.registerAction 'create-import', ['security', '$scope', 'messages', (security, $scope, messages)->
     return undefined unless security.hasRole('CURATOR') and $scope.resource == 'import' and messages.hasPromptFactory('new-import')
     {

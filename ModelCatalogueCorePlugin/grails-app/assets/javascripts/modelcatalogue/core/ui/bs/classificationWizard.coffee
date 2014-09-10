@@ -1,13 +1,4 @@
-classificationWizard = angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages'])
-
-#http://stackoverflow.com/questions/14833326/how-to-set-focus-on-input-field-in-angularjs
-classificationWizard.directive 'focusMe', ['$timeout', '$parse', ($timeout, $parse) -> {
-  link: (scope, element, attrs) ->
-    scope.$watch $parse(attrs.focusMe), (value) ->
-      $timeout (-> element[0].focus()) if value
-}]
-
-classificationWizard.config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', '$rootScope', ($modal, $q, messages,$rootScope) ->
     (title, body, args) ->
 

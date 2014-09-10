@@ -14,6 +14,8 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
       # default values
       $scope.editableProperties = []
 
+      $scope.lastAddedRow = 0
+
       $scope.removeProperty = (index) ->
           current = $scope.editableProperties[index]
           unique  = $scope.isKeyUnique(current.key)
@@ -30,7 +32,9 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
       $scope.addProperty = (index, property = {key: 'Key', value: 'Value'}) ->
         newProperty = angular.copy(property)
         delete newProperty.originalKey
-        $scope.editableProperties.splice(index + 1, 0, newProperty)
+        newIndex = index + 1
+        $scope.lastAddedRow = newIndex
+        $scope.editableProperties.splice(newIndex, 0, newProperty)
 
       $scope.keyChanged = (property) ->
         delete $scope.object[property.originalKey]

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.messages', 'mc.util.ui.focusMe']).config ['messagesProvider', (messagesProvider)->
  messagesProvider.setPromptFactory 'catalogue-element',  [ '$modal', ($modal) ->
    (title, body, args) ->
       dialog = $modal.open {
