@@ -1,0 +1,1537 @@
+<?xml version="1.0"?>
+<xs:schema xmlns="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" xmlns:SACT="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all" version="2-0">
+	<xs:complexType name="TS.GB-en-NHS.Date">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a date of the form: yyyy-mm-dd.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="TS">
+				<xs:attribute name="value" use="required">
+					<xs:simpleType>
+						<xs:restriction base="ts">
+							<xs:pattern value="(19|20)\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PN.NHS.Internal" abstract="true" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a name of the form: {prefix} {given} {given} {family}.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:sequence>
+					<xs:element name="prefix" type="en.prefix" minOccurs="0"/>
+					<xs:element name="given" type="en.given" minOccurs="0" maxOccurs="2"/>
+					<xs:element name="family" type="en.family" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="use" type="set_cs_EntityNameUse" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--ST Restriction to support Dictionary Dates-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType1">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of dictionary dates.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:pattern value="(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support Dictionary Boolean-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType2">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a boolean with value 'Y' or 'N'.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:enumeration value="Y"/>
+			<xs:enumeration value="N"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support alphanumeric only-->
+	<xs:simpleType name="ST.GB-en.NHS.StringType3">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an alphanumeric string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:pattern value="[a-zA-Z0-9]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support Dates-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType4">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of date and time.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:pattern value="(19|20)[0-9][0-9]-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support II Type 2 as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType5">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending UUID as string with in element.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:pattern value="[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}">
+				<xs:annotation>
+					<xs:documentation>
+						Pattern facet to allow upper case hex in the uuid in field element.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:pattern>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support II Type 5 NHS Number as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType6">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending of NHS Number as string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:length value="10"/>
+			<xs:pattern value="[0-9]{10}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support II Type 6 as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType7">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending of Radiological Accession Number content as string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support II Local Patient Identifier as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType8">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending of Local Patient Id as string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support II Type 7 Referrer Code as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType9">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending of referrer code as string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:length value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support II Type 4 as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType10">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending of Organisation data as derived from ODS as alphanumeric string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:minLength value="3"/>
+			<xs:maxLength value="12"/>
+			<xs:pattern value="[A-Z0-9]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support the representation time-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType11">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a time.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:pattern value="(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support CodedValueType7 OPCS Code as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType12">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending of OPCS code as string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:length value="4"/>
+			<xs:pattern value="[a-zA-Z0-9]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support CodedValueType5 ICDO Code as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType13">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an ICDO code as string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:minLength value="5"/>
+			<xs:maxLength value="7"/>
+			<xs:pattern value="[a-zA-Z0-9]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ST Restriction to support CodedValueType6 ICD10 (ICD) Code as String-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType14">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of ICD10 (ICD) content as string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:minLength value="4"/>
+			<xs:maxLength value="6"/>
+			<xs:pattern value="[a-zA-Z0-9]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--PN Restriction to support Family name only-->
+	<xs:complexType name="PN.GB-en-NHS.PersonNameType4">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a family name.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="prefix" type="en.prefix" minOccurs="0" maxOccurs="0"/>
+			<xs:element name="given" type="en.given" minOccurs="0" maxOccurs="0"/>
+			<xs:element name="family">
+				<xs:simpleType>
+					<xs:restriction base="st">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="use" type="set_cs_EntityNameUse" use="prohibited"/>
+	</xs:complexType>
+	<!--PN Restriction to support Given name only-->
+	<xs:complexType name="PN.GB-en-NHS.PersonNameType5">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a given name.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="prefix" type="en.prefix" minOccurs="0" maxOccurs="0"/>
+			<xs:element name="given">
+				<xs:simpleType>
+					<xs:restriction base="st">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="35"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="family" type="en.family" minOccurs="0" maxOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="use" type="set_cs_EntityNameUse" use="prohibited"/>
+	</xs:complexType>
+	<!--II Restriction to support SDS Org-->
+	<xs:complexType name="II.GB-en-NHS.IdentifierType4">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending of Organisation data as derived from ODS.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="II">
+				<xs:attribute name="root" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.19.1"/>
+				<xs:attribute name="extension" use="required">
+					<xs:simpleType>
+						<xs:restriction base="st">
+							<xs:minLength value="3"/>
+							<xs:maxLength value="12"/>
+							<xs:pattern value="[A-Z0-9]*"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="assigningAuthorityName" type="st" use="prohibited"/>
+				<xs:attribute name="displayable" type="bl" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="II.GB-en-NHS.IdentifierType2">
+		<xs:annotation>
+			<xs:documentation>This data type supports the sending of DCE UUID</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="II.NPfIT.uuid.required">
+				<xs:attribute name="root" type="II.NPfIT.root.uuid" use="required"/>
+				<xs:attribute name="extension" type="st" use="prohibited"/>
+				<xs:attribute name="nullFlavor" type="cs_NullFlavor" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="II.NPfIT.uuid.required">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a UUID.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="II">
+				<xs:attribute name="root" type="II.NPfIT.root.uuid" use="optional"/>
+				<xs:attribute name="extension" type="st" use="prohibited"/>
+				<xs:attribute name="nullFlavor" type="cs_NullFlavor" use="optional"/>
+				<xs:attribute name="updateMode" type="cs_UpdateMode" use="prohibited"/>
+				<xs:attribute name="assigningAuthorityName" type="st" use="prohibited"/>
+				<xs:attribute name="displayable" type="bl" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="II.NPfIT.root.uuid">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a UUID.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="uid">
+			<xs:pattern value="[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}">
+				<xs:annotation>
+					<xs:documentation>
+						Pattern facet to allow upper case hex in the uuid in root of II data type
+					</xs:documentation>
+				</xs:annotation>
+			</xs:pattern>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--Radiological Accession Number-->
+	<!--II Restriction to support NHS Number-->
+	<xs:complexType name="II.GB-en-NHS.IdentifierType5">
+		<xs:annotation>
+			<xs:documentation>This data type supports the use of NHS Number content</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="II">
+				<xs:attribute name="root" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.4.1"/>
+				<xs:attribute name="extension" use="required">
+					<xs:simpleType>
+						<xs:restriction base="st">
+							<xs:length value="10"/>
+							<xs:pattern value="[0-9]{10}"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="assigningAuthorityName" type="st" use="prohibited"/>
+				<xs:attribute name="displayable" type="bl" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="II.GB-en-NHS.IdentifierType6">
+		<xs:annotation>
+			<xs:documentation>This data type supports the use of Radiological Accession Number content.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="II">
+				<xs:attribute name="root" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.22"/>
+				<xs:attribute name="extension" use="required">
+					<xs:simpleType>
+						<xs:restriction base="st">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="20"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="assigningAuthorityName" type="st" use="prohibited"/>
+				<xs:attribute name="displayable" type="bl" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--II Restriction to support Referrer Code-->
+	<xs:complexType name="II.GB-en-NHS.IdentifierType7">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a referrer code.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="II">
+				<xs:attribute name="root" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.16.60"/>
+				<xs:attribute name="extension" use="required">
+					<xs:simpleType>
+						<xs:restriction base="st">
+							<xs:length value="8"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="assigningAuthorityName" type="st" use="prohibited"/>
+				<xs:attribute name="displayable" type="bl" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--Type to support Local Person Identifier-->
+	<xs:complexType name="II.GB-en-NHS.IdentifierType8">
+		<xs:complexContent>
+			<xs:restriction base="II">
+				<xs:attribute name="root" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.18.24"/>
+				<xs:attribute name="extension" type="st" use="required"/>
+				<xs:attribute name="assigningAuthorityName" type="st" use="prohibited"/>
+				<xs:attribute name="displayable" type="bl" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--AD Restriction to support postalCode only-->
+	<xs:complexType name="AD.GB-en-NHS.AddressType1">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an address represented with a postcode attribute.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:sequence>
+					<xs:element name="postalCode" type="postalcode"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="AD.NHS.Internal" abstract="true" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an address.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:sequence>
+					<xs:element name="postalCode" type="ADXP" minOccurs="0"/>
+					<xs:element name="streetAddressLine" type="ADXP" minOccurs="0" maxOccurs="5"/>
+				</xs:sequence>
+				<xs:attribute name="use" type="set_cs_PostalAddressUse" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--AD Restriction to support 5 street address lines only-->
+	<xs:complexType name="AD.GB-en-NHS.AddressType4" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a structured or unstructured address.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="postalCode" type="ADXP" minOccurs="0" maxOccurs="0"/>
+			<xs:choice>
+				<xs:element name="UnstructuredAddress">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="streetAddressLine">
+								<xs:simpleType>
+									<xs:restriction base="st">
+										<xs:maxLength value="175"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="StructuredAddress">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="streetAddressLine" minOccurs="5" maxOccurs="5">
+								<xs:simpleType>
+									<xs:restriction base="st">
+										<xs:maxLength value="35"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AD.NHS.AddressType1" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an address</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="AD.NHS.Internal">
+				<xs:sequence>
+					<xs:element name="postalCode" type="ADXP"/>
+					<xs:element name="streetAddressLine" type="ADXP" minOccurs="0" maxOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="nullFlavor" type="cs_NullFlavor" use="prohibited"/>
+				<xs:attribute name="updateMode" type="cs_UpdateMode" use="prohibited"/>
+				<xs:attribute name="use" type="set_cs_PostalAddressUse" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--CV Restriction to support Code only-->
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType1">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a code only.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" type="cs" use="required"/>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--CV Restriction to support NICIP Code-->
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType2">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of NICIP content</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="6"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.21"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--CV Restriction to support SNOMED CT-->
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType3">
+		<xs:annotation>
+			<xs:documentation>This type supports SNOMED-CT codes.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="18"/>
+							<xs:pattern value="\d{1,18}"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.15"/>
+				<xs:attribute name="nullFlavor" type="cs_NullFlavor" use="prohibited"/>
+				<xs:attribute name="updateMode" type="cs_UpdateMode" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType4">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of value in the set: 'Y', 'N', 'X'.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:enumeration value="Y"/>
+							<xs:enumeration value="N"/>
+							<xs:enumeration value="X"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType5">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of ICDO content.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:minLength value="5"/>
+							<xs:maxLength value="7"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.16.69"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType6">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of ICD10 content.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:minLength value="4"/>
+							<xs:maxLength value="6"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited" fixed="2.16.840.1.113883.6.3"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--CV Restriction to support OPCS Coding-->
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType7">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of OPCS coding.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:length value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.16.67"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--A restriction on CV to deal with Ethnic Category-->
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType8">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of Ethnic Category Code.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="2"/>
+							<xs:pattern value="99"/>
+							<xs:pattern value="[ABCDEFGHJKLMNPRSZ]"/>
+							<xs:pattern value="[ABCDEFGHJKLMNPRSZ]."/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited" fixed="2.16.840.1.113883.2.1.3.2.4.16.6"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--CV Restriction to support SNOMED-->
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType9">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of SNOMED content (of any version).</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="18"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited"/>
+				<xs:attribute name="nullFlavor" type="cs_NullFlavor" use="prohibited"/>
+				<xs:attribute name="updateMode" type="cs_UpdateMode" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--CV Restriction to support READ codes-->
+	<xs:complexType name="CV.GB-en-NHS.CodedValueType10">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of READ codes (of any version).</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CV">
+				<xs:attribute name="codeSystemName" type="st" use="prohibited"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="prohibited"/>
+				<xs:attribute name="displayName" type="st" use="prohibited"/>
+				<xs:attribute name="code" use="required">
+					<xs:simpleType>
+						<xs:restriction base="cs">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="5"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="codeSystem" type="uid" use="prohibited"/>
+				<xs:attribute name="nullFlavor" type="cs_NullFlavor" use="prohibited"/>
+				<xs:attribute name="updateMode" type="cs_UpdateMode" use="prohibited"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--Postal Code Restrictions-->
+	<xs:simpleType name="postalcode">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a postal code.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--BaseTypes-->
+	<xs:complexType name="en.delimiter" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a delimiter.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ENXP">
+				<xs:attribute name="partType" type="cs_EntityNamePartType" fixed="DEL"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="en.family" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of entity's family name.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ENXP">
+				<xs:attribute name="partType" type="cs_EntityNamePartType" fixed="FAM"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="en.given" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of entity's given name.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ENXP">
+				<xs:attribute name="partType" type="cs_EntityNamePartType" fixed="GIV"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="en.prefix" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of entity's prefix.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ENXP">
+				<xs:attribute name="partType" type="cs_EntityNamePartType" fixed="PFX"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="en.suffix" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of entity's suffix.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ENXP">
+				<xs:attribute name="partType" type="cs_EntityNamePartType" fixed="SFX"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="cs_EntityNamePartType">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an entity name part type.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="FAM"/>
+			<xs:enumeration value="GIV"/>
+			<xs:enumeration value="PFX"/>
+			<xs:enumeration value="SFX"/>
+			<xs:enumeration value="DEL"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cs_EntityNamePartQualifier">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an entity name part qualifier.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="BR"/>
+			<xs:enumeration value="SP"/>
+			<xs:enumeration value="VV"/>
+			<xs:enumeration value="AC"/>
+			<xs:enumeration value="PR"/>
+			<xs:enumeration value="NB"/>
+			<xs:enumeration value="LS"/>
+			<xs:enumeration value="CL"/>
+			<xs:enumeration value="IN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="set_cs_EntityNamePartQualifier">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a set of entity name part qualifiers.</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="cs_EntityNamePartQualifier"/>
+	</xs:simpleType>
+	<xs:complexType name="ENXP" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of part of an entity name.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ST">
+				<xs:attribute name="partType" type="cs_EntityNamePartType"/>
+				<xs:attribute name="qualifier" type="set_cs_EntityNamePartQualifier" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EN" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an entity name.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:sequence>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="delimiter" type="en.delimiter"/>
+						<xs:element name="family" type="en.family"/>
+						<xs:element name="given" type="en.given"/>
+						<xs:element name="prefix" type="en.prefix"/>
+						<xs:element name="suffix" type="en.suffix"/>
+					</xs:choice>
+					<xs:element name="validTime" type="IVL_TS" minOccurs="0"/>
+					<xs:element name="id" type="II" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="use" type="set_cs_EntityNameUse" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="set_cs_EntityNameUse">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a set of entity name uses.</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="cs_EntityNameUse"/>
+	</xs:simpleType>
+	<xs:simpleType name="cs_EntityNameUse">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a specific use of an entity name.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="L"/>
+			<xs:enumeration value="A"/>
+			<xs:enumeration value="I"/>
+			<xs:enumeration value="R"/>
+			<xs:enumeration value="ABC"/>
+			<xs:enumeration value="SYL"/>
+			<xs:enumeration value="IDE"/>
+			<xs:enumeration value="PREVIOUS-BIRTH"/>
+			<xs:enumeration value="PREVIOUS-MAIDEN"/>
+			<xs:enumeration value="PREVIOUS-BACHELOR"/>
+			<xs:enumeration value="PREVIOUS"/>
+			<xs:enumeration value="PREFERRED"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="PN" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a person name.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="EN"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="REAL">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of fractional numbers.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="QTY">
+				<xs:attribute name="value" type="real" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="set_cs_TelecommunicationAddressUse">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a set of telecommunication address uses.</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="cs_TelecommunicationAddressUse"/>
+	</xs:simpleType>
+	<xs:simpleType name="ts">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a timestamp.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9]{1,8}|([0-9]{9,14}|[0-9]{14,14}\.[0-9]+)([+\-][0-9]{1,4})?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="url">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a Uniform Resource Locator (URL).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:pattern value="[\-a-z0-9+]+:.*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="real">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a quantity defined at a given point of a continuum.</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="xs:decimal xs:double"/>
+	</xs:simpleType>
+	<xs:simpleType name="bl">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a binary value.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:boolean">
+			<xs:pattern value="true|false"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cs_SetOperator">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a set operator.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="I"/>
+			<xs:enumeration value="E"/>
+			<xs:enumeration value="A"/>
+			<xs:enumeration value="H"/>
+			<xs:enumeration value="P"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cs_TelecommunicationAddressUse">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of telecommunication address use.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="H"/>
+			<xs:enumeration value="HP"/>
+			<xs:enumeration value="HV"/>
+			<xs:enumeration value="WP"/>
+			<xs:enumeration value="AS"/>
+			<xs:enumeration value="EC"/>
+			<xs:enumeration value="PG"/>
+			<xs:enumeration value="MC"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cs_IntegrityCheckAlgorithm">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an algorithm used to check the integrity of data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="SHA-1"/>
+			<xs:enumeration value="SHA-256"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="bin">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of Base64-encoded data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:base64Binary"/>
+	</xs:simpleType>
+	<xs:simpleType name="cs_BinaryDataEncoding">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of the encoding type used for binary data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="B64"/>
+			<xs:enumeration value="TXT"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cs_CompressionAlgorithm">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of the algorithm used to compress data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="DF"/>
+			<xs:enumeration value="GZ"/>
+			<xs:enumeration value="ZL"/>
+			<xs:enumeration value="Z"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="uid">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a unique identifier.</xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="oid uuid ruid"/>
+	</xs:simpleType>
+	<xs:simpleType name="st">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a string of characters.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="cs_NullFlavor">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of the null flavour used.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="NI"/>
+			<xs:enumeration value="NA"/>
+			<xs:enumeration value="UNK"/>
+			<xs:enumeration value="NASK"/>
+			<xs:enumeration value="ASKU"/>
+			<xs:enumeration value="NAV"/>
+			<xs:enumeration value="OTH"/>
+			<xs:enumeration value="PINF"/>
+			<xs:enumeration value="NINF"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="oid">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an object identifier.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([0-9][0-9]*)(\.[0-9][0-9]*)*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="uuid">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a Universally Unique Identifier (UUID).</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ruid">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an identifier.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Za-z][A-Za-z0-9\-]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cs">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a character string.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:pattern value="[^\s]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cs_UpdateMode">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of the update mode used for data.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="added"/>
+			<xs:enumeration value="altered"/>
+			<xs:enumeration value="removed"/>
+			<xs:enumeration value="unchanged"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="set_cs_PostalAddressUse">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a set of postal address uses.</xs:documentation>
+		</xs:annotation>
+		<xs:list itemType="cs_PostalAddressUse"/>
+	</xs:simpleType>
+	<xs:simpleType name="cs_PostalAddressUse">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of the specific usage of a postal address.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="PHYS"/>
+			<xs:enumeration value="PST"/>
+			<xs:enumeration value="TMP"/>
+			<xs:enumeration value="BAD"/>
+			<xs:enumeration value="H"/>
+			<xs:enumeration value="HP"/>
+			<xs:enumeration value="HV"/>
+			<xs:enumeration value="WP"/>
+			<xs:enumeration value="ABC"/>
+			<xs:enumeration value="SYL"/>
+			<xs:enumeration value="IDE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="cs_AddressPartType">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a specific part of an address.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="cs">
+			<xs:enumeration value="DEL"/>
+			<xs:enumeration value="CNT"/>
+			<xs:enumeration value="STA"/>
+			<xs:enumeration value="CPA"/>
+			<xs:enumeration value="CTY"/>
+			<xs:enumeration value="ZIP"/>
+			<xs:enumeration value="SAL"/>
+			<xs:enumeration value="BNR"/>
+			<xs:enumeration value="BNN"/>
+			<xs:enumeration value="DIR"/>
+			<xs:enumeration value="STR"/>
+			<xs:enumeration value="STB"/>
+			<xs:enumeration value="STTYP"/>
+			<xs:enumeration value="ADL"/>
+			<xs:enumeration value="UNID"/>
+			<xs:enumeration value="UNIT"/>
+			<xs:enumeration value="CAR"/>
+			<xs:enumeration value="CEN"/>
+			<xs:enumeration value="DESC"/>
+			<xs:enumeration value="ADDRK"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="int">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an integer number.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer"/>
+	</xs:simpleType>
+	<xs:complexType name="CV">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of coded data where there is no requirement from sending translations or qualifiers, otherwise it has the same structure as the CD data type.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CE">
+				<xs:sequence>
+					<xs:element name="originalText" type="ED" minOccurs="0"/>
+					<xs:element name="translation" type="CD" minOccurs="0" maxOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="code" type="cs" use="optional"/>
+				<xs:attribute name="codeSystem" type="uid" use="optional"/>
+				<xs:attribute name="codeSystemName" type="st" use="optional"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="optional"/>
+				<xs:attribute name="displayName" type="st" use="optional"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CE">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of coded data, where the approved coding scheme is not the original scheme in which the data was encoded.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="CD">
+				<xs:sequence>
+					<xs:element name="qualifier" type="CR" minOccurs="0" maxOccurs="0"/>
+					<xs:element name="originalText" type="ED" minOccurs="0"/>
+					<xs:element name="translation" type="CD" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="code" type="cs" use="optional"/>
+				<xs:attribute name="codeSystem" type="uid" use="optional"/>
+				<xs:attribute name="codeSystemName" type="st" use="optional"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="optional"/>
+				<xs:attribute name="displayName" type="st" use="optional"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="thumbnail">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a thumbnail image.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ED">
+				<xs:sequence>
+					<xs:element name="reference" type="TEL" minOccurs="0"/>
+					<xs:element name="thumbnail" type="thumbnail" minOccurs="0" maxOccurs="0"/>
+					<xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="BIN" abstract="true" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of binary data.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:attribute name="representation" type="cs_BinaryDataEncoding" use="optional" default="TXT"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ED" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of encapsulated data.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="BIN">
+				<xs:sequence>
+					<xs:element name="reference" type="TEL" minOccurs="0"/>
+					<xs:element name="thumbnail" type="thumbnail" minOccurs="0"/>
+					<xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="mediaType" type="cs" use="optional" default="text/plain"/>
+				<xs:attribute name="language" type="cs" use="optional"/>
+				<xs:attribute name="compression" type="cs_CompressionAlgorithm" use="optional"/>
+				<xs:attribute name="integrityCheck" type="bin" use="optional"/>
+				<xs:attribute name="integrityCheckAlgorithm" type="cs_IntegrityCheckAlgorithm" use="optional" default="SHA-1"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TEL">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of telephone numbers, pager and email addresses, and references to external data.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="URL">
+				<xs:sequence>
+					<xs:element name="useablePeriod" type="IVL_TS" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="id" type="II" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="use" type="set_cs_TelecommunicationAddressUse" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="II">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an instance identifier.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:attribute name="root" type="uid" use="optional"/>
+				<xs:attribute name="extension" type="st" use="optional"/>
+				<xs:attribute name="assigningAuthorityName" type="st" use="optional"/>
+				<xs:attribute name="displayable" type="bl" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IVL_TS">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a time interval.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="SXCM_TS">
+				<xs:choice minOccurs="0">
+					<xs:sequence>
+						<xs:element name="low" type="IVXB_TS"/>
+						<xs:choice minOccurs="0">
+							<xs:element name="width" type="PQ" minOccurs="0"/>
+							<xs:element name="high" type="IVXB_TS" minOccurs="0"/>
+						</xs:choice>
+					</xs:sequence>
+					<xs:element name="high" type="IVXB_TS"/>
+					<xs:sequence>
+						<xs:element name="width" type="PQ"/>
+						<xs:element name="high" type="IVXB_TS" minOccurs="0"/>
+					</xs:sequence>
+					<xs:sequence>
+						<xs:element name="center" type="TS"/>
+						<xs:element name="width" type="PQ" minOccurs="0"/>
+					</xs:sequence>
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PQ">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a physical quantity.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="QTY">
+				<xs:sequence>
+					<xs:element name="translation" type="PQR" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="value" type="real" use="optional"/>
+				<xs:attribute name="unit" type="cs" use="optional" default="1"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PQR">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of physical quantity ratios.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="CV">
+				<xs:attribute name="value" type="real" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IVXB_TS">
+		<xs:annotation>
+			<xs:documentation/>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="TS">
+				<xs:attribute name="inclusive" type="bl" use="optional" default="true"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="SXCM_TS">
+		<xs:annotation>
+			<xs:documentation/>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="TS">
+				<xs:attribute name="operator" type="cs_SetOperator" use="optional" default="I"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="TS">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a timeStamp.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="QTY">
+				<xs:attribute name="value" type="ts" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="QTY" abstract="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a quantity.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="URL">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a Uniform Resource Locator (URL).</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:attribute name="value" type="url" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CD">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a concept descriptor.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:sequence>
+					<xs:element name="originalText" type="ED" minOccurs="0"/>
+					<xs:element name="qualifier" type="CR" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="qualifier" type="CR" maxOccurs="unbounded"/>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="translation" type="CD" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="code" type="cs" use="optional"/>
+				<xs:attribute name="codeSystem" type="uid" use="optional"/>
+				<xs:attribute name="codeSystemName" type="st" use="optional"/>
+				<xs:attribute name="codeSystemVersion" type="st" use="optional"/>
+				<xs:attribute name="displayName" type="st" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CR">
+		<xs:annotation>
+			<xs:documentation/>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="CD">
+				<xs:sequence>
+					<xs:element name="name" type="CV" minOccurs="0"/>
+					<xs:element name="value" type="CD" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="inverted" type="bl" use="optional" default="false"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ANY" abstract="true">
+		<xs:annotation>
+			<xs:documentation>This data type represents an abstract type from which more specific data types are derived.</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="nullFlavor" type="cs_NullFlavor" use="optional"/>
+		<xs:attribute name="updateMode" type="cs_UpdateMode" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="INT">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an integer expressed as an attribute "value".</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="QTY">
+				<xs:attribute name="value" type="int" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="AD" mixed="true">
+		<xs:annotation>
+			<xs:documentation>The data type supports the representation of an address.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:sequence>
+					<xs:choice minOccurs="0" maxOccurs="unbounded">
+						<xs:element name="delimiter">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="DEL"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="country">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="CNT"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="state">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="STA"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="county">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="CPA"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="city">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="CTY"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="postalCode">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="ZIP"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="streetAddressLine">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="SAL"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="houseNumber">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="BNR"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="houseNumberNumeric">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="BNN"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="direction">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="DIR"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="streetName">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="STR"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="streetNameBase">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="STB"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="streetNameType">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="STTYP"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="additionalLocator">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="ADL"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="unitID">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="UNID"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="unitType">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="UNIT"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="carrier">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="CAR"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="censusTract">
+							<xs:complexType mixed="true">
+								<xs:complexContent>
+									<xs:restriction base="ADXP">
+										<xs:attribute name="partType" type="cs_AddressPartType" fixed="CEN"/>
+									</xs:restriction>
+								</xs:complexContent>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="addressKey">
+							<xs:complexType mixed="true">
+								<xs:attribute name="partType" type="cs_AddressPartType" fixed="ADDRK"/>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="desc">
+							<xs:complexType mixed="true">
+								<xs:attribute name="partType" type="cs_AddressPartType" fixed="DESC"/>
+							</xs:complexType>
+						</xs:element>
+					</xs:choice>
+					<xs:element name="useablePeriod" type="IVL_TS" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="id" type="II" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="use" type="set_cs_PostalAddressUse" use="optional"/>
+				<xs:attribute name="isNotOrdered" type="bl" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ADXP" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of an address part.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ST">
+				<xs:attribute name="partType" type="cs_AddressPartType"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ST" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of string data.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ED">
+				<xs:sequence>
+					<xs:element name="reference" type="TEL" minOccurs="0"/>
+					<xs:element name="thumbnail" type="thumbnail" minOccurs="0"/>
+					<xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="mediaType" type="cs" use="optional" default="text/plain"/>
+				<xs:attribute name="language" type="cs" use="optional"/>
+				<xs:attribute name="compression" type="cs_CompressionAlgorithm" use="optional"/>
+				<xs:attribute name="integrityCheck" type="bin" use="optional"/>
+				<xs:attribute name="integrityCheckAlgorithm" type="cs_IntegrityCheckAlgorithm" use="optional" default="SHA-1"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="BL">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of a boolean "value", which shall be "true" or "false".</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="ANY">
+				<xs:attribute name="value" type="bl" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>
