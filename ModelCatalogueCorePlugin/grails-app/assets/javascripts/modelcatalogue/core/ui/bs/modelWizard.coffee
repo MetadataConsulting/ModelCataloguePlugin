@@ -82,7 +82,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   </div>
                   <p class="help-block">Parent model is source for the hierarchy relationship</p>
                 </div>
-                <simple-object-editor object="parent.ext" title="Relationship Metadata"></simple-object-editor>
+                <simple-object-editor object="parent.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
               </form>
           </div>
           <div ng-switch-when="children" id="children">
@@ -99,7 +99,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   </div>
                   <p class="help-block">Child model is destination for the hierarchy relationship</p>
                 </div>
-                <simple-object-editor object="child.ext" title="Relationship Metadata"></simple-object-editor>
+                <simple-object-editor object="child.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
               </form>
           </div>
           <div ng-switch-when="elements" id="elements">
@@ -121,7 +121,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link" ng-click="importFromCSV()">CSV file headers</a>.
                   </alert>
                 </div>
-                <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Source Min Occurs', 'Source Max Occurs', 'Destination Min Occurs', 'Destination Max Occurs']"></simple-object-editor>
+                <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
               </form>
             </tab>
           </div>
@@ -142,7 +142,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             </tab>
           </div>
           <div ng-switch-when="summary" id="summary">
-              <h4 ng-show="model.name &amp;&amp; !finished">Crating new model <strong>{{model.name}}</strong></h4>
+              <h4 ng-show="model.name &amp;&amp; !finished">Creating new model <strong>{{model.name}}</strong></h4>
               <h4 ng-show="model.name &amp;&amp;  finished">Model <strong>{{model.name}} created</strong></h4>
               <progressbar type="{{finished ? 'success' : 'primary'}}" value="pendingActionsCount == 0 ? 100 : Math.round(100 * (totalActions - pendingActionsCount) / totalActions)">{{totalActions - pendingActionsCount}} / {{totalActions}}</progressbar>
           </div>
