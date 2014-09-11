@@ -12,7 +12,13 @@ class MappingService {
             return existing
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
-        newOne.save()
+        newOne.validate()
+
+        if (newOne.hasErrors()) {
+            return newOne
+        }
+
+        newOne.save(flush: true)
         source.addToOutgoingMappings(newOne)
         destination.addToIncomingMappings(newOne)
         newOne
@@ -28,7 +34,7 @@ class MappingService {
         if (!old) return null
         source.removeFromOutgoingMappings(old)
         destination.removeFromIncomingMappings(old)
-        old.delete()
+        old.delete(flush: true)
         old
     }
 

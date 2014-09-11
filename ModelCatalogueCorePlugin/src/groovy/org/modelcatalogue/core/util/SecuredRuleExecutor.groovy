@@ -18,7 +18,7 @@ class SecuredRuleExecutor {
         final String compilationFailedMessage
 
         ValidationResult(String compilationFailedMessage) {
-            this.compilationFailedMessage = compilationFailedMessage
+            this.compilationFailedMessage = cleanUpMessage compilationFailedMessage
         }
 
         boolean asBoolean() {
@@ -100,5 +100,15 @@ class SecuredRuleExecutor {
         } catch (e) {
             return e
         }
+    }
+
+    static String cleanUpMessage(String full) {
+        String ret = full.replace('startup failed:\nGeneral error during canonicalization: ', '')
+        ret = ret.replace('Expression [VariableExpression]', 'variable')
+        int indexOfSecurityException = ret.indexOf('java.lang.SecurityException:')
+        if (indexOfSecurityException > -1) {
+            ret = ret.substring(0, indexOfSecurityException)
+        }
+        ret.trim()
     }
 }

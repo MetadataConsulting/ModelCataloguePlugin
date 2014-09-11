@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.springframework.validation.Errors
 
 class Mapping {
 
@@ -27,13 +28,15 @@ class Mapping {
             if (!val || !obj.source) return true
             return val != obj.source && val.class == obj.source.class
         }
-        mapping nullable: false, blank: false, maxSize: 10000, validator: { val, obj ->
+        mapping nullable: false, blank: false, maxSize: 10000, validator: { val, obj, Errors errors ->
             if (!val) return true
-            return validateMapping(val)
+            SecuredRuleExecutor.ValidationResult result = validateMapping(val)
+            if (result) return true
+            errors.rejectValue 'mapping', "wontCompile", [result.compilationFailedMessage] as Object[],  "Mapping compilation failed:\n {0}"
         }
     }
 
-    static boolean validateMapping(String mappingText) {
+    static SecuredRuleExecutor.ValidationResult validateMapping(String mappingText) {
         new SecuredRuleExecutor(x: 0).validate(mappingText)
     }
 

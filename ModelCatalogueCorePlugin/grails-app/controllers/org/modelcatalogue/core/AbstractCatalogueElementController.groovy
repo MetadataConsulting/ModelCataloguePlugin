@@ -279,11 +279,11 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         if (add) {
             String mappingString = null
             withFormat {
-                xml {
-                    mappingString = request.getXML().text()
-                }
                 json {
                     mappingString = request.getJSON().mapping
+                }
+                xml {
+                    mappingString = request.getXML().text()
                 }
             }
             Mapping mapping = mappingService.map(element, destination, mappingString)
