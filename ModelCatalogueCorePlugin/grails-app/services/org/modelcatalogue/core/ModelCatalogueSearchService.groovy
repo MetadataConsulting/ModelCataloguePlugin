@@ -64,20 +64,20 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         String query = "%$params.search%"
 
         if (PublishedElement.isAssignableFrom(resource)) {
-            // language=HQL
+            String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
-                from PublishedElement p
+                from ${resource.simpleName} ${alias}
                 where
-                    p.status in :statuses
+                    ${alias}.status in :statuses
                     and (
-                        lower(p.name) like lower(:query)
-                        or lower(p.description) like lower(:query)
-                        or lower(p.modelCatalogueId) like lower(:query)
-                        or p in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                        lower(${alias}.name) like lower(:query)
+                        or lower(${alias}.description) like lower(:query)
+                        or lower(${alias}.modelCatalogueId) like lower(:query)
+                        or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
                     )
             """
 
-            def results = Lists.fromQuery(params, PublishedElement, listQuery, [
+            def results = Lists.fromQuery(params, resource, listQuery, [
                     query: query,
                     statuses: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED]
             ])
@@ -86,17 +86,17 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = results.items
             searchResults.total = results.total
         } else if (ExtendibleElement.isAssignableFrom(resource)) {
-            // language=HQL
+            String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
-                from ExtendibleElement e
+                from ${resource.simpleName} ${alias}
                 where
-                    lower(e.name) like lower(:query)
-                    or lower(e.description) like lower(:query)
-                    or lower(e.modelCatalogueId) like lower(:query)
-                    or e in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                    lower(${alias}.name) like lower(:query)
+                    or lower(${alias}.description) like lower(:query)
+                    or lower(${alias}.modelCatalogueId) like lower(:query)
+                    or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
             """
 
-            def results = Lists.fromQuery(params, ExtendibleElement, listQuery, [
+            def results = Lists.fromQuery(params, resource, listQuery, [
                     query: query
             ])
 
