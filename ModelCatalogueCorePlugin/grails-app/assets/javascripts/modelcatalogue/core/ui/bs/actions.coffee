@@ -1,5 +1,14 @@
 angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actionsProvider', (actionsProvider)->
 
+  showErrorsUsingMessages = (messages) ->
+    (response) ->
+      if response.data.errors
+        if angular.isString response.data.errors
+          messages.error response.data.errors
+        else
+          for err in response.data.errors
+            messages.error err.message
+
   actionsProvider.registerAction 'create-catalogue-element', ['$scope', 'names', 'security', 'messages', ($scope, names, security, messages) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.resource
@@ -121,6 +130,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           $scope.element = updated
           messages.success("New version created for #{$scope.element.name}")
           $rootScope.$broadcast 'newVersionCreated', $scope.element
+        , showErrorsUsingMessages(messages)
     }
 
     updateAction = ->
@@ -150,6 +160,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             $scope.element = updated
             messages.success("#{$scope.element.name} finalized")
             $rootScope.$broadcast 'newVersionCreated', $scope.element
+          , showErrorsUsingMessages(messages)
     }
 
     updateAction = ->
@@ -176,6 +187,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         messages.confirm("Do you want to archive #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
             $scope.element = archived
+          , showErrorsUsingMessages(messages)
     }
 
     updateAction = ->
@@ -203,13 +215,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           .then ->
             messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
             $state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
-          .catch (response) ->
-            if response.data.errors
-              if angular.isString response.data.errors
-                messages.error response.data.errors
-              else
-                for err in response.data.errors
-                  messages.error err.message
+          .catch showErrorsUsingMessages(messages)
     }
 
     updateAction = ->
@@ -303,10 +309,10 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           label:  report.title
           url:    report.url
           action: ->
-            switch report.type
-              when 'LINK' then $window.open(@url, '_blank')
-              else enhance(rest(method: 'GET', url: @url)).then (result) ->
-                result.show()
+            if report.type == 'LINK'
+              $window.open(@url, '_blank')
+            else enhance(rest(method: 'GET', url: @url)).then (result) ->
+              result.show()
             return true
         }
 
