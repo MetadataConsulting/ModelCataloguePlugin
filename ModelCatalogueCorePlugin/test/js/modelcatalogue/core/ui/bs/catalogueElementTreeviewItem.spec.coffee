@@ -5,8 +5,9 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
 
   it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->
 
-    catEl = enhance angular.copy(fixtures.valueDomain.showOne.dataType)
+    catEl = enhance angular.copy(fixtures.dataType.showOne)
     catEl.description = "Hello World!"
+    catEl.valueDomains.total = 5
 
     $rootScope.element = catEl
     $rootScope.descend = ['valueDomains']
@@ -25,7 +26,6 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     valueDomains = angular.copy(fixtures.dataType.valueDomains1)
 
     $httpBackend.expect('GET', catEl.valueDomains.link).respond(valueDomains)
-    $httpBackend.expect('GET', /\/api\/modelCatalogue\/core\/dataType\/\d+/).respond({ok: true})
 
     element.find('a').click()
 

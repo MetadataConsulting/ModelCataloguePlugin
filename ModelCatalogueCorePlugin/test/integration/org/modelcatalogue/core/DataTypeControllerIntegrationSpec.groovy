@@ -154,14 +154,14 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
             ]
     }
 
-    def getMappingPaginationParameters(baseLink){
-        [
-                // no,size, max , off. tot. next                           , previous
-                [1, 2, 10, 0, 2, "", ""],
-                [2, 2, 5, 0, 2, "", ""],
-        ]
-
-    }
+//    def getMappingPaginationParameters(baseLink){
+//        [
+//                // no,size, max , off. tot. next                           , previous
+//                [1, 2, 10, 0, 2, "", ""],
+//                [2, 2, 5, 0, 2, "", ""],
+//        ]
+//
+//    }
 
 
     private createValueDomainsUsingDataType(DataType DataType, Integer max){

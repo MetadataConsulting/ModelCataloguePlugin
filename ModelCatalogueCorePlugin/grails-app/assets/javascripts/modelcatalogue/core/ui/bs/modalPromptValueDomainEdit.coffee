@@ -64,16 +64,16 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
           $scope.beforeSave = ->
             promise = $q.when {}
 
-            if angular.isString($scope.pending.conceptualDomain)
+            if $scope.pending.conceptualDomain and angular.isString($scope.pending.conceptualDomain)
               promise = promise.then -> catalogueElementResource('conceptualDomain').save({name: $scope.pending.conceptualDomain}).then (newDomain) ->
                 $scope.copy.conceptualDomains.push newDomain
                 $scope.pending.conceptualDomain = null
 
-            if angular.isString($scope.copy.dataType)
+            if $scope.copy.dataType and angular.isString($scope.copy.dataType)
               promise = promise.then -> catalogueElementResource('dataType').save({name: $scope.copy.dataType}).then (newType) ->
                 $scope.copy.dataType = newType
 
-            if angular.isString($scope.copy.unitOfMeasure)
+            if $scope.copy.unitOfMeasure and angular.isString($scope.copy.unitOfMeasure)
               promise = promise.then -> catalogueElementResource('measurementUnit').save({name: $scope.copy.unitOfMeasure}).then (newUnit) ->
                 $scope.copy.unitOfMeasure = newUnit
 

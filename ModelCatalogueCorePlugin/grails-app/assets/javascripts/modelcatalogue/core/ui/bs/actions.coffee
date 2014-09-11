@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   showErrorsUsingMessages = (messages) ->
     (response) ->
-      if response.data.errors
+      if response.data and response.data.errors
         if angular.isString response.data.errors
           messages.error response.data.errors
         else
@@ -228,9 +228,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-
-
-
   actionsProvider.registerAction 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.isInstanceOf('org.modelcatalogue.core.CatalogueElement')
@@ -255,6 +252,23 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     action
   ]
+
+  actionsProvider.registerAction 'create-new-mapping', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.hasOwnProperty('mappings')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   300
+      label:      'Create Mapping'
+      icon:       'fa fa-superscript'
+      type:       'success'
+      action:     ->
+        messages.prompt('Create new mapping for ' + $scope.element.name, '', {type: 'new-mapping', element: $scope.element}).catch showErrorsUsingMessages(messages)
+    }
+  ]
+
+
 
   actionsProvider.registerAction 'download-asset', [ '$scope', '$window', ($scope, $window) ->
     return undefined if not $scope.element?.downloadUrl?

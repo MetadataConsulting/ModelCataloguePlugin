@@ -16,8 +16,8 @@ class MappingMarshallers extends AbstractMarshallers {
         if (!map) return [:]
         [
                 id: map.id,
-                source: map.source.info,
-                destination: map.destination.info,
+                source: CatalogueElementMarshallers.minimalCatalogueElementJSON(map.source),
+                destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(map.destination),
                 mapping: map.mapping
         ]
     }
