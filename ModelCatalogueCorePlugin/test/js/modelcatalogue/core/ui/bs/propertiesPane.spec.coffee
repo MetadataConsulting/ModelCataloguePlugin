@@ -47,7 +47,7 @@ describe "mc.core.ui.propertiesPane", ->
     expect(element.find('tbody tr:nth-child(1) td.pp-table-property-value').text()).toBe("#{$rootScope.element.id}")
     expect(element.find('tbody tr:nth-child(2) td.pp-table-property-value').text()).toBe("#{$rootScope.element.name}")
     expect(element.find('tbody tr:nth-child(3) td.pp-table-property-value').text()).toBe("#{$rootScope.element.description}")
-    expect(element.find('tbody tr:nth-child(4) td.pp-table-property-value').text()).toBe("#{$rootScope.element.dataType.name}")
+    expect(element.find('tbody tr:nth-child(4) td.pp-table-property-value-no-wrap a').text()).toBe("#{$rootScope.element.dataType.name}")
 
     shown = null
 
@@ -58,7 +58,7 @@ describe "mc.core.ui.propertiesPane", ->
 
     expect(shown).toBeNull()
 
-    link = element.find('tbody tr:nth-child(4) td.pp-table-property-element-value a')
+    link = element.find('tbody tr:nth-child(4) td.pp-table-property-value-no-wrap a')
 
     expect(link.length).toBe(1)
 
