@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
@@ -63,33 +64,44 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         String query = "%$params.search%"
 
         if (PublishedElement.isAssignableFrom(resource)) {
-            DetachedCriteria criteria = new DetachedCriteria(resource)
-            criteria.and {
-                'in'('status', PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED)
-                or {
-                    ilike('name', query)
-                    ilike('description', query)
-                    ilike('modelCatalogueId', query)
-                    extensions {
-                        ilike('extensionValue', query)
-                    }
-                }
-            }
-            searchResults.searchResults = criteria.list(params)
-            searchResults.total = criteria.count()
-        } else if (ExtendibleElement.isAssignableFrom(resource)) {
-            DetachedCriteria criteria = new DetachedCriteria(resource)
-            criteria.or {
-                ilike('name', query)
-                ilike('description', query)
-                ilike('modelCatalogueId', query)
-                extensions {
-                    ilike('extensionValue', query)
-                }
-            }
+            // language=HQL
+            String listQuery = """
+                from PublishedElement p
+                where
+                    p.status in :statuses
+                    and (
+                        lower(p.name) like lower(:query)
+                        or lower(p.description) like lower(:query)
+                        or lower(p.modelCatalogueId) like lower(:query)
+                        or p in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                    )
+            """
 
-            searchResults.searchResults = criteria.list(params)
-            searchResults.total = criteria.count()
+            def results = Lists.fromQuery(params, PublishedElement, listQuery, [
+                    query: query,
+                    statuses: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED]
+            ])
+
+
+            searchResults.searchResults = results.items
+            searchResults.total = results.total
+        } else if (ExtendibleElement.isAssignableFrom(resource)) {
+            // language=HQL
+            String listQuery = """
+                from ExtendibleElement e
+                where
+                    lower(e.name) like lower(:query)
+                    or lower(e.description) like lower(:query)
+                    or lower(e.modelCatalogueId) like lower(:query)
+                    or e in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+            """
+
+            def results = Lists.fromQuery(params, ExtendibleElement, listQuery, [
+                    query: query
+            ])
+
+            searchResults.searchResults = results.items
+            searchResults.total = results.total
         } else if (CatalogueElement.isAssignableFrom(resource)) {
             DetachedCriteria criteria = new DetachedCriteria(resource)
             criteria.or {
