@@ -6,7 +6,7 @@ describe "mc.core.ui.dataImportView", ->
   beforeEach module 'mc.core.ui.bs.propertiesPane'
   beforeEach module 'mc.core.ui.bs.simpleObjectEditor'
 
-  it "element get compiled",  inject ($compile, $rootScope, enhance,  $httpBackend) ->
+  xit "element get compiled",  inject ($compile, $rootScope, enhance,  $httpBackend) ->
     $httpBackend.when('GET', /.*/).respond({ok: true})
 
     catEl = enhance angular.copy(fixtures.Importer.list1)
