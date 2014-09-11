@@ -4,14 +4,15 @@ import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.dataarchitect.ImportRow
+import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 import org.modelcatalogue.core.util.ImportRows
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class DataImportController extends AbstractRestfulController{
 
-    def dataImportService
-    private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream']
+    def dataImportService, XSDImportService
+    private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml']
     static responseFormats = ['json']
     static allowedMethods = [upload: "POST"]
 
@@ -24,48 +25,73 @@ class DataImportController extends AbstractRestfulController{
         return "/dataArchitect/imports"
     }
 
+
+    protected getErrors(Map params, file){
+        def errors = []
+        if (!params?.conceptualDomain) errors.add("no conceptual domain!")
+        if (!params?.name) errors.add("no import name")
+        if (!file) errors.add("no file")
+        return errors
+    }
+
+    protected trimString(string){
+        string.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
+        return string
+    }
+
+
+
     def upload(Integer max) {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
             return
         }
-        def response
-        DataImport importer
         handleParams(max)
+        def errors = [], response
+
         if (!(request instanceof MultipartHttpServletRequest)) {
-            importer.errors.rejectValue('uploaded', 'import.uploadfailed', "No file")
+            errors.add("No file")
+            response =  ["errors": errors]
         }else {
             String conceptualDomainName, conceptualDomainDescription, importName
-            MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request
-            MultipartFile file = multiRequest.getFile("file")
-            def params = multiRequest.getParameterMap()
-            if (!params?.conceptualDomain) {
-                response = ["errors": "No conceptual domain!"]
-            } else if (!params?.name) {
-                response = ["errors": "no import name"]
-            } else if (!file) {
-                response = ["errors": "No file"]
-            } else {
-                conceptualDomainName = params.conceptualDomain.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
-                if (params?.conceptualDomainDescription) conceptualDomainDescription = params.conceptualDomainDescription.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else conceptualDomainDescription = ""
-                if (params?.name) importName = params.name.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else name = ""
+            MultipartFile file = request.getFile("file")
+            errors.addAll(getErrors(params, file))
+
+            if (!errors) {
+                conceptualDomainName = trimString(params.conceptualDomain)
+                if (params?.conceptualDomainDescription) conceptualDomainDescription = trimString(params.conceptualDomainDescription) else conceptualDomainDescription = ""
+                if (params?.name) importName = trimString(params.name) else importName = ""
                 def confType = file.getContentType()
-                if (CONTENT_TYPES.contains(confType) && file.size > 0) {
+
+
+                if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
                     ExcelLoader parser = new ExcelLoader(file.inputStream)
                     def (headers, rows) = parser.parse()
                     HeadersMap headersMap = populateHeaders()
-                    importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap)
+                    DataImport importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap)
+                    response = importer
+
+                } else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
+
+                    XsdLoader parserXSD = new XsdLoader(file.inputStream)
+                    def (topLevelElements, simpleDataTypes, complexDataTypes, schema, logErrorsSACT) = parserXSD.parse()
+                    XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema)
+
+                    DataImport importer = new DataImport(name:conceptualDomainName).save(flush:true, failOnError:true)
+
                     response = importer
 
                 } else {
-                    if (!CONTENT_TYPES.contains(confType)) {
-                        response = ["errors": "input should be an Excel file but uploaded content is ${confType}"]
-                    } else if (file.size <= 0){
-                        response = ["errors": "The uploaded file is empty"]
-                    }
+                    if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
+                    if (file.size <= 0) errors.add("The uploaded file is empty")
+                    response =  ["errors": errors]
                 }
+            }else{
+                response =  ["errors": errors]
             }
         }
+
+
 
         reportCapableRespond response
     }

@@ -158,6 +158,9 @@ class BootStrap {
                         }
                     }
 
+                    def parent = new Model(name:"parent1", status: PublishedElementStatus.FINALIZED).save(flush:true)
+                    parent.addToChildOf(parent)
+
                     assert !actionService.create(batch, TestAction, fail: true).hasErrors()
                     assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
                     assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()

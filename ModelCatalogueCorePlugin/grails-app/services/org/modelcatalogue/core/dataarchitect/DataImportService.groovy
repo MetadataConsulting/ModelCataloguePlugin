@@ -10,7 +10,9 @@ import org.modelcatalogue.core.ExtendibleElement
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.dataarchitect.xsd.*
 
 class DataImportService {
     static transactional = false
@@ -267,7 +269,7 @@ class DataImportService {
                 pendingDataElements.each { it ->
                     def dataElement = it[0]
                     def relationship = model.addToContains(dataElement)
-                    relationship.ext.put("Context" , it[2].name)
+//                    relationship.ext.put("Context" , it[2].name)
                     dataElement.status = PublishedElementStatus.FINALIZED
                     dataElement.save(flush:true, failOnError:true)
                 }
@@ -308,14 +310,19 @@ class DataImportService {
         //check cache of models to see if it has already been created
         Model model = importer.models.find{it.name == modelParams.name}
         if(!model && modelParams.name){
-            model = new Model(modelParams)
-            model.modelCatalogueId = modelParams.modelCatalogueId
-            model.save()
-            model.addToClassifications(classification)
-            model.addToHasContextOf(conceptualDomain)
+            model = createModel(modelParams, classification, conceptualDomain)
         }else{
             model.addToClassifications(classification)
         }
+        return model
+    }
+
+    protected createModel(Map modelParams, Classification classification, ConceptualDomain conceptualDomain){
+        Model model = new Model(modelParams)
+        model.modelCatalogueId = modelParams.modelCatalogueId
+        model.save()
+        model.addToClassifications(classification)
+        model.addToHasContextOf(conceptualDomain)
         return model
     }
 
@@ -369,7 +376,6 @@ class DataImportService {
     }
 
     protected Boolean checkValueDomainForChanges(Map params, ValueDomain valueDomain, ConceptualDomain cd){
-        //ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, params.unitOfMeasure)
         if(valueDomain) {
             if (!valueDomain.conceptualDomains.contains(cd)) { return true }
             if (valueDomain.unitOfMeasure != params.unitOfMeasure) { return true }
@@ -381,6 +387,20 @@ class DataImportService {
         }
         return false
     }
+
+    protected Boolean checkValueDomainForChanges(ValueDomain newVD, ValueDomain valueDomain, ConceptualDomain cd){
+        if(valueDomain) {
+            if (!valueDomain.conceptualDomains.contains(cd)) { return true }
+            if (valueDomain.unitOfMeasure != newVD.unitOfMeasure) { return true }
+            if (newVD.dataType instanceof EnumeratedType && valueDomain.dataType instanceof EnumeratedType) {
+                if (valueDomain.dataType.enumAsString != newVD.dataType.enumAsString) { return true }
+            } else if (valueDomain.dataType != newVD.dataType) { return true }
+        }else{
+            if(newVD.dataType||newVD.unitOfMeasure){return true}
+        }
+        return false
+    }
+
 
     protected Boolean checkDataElementForChanges(Map params, Map metadata, DataElement dataElement, Classification classification) {
         Boolean hasDataElementChanged = false
@@ -462,14 +482,79 @@ class DataImportService {
         return dataElement
     }
 
+    //update data element given value domain info
+    protected DataElement updateDataElement(DataImport importer, element, DataElement dataElement, ValueDomain valueDomain, ConceptualDomain cd, Model model, Classification classification) {
+
+        def params = [name: element.name, description: element.description]
+        Map metadata = [:]
+        Boolean dataElementChanged = checkDataElementForChanges(params, metadata, dataElement, classification)
+        ValueDomain vd = dataElement.valueDomain
+        Boolean valueDomainChanged = checkValueDomainForChanges(valueDomain, vd, cd)
+
+        if (dataElementChanged || valueDomainChanged) {
+
+            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
+                model.status = PublishedElementStatus.UPDATED
+                model.save()
+            }
+
+            addModelToImport(importer, model)
+
+            publishedElementService.archiveAndIncreaseVersion(dataElement)
+            dataElement.refresh()
+
+            if(dataElementChanged) {
+                dataElement.name = element.name
+                dataElement.description = element.description
+                dataElement.status = PublishedElementStatus.UPDATED
+                dataElement.save()
+                dataElement.addToClassifications(classification)
+                dataElement = updateMetadata(metadata, dataElement)
+            }
+
+            if (valueDomainChanged) {
+                if(dataElement.status != PublishedElementStatus.UPDATED) {
+                    dataElement.status = PublishedElementStatus.UPDATED
+                    dataElement.valueDomain = valueDomain
+                    dataElement.save()
+                }
+
+            }
+
+            addUpdatedDataElements(importer, dataElement, model, conceptualDomain)
+
+        }
+
+        return dataElement
+    }
+
     protected ValueDomain importValueDomain(Map vdParams, DataElement dataElement, ConceptualDomain cd) {
         ValueDomain vd = ValueDomain.findByDataTypeAndUnitOfMeasure(vdParams.dataType, vdParams.unitOfMeasure)
         if (!vd) { vd = new ValueDomain(vdParams).save() }
         vd.addToConceptualDomains(cd)
         dataElement.valueDomain = vd
-        vd.addToDataElements(dataElement)
         vd.save()
     }
+
+
+    protected  importValueDomain(String name, String description, DataType dataType, String regexDef, ConceptualDomain cd, Boolean multiple=Boolean.FALSE) {
+        ValueDomain vd = ValueDomain.findByDataTypeAndName(dataType, name)
+        if (!vd) {
+            vd = new ValueDomain(name: name, description: description, dataType: dataType, multiple: multiple).save()
+            if (regexDef!=""){
+                vd.setRegexDef(regexDef)
+                vd.save()
+            }
+        }
+        if (vd) {
+            vd.addToConceptualDomains(cd)
+            vd.save()
+        }
+        else {
+            println("Value Domain: " + name + " not imported.")
+        }
+    }
+
 
     protected DataElement importDataElement(DataImport importer, Map params, Map metadata, Model model, Map vdParams, ConceptualDomain cd, Classification classification) {
 
@@ -651,6 +736,329 @@ class DataImportService {
     }
 
 
+    def createDataTypesAndValueDomains(DataImport importer, ConceptualDomain cd, ArrayList<XsdSimpleType> simpleDataTypes){
+        DataType dataType
+        ValueDomain vd
+        // Add all the simple data types
+        simpleDataTypes.each { XsdSimpleType simpleType ->
+            (vd, dataType) = createSimpleType(importer, cd, simpleType, simpleDataTypes)
+            addRulesToSimpleType(simpleType, vd)
+            if (vd!=null && dataType!=null) println("SimpleType: " + simpleType.name)
+        }
+    }
+
+
+    private addRulesToSimpleType( XsdSimpleType simpleType, ValueDomain vd){
+        //Check the rules/patterns that apply to this type
+        String rule = ""
+        simpleType.restriction?.patterns?.each { XsdPattern pattern ->
+            def patternLength = pattern.value.length()
+            if (simpleType.restriction.minLength != "" && simpleType.restriction.maxLength == "" && pattern.value.charAt(patternLength - 1) == "]") {
+                if (rule =="") rule += pattern.value ("{" + simpleType.restriction.minLength + "," + simpleType.restriction.maxLength + "}")
+                else rule += ("|" + pattern.value ("{" + simpleType.restriction.minLength + "," + simpleType.restriction.maxLength + "}"))
+            }
+        }
+        vd.setRegexDef(rule)
+        vd.save()
+    }
+
+    private createSimpleType(DataImport importer, ConceptualDomain cd, XsdSimpleType simpleType, ArrayList<XsdSimpleType> simpleDataTypes){
+        String type
+        String description= simpleType?.description
+        ValueDomain vd
+        def dataType
+        String name = simpleType.name
+        if (simpleType.restriction!= null && simpleType.restriction.base != null) {
+            type = simpleType.restriction.base
+            if (simpleType.restriction.base.contains("xs:")) {
+                dataType = DataType.findByName(simpleType.restriction.base)
+
+                if (dataType == null) {
+                    dataType = simpleDataTypes.find{it.name==simpleType.restriction.base}
+                    if(dataType){
+                        createSimpleType(importer, cd, dataType, simpleDataTypes)
+                        dataType = DataType.findByName(simpleType.restriction.base)
+                    }else {
+                        dataType = new DataType(name: simpleType.restriction.base).save()
+                    }
+                }
+
+                vd = importValueDomain(name, description, dataType, "", cd)
+                addMetadataToValueDomain(vd, simpleType)
+                vd.save()
+                return [vd, dataType]
+            }
+            else {
+
+                //Check if the value domain already exists
+                vd = ValueDomain.findByName(name)
+                if(vd && !vd.conceptualDomains.contains(cd)) vd = null
+                if (vd == null) {
+                    vd = ValueDomain.findByName(type)
+                    if(!vd) {
+                        XsdSimpleType simpleDataType = simpleDataTypes.find { it.name == type }
+                        (vd, dataType) = createSimpleType(importer, cd, simpleDataType, simpleDataTypes)
+                    }
+                    // Check enumerated elements
+//                    if (simpleType.restriction.enumeration != "") {
+                        DataType enumeratedDataType = importDataType(simpleType.name, simpleType.restriction.enumeration)
+                        ValueDomain enumeratedVD = importValueDomain(simpleType.name, simpleType.description, enumeratedDataType, "", cd)
+                        addMetadataToValueDomain(enumeratedVD, simpleType)
+                        enumeratedVD.save()
+                        enumeratedVD.addToBasedOn(vd)
+                        vd.save()
+                        enumeratedVD.save()
+                        return [enumeratedVD, enumeratedDataType]
+//                    }
+//                    else return [vd,dataType]
+                } else {
+                    return [vd, vd.dataType]
+                }
+            }
+        }
+        else
+        {
+            //Check for union
+            if (simpleType.union!=null)
+            {
+                //get datatypes of union
+                String [] dataTypes =  simpleType.union.memberTypes.split(" ")
+                if (dataTypes.size()>0)
+                {
+                    ArrayList<ValueDomain> valueDomains = []
+                    dataTypes.each {String base ->
+                        dataType = DataType.findByName(base)
+
+                        if (dataType == null) {
+                            dataType = simpleDataTypes.find{it.name==base}
+                            if(dataType){
+                                createSimpleType(importer, cd, dataType, simpleDataTypes)
+                                dataType = DataType.findByName(base)
+                            }else {
+                                dataType = new DataType(name: base).save()
+                            }
+                        }
+
+                        ValueDomain valueDomain = importValueDomain(base, base, dataType, "", cd)
+                        valueDomain.save()
+                        valueDomains << valueDomain
+                    }
+
+                    if (valueDomains.size()>0)
+                    {
+                        //Create the root value domain
+                        vd = importValueDomain(name, description, null, "", cd)
+                        //Add union of relationships
+                        valueDomains.each {ValueDomain valueDomain ->
+                            vd.addToUnionOf(valueDomain)
+                            valueDomain.addToUnionOf(vd)
+                            vd.save()
+                            valueDomain.save()
+                        }
+                    }
+                }
+                return [vd, null]
+            }
+            else
+            {
+                //Check for list
+                if ( simpleType.list != null)
+                {
+                    String base = simpleType.list.itemType
+                    dataType = DataType.findByName(base)
+                    if (dataType == null) {
+                        dataType = simpleDataTypes.find{it.name==base}
+                        if(dataType){
+                            createSimpleType(importer, cd, dataType, simpleDataTypes)
+                            dataType = DataType.findByName(base)
+                        }else {
+                            dataType = new DataType(name: base).save()
+                        }
+                    }
+                    vd = importValueDomain(name, description, dataType, "", cd, Boolean.TRUE)
+                    vd.save()
+                    return [vd, dataType]
+                }
+            }
+        }
+
+    }
+    private addMetadataToValueDomain (vd, XsdSimpleType simpleType){
+
+        String pattern=""
+        simpleType.restriction?.patterns?.each { XsdPattern xsdPattern ->
+            if (pattern == "") {
+                pattern += xsdPattern.value
+            } else {
+                pattern += ("|" + xsdPattern.value)
+
+            }
+        }
+        def metadata = [minLength: simpleType.restriction?.minLength,
+                        maxLength: simpleType.restriction?.maxLength,
+                        lenght: simpleType.restriction?.length,
+                        minInclusive: simpleType.restriction?.minInclusive,
+                        maxInclusive: simpleType.restriction?.maxInclusive,
+                        minExclusive: simpleType.restriction?.minExclusive,
+                        maxExclusive: simpleType.restriction?.maxExclusive,
+                        pattern: pattern
+        ]
+
+
+        vd = updateMetadata(metadata, vd)
+
+
+    }
+
+
+
+    def createModels(DataImport importer, ConceptualDomain conceptualDomain, ArrayList<XsdComplexType> complexDataTypes, ArrayList<XsdGroup> groups, Classification classification){
+
+        complexDataTypes.each { XsdComplexType complexDataType ->
+            //Create Model for each Group, Choice and Sequence.
+            //Model model = matchOrCreateModel(importer, [name:complexDataType.name, description: complexDataType.description], cd, classification).save()
+            def model = createModel([name:complexDataType.name, description: complexDataType.description], classification, conceptualDomain)
+            if (model != null) println("Model: " + complexDataType.name)
+            addModelToImport(importer, model)
+        }
+
+        groups.each{ XsdGroup group ->
+            //Model model = matchOrCreateModel(importer, [name:group.name, description: group.description], cd, classification).save()
+            def model = createModel([name:group.name, description: group.description], classification, conceptualDomain)
+            addModelToImport(importer, model)
+        }
+
+    }
+
+    def createCatalogueElements(DataImport importer, ArrayList<XsdElement> elements, ConceptualDomain conceptualDomain, Classification classification){
+
+
+        // Extract all the DataElements
+        elements.each { XsdElement element ->
+
+            Model complexTypeModel = Model.findByName(element.type)
+            if  (complexTypeModel == null) {
+
+                //find or create the data element
+                ValueDomain valueDomain = ValueDomain.findByName(element.type)
+                def containingModels = Model.findAllWhere(name:element.section)
+                def containingModel = containingModels.find{it.classifications.contains(classification)}
+
+                def dataElements = DataElement.findByName(element.name)
+                def dataElement
+                dataElements.each{ DataElement de->
+                    def classifications = de.classifications
+                    if(classifications.find{it.id==classification.id} && de.valueDomain.id == valueDomain.id) dataElement = de
+                }
+
+
+                if (dataElement){
+                    if(checkDataElementForChanges([name: element.name, description: element.description], [:],dataElement, classification)) {
+                        dataElement = null
+                    }else{
+                        dataElement.addToClassifications(classification)
+                        Relationship containedIn = dataElement.addToContainedIn(containingModel)
+                        containedIn.ext.put("Min Occurs", element.minOccurs)
+                        containedIn.ext.put("Max Occurs", element.maxOccurs)
+                        containedIn.ext.put("type", "xs:element")
+                        addModelToImport(importer, containingModel)
+                    }
+                }
+
+                if (!dataElement) {
+                    dataElement = new DataElement(name: element.name, description: element.description).save()
+                    dataElement.addToClassifications(classification)
+                    Relationship containedIn = dataElement.addToContainedIn(containingModel)
+                    containedIn.ext.put("Min Occurs", element.minOccurs)
+                    containedIn.ext.put("Max Occurs", element.maxOccurs)
+                    containedIn.ext.put("type", "xs:element")
+                    addModelToImport(importer, containingModel)
+                    addUpdatedDataElements(importer, dataElement, containingModel, conceptualDomain)
+                }
+
+                dataElement.valueDomain = valueDomain
+                dataElement.save()
+
+                return dataElement
+
+            }
+            else
+            {
+                //create the model
+                Model model = Model.findByName(element.name)
+                if (model ==null) model = matchOrCreateModel(importer, [name:element.name, description: element.description], conceptualDomain, classification)
+                Model parentNode = Model.findByName(element.section)
+                if (parentNode!=null && model !=null) {
+                    parentNode.addToParentOf(model)
+                    model.addToParentOf(complexTypeModel)
+                    model.save(flush:true)
+                    println("ParentModel: " + element.section +  " Model: " + element.name + " ComplexModel: " + element.type)
+                }
+            }
+        }
+
+    }
+
+    def createCatalogueAttributes(DataImport importer, ArrayList<XsdAttribute> attributes, ConceptualDomain conceptualDomain, Classification classification){
+
+        // Extract all the DataElements
+        attributes.each { XsdAttribute attribute ->
+
+            //find or create the data attribute
+            ValueDomain valueDomain = ValueDomain.findByName(attribute.type)
+            def containingModels = Model.findAllWhere(name: attribute.section)
+            def containingModel = containingModels.find { it.classifications.contains(classification) }
+
+            def dataElements = DataElement.findByNameAndValueDomain(attribute.name, valueDomain)
+            def dataElement
+            dataElements.each{ DataElement de->
+                def classifications = de.classifications
+                if(classifications.find{it.id==classification.id}) dataElement = de
+            }
+
+
+            def metaDataParams = [:]
+            if(attribute?.defaultValue) metaDataParams.put("defaultValue", attribute?.defaultValue)
+            if(attribute?.fixed) metaDataParams.put("fixed", attribute?.fixed)
+            if(attribute?.form) metaDataParams.put("form", attribute?.form)
+            if(attribute?.id) metaDataParams.put("id", attribute?.id)
+            if(attribute?.ref) metaDataParams.put("ref", attribute?.ref)
+
+            if (dataElement){
+                if(checkDataElementForChanges([name: attribute.name, description: attribute.description], metaDataParams,dataElement, classification)) {
+                    dataElement = null
+                }else{
+                    dataElement.addToClassifications(classification)
+                    Relationship containedIn = dataElement.addToContainedIn(containingModel)
+                    containedIn.ext.put("type", "xs:attribute")
+                    if(attribute?.use) containedIn.ext.put("use", attribute?.use)
+                }
+            }
+
+            if (!dataElement) {
+                dataElement = new DataElement(name: attribute.name, description: attribute.description).save()
+                if(attribute?.defaultValue) dataElement.ext.put("defaultValue", attribute?.defaultValue)
+                if(attribute?.fixed) dataElement.ext.put("fixed", attribute?.fixed)
+                if(attribute?.form) dataElement.ext.put("form", attribute?.form)
+                if(attribute?.id) dataElement.ext.put("id", attribute?.id)
+                if(attribute?.ref) dataElement.ext.put("ref", attribute?.ref)
+                dataElement.save()
+                dataElement.addToClassifications(classification)
+                Relationship containedIn = dataElement.addToContainedIn(containingModel)
+                containedIn.ext.put("type", "xs:attribute")
+                if(attribute?.use) containedIn.ext.put("use", attribute?.use)
+                addModelToImport(importer, containingModel)
+                addUpdatedDataElements(importer, dataElement, containingModel, conceptualDomain)
+            }
+
+            dataElement.valueDomain = valueDomain
+            dataElement.save()
+
+            return dataElement
+
+
+        }
+    }
 
 
 }

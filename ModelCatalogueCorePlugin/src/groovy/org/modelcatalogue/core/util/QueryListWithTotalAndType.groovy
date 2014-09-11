@@ -51,7 +51,7 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     @Override
     Long getTotal() {
         if (total == null) {
-            return total = type.executeQuery(countQuery, arguments, params)[0]
+            return total = type.executeQuery(countQuery, arguments)[0]
         }
         return total
     }

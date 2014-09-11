@@ -116,7 +116,7 @@ class ValueDomainSpec extends Specification {
 
         where:
         regexp         | rule                   | matches
-        "(?i)google"   | "x ==~ /(?i)google/"   | "gOOgle"
+        "(?i)google"   | "x ==~ /(?i)google/"  | "gOOgle"
 
     }
 
@@ -127,6 +127,7 @@ class ValueDomainSpec extends Specification {
         where:
         rule        | x
         "x > 10"    | 20
+        "x ==~ /(?i)google/ || x ==~/g01gle/" |  "g01gle"
     }
 
 }
