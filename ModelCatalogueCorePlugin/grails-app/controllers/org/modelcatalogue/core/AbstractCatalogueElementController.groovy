@@ -298,7 +298,8 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         }
         Mapping old = mappingService.unmap(element, destination)
         if (old) {
-            respond HttpStatus.CREATED
+            response.status = HttpServletResponse.SC_NO_CONTENT
+            render "DELETED"
         } else {
             notFound()
         }
