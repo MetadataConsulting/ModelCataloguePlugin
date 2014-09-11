@@ -5,6 +5,7 @@ import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.SimpleListWrapper
+import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
 
@@ -297,7 +298,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         }
         Mapping old = mappingService.unmap(element, destination)
         if (old) {
-            response.status = HttpServletResponse.SC_NO_CONTENT
+            respond HttpStatus.CREATED
         } else {
             notFound()
         }

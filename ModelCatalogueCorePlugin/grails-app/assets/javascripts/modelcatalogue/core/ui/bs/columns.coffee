@@ -11,11 +11,13 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   getConceptualDomainsForValueDomain = (valueDomain) ->
+    return '' if not valueDomain.conceptualDomains
     domainNames = for domain in valueDomain.conceptualDomains
       "<a href='#/catalogue/conceptualDomain/#{domain.id}'>#{domain.name}</a>"
     domainNames.join(', ')
 
   getClassificationsForDataElement = (dataElement) ->
+    return '' if not dataElement.classifications
     classificationNames = for classification in dataElement.classifications
       "<a href='#/catalogue/classification/#{classification.id}'>#{classification.name}</a>"
     classificationNames.join(', ')
@@ -82,9 +84,8 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Mapping', [
-    {header: 'Destination',     value: "destination.name",                                    classes: 'col-md-4', show: 'destination.show()', sort: {property: 'destination.name', type: 'alphabet'}}
-    {header: 'Mapping',         value: 'mapping',                                             classes: 'col-md-5'}
-    {header: 'Identification',  value: "destination.getElementTypeName() + ': ' + destination.id", classes: 'col-md-3', show: 'destination.show()'}
+    {header: 'Destination',         value: "destination.name",                 classes: 'col-md-4', show: 'destination.show()'}
+    {header: 'Mapping',             value: 'mapping',                          classes: 'col-md-6 preserve-all'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.MeasurementUnit', [

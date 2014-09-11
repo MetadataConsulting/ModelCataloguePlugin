@@ -21,6 +21,7 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
               <div class="form-group">
                 <label for="mapping">Mapping</label>
                 <textarea rows="10" ng-model="copy.mapping" placeholder="Mapping" class="form-control" id="mapping"></textarea>
+                <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value from current domain. Last row is the result. For example you can <a ng-click="showMapExample()">map string values</a> or <a ng-click="showConvertExample()">convert numeric values</a></p>
               </div>
             </form>
         </div>
@@ -32,7 +33,29 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
         controller: ['$scope', 'messages', '$modalInstance', ($scope, messages, $modalInstance) ->
           $scope.update = args.update
           $scope.messages = messages.createNewMessages()
-          $scope.copy = args.mapping ? {}
+          $scope.copy = if args.mapping then angular.copy(args.mapping) else {}
+
+          MAP_EXAMPLE = """// letters to fruit
+[
+  'a': 'apple',
+  'b': 'banana',
+  'c': 'cherry'
+][x]"""
+          CONVERSION_EXAMPLE = """// compute Fahrenheit to Celsius
+(x as Double) * 9 / 5 + 32
+"""
+          showExample = (example) ->
+            ->
+              if $scope.copy.mapping and $scope.copy.mapping != MAP_EXAMPLE and $scope.copy.mapping != CONVERSION_EXAMPLE
+                messages.confirm("Replace current mapping with example", "Do already have some mapping, do you want to replace it with the example?").then ->
+                  $scope.copy.mapping = example
+              else
+                $scope.copy.mapping = example
+
+
+          $scope.showMapExample = showExample(MAP_EXAMPLE)
+          $scope.showConvertExample = showExample(CONVERSION_EXAMPLE)
+
 
 
           $scope.createMapping = ->
