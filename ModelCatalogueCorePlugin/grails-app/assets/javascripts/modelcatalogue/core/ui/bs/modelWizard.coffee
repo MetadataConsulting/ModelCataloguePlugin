@@ -65,7 +65,10 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           </div>
           <div ng-switch-when="metadata" id="metadata">
               <form ng-submit="select('parents')">
-                <simple-object-editor title="Key" value-title="Value" object="metadata"></simple-object-editor>
+                <div>
+                  <h4>Metadata</h4>
+                  <simple-object-editor title="Key" value-title="Value" object="metadata"></simple-object-editor>
+                </div>
               </form>
           </div>
           <div ng-switch-when="parents" id="parents">
@@ -75,7 +78,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Parent Model</label>
                   <elements-as-tags elements="parents"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="model">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="model" typeahead-on-select="push('parents', 'parent')">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
@@ -92,7 +95,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Child Model</label>
                   <elements-as-tags elements="children"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="model">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="child.element" focus-me="step=='children'" catalogue-element-picker="model" typeahead-on-select="push('children', 'child')">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('children', 'child')" ng-disabled="isEmpty(child.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
@@ -109,16 +112,16 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Data Element</label>
                   <elements-as-tags elements="dataElements"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement"  typeahead-on-select="push('dataElements', 'dataElement')">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                   <p class="help-block">Data element is destination for the containment relationship</p>
                 </div>
-                <div>
+                <div ng-click="importFromCSV()">
                   <alert type="'info'">
-                    <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link" ng-click="importFromCSV()">CSV file headers</a>.
+                    <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link">CSV file headers</a>.
                   </alert>
                 </div>
                 <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Source Min Occurs', 'Source Max Occurs', 'Destination Min Occurs', 'Destination Max Occurs']"></simple-object-editor>
@@ -132,7 +135,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Classifications</label>
                   <elements-as-tags elements="classifications"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification" focus-me="step=='classifications'" catalogue-element-picker="classification">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification" focus-me="step=='classifications'" catalogue-element-picker="classification"  typeahead-on-select="classifications.push(classification);classification = null">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="classifications.push(classification);classification = null" ng-disabled="isEmpty(classification)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
@@ -326,7 +329,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           $scope.dismiss = (reason) ->
             return $modalInstance.dismiss(reason) if $scope.finished
             if $scope.model.name or $scope.model.description or not $scope.isEmpty($scope.metadata) or $scope.parents.length > 0 or $scope.children.length > 0 or $scope.dataElements.length > 0 or $scope.classifications.length > 0
-              messages.confirm("Close Classification Wizard", "Do you want to discard all changes?").then ->
+              messages.confirm("Close Model Wizard", "Do you want to discard all changes?").then ->
                 $modalInstance.dismiss(reason)
             else
               $modalInstance.dismiss(reason)

@@ -17,7 +17,7 @@ angular.module('mc.core.ui.bs.modalPromptCsvHeaders', ['mc.util.messages', 'angu
               <div class="form-group">
                 <label for="asset" class="">CSV File</label>
                 <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="csvFile" placeholder="CSV File" ng-model="csvFile" ng-file-select="onFileSelect($files)">
-                <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
+                <progressbar value="progress" ng-show="uploading &amp;&amp; progress"><span ng-hide="progress == 100">{{progress}} %</span><span ng-show="progress == 100">Upload finished. Data elements are being matched. This may take a while.</span></progressbar>
               </div>
             </form>
         </div>
