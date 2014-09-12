@@ -19,7 +19,7 @@ angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
-            <form role="form">
+            <form role="form" ng-submit="saveElement()">
               <div class="form-group">
                 <label for="name" class="">Name</label>
                 <input type="text" class="form-control" id="name" placeholder="Name" ng-model="copy.name">

@@ -14,7 +14,7 @@ angular.module('mc.core.ui.bs.modalPromptActionParametersEdit', ['mc.util.messag
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
             <blockquote class="action-description">{{action.description}}</blockquote>
-            <form role="form">
+            <form role="form" ng-submit="updateParameters()">
               <div class="new-relationship-modal-prompt-metadata">
                 <simple-object-editor object="parameters" title="Parameters"></simple-object-editor>
               </div>
