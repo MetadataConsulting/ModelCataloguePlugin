@@ -133,8 +133,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         user: ['security', (security) ->
           if security.getCurrentUser() then return security.getCurrentUser().displayName else return ''
         ]
-        statistics: ['catalogue', (catalogue) ->
-          catalogue.getStatistics()
+        statistics: ['catalogue', 'security', (catalogue, security) ->
+          if security.getCurrentUser() then return catalogue.getStatistics() else return ''
         ]
   }
 
