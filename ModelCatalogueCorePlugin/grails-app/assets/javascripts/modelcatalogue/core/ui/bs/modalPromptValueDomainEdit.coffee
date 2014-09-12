@@ -13,7 +13,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
-            <form role="form">
+            <form role="form" ng-submit="saveElement()">
               <div class="form-group">
                 <label for="conceptualDomain"> Conceptual Domains</label>
                 <elements-as-tags elements="copy.conceptualDomains"></elements-as-tags>

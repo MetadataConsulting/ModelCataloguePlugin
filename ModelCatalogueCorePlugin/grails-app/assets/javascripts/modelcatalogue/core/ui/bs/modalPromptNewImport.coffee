@@ -15,7 +15,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
-            <form role="form">
+            <form role="form" ng-submit="saveElement()">
               <div class="form-group">
                 <label for="name" class="">Conceptual Domain</label>
                 <input type="text" class="form-control" id="conceptualDomain" ng-model="copy.conceptualDomain">
@@ -76,6 +76,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
             }).progress((evt) ->
               $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
             ).success((result) ->
+              result = enhance result
               $scope.uploading = false
               if result.errors
                 for err in result.errors
@@ -84,7 +85,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
               else
                 if args?.create
                   messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
-                  $modalInstance.close(enhance result)
+                  $modalInstance.close(result)
             ).error((data) ->
               for err in data.errors
                 $scope.messages.error err.message
