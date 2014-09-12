@@ -138,12 +138,44 @@ Model catalogue core plugin (metadata registry)
 
         xlsxListRenderer.registerRowWriter('NHIC') {
             title "NHIC"
-            //headers "Classification", "Parent Model Unique Code", "Parent Model", "Model Unique Code", "Model", "Data Item Unique Code", "Data Item Name", "Data Item Description", "Measurement Unit", "Data type", "Metadata", "NHIC_Identifier", "Link_to_existing_definition", "Notes_from_GD_JCIS", "Optional_Local_Identifier", "A", "B", "C", "D", "E","F", "G", "H", "E2", "System", "Comments", "Group", "More-comments", "Multiplicity", "Temp", "Index", "NIHR Code", "Section_0", "Section_1", "Section_2", "Section_3", "Supporting", "Associated date and time", "Given Data type", "Template", "List content", "Timing of Data Collection", "Source UCH", "label1 - UCH", "label2 - UCH", "More metadata1", "Reference", "ranges - UCH", "Cambridge", "Source Cambridge", "Type of Anonymisation", "Data Dictionary Element", "Link to existing definition", "Anonymizing Rules", "File Name (COSD XSD)", "XSD Element Name","Original Data Item Name (COSD v1.2 xls)","Pathway Group"
-            headers "Parent Model Unique Code",	"Parent Model",	"Model Unique Code", "Model", "Data Item Unique Code", "Data Item Name", "Data Item Description", "Measurement Unit", "Data type",	"Metadata", "Data item No.","Schema Specification","Data Dictionary Element", "Current Collection", "Format"
+            headers "Classification", "Parent Model Unique Code",
+            "Parent Model", "Model Unique Code", "Model",
+            "Data Item Unique Code", "Data Item Name", "Data Item Description",
+            "Measurement Unit", "Data type", "Metadata",
+            "NHIC_Identifier", "Link_to_existing_definition", "Notes_from_GD_JCIS",
+            "Optional_Local_Identifier", "A", "B",
+            "C", "D", "E","F",
+            "G", "H", "E2", "System",
+            "Comments", "Group", "More-comments", "Multiplicity",
+            "Temp", "Index", "NIHR Code", "Section_0",
+            "Section_1", "Section_2", "Section_3", "Supporting",
+            "Associated date and time", "Given Data type", "Template", "List content",
+            "Timing of Data Collection", "Source UCH", "label1 - UCH", "label2 - UCH",
+            "More metadata1", "Reference", "ranges - UCH", "Cambridge",
+            "Source Cambridge", "Type of Anonymisation", "Data Dictionary Element", "Link to existing definition",
+            "Anonymizing Rules", "File Name (COSD XSD)", "XSD Element Name",
+            "Original Data Item Name (COSD v1.2 xls)","Pathway Group"
+//            headers "Parent Model Unique Code",	"Parent Model",	"Model Unique Code", "Model", "Data Item Unique Code", "Data Item Name", "Data Item Description", "Measurement Unit", "Data type",	"Metadata", "Data item No.","Schema Specification","Data Dictionary Element", "Current Collection", "Format"
             when { ListWrapper container, RenderContext context ->
                 context.actionName in ['index', 'search', 'metadataKeyCheck', 'uninstantiatedDataElements', 'getSubModelElements'] && container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
-                [[getParentModel(element)?.modelCatalogueId, getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name, element.modelCatalogueId, element.name, element.description, getUnitOfMeasure(element), getDataType(element), "-", element.ext.get("Data item No."), element.ext.get("Schema Specification"), element.ext.get("Data Dictionary Element"), element.ext.get("Current Collection"), element.ext.get("Format") ]]
+                [[element.classifications.toArray().toString(), getParentModel(element)?.modelCatalogueId,
+                  getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name,
+                  element.modelCatalogueId, element.name, element.description,
+                  getUnitOfMeasure(element), getDataType(element), "-",
+                  element.ext.get("Data item No."), element.ext.get("Schema Specification"), element.ext.get("Data Dictionary Element"),
+                  element.ext.get("Optional_Local_Identifier"), element.ext.get("A"), element.ext.get("B"),
+                  element.ext.get("C"), element.ext.get("D"), element.ext.get("E"), element.ext.get("F"),
+                  element.ext.get("G"), element.ext.get("H"), element.ext.get("E2"), element.ext.get("System"),
+                  element.ext.get("Comments"), element.ext.get("Group"), element.ext.get("More-comments"), element.ext.get("Multiplicity"),
+                  element.ext.get("Temp"), element.ext.get("Index"), element.ext.get("NIHR Code"), element.ext.get("Section_0"),
+                  element.ext.get("Section_1"), element.ext.get("Section_2"), element.ext.get("Section_3"), element.ext.get("Supporting"),
+                  element.ext.get("Associated date and time"), element.ext.get("Given Data type"), element.ext.get("Template"), element.ext.get("List content"),
+                  element.ext.get("Timing of Data Collection"), element.ext.get("Source UCH"), element.ext.get("label1 - UCH"), element.ext.get("label2 - UCH"),
+                  element.ext.get("More metadata1"), element.ext.get("Reference"), element.ext.get("ranges - UCH"), element.ext.get("Cambridge"),
+                  element.ext.get("Source Cambridge"), element.ext.get("Type of Anonymisation"), element.ext.get("Data Dictionary Element"), element.ext.get("Link to existing definition"),
+                  element.ext.get("Anonymizing Rules"), element.ext.get("File Name (COSD XSD)"), element.ext.get("XSD Element Name"),
+                  element.ext.get("Original Data Item Name (COSD v1.2 xls)"), element.ext.get("Pathway Group")]]
             }
         }
 //EXAMPLE OF the kinds of reports you can configure:
