@@ -21,12 +21,12 @@ describe "mc.core.modelCatalogueDataArchitect", ->
     $httpBackend.flush()
 
     expect(result).toBeDefined()
-    expect(result.total).toBe(11)
+    expect(result.total).toBe(8)
     expect(result.page).toBe(10)
-    expect(result.size).toBe(10)
+    expect(result.size).toBe(8)
     expect(result.offset).toBe(0)
     expect(result.list).toBeDefined()
-    expect(result.list.length).toBe(10)
+    expect(result.list.length).toBe(8)
 
   it "metadataKeyCheck with params", inject ($httpBackend, modelCatalogueDataArchitect, modelCatalogueApiRoot) ->
     $httpBackend

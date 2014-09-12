@@ -48,12 +48,12 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
 
     @Override
     ValueDomain getLoadItem() {
-        ValueDomain.findByName("value domain test5")
+        ValueDomain.findByName("value domain test3")
     }
 
     @Override
     ValueDomain getAnotherLoadItem() {
-        ValueDomain.findByName("value domain test6")
+        ValueDomain.findByName("value domain test4")
     }
 
     @Override

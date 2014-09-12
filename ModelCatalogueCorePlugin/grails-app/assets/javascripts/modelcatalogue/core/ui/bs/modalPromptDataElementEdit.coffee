@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
-            <form role="form">
+            <form role="form" ng-submit="saveElement()">
               <div class="form-group">
                 <label for="classification"> Classifications</label>
                 <elements-as-tags elements="copy.classifications"></elements-as-tags>

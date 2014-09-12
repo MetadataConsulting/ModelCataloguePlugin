@@ -18,7 +18,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
     def setupSpec(){
         loadFixtures()
         de1 = DataElement.findByName("DE_author")
-        de2 = DataElement.findByName("auth7")
+        de2 = DataElement.findByName("auth")
         de3 = DataElement.findByName("AUTHOR")
         de4 = DataElement.findByName("auth4")
         de5 = DataElement.findByName("auth5")
@@ -90,7 +90,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         ListWithTotal dataElements = dataArchitectService.uninstantiatedDataElements(params)
 
         then:
-        !dataElements.items.contains(DataElement.get(de2.id))
+        !dataElements.items.contains(DataElement.findByName('speed of Vauxhall'))
         dataElements.items.contains(DataElement.get(de1.id))
         dataElements.items.contains(DataElement.get(de3.id))
 
