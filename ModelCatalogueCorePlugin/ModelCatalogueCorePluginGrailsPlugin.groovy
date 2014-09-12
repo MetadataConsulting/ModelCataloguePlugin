@@ -117,6 +117,25 @@ Model catalogue core plugin (metadata registry)
         }
 
         xlsxListRenderer.registerRowWriter {
+            title "DataTypes to Excel"
+            headers 'Model Catalogue ID', 'Name', 'Enumerations', 'Value Domain'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || CatalogueElement.isAssignableFrom(container.itemType))
+            } then { DataType dataType ->
+                [[dataType.id, dataType.name, getEnumerationString(dataType), getValueDomainString(dataType)]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter {
+            title "ValueDomains to Excel"
+            headers 'Model Catalogue ID', 'Name', 'Conceptual Domains', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || CatalogueElement.isAssignableFrom(container.itemType))
+            } then { ValueDomain valueDomain ->
+                [[valueDomain.id, valueDomain.name, getConceptualDomainString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
+            }
+        }
+        xlsxListRenderer.registerRowWriter {
             title "Relationship Types to Excel"
             headers 'Name', 'Source to Destination', 'Destination to Source'
             when { ListWrapper container, RenderContext context ->
@@ -159,11 +178,11 @@ Model catalogue core plugin (metadata registry)
             when { ListWrapper container, RenderContext context ->
                 context.actionName in ['index', 'search', 'metadataKeyCheck', 'uninstantiatedDataElements', 'getSubModelElements'] && container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
-                [[element.classifications.toArray().toString(), getParentModel(element)?.modelCatalogueId,
+                [[getClassificationString(element), getParentModel(element)?.modelCatalogueId,
                   getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name,
                   element.modelCatalogueId, element.name, element.description,
                   getUnitOfMeasure(element), getDataType(element), "-",
-                  element.ext.get("Data item No."), element.ext.get("Schema Specification"), element.ext.get("Data Dictionary Element"),
+                  element.ext.get("NHIC_Identifier"), element.ext.get("Link_to_existing_definition"), element.ext.get("Notes_from_GD_JCIS"),
                   element.ext.get("Optional_Local_Identifier"), element.ext.get("A"), element.ext.get("B"),
                   element.ext.get("C"), element.ext.get("D"), element.ext.get("E"), element.ext.get("F"),
                   element.ext.get("G"), element.ext.get("H"), element.ext.get("E2"), element.ext.get("System"),
@@ -178,6 +197,8 @@ Model catalogue core plugin (metadata registry)
                   element.ext.get("Original Data Item Name (COSD v1.2 xls)"), element.ext.get("Pathway Group")]]
             }
         }
+
+//        element.ext.NHIC_Identifier, element.ext.Link_to_existing_definition, element.ext.Notes_from_GD_JCIS , element.ext.Optional_Local_Identifier, element.ext.A, element.ext.B, element.ext.C , element.ext.D , element.ext.E , element.ext.F , element.ext.G, element.ext.H, element.ext.E2, element.ext.System, element.ext.Comments, element.ext.Group]]
 //EXAMPLE OF the kinds of reports you can configure:
 //
 //        xlsxListRenderer.registerRowWriter('COSD') {
@@ -281,5 +302,51 @@ Model catalogue core plugin (metadata registry)
             return unitOfMeasure?.name
         }
         return null
+    }
+    
+    def static getClassificationString(DataElement dataElement){
+        String classifications = ""
+        dataElement.classifications.eachWithIndex{ def classification, int i ->
+            if (classifications != "") classifications += (", " + classification.name)
+            else classifications = classification.name
+        }
+        return classifications
+    }
+
+    def static getValueDomainString(DataType dataType){
+        String valueDomains = ""
+
+        dataType.relatedValueDomains.eachWithIndex{ ValueDomain valueDomain, int i ->
+            String vdText = valueDomain.id + " \t " + valueDomain.name + " \t "
+            if (valueDomains!="") valueDomains += ("\r\n" + vdText )
+            else valueDomains = vdText
+        }
+        return valueDomains
+    }
+
+    def static getEnumerationString(DataType dataType){
+        if (dataType instanceof EnumeratedType) {
+            return dataType.enumAsString
+        }
+        return null
+    }
+
+    def static getConceptualDomainString(ValueDomain valueDomain){
+        String conceptualDomains = ""
+
+        valueDomain.conceptualDomains.eachWithIndex{ ConceptualDomain conceptualDomain, int i ->
+            if (conceptualDomains!="") conceptualDomains += ("\r\n" + conceptualDomain.name )
+            else conceptualDomains = conceptualDomain.name
+        }
+        return conceptualDomains
+    }
+
+    def static getValueDomainRuleString(ValueDomain valueDomain){
+        String rules = ""
+        valueDomain.rule.eachWithIndex{ String rule, int i ->
+            if (rules!="") rules += ("\r\n" + rule )
+            else rules = rule
+        }
+        return rules
     }
 }
