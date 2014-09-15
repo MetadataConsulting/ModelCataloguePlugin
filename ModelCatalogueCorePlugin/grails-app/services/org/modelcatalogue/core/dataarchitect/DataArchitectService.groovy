@@ -2,17 +2,9 @@ package org.modelcatalogue.core.dataarchitect
 
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
-import groovy.transform.stc.ClosureParams
-import groovy.transform.stc.FromString
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.Mapping
-import org.modelcatalogue.core.PublishedElementStatus
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
-import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 
 class DataArchitectService {
@@ -160,15 +152,8 @@ class DataArchitectService {
 
                 if (mapping.index == -1) {
                     mapping.mapping = Mapping.DIRECT_MAPPING
-                } else if (!definition.source?.valueDomain || !definition.destination?.valueDomain) {
-                    mapping.mapping = Mapping.DIRECT_MAPPING
                 } else {
-                    Mapping m = Mapping.findBySourceAndDestination(definition.source.valueDomain, definition.destination.valueDomain)
-                    if (m) {
-                        mapping.mapping = m
-                    } else {
-                        mapping.mapping = Mapping.DIRECT_MAPPING
-                    }
+                    mapping.mapping = findDomainMapping(definition.source, definition.destination)
                 }
                 outputMappings << mapping
             }
@@ -198,5 +183,22 @@ class DataArchitectService {
             reader.close()
         }
 
+    }
+
+    /**
+     * Finds mapping between selected data elements or Mapping#DIRECT_MAPPING.
+     * @param source source data element
+     * @param destination destination data element
+     * @return mapping if exists between data elements's value domains or direct mapping
+     */
+    Mapping findDomainMapping(DataElement source, DataElement destination) {
+        if (!source?.valueDomain || !destination?.valueDomain) {
+            return Mapping.DIRECT_MAPPING
+        }
+        Mapping mapping = Mapping.findBySourceAndDestination(source.valueDomain, destination.valueDomain)
+        if (mapping) {
+            return mapping
+        }
+        return Mapping.DIRECT_MAPPING
     }
 }
