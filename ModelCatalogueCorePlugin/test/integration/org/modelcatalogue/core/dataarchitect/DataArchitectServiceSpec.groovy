@@ -1,11 +1,17 @@
 package org.modelcatalogue.core.dataarchitect
 
+import au.com.bytecode.opencsv.CSVReader
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListWithTotal
+import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.modelcatalogue.core.util.Lists
 import spock.lang.Shared
+
+import java.nio.charset.Charset
+
 /**
  * Created by adammilward on 05/02/2014.
  */
@@ -83,7 +89,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 
     }
 
-    def "find uninstantiatedDataElements"(){
+    def "find uninstantiatedDataElements"() {
         when:
         Map params = [:]
         params.put("max", 12)
@@ -94,6 +100,38 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         dataElements.items.contains(DataElement.get(de1.id))
         dataElements.items.contains(DataElement.get(de3.id))
 
+    }
+
+    def "transform csv"() {
+        when:
+        CsvTransformation transformation = CsvTransformation.findByName("Example")
+
+        StringReader reader = new StringReader("writer;patient temperature uk;speed of Opel\nAgata Christie;38.5;120\nDick Francis;36.7;90")
+        StringWriter writer = new StringWriter()
+
+        dataArchitectService.transformData(transformation, reader, writer)
+
+        String result = writer.toString()
+
+        println result
+
+        CSVReader csvReader = new CSVReader(new StringReader(result.toString()), ';'.charAt(0))
+
+        List<String> newHeaders = csvReader.readNext().toList()
+
+        then:
+        newHeaders.contains 'creator'
+        newHeaders.contains 'patient temperature us'
+        newHeaders.contains 'speed of Vauxhall'
+
+
+        when:
+        List<String> firstDataRow = csvReader.readNext().toList()
+
+        then:
+        firstDataRow[newHeaders.indexOf("creator")]                 == "Agata Christie"
+        firstDataRow[newHeaders.indexOf("speed of Vauxhall")]       == "74.56454304"
+        firstDataRow[newHeaders.indexOf("patient temperature us")]  == "101.3"
     }
 
 }
