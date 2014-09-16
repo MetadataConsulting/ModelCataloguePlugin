@@ -118,9 +118,9 @@ Model catalogue core plugin (metadata registry)
 
         xlsxListRenderer.registerRowWriter {
             title "DataTypes to Excel"
-            headers 'Model Catalogue ID', 'Name', 'Enumerations', 'Value Domain'
+            headers 'Model Catalogue ID', 'Name', 'Enumerations', 'Value Domains'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || CatalogueElement.isAssignableFrom(container.itemType))
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || DataType.isAssignableFrom(container.itemType))
             } then { DataType dataType ->
                 [[dataType.id, dataType.name, getEnumerationString(dataType), getValueDomainString(dataType)]]
             }
@@ -130,7 +130,7 @@ Model catalogue core plugin (metadata registry)
             title "ValueDomains to Excel"
             headers 'Model Catalogue ID', 'Name', 'Conceptual Domains', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || CatalogueElement.isAssignableFrom(container.itemType))
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
             } then { ValueDomain valueDomain ->
                 [[valueDomain.id, valueDomain.name, getConceptualDomainString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
             }
