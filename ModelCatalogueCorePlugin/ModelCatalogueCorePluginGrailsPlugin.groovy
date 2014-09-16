@@ -156,7 +156,7 @@ Model catalogue core plugin (metadata registry)
         }
 
         xlsxListRenderer.registerRowWriter('NHIC') {
-            title "NHIC"
+            title "Data Elements to Excel"
             headers "Classification", "Parent Model Unique Code",
             "Parent Model", "Model Unique Code", "Model",
             "Data Item Unique Code", "Data Item Name", "Data Item Description",
