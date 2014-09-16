@@ -1123,6 +1123,27 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+	
+	<xs:complexType name="ST" mixed="true">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of string data.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ED">
+				<xs:sequence>
+					<xs:element name="reference" type="TEL" minOccurs="0"/>
+					<xs:element name="thumbnail" type="thumbnail" minOccurs="0"/>
+					<xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="mediaType" type="cs" use="optional" default="text/plain"/>
+				<xs:attribute name="language" type="cs" use="optional"/>
+				<xs:attribute name="compression" type="cs_CompressionAlgorithm" use="optional"/>
+				<xs:attribute name="integrityCheck" type="bin" use="optional"/>
+				<xs:attribute name="integrityCheckAlgorithm" type="cs_IntegrityCheckAlgorithm" use="optional" default="SHA-1"/>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	
 	<xs:complexType name="TEL">
 		<xs:annotation>
 			<xs:documentation>This data type supports the representation of telephone numbers, pager and email addresses, and references to external data.</xs:documentation>
@@ -1505,25 +1526,7 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<xs:complexType name="ST" mixed="true">
-		<xs:annotation>
-			<xs:documentation>This data type supports the representation of string data.</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:restriction base="ED">
-				<xs:sequence>
-					<xs:element name="reference" type="TEL" minOccurs="0"/>
-					<xs:element name="thumbnail" type="thumbnail" minOccurs="0"/>
-					<xs:any namespace="##other" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
-				<xs:attribute name="mediaType" type="cs" use="optional" default="text/plain"/>
-				<xs:attribute name="language" type="cs" use="optional"/>
-				<xs:attribute name="compression" type="cs_CompressionAlgorithm" use="optional"/>
-				<xs:attribute name="integrityCheck" type="bin" use="optional"/>
-				<xs:attribute name="integrityCheckAlgorithm" type="cs_IntegrityCheckAlgorithm" use="optional" default="SHA-1"/>
-			</xs:restriction>
-		</xs:complexContent>
-	</xs:complexType>
+	
 	<xs:complexType name="BL">
 		<xs:annotation>
 			<xs:documentation>This data type supports the representation of a boolean "value", which shall be "true" or "false".</xs:documentation>

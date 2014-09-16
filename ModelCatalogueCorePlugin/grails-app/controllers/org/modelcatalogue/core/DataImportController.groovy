@@ -74,11 +74,10 @@ class DataImportController extends AbstractRestfulController{
                 } else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
 
                     XsdLoader parserXSD = new XsdLoader(file.inputStream)
-                    def (topLevelElements, simpleDataTypes, complexDataTypes, schema, logErrorsSACT) = parserXSD.parse()
-                    XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema)
+                    def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrorsSACT) = parserXSD.parse()
+                    XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces)
 
                     DataImport importer = new DataImport(name:conceptualDomainName).save(flush:true, failOnError:true)
-
                     response = importer
 
                 } else {
