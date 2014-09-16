@@ -87,30 +87,38 @@ class XSDImportService {
 
     def createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationName, String conceptualDomainName, XsdSchema schema, Collection<QName> namespaces){
 
-        Collection<Classification> classifications = []
-        Collection<ConceptualDomain> conceptualDomains = []
-        def description
-        if(schema.targetNamespace){
-            description = "Generated from Schema........ \r\n Info: \r\n targetNamespace: " + schema.targetNamespace +"\r\n"
-            if(schema.attributeFormDefault) description += "attributeFormDefault: " + schema.attributeFormDefault +"\r\n"
-            if(schema.blockDefault) description += "blockDefault: " + schema.blockDefault +"\r\n"
-            if(schema.elementFormDefault) description += "attributeFormDefault: " + schema.elementFormDefault +"\r\n"
-            if(schema.finalDefault) description +="attributeFormDefault: " + schema.finalDefault +"\r\n"
-            if(schema.id) description += "attributeFormDefault: " + schema.id +"\r\n"
-            if(schema.version) description +="attributeFormDefault: " + schema.version +"\r\n"
-        }
+        try {
+            Collection<Classification> classifications = []
+            Collection<ConceptualDomain> conceptualDomains = []
+            def description
+            if (schema.targetNamespace) {
+                description = "Generated from Schema........ \r\n Info: \r\n targetNamespace: " + schema.targetNamespace + "\r\n"
+                if (schema.attributeFormDefault) description += "attributeFormDefault: " + schema.attributeFormDefault + "\r\n"
+                if (schema.blockDefault) description += "blockDefault: " + schema.blockDefault + "\r\n"
+                if (schema.elementFormDefault) description += "attributeFormDefault: " + schema.elementFormDefault + "\r\n"
+                if (schema.finalDefault) description += "attributeFormDefault: " + schema.finalDefault + "\r\n"
+                if (schema.id) description += "attributeFormDefault: " + schema.id + "\r\n"
+                if (schema.version) description += "attributeFormDefault: " + schema.version + "\r\n"
+            }
 
-        conceptualDomains = getConceptualDomains(schema, conceptualDomainName, namespaces, description)
-        classifications = getClassifications(schema, classificationName, namespaces, description)
+            conceptualDomains = getConceptualDomains(schema, conceptualDomainName, namespaces, description)
+            classifications = getClassifications(schema, classificationName, namespaces, description)
 
-        //if the getConceptualDomains returns empty array i.e. some namespaces don't exist
-        if(conceptualDomains.size()>0 && classifications.size()>0) {
+            //if the getConceptualDomains returns empty array i.e. some namespaces don't exist
+            if (conceptualDomains.size() > 0 && classifications.size() > 0) {
 
-            //make sure the new classifications from the new namespace are related to one another
-            classifications.first().addToRelatedTo(conceptualDomains.first())
+                //make sure the new classifications from the new namespace are related to one another
+                classifications.first().addToRelatedTo(conceptualDomains.first())
 
-            createValueDomainsAndDataTypes(simpleDataTypes, conceptualDomains)
-            createModelsAndElements(complexDataTypes, classifications, conceptualDomains, topLevelElements)
+                createValueDomainsAndDataTypes(simpleDataTypes, conceptualDomains)
+                createModelsAndElements(complexDataTypes, classifications, conceptualDomains, topLevelElements)
+            }
+
+            return [classifications.first(), conceptualDomains.first()]
+
+        }catch(e){
+            log.error "Exception during import", e
+            throw e
         }
     }
 
