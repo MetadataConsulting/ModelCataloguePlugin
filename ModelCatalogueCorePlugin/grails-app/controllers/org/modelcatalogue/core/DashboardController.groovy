@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
+import org.modelcatalogue.core.dataarchitect.CsvTransformation
 
 class DashboardController {
 
@@ -35,6 +36,7 @@ class DashboardController {
                 valueDomainCount:ValueDomain.count(),
                 incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
                 conceptualDomainCount:ConceptualDomain.count(),
+                transformationsCount:CsvTransformation.count(),
                 ]
         respond model
     }

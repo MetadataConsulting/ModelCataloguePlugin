@@ -9,15 +9,17 @@ class ColumnTransformationDefinition {
 
     String header
 
-    static belongsTo = [tranformation: CsvTransformation]
+    static belongsTo = [transformation: CsvTransformation]
 
     static constraints = {
         header nullable: true
+        destination nullable: true
     }
 
     String getHeader() {
-        if (header) return header
-        if (destination) return destination.name
-        return null
+        if (header)         return header
+        if (destination)    return destination.name
+        if (source)         return source.name
+                            return null
     }
 }

@@ -106,16 +106,12 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         when:
         CsvTransformation transformation = CsvTransformation.findByName("Example")
 
-        StringReader reader = new StringReader("writer;patient temperature uk;speed of Opel\nAgata Christie;38.5;120\nDick Francis;36.7;90")
+        StringReader reader = new StringReader("writer;patient temperature uk;speed of Opel;auth5\nAgata Christie;38.5;120;ABC\nDick Francis;36.7;90;DEF")
         StringWriter writer = new StringWriter()
 
         dataArchitectService.transformData(transformation, reader, writer)
 
-        String result = writer.toString()
-
-        println result
-
-        CSVReader csvReader = new CSVReader(new StringReader(result.toString()), ';'.charAt(0))
+        CSVReader csvReader = new CSVReader(new StringReader(writer.toString()), ';'.charAt(0))
 
         List<String> newHeaders = csvReader.readNext().toList()
 
@@ -123,6 +119,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         newHeaders.contains 'creator'
         newHeaders.contains 'patient temperature us'
         newHeaders.contains 'speed of Vauxhall'
+        newHeaders.contains 'co-author'
 
 
         when:
@@ -132,6 +129,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         firstDataRow[newHeaders.indexOf("creator")]                 == "Agata Christie"
         firstDataRow[newHeaders.indexOf("speed of Vauxhall")]       == "74.56454304"
         firstDataRow[newHeaders.indexOf("patient temperature us")]  == "101.3"
+        firstDataRow[newHeaders.indexOf("co-author")]               == "ABC"
     }
 
 }
