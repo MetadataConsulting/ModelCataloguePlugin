@@ -134,43 +134,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
         List<Object> elements = []
 
         file.inputStream.withReader {
-            String[] headers = csvService.readHeaders(it, params.separator ?: ';')
-
-            for (String header in headers) {
-                def element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.FINALIZED)
-                if (!element) {
-                    element = DataElement.findByModelCatalogueId(header)
-                }
-                if (!element) {
-                    if (header.contains('_')) {
-                        element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.FINALIZED)
-                    } else {
-                        element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.FINALIZED)
-                    }
-                }
-                if (!element) {
-                    element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.DRAFT)
-                }
-                if (!element) {
-                    if (header.contains('_')) {
-                        element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.DRAFT)
-                    } else {
-                        element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.DRAFT)
-                    }
-                }
-                if (element) {
-                    elements << element
-                } else {
-                    def searchResult = modelCatalogueSearchService.search(DataElement, [search: header])
-                    // only if we have single hit
-                    if (searchResult.total == 1) {
-                        elements << searchResult.searchResults[0]
-                    } else {
-                        elements << header
-                    }
-                }
-            }
-
+            elements = dataArchitectService.matchDataElementsWithCSVHeaders(csvService.readHeaders(it, params.separator ?: ';'))
         }
 
         respond elements

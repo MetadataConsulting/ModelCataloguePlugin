@@ -5,6 +5,12 @@ import org.springframework.validation.Errors
 
 class Mapping {
 
+    // placeholder for situation where no mapping is expected
+    // do not save of modify this value
+    // static final Mapping DIRECT_MAPPING = new Mapping(mapping: 'x')
+
+    static Mapping getDIRECT_MAPPING() { new Mapping(mapping: 'x') }
+
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {

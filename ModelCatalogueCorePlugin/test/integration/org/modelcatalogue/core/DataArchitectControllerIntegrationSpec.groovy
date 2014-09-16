@@ -22,7 +22,7 @@ def setupSpec(){
     //domainModellerService.modelDomains()
     loadFixtures()
     de1 = DataElement.findByName("DE_author")
-    de2 = DataElement.findByName("auth7")
+    de2 = DataElement.findByName("auth")
     de3 = DataElement.findByName("AUTHOR")
     de4 = DataElement.findByName("auth4")
     de5 = DataElement.findByName("auth5")
@@ -123,12 +123,12 @@ def "json -  get uninstantiated data elements from the catalogue"(){
     then:
 
     json.success
-    json.total == 11
+    json.total == 8
     json.offset == 0
     json.page == 10
     json.list
-    json.list.size() == 10
-    json.next == "/dataArchitect/uninstantiatedDataElements?max=10&offset=10"
+    json.list.size() == 8
+    json.next == ""
     json.previous == ""
 
 
@@ -289,7 +289,7 @@ def "xml -  create dataElement relationships"(){
         )
 
 
-        GrailsMockMultipartFile mockFile = new GrailsMockMultipartFile('csv', 'headers.txt', 'text/plain', 'DE AUTHOR;auth5;auth8;whatever'.bytes)
+        GrailsMockMultipartFile mockFile = new GrailsMockMultipartFile('csv', 'headers.txt', 'text/plain', 'DE AUTHOR;speed of vauxhall;speed of opel;whatever'.bytes)
 
         when:
         controller.request.addFile mockFile

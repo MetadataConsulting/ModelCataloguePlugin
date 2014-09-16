@@ -1,10 +1,8 @@
 package org.modelcatalogue.core.dataarchitect
 
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.PublishedElementStatus
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
+import au.com.bytecode.opencsv.CSVReader
+import au.com.bytecode.opencsv.CSVWriter
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
@@ -93,6 +91,114 @@ class DataArchitectService {
         return searchParams
     }
 
+    List<Object> matchDataElementsWithCSVHeaders(String[] headers) {
+        List<Object> elements = []
 
+        for (String header in headers) {
+            def element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.FINALIZED)
+            if (!element) {
+                element = DataElement.findByModelCatalogueId(header)
+            }
+            if (!element) {
+                if (header.contains('_')) {
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.FINALIZED)
+                } else {
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.FINALIZED)
+                }
+            }
+            if (!element) {
+                element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.DRAFT)
+            }
+            if (!element) {
+                if (header.contains('_')) {
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.DRAFT)
+                } else {
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.DRAFT)
+                }
+            }
+            if (element) {
+                elements << element
+            } else {
+                def searchResult = modelCatalogueSearchService.search(DataElement, [search: header])
+                // only if we have single hit
+                if (searchResult.total == 1) {
+                    elements << searchResult.searchResults[0]
+                } else {
+                    elements << header
+                }
+            }
+        }
 
+        elements
+    }
+
+    void transformData(CsvTransformation transformation, Reader input, Writer output) {
+        if (!transformation) throw new IllegalArgumentException("Transformation missing!")
+        if (!transformation.columnDefinitions) throw new IllegalArgumentException("Nothing to transform. Column definitions missing!")
+
+        Character separatorChar = transformation.separator?.charAt(0)
+
+        CSVReader reader = new CSVReader(input, separatorChar)
+
+        try {
+            List<Object> dataElementsFromHeaders = matchDataElementsWithCSVHeaders(reader.readNext())
+
+            List<Map<String, Object>> outputMappings = new ArrayList(dataElementsFromHeaders.size())
+
+            for (ColumnTransformationDefinition definition in transformation.columnDefinitions) {
+                def mapping = [:]
+                mapping.header = definition.header
+                mapping.index  = dataElementsFromHeaders.indexOf(definition.source)
+
+                if (mapping.index == -1) {
+                    mapping.mapping = Mapping.DIRECT_MAPPING
+                } else {
+                    mapping.mapping = findDomainMapping(definition.source, definition.destination)
+                }
+                outputMappings << mapping
+            }
+
+            CSVWriter writer = new CSVWriter(output, separatorChar)
+
+            try {
+                writer.writeNext(outputMappings.collect { it.header } as String[])
+
+                String[] line = reader.readNext()
+                while (line) {
+                    List<String> transformed = new ArrayList<String>(line.size())
+
+                    for (Map<String, Object> outputMapping in outputMappings) {
+                        transformed << outputMapping.mapping.map(line[outputMapping.index])
+                    }
+
+                    writer.writeNext(transformed as String[])
+
+                    line = reader.readNext()
+                }
+            } finally {
+                writer.flush()
+                writer.close()
+            }
+        } finally {
+            reader.close()
+        }
+
+    }
+
+    /**
+     * Finds mapping between selected data elements or Mapping#DIRECT_MAPPING.
+     * @param source source data element
+     * @param destination destination data element
+     * @return mapping if exists between data elements's value domains or direct mapping
+     */
+    Mapping findDomainMapping(DataElement source, DataElement destination) {
+        if (!source?.valueDomain || !destination?.valueDomain) {
+            return Mapping.DIRECT_MAPPING
+        }
+        Mapping mapping = Mapping.findBySourceAndDestination(source.valueDomain, destination.valueDomain)
+        if (mapping) {
+            return mapping
+        }
+        return Mapping.DIRECT_MAPPING
+    }
 }

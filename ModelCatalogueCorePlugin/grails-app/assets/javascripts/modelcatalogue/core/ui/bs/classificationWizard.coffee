@@ -52,16 +52,16 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                   <label for="name" class="">Data Element</label>
                   <elements-as-tags elements="dataElements"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="dataElement.element" focus-me="step=='elements'" catalogue-element-picker="dataElement"  typeahead-on-select="push('dataElements', 'dataElement')">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('dataElements', 'dataElement')" ng-disabled="isEmpty(dataElement.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                 </div>
               </form>
-              <div>
+              <div  ng-click="importFromCSV()">
                 <alert type="'info'">
-                  <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link" ng-click="importFromCSV()">CSV file headers</a>.
+                  <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link">CSV file headers</a>.
                 </alert>
               </div>
           </div>

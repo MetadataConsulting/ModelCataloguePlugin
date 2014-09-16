@@ -9,8 +9,8 @@ abstract class ModelCataloguePage extends Page {
         viewTitle           { $("h2") }
         subviewTitle        { $("h3:not(.ng-hide)") }
 
-        showLoginButton     { $("i.glyphicon.glyphicon-log-in") }
-        showLogoutButton    { $("i.glyphicon.glyphicon-log-out") }
+        showLoginButton     { $(".navbar-form i.glyphicon.glyphicon-log-in") }
+        showLogoutButton    { $(".navbar-form i.glyphicon.glyphicon-log-out") }
 
 
         loginDialog         { $("div.login-modal-prompt") }

@@ -179,6 +179,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+        cleanRelations(instance)
+
         instance.save flush:true
 
         bindRelations(instance)
@@ -218,6 +220,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+
         bindData instance, getObjectToBind(), [include: includeFields]
 
         if (instance.hasErrors()) {
@@ -225,7 +228,12 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+        cleanRelations(instance)
+
         instance.save flush:true
+
+        bindRelations(instance)
+
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
@@ -241,6 +249,19 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
     }
 
+    /**
+     * Creates a new instance of the resource.  If the request
+     * contains a body the body will be parsed and used to
+     * initialize the new instance, otherwise request parameters
+     * will be used to initialized the new instance.
+     *
+     * @return The resource instance
+     */
+    protected T createResource() {
+        T instance = resource.newInstance()
+        bindData instance, getObjectToBind(), [include: includeFields]
+        instance
+    }
 
     /**
      * @deprecated use DetachedListWrapper instead where possible
@@ -363,6 +384,20 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         request
     }
 
-    protected bindRelations(T instance) { }
+    /**
+     * Clean the relations before persisting.
+     * @param instance the instance to persisted
+     */
+    protected cleanRelations(T instance) { }
+
+    /**
+     * Bind the relations as soon as the instance is persisted.
+     * @param instance the persisted instance
+     */
+    protected final bindRelations(T instance) {
+        bindRelations(instance, objectToBind)
+    }
+
+    protected bindRelations(T instance, Object objectToBind) {}
 
 }

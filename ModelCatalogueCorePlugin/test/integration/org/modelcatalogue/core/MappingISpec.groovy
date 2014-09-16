@@ -6,32 +6,28 @@ import spock.lang.Unroll
 class MappingISpec extends AbstractIntegrationSpec {
 
     @Shared
-    def degreeC, degreeF
+    def vd1, vd2
 
     @Shared MappingService mappingService = new MappingService()
 
     def setupSpec(){
         loadFixtures()
-        degreeC = ValueDomain.findByName("value domain Celsius")
-        degreeF = ValueDomain.findByName("value domain Fahrenheit")
-
+        vd1 = ValueDomain.findByName("value domain test3")
+        vd2 = ValueDomain.findByName("value domain test4")
     }
 
     /*
     def cleanupSpec(){
 
-        degreeC.delete()
-        degreeF.delete()
+        vd1.delete()
+        vd2.delete()
 
     }*/
 
 
     @Unroll
     def "create a mew data type from #args validates to #validates" (){
-
-        expect:
-
-        Mapping.list().isEmpty()
+        int initialCount = Mapping.count()
 
         when:
 
@@ -42,7 +38,7 @@ class MappingISpec extends AbstractIntegrationSpec {
         then:
 
         !type.hasErrors() == validates
-        Mapping.list().size() == size
+        Mapping.count()   == size + initialCount
 
         when:
 
@@ -56,8 +52,8 @@ class MappingISpec extends AbstractIntegrationSpec {
         validates | size | args
         false     | 0    | [:]
         false     | 0    | [name: "x" * 256]
-        false     | 0    | [ name: "String", source: degreeC, destination: degreeF, mapping: "foo" ]
-        true      | 1    | [ name: "String1", source: degreeC, destination: degreeF, mapping: "x * 2" ]
+        false     | 0    | [ name: "String", source: vd1, destination: vd2, mapping: "foo" ]
+        true      | 1    | [ name: "String1", source: vd1, destination: vd2, mapping: "x * 2" ]
 
 
 
@@ -67,7 +63,7 @@ class MappingISpec extends AbstractIntegrationSpec {
 
         when:
 
-        def dC = ValueDomain.get(degreeC.id)
+        def dC = ValueDomain.get(vd1.id)
 
         Mapping self = mappingService.map(dC, dC, "x")
 
@@ -82,8 +78,8 @@ class MappingISpec extends AbstractIntegrationSpec {
 
         when:
 
-        def dC = ValueDomain.get(degreeC.id)
-        def dF = ValueDomain.get(degreeF.id)
+        def dC = ValueDomain.get(vd1.id)
+        def dF = ValueDomain.get(vd2.id)
 
         Mapping zero = mappingService.map(dC, new ValueDomain(name: "none"), "x")
 

@@ -25,8 +25,7 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
 
     }
 
-    @Override
-    protected bindRelations(Classification instance) {
+    protected bindRelations(Classification instance, Object objectToBind) {
         if (objectToBind.classifies != null) {
             for (domain in instance.classifies.findAll { !(it.id in objectToBind.classifies*.id) }) {
                 instance.removeFromClassifies(domain)
