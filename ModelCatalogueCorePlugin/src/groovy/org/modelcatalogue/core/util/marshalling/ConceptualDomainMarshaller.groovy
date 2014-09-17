@@ -14,6 +14,7 @@ class ConceptualDomainMarshaller extends CatalogueElementMarshallers {
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
+        ret.namespace = el.namespace
         ret.valueDomains = [count: el.valueDomains?.size() ?: 0, itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/valueDomain"]
         ret
     }
@@ -21,6 +22,7 @@ class ConceptualDomainMarshaller extends CatalogueElementMarshallers {
     protected void buildXml(el, XML xml) {
         super.buildXml(el, xml)
         xml.build {
+            namespace el.namespace
             valueDomains count: el.valueDomains?.size() ?: 0, itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/valueDomain"
         }
     }

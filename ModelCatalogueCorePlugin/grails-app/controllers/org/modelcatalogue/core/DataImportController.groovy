@@ -133,10 +133,10 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                 updated.addToRelatedTo(classification)
                 updated.addToRelatedTo(conceptualDomain)
             } catch (e) {
-                log.error "Exception of type ${e.class} exporting asset ${id}", e
-//                throw e
-                updated.status = PublishedElementStatus.ARCHIVED
-                updated.description = "Error importing file: " + "Exception of type ${e.class} exporting asset ${id}"
+                updated.refresh()
+                updated.status = PublishedElementStatus.FINALIZED
+                updated.name = updated.name + " - Error during upload"
+                updated.description = "Error importing file: please validate that the schema is valid xml and that any dependencies already exist in the catalogue"
                 updated.save(flush: true, failOnError: true)
             }
         }
