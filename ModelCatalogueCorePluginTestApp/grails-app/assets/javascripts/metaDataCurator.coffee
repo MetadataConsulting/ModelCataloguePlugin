@@ -42,8 +42,8 @@ metadataCurator.run ['$templateCache', ($templateCache) ->
 ]
 
 metadataCurator.controller('metadataCurator.searchCtrl',
-  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$log', '$q', '$state', 'names'
-    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $log, $q, $state, names)->
+  ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$log', '$q', '$state', 'names', 'messages'
+    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $log, $q, $state, names, messages)->
       actions = []
 
       $scope.search = (item, model, label) ->
@@ -67,7 +67,7 @@ metadataCurator.controller('metadataCurator.searchCtrl',
           action: (term) -> ->
               $state.go('mc.search', {q: term})
 
-          icon: 'glyphicon glyphicon-search'
+          icon: 'fa fa-fw fa-search'
         }
 
         actions.push {
@@ -78,7 +78,7 @@ metadataCurator.controller('metadataCurator.searchCtrl',
           action: (term) ->
             ->
               $state.go('mc.resource.list', {q: term})
-          icon: 'glyphicon glyphicon-search'
+          icon: 'fa fa-fw fa-search'
         }
 
         actions.push {
@@ -88,7 +88,17 @@ metadataCurator.controller('metadataCurator.searchCtrl',
           action: (term) ->
             ->
               $state.go('mc.resource.show.property', {q: term})
-          icon: 'glyphicon glyphicon-search'
+          icon: 'fa fa-fw fa-search'
+        }
+
+        actions.push {
+          condition: -> true
+          label: (term) ->
+            "Convert <strong>#{term}</strong>"
+          action: (term) ->
+            ->
+              messages.prompt('', '', {type: 'convert-with-value-domain', value: term})
+          icon: 'fa fa-fw fa-long-arrow-right'
         }
 
       $scope.getResults = (term) ->

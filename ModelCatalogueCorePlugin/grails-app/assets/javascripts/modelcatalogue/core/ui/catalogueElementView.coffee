@@ -163,40 +163,47 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                 deferred.promise
             }
 
-          if fn.itemType == 'org.modelcatalogue.core.Mapping' and security.hasRole('CURATOR')
+          if fn.itemType == 'org.modelcatalogue.core.Mapping'
             tabDefinition.actions.push {
-              icon:   'edit'
+              icon:   'arrow-right'
               type:   'primary'
               action: (mapping) ->
-                args = {type: 'new-mapping', update: true, element: element, mapping: mapping}
-                messages.prompt('Update Mapping', '', args).then (updated)->
-                  angular.extend mapping, updated
+                messages.prompt('', '', {type: 'convert-with-value-domain', source: element, destination: mapping.destination})
             }
-            tabDefinition.actions.push {
-              icon:   'remove'
-              type:   'danger'
-              action: (mapping) ->
-                deferred = $q.defer()
-                messages.confirm('Remove Mapping', "Do you really want to remove mapping from #{element.name} to #{mapping.destination.name}?").then ->
-                    element.mappings.remove(mapping.destination.id, {}).then ->
-                      messages.success('Mapping removed!', "#{mapping.destination.name} is no longer related to #{element.name}")
-                      # reloads the table
-                      deferred.resolve(true)
-                    , (response) ->
-                      if response.data?.errors
-                        if angular.isString response.data.errors
-                          messages.error response.data.errors
-                        else
-                          for err in response.data.errors
-                            messages.error err.message
-                      else if response.status == 404
-                        messages.error('Error removing mapping', 'Mapping cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
+            if security.hasRole('CURATOR')
+              tabDefinition.actions.push {
+                icon:   'edit'
+                type:   'success'
+                action: (mapping) ->
+                  args = {type: 'new-mapping', update: true, element: element, mapping: mapping}
+                  messages.prompt('Update Mapping', '', args).then (updated)->
+                    angular.extend mapping, updated
+              }
+              tabDefinition.actions.push {
+                icon:   'remove'
+                type:   'danger'
+                action: (mapping) ->
+                  deferred = $q.defer()
+                  messages.confirm('Remove Mapping', "Do you really want to remove mapping from #{element.name} to #{mapping.destination.name}?").then ->
+                      element.mappings.remove(mapping.destination.id, {}).then ->
+                        messages.success('Mapping removed!', "#{mapping.destination.name} is no longer related to #{element.name}")
+                        # reloads the table
                         deferred.resolve(true)
-                      else
-                        messages.error('Error removing mapping', 'Mapping cannot be removed, see application logs for details')
+                      , (response) ->
+                        if response.data?.errors
+                          if angular.isString response.data.errors
+                            messages.error response.data.errors
+                          else
+                            for err in response.data.errors
+                              messages.error err.message
+                        else if response.status == 404
+                          messages.error('Error removing mapping', 'Mapping cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
+                          deferred.resolve(true)
+                        else
+                          messages.error('Error removing mapping', 'Mapping cannot be removed, see application logs for details')
 
-                deferred.promise
-            }
+                  deferred.promise
+              }
 
 
 

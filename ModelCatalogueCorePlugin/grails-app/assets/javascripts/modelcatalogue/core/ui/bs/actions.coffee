@@ -301,6 +301,22 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerAction 'convert', [ '$scope', 'messages', 'security', ($scope, messages) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf('valueDomain')
+
+    {
+      position:   0
+      label:      'Convert'
+      icon:       'fa fa-long-arrow-right'
+      type:       'primary'
+      action:     ->
+        messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
+
+    }
+  ]
+
   actionsProvider.registerAction 'refresh-asset', [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
     return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
     return undefined if $scope.element.status != 'PENDING'

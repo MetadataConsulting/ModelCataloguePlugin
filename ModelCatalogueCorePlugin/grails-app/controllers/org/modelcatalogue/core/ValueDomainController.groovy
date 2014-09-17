@@ -42,6 +42,39 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
 
     }
 
+    def convert() {
+        ValueDomain valueDomain = queryForResource(params.id)
+        if (!valueDomain) {
+            notFound()
+            return
+        }
+
+        ValueDomain other = queryForResource(params.destination)
+        if (!other) {
+            notFound()
+            return
+        }
+
+        Mapping mapping = Mapping.findBySourceAndDestination(valueDomain, other)
+        if (!mapping) {
+            notFound()
+            return
+        }
+
+        if (!params.value) {
+            respond result: "Please, enter valid value."
+            return
+        }
+
+        def result = mapping.map(params.value)
+
+        if (result instanceof Exception) {
+            respond result: "ERROR: ${result.class.simpleName}: $result.message"
+        }
+
+        respond result: result
+    }
+
     // conceptual domains are marshalled with the value domain so no need for special method to fetch them
 
     protected bindRelations(ValueDomain instance, Object objectToBind) {

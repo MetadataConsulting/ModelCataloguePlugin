@@ -10,6 +10,31 @@ import javax.servlet.http.HttpServletResponse
  */
 class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
 
+    def "can covert value"() {
+        ValueDomain celsius = ValueDomain.findByName("value domain Celsius")
+        ValueDomain fahrenheit = ValueDomain.findByName("value domain Fahrenheit")
+
+        expect:
+        celsius
+        fahrenheit
+
+        when:
+        controller.request.method       = 'GET'
+        controller.params.id            = celsius.id
+        controller.params.destination   = fahrenheit.id
+        controller.params.value         = '37.4'
+        controller.response.format      = "json"
+
+        controller.convert()
+
+        def json = controller.response.json
+
+        then:
+        json.result == 99.32
+
+    }
+
+
     @Override
     Map getPropertiesToEdit(){
         [name: "changedName", description: "edited description "]
