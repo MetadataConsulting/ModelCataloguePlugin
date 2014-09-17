@@ -30,6 +30,23 @@ class SecuredRuleExecutor {
         }
     }
 
+    static class ReusableScript {
+        final Script script
+
+        ReusableScript(Script script) {
+            this.script = script
+        }
+
+        Object execute(Map<String, Object> binding) {
+            script.binding = new Binding(binding)
+            try {
+                return script.run()
+            } catch (e) {
+                return e
+            }
+        }
+    }
+
     private final Binding binding
     private final GroovyShell shell
 
@@ -89,6 +106,14 @@ class SecuredRuleExecutor {
             return ValidationResult.OK
         } catch (CompilationFailedException e) {
             return new ValidationResult(e.message)
+        }
+    }
+
+    ReusableScript reuse(String scriptText) {
+        try {
+            return new ReusableScript(shell.parse(scriptText))
+        } catch (CompilationFailedException ignored) {
+            return null
         }
     }
 

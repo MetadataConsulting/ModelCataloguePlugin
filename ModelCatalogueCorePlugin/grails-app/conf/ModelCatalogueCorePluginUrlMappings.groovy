@@ -86,6 +86,9 @@ class ModelCatalogueCorePluginUrlMappings {
                 }
             }
 
+            if (controllerName == 'csvTransformation') {
+                "/api/modelCatalogue/core/$controllerName/$id/transform"(controller: controllerName, action: 'transform', method: HttpMethod.POST)
+            }
 
             if (controllerName == 'relationshipType') {
                 "/api/modelCatalogue/core/$controllerName/elementClasses"(controller: controllerName, action: 'elementClasses', method: HttpMethod.GET)

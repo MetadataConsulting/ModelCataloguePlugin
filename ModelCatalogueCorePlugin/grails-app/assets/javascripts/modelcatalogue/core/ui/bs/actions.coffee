@@ -284,6 +284,23 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerAction 'transform-csv', [ '$scope', 'messages', 'security', ($scope, messages, security) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf('csvTransformation')
+    return undefined if not security.isUserLoggedIn()
+
+    {
+      position:   0
+      label:      'Transform'
+      icon:       'fa fa-long-arrow-right'
+      type:       'primary'
+      action:     ->
+        messages.prompt('Transform CSV File', '', {type: 'transform-csv-file', element: $scope.element})
+
+    }
+  ]
+
   actionsProvider.registerAction 'refresh-asset', [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
     return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
     return undefined if $scope.element.status != 'PENDING'

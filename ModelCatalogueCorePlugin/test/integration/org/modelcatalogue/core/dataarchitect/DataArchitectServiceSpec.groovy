@@ -113,6 +113,8 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 
         CSVReader csvReader = new CSVReader(new StringReader(writer.toString()), ';'.charAt(0))
 
+        println writer.toString()
+
         List<String> newHeaders = csvReader.readNext().toList()
 
         then:

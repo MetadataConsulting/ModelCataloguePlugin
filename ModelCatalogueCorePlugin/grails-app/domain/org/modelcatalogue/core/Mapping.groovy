@@ -26,6 +26,15 @@ class Mapping {
         mapValue(mapping, value)
     }
 
+    /**
+     * Creates new reusable mapping. Execute the mapper with <code>execute(x: valueToBeMapped)</code>
+     * to get the mapped value.
+     * @return reusable mapping
+     */
+    SecuredRuleExecutor.ReusableScript mapper() {
+        reusableMapping(mapping)
+    }
+
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 
     static constraints = {
@@ -48,6 +57,10 @@ class Mapping {
 
     static Object mapValue(String mapping, Object value) {
         new SecuredRuleExecutor(x: value).execute(mapping)
+    }
+
+    static SecuredRuleExecutor.ReusableScript reusableMapping(String mappingText) {
+        new SecuredRuleExecutor(x: 0).reuse(mappingText)
     }
 
     String toString() {

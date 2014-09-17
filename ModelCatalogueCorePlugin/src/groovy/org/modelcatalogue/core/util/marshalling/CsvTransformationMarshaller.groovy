@@ -25,7 +25,6 @@ class CsvTransformationMarshaller extends AbstractMarshallers {
                 version: el.version,
                 elementType: el.class.name,
                 description: el.description,
-                separator: el.separator,
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
                 columns:  el.columnDefinitions.collect { [source: CatalogueElementMarshallers.minimalCatalogueElementJSON(it.source), destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(it.destination), header: it.header] },
@@ -37,7 +36,6 @@ class CsvTransformationMarshaller extends AbstractMarshallers {
         xml.build {
             name el.name
             description el.description
-            separator el.separator
             dateCreated el.dateCreated
             lastUpdated el.lastUpdated
         }

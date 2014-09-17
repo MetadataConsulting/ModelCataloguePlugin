@@ -66,6 +66,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     applicationTitle "Actions in batch #{element.name}"
 ])
 
+.controller('mc.core.ui.states.CsvTransformationCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+    $scope.element  = element
+])
+
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle) ->
     listEnhancer    = enhance.getEnhancer('list')
 
@@ -142,6 +146,25 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     abstract: true
     url: '/catalogue'
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  }
+
+
+  $stateProvider.state('mc.csvTransformations', {
+    abstract: true,
+    url: "/transformations/csv"
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  })
+
+  $stateProvider.state 'mc.csvTransformations.show', {
+    url: '/{id:\\d+}'
+    templateUrl: 'modelcatalogue/core/ui/state/csvTransformation.html'
+    resolve:
+      element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
+        $stateParams.resource = "csvTransformation"
+        return catalogueElementResource('csvTransformation').get($stateParams.id)
+      ]
+
+    controller: 'mc.core.ui.states.CsvTransformationCtrl'
   }
 
   $stateProvider.state('mc.actions', {
@@ -448,6 +471,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   $templateCache.put 'modelcatalogue/core/ui/state/batch.html', '''
     <div ng-show="element">
       <batch-view batch="element"></batch-view>
+    </div>
+  '''
+
+  $templateCache.put 'modelcatalogue/core/ui/state/csvTransformation.html', '''
+    <div ng-show="element">
+      <csv-transformation-view element="element"></csv-transformation-view>
     </div>
   '''
 

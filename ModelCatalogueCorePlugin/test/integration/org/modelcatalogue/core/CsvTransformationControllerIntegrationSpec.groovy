@@ -17,7 +17,7 @@ class CsvTransformationControllerIntegrationSpec extends AbstractControllerInteg
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "Changed Transformation", columnDefinitions: [
+        [name: "Changed Transformation", columns: [
                 [source: DataElement.findByName("patient temperature uk"), destination: DataElement.findByName("patient temperature us")],
                 [source: DataElement.findByName("speed of Opel"), destination: DataElement.findByName("speed of Vauxhall"), header: "speed"],
         ]]
@@ -26,8 +26,7 @@ class CsvTransformationControllerIntegrationSpec extends AbstractControllerInteg
     @Override
     Map getNewInstance(){
         [name:"New Transformation",
-                separator: ",",
-                columnDefinitions: [
+            columns: [
             [source: DataElement.findByName("speed of Opel"), destination: DataElement.findByName("speed of Vauxhall"), header: "speed"],
             [source: DataElement.findByName("writer")]
 
@@ -68,13 +67,15 @@ class CsvTransformationControllerIntegrationSpec extends AbstractControllerInteg
 
     @Override
     def customJsonPropertyCheck(item, json){
-        checkProperty(json.separator , item.separator, "separator")
+        assert json.columns
+        assert json.columns.size() == 4
         return true
     }
 
     @Override
     def customJsonPropertyCheck(inputItem, json, outputItem){
-        checkProperty(json.separator , inputItem.separator, "separator")
+        assert json.columns
+        assert json.columns.size() == 2
         return true
     }
 

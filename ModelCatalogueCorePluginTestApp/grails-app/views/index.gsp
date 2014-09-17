@@ -96,6 +96,10 @@
                                                                                  ui-sref="mc.resource.list({resource: 'relationshipType'})"
                                                                                  ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-link"></span>&nbsp; Relationship Types</a>
                             </li>
+                            <li show-for-role="CURATOR" ui-sref-active="active"><a id="csvTransformationsLink"
+                                                                                   ui-sref="mc.resource.list({resource: 'csvTransformation'})"
+                                                                                   ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-long-arrow-"></span>&nbsp; Relationship Types</a>
+                            </li>
                             <li class="hide" show-for-role="CURATOR" ui-sref-active="active"><a id="batchLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-flash"></span>&nbsp; Actions</a></li>
                         </ul>
                     </li>

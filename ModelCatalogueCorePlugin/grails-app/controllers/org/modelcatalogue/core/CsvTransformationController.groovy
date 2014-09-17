@@ -1,28 +1,66 @@
 package org.modelcatalogue.core
 
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.springframework.web.multipart.MultipartFile
 
 class CsvTransformationController extends AbstractRestfulController<CsvTransformation>{
+
+    def dataArchitectService
+
+    static allowedMethods = [transform: "POST"]
 
     CsvTransformationController() {
         super(CsvTransformation)
     }
 
+    def transform() {
+        if (!params.id) {
+            notFound()
+        }
+
+        if (!modelCatalogueSecurityService.hasRole('USER')) {
+            notAuthorized()
+            return
+        }
+
+        CsvTransformation transformation = CsvTransformation.get(params.id)
+
+        if (!transformation) {
+            notFound()
+        }
+
+        MultipartFile file = request.getFile('csv')
+
+        params.separator = params.separator ?: ';'
+
+        response.setHeader("Content-Disposition", "filename=${transformation.name}.csv")
+        response.setHeader("Content-Type", "text/csv")
+        file.inputStream.withReader {
+            dataArchitectService.transformData(params, transformation, it, response.getWriter())
+        }
+    }
+
     @Override
     protected bindRelations(CsvTransformation instance, Object objectToBind) {
-        if (objectToBind.columnDefinitions != null) {
-            for (definition in objectToBind.columnDefinitions) {
+        if (objectToBind.columns != null) {
+            for (definition in objectToBind.columns) {
                 ColumnTransformationDefinition columnTransformationDefinition = new ColumnTransformationDefinition(
                         transformation: instance,
-                        source: definition.source?.id ? DataElement.get(definition.source.id) : null,
-                        destination: definition.destination?.id ? DataElement.get(definition.destination.id) : null,
+                        source: getByIdOrNull(definition.source),
+                        destination: getByIdOrNull(definition.destination),
                         header: definition.header
                 )
                 columnTransformationDefinition.save(failOnError: true)
-                instance.addToColumnDefinitions columnTransformationDefinition
             }
         }
+    }
+
+    private static DataElement getByIdOrNull(sourceOrDestination) {
+        if (!sourceOrDestination) return null
+        if (sourceOrDestination instanceof JSONObject.Null) return null
+        DataElement.get(sourceOrDestination.id)
     }
 
     // column definitions deleted on cascade

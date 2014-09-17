@@ -47,6 +47,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               $state.go('mc.actions.show', {id: self.id}); self
             else if self.isInstanceOf "dataImport"
               $state.go('mc.dataArchitect.imports.show', {id: self.id}); self
+            else if self.isInstanceOf "csvTransformation"
+              $state.go('mc.csvTransformations.show', {id: self.id}); self
             else
               $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}); self
 

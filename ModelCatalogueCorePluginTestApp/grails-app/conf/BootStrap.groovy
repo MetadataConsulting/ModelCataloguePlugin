@@ -7,6 +7,8 @@ import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.core.testapp.UserRole
 import org.modelcatalogue.core.testapp.Role
 import org.modelcatalogue.core.testapp.User
+import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.core.*
@@ -20,6 +22,7 @@ class BootStrap {
     def publishedElementService
     def executorService
     def actionService
+    def mappingService
 
     XLSXListRenderer xlsxListRenderer
     ReportsRegistry reportsRegistry
@@ -166,6 +169,9 @@ class BootStrap {
                     assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
                     assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
 
+
+                    setupSimpleCsvTransformation()
+
                     println "Init finished in ${new Date()}"
                 } catch (e) {
                     e.printStackTrace()
@@ -174,6 +180,34 @@ class BootStrap {
             }
         }
 
+    }
+
+    def setupSimpleCsvTransformation() {
+        MeasurementUnit c = MeasurementUnit.findByName("celsius")
+        MeasurementUnit f = MeasurementUnit.findByName("fahrenheit")
+
+        DataType doubleType = DataType.findByName("Double")
+
+        assert c
+        assert f
+        assert doubleType
+
+        ValueDomain temperatureUS = new ValueDomain(name: "temperature US", dataType: doubleType, unitOfMeasure: f).save(failOnError: true)
+        ValueDomain temperature   = new ValueDomain(name: "temperature",    dataType: doubleType, unitOfMeasure: c).save(failOnError: true)
+
+
+        assert mappingService.map(temperature, temperatureUS, "(x as Double) * 9 / 5 + 32")
+        assert mappingService.map(temperatureUS, temperature, "((x as Double) - 32) * 5 / 9")
+
+        DataElement patientTemperature   = new DataElement(name: "patient temperature",    valueDomain: temperature).save(failOnError: true)
+        DataElement patientTemperatureUS = new DataElement(name: "patient temperature US", valueDomain: temperatureUS).save(failOnError: true)
+
+
+        CsvTransformation transformation = new CsvTransformation(name: "UK to US records").save(failOnError: true)
+
+        new ColumnTransformationDefinition(transformation: transformation, source: DataElement.findByName("PERSON GIVEN NAME"), header: "FIRST NAME").save(failOnError: true)
+        new ColumnTransformationDefinition(transformation: transformation, source: DataElement.findByName("PERSON FAMILY NAME"), header: "SURNAME").save(failOnError: true)
+        new ColumnTransformationDefinition(transformation: transformation, source: patientTemperature, destination: patientTemperatureUS, header: "PATIENT TEMPERATURE").save(failOnError: true)
     }
 
     def destroy = {}
