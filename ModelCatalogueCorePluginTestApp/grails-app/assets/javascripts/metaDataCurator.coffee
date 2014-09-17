@@ -94,6 +94,16 @@ metadataCurator.controller('metadataCurator.searchCtrl',
         actions.push {
           condition: -> true
           label: (term) ->
+            "Validate <strong>#{term}</strong>"
+          action: (term) ->
+            ->
+              messages.prompt('', '', {type: 'validate-value-by-domain', value: term})
+          icon: 'fa fa-fw fa-check-circle-o'
+        }
+
+        actions.push {
+          condition: -> true
+          label: (term) ->
             "Convert <strong>#{term}</strong>"
           action: (term) ->
             ->

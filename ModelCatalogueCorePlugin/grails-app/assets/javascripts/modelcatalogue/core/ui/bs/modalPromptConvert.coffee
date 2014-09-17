@@ -40,7 +40,7 @@ angular.module('mc.core.ui.bs.modalPromptConvert', ['mc.util.messages']).config 
 
           $scope.messages = messages.createNewMessages()
 
-          $scope.defaultResult = 'Please enter valid value.'
+          $scope.defaultResult = 'Please enter value.'
 
           $scope.destinations = []
 

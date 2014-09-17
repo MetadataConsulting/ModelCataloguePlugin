@@ -192,8 +192,8 @@ class BootStrap {
         assert f
         assert doubleType
 
-        ValueDomain temperatureUS = new ValueDomain(name: "temperature US", dataType: doubleType, unitOfMeasure: f).save(failOnError: true)
-        ValueDomain temperature   = new ValueDomain(name: "temperature",    dataType: doubleType, unitOfMeasure: c).save(failOnError: true)
+        ValueDomain temperatureUS = new ValueDomain(name: "temperature US", dataType: doubleType, unitOfMeasure: f, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
+        ValueDomain temperature   = new ValueDomain(name: "temperature",    dataType: doubleType, unitOfMeasure: c, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
 
 
         assert mappingService.map(temperature, temperatureUS, "(x as Double) * 9 / 5 + 32")

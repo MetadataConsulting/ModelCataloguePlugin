@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
+import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse
 
@@ -31,6 +32,32 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
 
         then:
         json.result == 99.32
+
+    }
+
+
+    @Unroll
+    def "validate=#valid value #value with rule #domain.rule of domain #domain"() {
+        expect:
+        domain
+
+        when:
+        controller.request.method       = 'GET'
+        controller.params.id            = domain.id
+        controller.params.value         = value
+        controller.response.format      = "json"
+
+        controller.validateValue()
+
+        def json = controller.response.json
+
+        then:
+        json.result == valid
+
+        where:
+        valid | value | domain
+        true  | '10'  | ValueDomain.findByName("value domain Celsius")
+        true  | '10'  | ValueDomain.findByName("value domain Fahrenheit")
 
     }
 

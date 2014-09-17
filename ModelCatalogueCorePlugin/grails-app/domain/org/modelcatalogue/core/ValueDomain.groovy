@@ -92,7 +92,8 @@ class ValueDomain extends ExtendibleElement  {
         null
     }
 
-    boolean validateRule(Object x) {
+    def validateRule(Object x) {
+        if (!rule) return true
         new SecuredRuleExecutor(x: x, domain: this).execute(rule)
     }
 

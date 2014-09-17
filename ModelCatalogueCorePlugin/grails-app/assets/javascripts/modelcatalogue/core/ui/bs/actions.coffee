@@ -306,8 +306,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('valueDomain')
 
-    {
-      position:   0
+    action = {
+      position:   -100
       label:      'Convert'
       icon:       'fa fa-long-arrow-right'
       type:       'primary'
@@ -315,6 +315,32 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
 
     }
+
+    $scope.$watch 'element.mappings.total', (total) ->
+      action.disabled = not total
+
+    action
+
+  ]
+
+  actionsProvider.registerAction 'validate-value', [ '$scope', 'messages', 'security', ($scope, messages) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf('valueDomain')
+
+    action = {
+      position:   -200
+      label:      'Validate Value'
+      icon:       'fa fa-check-circle-o'
+      type:       'primary'
+      action:     ->
+        messages.prompt('', '', {type: 'validate-value-by-domain', domain: $scope.element})
+    }
+
+    $scope.$watch 'element.rule', (rule) ->
+      action.disabled = not rule
+
+    action
   ]
 
   actionsProvider.registerAction 'refresh-asset', [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->

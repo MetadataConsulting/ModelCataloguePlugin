@@ -121,7 +121,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 </div>
                 <div ng-click="importFromCSV()">
                   <alert type="'info'">
-                    <strong>Hint:</strong> If you have CSV file with sample data you can import these data elements from <a class="alert-link">CSV file headers</a>.
+                    <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
                   </alert>
                 </div>
                 <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
