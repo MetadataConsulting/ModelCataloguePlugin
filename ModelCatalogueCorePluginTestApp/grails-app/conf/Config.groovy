@@ -4,7 +4,6 @@ import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.ValueDomain
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
