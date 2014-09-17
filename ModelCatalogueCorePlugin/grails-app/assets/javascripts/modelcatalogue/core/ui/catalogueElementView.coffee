@@ -133,7 +133,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               icon:   'edit'
               type:   'primary'
               action: (rel) ->
-                args = {relationshipType: rel.type, direction: rel.direction, type: 'new-relationship', update: true, element: element, relation: rel.relation, metadata: rel.ext}
+                args = {relationshipType: rel.type, direction: rel.direction, type: 'new-relationship', update: true, element: element, relation: rel.relation, metadata: angular.copy(rel.ext)}
                 messages.prompt('Update Relationship', '', args).then (updated)->
                   rel.ext = updated.ext
             }
@@ -173,7 +173,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             if security.hasRole('CURATOR')
               tabDefinition.actions.push {
                 icon:   'edit'
-                type:   'success'
+                type:   'primary'
                 action: (mapping) ->
                   args = {type: 'new-mapping', update: true, element: element, mapping: mapping}
                   messages.prompt('Update Mapping', '', args).then (updated)->
