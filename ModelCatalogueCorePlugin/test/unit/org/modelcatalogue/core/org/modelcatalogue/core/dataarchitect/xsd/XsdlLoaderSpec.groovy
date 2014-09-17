@@ -60,6 +60,7 @@ class XsdlLoaderSpec extends Specification {
 
         XmlParser parser = new XmlParser()
         def elementParser = parser.parseText(elementText)
+        elementParser
         XsdElement xsdElement = loader.readElement(elementParser, "")
 
         then: "I get the associated XsdElement structure for the given valueNode"

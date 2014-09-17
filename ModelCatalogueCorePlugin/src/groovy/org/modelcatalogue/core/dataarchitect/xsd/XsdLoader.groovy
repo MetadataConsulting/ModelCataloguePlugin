@@ -155,7 +155,6 @@ class XsdLoader {
 
     }
 
-
     def readElement(Node node, String section){
         String dataItemName=""
         String dataItemType = ""
@@ -210,9 +209,12 @@ class XsdLoader {
                     break
             }
         }
-        XsdElement result = new XsdElement(name: dataItemName, description: dataItemDescription, type: dataItemType, minOccurs: dataItemMinOccurs, maxOccurs: dataItemMaxOccurs, section: section, simpleType: simpleType, complexType: complexDataType , namespace: node.name())
+        def namespace = node.name()
+        if(!(namespace instanceof QName)) namespace = new QName("no namespace", "no namespace")
+        XsdElement result = new XsdElement(name: dataItemName, description: dataItemDescription, type: dataItemType, minOccurs: dataItemMinOccurs, maxOccurs: dataItemMaxOccurs, section: section, simpleType: simpleType, complexType: complexDataType , namespace: namespace)
         return result
     }
+
     def readSimpleType(Node node, String elementName){
         // data type can be enumeration
         // have restriction
