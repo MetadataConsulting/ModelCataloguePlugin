@@ -27,6 +27,7 @@ class CsvTransformation {
 
     static mapping = {
         columnDefinitions cascade: "all-delete-orphan"
-    }
+		separator column:"separatorChar"
+	}
 
 }
