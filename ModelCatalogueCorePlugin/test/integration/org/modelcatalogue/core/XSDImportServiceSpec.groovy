@@ -16,37 +16,39 @@ class XSDImportServiceSpec extends IntegrationSpec {
     }
 
 
-    def "ingest XML schema 1"(){
+//uncomment locally
 
-        setup:
-        initCatalogueService.initCatalogue()
-        def filenameXsd = "test/unit/resources/SACT/SACT_XMLDataTypes-v2-0.xsd" //"test/unit/resources/SACT/SACTSACT_XMLSchema_EXAMPLE2.xsd"
-        InputStream inputStream = new FileInputStream(filenameXsd)
-        XsdLoader parserXSD = new XsdLoader(inputStream)
-        def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrorsSACT) = parserXSD.parse()
-
-        when:
-
-        XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, "SACT", "SACT", schema, namespaces)
-
-        then:
-
-        def filenameXsd2 = "test/unit/resources/SACT/SACTSACT_XMLSchema-v2-0_Nested.xsd" //"test/unit/resources/SACT/SACTSACT_XMLSchema_EXAMPLE2.xsd"
-        InputStream inputStream2 = new FileInputStream(filenameXsd2)
-        XsdLoader parserXSD2 = new XsdLoader(inputStream2)
-        def (topLevelElements2, simpleDataTypes2, complexDataTypes2, schema2, namespaces2, logErrorsSACT2) = parserXSD2.parse()
-
-
-        when:
-
-        XSDImportService.createAll(simpleDataTypes2, complexDataTypes2, topLevelElements2, "SACT", "SACT", schema, namespaces)
-
-        then:
-
-
-
-
-        def cs_NullFlavor = ValueDomain.findByName("cs_NullFlavor")
+//    def "ingest XML schema 1"(){
+//
+//        setup:
+//        initCatalogueService.initCatalogue()
+//        def filenameXsd = "test/unit/resources/SACT/SACT_XMLDataTypes-v2-0.xsd" //"test/unit/resources/SACT/SACTSACT_XMLSchema_EXAMPLE2.xsd"
+//        InputStream inputStream = new FileInputStream(filenameXsd)
+//        XsdLoader parserXSD = new XsdLoader(inputStream)
+//        def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrorsSACT) = parserXSD.parse()
+//
+//        when:
+//
+//        XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, "SACT", "SACT", schema, namespaces)
+//
+//        then:
+//
+//        def filenameXsd2 = "test/unit/resources/SACT/SACTSACT_XMLSchema-v2-0_Nested.xsd" //"test/unit/resources/SACT/SACTSACT_XMLSchema_EXAMPLE2.xsd"
+//        InputStream inputStream2 = new FileInputStream(filenameXsd2)
+//        XsdLoader parserXSD2 = new XsdLoader(inputStream2)
+//        def (topLevelElements2, simpleDataTypes2, complexDataTypes2, schema2, namespaces2, logErrorsSACT2) = parserXSD2.parse()
+//
+//
+//        when:
+//
+//        XSDImportService.createAll(simpleDataTypes2, complexDataTypes2, topLevelElements2, "SACT", "SACT", schema, namespaces)
+//
+//        then:
+//
+//
+//
+//
+//        def cs_NullFlavor = ValueDomain.findByName("cs_NullFlavor")
 //        def cs_UpdateMode = ValueDomain.findByName("cs_UpdateMode")
 //        def cs_AddressPartType = ValueDomain.findByName("cs_AddressPartType")
 //        def cs = ValueDomain.findByName("cs")
@@ -156,7 +158,7 @@ class XSDImportServiceSpec extends IntegrationSpec {
 
 
 
-    }
+//    }
 
 
 
@@ -164,17 +166,26 @@ class XSDImportServiceSpec extends IntegrationSpec {
 //
 //        setup:
 //        initCatalogueService.initCatalogue()
-//        def filenameXsd = "test/unit/resources/SACT/SACTSACT_XMLSchema-v2-0_Nested2.xsd"
+//        def filenameXsd = "test/unit/resources/SACT/XMLDataTypes.xsd"
 //        InputStream inputStream = new FileInputStream(filenameXsd)
 //        XsdLoader parserXSD = new XsdLoader(inputStream)
 //        def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrorsSACT) = parserXSD.parse()
 //
+//        def filenameXsd2 = "test/unit/resources/SACT/Breast_XMLSchema.xsd"
+//        InputStream inputStream2 = new FileInputStream(filenameXsd2)
+//        XsdLoader parserXSD2 = new XsdLoader(inputStream2)
+//        def (topLevelElements2, simpleDataTypes2, complexDataTypes2, schema2, namespaces2, logErrorsSACT2) = parserXSD.parse()
+//
 //        when:
 //
 //        XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, "SACT", "SACT", schema, namespaces)
+//        XSDImportService.createAll(simpleDataTypes2, complexDataTypes2, topLevelElements2, "SACT", "SACT", schema2, namespaces2)
 //
 ////models
 //        def SACT = Model.findByName("SACT")
+//
+//
+//
 //        def SACTSACTType = Model.findByName("SACTSACTType")
 //        def SACTSACTRecordType = Model.findByName("SACTSACTRecordType")
 //        def SACTDemographicsAndConsultantType = Model.findByName("SACTDemographicsAndConsultantType")

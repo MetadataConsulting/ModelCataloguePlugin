@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.converters.XML
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.DataImport
@@ -108,7 +107,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
         String uri = request.forwardURI + '?' + request.queryString
 
         Asset asset = new Asset(
-                name: "Import for" + theName,
+                name: "Import for " + theName,
                 originalFileName: theName,
                 description: "Your import will be available in this asset soon. Use Refresh action to reload.",
                 status: PublishedElementStatus.PENDING,

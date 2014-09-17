@@ -137,7 +137,6 @@ class XSDImportService {
         if(!typeClassification) typeClassification = new Classification(name: classifications.first()?.name + " types", namespace: classifications.first()?.namespace + " types" ).save()
         classifications.add(typeClassification)
 
-
         Model containerModel = findModel(containerModelName, classifications)
         if(!containerModel) containerModel = new Model(name:  containerModelName , description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish").save()
         complexDataTypes.each{ XsdComplexType complexType ->
@@ -152,16 +151,16 @@ class XSDImportService {
         }
 
         circularModels.each{ Model model ->
-            def basedOn = model.basedOn.first()
-            def basedOnContains = (!basedOn)?:basedOn.contains
+            def isBasedOn = model.isBasedOn.first()
+            def isBasedOnContains = (!isBasedOn)?:isBasedOn.contains
             def modelContains = model.contains
-            basedOnContains.each{ DataElement de->
+            isBasedOnContains.each{ DataElement de->
                 def contained = modelContains.find{it.name==de.name}
                 if(!contained) model.addToContains(de)
             }
-            def basedOnChildren = (!basedOn)?:basedOn.parentOf
+            def isBasedOnChildren = (!isBasedOn)?:isBasedOn.parentOf
             def modelChildren = model.parentOf
-            basedOnChildren.each{ Model md->
+            isBasedOnChildren.each{ Model md->
                 def contained = modelChildren.find{it.name==md.name}
                 if(!contained) model.addToParentOf(md)
             }
@@ -202,7 +201,7 @@ class XSDImportService {
             }
 
             if(baseModel) {
-                model.addToBasedOn(baseModel)
+                model.addToIsBasedOn(baseModel)
                 elements = addElements(elements, getElementsFromModel(baseModel), true)
             }
 
@@ -255,7 +254,7 @@ class XSDImportService {
             valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: rule).save(flush: true, failOnError: true)
             valueDomain.addToConceptualDomains(conceptualDomains.first())
 
-            if (baseValueDomain) valueDomain.addToBasedOn(baseValueDomain)
+            if (baseValueDomain) valueDomain.addToIsBasedOn(baseValueDomain)
             if (simpleDataType.union) valueDomain = addUnions(valueDomain, simpleDataType.union, simpleDataTypes, conceptualDomains)
 
             //TODO: get metadata(is there any?)
@@ -352,7 +351,8 @@ class XSDImportService {
     protected getBaseModel(String base, Collection<Classification> classifications, Collection<ConceptualDomain> conceptualDomains, Collection<XsdComplexType> complexDataTypes){
         def baseModel
         def complexType = inXsdComplexTypes(base, complexDataTypes)
-        baseModel = matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes)
+        if(complexType) baseModel = matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes) else baseModel = findModel(base, classifications)
+
         return baseModel
     }
 
@@ -503,7 +503,7 @@ class XSDImportService {
         if(oldModel?.status == PublishedElementStatus.UPDATED) circularModels.add(newModel)
         newModel = addClassifications(newModel, classifications)
         newModel = copyRelations(newModel, oldModel)
-        newModel.addToBasedOn(oldModel)
+        newModel.addToIsBasedOn(oldModel)
         def element = new Element()
         element.model = newModel
         element.metadata = metadata
@@ -516,7 +516,7 @@ class XSDImportService {
         modelsCreated.add(newModel)
         newModel = addClassifications(newModel, classifications)
         newModel = copyRelations(newModel, oldModel)
-        newModel.addToBasedOn(oldModel)
+        newModel.addToIsBasedOn(oldModel)
         def element = new Element()
         element.model = newModel
         element.metadata = metadata

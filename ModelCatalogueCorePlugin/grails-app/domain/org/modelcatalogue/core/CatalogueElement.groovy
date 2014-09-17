@@ -35,7 +35,7 @@ abstract class CatalogueElement {
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
     static relationships = [
-            incoming: [base: 'basedOn'],
+            incoming: [base: 'isBasedOn'],
             outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf'],
             bidirectional: [relatedTo: 'relatedTo']
     ]

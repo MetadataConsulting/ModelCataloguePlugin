@@ -805,7 +805,7 @@ class DataImportService {
                         ValueDomain enumeratedVD = importValueDomain(simpleType.name, simpleType.description, enumeratedDataType, "", cd)
                         addMetadataToValueDomain(enumeratedVD, simpleType)
                         enumeratedVD.save()
-                        enumeratedVD.addToBasedOn(vd)
+                        enumeratedVD.addToIsBasedOn(vd)
                         vd.save()
                         enumeratedVD.save()
                         return [enumeratedVD, enumeratedDataType]
