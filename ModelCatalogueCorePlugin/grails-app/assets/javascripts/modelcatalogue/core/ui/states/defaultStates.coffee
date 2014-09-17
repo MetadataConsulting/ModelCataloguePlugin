@@ -15,6 +15,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       updateDashboard(user.data.displayName)
     )
 
+    $scope.convert = ->
+      messages.prompt('', '', {type: 'convert-with-value-domain'})
+
+    $scope.validate = ->
+      messages.prompt('', '', {type: 'validate-value-by-domain'})
+
     $scope.create = (what) ->
       dialogType = "create-#{what}"
       if not messages.hasPromptFactory(dialogType)
@@ -641,6 +647,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     <div class="col-xs-9 text-right">
                                         <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} </div>
                                         <div><a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}"> Incomplete Value Domains</a> {{incompleteValueDomainsCount}} </div>
+                                        <div><a ng-click="validate()">Validate</a> / <a ng-click="convert()">Convert</a></div>
                                     </div>
                                 </div>
                             </div>

@@ -4,7 +4,6 @@ import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.ValueDomain
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -192,7 +191,7 @@ modelcatalogue.defaults.relationshiptypes =  [
 
             return true
         '''],
-        [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement],
+        [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement],
         [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],

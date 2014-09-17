@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
+import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse
 
@@ -9,6 +10,57 @@ import javax.servlet.http.HttpServletResponse
  * Created by adammilward on 27/02/2014.
  */
 class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
+
+    def "can covert value"() {
+        ValueDomain celsius = ValueDomain.findByName("value domain Celsius")
+        ValueDomain fahrenheit = ValueDomain.findByName("value domain Fahrenheit")
+
+        expect:
+        celsius
+        fahrenheit
+
+        when:
+        controller.request.method       = 'GET'
+        controller.params.id            = celsius.id
+        controller.params.destination   = fahrenheit.id
+        controller.params.value         = '37.4'
+        controller.response.format      = "json"
+
+        controller.convert()
+
+        def json = controller.response.json
+
+        then:
+        json.result == 99.32
+
+    }
+
+
+    @Unroll
+    def "validate=#valid value #value with rule #domain.rule of domain #domain"() {
+        expect:
+        domain
+
+        when:
+        controller.request.method       = 'GET'
+        controller.params.id            = domain.id
+        controller.params.value         = value
+        controller.response.format      = "json"
+
+        controller.validateValue()
+
+        def json = controller.response.json
+
+        then:
+        json.result == valid
+
+        where:
+        valid | value | domain
+        true  | '10'  | ValueDomain.findByName("value domain Celsius")
+        true  | '10'  | ValueDomain.findByName("value domain Fahrenheit")
+
+    }
+
 
     @Override
     Map getPropertiesToEdit(){
