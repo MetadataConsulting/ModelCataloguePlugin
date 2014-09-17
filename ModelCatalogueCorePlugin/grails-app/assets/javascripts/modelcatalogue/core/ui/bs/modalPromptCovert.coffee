@@ -18,7 +18,7 @@ angular.module('mc.core.ui.bs.modalPromptCovert', ['mc.util.messages']).config [
               </div>
               <div class="form-group" ng-hide="args.destination">
                 <label for="destination">To</label>
-                <input type="text" id="destination" placeholder="Destination Value Domain" ng-model="definition.destination" catalogue-element-picker="valueDomain" label="el.name" typeahead-on-select="convert()">
+                <select class="form-control" ng-model="definition.destination" ng-change="convert()" ng-options="dest as dest.name for dest in destinations" ng-disabled="destinations.length == 0"></select>
               </div>
               <div class="form-group">
                 <label for="value">Value</label>
@@ -41,6 +41,26 @@ angular.module('mc.core.ui.bs.modalPromptCovert', ['mc.util.messages']).config [
           $scope.messages = messages.createNewMessages()
 
           $scope.defaultResult = 'Please enter valid value.'
+
+          $scope.destinations = []
+
+          appendToDestinations = (result) ->
+            for mapping in result.list
+              $scope.destinations.push mapping.destination
+
+            if result.next.size > 0
+              result.next().then appendToDestinations
+            else if $scope.destinations.length > 0
+              $scope.definition.destination = $scope.destinations[0]
+              $scope.convert()
+
+
+          onSourceSelected = (source) ->
+            $scope.destinations = []
+            return if not source or not source.mappings
+            source.mappings().then appendToDestinations
+
+          $scope.$watch 'definition.source', onSourceSelected
 
           $scope.convert = ->
             if $scope.definition.source and not angular.isString($scope.definition.source) and $scope.definition.destination and not angular.isString($scope.definition.destination) and $scope.definition.value
