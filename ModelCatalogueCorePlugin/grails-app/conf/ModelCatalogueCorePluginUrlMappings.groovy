@@ -5,7 +5,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
 	static mappings = {
 
-        def resources         = ['batch', 'relationshipType' ]
+        def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
         def publishedElements = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
         def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'classification']
         def allElements       = catalogueElements + resources
@@ -86,6 +86,9 @@ class ModelCatalogueCorePluginUrlMappings {
                 }
             }
 
+            if (controllerName == 'csvTransformation') {
+                "/api/modelCatalogue/core/$controllerName/$id/transform"(controller: controllerName, action: 'transform', method: HttpMethod.POST)
+            }
 
             if (controllerName == 'relationshipType') {
                 "/api/modelCatalogue/core/$controllerName/elementClasses"(controller: controllerName, action: 'elementClasses', method: HttpMethod.GET)

@@ -66,6 +66,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     applicationTitle "Actions in batch #{element.name}"
 ])
 
+.controller('mc.core.ui.states.CsvTransformationCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+    $scope.element  = element
+])
+
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle) ->
     listEnhancer    = enhance.getEnhancer('list')
 
@@ -150,6 +154,25 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     abstract: true
     url: '/catalogue'
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  }
+
+
+  $stateProvider.state('mc.csvTransformations', {
+    abstract: true,
+    url: "/transformations/csv"
+    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  })
+
+  $stateProvider.state 'mc.csvTransformations.show', {
+    url: '/{id:\\d+}'
+    templateUrl: 'modelcatalogue/core/ui/state/csvTransformation.html'
+    resolve:
+      element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
+        $stateParams.resource = "csvTransformation"
+        return catalogueElementResource('csvTransformation').get($stateParams.id)
+      ]
+
+    controller: 'mc.core.ui.states.CsvTransformationCtrl'
   }
 
   $stateProvider.state('mc.actions', {
@@ -459,6 +482,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </div>
   '''
 
+  $templateCache.put 'modelcatalogue/core/ui/state/csvTransformation.html', '''
+    <div ng-show="element">
+      <csv-transformation-view element="element"></csv-transformation-view>
+    </div>
+  '''
+
   #language=HTML
   $templateCache.put 'modelcatalogue/core/ui/state/dashboard.html', '''
     		<!-- Jumbotron -->
@@ -711,6 +740,28 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
+                    <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <a ui-sref="mc.resource.list({resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}"><i class="fa fa-long-arrow-right fa-5x fa-fw"></i></a>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}">CSV Transformations</a> {{transformationsCount}}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a ng-click="create('csvTransformation')">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create CSV Transformation</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
                     <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4 hide">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -729,7 +780,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
                             <a ng-click="create('batch')">
                                 <div class="panel-footer">
-                                    <span class="pull-left">Create New Batch</span>
+                                    <span class="pull-left">Create Batch</span>
                                     <span class="pull-right"><i class="fa fa-magic"></i></span>
                                     <div class="clearfix"></div>
                                 </div>

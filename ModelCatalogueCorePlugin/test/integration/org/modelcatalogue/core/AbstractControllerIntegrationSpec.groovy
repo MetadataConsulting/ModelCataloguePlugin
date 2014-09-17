@@ -449,10 +449,21 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     }
 
 
+    T prepareInstanceForDelete() {
+        T elementToDelete = resource.newInstance(newInstance)
+        if (controller instanceof AbstractRestfulController) {
+            controller.cleanRelations(elementToDelete)
+            elementToDelete.save()
+            controller.bindRelations(elementToDelete, newInstance)
+            return elementToDelete
+        }
+        elementToDelete.save()
+    }
+
     def "Return 204 for existing item as JSON on delete"() {
         if (controller.readOnly) return
 
-        def elementToDelete = resource.newInstance(newInstance).save()
+        def elementToDelete = prepareInstanceForDelete()
         removeAllRelations(elementToDelete)
         controller.response.format = "json"
         controller.params.id = elementToDelete.id
@@ -468,7 +479,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     def "Return 204 for existing item as XML on delete"() {
         if (controller.readOnly) return
 
-        def elementToDelete = resource.newInstance(newInstance).save()
+        def elementToDelete = prepareInstanceForDelete()
         removeAllRelations(elementToDelete)
         controller.response.format = "xml"
         controller.params.id = elementToDelete.id

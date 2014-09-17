@@ -172,7 +172,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
     }
 
     // classifications are marshalled with the published element so no need for special method to fetch them
-    protected bindRelations(PublishedElement instance) {
+    protected bindRelations(PublishedElement instance, Object objectToBind) {
         if (objectToBind.classifications != null) {
             for (classification in instance.classifications.findAll { !(it.id in objectToBind.classifications*.id) }) {
                 instance.removeFromClassifications classification
