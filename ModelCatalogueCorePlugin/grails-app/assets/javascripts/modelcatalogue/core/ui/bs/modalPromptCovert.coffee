@@ -18,7 +18,7 @@ angular.module('mc.core.ui.bs.modalPromptCovert', ['mc.util.messages']).config [
               </div>
               <div class="form-group" ng-hide="args.destination">
                 <label for="destination">To</label>
-                <select class="form-control" ng-model="definition.destination" ng-change="convert()" ng-options="dest as dest.name for dest in destinations" ng-disabled="destinations.length == 0"></select>
+                <select class="form-control" ng-model="definition.destination" ng-change="convert()" ng-options="dest as dest.name for dest in destinations" ng-disabled="destinations.length < 2"></select>
               </div>
               <div class="form-group">
                 <label for="value">Value</label>
