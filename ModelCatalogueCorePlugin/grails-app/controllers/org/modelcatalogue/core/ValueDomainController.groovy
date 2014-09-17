@@ -57,7 +57,7 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
 
         Mapping mapping = Mapping.findBySourceAndDestination(valueDomain, other)
         if (!mapping) {
-            notFound()
+            respond result: "Mapping is missing. Don't know how to convert value."
             return
         }
 
