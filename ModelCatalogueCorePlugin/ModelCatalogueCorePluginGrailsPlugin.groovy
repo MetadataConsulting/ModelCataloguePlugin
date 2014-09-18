@@ -50,6 +50,8 @@ Model catalogue core plugin (metadata registry)
     // Online location of the plugin's browseable source code.
 //    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
 
+    private static String stringSeparator = "\r\n"
+
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
@@ -107,35 +109,112 @@ Model catalogue core plugin (metadata registry)
 
         XLSXListRenderer xlsxListRenderer = ctx.getBean(XLSXListRenderer)
 
-        xlsxListRenderer.registerRowWriter {
-            title "Catalogue Elements to Excel"
-            headers 'ID', 'Name', 'Description'
+        xlsxListRenderer.registerRowWriter ('Classifications'){
+            title "Classifications to Excel"
+            //headers ' Model Catalogue ID',  'Symbol', 'Unit of Measurement', 'Description'
+            headers  'Model Catalogue ID',  'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || CatalogueElement.isAssignableFrom(container.itemType))
-            } then { CatalogueElement element ->
-                [[element.id, element.name, element.description]]
+                    context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || Classification.isAssignableFrom(container.itemType))
+            } then { Classification classification ->
+                [[ classification.modelCatalogueId,  classification.name, classification.description]]
             }
         }
 
-        xlsxListRenderer.registerRowWriter {
+        xlsxListRenderer.registerRowWriter ('ConceptualDomainsFromContextRelationship'){
+            title "Conceptual Domains to Excel"
+            //headers ' Model Catalogue ID',  'Symbol', 'Unit of Measurement', 'Description'
+            headers  'Model Catalogue ID',  'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                ((context.actionName in [null,  'incoming' ] ) && (context.getWebRequest().getParams().get("type") in ['context'])  && (!container.itemType || Relationship.isAssignableFrom(container.itemType)) && (context.controllerName == 'model') )
+            } then { Relationship relationship ->
+                [[ relationship.source.modelCatalogueId,  relationship.source.name, relationship.source.description]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter ('ConceptualDomains'){
+            title "Conceptual Domains to Excel"
+            //headers ' Model Catalogue ID',  'Symbol', 'Unit of Measurement', 'Description'
+            headers  'Model Catalogue ID',  'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                ((context.actionName in [null,  'index' ] ) && (context.getWebRequest().getParams().get("type") in [null])  && (!container.itemType || ConceptualDomain.isAssignableFrom(container.itemType)) && (context.controllerName == 'model') )
+            } then { ConceptualDomain conceptualDomain ->
+                [[ conceptualDomain.modelCatalogueId, conceptualDomain.name, conceptualDomain.description]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter ('ConceptualDomainsIndex') {
+            title "Conceptual Domains to Excel"
+            //headers ' Model Catalogue ID',  'Symbol', 'Unit of Measurement', 'Description'
+            headers  'Model Catalogue ID',  'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null, 'index'] && (!container.itemType || ConceptualDomain.isAssignableFrom(container.itemType))
+            } then { ConceptualDomain conceptualDomain ->
+                [[ conceptualDomain.modelCatalogueId, conceptualDomain.name, conceptualDomain.description]]
+            }
+        }
+
+//        xlsxListRenderer.registerRowWriter {
+//            title "Catalogue Elements to Excel"
+//            headers 'ID', 'Name', 'Description'
+//            when { ListWrapper container, RenderContext context ->
+//                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || CatalogueElement.isAssignableFrom(container.itemType))
+//            } then { CatalogueElement element ->
+//                [[element.id, element.name, element.description]]
+//            }
+//        }
+
+
+
+        xlsxListRenderer.registerRowWriter ('DataTypes') {
             title "DataTypes to Excel"
             headers 'Model Catalogue ID', 'Name', 'Enumerations', 'Value Domains'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || DataType.isAssignableFrom(container.itemType))
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'properties'] && (!container.itemType || DataType.isAssignableFrom(container.itemType))
             } then { DataType dataType ->
                 [[dataType.id, dataType.name, getEnumerationString(dataType), getValueDomainString(dataType)]]
             }
         }
 
-        xlsxListRenderer.registerRowWriter {
+//        xlsxListRenderer.registerRowWriter {
+//            title "ValueDomains to Excel"
+//            headers 'Model Catalogue ID', 'Name', 'Conceptual Domains', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
+//            when { ListWrapper container, RenderContext context ->
+//                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
+//            } then { ValueDomain valueDomain ->
+//                [[valueDomain.id, valueDomain.name, getConceptualDomainString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
+//            }
+//        }
+        xlsxListRenderer.registerRowWriter ('ValueDomains') {
             title "ValueDomains to Excel"
             headers 'Model Catalogue ID', 'Name', 'Conceptual Domains', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'valueDomains'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
             } then { ValueDomain valueDomain ->
-                [[valueDomain.id, valueDomain.name, getConceptualDomainString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
+                [[valueDomain.modelCatalogueId, valueDomain.name, getConceptualDomainString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
             }
         }
+
+        xlsxListRenderer.registerRowWriter ('MeasurementUnits'){
+            title "Measurement Units to Excel"
+            //headers ' Model Catalogue ID',  'Symbol', 'Unit of Measurement', 'Description'
+            headers  'Model Catalogue ID', 'Symbol', 'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || MeasurementUnit.isAssignableFrom(container.itemType))
+            } then { MeasurementUnit measurementUnit ->
+                [[ measurementUnit.modelCatalogueId, measurementUnit.symbol, measurementUnit.name, measurementUnit.description]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter ('Relationships') {
+            title "Relationships to Excel"
+            headers 'Source Model Catalogue Id', 'Source Name','Relationship','Destination Model Catalogue Id', 'Destination Name'
+            when { ListWrapper container, RenderContext context ->
+                (context.actionName in [null, 'index', 'search','relationships'] && (!container.itemType || Relationship.isAssignableFrom(container.itemType)))
+            } then { Relationship relationship ->
+                [[relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name]]
+            }
+        }
+
         xlsxListRenderer.registerRowWriter {
             title "Relationship Types to Excel"
             headers 'Name', 'Source to Destination', 'Destination to Source'
@@ -146,56 +225,101 @@ Model catalogue core plugin (metadata registry)
             }
         }
 
-        xlsxListRenderer.registerRowWriter {
-            title "Current Relations"
-            headers 'Type', 'Source', 'Destination'
-            when { container, context ->
-                container instanceof Relationships
-            } then { Relationship r ->
-                [[r.relationshipType, r.source.name, r.destination.name]]
+
+//        xlsxListRenderer.registerRowWriter {
+//            title "Current Relations"
+//            headers 'Type', 'Source', 'Destination'
+//            when { container, context ->
+//                container instanceof Relationships
+//            } then { Relationship r ->
+//                [[r.relationshipType, r.source.name, r.destination.name]]
+//            }
+//        }
+
+
+
+        //   *******  MODELS  **********
+        xlsxListRenderer.registerRowWriter ('Models') {
+            title "Models to Excel"
+            headers  'Model Catalogue ID', 'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                context.actionName in [null,'index'] && (Model.isAssignableFrom(container.itemType))
+            } then { Model model ->
+                [[ model.modelCatalogueId, model.name, model.description]]
+            }
+        }
+        xlsxListRenderer.registerRowWriter ('ModelsOutgoingContextRelationshipsContext'){
+            title "Models to Excel"
+            headers  'Source Model Catalogue Id', 'Source Name','Relationship','Destination Model Catalogue Id', 'Destination Name'
+            when { ListWrapper container, RenderContext context ->
+                (!container.itemType || Relationship.isAssignableFrom(container.itemType) && (context.actionName in [null,  'outgoing' ] ) && (context.getWebRequest().getParams().get("type") in ['context', 'hierarchy']) )
+            } then { Relationship relationship ->
+                [[ relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name]]
+                //relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name
             }
         }
 
+        xlsxListRenderer.registerRowWriter ('ModelsIncomingContextRelationshipsContext'){
+            title "Models to Excel"
+            headers 'Source Model Catalogue Id', 'Source Name','Relationship','Destination Model Catalogue Id', 'Destination Name'// 'Model Catalogue ID', 'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                (!container.itemType || Relationship.isAssignableFrom(container.itemType) && ((context.actionName in [null,  'incoming' ] ) && (context.getWebRequest().getParams().get("type") in ['context']) && (context.controllerName != 'model') ))
+            } then { Relationship relationship ->
+                [[ relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name]]
+            }
+        }
+        xlsxListRenderer.registerRowWriter ('ModelsIncomingContextRelationshipsHierarchy'){
+            title "Models to Excel"
+            headers  'Source Model Catalogue Id', 'Source Name','Relationship','Destination Model Catalogue Id', 'Destination Name'//'Model Catalogue ID', 'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                (!container.itemType || Relationship.isAssignableFrom(container.itemType) && ((context.actionName in [null,  'incoming' ] ) && (context.getWebRequest().getParams().get("type") in ['hierarchy'])&& (context.controllerName == 'model') ))
+            } then { Relationship relationship ->
+                [[ relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name]]
+            }
+        }
+
+        xlsxListRenderer.registerRowWriter ('ModelsIncomingContextRelationshipsContainment'){
+            title "Models to Excel"
+            headers 'Source Model Catalogue Id', 'Source Name','Relationship','Destination Model Catalogue Id', 'Destination Name'// 'Model Catalogue ID', 'Name', 'Description'
+            when { ListWrapper container, RenderContext context ->
+                (!container.itemType || Relationship.isAssignableFrom(container.itemType) && ((context.actionName in [null,  'incoming' ] ) && (context.getWebRequest().getParams().get("type") in ['containment'])&& (context.controllerName == 'dataElement') ))
+            } then { Relationship relationship ->
+                [[ relationship.source.modelCatalogueId, relationship.source.name, relationship.relationshipType.sourceToDestination, relationship.destination.modelCatalogueId, relationship.destination.name]]
+            }
+        }
+
+//        xlsxListRenderer.registerRowWriter('NHIC') {
+//            title "Data Elements to Excel"
+//            append metadata
+//            headers "Classification", "Conceptual Domain", "Parent Model Unique Code",
+//                    "Parent Model", "Model Unique Code", "Model",
+//                    "Data Item Unique Code", "Data Item Name", "Data Item Description",
+//                    "Measurement Unit","Measurement Unit Symbol", "Data type", "Metadata"
+//
+//            when { ListWrapper container, RenderContext context ->
+//                context.actionName in ['index', 'search', 'metadataKeyCheck', 'uninstantiatedDataElements', 'getSubModelElements', 'containedIn', 'isContextFor' ] && container.itemType && DataElement.isAssignableFrom(container.itemType)
+//            } then { DataElement element ->
+//                [[getClassificationString(element), getConceptualDomainString(element), getParentModel(element)?.modelCatalogueId,
+//                  getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name,
+//                  element.modelCatalogueId, element.name, element.description,
+//                  getUnitOfMeasure(element), getUnitOfMeasureSymbol(element) , getDataType(element), "-"]]
+//            }
+//        }
         xlsxListRenderer.registerRowWriter('NHIC') {
             title "Data Elements to Excel"
-            headers "Classification", "Parent Model Unique Code",
+            append metadata
+            headers "Classification", "Conceptual Domain", "Parent Model Unique Code",
             "Parent Model", "Model Unique Code", "Model",
             "Data Item Unique Code", "Data Item Name", "Data Item Description",
-            "Measurement Unit", "Data type", "Metadata",
-            "NHIC_Identifier", "Link_to_existing_definition", "Notes_from_GD_JCIS",
-            "Optional_Local_Identifier", "A", "B",
-            "C", "D", "E","F",
-            "G", "H", "E2", "System",
-            "Comments", "Group", "More-comments", "Multiplicity",
-            "Temp", "Index", "NIHR Code", "Section_0",
-            "Section_1", "Section_2", "Section_3", "Supporting",
-            "Associated date and time", "Given Data type", "Template", "List content",
-            "Timing of Data Collection", "Source UCH", "label1 - UCH", "label2 - UCH",
-            "More metadata1", "Reference", "ranges - UCH", "Cambridge",
-            "Source Cambridge", "Type of Anonymisation", "Data Dictionary Element", "Link to existing definition",
-            "Anonymizing Rules", "File Name (COSD XSD)", "XSD Element Name",
-            "Original Data Item Name (COSD v1.2 xls)","Pathway Group"
-//            headers "Parent Model Unique Code",	"Parent Model",	"Model Unique Code", "Model", "Data Item Unique Code", "Data Item Name", "Data Item Description", "Measurement Unit", "Data type",	"Metadata", "Data item No.","Schema Specification","Data Dictionary Element", "Current Collection", "Format"
+            "Measurement Unit","Measurement Unit Symbol", "Data type", "Metadata"
+
             when { ListWrapper container, RenderContext context ->
-                context.actionName in ['index', 'search', 'metadataKeyCheck', 'uninstantiatedDataElements', 'getSubModelElements'] && container.itemType && DataElement.isAssignableFrom(container.itemType)
+                container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
-                [[getClassificationString(element), getParentModel(element)?.modelCatalogueId,
+                [[getClassificationString(element), getConceptualDomainString(element), getParentModel(element)?.modelCatalogueId,
                   getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name,
                   element.modelCatalogueId, element.name, element.description,
-                  getUnitOfMeasure(element), getDataType(element), "-",
-                  element.ext.get("NHIC_Identifier"), element.ext.get("Link_to_existing_definition"), element.ext.get("Notes_from_GD_JCIS"),
-                  element.ext.get("Optional_Local_Identifier"), element.ext.get("A"), element.ext.get("B"),
-                  element.ext.get("C"), element.ext.get("D"), element.ext.get("E"), element.ext.get("F"),
-                  element.ext.get("G"), element.ext.get("H"), element.ext.get("E2"), element.ext.get("System"),
-                  element.ext.get("Comments"), element.ext.get("Group"), element.ext.get("More-comments"), element.ext.get("Multiplicity"),
-                  element.ext.get("Temp"), element.ext.get("Index"), element.ext.get("NIHR Code"), element.ext.get("Section_0"),
-                  element.ext.get("Section_1"), element.ext.get("Section_2"), element.ext.get("Section_3"), element.ext.get("Supporting"),
-                  element.ext.get("Associated date and time"), element.ext.get("Given Data type"), element.ext.get("Template"), element.ext.get("List content"),
-                  element.ext.get("Timing of Data Collection"), element.ext.get("Source UCH"), element.ext.get("label1 - UCH"), element.ext.get("label2 - UCH"),
-                  element.ext.get("More metadata1"), element.ext.get("Reference"), element.ext.get("ranges - UCH"), element.ext.get("Cambridge"),
-                  element.ext.get("Source Cambridge"), element.ext.get("Type of Anonymisation"), element.ext.get("Data Dictionary Element"), element.ext.get("Link to existing definition"),
-                  element.ext.get("Anonymizing Rules"), element.ext.get("File Name (COSD XSD)"), element.ext.get("XSD Element Name"),
-                  element.ext.get("Original Data Item Name (COSD v1.2 xls)"), element.ext.get("Pathway Group")]]
+                  getUnitOfMeasure(element), getUnitOfMeasureSymbol(element) , getDataType(element), "-"]]
             }
         }
 
@@ -238,6 +362,7 @@ Model catalogue core plugin (metadata registry)
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
 
+
     }
 
     def onChange = { event ->
@@ -279,9 +404,33 @@ Model catalogue core plugin (metadata registry)
         }
         return null
     }
+    def static getConceptualDomainString(DataElement dataElement){
+        return getConceptualDomainString(dataElement.valueDomain)
+    }
+
+
+
 
     def static getValueDomain(DataElement dataElement){
         return dataElement.valueDomain
+    }
+
+    def static getUnitOfMeasure(DataElement dataElement){
+        ValueDomain valueDomain = getValueDomain(dataElement)
+        if(valueDomain) {
+            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
+            return unitOfMeasure?.name
+        }
+        return null
+    }
+
+    def static getUnitOfMeasureSymbol(DataElement dataElement){
+        ValueDomain valueDomain = getValueDomain(dataElement)
+        if(valueDomain) {
+            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
+            return unitOfMeasure?.symbol
+        }
+        return null
     }
 
     def static getDataType(DataElement dataElement){
@@ -296,19 +445,10 @@ Model catalogue core plugin (metadata registry)
         return null
     }
 
-    def static getUnitOfMeasure(DataElement dataElement){
-        ValueDomain valueDomain = getValueDomain(dataElement)
-        if(valueDomain) {
-            MeasurementUnit unitOfMeasure = valueDomain?.unitOfMeasure
-            return unitOfMeasure?.name
-        }
-        return null
-    }
-    
     def static getClassificationString(DataElement dataElement){
         String classifications = ""
         dataElement.classifications.eachWithIndex{ def classification, int i ->
-            if (classifications != "") classifications += (", " + classification.name)
+            if (classifications != "") classifications += (stringSeparator + classification.name)
             else classifications = classification.name
         }
         return classifications
@@ -319,7 +459,7 @@ Model catalogue core plugin (metadata registry)
 
         dataType.relatedValueDomains.eachWithIndex{ ValueDomain valueDomain, int i ->
             String vdText = valueDomain.id + " \t " + valueDomain.name + " \t "
-            if (valueDomains!="") valueDomains += ("\r\n" + vdText )
+            if (valueDomains!="") valueDomains += (stringSeparator + vdText )
             else valueDomains = vdText
         }
         return valueDomains
@@ -336,7 +476,7 @@ Model catalogue core plugin (metadata registry)
         String conceptualDomains = ""
 
         valueDomain.conceptualDomains.eachWithIndex{ ConceptualDomain conceptualDomain, int i ->
-            if (conceptualDomains!="") conceptualDomains += ("\r\n" + conceptualDomain.name )
+            if (conceptualDomains!="") conceptualDomains += (stringSeparator + conceptualDomain.name )
             else conceptualDomains = conceptualDomain.name
         }
         return conceptualDomains
@@ -345,7 +485,7 @@ Model catalogue core plugin (metadata registry)
     def static getValueDomainRuleString(ValueDomain valueDomain){
         String rules = ""
         valueDomain.rule.eachWithIndex{ String rule, int i ->
-            if (rules!="") rules += ("\r\n" + rule )
+            if (rules!="") rules += (stringSeparator + rule )
             else rules = rule
         }
         return rules

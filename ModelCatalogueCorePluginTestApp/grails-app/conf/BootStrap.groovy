@@ -30,16 +30,16 @@ class BootStrap {
         initCatalogueService.initDefaultDataTypes()
         initCatalogueService.initDefaultMeasurementUnits()
 
-        xlsxListRenderer.registerRowWriter('reversed') {
-            title "Reversed DEMO Export"
-            append metadata
-            headers 'Description', 'Name', 'ID'
-            when { ListWrapper container, RenderContext context ->
-                context.actionName in ['index', 'search'] && container.itemType && CatalogueElement.isAssignableFrom(container.itemType)
-            } then { CatalogueElement element ->
-                [[element.description, element.name, element.id]]
-            }
-        }
+//        xlsxListRenderer.registerRowWriter('reversed') {
+//            title "Reversed DEMO Export"
+//            append metadata
+//            headers 'Description', 'Name', 'ID'
+//            when { ListWrapper container, RenderContext context ->
+//                context.actionName in ['index', 'search'] && container.itemType && CatalogueElement.isAssignableFrom(container.itemType)
+//            } then { CatalogueElement element ->
+//                [[element.description, element.name, element.id]]
+//            }
+//        }
 
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
