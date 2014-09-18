@@ -261,3 +261,54 @@ a div.panel-footer, .with-pointer {
 }
 
 
+.fixed-height(@height) {
+  height: @height;
+  max-height: @height;
+  min-height: @height;
+}
+
+.with-ellipses {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+.panel-fixed-height(@height) {
+  padding-bottom: 15px;
+  .panel-heading {
+    .fixed-height(40px);
+    .panel-title {
+      .with-ellipses();
+      cursor: pointer;
+    }
+  }
+  .panel-body {
+    .fixed-height(@height - 40px);
+    overflow-y: auto;
+  }
+}
+
+.panel-fixed-height-500 {
+  .panel-fixed-height(500px);
+}
+.panel-fixed-height-300 {
+  .panel-fixed-height(300px);
+}
+
+.infinite-scroll-item .panel-actions {
+  display: none;
+}
+
+.infinite-scroll-item:hover .panel-actions {
+  display: block;
+  position: absolute;
+  padding: 0px 10px;
+  top: 50px;
+  float: right;
+  right: 15px;
+  opacity: 0.6;
+}
+
+.infinite-scroll-item:hover .panel-actions:hover {
+  opacity: 1;
+}

@@ -94,7 +94,7 @@ metadataCurator.controller('metadataCurator.searchCtrl',
         actions.push {
           condition: -> true
           label: (term) ->
-            if $rootScope.elementToShow?.isInstanceOf 'valueDomain' and $rootScope.elementToShow?.rule
+            if $rootScope.elementToShow?.isInstanceOf('valueDomain') and $rootScope.elementToShow?.rule
               "Validate <strong>#{term}</strong> by <strong>#{$rootScope.elementToShow.name}</strong>"
             else
               "Validate <strong>#{term}</strong>"
@@ -108,7 +108,7 @@ metadataCurator.controller('metadataCurator.searchCtrl',
         actions.push {
           condition: -> true
           label: (term) ->
-            if $rootScope.elementToShow?.isInstanceOf 'valueDomain' and $rootScope.elementToShow?.mappings?.total > 0
+            if $rootScope.elementToShow?.isInstanceOf('valueDomain') and $rootScope.elementToShow?.mappings?.total > 0
               "Convert <strong>#{term}</strong> from <strong>#{$rootScope.elementToShow.name}</strong>"
             else
               "Convert <strong>#{term}</strong>"
