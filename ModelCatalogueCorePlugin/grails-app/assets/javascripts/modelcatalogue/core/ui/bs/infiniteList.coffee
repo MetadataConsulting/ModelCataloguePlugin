@@ -8,8 +8,8 @@ angular.module('mc.core.ui.bs.infiniteList', ['mc.core.ui.infiniteList', 'ngSani
               <a><span class="fa close" ng-class="{'fa-expand': !expanded, 'fa-compress': expanded}" ng-click="extendOrCollapse($event)"></span></a>
               <h3 class="panel-title" title="{{element.name}}" ng-click="element.show()"><span ng-class="element.getIcon()"></span> {{element.name}}</h3>
             </div>
-            <div class="panel-body">
-              <blockquote>{{element.description}}</blockquote>
+            <div class="panel-body preserve-new-lines">
+              {{element.description}}
             </div>
           </div>
           <div class="panel-actions">
