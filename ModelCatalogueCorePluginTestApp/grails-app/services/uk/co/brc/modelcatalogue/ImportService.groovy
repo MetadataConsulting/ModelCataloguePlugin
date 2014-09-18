@@ -237,7 +237,7 @@ class ImportService {
     private static findOrCreateConceptualDomain(String name, String description) {
         def cd = ConceptualDomain.findByName(name)
         if (!cd) {
-            cd = new ConceptualDomain(name: name, description: description).save()
+            cd = new ConceptualDomain(name: name, description: description, namespace: "www.nhic.co.uk").save()
         }
         return cd
     }

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.dataarchitect.xsd
 
 import grails.test.mixin.Mock
+import groovy.xml.QName
 import org.modelcatalogue.core.ValueDomain
 
 /**
@@ -16,6 +17,7 @@ class XsdLoader {
     ArrayList<XsdSimpleType> simpleDataTypes =[]
     ArrayList<XsdComplexType>  complexDataTypes =[]
     ArrayList<XsdGroup> groups =[]
+    ArrayList<QName> namespaces =[]
     XmlParser parser
     XsdSchema schema
     def xsd
@@ -31,7 +33,7 @@ class XsdLoader {
 
     public XsdLoader(InputStream inputStream){
         fileInputStream  = inputStream
-        parser = new XmlParser()
+        parser = new XmlParser(true, true)
         xsd = parser.parse (fileInputStream)
     }
 
@@ -39,6 +41,10 @@ class XsdLoader {
     {
         parser = new XmlParser()
         xsd = parser.parse (xsdText)
+    }
+
+    private addToNameSpaces(QName namespace){
+        if(!namespaces.find{it.namespaceURI == namespace.namespaceURI}) namespaces.add(namespace)
     }
 
     def parse(){
@@ -52,14 +58,17 @@ class XsdLoader {
                     break
                 case "element":
                     XsdElement element =  readElement(valueNode, "")
+                    addToNameSpaces(element.namespace)
                     if(!element.section) topLevelElements << element
                     break
                 case "complexType":
                     XsdComplexType complexDataType = readComplexType (valueNode, "")
+                    addToNameSpaces(complexDataType.namespace)
                     complexDataTypes << complexDataType
                     break
                 case "simpleType":
                     XsdSimpleType simpleType =  readSimpleType(valueNode, "")
+                    addToNameSpaces(simpleType.namespace)
                     simpleDataTypes << simpleType
                     break
                 default:
@@ -67,7 +76,7 @@ class XsdLoader {
                     break
             }
         }
-        [topLevelElements, simpleDataTypes, complexDataTypes, schema, logErrors]
+        [topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrors]
     }
 
 
@@ -112,6 +121,7 @@ class XsdLoader {
     def readSchema(Node node){
         def attributes = node.attributes()
         XsdSchema schema = new XsdSchema()
+        schema.namespace = node.name()
         attributes.eachWithIndex{ def attribute, int attributeIndex ->
             switch (attribute.key){
                 case "targetNamespace":
@@ -144,7 +154,6 @@ class XsdLoader {
         return schema
 
     }
-
 
     def readElement(Node node, String section){
         String dataItemName=""
@@ -200,9 +209,12 @@ class XsdLoader {
                     break
             }
         }
-        XsdElement result = new XsdElement(name: dataItemName, description: dataItemDescription, type: dataItemType, minOccurs: dataItemMinOccurs, maxOccurs: dataItemMaxOccurs, section: section, simpleType: simpleType, complexType: complexDataType )
+        def namespace = node.name()
+        if(!(namespace instanceof QName)) namespace = new QName("no namespace", "no namespace")
+        XsdElement result = new XsdElement(name: dataItemName, description: dataItemDescription, type: dataItemType, minOccurs: dataItemMinOccurs, maxOccurs: dataItemMaxOccurs, section: section, simpleType: simpleType, complexType: complexDataType , namespace: namespace)
         return result
     }
+
     def readSimpleType(Node node, String elementName){
         // data type can be enumeration
         // have restriction
@@ -252,7 +264,7 @@ class XsdLoader {
             dataTypeName = checkSimpleTypeName(dataTypeName)
         }
 
-        XsdSimpleType result = new XsdSimpleType(name: dataTypeName,description: xsdElementAnnotation, restriction: xsdRestriction, list: list, union: union )
+        XsdSimpleType result = new XsdSimpleType(name: dataTypeName,description: xsdElementAnnotation, restriction: xsdRestriction, list: list, union: union , namespace: node.name())
     }
 
     def checkSimpleTypeName(dataTypeName){
@@ -407,7 +419,7 @@ class XsdLoader {
             }
         }
 
-        XsdComplexType result = new XsdComplexType(name: dataTypeName, description: description, abstractAttr: abstractAttr, restriction: restriction, sequence: sequence, complexContent: complexContent, mixed: mixed, attributes:attributes)
+        XsdComplexType result = new XsdComplexType(name: dataTypeName, description: description, abstractAttr: abstractAttr, restriction: restriction, sequence: sequence, complexContent: complexContent, mixed: mixed, attributes:attributes, namespace: node.name())
 
     }
 
