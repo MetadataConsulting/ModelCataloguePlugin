@@ -65,15 +65,17 @@ class DataImportController<T> extends AbstractRestfulController<T>{
 
 
                 if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
-                    ExcelLoader parser = new ExcelLoader(file.inputStream)
+
+                    InputStream inputStream = file.inputStream
+                    def asset = storeAsset(params, file)
+                    ExcelLoader parser = new ExcelLoader(inputStream)
                     def (headers, rows) = parser.parse()
                     HeadersMap headersMap = populateHeaders()
-                    DataImport importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap)
+                    DataImport importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap, asset)
                     response = importer
                     reportCapableRespond response
 
                 } else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
-
 
                     Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
 
@@ -100,11 +102,10 @@ class DataImportController<T> extends AbstractRestfulController<T>{
 
     }
 
-    protected renderImportAsAsset(param, file, conceptualDomainName){
+
+    protected storeAsset(param, file){
 
         String theName = (param.name ?: param.action)
-        InputStream inputStream = file.inputStream
-        String uri = request.forwardURI + '?' + request.queryString
 
         Asset asset = new Asset(
                 name: "Import for " + theName,
@@ -117,6 +118,15 @@ class DataImportController<T> extends AbstractRestfulController<T>{
         assetService.storeAssetFromFile(file, asset)
         asset.save(flush: true, failOnError: true)
 
+        return asset
+
+    }
+
+    protected renderImportAsAsset(param, file, conceptualDomainName){
+
+        String uri = request.forwardURI + '?' + request.queryString
+        InputStream inputStream = file.inputStream
+        def asset = storeAsset(param, file)
         Long id = asset.id
 
         executorService.submit {

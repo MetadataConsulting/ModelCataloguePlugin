@@ -21,7 +21,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     @Shared
     def fileName, recorder, filenameXsd, filenameXsd2
     def setupSpec(){
-        fileName = "test/integration/resources/DataTemplate.xls"
+        fileName = "test/integration/resources/example.xls"
         filenameXsd = "test/unit/resources/SACT/XMLDataTypes.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
         filenameXsd2 = "test/unit/resources/SACT/Breast_XMLSchema.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
         loadMarshallers()
@@ -47,7 +47,8 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
 //        def numElements = DataElement.count()
 //        controller.response.format = 'json'
 //        controller.metaClass.request = new MockMultipartHttpServletRequest()
-//        controller.request.parameters = ['conceptualDomain' : 'test', 'name' : 'testImport123']
+//        controller.params.conceptualDomain = 'COSD'
+//        controller.params.name = 'testImport123'
 //        InputStream inputStream = new FileInputStream(fileName)
 //        controller.request.addFile(new MockMultipartFile('file', fileName,"application/octet-stream" , inputStream))
 //        controller.upload()
@@ -59,6 +60,21 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
 //        json
 //        json.pendingAction
 //        DataImport.list().size()>0
+//
+//        when:
+//        controller.resolveAll(json.id)
+//
+//        then:
+//        json
+//
+//        when:
+//        controller.ingestQueue(json.id)
+//
+//        then:
+//        json
+//
+//
+//
 //
 //    }
 
