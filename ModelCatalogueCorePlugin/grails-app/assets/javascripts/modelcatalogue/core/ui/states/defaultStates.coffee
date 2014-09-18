@@ -435,7 +435,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
       <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp; {{title}} List</h2>
-      <decorated-list list="list" columns="columns" state-driven="true"></decorated-list>
+      <infinite-list list="list"></infinite-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">
