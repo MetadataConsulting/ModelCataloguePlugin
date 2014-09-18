@@ -2,6 +2,8 @@ package org.modelcatalogue.core.actions
 
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 
 /**
  * Base class for ActionRunner interface.
@@ -14,6 +16,9 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
  *
  */
 abstract class AbstractActionRunner implements ActionRunner {
+
+    @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
+
     PrintWriter out
     protected Map<String,String> parameters = [:]
 
@@ -85,5 +90,32 @@ abstract class AbstractActionRunner implements ActionRunner {
             return ""
         }
         description.toString().stripIndent().trim().replaceAll(/(\S)\n(?=\S)/, '$1 ').replaceAll(/\n\n/, '\n')
+    }
+
+
+    static String encodeEntity(entity) {
+        if (!entity.hasProperty('id') || !entity) {
+            return null
+        }
+        return "gorm://${entity.class.name}:${entity.id}"
+    }
+
+    Object decodeEntity(String encoded) {
+        if (!encoded) {
+            return null
+        }
+        def match = encoded =~ /gorm:\/\/(.*):(\d+)/
+        if (match) {
+            try {
+                def entity = Class.forName(match[0][1]).get(match[0][2] as Long)
+                if (entity) {
+                    autowireCapableBeanFactory.autowireBean(entity)
+                }
+                return entity
+            } catch (ClassNotFoundException ignored) {
+                return null
+            }
+        }
+        return null
     }
 }

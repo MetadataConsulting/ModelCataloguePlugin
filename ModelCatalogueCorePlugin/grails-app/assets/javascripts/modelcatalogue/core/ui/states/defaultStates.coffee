@@ -770,7 +770,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
-                    <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4 hide">
+                    <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <div class="row">

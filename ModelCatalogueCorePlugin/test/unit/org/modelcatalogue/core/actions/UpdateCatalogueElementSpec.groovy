@@ -120,6 +120,7 @@ class UpdateCatalogueElementSpec extends Specification {
         sw.toString() == "<a href='#/catalogue/model/1'>Model 'The New Model Name'</a> updated"
         Model.findByName('The New Model Name').ext.foo == 'bar'
         Model.findByName('The New Model Name').ext.bar == null
+        updateAction.result == AbstractActionRunner.encodeEntity(Model.findByName('The New Model Name'))
     }
 
     def "error is reported to the output stream"() {

@@ -202,7 +202,9 @@ class ActionService {
         }
 
         ActionRunner runnerInstance = createRunner(runner)
-        Map<String, String> parameterErrors = runnerInstance.validate(parameters.findAll{ key, value -> !(value instanceof Action)}.collectEntries {key, value -> [key, value?.toString()]} as Map<String, String>)
+        Map<String, String> parameterErrors = runnerInstance.validate(parameters.findAll{ key, value -> !(value instanceof Action)}.collectEntries {key, value ->
+            [key, value?.hasProperty('id') ? AbstractActionRunner.encodeEntity(value) : value?.toString()]
+        } as Map<String, String>)
 
         parameterErrors.each { key, message ->
             created.errors.rejectValue('extensions', "${runner.name}.$key", message)
@@ -219,7 +221,11 @@ class ActionService {
                 if (value instanceof Action) {
                     return
                 }
-                created.addExtension(key, value?.toString())
+                if (value.hasProperty('id')) {
+                    created.addExtension(key, AbstractActionRunner.encodeEntity(value))
+                } else {
+                    created.addExtension(key, value?.toString())
+                }
             }
         }
 

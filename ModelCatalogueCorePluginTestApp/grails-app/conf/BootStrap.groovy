@@ -2,6 +2,7 @@ import grails.rest.render.RenderContext
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.actions.CreateCatalogueElement
+import org.modelcatalogue.core.actions.CreateRelationship
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.core.testapp.UserRole
@@ -168,6 +169,13 @@ class BootStrap {
                     assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
                     assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
                     assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
+
+
+                    Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
+                    if (createRelationshipAction.hasErrors()) {
+                        println createRelationshipAction.errors
+                        throw new AssertionError("Failed to create relationship actions!")
+                    }
 
 
                     setupSimpleCsvTransformation()
