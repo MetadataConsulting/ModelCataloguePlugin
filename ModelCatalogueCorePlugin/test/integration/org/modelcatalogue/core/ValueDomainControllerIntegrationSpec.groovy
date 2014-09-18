@@ -23,7 +23,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
         controller.request.method       = 'GET'
         controller.params.id            = celsius.id
         controller.params.destination   = fahrenheit.id
-        controller.params.value         = '37.4'
+        controller.params.value         = '37'
         controller.response.format      = "json"
 
         controller.convert()
@@ -31,7 +31,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
         def json = controller.response.json
 
         then:
-        json.result == 99.32
+        json.result == 98.6
 
     }
 
@@ -155,7 +155,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
     }
 
     boolean removeAllRelations(CatalogueElement instance) {
-        ValueDomain domain = instance
+        ValueDomain domain = instance as ValueDomain
 
         for (ConceptualDomain conceptualDomain in domain.conceptualDomains) {
             conceptualDomain.removeFromValueDomains(domain)
