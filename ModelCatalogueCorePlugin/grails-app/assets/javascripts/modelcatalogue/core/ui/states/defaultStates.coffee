@@ -198,7 +198,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
   $stateProvider.state 'mc.resource.list', {
-    url: '/all?page&order&sort&status&q&max&classification'
+    url: '/all?page&order&sort&status&q&max&classification&display'
 
     templateUrl: 'modelcatalogue/core/ui/state/list.html'
 
@@ -435,7 +435,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
       <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp; {{title}} List</h2>
-      <infinite-list list="list"></infinite-list>
+      <decorated-list ng-if="$stateParams.display == undefined" list="list" columns="columns" state-driven="true"></decorated-list>
+      <infinite-list  ng-if="$stateParams.display == 'grid'" list="list"></infinite-list>
     </div>
     <div ng-if="resource == 'model'">
       <div class="row">
