@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.org.modelcatalogue.core.dataarchitect.xsd
 
 import grails.test.mixin.Mock
+import groovy.xml.QName
 import org.modelcatalogue.core.ValueDomain
 import spock.lang.Specification
 import org.modelcatalogue.core.dataarchitect.xsd.*
@@ -27,10 +28,11 @@ class XsdlLoaderSpec extends Specification {
         ArrayList<XsdSimpleType> simpleDataTypes =[]
         ArrayList<XsdComplexType>  complexDataTypes =[]
         ArrayList<XsdGroup> topLevelElements =[]
+        ArrayList<QName> xsdNamespaces =[]
         def schema
 
         when:"An XSD file is loaded and the file is parsed"
-        (topLevelElements, simpleDataTypes, complexDataTypes, schema, logErrors) = loader.parse()
+        (topLevelElements, simpleDataTypes, complexDataTypes, schema, xsdNamespaces, logErrors) = loader.parse()
 
         then: "File content is loaded"
 
@@ -58,6 +60,7 @@ class XsdlLoaderSpec extends Specification {
 
         XmlParser parser = new XmlParser()
         def elementParser = parser.parseText(elementText)
+        elementParser
         XsdElement xsdElement = loader.readElement(elementParser, "")
 
         then: "I get the associated XsdElement structure for the given valueNode"

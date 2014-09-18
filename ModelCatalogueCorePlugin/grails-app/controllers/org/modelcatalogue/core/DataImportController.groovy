@@ -9,7 +9,7 @@ import org.modelcatalogue.core.util.ImportRows
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
-class DataImportController extends AbstractRestfulController{
+class DataImportController<T> extends AbstractRestfulController<T>{
 
     def dataImportService, XSDImportService
     private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml']
@@ -65,36 +65,97 @@ class DataImportController extends AbstractRestfulController{
 
 
                 if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
-                    ExcelLoader parser = new ExcelLoader(file.inputStream)
+
+                    InputStream inputStream = file.inputStream
+                    def asset = storeAsset(params, file)
+                    ExcelLoader parser = new ExcelLoader(inputStream)
                     def (headers, rows) = parser.parse()
                     HeadersMap headersMap = populateHeaders()
-                    DataImport importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap)
+                    DataImport importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap, asset)
                     response = importer
+                    reportCapableRespond response
 
                 } else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
 
-                    XsdLoader parserXSD = new XsdLoader(file.inputStream)
-                    def (topLevelElements, simpleDataTypes, complexDataTypes, schema, logErrorsSACT) = parserXSD.parse()
-                    XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema)
+                    Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
 
-                    DataImport importer = new DataImport(name:conceptualDomainName).save(flush:true, failOnError:true)
-
-                    response = importer
+                    webRequest.currentResponse.with {
+                        //TODO: remove the base link
+                        def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
+                        status = 302
+                        setHeader("Location", location.toString())
+                        setHeader("X-Asset-ID", asset.id.toString())
+                        outputStream.flush()
+                    }
 
                 } else {
                     if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
                     if (file.size <= 0) errors.add("The uploaded file is empty")
                     response =  ["errors": errors]
+                    reportCapableRespond response
                 }
             }else{
                 response =  ["errors": errors]
+                reportCapableRespond response
             }
         }
 
-
-
-        reportCapableRespond response
     }
+
+
+    protected storeAsset(param, file){
+
+        String theName = (param.name ?: param.action)
+
+        Asset asset = new Asset(
+                name: "Import for " + theName,
+                originalFileName: theName,
+                description: "Your import will be available in this asset soon. Use Refresh action to reload.",
+                status: PublishedElementStatus.PENDING,
+                contentType: 'application/xslt',
+                size: 0
+        )
+        assetService.storeAssetFromFile(file, asset)
+        asset.save(flush: true, failOnError: true)
+
+        return asset
+
+    }
+
+    protected renderImportAsAsset(param, file, conceptualDomainName){
+
+        String uri = request.forwardURI + '?' + request.queryString
+        InputStream inputStream = file.inputStream
+        def asset = storeAsset(param, file)
+        Long id = asset.id
+
+        executorService.submit {
+            Asset updated = Asset.get(id)
+            try {
+                XsdLoader parserXSD = new XsdLoader(inputStream)
+                def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrorsSACT) = parserXSD.parse()
+                def (classification, conceptualDomain) = XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces)
+                updated.status = PublishedElementStatus.FINALIZED
+                updated.description = "Your export is ready. Use Download button to view it."
+                updated.ext['Original URL'] = uri
+                updated.save(flush: true, failOnError: true)
+                updated.addToRelatedTo(classification)
+                updated.addToRelatedTo(conceptualDomain)
+            } catch (e) {
+                updated.refresh()
+                updated.status = PublishedElementStatus.FINALIZED
+                updated.name = updated.name + " - Error during upload"
+                updated.description = "Error importing file: please validate that the schema is valid xml and that any dependencies already exist in the catalogue"
+                updated.save(flush: true, failOnError: true)
+            }
+        }
+
+        asset
+
+    }
+
+
+
 
 
     def pendingAction(Integer max){

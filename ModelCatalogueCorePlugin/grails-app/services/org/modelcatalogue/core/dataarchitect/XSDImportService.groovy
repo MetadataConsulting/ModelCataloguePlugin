@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
+import groovy.xml.QName
 import org.hibernate.annotations.FetchMode
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ConceptualDomain
@@ -9,6 +10,7 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElement
+import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
@@ -34,37 +36,90 @@ import javax.persistence.criteria.JoinType
 class XSDImportService {
 
     def relationshipService, modelService
-
+    ArrayList<Model> circularModels = []
+    ArrayList<Model> modelsCreated = []
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
 
 
-    def createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationsString, String conceptualDomainsString, XsdSchema schema){
-
+    def getClassifications(XsdSchema schema, String classificationName, Collection<QName> namespaces, String description){
         Collection<Classification> classifications = []
+
+        //match the conceptual domain
+        classifications.add(matchOrCreateClassification(classificationName, schema.targetNamespace, description))
+        for (namespace in namespaces) {
+            def classification = Classification.findByNamespace(namespace.namespaceURI)
+            if (!classification){
+                classifications = []
+                break
+            }else if(!classifications.find{it.namespace == namespace.namespaceURI}) classifications.add(classification)
+        }
+
+        return classifications
+    }
+
+    def matchOrCreateClassification(String classificationName, String namespaceURI, String description){
+        Classification classification = Classification.findByNamespace(namespaceURI)
+        if(!classification) classification = new Classification(name: classificationName, namespace: namespaceURI, description: description).save()
+        return classification
+    }
+
+    def matchOrCreateConceptualDomain(String conceptualDomainName, String namespaceURI, String description){
+        ConceptualDomain conceptualDomain = ConceptualDomain.findByNamespace(namespaceURI)
+        if(!conceptualDomain) conceptualDomain = new ConceptualDomain(name: conceptualDomainName, namespace: namespaceURI, description: description).save()
+        return conceptualDomain
+    }
+
+    def getConceptualDomains(XsdSchema schema, String conceptualDomainName, Collection<QName> namespaces, String description){
         Collection<ConceptualDomain> conceptualDomains = []
 
-        classificationsString.split(',').each{ String classificationName ->
-            classifications.add(new Classification(name: classificationName).save())
+        //match the conceptual domain
+        conceptualDomains.add(matchOrCreateConceptualDomain(conceptualDomainName, schema.targetNamespace, description))
+        for (namespace in namespaces) {
+            def conceptualDomain = ConceptualDomain.findByNamespace(namespace.namespaceURI)
+            if (!conceptualDomain){
+                conceptualDomains = []
+                break
+            }else if(!conceptualDomains.find{it.namespace == namespace.namespaceURI}) conceptualDomains.add(conceptualDomain)
         }
 
-        conceptualDomainsString.split(',').each{ String conceptualDomainName ->
-            conceptualDomains.add(new ConceptualDomain(name: conceptualDomainName).save())
+        return conceptualDomains
+    }
+
+    def createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationName, String conceptualDomainName, XsdSchema schema, Collection<QName> namespaces){
+
+        try {
+            Collection<Classification> classifications = []
+            Collection<ConceptualDomain> conceptualDomains = []
+            def description
+            if (schema.targetNamespace) {
+                description = "Generated from Schema........ \r\n Info: \r\n targetNamespace: " + schema.targetNamespace + "\r\n"
+                if (schema.attributeFormDefault) description += "attributeFormDefault: " + schema.attributeFormDefault + "\r\n"
+                if (schema.blockDefault) description += "blockDefault: " + schema.blockDefault + "\r\n"
+                if (schema.elementFormDefault) description += "attributeFormDefault: " + schema.elementFormDefault + "\r\n"
+                if (schema.finalDefault) description += "attributeFormDefault: " + schema.finalDefault + "\r\n"
+                if (schema.id) description += "attributeFormDefault: " + schema.id + "\r\n"
+                if (schema.version) description += "attributeFormDefault: " + schema.version + "\r\n"
+            }
+
+            conceptualDomains = getConceptualDomains(schema, conceptualDomainName, namespaces, description)
+            classifications = getClassifications(schema, classificationName, namespaces, description)
+
+            //if the getConceptualDomains returns empty array i.e. some namespaces don't exist
+            if (conceptualDomains.size() > 0 && classifications.size() > 0) {
+
+                //make sure the new classifications from the new namespace are related to one another
+                classifications.first().addToRelatedTo(conceptualDomains.first())
+
+                createValueDomainsAndDataTypes(simpleDataTypes, conceptualDomains)
+                createModelsAndElements(complexDataTypes, classifications, conceptualDomains, topLevelElements)
+            }
+
+            return [classifications.first(), conceptualDomains.first()]
+
+        }catch(e){
+            log.error "Exception during import", e
+            throw e
         }
-
-        if(schema.targetNamespace){
-
-            def description = "Generated from Schema........ \r\n Info: \r\n targetNamespace: " + schema.targetNamespace +"\r\n"
-            if(schema.attributeFormDefault) description += "attributeFormDefault: " + schema.attributeFormDefault +"\r\n"
-            if(schema.blockDefault) description += "blockDefault: " + schema.blockDefault +"\r\n"
-            if(schema.elementFormDefault) description += "attributeFormDefault: " + schema.elementFormDefault +"\r\n"
-            if(schema.finalDefault) description +="attributeFormDefault: " + schema.finalDefault +"\r\n"
-            if(schema.id) description += "attributeFormDefault: " + schema.id +"\r\n"
-            if(schema.version) description +="attributeFormDefault: " + schema.version +"\r\n"
-            conceptualDomains.add(new ConceptualDomain(name: schema.targetNamespace).save())
-        }
-
-        createValueDomainsAndDataTypes(simpleDataTypes, conceptualDomains)
-        createModelsAndElements(complexDataTypes, classifications, conceptualDomains, topLevelElements)
     }
 
     def createValueDomainsAndDataTypes(Collection<XsdSimpleType> simpleDataTypes, Collection<ConceptualDomain> conceptualDomains){
@@ -78,18 +133,40 @@ class XSDImportService {
     def createModelsAndElements(Collection<XsdComplexType> complexDataTypes, Collection<Classification> classifications, Collection<ConceptualDomain> conceptualDomains, Collection<XsdElement> topLevelElements, String containerModelName = ""){
 
         if(!containerModelName) containerModelName = classifications.first()?.name + " types"
-        Model containerModel = new Model(name:  containerModelName , description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish").save()
-        containerModel = addClassifications(containerModel, classifications)
-        Collection<Model> models = []
+        Classification typeClassification = Classification.findByNamespace(classifications.first()?.namespace + " types")
+        if(!typeClassification) typeClassification = new Classification(name: classifications.first()?.name + " types", namespace: classifications.first()?.namespace + " types" ).save()
+        classifications.add(typeClassification)
 
+        Model containerModel = findModel(containerModelName, classifications)
+        if(!containerModel) containerModel = new Model(name:  containerModelName , description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish").save()
         complexDataTypes.each{ XsdComplexType complexType ->
-            models.add(matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes))
+            Model model = matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes)
         }
 
-        models.each{ Model model->
-            if(!model.childOf) model.addToChildOf(containerModel)
+        modelsCreated.each{ Model model->
+            if(!model.childOf) {
+                model.addToChildOf(containerModel)
+                model.addToClassifications(typeClassification)
+            }
         }
 
+        circularModels.each{ Model model ->
+            def isBasedOn = model.isBasedOn.first()
+            def isBasedOnContains = (!isBasedOn)?:isBasedOn.contains
+            def modelContains = model.contains
+            isBasedOnContains.each{ DataElement de->
+                def contained = modelContains.find{it.name==de.name}
+                if(!contained) model.addToContains(de)
+            }
+            def isBasedOnChildren = (!isBasedOn)?:isBasedOn.parentOf
+            def modelChildren = model.parentOf
+            isBasedOnChildren.each{ Model md->
+                def contained = modelChildren.find{it.name==md.name}
+                if(!contained) model.addToParentOf(md)
+            }
+        }
+
+        containerModel = addClassifications(containerModel, classifications)
 
         topLevelElements.each{ XsdElement element ->
             ArrayList<Element> elements = []
@@ -98,9 +175,7 @@ class XSDImportService {
     }
 
     protected addClassifications(PublishedElement element, Collection<Classification> classifications){
-        classifications.each{ Classification classification ->
-            element.addToClassifications(classification)
-        }
+        element.addToClassifications(classifications.first())
         return element
     }
 
@@ -109,11 +184,12 @@ class XSDImportService {
         def baseModel = ""
         def model = findModel(complexType.name, classifications)
         if(!model){
-            model = new Model(name: complexType.name, description: complexType.description).save(flush:true, failOnError: true)
+
+            model = new Model(name: complexType.name, description: complexType.description, status: PublishedElementStatus.UPDATED).save(flush:true, failOnError: true)
             model = addClassifications(model, classifications)
+            modelsCreated.add(model)
 
             if(complexType?.restriction) (elements, baseModel) = getRestrictionDetails(complexType.restriction, classifications, complexType.name, conceptualDomains, complexDataTypes)
-
 
             if(complexType?.sequence) elements = addElements(elements, getElementsFromSequence(complexType.sequence, classifications, conceptualDomains, complexDataTypes))
 
@@ -125,8 +201,8 @@ class XSDImportService {
             }
 
             if(baseModel) {
-                model.addToBasedOn(baseModel)
-                elements = addElements(elements, getElementsFromModel(baseModel), false)
+                model.addToIsBasedOn(baseModel)
+                elements = addElements(elements, getElementsFromModel(baseModel), true)
             }
 
             if(complexType.attributes) elements = addElements(elements, getElementsFromAttributes(complexType.attributes, conceptualDomains, classifications))
@@ -144,6 +220,8 @@ class XSDImportService {
                     }
                 }
             }
+
+            model.status = PublishedElementStatus.DRAFT
 
         }
         return model
@@ -174,11 +252,9 @@ class XSDImportService {
         if(!valueDomain) {
             def (dataType, rule, baseValueDomain) = getRestrictionDetails(simpleDataType.restriction, simpleDataTypes, conceptualDomains, simpleDataType.name)
             valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: rule).save(flush: true, failOnError: true)
-            conceptualDomains.each{ ConceptualDomain conceptualDomain ->
-                valueDomain.addToConceptualDomains(conceptualDomain)
-            }
+            valueDomain.addToConceptualDomains(conceptualDomains.first())
 
-            if (baseValueDomain) valueDomain.addToBasedOn(baseValueDomain)
+            if (baseValueDomain) valueDomain.addToIsBasedOn(baseValueDomain)
             if (simpleDataType.union) valueDomain = addUnions(valueDomain, simpleDataType.union, simpleDataTypes, conceptualDomains)
 
             //TODO: get metadata(is there any?)
@@ -275,26 +351,24 @@ class XSDImportService {
     protected getBaseModel(String base, Collection<Classification> classifications, Collection<ConceptualDomain> conceptualDomains, Collection<XsdComplexType> complexDataTypes){
         def baseModel
         def complexType = inXsdComplexTypes(base, complexDataTypes)
-        baseModel = matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes)
+        if(complexType) baseModel = matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes) else baseModel = findModel(base, classifications)
+
         return baseModel
     }
 
-    protected ArrayList<Element> addElements(ArrayList<Element> elements, ArrayList<Element> elementsToAdd, Boolean inherit = true){
+    protected ArrayList<Element> addElements(ArrayList<Element> elements, ArrayList<Element> elementsToAdd, Boolean inherited = false){
         elementsToAdd.each{ Element element->
-            elements = addElement(elements, element, inherit)
+            elements = addElement(elements, element, inherited)
         }
         return elements
     }
 
-    protected ArrayList<Element> addElement(ArrayList<Element> elements, Element element, Boolean inherit = true){
+    protected ArrayList<Element> addElement(ArrayList<Element> elements, Element element, Boolean inherited = false){
         Element overrideElement
         if(element?.dataElement) overrideElement = elements.find{ it?.dataElement &&  it?.dataElement.name == element?.dataElement.name}
         if(element?.model) overrideElement = elements.find{ it?.model &&  it?.model.name == element?.model.name}
         //remove overriden element (if overriden)
-        if(inherit && overrideElement){
-            elements.remove(overrideElement)
-            elements.add(element)
-        }else if(!overrideElement){
+        if(!inherited || ! overrideElement){
             elements.add(element)
         }
 
@@ -384,12 +458,23 @@ class XSDImportService {
     protected getElementsFromXsdElement(ArrayList<Element> elements, XsdElement el, Collection<Classification> classifications, Collection<ConceptualDomain> conceptualDomains, Collection<XsdComplexType> complexDataTypes){
         def complexType
         if(el.type) complexType = inXsdComplexTypes(el.type, complexDataTypes)
+
         if(complexType){
             def metadata = [:]
             if(el?.minOccurs) metadata.put("Min Occurs", el.minOccurs)
             if(el?.maxOccurs) metadata.put("Max Occurs", el.maxOccurs)
             elements = addElement(elements, createElementModelFromXSDComplexElement(complexType, el, classifications, conceptualDomains, complexDataTypes, metadata))
-        } else elements = addElement(elements, createElementFromXSDElement(el, classifications, conceptualDomains))
+        } else {
+            complexType = findModel(el.type, classifications)
+            if(complexType){
+                def metadata = [:]
+                if(el?.minOccurs) metadata.put("Min Occurs", el.minOccurs)
+                if(el?.maxOccurs) metadata.put("Max Occurs", el.maxOccurs)
+                elements = addElement(elements, createElementModelFromXSDComplexElement(complexType, el, classifications, conceptualDomains, complexDataTypes, metadata))
+            }else {
+                elements = addElement(elements, createElementFromXSDElement(el, classifications, conceptualDomains))
+            }
+        }
 
         return elements
     }
@@ -412,27 +497,49 @@ class XSDImportService {
     }
 
     protected Element createElementModelFromXSDComplexElement(XsdComplexType complexType, XsdElement el, Collection<Classification> classifications, Collection<ConceptualDomain> conceptualDomains, Collection<XsdComplexType> complexDataTypes, Map metadata = [:]){
-        def oldModel = matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes)
-        def newModel = new Model(name: el.name, description: el.description).save()
+        Model oldModel = matchOrCreateModel(complexType, classifications, conceptualDomains, complexDataTypes)
+        Model newModel = new Model(name: el.name, description: el.description).save()
+        modelsCreated.add(newModel)
+        if(oldModel?.status == PublishedElementStatus.UPDATED) circularModels.add(newModel)
         newModel = addClassifications(newModel, classifications)
         newModel = copyRelations(newModel, oldModel)
-        newModel.addToBasedOn(oldModel)
+        newModel.addToIsBasedOn(oldModel)
         def element = new Element()
         element.model = newModel
         element.metadata = metadata
         return element
     }
 
+    protected Element createElementModelFromXSDComplexElement(Model oldModel, XsdElement el, Collection<Classification> classifications, Collection<ConceptualDomain> conceptualDomains, Collection<XsdComplexType> complexDataTypes, Map metadata = [:]){
+
+        def newModel = new Model(name: el.name, description: el.description).save()
+        modelsCreated.add(newModel)
+        newModel = addClassifications(newModel, classifications)
+        newModel = copyRelations(newModel, oldModel)
+        newModel.addToIsBasedOn(oldModel)
+        def element = new Element()
+        element.model = newModel
+        element.metadata = metadata
+        return element
+    }
+
+
     protected Model copyRelations(Model newModel, Model oldModel){
 
         for (Relationship r in oldModel.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession' || r.relationshipType.name == 'base'  || r.relationshipType.name == 'hierarchy' ) continue
-            relationshipService.link(r.source, newModel, r.relationshipType)
+            def newR = relationshipService.link(r.source, newModel, r.relationshipType)
+            r.ext.each{ key, value ->
+                newR.ext.put(key, value)
+            }
         }
 
         for (Relationship r in oldModel.outgoingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession' || r.relationshipType.name == 'base' ) continue
-            relationshipService.link(newModel, r.destination, r.relationshipType)
+            def newR =  relationshipService.link(newModel, r.destination, r.relationshipType)
+            r.ext.each{ key, value ->
+                newR.ext.put(key, value)
+            }
         }
 
         return newModel
@@ -459,7 +566,7 @@ class XSDImportService {
         else if(xsdElement?.simpleType) valueDomain = findValueDomain(xsdElement.name, conceptualDomains)
         dataElement.valueDomain = valueDomain
         dataElement.save()
-        def metadata = ["type":"xs:element"]
+        def metadata = ["Type":"xs:element"]
         if(xsdElement?.minOccurs) metadata.put("Min Occurs", xsdElement.minOccurs)
         if(xsdElement?.maxOccurs) metadata.put("Max Occurs", xsdElement.maxOccurs)
         element.metadata = metadata
@@ -483,7 +590,7 @@ class XSDImportService {
         else if(attribute?.simpleType) valueDomain = findValueDomain(attribute.name, conceptualDomains)
         dataElement.valueDomain = valueDomain
         dataElement.save()
-        def metadata = ["type":"xs:attribute"]
+        def metadata = ["Type":"xs:attribute"]
         if(attribute?.use) metadata.put("use", attribute.use)
         element.metadata = metadata
         element.dataElement = dataElement
@@ -602,4 +709,5 @@ class Element{
     DataElement dataElement
     Model model
     Map metadata
+
 }

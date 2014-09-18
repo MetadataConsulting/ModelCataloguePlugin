@@ -101,6 +101,24 @@ class AssetService {
         }
     }
 
+    void storeAssetFromInputStream(InputStream inputStream, String contentType, Asset asset) {
+        DigestInputStream dis = null
+        try {
+            MessageDigest md5 = MessageDigest.getInstance('MD5')
+            dis = new DigestInputStream(inputStream, md5)
+            CountingInputStream countingInputStream = new CountingInputStream(dis)
+            modelCatalogueStorageService.store('assets', asset.modelCatalogueId, contentType, { OutputStream it -> it << countingInputStream })
+            asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
+            asset.size = countingInputStream.byteCount
+            asset.save()
+        } catch (Exception e) {
+            log.error("Exception storing asset from file", e)
+            throw e
+        } finally {
+            dis?.close()
+        }
+    }
+
     void storeAssetWithSteam(Asset asset, String contentType, Closure withOutputStream) {
         if (!asset) throw new IllegalArgumentException("Please, provide valid asset.")
         MessageDigest md5 = MessageDigest.getInstance('MD5')

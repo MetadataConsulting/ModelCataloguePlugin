@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
+import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
@@ -21,9 +22,9 @@ class DataImportService {
     private static final REGEX = '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
 
     @Transactional
-    def importData(ArrayList headers, ArrayList rows, String name, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap) {
+    def importData(ArrayList headers, ArrayList rows, String name, String conceptualDomain, String conceptualDomainDescription, HeadersMap headersMap, Asset asset) {
         //get indexes of the appropriate sections
-        DataImport newImporter = new DataImport(name: name)
+        DataImport newImporter = new DataImport(name: name, asset: asset)
         def dataItemNameIndex = headers.indexOf(headersMap.dataElementName)
         def dataItemCodeIndex = headers.indexOf(headersMap.dataElementCode)
         def dataItemDescriptionIndex = headers.indexOf(headersMap.dataElementDescription)
@@ -171,6 +172,23 @@ class DataImportService {
         return row
     }
 
+
+    def actionAsset(DataImport importer){
+
+        Asset asset = importer.asset
+
+        importer.classifications.each{ Classification classification ->
+            classification.addToRelatedTo(asset)
+        }
+
+        importer.conceptualDomains.each{ ConceptualDomain conceptualDomain ->
+            conceptualDomain.addToRelatedTo(asset)
+        }
+
+        asset.status = PublishedElementStatus.FINALIZED
+        asset.save()
+    }
+
     @Transactional
     def void ingestImportQueue(DataImport importer) {
         def queue = importer.importQueue.iterator()
@@ -188,6 +206,7 @@ class DataImportService {
             }
         }
         actionPendingModels(importer)
+        actionAsset(importer)
     }
 
     /**
@@ -202,11 +221,13 @@ class DataImportService {
         propertyInstanceMap.get().clear()
     }
 
+
+
     def void ingestRow(DataImport importer, ImportRow row, Boolean bulkIngest = false) {
         if(row.rowActions.isEmpty()) {
             def conceptualDomain, model, dataType, measurementUnit, classification
-            conceptualDomain = importConceptualDomain(row.conceptualDomainName, row.conceptualDomainDescription)
-            classification = importClassification(row.classification)
+            conceptualDomain = importConceptualDomain(importer, row.conceptualDomainName, row.conceptualDomainDescription)
+            classification = importClassification(importer, row.classification)
             if(!row.dataElementName){
                 //only need to import the model information
                 importModels(importer, row.parentModelCode, row.parentModelName, row.containingModelCode, row.containingModelName, conceptualDomain, classification)
@@ -327,17 +348,34 @@ class DataImportService {
     }
 
 
-    def importConceptualDomain(String name, String description) {
+    def addConceptualDomainToImport(DataImport importer, ConceptualDomain conceptualDomain){
+        if(!importer.conceptualDomains.contains(conceptualDomain)) importer.conceptualDomains.add(conceptualDomain)
+    }
+
+    def addClassificationToImport(DataImport importer, Classification classification){
+        if(!importer.classifications.contains(classification)) importer.classifications.add(classification)
+    }
+
+
+    def importConceptualDomain(DataImport importer, String name, String description) {
         name = name.trim()
-        ConceptualDomain conceptualDomain = ConceptualDomain.findByName(name)
-        if (!conceptualDomain) { conceptualDomain = new ConceptualDomain(name: name, description: description).save() }
+        ConceptualDomain conceptualDomain = importer.conceptualDomains.find{it.name==name}
+        if(!conceptualDomain){
+            conceptualDomain = ConceptualDomain.findByName(name)
+            if (!conceptualDomain) { conceptualDomain = new ConceptualDomain(name: name, description: description).save() }
+            addConceptualDomainToImport(importer, conceptualDomain)
+        }
         return conceptualDomain
     }
 
-    def importClassification(String name) {
+    def importClassification(DataImport importer, String name) {
         name = name.trim()
-        Classification classification = Classification.findByName(name)
-        if (!classification) { classification = new Classification(name: name).save() }
+        Classification classification = importer.classifications.find{it.name==name}
+        if(!classification) {
+            classification = Classification.findByName(name)
+            if (!classification) classification = new Classification(name: name).save()
+            addClassificationToImport(importer, classification)
+        }
         return classification
     }
 
@@ -805,7 +843,7 @@ class DataImportService {
                         ValueDomain enumeratedVD = importValueDomain(simpleType.name, simpleType.description, enumeratedDataType, "", cd)
                         addMetadataToValueDomain(enumeratedVD, simpleType)
                         enumeratedVD.save()
-                        enumeratedVD.addToBasedOn(vd)
+                        enumeratedVD.addToIsBasedOn(vd)
                         vd.save()
                         enumeratedVD.save()
                         return [enumeratedVD, enumeratedDataType]

@@ -9,5 +9,4 @@ class XsdComplexContent {
     XsdRestriction restriction
     XsdExtension extension
     ArrayList <XsdAttribute> attributes
-
 }

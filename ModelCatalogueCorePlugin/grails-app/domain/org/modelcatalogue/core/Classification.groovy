@@ -7,6 +7,12 @@ class Classification extends CatalogueElement {
 
     Set classifies = []
 
+    String namespace
+
+    static constraints = {
+        namespace nullable: true, unique: true
+    }
+
     static searchable = {
         name boost:5
         except = ['incomingRelationships', 'outgoingRelationships']

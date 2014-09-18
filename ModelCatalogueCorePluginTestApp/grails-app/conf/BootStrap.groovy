@@ -30,9 +30,7 @@ class BootStrap {
 
     def init = { servletContext ->
 
-        initCatalogueService.initDefaultRelationshipTypes()
-        initCatalogueService.initDefaultDataTypes()
-        initCatalogueService.initDefaultMeasurementUnits()
+        initCatalogueService.initCatalogue()
 
         xlsxListRenderer.registerRowWriter('reversed') {
             title "Reversed DEMO Export"
@@ -109,7 +107,7 @@ class BootStrap {
                     println 'Running post init job'
                     println 'Importing data'
                     importService.importData()
-                    def classification =  new Classification(name: "dataSet1").save(failOnError: true)
+                    def classification =  new Classification(name: "nhic", namespace: "www.nhic.co.uk").save(failOnError: true)
 //                    def de = new DataElement(name: "testera", description: "test data architect", classifications: [classification]).save(failOnError: true)
 //                    de.ext.metadata = "test metadata"
 //

@@ -92,6 +92,13 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.contained.list           = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
     $scope.contained.element        = if list.size > 0 then list.list[0]
 
+    printMetadata = (relationship) ->
+      result  = ''
+      ext     = relationship.ext ? {}
+      for key, value of ext
+        result += "#{key}: #{value ? ''}\n"
+      result
+
     printLocalIdentifiers = (relationship) ->
       result = ''
       ext     = relationship?.relation?.ext ? {}
@@ -108,8 +115,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     $scope.contained.columns        = [
       {header: 'Name',          value: "relation.name",        classes: 'col-md-3', show: "relation.show()"}
-      {header: 'Description',   value: "relation.description", classes: 'col-md-6'}
+      {header: 'Description',   value: "relation.description", classes: 'col-md-4'}
       {header: 'Local Identifier', value:  printLocalIdentifiers,     classes: 'col-md-2'}
+      {header: 'Metadata', value:  printMetadata,     classes: 'col-md-3'}
     ]
 
 
