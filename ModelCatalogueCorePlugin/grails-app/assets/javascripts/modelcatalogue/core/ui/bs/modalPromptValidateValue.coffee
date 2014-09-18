@@ -32,7 +32,7 @@ angular.module('mc.core.ui.bs.modalPromptValidateValue', ['mc.util.messages']).c
           $scope.args = args
 
           $scope.definition =
-            domain: args.domain
+            domain: args.domain ? args.domainHint
             value: args.value
 
           $scope.messages = messages.createNewMessages()
@@ -48,6 +48,8 @@ angular.module('mc.core.ui.bs.modalPromptValidateValue', ['mc.util.messages']).c
                 $scope.messages.error "Error happened during the conversion. See application log for details"
             else
               $scope.result = $scope.defaultResult
+
+          $scope.validate()
         ]
 
       }

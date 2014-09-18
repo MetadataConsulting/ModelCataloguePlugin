@@ -59,8 +59,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   ])
 
-.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
-    $scope.element  = element
+.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', '$rootScope', ($scope, $stateParams, $state, $log, element, $rootScope) ->
+    $scope.element = element
+    $rootScope.elementToShow = element
 ])
 
 .controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
@@ -239,6 +240,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
           catalogueElementResource($stateParams.resource).get($stateParams.id)
         ]
+    onExit: ['$rootScope', ($rootScope) ->
+      $rootScope.elementToShow = null
+    ]
 
     controller: 'mc.core.ui.states.ShowCtrl'
   }
@@ -252,6 +256,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
         catalogueElementResource($stateParams.resource).getByUUID($stateParams.uuid)
       ]
+
+    onExit: ['$rootScope', ($rootScope) ->
+      $rootScope.elementToShow = null
+    ]
 
     controller: 'mc.core.ui.states.ShowCtrl'
   }

@@ -94,20 +94,27 @@ metadataCurator.controller('metadataCurator.searchCtrl',
         actions.push {
           condition: -> true
           label: (term) ->
-            "Validate <strong>#{term}</strong>"
+            if $rootScope.elementToShow?.isInstanceOf 'valueDomain' and $rootScope.elementToShow?.rule
+              "Validate <strong>#{term}</strong> by <strong>#{$rootScope.elementToShow.name}</strong>"
+            else
+              "Validate <strong>#{term}</strong>"
+
           action: (term) ->
             ->
-              messages.prompt('', '', {type: 'validate-value-by-domain', value: term})
+              messages.prompt('', '', {type: 'validate-value-by-domain', value: term, domainHint: if $rootScope.elementToShow?.rule then $rootScope.elementToShow else undefined})
           icon: 'fa fa-fw fa-check-circle-o'
         }
 
         actions.push {
           condition: -> true
           label: (term) ->
-            "Convert <strong>#{term}</strong>"
+            if $rootScope.elementToShow?.isInstanceOf 'valueDomain' and $rootScope.elementToShow?.mappings?.total > 0
+              "Convert <strong>#{term}</strong> from <strong>#{$rootScope.elementToShow.name}</strong>"
+            else
+              "Convert <strong>#{term}</strong>"
           action: (term) ->
             ->
-              messages.prompt('', '', {type: 'convert-with-value-domain', value: term})
+              messages.prompt('', '', {type: 'convert-with-value-domain', value: term, sourceHint: if $rootScope.elementToShow?.mappings?.total > 0 then $rootScope.elementToShow else undefined})
           icon: 'fa fa-fw fa-long-arrow-right'
         }
 

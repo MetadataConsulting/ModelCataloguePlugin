@@ -34,7 +34,7 @@ angular.module('mc.core.ui.bs.modalPromptConvert', ['mc.util.messages']).config 
           $scope.args = args
 
           $scope.definition =
-            source: args.source
+            source: args.source ? args.sourceHint
             destination: args.destination
             value: args.value
 
@@ -74,6 +74,8 @@ angular.module('mc.core.ui.bs.modalPromptConvert', ['mc.util.messages']).config 
                   $scope.messages.error "Error happened during the conversion. See application log for details"
             else
               $scope.result = $scope.defaultResult
+
+          $scope.convert()
         ]
 
       }

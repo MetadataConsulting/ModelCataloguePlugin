@@ -98,7 +98,7 @@
                             </li>
                             <li show-for-role="CURATOR" ui-sref-active="active"><a id="csvTransformationsLink"
                                                                                    ui-sref="mc.resource.list({resource: 'csvTransformation'})"
-                                                                                   ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-long-arrow-"></span>&nbsp; Transformations </a>
+                                                                                   ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-long-arrow-right"></span>&nbsp; CSV Transformations</a>
                             </li>
                             <li class="hide" show-for-role="CURATOR" ui-sref-active="active"><a id="batchLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"><span class="fa fa-fw fa-flash"></span>&nbsp; Actions</a></li>
                         </ul>
