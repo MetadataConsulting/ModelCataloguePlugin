@@ -422,6 +422,130 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   }
 ])
 
+.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$log', '$q', '$state', 'names', 'messages', 'actions'
+    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $log, $q, $state, names, messages, actions)->
+      actions = []
+
+      $scope.search = (item, model, label) ->
+        if angular.isString(item)
+          $state.go('mc.search', {q: model })
+        else
+          item?.action item, model, label
+
+      $scope.clearSelection = ->
+        $state.searchSelect = undefined
+        $rootScope.$stateParams.q = undefined
+        $state.go('.', {q: undefined })
+
+      initActions = ->
+        actions = []
+        actions.push {
+          condition: (term) -> term
+          label: (term) ->
+            "Search <strong>Catalogue Element</strong> for <strong>#{term}</strong>"
+
+          action: (term) -> ->
+            $state.go('mc.search', {q: term})
+
+          icon: 'fa fa-fw fa-search'
+        }
+
+        actions.push {
+          condition: (term) -> term and $state.includes("mc.resource.list.**") and  $state.$current.params.indexOf('q') >= 0 and $state.params.resource
+          label: (term) ->
+            naturalName = names.getNaturalName($state.params.resource)
+            "Search any <strong>#{naturalName}</strong> for <strong>#{term}</strong>"
+          action: (term) ->
+            ->
+              $state.go('mc.resource.list', {q: term})
+          icon: 'fa fa-fw fa-search'
+        }
+
+        actions.push {
+          condition: (term) -> term and $state.current.name == 'mc.resource.show.property' and  $state.$current.params.indexOf('q') >= 0 and $rootScope.$$searchContext
+          label: (term) ->
+            "Search current <strong>#{$rootScope.$$searchContext}</strong> for <strong>#{term}</strong>"
+          action: (term) ->
+            ->
+              $state.go('mc.resource.show.property', {q: term})
+          icon: 'fa fa-fw fa-search'
+        }
+
+        actions.push {
+          condition: -> true
+          label: (term) ->
+            if $rootScope.elementToShow?.isInstanceOf('valueDomain') and $rootScope.elementToShow?.rule
+              "Validate <strong>#{term}</strong> by <strong>#{$rootScope.elementToShow.name}</strong>"
+            else
+              "Validate <strong>#{term}</strong>"
+
+          action: (term) ->
+            ->
+              messages.prompt('', '', {type: 'validate-value-by-domain', value: term, domainHint: if $rootScope.elementToShow?.rule then $rootScope.elementToShow else undefined})
+          icon: 'fa fa-fw fa-check-circle-o'
+        }
+
+        actions.push {
+          condition: -> true
+          label: (term) ->
+            if $rootScope.elementToShow?.isInstanceOf('valueDomain') and $rootScope.elementToShow?.mappings?.total > 0
+              "Convert <strong>#{term}</strong> from <strong>#{$rootScope.elementToShow.name}</strong>"
+            else
+              "Convert <strong>#{term}</strong>"
+          action: (term) ->
+            ->
+              messages.prompt('', '', {type: 'convert-with-value-domain', value: term, sourceHint: if $rootScope.elementToShow?.mappings?.total > 0 then $rootScope.elementToShow else undefined})
+          icon: 'fa fa-fw fa-long-arrow-right'
+        }
+
+      $scope.getResults = (term) ->
+        deferred = $q.defer()
+
+        results = []
+
+        return if not term
+
+        for action in actions when action.condition(term)
+          results.push {
+            label:  action.label(term)
+            action: action.action(term)
+            icon:   action.icon
+            term:   term
+          }
+
+        deferred.notify results
+
+        if term
+          modelCatalogueSearch(term).then (searchResults)->
+            for searchResult in searchResults.list
+              results.push {
+                label:      if searchResult.getLabel then searchResult.getLabel() else searchResult.name
+                action:     searchResult.show
+                icon:       if searchResult.getIcon  then searchResult.getIcon()  else 'glyphicon glyphicon-file'
+                term:       term
+                highlight:  true
+              }
+
+            deferred.resolve results
+        else
+          deferred.resolve results
+
+        deferred.promise
+
+      initActions()
+
+      $scope.$on '$stateChangeSuccess', (event, toState, toParams) ->
+        $scope.searchSelect = toParams.q
+
+])
+
+.controller('defaultStates.userCtrl', ['$scope', 'security', ($scope, security)->
+  $scope.logout = ->
+    security.logout()
+  $scope.login = ->
+    security.requireLogin()
+])
+
 .run(['$rootScope', '$state', '$stateParams', ($rootScope, $state, $stateParams) ->
     # It's very handy to add references to $state and $stateParams to the $rootScope
     # so that you can access them from any scope within your applications.For example,
@@ -430,7 +554,38 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $rootScope.$state = $state
     $rootScope.$stateParams = $stateParams
 ])
+
 .run(['$templateCache', ($templateCache) ->
+
+  $templateCache.put 'modelcatalogue/core/ui/omnisearch.html', '''
+    <form class="navbar-form navbar-right navbar-input-group search-form hidden-xs" role="search" autocomplete="off" ng-submit="search()" ng-controller="defaultStates.searchCtrl">
+        <a ng-click="clearSelection()" ng-class="{'invisible': !$stateParams.q}" class="clear-selection btn btn-link"><span class="glyphicon glyphicon-remove"></span></a>
+        <div class="form-group">
+            <input
+                   ng-model="searchSelect"
+                   type="text"
+                   name="search-term"
+                   id="search-term"
+                   placeholder="Search"
+                   typeahead="result.term as result.label for result in getResults($viewValue)"
+                   typeahead-on-select="search($item, $model, $label)"
+                   typeahead-template-url="modelcatalogue/core/ui/omnisearchItem.html"
+                   typeahead-wait-ms="300"
+                   class="form-control"
+                   ng-class="{'expanded': searchSelect}"
+            >
+        </div>
+        <button class="btn btn-default" ng-click="select(searchSelect)"><i class="glyphicon glyphicon-search"></i></button>
+    </form>
+  '''
+
+  $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
+    <a>
+        <span class="omnisearch-icon" ng-class="match.model.icon"></span>
+        <span ng-if="!match.model.highlight" bind-html-unsafe="match.label"></span>
+        <span ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+    </a>
+  '''
 
   $templateCache.put 'modelcatalogue/core/ui/state/parent.html', '''
     <ui-view></ui-view>
@@ -515,7 +670,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 				software components
 			</p>
 
-      <form ng-controller="metadataCurator.userCtrl">
+      <form ng-controller="defaultStates.userCtrl">
          <button ng-click="login()" class="btn btn-large btn-primary" type="submit">Login <i class="glyphicon glyphicon-log-in"></i></button>
          <a href="" class="btn btn-large btn-primary" >Sign Up <i class="glyphicon glyphicon-pencil"></i></a>
       </form>
