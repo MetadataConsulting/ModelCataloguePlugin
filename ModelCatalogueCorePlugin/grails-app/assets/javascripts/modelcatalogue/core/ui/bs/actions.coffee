@@ -504,10 +504,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     if $scope.element
       return undefined if $scope.element.isInstanceOf 'dataImport'
     {
-    position:   1000
-    label:      'Export'
-    icon:       'glyphicon glyphicon-download-alt'
-    type:       'primary'
+      position:   1000
+      label:      'Export'
+      icon:       'glyphicon glyphicon-download-alt'
+      type:       'primary'
+      expandToLeft: true
     }
   ]
 
