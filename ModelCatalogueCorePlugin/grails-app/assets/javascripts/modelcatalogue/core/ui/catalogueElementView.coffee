@@ -71,7 +71,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
             $scope.naturalPropertyName = propCfg.label
 
-            $rootScope.$$searchContext = if tabsByName[newProperty]?.loader then propCfg.label else undefined
+            $rootScope.$$searchContext = if tabsByName[newProperty]?.loader && tabsByName[newProperty]?.search then propCfg.label else undefined
 
             for tab in $scope.tabs
               tab.active = tab.name == newProperty

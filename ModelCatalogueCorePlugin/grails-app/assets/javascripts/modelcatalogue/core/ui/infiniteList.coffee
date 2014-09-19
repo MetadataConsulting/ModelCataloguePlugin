@@ -10,7 +10,6 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.listEnhancer', 'mc.core.ui.c
       $scope.loading  = false
       $scope.elements = $scope.list.list
       $scope.next     = $scope.list.next
-      $scope.expanded = false
 
       $scope.extendOrCollapse = ($event)->
         panelContainer = angular.element(angular.element($event.currentTarget).closest('.panel').parent())
@@ -22,7 +21,6 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.listEnhancer', 'mc.core.ui.c
           $animate.addClass(panelContainer, 'col-sm-12')
           $animate.addClass(panelContainer, 'col-lg-12')
           $animate.addClass(panelContainer, 'expanded')
-          $scope.expanded = true
         else
           $animate.removeClass(panelContainer, 'col-md-12')
           $animate.removeClass(panelContainer, 'col-sm-12')
@@ -31,7 +29,6 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.listEnhancer', 'mc.core.ui.c
           $animate.addClass(panelContainer, 'col-md-4')
           $animate.addClass(panelContainer, 'col-sm-6')
           $animate.addClass(panelContainer, 'col-lg-4')
-          $scope.expanded = false
 
         $window.scrollTo 0, panelContainer.offset().top - 70
 

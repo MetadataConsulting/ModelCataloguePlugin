@@ -451,7 +451,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         }
 
         actions.push {
-          condition: (term) -> term and $state.includes("mc.resource.list.**") and  $state.$current.params.indexOf('q') >= 0 and $state.params.resource
+          condition: (term) -> term and $state.$current.params.indexOf('q') >= 0 and $state.params.resource
           label: (term) ->
             naturalName = names.getNaturalName($state.params.resource)
             "Search any <strong>#{naturalName}</strong> for <strong>#{term}</strong>"

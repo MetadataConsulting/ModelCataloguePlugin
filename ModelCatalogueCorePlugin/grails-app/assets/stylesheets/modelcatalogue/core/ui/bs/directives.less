@@ -358,3 +358,13 @@ a div.panel-footer, .with-pointer {
   }
 
 }
+
+.expandable {
+  &.expanded .close:before {
+    content: "\f066";
+  }
+
+  &:not(.expanded) .close:before {
+    content: "\f065";
+  }
+}
