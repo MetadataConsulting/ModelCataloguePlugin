@@ -4,16 +4,6 @@
 <head>
 
     <title>Model Catalogue Demo App</title>
-
-    %{--<!-- example of customization -->--}%
-    %{--<script type="text/ng-template" id="modelcatalogue/core/ui/decoratedList.html">--}%
-    %{--<div>--}%
-    %{--<p ng-hide="list.list">No data</p>--}%
-    %{--<ul>--}%
-    %{--<li ng-repeat="item in list.list">{{item.name}}</li>--}%
-    %{--</ul>--}%
-    %{--</div>--}%
-    %{--</script>--}%
     <asset:stylesheet href="metaDataCurator.css"/>
     <asset:javascript src="metaDataCurator.js"/>
     <script type="text/javascript">
