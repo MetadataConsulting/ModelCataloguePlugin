@@ -22,7 +22,7 @@ environments {
     test {
         dataSource {
             dbCreate = "update"
-            url = "java:comp/env/jdbc/mydb"
+            url = "java:comp/env/jdbc/mcc-testapp"
             driverClassName = "com.mysql.jdbc.Driver"
         }
     }
