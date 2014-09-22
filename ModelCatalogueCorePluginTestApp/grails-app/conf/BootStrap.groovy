@@ -14,6 +14,7 @@ import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.TestAction
+import org.springframework.http.HttpMethod
 
 class BootStrap {
 
@@ -84,20 +85,20 @@ class BootStrap {
                 '/logout', '/logout.*', '/logout/*',
                 '/register/*', '/errors', '/errors/*'
         ]) {
-            new Requestmap(url: url, configAttribute: 'permitAll').save(failOnError: true)
+            createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY',   httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
-        new Requestmap(url: '/asset/download/*',             configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY',   httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.POST).save(failOnError: true)
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.PUT).save(failOnError: true)
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.DELETE).save(failOnError: true)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/asset/download/*',             'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.POST)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.PUT)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.DELETE)
 
-//        new Requestmap(url: '/api/modelCatalogue/core/model/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/dataElement/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/dataType/**', configAttribute: 'ROLE_USER').save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/relationshipTypes/**', configAttribute: 'ROLE_ADMIN').save(failOnError: true)
+//        createRequestmapIfMissing('/api/modelCatalogue/core/model/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
 
 
 
@@ -217,5 +218,10 @@ class BootStrap {
     }
 
     def destroy = {}
+
+
+    private static Requestmap createRequestmapIfMissing(String url, String configAttribute, HttpMethod method = null) {
+        Requestmap.findOrSaveByUrlAndConfigAttributeAndHttpMethod(url, configAttribute, method, [failOnError: true])
+    }
 
 }
