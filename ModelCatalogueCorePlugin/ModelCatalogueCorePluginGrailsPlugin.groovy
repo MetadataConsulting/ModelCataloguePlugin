@@ -207,7 +207,7 @@ Model catalogue core plugin (metadata registry)
             title "Models to Excel"
             headers  'Model Catalogue ID', 'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null,'index'] && (Model.isAssignableFrom(container.itemType))
+                context.actionName in [null,'index'] && (!container.itemType || Model.isAssignableFrom(container.itemType))
             } then { Model model ->
                 [[ model.modelCatalogueId, model.name, model.description]]
             }
