@@ -27,6 +27,8 @@ class ModelCatalogueCorePluginUrlMappings {
 
 
             if (controllerName == 'batch') {
+                "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/run"(controller: controllerName, action: 'runAll', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$state?"(controller: controllerName, action: 'listActions', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/dismiss"(controller: controllerName, action: 'dismiss', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/reactivate"(controller: controllerName, action: 'reactivate', method: HttpMethod.POST)
@@ -73,6 +75,8 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName == 'valueDomain') {
                     "/api/modelCatalogue/core/$controllerName/$id/dataElement"(controller: controllerName, action: 'dataElements', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$controllerName/$id/convert/$destination"(controller: controllerName, action: 'convert', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$controllerName/$id/validateValue"(controller: controllerName, action: 'validateValue', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'conceptualDomain') {
@@ -86,6 +90,9 @@ class ModelCatalogueCorePluginUrlMappings {
                 }
             }
 
+            if (controllerName == 'csvTransformation') {
+                "/api/modelCatalogue/core/$controllerName/$id/transform"(controller: controllerName, action: 'transform', method: HttpMethod.POST)
+            }
 
             if (controllerName == 'relationshipType') {
                 "/api/modelCatalogue/core/$controllerName/elementClasses"(controller: controllerName, action: 'elementClasses', method: HttpMethod.GET)
@@ -98,6 +105,7 @@ class ModelCatalogueCorePluginUrlMappings {
             "/getSubModelElements/$modelId?" (controller: "dataArchitect", action: 'getSubModelElements', method: HttpMethod.GET)
             "/findRelationsByMetadataKeys/$key?" (controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)
             "/elementsFromCSV" (controller: "dataArchitect", action: "elementsFromCSV", method: HttpMethod.POST)
+            "/generateSuggestions" (controller: "dataArchitect", action: "generateSuggestions", method: HttpMethod.POST)
 
             "/imports/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
             "/imports" (controller: "dataImport", action: 'index', method: HttpMethod.GET)

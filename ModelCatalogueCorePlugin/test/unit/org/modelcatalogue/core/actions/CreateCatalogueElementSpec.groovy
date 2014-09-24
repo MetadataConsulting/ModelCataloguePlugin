@@ -96,6 +96,7 @@ class CreateCatalogueElementSpec extends Specification {
         Model.countByStatus(PublishedElementStatus.DRAFT) == 1
         sw.toString() == "New <a href='#/catalogue/model/1'>Model 'The Model'</a> created"
         Model.findByName('The Model').ext.foo == 'bar'
+        createAction.result == AbstractActionRunner.encodeEntity(Model.findByName('The Model'))
     }
 
     def "error is reported to the output stream"() {

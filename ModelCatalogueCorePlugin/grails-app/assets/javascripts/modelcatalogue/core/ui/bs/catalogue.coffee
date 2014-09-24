@@ -10,6 +10,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'asset',              "fa fa-fw fa-file-o"
   catalogueProvider.setIcon 'relationshipType',   "fa fa-fw fa-link"
   catalogueProvider.setIcon 'action',             "fa fa-fw fa-flash"
+  catalogueProvider.setIcon 'batch',              "fa fa-fw fa-flash"
   catalogueProvider.setIcon 'csvTransformation',  "fa fa-fw fa-long-arrow-right"
 
   # this should be generated automatically in the future

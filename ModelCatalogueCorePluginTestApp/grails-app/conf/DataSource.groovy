@@ -22,7 +22,10 @@ environments {
     test {
         dataSource {
             dbCreate = "update"
-            url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            url = "jdbc:mysql://ec2-176-34-253-124.eu-west-1.compute.amazonaws.com:3306/modelcatalogue-core-testapp?autoReconnect=true&useUnicode=yes"
+            username = System.getenv('METADATA_DB_USERNAME')
+            password = System.getenv('METADATA_DB_PASSWORD')
+            driverClassName = "com.mysql.jdbc.Driver"
         }
     }
     production {

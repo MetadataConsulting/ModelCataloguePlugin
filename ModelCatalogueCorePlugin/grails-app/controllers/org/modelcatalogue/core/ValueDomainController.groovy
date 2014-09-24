@@ -42,6 +42,76 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
 
     }
 
+    def convert() {
+        ValueDomain valueDomain = queryForResource(params.id)
+        if (!valueDomain) {
+            notFound()
+            return
+        }
+
+        ValueDomain other = queryForResource(params.destination)
+        if (!other) {
+            notFound()
+            return
+        }
+
+        Mapping mapping = Mapping.findBySourceAndDestination(valueDomain, other)
+        if (!mapping) {
+            respond result: "Mapping is missing. Don't know how to convert value."
+            return
+        }
+
+        if (!params.value) {
+            respond result: "Please, enter value."
+            return
+        }
+
+        def valid = valueDomain.validateRule(params.value)
+
+        if (!(valid instanceof Boolean && valid)) {
+            respond result: "INVALID: Please, enter valid value"
+            return
+        }
+
+        def result = mapping.map(params.value)
+
+        if (result instanceof Exception) {
+            respond result: "ERROR: ${result.class.simpleName}: $result.message"
+            return
+        }
+
+        respond result: result
+    }
+
+
+    def validateValue() {
+        ValueDomain valueDomain = queryForResource(params.id)
+        if (!valueDomain) {
+            notFound()
+            return
+        }
+
+        if (!valueDomain.rule) {
+            respond result: "Rule is missing. Don't know how to validate value."
+            return
+        }
+
+        if (!params.value) {
+            respond result: "Please, enter value."
+            return
+        }
+
+        def result = valueDomain.validateRule(params.value)
+
+        if (result instanceof Exception) {
+            respond result: "ERROR: ${result.class.simpleName}: $result.message"
+        }
+
+        respond result: result
+    }
+
+
+
     // conceptual domains are marshalled with the value domain so no need for special method to fetch them
 
     protected bindRelations(ValueDomain instance, Object objectToBind) {

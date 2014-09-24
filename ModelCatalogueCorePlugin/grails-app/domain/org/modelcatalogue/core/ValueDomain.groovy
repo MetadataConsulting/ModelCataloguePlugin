@@ -76,6 +76,13 @@ class ValueDomain extends ExtendibleElement  {
         outgoing: [base: 'isBaseFor', union: 'unionOf']
     ]
 
+    String getClassifiedName() {
+        if (!conceptualDomains) {
+            return name
+        }
+        "$name (${conceptualDomains*.name.sort().join(', ')})"
+    }
+
     void setRegexDef(String regex) {
         if (!regex) {
             rule = null
@@ -92,7 +99,8 @@ class ValueDomain extends ExtendibleElement  {
         null
     }
 
-    boolean validateRule(Object x) {
+    def validateRule(Object x) {
+        if (!rule) return true
         new SecuredRuleExecutor(x: x, domain: this).execute(rule)
     }
 

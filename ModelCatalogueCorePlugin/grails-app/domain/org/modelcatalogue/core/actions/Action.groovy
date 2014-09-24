@@ -28,6 +28,10 @@ class Action implements Extendible {
     static hasMany = [dependsOn: ActionDependency, dependencies: ActionDependency, extensions: ActionParameter]
     static mappedBy = [dependsOn: 'dependant', dependencies: 'provider']
     static belongsTo = [batch: Batch]
+    static mapping = {
+        // no need to optimistic locking, it usually just causes errors
+        version false
+    }
 
     static constraints = {
         outcome maxSize: 10000, nullable: true, bindable: false

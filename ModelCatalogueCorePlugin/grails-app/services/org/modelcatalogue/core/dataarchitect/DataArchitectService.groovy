@@ -3,13 +3,21 @@ package org.modelcatalogue.core.dataarchitect
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.actions.Batch
+import org.modelcatalogue.core.actions.MergePublishedElements
+import org.modelcatalogue.core.actions.Action
+import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class DataArchitectService {
 
-    def modelCatalogueSearchService, relationshipService
+    def modelCatalogueSearchService
+    def relationshipService
+    def publishedElementService
+    def actionService
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
         Lists.fromCriteria(params, DataElement) {
@@ -132,11 +140,11 @@ class DataArchitectService {
         elements
     }
 
-    void transformData(CsvTransformation transformation, Reader input, Writer output) {
+    void transformData(Map<String, String> options = [separator: ';'],CsvTransformation transformation, Reader input, Writer output) {
         if (!transformation) throw new IllegalArgumentException("Transformation missing!")
         if (!transformation.columnDefinitions) throw new IllegalArgumentException("Nothing to transform. Column definitions missing!")
 
-        Character separatorChar = transformation.separator?.charAt(0)
+        Character separatorChar = options.separator?.charAt(0)
 
         CSVReader reader = new CSVReader(input, separatorChar)
 
@@ -151,9 +159,9 @@ class DataArchitectService {
                 mapping.index  = dataElementsFromHeaders.indexOf(definition.source)
 
                 if (mapping.index == -1) {
-                    mapping.mapping = Mapping.DIRECT_MAPPING
+                    mapping.mapping = null
                 } else {
-                    mapping.mapping = findDomainMapping(definition.source, definition.destination)
+                    mapping.mapping = findDomainMapper(definition.source, definition.destination)
                 }
                 outputMappings << mapping
             }
@@ -168,7 +176,12 @@ class DataArchitectService {
                     List<String> transformed = new ArrayList<String>(line.size())
 
                     for (Map<String, Object> outputMapping in outputMappings) {
-                        transformed << outputMapping.mapping.map(line[outputMapping.index])
+                        String value = outputMapping.index >= 0 ? line[outputMapping.index] : null
+                        if (outputMapping.mapping == null) {
+                            transformed << value
+                        } else {
+                            transformed << outputMapping.mapping.execute(x: value)
+                        }
                     }
 
                     writer.writeNext(transformed as String[])
@@ -191,14 +204,29 @@ class DataArchitectService {
      * @param destination destination data element
      * @return mapping if exists between data elements's value domains or direct mapping
      */
-    Mapping findDomainMapping(DataElement source, DataElement destination) {
+    SecuredRuleExecutor.ReusableScript findDomainMapper(DataElement source, DataElement destination) {
         if (!source?.valueDomain || !destination?.valueDomain) {
-            return Mapping.DIRECT_MAPPING
+            return null
         }
         Mapping mapping = Mapping.findBySourceAndDestination(source.valueDomain, destination.valueDomain)
         if (mapping) {
-            return mapping
+            return mapping.mapper()
         }
-        return Mapping.DIRECT_MAPPING
+        return null
+    }
+
+    def generateMergeModelActions() {
+        publishedElementService.findDuplicateModelsSuggestions().each { destId, sources ->
+            Model model = Model.get(destId)
+            Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
+            for (Action action in batch.actions) {
+                if (action.state in [ActionState.DISMISSED, ActionState.FAILED, ActionState.PENDING]) {
+                    action.delete(flush: true)
+                }
+            }
+            sources.each { srcId ->
+                actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", deep: true
+            }
+        }
     }
 }

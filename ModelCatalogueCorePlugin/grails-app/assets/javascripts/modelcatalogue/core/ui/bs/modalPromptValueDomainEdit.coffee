@@ -42,7 +42,10 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
               </div>
               <div class="form-group">
                 <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
-                <textarea  collapse="ruleCollapsed" rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
+                <div collapse="ruleCollapsed" >
+                  <textarea rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
+                  <p class="help-block">Enter valid <a href="http://www.groovy-lang.org/" target="_blank">Groovy</a> code. Variable <code>x</code> refers to the value validated value and  <code>domain</code> to current value domain. Last row is the result which should be <code>boolean</code> value. For example you can <a ng-click="showRegexExample()"><span class="fa fa-magic"></span> validate using regular expression</a> or <a ng-click="showSetExample()"><span class="fa fa-magic"></span> values in set</a></p>
+                </div>
               </div>
             </form>
         </div>
@@ -57,7 +60,26 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
           $scope.messages       = messages.createNewMessages()
           $scope.pending        = {}
           $scope.create         = args.create
-          $scope.ruleCollapsed  = true
+          $scope.ruleCollapsed  = not $scope.copy.rule
+
+          REGEX_EXAMPLE = """// value is decimal number
+x ==~ /\\d+(\\.\\d+)?/
+"""
+          SET_EXAMPLE = """// value is one of predefined values
+x in ['apple', 'banana', 'cherry']
+"""
+
+          showExample = (example) ->
+            ->
+              if $scope.copy.rule and $scope.copy.rule != REGEX_EXAMPLE and $scope.copy.rule != SET_EXAMPLE
+                messages.confirm("Replace current rule with example", "Do already have some rule, do you want to replace it with the example?").then ->
+                  $scope.copy.rule = example
+              else
+                $scope.copy.rule = example
+
+
+          $scope.showRegexExample = showExample(REGEX_EXAMPLE)
+          $scope.showSetExample = showExample(SET_EXAMPLE)
 
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 

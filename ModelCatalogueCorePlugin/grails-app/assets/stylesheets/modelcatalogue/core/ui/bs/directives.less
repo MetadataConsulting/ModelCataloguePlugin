@@ -261,3 +261,110 @@ a div.panel-footer, .with-pointer {
 }
 
 
+.fixed-height(@height) {
+  height: @height;
+  max-height: @height;
+  min-height: @height;
+}
+
+.with-ellipses {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
+.panel-fixed-height(@height) {
+  padding-bottom: 15px;
+  .panel-heading {
+    .fixed-height(40px);
+    .panel-title {
+      .with-ellipses();
+      cursor: pointer;
+    }
+  }
+  .panel-body {
+    .fixed-height(@height - 40px);
+    overflow-y: auto;
+  }
+}
+
+.panel-fixed-height-500 {
+  .panel-fixed-height(500px);
+}
+.panel-fixed-height-300 {
+  .panel-fixed-height(300px);
+}
+
+.infinite-scroll-item .panel-actions {
+  display: none;
+}
+
+.infinite-scroll-item:hover .panel-actions {
+  display: block;
+  position: absolute;
+  padding: 0px 10px;
+  top: 50px;
+  float: right;
+  right: 15px;
+  opacity: 0.6;
+}
+
+.infinite-scroll-item:hover .panel-actions:hover {
+  opacity: 1;
+}
+
+
+.navbar-input-group {
+  font-size: 0px; /*removes whitespace between button and input*/
+
+  input {
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    &:hover, &:active, &:focus, &.expanded {
+      width: 400px;
+    }
+  }
+
+  .btn {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-left: 0px;
+    width: 45px;
+  }
+
+  ul {
+    width: 445px;
+
+    li a {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.clear-selection {
+  font-size: 16px;
+  position: relative;
+  float: right;
+  right: 100px;
+  margin-right: -60px;
+
+  color: #d9534f;
+  opacity: 0.3;
+
+  &:hover {
+    color: #d9534f;
+    opacity: 1;
+  }
+
+}
+
+.expandable {
+  &.expanded .close:before {
+    content: "\f066";
+  }
+
+  &:not(.expanded) .close:before {
+    content: "\f065";
+  }
+}

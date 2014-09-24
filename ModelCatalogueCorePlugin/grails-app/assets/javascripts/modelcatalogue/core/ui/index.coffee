@@ -3,7 +3,9 @@
 #= require ng-file-upload/angular-file-upload.js
 #= require modelcatalogue/core/index
 #= require decoratedList
+#= require infiniteList
 #= require catalogueElementView
+#= require csvTransformationView
 #= require batchView
 #= require importView
 #= require catalogueElementTreeviewItem
@@ -24,7 +26,9 @@ angular.module('mc.core.ui', [
   'mc.core'
   # list of modules
   'mc.core.ui.decoratedList'
+  'mc.core.ui.infiniteList'
   'mc.core.ui.catalogueElementView'
+  'mc.core.ui.csvTransformationView'
   'mc.core.ui.importView'
   'mc.core.ui.batchView'
   'mc.core.ui.catalogueElementTreeviewItem'

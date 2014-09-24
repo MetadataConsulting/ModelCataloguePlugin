@@ -13,7 +13,8 @@ class ClassificationMarshaller extends CatalogueElementMarshallers {
     protected Map<String, Object> prepareJsonMap(element) {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
-        ret.putAll classifies: [count: element.classifies?.size() ?: 0, itemType: Classification.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/classifies"]
+        ret.putAll  namespace: element.namespace,
+                    classifies: [count: element.classifies?.size() ?: 0, itemType: Classification.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/classifies"]
         return ret
     }
 
@@ -21,6 +22,7 @@ class ClassificationMarshaller extends CatalogueElementMarshallers {
     protected void buildXml(element, XML xml) {
         super.buildXml(element, xml)
         xml.build {
+            namespace element.namespace
             classifies count: element.classifies?.size() ?: 0, itemType: Classification.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/classifies"
         }
     }

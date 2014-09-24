@@ -29,6 +29,7 @@ module.exports = function(config) {
             'grails-app/assets/bower_components/angular/angular.js',
             'grails-app/assets/bower_components/angular-cookies/angular-cookies.js',
             'grails-app/assets/bower_components/angular-sanitize/angular-sanitize.js',
+            'grails-app/assets/bower_components/angular-animate/angular-animate.js',
             'grails-app/assets/bower_components/angular-http-auth/src/http-auth-interceptor.js',
             'grails-app/assets/bower_components/angular-ui-router/release/angular-ui-router.js',
             'grails-app/assets/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',

@@ -23,7 +23,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
                 </small>
               </h4>
             </div>
-            <div class="preserve-new-lines">{{action.message}}</div>
+            <div class="preserve-new-lines" ng-bind-html="action.message"></div>
             <br ng-show="action.outcome"/>
             <pre ng-show="action.outcome">{{action.outcome}}</pre>
           </alert>
@@ -43,8 +43,8 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
                 </small>
               </h4>
             </div>
-            <div class="preserve-new-lines" ng-show="action.state == 'PERFORMING'">{{action.message}}</div>
-            <div class="preserve-new-lines" ng-show="action.state == 'FAILED'">Failed to "{{action.message}}"</div>
+            <div class="preserve-new-lines" ng-show="action.state == 'PERFORMING'" ng-bind-html="action.message"></div>
+            <div class="preserve-new-lines" ng-show="action.state == 'FAILED'">Failed to "<span ng-bind-html="action.message">{{action.message}}</span>"</div>
             <br ng-show="action.outcome &amp;&amp; action.state == 'FAILED' &amp;&amp; action.message"/>
             <div class="preserve-new-lines" ng-show="action.outcome &amp;&amp; action.state == 'PERFORMED'" ng-bind-html="action.outcome"></div>
             <pre ng-show="action.outcome &amp;&amp; action.state == 'FAILED'">{{action.outcome}}</pre>

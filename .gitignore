@@ -4,3 +4,5 @@
 **/web-app/*
 **/.idea/*
 **/atlassian-ide-plugin.xml
+ModelCatalogueCorePlugin/test/unit/resources/SACT/Breast_XMLSchema.xsd
+ModelCatalogueCorePlugin/test/unit/resources/SACT/XMLDataTypes.xsd

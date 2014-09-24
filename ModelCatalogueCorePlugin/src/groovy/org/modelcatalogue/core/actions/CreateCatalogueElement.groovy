@@ -74,6 +74,7 @@ class CreateCatalogueElement extends AbstractActionRunner {
                 }
             }
             out << "New <a href='#/catalogue/${GrailsNameUtils.getPropertyName(type)}/${element.id}'>${GrailsNameUtils.getNaturalName(type.simpleName)} '$name'</a> created"
+            result = encodeEntity element
         } else {
             fail("Unable to create new ${GrailsNameUtils.getNaturalName(type.simpleName)} using parameters ${parameters}")
             for (ObjectError error in element.errors.allErrors) {

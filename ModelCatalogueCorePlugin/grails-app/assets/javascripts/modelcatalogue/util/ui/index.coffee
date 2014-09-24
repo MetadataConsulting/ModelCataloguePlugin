@@ -9,7 +9,10 @@
 #= require actionButtonDropdown
 #= require applicationTitle
 #= require contextualActions
+#= require contextualMenu
 #= require focusMe
+#= require menuItemDropdown
+#= require menuItemSingle
 
 angular.module 'mc.util.ui', [
   # dependencies
@@ -27,4 +30,7 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.actionButtonDropdown'
   'mc.util.ui.applicationTitle'
   'mc.util.ui.contextualActions'
+  'mc.util.ui.contextualMenu'
+  'mc.util.ui.menuItemDropdown'
+  'mc.util.ui.menuItemSingle'
 ]

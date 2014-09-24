@@ -11,7 +11,6 @@ class CsvTransformation {
 
     String name
     String description
-    String separator = ";"
 
     List<ColumnTransformationDefinition> columnDefinitions
 
@@ -23,23 +22,12 @@ class CsvTransformation {
 
     static constraints = {
         name size: 1..255
-        separator size: 1..1
         description nullable: true
     }
 
     static mapping = {
         columnDefinitions cascade: "all-delete-orphan"
-    }
+		separator column:"separatorChar"
+	}
 
-    def beforeDelete() {
-//        if (columnDefinitions) {
-//            final definitions = new ArrayList(columnDefinitions)
-//            for (ColumnTransformationDefinition definition in definitions) {
-//                definition.transformation = null
-//                removeFromColumnDefinitions(definition)
-//                definition.delete()
-//            }
-//            columnDefinitions.clear()
-//        }
-    }
 }

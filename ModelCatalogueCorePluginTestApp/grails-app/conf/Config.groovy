@@ -4,7 +4,6 @@ import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.ValueDomain
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -96,6 +95,9 @@ environments {
     development {
         grails.logging.jul.usebridge = true
     }
+    test {
+        grails.plugin.console.enabled = true
+    }
     production {
         grails.logging.jul.usebridge = false
         grails.serverURL = "http://mcc-testapp.metadata.eu.cloudbees.net"
@@ -110,7 +112,7 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-//    debug 'org.modelcatalogue'
+    debug 'grails.app.services.org.modelcatalogue.core.PublishedElementService'
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
@@ -192,7 +194,7 @@ modelcatalogue.defaults.relationshiptypes =  [
 
             return true
         '''],
-        [name: 'base', sourceToDestination: 'based on', destinationToSource: 'is base for', sourceClass: CatalogueElement, destinationClass: CatalogueElement],
+        [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement],
         [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],

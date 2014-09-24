@@ -19,10 +19,10 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
     updateActions = ->
       $element.empty()
       for action in actions.getActions($scope.scope ? $scope.$parent)
-
-        newScope = $scope.$new()
-        newScope.action = action
-        $element.append($compile(getTemplate(action))(newScope))
+        unless action.navigation
+          newScope = $scope.$new()
+          newScope.action = action
+          $element.append($compile(getTemplate(action))(newScope))
 
     updateActions()
 

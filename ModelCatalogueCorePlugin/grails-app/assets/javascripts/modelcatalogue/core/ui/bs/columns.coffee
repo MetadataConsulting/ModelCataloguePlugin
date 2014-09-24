@@ -105,7 +105,8 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   columnsProvider.registerColumns 'org.modelcatalogue.core.Relationship', [
     {header: 'Relation',        value: 'type[direction]',  classes: 'col-md-3'}
     {header: 'Destination',     value: "relation.name",    classes: 'col-md-3', show: "relation.show()"}
-    {header: 'Metadata',        value:  printMetadata,     classes: 'col-md-5'}
+    {header: 'Type',        value:  "relation.getElementTypeName()",     classes: 'col-md-2'}
+    {header: 'Metadata',        value:  printMetadata,     classes: 'col-md-3'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.RelationshipType', [
@@ -129,11 +130,12 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Batch', [
-    {header: "Created"     , value: "dateCreated | date:'short'"   , class: 'col-md-2',               sort: {property: 'dateCreated', type: 'order'}}
+    {header: "Last Updated", value: "lastUpdated | date:'short'"   , class: 'col-md-2',               sort: {property: 'lastUpdated', type: 'order'}}
     {header: "Name"        , value: 'name'                         , class: 'col-md-4', show: true  , sort: {property: 'name', type: 'alphabet'}}
-    {header: "Pending"     , value: "pending.total"                , class: 'col-md-2'}
-    {header: "Performed"   , value: "performed.total"              , class: 'col-md-2'}
-    {header: "Failed"      , value: "failed.total"                 , class: 'col-md-2'}
+    {header: "Pending"     , value: "pending.total"                , class: 'col-md-1'}
+    {header: "Running"     , value: "performing.total"             , class: 'col-md-1'}
+    {header: "Performed"   , value: "performed.total"              , class: 'col-md-1'}
+    {header: "Failed"      , value: "failed.total"                 , class: 'col-md-1'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Action', [

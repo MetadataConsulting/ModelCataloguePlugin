@@ -1,5 +1,8 @@
 package org.modelcatalogue.core.dataarchitect
 
+import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.DataElement
 
@@ -10,6 +13,9 @@ class DataImport {
     Collection<Model> models = []
     Collection<DataElement> updatedDataElements = []
     Collection<String> messages = []
+    Collection<ConceptualDomain> conceptualDomains = []
+    Collection<Classification> classifications = []
+    Asset asset
 
     Set pendingAction = []
     Set importQueue = []
@@ -23,5 +29,7 @@ class DataImport {
         pendingAction nullable: true
         importQueue nullable: true
     }
+
+
 
 }

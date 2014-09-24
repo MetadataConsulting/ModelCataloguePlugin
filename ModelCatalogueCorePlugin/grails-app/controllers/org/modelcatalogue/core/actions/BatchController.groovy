@@ -19,6 +19,54 @@ class BatchController extends AbstractRestfulController<Batch> {
         super(Batch)
     }
 
+    def archive() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (!params.id) {
+            notFound()
+            return
+        }
+
+        Batch batch = Batch.get(params.id)
+
+        if (!batch) {
+            notFound()
+            return
+        }
+
+        batch.archived = true
+
+        respond batch
+    }
+
+    def runAll() {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (!params.id) {
+            notFound()
+            return
+        }
+
+        Batch batch = Batch.get(params.id)
+
+        if (!batch) {
+            notFound()
+            return
+        }
+
+        for (Action action in batch.actions) {
+            actionService.run(action)
+        }
+
+        respond batch
+    }
+
     @Override
     def index(Integer max) {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
@@ -44,7 +92,7 @@ class BatchController extends AbstractRestfulController<Batch> {
             return
         }
 
-        Action action = Action.lock(params.long('actionId'))
+        Action action = Action.get(params.long('actionId'))
 
         if (!action) {
             notFound()
@@ -99,7 +147,7 @@ class BatchController extends AbstractRestfulController<Batch> {
             return
         }
 
-        Action action = Action.lock(params.long('actionId'))
+        Action action = Action.get(params.long('actionId'))
 
         if (!action) {
             notFound()
@@ -120,7 +168,7 @@ class BatchController extends AbstractRestfulController<Batch> {
             return
         }
 
-        Action action = Action.lock(params.long('actionId'))
+        Action action = Action.get(params.long('actionId'))
 
         if (!action) {
             notFound()
@@ -143,7 +191,7 @@ class BatchController extends AbstractRestfulController<Batch> {
             return
         }
 
-        Action action = Action.lock(params.long('actionId'))
+        Action action = Action.get(params.long('actionId'))
 
         if (!action) {
             notFound()

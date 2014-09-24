@@ -117,7 +117,65 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         !(archived in domain.dataElements)
     }
 
-    def "create new version of heirachy model"() {
+    def "merge"() {
+        Classification sact = new Classification(name: "SACT").save(failOnError: true)
+        Classification cosd = new Classification(name: "COSD").save(failOnError: true)
+
+        ValueDomain domain = new ValueDomain(name: "merger test domain").save(failOnError: true)
+        DataElement source = new DataElement(name: "merge tester", valueDomain: domain, classifications: [sact]).save(failOnError: true)
+        DataElement destination = new DataElement(name: "merge tester", classifications: [cosd]).save(failOnError: true)
+        Model m1 = new Model(name: 'merge test container 1').save(failOnError: true)
+        Model m2 = new Model(name: 'merge test container 2').save(failOnError: true)
+
+        Model m3cosd = new Model(name: 'merge test container 3', classifications: [cosd]).save(failOnError: true)
+        Model m3sact = new Model(name: 'merge test container 3', classifications: [sact]).save(failOnError: true)
+
+        m1.addToContains(source)
+        m2.addToContains(destination)
+
+        m3cosd.addToContains(destination)
+        m3sact.addToContains(source)
+
+        source.ext.one = 'one'
+        source.ext.two = '2'
+
+        destination.ext.two = 'two'
+        destination.ext.three = 'three'
+
+        def merged = publishedElementService.merge(source, destination)
+
+        expect:
+        merged.errors.errorCount == 0
+        merged == destination
+        merged.valueDomain == domain
+        destination.ext.size() == 3
+        destination.ext.two == 'two'
+        source.countContainedIn() == 2
+        destination.countContainedIn() == 3
+        source.classifications.size() == 0
+        destination.classifications.size() == 2
+        source.archived
+        destination.supersededBy.contains source
+        !m3cosd.archived
+        m3sact.archived
+
+        cleanup:
+        source.ext.clear()
+        destination.ext.clear()
+        source.beforeDelete()
+        source.delete()
+        destination.beforeDelete()
+        destination.delete()
+        domain.delete()
+        m1.delete()
+        m2.delete()
+        m3cosd.delete()
+        m3sact.delete()
+        sact.delete()
+        cosd.delete()
+    }
+
+    def "create new version of hierarchy model"() {
 
         setup:
         Model md1      = new Model(name:"test1").save()
