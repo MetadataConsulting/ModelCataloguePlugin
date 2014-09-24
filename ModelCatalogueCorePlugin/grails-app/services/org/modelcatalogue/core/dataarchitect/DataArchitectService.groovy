@@ -216,17 +216,27 @@ class DataArchitectService {
     }
 
     def generateMergeModelActions() {
-        publishedElementService.findDuplicateModelsSuggestions().each { destId, sources ->
-            Model model = Model.get(destId)
-            Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
-            for (Action action in batch.actions) {
+        // clean old batches
+        Batch.findAllByNameLike("Merge model '%'").each { Batch batch ->
+            for (Action action in new HashSet<Action>(batch.actions)) {
                 if (action.state in [ActionState.DISMISSED, ActionState.FAILED, ActionState.PENDING]) {
+                    batch.removeFromActions(action)
+                    action.batch = null
                     action.delete(flush: true)
                 }
             }
+            batch.archived =  true
+            batch.save()
+        }
+
+        publishedElementService.findDuplicateModelsSuggestions().each { destId, sources ->
+            Model model = Model.get(destId)
+            Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
             sources.each { srcId ->
                 actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", deep: true
             }
+            batch.archived = false
+            batch.save()
         }
     }
 }

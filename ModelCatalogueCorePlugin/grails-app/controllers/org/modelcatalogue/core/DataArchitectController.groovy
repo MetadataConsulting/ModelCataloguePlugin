@@ -145,6 +145,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
             dataArchitectService.generateMergeModelActions()
             respond status: HttpStatus.OK
         } catch (e) {
+            log.error("Error generating suggestions", e)
             respond status: HttpStatus.BAD_REQUEST
         }
     }

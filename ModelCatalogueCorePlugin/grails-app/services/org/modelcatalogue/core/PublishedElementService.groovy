@@ -229,7 +229,9 @@ class PublishedElementService {
 
         // do not merge with already archived ones
         if (source.archived) {
-            destination.errors.reject('merge.source.already.archived', 'Source is already archived')
+            if (!(source in destination.supersededBy)) {
+                destination.errors.reject('merge.source.already.archived', 'Source is already archived')
+            }
             return destination
         }
 
