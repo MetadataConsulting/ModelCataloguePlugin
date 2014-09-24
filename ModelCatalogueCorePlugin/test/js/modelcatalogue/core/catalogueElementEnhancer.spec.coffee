@@ -45,9 +45,9 @@ describe "mc.core.catalogueElementEnhancer", ->
     model   = enhance angular.copy(fixtures.model.showOne)
     element = enhance angular.copy(fixtures.dataElement.showOne)
 
-    expect(domain.getLabel()) .toBe("value domain test3 (Value Domain in public libraries)")
-    expect(model.getLabel())  .toBe("mTest3 (Model)")
-    expect(element.getLabel()).toBe("DE_author (Data Element)")
+    expect(domain.getLabel()) .toBe("value domain test3 (public libraries)")
+    expect(model.getLabel())  .toBe("mTest3")
+    expect(element.getLabel()).toBe("DE_author")
 
   it "returns expected results for instance of", inject (enhance) ->
     domain  = enhance angular.copy(fixtures.valueDomain.showOne)
