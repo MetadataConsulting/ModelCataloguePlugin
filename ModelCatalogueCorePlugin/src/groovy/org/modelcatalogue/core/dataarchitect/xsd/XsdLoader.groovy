@@ -21,7 +21,6 @@ class XsdLoader {
     XmlParser parser
     XsdSchema schema
     def xsd
-    Random random = new Random()
 
     protected static fileInputStream
 
@@ -269,7 +268,7 @@ class XsdLoader {
 
     def checkSimpleTypeName(dataTypeName){
         if(ValueDomain.findByName(dataTypeName)){
-            dataTypeName = dataTypeName + random.nextInt()
+            dataTypeName = "${dataTypeName}_name_conflict_${UUID.randomUUID()}"
             dataTypeName = checkSimpleTypeName(dataTypeName)
         }
         return dataTypeName
