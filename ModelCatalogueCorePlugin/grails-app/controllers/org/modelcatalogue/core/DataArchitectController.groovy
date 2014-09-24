@@ -77,7 +77,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     def getSubModelElements(){
         Long id = params.long('modelId') ?: params.long('id')
-        reportCapableRespond Lists.lazy(params, Model, "/dataArchitect/getSubModelElements", "elements")  {
+        reportCapableRespond Lists.lazy(params, DataElement, "/dataArchitect/getSubModelElements", "elements")  {
             if (id){
                 Model model = Model.get(id)
                 ListWithTotalAndType<Model> subModels = modelService.getSubModels(model)
