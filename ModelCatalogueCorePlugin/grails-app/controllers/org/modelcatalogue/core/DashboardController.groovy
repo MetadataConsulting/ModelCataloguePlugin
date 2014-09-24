@@ -35,6 +35,8 @@ class DashboardController {
                 dataTypeCount:DataType.count(),
                 valueDomainCount:ValueDomain.count(),
                 incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
+                unusedValueDomainsCount: dataArchitectService.unusedValueDomains(params).total,
+                duplicateValueDomainsCount: dataArchitectService.duplicateValueDomains(params).total,
                 conceptualDomainCount:ConceptualDomain.count(),
                 transformationsCount:CsvTransformation.count(),
                 ]

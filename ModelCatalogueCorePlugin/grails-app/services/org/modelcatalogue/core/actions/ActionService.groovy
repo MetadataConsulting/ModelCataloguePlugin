@@ -278,6 +278,14 @@ class ActionService {
         }
     }
 
+    int resetAllRunningActions() {
+        // TODO: create test
+        def criteria = new DetachedCriteria(Action).build {
+            eq 'state', ActionState.PERFORMING
+        }
+        criteria.updateAll(state: ActionState.PENDING)
+    }
+
     /**
      * Searches for all actions with given type and search params (contained in ext/extensions map).
      * @param searchParams parameter and their expected values which should be present in ext/extensions map

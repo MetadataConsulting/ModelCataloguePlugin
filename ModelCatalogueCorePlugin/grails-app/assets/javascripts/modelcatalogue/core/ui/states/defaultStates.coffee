@@ -215,7 +215,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           page = parseInt($stateParams.page ? 1, 10)
           page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only model controller will respond on it
-          params                = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true, system: true
+          params                = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: $stateParams.display == undefined, system: true
           params.order          = $stateParams.order ? 'asc'
           params.sort           = $stateParams.sort ? 'name'
           params.status         = $stateParams.status ? 'finalized'
@@ -593,15 +593,15 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   #language=HTML
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
-    <div ng-if="resource != 'model'">
+    <div ng-if="resource != 'model' || $stateParams.display != undefined">
       <span class="pull-right">
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
-      <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp; {{title}} List</h2>
-      <decorated-list ng-if="$stateParams.display == undefined" list="list" columns="columns" state-driven="true"></decorated-list>
+      <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{title}} List</h2>
+      <decorated-list ng-if="$stateParams.display == undefined || $stateParams.display == 'table'" list="list" columns="columns" state-driven="true"></decorated-list>
       <infinite-list  ng-if="$stateParams.display == 'grid'" list="list"></infinite-list>
     </div>
-    <div ng-if="resource == 'model'">
+    <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">
       <div class="row">
         <div class="col-md-4">
           <h2>
@@ -809,8 +809,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                         <a ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cog fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} </div>
-                                        <div><a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}"> Incomplete Value Domains</a> {{incompleteValueDomainsCount}} </div>
+                                        <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} <span ng-show="incompleteValueDomainsCount"> / <a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}">Incomplete </a> {{incompleteValueDomainsCount}}</span></div>
+                                        <div><a id="unusedValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'unused'})" ui-sref-opts="{inherit: false}">Unused</a> {{unusedValueDomainsCount}} / <a id="duplicateValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'duplicate'})" ui-sref-opts="{inherit: false}"> Duplicate</a> {{duplicateValueDomainsCount}}</div>
                                         <div><a ng-click="validate()">Validate</a> / <a ng-click="convert()">Convert</a></div>
                                     </div>
                                 </div>

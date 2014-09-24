@@ -109,6 +109,7 @@ class BootStrap {
 
         environments {
             development {
+                actionService.resetAllRunningActions()
                 try {
                     println 'Running post init job'
                     println 'Importing data'
@@ -189,6 +190,9 @@ class BootStrap {
                     e.printStackTrace()
                 }
                 //domainModellerService.modelDomains()
+            }
+            test {
+                actionService.resetAllRunningActions()
             }
         }
 

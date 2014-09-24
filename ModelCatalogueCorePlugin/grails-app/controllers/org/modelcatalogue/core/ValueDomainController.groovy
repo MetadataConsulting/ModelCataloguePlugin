@@ -17,6 +17,16 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
             reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.incompleteValueDomains(params))
             return
         }
+        if (params.status == 'duplicate') {
+            handleParams(max)
+            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.duplicateValueDomains(params))
+            return
+        }
+        if (params.status == 'unused') {
+            handleParams(max)
+            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.unusedValueDomains(params))
+            return
+        }
         super.index(max)
     }
 

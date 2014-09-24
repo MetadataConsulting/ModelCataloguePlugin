@@ -8,7 +8,10 @@ class PublishedElementService {
 
     static transactional = true
 
-    def grailsApplication, relationshipService, modelCatalogueSearchService
+    def grailsApplication
+    def relationshipService
+    def modelCatalogueSearchService
+    def messageSource
 
     List<PublishedElement> list(params = [:]) {
         PublishedElement.findAllByStatus(getStatusFromParams(params), params)
@@ -123,7 +126,7 @@ class PublishedElementService {
         return PublishedElementStatus.valueOf(params.status.toString().toUpperCase())
     }
 
-    private PublishedElement createNewVersion(PublishedElement element){
+    private static PublishedElement createNewVersion(PublishedElement element){
         element.versionNumber++
         element.versionCreated = new Date()
         element.updateModelCatalogueId()
@@ -192,7 +195,7 @@ class PublishedElementService {
         archived
     }
 
-    private PublishedElement populateArchivedProperties(PublishedElement archived, PublishedElement element){
+    private static PublishedElement populateArchivedProperties(PublishedElement archived, PublishedElement element){
         //set archived as updated whilst updates are going on (so it doesn't interfere with regular validation rules)
         archived.status = PublishedElementStatus.UPDATED
         archived.dateCreated = element.dateCreated // keep the original creation date
@@ -292,6 +295,11 @@ class PublishedElementService {
                 continue
             }
 
+            if (rel.archived || rel.destination.archived) {
+                // no need to transfer archived elements
+                continue
+            }
+
             Relationship existing = destination.outgoingRelationships.find { it.destination.name - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX == rel.destination.name - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX && it.relationshipType == rel.relationshipType }
 
             if (existing) {
@@ -305,7 +313,8 @@ class PublishedElementService {
 
             Relationship newOne = relationshipService.link destination, rel.destination, rel.relationshipType, rel.archived
             if (newOne.hasErrors()) {
-                destination.errors.rejectValue 'outgoingRelationships', 'unable.to.transfer.relationships', [rel] as Object[],  "Unable to transfer relationship {1}"
+                destination.errors.rejectValue 'outgoingRelationships', 'unable.to.transfer.relationships', [rel, newOne.errors.allErrors.collect { messageSource.getMessage(it, Locale.default)}.join(", ")] as Object[],  "Unable to transfer relationship {0}. Errors: {1}"
+
             } else {
                 newOne.ext.putAll(rel.ext)
             }
@@ -318,6 +327,11 @@ class PublishedElementService {
 
             if (rel.source == destination) {
                 // do not self-reference
+                continue
+            }
+
+            if (rel.archived || rel.source.archived) {
+                // no need to transfer archived elements
                 continue
             }
 
@@ -334,7 +348,7 @@ class PublishedElementService {
 
             Relationship newOne = relationshipService.link rel.source, destination, rel.relationshipType, rel.archived
             if (newOne.hasErrors()) {
-                destination.errors.rejectValue 'incomingRelationships', 'unable.to.transfer.relationships', [rel] as Object[],  "Unable to transfer relationship {1}"
+                destination.errors.rejectValue 'incomingRelationships', 'unable.to.transfer.relationships', [rel, newOne.errors.allErrors.collect { messageSource.getMessage(it, Locale.default)}.join(", ")] as Object[],  "Unable to transfer relationship {0}. Errors: {1}"
             } else {
                 newOne.ext.putAll(rel.ext)
             }
@@ -359,10 +373,18 @@ class PublishedElementService {
     }
 
     Map<Long, Set<Long>> findDuplicateModelsSuggestions() {
+        // TODO: create test
         Object[][] results = Model.executeQuery """
             select m.id, m.name, rel.destination.name
             from Model m join m.outgoingRelationships as rel
             where
+                m.name in (
+                    select model.name from Model model
+                    where model.status in :states
+                    group by model.name
+                    having count(model.id) > 1
+                )
+            and
                 m.status in :states
             and
                 rel.archived = false
@@ -399,6 +421,36 @@ class PublishedElementService {
         }
 
         suggestions
+    }
+
+    Map<Long, Set<Long>> findDuplicateDataElementsSuggestions() {
+        // TODO: create test
+        Object[][] results = DataElement.executeQuery """
+            select count(de.id), de.name, vd.id, vd.name
+                from DataElement de join de.valueDomain vd
+                where
+                    de.status in :states
+                group by de.name, vd.id
+                having count(de.id) > 1
+        """, [states: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.FINALIZED]]
+
+        Map<Long, Set<Long>> elements = new LinkedHashMap<Long, Set<Long>>()
+
+        results.each { row ->
+            Long[] duplicates = DataElement.executeQuery """
+                    select de.id from DataElement de
+                    where de.name = :name
+                    and de.valueDomain.id = :vd
+                    and de.status in :states
+
+                    order by de.dateCreated
+            """, [name: row[1], vd: row[2], states: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.FINALIZED]]
+
+            elements[duplicates.head()] = new HashSet<Long>(duplicates.tail().toList())
+
+        }
+
+        elements
     }
 
 
