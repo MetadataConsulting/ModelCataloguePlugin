@@ -25,12 +25,12 @@ abstract class CatalogueElement {
     Date lastUpdated
 
     //stop null pointers (especially deleting new items)
-    Set incomingRelationships = []
-    Set outgoingRelationships = []
-    Set outgoingMappings = []
-    Set incomingMappings = []
+    Set<Relationship> incomingRelationships = []
+    Set<Relationship> outgoingRelationships = []
+    Set<Mapping> outgoingMappings = []
+    Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations']
+    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'classifiedName']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
@@ -71,6 +71,8 @@ abstract class CatalogueElement {
      * org.modelcatalogue.core.Relationship class
      * @return list of items which contains incoming and outgoing relations
      */
+
+    String getClassifiedName() { name }
 
     List getRelations() {
         return [
@@ -189,19 +191,19 @@ abstract class CatalogueElement {
     }
 
     def beforeDelete(){
-        outgoingRelationships.each{ Relationship relationship->
+        new HashSet(outgoingRelationships).each{ Relationship relationship->
             relationship.beforeDelete()
             relationship.delete(flush:true)
         }
-        incomingRelationships.each{ Relationship relationship ->
+        new HashSet(incomingRelationships).each{ Relationship relationship ->
             relationship.beforeDelete()
             relationship.delete(flush:true)
         }
-        outgoingMappings.each{ Mapping mapping ->
+        new HashSet(outgoingMappings).each{ Mapping mapping ->
             mapping.beforeDelete()
             mapping.delete(flush:true)
         }
-        incomingMappings.each{ Mapping mapping ->
+        new HashSet(incomingMappings).each{ Mapping mapping ->
             mapping.beforeDelete()
             mapping.delete(flush:true)
         }

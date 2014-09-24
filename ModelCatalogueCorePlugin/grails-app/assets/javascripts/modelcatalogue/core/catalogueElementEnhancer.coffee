@@ -52,11 +52,22 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
             else
               $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}); self
 
+          self.href           = () ->
+            if self.isInstanceOf "batch"
+              return $state.href('mc.actions.show', {id: self.id})
+            if self.isInstanceOf "dataImport"
+              return $state.href('mc.dataArchitect.imports.show', {id: self.id})
+            if self.isInstanceOf "csvTransformation"
+              return $state.href('mc.csvTransformations.show', {id: self.id})
+
+            $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
+
 
           self.isInstanceOf   = (type) ->
             catalogue.isInstanceOf @elementType, type
 
           self.getLabel = ->
+              return @classifiedName if @classifiedName?
               if @classifications? && @classifications.length > 0
                 classificationNames = commaSeparatedList(@classifications)
                 return "#{@name} (#{@getElementTypeName()} in #{classificationNames})"

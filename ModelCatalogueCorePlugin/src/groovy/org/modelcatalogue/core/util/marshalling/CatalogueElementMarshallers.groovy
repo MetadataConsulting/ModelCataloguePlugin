@@ -36,6 +36,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 elementType: el.class.name,
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
+                classifiedName: el.classifiedName,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 relationships: [count: el.countRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
                 outgoingRelationships: [count: el.countOutgoingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing/search"],

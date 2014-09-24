@@ -4,6 +4,8 @@ import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
+import org.springframework.context.MessageSource
+import org.springframework.validation.ObjectError
 
 /**
  * Base class for ActionRunner interface.
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.config.AutowireCapableBeanFactory
 abstract class AbstractActionRunner implements ActionRunner {
 
     @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
+    @Autowired MessageSource messageSource
 
     PrintWriter out
     protected Map<String,String> parameters = [:]
@@ -117,5 +120,11 @@ abstract class AbstractActionRunner implements ActionRunner {
             }
         }
         return null
+    }
+
+    protected printErrors(List<ObjectError> errors) {
+        for (ObjectError error in errors) {
+            out << messageSource.getMessage(error, Locale.default)
+        }
     }
 }

@@ -159,8 +159,9 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
         show = 'show()' if show == true
         if angular.isFunction(show) then show(element) else $scope.$eval(show, element)
 
-      $scope.showEnabled = (show) ->
-        show?
+      $scope.showEnabled = (show, element) ->
+        return 'link' if show == true && angular.isFunction(element?.href)
+        return show?
 
       $scope.getColumnsCount = () ->
         count = $scope.columns.length

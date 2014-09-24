@@ -95,6 +95,9 @@ environments {
     development {
         grails.logging.jul.usebridge = true
     }
+    test {
+        grails.plugin.console.enabled = true
+    }
     production {
         grails.logging.jul.usebridge = false
         grails.serverURL = "http://mcc-testapp.metadata.eu.cloudbees.net"
@@ -109,7 +112,7 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-//    debug 'org.modelcatalogue'
+    debug 'grails.app.services.org.modelcatalogue.core.PublishedElementService'
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'

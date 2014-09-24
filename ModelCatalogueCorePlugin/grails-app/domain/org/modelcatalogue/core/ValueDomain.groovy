@@ -76,6 +76,13 @@ class ValueDomain extends ExtendibleElement  {
         outgoing: [base: 'isBaseFor', union: 'unionOf']
     ]
 
+    String getClassifiedName() {
+        if (!conceptualDomains) {
+            return name
+        }
+        "$name (${conceptualDomains*.name.sort().join(', ')})"
+    }
+
     void setRegexDef(String regex) {
         if (!regex) {
             rule = null

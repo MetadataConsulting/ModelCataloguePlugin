@@ -65,15 +65,8 @@ class ActionService {
 
         Callable<ActionResult> job = {
             try {
-                Action a
+                Action a = Action.get(id)
                 
-                try {
-                    a = Action.lock(id)
-                } catch (UnsupportedOperationException ignored) {
-                    a = Action.get(id)
-                }
-
-
                 StringWriter sw = new StringWriter()
                 PrintWriter pw = new PrintWriter(sw)
 

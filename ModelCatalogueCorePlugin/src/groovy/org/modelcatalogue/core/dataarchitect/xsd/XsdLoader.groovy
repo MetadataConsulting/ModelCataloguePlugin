@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.dataarchitect.xsd
 
-import grails.test.mixin.Mock
 import groovy.xml.QName
 import org.modelcatalogue.core.ValueDomain
 
@@ -10,6 +9,7 @@ import org.modelcatalogue.core.ValueDomain
 
 class XsdLoader {
 
+    public static final String ABSTRACT_COMPLEX_TYPE_SUFFIX = "_abstract_complexType"
     String logErrors =""
     ArrayList<XsdAttribute> allAttributes = []
     ArrayList<XsdElement> allElements = []
@@ -215,7 +215,7 @@ class XsdLoader {
         return result
     }
 
-    def readSimpleType(Node node, String elementName){
+    XsdSimpleType readSimpleType(Node node, String elementName){
         // data type can be enumeration
         // have restriction
         // minInclusive
@@ -264,7 +264,7 @@ class XsdLoader {
             dataTypeName = checkSimpleTypeName(dataTypeName)
         }
 
-        XsdSimpleType result = new XsdSimpleType(name: dataTypeName,description: xsdElementAnnotation, restriction: xsdRestriction, list: list, union: union , namespace: node.name())
+        new XsdSimpleType(name: dataTypeName,description: xsdElementAnnotation, restriction: xsdRestriction, list: list, union: union , namespace: node.name())
     }
 
     def checkSimpleTypeName(dataTypeName){
@@ -355,7 +355,7 @@ class XsdLoader {
     }
 
 
-    def readComplexType(Node node, String elementName) {
+    XsdComplexType readComplexType(Node node, String elementName) {
 //        XsdSequenceComplexDataType sequenceElements =[]
         String dataTypeName = ""
         String minOccurs = ""
@@ -393,7 +393,7 @@ class XsdLoader {
         }
 
 
-        if (dataTypeName=="") dataTypeName = elementName + "_abstract_complexType"
+        if (dataTypeName=="") dataTypeName = elementName + ABSTRACT_COMPLEX_TYPE_SUFFIX
 
         def values = node.value()
         values.eachWithIndex{ Node valueNode, int valueNodeIndex ->
@@ -419,8 +419,7 @@ class XsdLoader {
             }
         }
 
-        XsdComplexType result = new XsdComplexType(name: dataTypeName, description: description, abstractAttr: abstractAttr, restriction: restriction, sequence: sequence, complexContent: complexContent, mixed: mixed, attributes:attributes, namespace: node.name())
-
+        new XsdComplexType(name: dataTypeName, description: description, abstractAttr: abstractAttr, restriction: restriction, sequence: sequence, complexContent: complexContent, mixed: mixed, attributes:attributes, namespace: node.name())
     }
 
 

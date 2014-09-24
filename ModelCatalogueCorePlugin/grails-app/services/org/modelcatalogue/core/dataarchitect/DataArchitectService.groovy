@@ -3,6 +3,10 @@ package org.modelcatalogue.core.dataarchitect
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.actions.Batch
+import org.modelcatalogue.core.actions.MergePublishedElements
+import org.modelcatalogue.core.actions.Action
+import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
@@ -10,7 +14,10 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class DataArchitectService {
 
-    def modelCatalogueSearchService, relationshipService
+    def modelCatalogueSearchService
+    def relationshipService
+    def publishedElementService
+    def actionService
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
         Lists.fromCriteria(params, DataElement) {
@@ -206,5 +213,20 @@ class DataArchitectService {
             return mapping.mapper()
         }
         return null
+    }
+
+    def generateMergeModelActions() {
+        publishedElementService.findDuplicateModelsSuggestions().each { destId, sources ->
+            Model model = Model.get(destId)
+            Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
+            for (Action action in batch.actions) {
+                if (action.state in [ActionState.DISMISSED, ActionState.FAILED, ActionState.PENDING]) {
+                    action.delete(flush: true)
+                }
+            }
+            sources.each { srcId ->
+                actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", deep: true
+            }
+        }
     }
 }

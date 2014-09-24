@@ -13,7 +13,7 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     Date versionCreated = new Date()
 
-    Set classifications = []
+    Set<Classification> classifications = []
 
     static searchable = {
         except = ['versionNumber']
@@ -25,6 +25,13 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     static mapping = {
         tablePerHierarchy false
+    }
+
+    String getClassifiedName() {
+        if (!classifications) {
+            return name
+        }
+        "$name (${classifications*.name.sort().join(', ')})"
     }
 
     @Override
@@ -52,7 +59,6 @@ abstract class PublishedElement extends ExtendibleElement  {
             incoming: [supersession: 'supersedes'],
             outgoing: [supersession: 'supersededBy']
     ]
-
 
 
     String toString() {

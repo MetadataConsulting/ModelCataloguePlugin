@@ -27,6 +27,8 @@ class ModelCatalogueCorePluginUrlMappings {
 
 
             if (controllerName == 'batch') {
+                "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/run"(controller: controllerName, action: 'runAll', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$state?"(controller: controllerName, action: 'listActions', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/dismiss"(controller: controllerName, action: 'dismiss', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/reactivate"(controller: controllerName, action: 'reactivate', method: HttpMethod.POST)
@@ -103,6 +105,7 @@ class ModelCatalogueCorePluginUrlMappings {
             "/getSubModelElements/$modelId?" (controller: "dataArchitect", action: 'getSubModelElements', method: HttpMethod.GET)
             "/findRelationsByMetadataKeys/$key?" (controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)
             "/elementsFromCSV" (controller: "dataArchitect", action: "elementsFromCSV", method: HttpMethod.POST)
+            "/generateSuggestions" (controller: "dataArchitect", action: "generateSuggestions", method: HttpMethod.POST)
 
             "/imports/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
             "/imports" (controller: "dataImport", action: 'index', method: HttpMethod.GET)

@@ -336,6 +336,31 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
+  actionsProvider.registerAction 'archive-batch', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+    return undefined if $scope.action
+    return undefined if not $scope.batch
+    return undefined if not security.hasRole('CURATOR')
+
+    action = {
+      position:   150
+      label:      'Archive'
+      icon:       'glyphicon glyphicon-compressed'
+      type:       'danger'
+      action:     ->
+        messages.confirm("Do you want to archive batch #{$scope.batch.name} ?", "The batch #{$scope.batch.name} will be archived").then ->
+          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.batch.link}/archive", method: 'POST')).then (archived) ->
+            $scope.batch = archived
+          , showErrorsUsingMessages(messages)
+    }
+
+    updateAction = ->
+      action.disabled = $scope.batch.archived
+
+    $scope.$watch 'batch.archived', updateAction
+
+    action
+  ]
+
   actionsProvider.registerAction 'delete', ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not security.hasRole('ADMIN')
@@ -493,6 +518,25 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           $scope.element = refreshed
           $rootScope.$broadcast 'redrawContextualActions'
 
+    }
+  ]
+
+  actionsProvider.registerAction 'generate-merge-models', ['$scope', 'security', 'catalogue', 'modelCatalogueApiRoot', '$http', 'messages', ($scope, security, catalogue, modelCatalogueApiRoot, $http, messages)->
+    return undefined unless security.isUserLoggedIn()
+    return undefined unless $scope.list
+    return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'batch')
+    {
+      position:   100
+      label:      'Generate Suggestions'
+      icon:       'fa fa-flash'
+      type:       'primary'
+      action: ->
+        messages.confirm("Generate Suggestions", "Suggestions to optimalize catalogue will be generated. This may take a long time depending on complexity of the catalogue.")
+        $http.post("#{modelCatalogueApiRoot}/dataArchitect/generateSuggestions").then ->
+          messages.success "Actions to merge models are being created"
+          $scope.list.reload()
+        , ->
+          messages.error "Cannot create actions to merge models."
     }
   ]
 

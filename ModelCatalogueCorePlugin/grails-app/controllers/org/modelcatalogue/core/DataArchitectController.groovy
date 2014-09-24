@@ -140,5 +140,14 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
         respond elements
     }
 
+    def generateSuggestions() {
+        try {
+            dataArchitectService.generateMergeModelActions()
+            respond status: HttpStatus.OK
+        } catch (e) {
+            respond status: HttpStatus.BAD_REQUEST
+        }
+    }
+
 
 }

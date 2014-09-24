@@ -2,7 +2,6 @@ package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
 import groovy.xml.QName
-import org.hibernate.annotations.FetchMode
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
@@ -29,8 +28,6 @@ import org.modelcatalogue.core.dataarchitect.xsd.XsdSimpleType
 import org.modelcatalogue.core.dataarchitect.xsd.XsdUnion
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
-
-import javax.persistence.criteria.JoinType
 
 @Transactional
 class XSDImportService {

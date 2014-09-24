@@ -94,6 +94,11 @@ class BootStrap {
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.PUT)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.DELETE)
 
+
+        createRequestmapIfMissing('/console/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/dbconsole/**',                 'ROLE_ADMIN')
+        createRequestmapIfMissing('/plugins/console-1.5.0/**',     'ROLE_ADMIN')
+
 //        createRequestmapIfMissing('/api/modelCatalogue/core/model/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
