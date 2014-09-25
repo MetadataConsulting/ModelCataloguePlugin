@@ -215,7 +215,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           page = parseInt($stateParams.page ? 1, 10)
           page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only model controller will respond on it
-          params                = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: $stateParams.display == undefined, system: true
+          params                = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true, system: true
           params.order          = $stateParams.order ? 'asc'
           params.sort           = $stateParams.sort ? 'name'
           params.status         = $stateParams.status ? 'finalized'
