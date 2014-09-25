@@ -77,7 +77,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.element  = element
 ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', 'messages', 'modelCatalogueApiRoot', 'rest', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle, messages, modelCatalogueApiRoot, rest) ->
     listEnhancer    = enhance.getEnhancer('list')
 
     if $stateParams.resource
@@ -91,6 +91,21 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.contained.noStatusSwitch = $scope.$new(true)
     $scope.contained.list           = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
     $scope.contained.element        = if list.size > 0 then list.list[0]
+
+
+    if $stateParams.resource == 'batch'
+      $scope.actions = [
+        {
+          icon:   'flash'
+          type:   'default'
+          action: (batch) ->
+            messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
+              enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}#{batch.link}/run")).then (updated) ->
+                angular.extend(batch, updated)
+        }
+      ]
+    else
+      $scope.actions = []
 
     printMetadata = (relationship) ->
       result  = ''
@@ -598,7 +613,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
       <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{title}} List</h2>
-      <decorated-list ng-if="$stateParams.display == undefined || $stateParams.display == 'table'" list="list" columns="columns" state-driven="true"></decorated-list>
+      <decorated-list ng-if="$stateParams.display == undefined || $stateParams.display == 'table'" list="list" columns="columns" state-driven="true" actions="actions"></decorated-list>
       <infinite-list  ng-if="$stateParams.display == 'grid'" list="list"></infinite-list>
     </div>
     <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">

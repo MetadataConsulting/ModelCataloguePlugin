@@ -11,8 +11,10 @@ angular.module('mc.core.ui.bs.modalConfirm', ['mc.util.messages']).config ['mess
             ''' + body + '''
         </div>
         <div class="modal-footer">
+          <form role="form">
             <button class="btn btn-primary" ng-click="$close(true)">OK</button>
             <button class="btn btn-warning" ng-click="$dismiss(false)">Cancel</button>
+          </form>
         </div>
         '''
       }

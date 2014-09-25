@@ -375,7 +375,7 @@ class PublishedElementService {
     Map<Long, Set<Long>> findDuplicateModelsSuggestions() {
         // TODO: create test
         Object[][] results = Model.executeQuery """
-            select m.id, m.name, rel.destination.name
+            select m.id, m.name, rel.relationshipType.name,  rel.destination.name
             from Model m join m.outgoingRelationships as rel
             where
                 m.name in (
@@ -389,18 +389,23 @@ class PublishedElementService {
             and
                 rel.archived = false
             and
-                rel.relationshipType = :containment
+                (rel.relationshipType = :containment or rel.relationshipType = :hierarchy)
             order by m.name asc, m.dateCreated asc, rel.destination.name asc
-        """, [states: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.FINALIZED], containment: RelationshipType.findByName('containment')]
+        """, [states: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.FINALIZED], containment: RelationshipType.findByName('containment'), hierarchy: RelationshipType.findByName('hierarchy')]
 
 
-        Map<Long, Map<String, Object>> models = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>()] }
+        Map<Long, Map<String, Object>> models = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>(), childrenNames: new TreeSet<String>()] }
 
         for (Object[] row in results) {
             def info = models[row[0] as Long]
             info.name = row[1] - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX
-            info.elementNames << row[2].toString()
-            info.elementNamesSize = info.elementNames.size()
+            if (row[2] == 'containment') {
+                info.elementNames << row[3].toString()
+                info.elementNamesSize = info.elementNames.size()
+            } else {
+                info.childrenNames << row[3].toString()
+                info.childrenNamesSize = info.childrenNames.size()
+            }
         }
 
         Map<Long, Set<Long>> suggestions = new LinkedHashMap<Long, Set<Long>>().withDefault { new TreeSet<Long>() }
@@ -412,7 +417,7 @@ class PublishedElementService {
             if (!current) {
                 current = info
             } else {
-                if (info.name == current.name && info.elementNamesSize == current.elementNamesSize && info.elementNames == current.elementNames) {
+                if (info.name == current.name && info.elementNamesSize == current.elementNamesSize && info.childrenNamesSize == current.childrenNamesSize && info.elementNames == current.elementNames && info.childrenNames == current.childrenNames) {
                     suggestions[current.id] << info.id
                 } else {
                     current = info

@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.dataarchitect.xsd
 
 import groovy.xml.QName
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.DataType
 
 /**
  * Created by sus_avi on 17/06/2014.
@@ -10,7 +10,6 @@ import org.modelcatalogue.core.ValueDomain
 class XsdLoader {
 
     public static final String ABSTRACT_COMPLEX_TYPE_SUFFIX = "_abstract_complexType"
-    public static final String NAME_CONFLICT_MARKER = "name conflict"
     String logErrors =""
     ArrayList<XsdAttribute> allAttributes = []
     ArrayList<XsdElement> allElements = []
@@ -259,20 +258,11 @@ class XsdLoader {
                     break
             }
         }
-        if (dataTypeName=="") {
+        if (dataTypeName == "") {
             dataTypeName = node.parent().attributes().get("name")
-            dataTypeName = checkSimpleTypeName(dataTypeName)
         }
 
         new XsdSimpleType(name: dataTypeName,description: xsdElementAnnotation, restriction: xsdRestriction, list: list, union: union , namespace: node.name())
-    }
-
-    def checkSimpleTypeName(dataTypeName){
-        if(ValueDomain.findByName(dataTypeName)){
-            dataTypeName = "${dataTypeName} ($NAME_CONFLICT_MARKER ${UUID.randomUUID()})"
-            dataTypeName = checkSimpleTypeName(dataTypeName)
-        }
-        return dataTypeName
     }
 
     def readUnion (Node node, String elementName){
