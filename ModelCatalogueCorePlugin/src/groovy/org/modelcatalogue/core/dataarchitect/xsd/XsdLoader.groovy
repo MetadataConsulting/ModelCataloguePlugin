@@ -10,6 +10,7 @@ import org.modelcatalogue.core.ValueDomain
 class XsdLoader {
 
     public static final String ABSTRACT_COMPLEX_TYPE_SUFFIX = "_abstract_complexType"
+    public static final String NAME_CONFLICT_MARKER = "name conflict"
     String logErrors =""
     ArrayList<XsdAttribute> allAttributes = []
     ArrayList<XsdElement> allElements = []
@@ -268,7 +269,7 @@ class XsdLoader {
 
     def checkSimpleTypeName(dataTypeName){
         if(ValueDomain.findByName(dataTypeName)){
-            dataTypeName = "${dataTypeName} (name conflict ${UUID.randomUUID()})"
+            dataTypeName = "${dataTypeName} ($NAME_CONFLICT_MARKER ${UUID.randomUUID()})"
             dataTypeName = checkSimpleTypeName(dataTypeName)
         }
         return dataTypeName

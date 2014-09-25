@@ -10,6 +10,12 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     { header: "Description", value: "description" }
   ]
 
+  getEnumerations = (enumeratedType) ->
+    return enumeratedType.description if not enumeratedType.enumerations
+    enumerations = []
+    enumerations.push "#{key}: #{value}" for key, value of enumeratedType.enumerations
+    enumerations.join('\n')
+
   getConceptualDomainsForValueDomain = (valueDomain) ->
     return '' if not valueDomain.conceptualDomains
     domainNames = for domain in valueDomain.conceptualDomains
@@ -28,7 +34,6 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
   # default
   columnsProvider.registerColumns 'org.modelcatalogue.core.ConceptualDomain', nameAndDescription()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', nameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.PublishedElement', publishedElementColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.ExtendibleElement', publishedElementColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
@@ -126,7 +131,12 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', [
     {header: "Name",        value: 'name',        class: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
-    {header: "Enumerations", value: 'enumerations', class: 'col-md-6'}
+    {header: "Enumerations or Description", value: getEnumerations, class: 'col-md-6'}
+  ]
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', [
+    {header: "Name",        value: 'name',        class: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
+    {header: "Enumerations or Description", value: getEnumerations, class: 'col-md-6'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Batch', [
