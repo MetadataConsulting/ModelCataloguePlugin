@@ -204,7 +204,6 @@ class DataArchitectService {
             from ValueDomain v
             where
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-            order by v.name asc, v.dateCreated asc
         """, [archived: PublishedElementStatus.ARCHIVED]
     }
 
@@ -215,9 +214,7 @@ class DataArchitectService {
             where
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
             and
-                v.name in (select vd.name from ValueDomain vd group by vd.name having count(vd.name) > 1) or v.name like '%name conflict%'
-            order by v.name asc, v.dateCreated asc
-
+                v.name in (select vd.name from ValueDomain vd group by vd.name having count(vd.name) > 1)
         """, [archived: PublishedElementStatus.ARCHIVED]
     }
 
