@@ -173,7 +173,7 @@ class XSDImporter {
     }
 
     protected ValueDomain findValueDomain(String name, DataType dataType = null) {
-        List<ValueDomain> valueDomains = ValueDomain.findAllByName(name)
+        List<ValueDomain> valueDomains = ValueDomain.findAllByNameOrNameIlike(name, "$name (in %)")
 
         for (ValueDomain domain in valueDomains) {
             if (dataType && domain.dataType == dataType) {

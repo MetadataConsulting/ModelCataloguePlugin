@@ -47,6 +47,7 @@ abstract class CatalogueElement {
         dateCreated bindable: false
         lastUpdated bindable: false
         archived bindable: false
+        classifiedName bindable: false
     }
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable

@@ -5,12 +5,14 @@ import au.com.bytecode.opencsv.CSVWriter
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.actions.MergePublishedElements
+import org.modelcatalogue.core.actions.UpdateCatalogueElement
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 
 class DataArchitectService {
 
@@ -218,6 +220,37 @@ class DataArchitectService {
         """, [archived: PublishedElementStatus.ARCHIVED]
     }
 
+    Map<Long, String> dataTypesNamesSuggestions() {
+        def results = DataType.executeQuery """
+            select d.id, re.source.name
+            from DataType d
+                left join d.relatedValueDomains vd
+                left join vd.dataElements de
+                left join de.incomingRelationships re
+
+            where
+                d.name in (select d.name from DataType d group by d.name having count(d.name) > 1)
+            and
+                re.relationshipType = :containment
+
+            order by d.name, de.id
+        """, [containment: RelationshipType.findByName('containment')]
+
+        Map<Long, Set<String>> suggestions = new LinkedHashMap<Long, Set<String>>().withDefault { new TreeSet<String>() }
+
+        for (row in results) {
+            suggestions[row[0]] << (row[1] - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX)
+        }
+
+        Map<Long, String> ret = [:]
+
+        suggestions.each { Long id, Set<String> names ->
+            ret[id] = DataType.suggestName(names)
+        }
+
+        ret
+    }
+
     /**
      * Finds mapping between selected data elements or Mapping#DIRECT_MAPPING.
      * @param source source data element
@@ -251,6 +284,25 @@ class DataArchitectService {
 
         Batch.findAllByNameIlike("Merge Model '%'").each reset
         Batch.findAllByNameIlike("Merge Data Element '%'").each reset
+
+        Batch.findAllByName("Rename Data Types and Value Domains").each reset
+
+
+        Map<Long, String> suggestions = dataTypesNamesSuggestions()
+        if (suggestions) {
+            Batch renameBatch = Batch.findOrSaveByName("Rename Data Types and Value Domains")
+            suggestions.each { id, name ->
+                DataType type = DataType.get(id)
+                String originalName = type.name
+                String newName = "$originalName (in $name)"
+                Action updateDataType = actionService.create renameBatch, UpdateCatalogueElement, id: id , type: DataType.name, name: newName
+                type.relatedValueDomains.each { ValueDomain it ->
+                    actionService.create renameBatch, UpdateCatalogueElement, id: it.id, type: ValueDomain.name, name: newName, relatedDataType: updateDataType
+                }
+            }
+            renameBatch.archived = false
+            renameBatch.save()
+        }
 
         publishedElementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
             DataElement dataElement = DataElement.get(destId)

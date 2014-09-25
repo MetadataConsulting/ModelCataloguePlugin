@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.util.GrailsNameUtils
 import org.apache.commons.lang.builder.EqualsBuilder
 import org.apache.commons.lang.builder.HashCodeBuilder
 
@@ -55,4 +56,22 @@ class DataType extends CatalogueElement {
     }
 
 
+    static String suggestName(Set<String> suggestions) {
+        if (!suggestions) {
+            return null
+        }
+        if (suggestions.size() == 1) {
+            return suggestions[0]
+        }
+
+        List<List<String>> words = suggestions.collect { GrailsNameUtils.getNaturalName(it).split(/\s/).toList() }
+
+        List<String> result = words.head()
+
+        for (List<String> others in words.tail()) {
+            result = result.intersect(others)
+        }
+
+        result.join(" ")
+    }
 }

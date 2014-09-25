@@ -374,7 +374,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected getIncludeFields(){
         GrailsDomainClass clazz = grailsApplication.getDomainClass(resource.name)
         def fields = clazz.persistentProperties.collect{it.name}
-        fields.removeAll(['dateCreated','lastUpdated','incomingMappings', 'incomingRelationships', 'modelCatalogueId', 'outgoingMappings', 'outgoingRelationships'])
+        fields.removeAll(['dateCreated', 'classifiedName', 'lastUpdated','incomingMappings', 'incomingRelationships', 'modelCatalogueId', 'outgoingMappings', 'outgoingRelationships'])
         fields
     }
 
