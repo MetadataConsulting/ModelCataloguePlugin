@@ -268,7 +268,7 @@ class XsdLoader {
 
     def checkSimpleTypeName(dataTypeName){
         if(ValueDomain.findByName(dataTypeName)){
-            dataTypeName = "${dataTypeName}_name_conflict_${UUID.randomUUID()}"
+            dataTypeName = "${dataTypeName} (name conflict ${UUID.randomUUID()})"
             dataTypeName = checkSimpleTypeName(dataTypeName)
         }
         return dataTypeName

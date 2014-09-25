@@ -126,7 +126,7 @@ class PublishedElementService {
         return PublishedElementStatus.valueOf(params.status.toString().toUpperCase())
     }
 
-    private static PublishedElement createNewVersion(PublishedElement element){
+    private PublishedElement createNewVersion(PublishedElement element){
         element.versionNumber++
         element.versionCreated = new Date()
         element.updateModelCatalogueId()
@@ -195,7 +195,7 @@ class PublishedElementService {
         archived
     }
 
-    private static PublishedElement populateArchivedProperties(PublishedElement archived, PublishedElement element){
+    private PublishedElement populateArchivedProperties(PublishedElement archived, PublishedElement element){
         //set archived as updated whilst updates are going on (so it doesn't interfere with regular validation rules)
         archived.status = PublishedElementStatus.UPDATED
         archived.dateCreated = element.dateCreated // keep the original creation date
