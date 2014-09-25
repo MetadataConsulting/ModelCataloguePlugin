@@ -113,7 +113,7 @@ class EnumeratedType extends DataType {
         return ret
     }
 
-    private static String quote(String s) {
+    static String quote(String s) {
         if (s == null) return null
         String ret = s
         QUOTED_CHARS.each { original, replacement ->
@@ -122,7 +122,7 @@ class EnumeratedType extends DataType {
         ret
     }
 
-    private static String unquote(String s) {
+    static String unquote(String s) {
         if (s == null) return null
         String ret = s
         QUOTED_CHARS.reverseEach { original, pattern ->

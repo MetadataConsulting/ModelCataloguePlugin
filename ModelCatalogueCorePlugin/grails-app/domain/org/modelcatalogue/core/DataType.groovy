@@ -23,7 +23,7 @@ class DataType extends CatalogueElement {
     }
 
     static constraints = {
-        name unique: true, size: 2..255
+        name size: 1..255
     }
 
     static mapping = {
