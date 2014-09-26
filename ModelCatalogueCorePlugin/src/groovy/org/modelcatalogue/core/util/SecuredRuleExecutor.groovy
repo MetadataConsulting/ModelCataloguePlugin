@@ -49,10 +49,16 @@ class SecuredRuleExecutor {
 
     private final Binding binding
     private final GroovyShell shell
+    private final Class<? extends Script> baseScriptClass
 
     SecuredRuleExecutor(Binding binding) {
-        this.binding = binding
-        this.shell   = createShell(binding)
+        this(Script.class, binding)
+    }
+
+    SecuredRuleExecutor(Class<? extends Script> baseScriptClass, Binding binding) {
+        this.binding            = binding
+        this.shell              = createShell(binding)
+        this.baseScriptClass    = baseScriptClass
     }
 
     private createShell(Binding binding) {
@@ -92,6 +98,10 @@ class SecuredRuleExecutor {
 
         configuration.addCompilationCustomizers(importCustomizer)
         configuration.addCompilationCustomizers(secureASTCustomizer)
+
+        if (baseScriptClass && baseScriptClass != Script.class) {
+            configuration.scriptBaseClass = baseScriptClass.name
+        }
 
         new GroovyShell(getClass().getClassLoader(), binding, configuration)
     }

@@ -542,7 +542,7 @@ class XSDImporter {
     protected static String addToRule(String rule1, String rule2) {
         if (rule1 && !rule2) return rule1
         if (rule2 && !rule1) return rule2
-        return "$rule1 || $rule2"
+        return "$rule1 && $rule2"
     }
 
     protected static EnumeratedType createOrMatchEnumeratedType(String name, String data) {
