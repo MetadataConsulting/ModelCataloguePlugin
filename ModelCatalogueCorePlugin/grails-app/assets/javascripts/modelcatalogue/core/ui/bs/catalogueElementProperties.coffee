@@ -1,12 +1,12 @@
 angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
   nameAndIdent = -> [
-    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-5', show: "relation.show()"}
+    {header: 'Name',            value: "ext.name || ext.Name || relation.name ",                                 classes: 'col-md-5', show: "relation.show()"}
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()"}
   ]
 
   nameAndIdAndMetadata = -> [
-    {header: 'Name',            value: "relation.name",                                 classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Name',            value: "ext.name || ext.Name || relation.name",                                 classes: 'col-md-3', show: "relation.show()"}
     {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()"}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
@@ -38,7 +38,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     return "#{(asset.size)} B"
 
   attachmentColumns = -> [
-    {header: "Name",        value: 'relation.name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: 'relation.show()'}
+    {header: "Name",        value: 'ext.name || ext.Name || relation.name', class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: 'relation.show()'}
     {header: "File Name",   value: 'relation.originalFileName',  class: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
     {header: "Size",        value: computeBytes,                 class: 'col-md-2', sort: {property: 'size', type: 'order'}}
     {header: "Mime Type",   value: 'relation.contentType',       class: 'col-md-2', sort: {property: 'contentType', type: 'alphabet'}}

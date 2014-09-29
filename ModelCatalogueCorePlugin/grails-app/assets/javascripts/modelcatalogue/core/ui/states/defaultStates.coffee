@@ -129,7 +129,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       result
 
     $scope.contained.columns        = [
-      {header: 'Name',          value: "relation.name",        classes: 'col-md-3', show: "relation.show()"}
+      {header: 'Name',          value: "ext.name || ext.Name || relation.name",        classes: 'col-md-3', show: "relation.show()"}
       {header: 'Description',   value: "relation.description", classes: 'col-md-4'}
       {header: 'Local Identifier', value:  printLocalIdentifiers,     classes: 'col-md-2'}
       {header: 'Metadata', value:  printMetadata,     classes: 'col-md-3'}
@@ -627,7 +627,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           </h2>
         </div>
         <div class="col-md-8">
-          <h3 ng-show="contained.element">{{contained.element.name}}
+          <h3 ng-show="contained.element">{{contained.element.metadata.name || contained.element.metadata.Name || contained.element.name}}
             <span class="pull-right">
               <contextual-actions size="sm" no-colors="true" icon-only="true" scope="contained"></contextual-actions>
             </span>

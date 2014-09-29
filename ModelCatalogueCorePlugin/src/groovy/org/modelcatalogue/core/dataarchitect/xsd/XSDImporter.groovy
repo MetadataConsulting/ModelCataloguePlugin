@@ -11,8 +11,36 @@ import static org.modelcatalogue.core.EnumeratedType.quote
 @Log4j
 class XSDImporter {
 
-    Collection<XsdSimpleType> simpleDataTypes
-    Collection<XsdComplexType> complexDataTypes
+    static final String XS_ATTRIBUTE = "xs:attribute"
+
+
+    Map<String,XsdSimpleType> simpleDataTypesByName = [:]
+
+    Collection<XsdSimpleType> getSimpleDataTypes() {
+        simpleDataTypesByName.values()
+    }
+
+    void setSimpleDataTypes(Collection<XsdSimpleType> types) {
+        simpleDataTypesByName.clear()
+        for (XsdSimpleType type in types) {
+            simpleDataTypesByName.put(type.name, type)
+        }
+    }
+
+
+    Map<String,XsdComplexType> complexDataTypesByName = [:]
+
+    Collection<XsdComplexType> getComplexDataTypes() {
+        complexDataTypesByName.values()
+    }
+
+    void setComplexDataTypes(Collection<XsdComplexType> types) {
+        complexDataTypesByName.clear()
+        for (XsdComplexType type in types) {
+            complexDataTypesByName.put(type.name, type)
+        }
+    }
+
     Collection<XsdElement> topLevelElements
     Collection<Classification> classifications
     Collection<ConceptualDomain> conceptualDomains
@@ -22,16 +50,37 @@ class XSDImporter {
     XsdSchema schema
     Collection<QName> namespaces
 
-    ArrayList<Model> circularModels = []
-    ArrayList<Model> modelsCreated = []
+    List<Model> circularModels = []
+    List<Model> modelsCreated = []
+    List<DataElement> elementsCreated = []
+
+    Model containerModel
 
     def createAll() {
-        log.info("Processing ${schema.targetNamespace} STARTED")
         log.info("Processing simple types")
         createValueDomainsAndDataTypes()
         log.info("Processing complex types")
         createModelsAndElements()
-        log.info("Processing ${schema.targetNamespace} FINISHED")
+
+        log.info("Publishing elements as DRAFT")
+        for (DataElement element in elementsCreated) {
+            element.status = PublishedElementStatus.DRAFT
+            element.save()
+        }
+
+        log.info("Publishing models as DRAFT")
+        for (Model model in modelsCreated) {
+            model.status = PublishedElementStatus.DRAFT
+            model.save()
+        }
+
+        if (containerModel) {
+            containerModel.status = PublishedElementStatus.DRAFT
+            containerModel.save()
+        }
+
+
+        log.info("Processing FINISHED")
     }
 
     def createValueDomainsAndDataTypes() {
@@ -44,13 +93,13 @@ class XSDImporter {
 
     def createModelsAndElements(String containerModelName = "") {
 
-        if (!containerModelName) containerModelName = classifications.first()?.name + " types"
-        Classification typeClassification = Classification.findByNamespace(classifications.first()?.namespace + " types")
-        if (!typeClassification) typeClassification = new Classification(name: classifications.first()?.name + " types", namespace: classifications.first()?.namespace + " types").save()
+        if (!containerModelName) containerModelName = classifications.first()?.name + " Complex Types"
+        Classification typeClassification = Classification.findByNamespace(classifications.first()?.namespace + " Complex Types")
+        if (!typeClassification) typeClassification = new Classification(name: classifications.first()?.name + " Complex Types", namespace: classifications.first()?.namespace + " Complex Types").save()
         classifications.add(typeClassification)
 
-        Model containerModel = findModel(containerModelName)
-        if (!containerModel) containerModel = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish").save()
+        containerModel = findModel(containerModelName)
+        if (!containerModel) containerModel = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save()
         complexDataTypes.each { XsdComplexType complexType ->
             matchOrCreateModel(complexType)
         }
@@ -86,12 +135,12 @@ class XSDImporter {
         }
     }
 
-    protected addClassifications(PublishedElement element) {
+    protected <E extends PublishedElement> E  addClassifications(E element) {
         element.addToClassifications(classifications.first())
-        return element
+        element
     }
 
-    def matchOrCreateModel(XsdComplexType complexType) {
+    Model matchOrCreateModel(XsdComplexType complexType) {
         log.info("Processing model for complex type ${complexType.name}: ${complexType.description}")
         ArrayList<Element> elements = []
         def baseModel = ""
@@ -102,7 +151,7 @@ class XSDImporter {
             model = addClassifications(model)
             modelsCreated.add(model)
 
-            if (complexType?.restriction) (elements, baseModel) = getRestrictionDetails(complexType.restriction, complexType.name)
+            if (complexType?.restriction) (elements, baseModel) = getRestrictionDetails(complexType.restriction)
 
             if (complexType?.sequence) elements = addElements(elements, getElementsFromSequence(complexType.sequence))
 
@@ -124,17 +173,17 @@ class XSDImporter {
                 if (element.dataElement) {
                     def relationship = model.addToContains(element.dataElement)
                     element.metadata.each { metadata ->
-                        relationship.ext.put(metadata.key, metadata.value)
+                        relationship.ext.put(metadata.key, metadata.value?.toString())
                     }
                 } else if (element.model) {
                     def relationship = model.addToParentOf(element.model)
                     element.metadata.each { metadata ->
-                        relationship.ext.put(metadata.key, metadata.value)
+                        relationship.ext.put(metadata.key, metadata.value?.toString())
                     }
                 }
             }
 
-            model.status = PublishedElementStatus.DRAFT
+            model.status = PublishedElementStatus.PENDING
 
         }
         return model
@@ -169,39 +218,32 @@ class XSDImporter {
     }
 
     Model findModel(String name) {
-        def models, model
-        models = Model.findAllByName(name)
-        models.each { Model md ->
-            classifications.each { Classification classification ->
-                if (md.classifications.contains(classification)) model = md
-            }
+        def models = Model.executeQuery("""
+            select m from Model m left join m.classifications c
+            where m.name = :name and c in :classifications
+            group by m
+        """, [name: name, classifications: classifications])
+        if (models) {
+            return models[0]
         }
-        model
     }
 
-    protected ValueDomain findValueDomain(String name, DataType dataType = null, String fixed = null) {
+    protected ValueDomain findValueDomain(String name, DataType dataType = null, String rule = null) {
         List<ValueDomain> valueDomains = ValueDomain.findAllByNameOrNameIlike(name, "$name (in %)")
 
         for (ValueDomain domain in valueDomains) {
             if (dataType && domain.dataType == dataType) {
-                if (conceptualDomains.intersect(domain.conceptualDomains)) {
-//                    if (!fixed) {
-//                        return domain
-//                    } else if (domain.rule.contains(fixedRule(fixed))) {
+                if (conceptualDomains.intersect(domain.conceptualDomains) && domain.rule == rule) {
                         return domain
-//                    }
                 }
             } else if (!dataType) {
-                if (conceptualDomains.intersect(domain.conceptualDomains)) {
-//                    if (!fixed) {
-//                        return domain
-//                    } else if (domain.rule.contains(fixedRule(fixed))) {
+                if (conceptualDomains.intersect(domain.conceptualDomains) && domain.rule == rule) {
                         return domain
-//                    }
                 }
             }
 
         }
+
         return null
     }
 
@@ -357,32 +399,38 @@ class XSDImporter {
     }
 
     protected getElementsFromXsdElement(ArrayList<Element> elements, XsdElement el) {
-        def complexType
-        if (el.type) complexType = inXsdComplexTypes(el.type)
+        if (el.type) {
+            Model complexType = findModel(el.type)
 
-        if (complexType) {
-            def metadata = [:]
-            if (el?.minOccurs) metadata.put("Min Occurs", el.minOccurs)
-            if (el?.maxOccurs) metadata.put("Max Occurs", el.maxOccurs)
-            elements = addElement(elements, createElementModelFromXSDComplexElement(complexType, el, metadata))
-        } else {
-            complexType = findModel(el.type)
+            if (!complexType) {
+                XsdComplexType type = inXsdComplexTypes(el.type)
+                if (type) {
+                    complexType = matchOrCreateModel(type)
+                }
+            }
+
             if (complexType) {
-                def metadata = [:]
-                if (el?.minOccurs) metadata.put("Min Occurs", el.minOccurs)
-                if (el?.maxOccurs) metadata.put("Max Occurs", el.maxOccurs)
-                elements = addElement(elements, createElementModelFromXSDComplexElement(complexType, el, metadata))
-            } else {
-                elements = addElement(elements, createElementFromXSDElement(el))
+                return addElement(elements, createElementModelFromXSDComplexElement(complexType, el, [
+                        Name        : el.name,
+                        "Min Occurs": el.minOccurs,
+                        "Max Occurs": el.maxOccurs,
+
+                ]))
             }
         }
+        if (el.complexType) {
+            return addElement(elements, createElementModelFromXSDComplexElement(el.complexType, el, [
+                    Name        : el.name,
+                    "Max Occurs": el.maxOccurs,
+                    "Min Occurs": el.minOccurs
+            ]))
 
-        return elements
+        }
+        return addElement(elements, createElementFromXSDElement(el))
     }
 
-    protected inXsdComplexTypes(String type) {
-        XsdComplexType complexType = complexDataTypes.find { it.name == type }
-        return complexType
+    protected XsdComplexType inXsdComplexTypes(String type) {
+        complexDataTypesByName[type]
     }
 
     protected getElementsFromAttributes(ArrayList<XsdAttribute> attributes) {
@@ -398,30 +446,11 @@ class XSDImporter {
     }
 
     protected Element createElementModelFromXSDComplexElement(XsdComplexType complexType, XsdElement el, Map metadata = [:]) {
-        Model oldModel = matchOrCreateModel(complexType)
-        Model newModel = new Model(name: el.name, description: el.description).save()
-        modelsCreated.add(newModel)
-        if (oldModel?.status == PublishedElementStatus.UPDATED) circularModels.add(newModel)
-        newModel = addClassifications(newModel)
-        newModel = copyRelations(newModel, oldModel)
-        newModel.addToIsBasedOn(oldModel)
-        def element = new Element()
-        element.model = newModel
-        element.metadata = metadata
-        return element
+        new Element(model: matchOrCreateModel(complexType), metadata: metadata + [Name: el.name])
     }
 
-    protected Element createElementModelFromXSDComplexElement(Model oldModel, XsdElement el, Map metadata = [:]) {
-
-        Model newModel = new Model(name: el.name, description: el.description).save()
-        modelsCreated.add(newModel)
-        newModel = addClassifications(newModel)
-        newModel = copyRelations(newModel, oldModel)
-        newModel.addToIsBasedOn(oldModel)
-        def element = new Element()
-        element.model = newModel
-        element.metadata = metadata
-        return element
+    protected Element createElementModelFromXSDComplexElement(Model mode, XsdElement el, Map metadata) {
+        new Element(model: mode, metadata: metadata + [Name: el.name])
     }
 
 
@@ -430,16 +459,24 @@ class XSDImporter {
         for (Relationship r in oldModel.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession' || r.relationshipType.name == 'base' || r.relationshipType.name == 'hierarchy') continue
             def newR = relationshipService.link(r.source, newModel, r.relationshipType)
-            r.ext.each { key, value ->
-                newR.ext.put(key, value)
+            if (newR.hasErrors()) {
+                log.error("ERROR copying relationships: $newR.errors")
+            } else {
+                r.ext.each { key, value ->
+                    newR.ext.put(key, value)
+                }
             }
         }
 
         for (Relationship r in oldModel.outgoingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession' || r.relationshipType.name == 'base') continue
             def newR = relationshipService.link(newModel, r.destination, r.relationshipType)
-            r.ext.each { key, value ->
-                newR.ext.put(key, value)
+            if (newR.hasErrors()) {
+                log.error("ERROR copying relationships: $newR.errors")
+            } else {
+                r.ext.each { key, value ->
+                    newR.ext.put(key, value)
+                }
             }
         }
 
@@ -447,63 +484,124 @@ class XSDImporter {
     }
 
 
-    protected createElementFromXSDComplexElement(XsdComplexType complexType, Map metadata = [:]) {
-        def model = matchOrCreateModel(complexType)
-        def element = new Element()
-        element.model = model
-        element.metadata = metadata
-        return element
+    protected createElementFromXSDElement(XsdElement xsdElement) {
+        DataElement dataElement = matchOrCreateDataElement(xsdElement.name, matchOrCreateValueDomain(xsdElement), (xsdElement.description) ?: xsdElement.section + "." + xsdElement.name)
+
+
+        new Element(dataElement: dataElement, metadata: [
+                "Type":         "xs:element",
+                 Name:           xsdElement.name,
+                "Min Occurs":    xsdElement?.minOccurs,
+                "Max Occurs":    xsdElement?.maxOccurs
+        ])
     }
 
+    protected matchOrCreateDataElement(String name, ValueDomain domain, String description = null) {
+        DataElement dataElement = findDataElement(name, domain)
 
-    protected createElementFromXSDElement(XsdElement xsdElement) {
-        Element element = new Element()
-        ValueDomain valueDomain
-        def description = (xsdElement.description) ?: xsdElement.section + "." + xsdElement.name
-        DataElement dataElement = new DataElement(name: xsdElement.name, description: description)
-        dataElement = addClassifications(dataElement)
-        if (xsdElement?.type) valueDomain = findValueDomain(xsdElement.type)
-        else if (xsdElement?.simpleType) valueDomain = matchOrCreateValueDomain(xsdElement.simpleType)
-        dataElement.valueDomain = valueDomain
-        dataElement.save()
-        def metadata = ["Type": "xs:element"]
-        if (xsdElement?.minOccurs) metadata.put("Min Occurs", xsdElement.minOccurs)
-        if (xsdElement?.maxOccurs) metadata.put("Max Occurs", xsdElement.maxOccurs)
-        element.metadata = metadata
-        element.dataElement = dataElement
-        return element
+        if (!dataElement) {
+            dataElement = new DataElement(name: name, description: description, valueDomain: domain, status: PublishedElementStatus.PENDING)
+            dataElement = addClassifications(dataElement)
+            elementsCreated << dataElement.save()
+        }
+
+        dataElement
+    }
+
+    protected DataElement findDataElement(String name, ValueDomain domain) {
+        def elements
+
+        if (domain) {
+            elements = DataElement.executeQuery("""
+                select de from DataElement de left join de.classifications c
+                where de.name = :name and de.valueDomain = :domain and c in :classifications
+                group by de
+            """, [name: name, domain: domain, classifications: classifications])
+        } else {
+            elements = DataElement.executeQuery("""
+                select de from DataElement de left join de.classifications c
+                where de.name = :name and de.valueDomain is null and c in :classifications
+                group by de
+            """, [name: name, classifications: classifications])
+        }
+
+        if (elements) {
+            return elements[0]
+        }
+    }
+
+    protected ValueDomain matchOrCreateValueDomain(XsdElement xsdElement) {
+        if (!xsdElement)            return null
+        if (xsdElement.simpleType)  return matchOrCreateValueDomain(xsdElement.simpleType)
+        if (xsdElement.type) {
+            ValueDomain domain = findValueDomain(xsdElement.type)
+
+            if (domain)             return domain
+
+            XsdSimpleType simpleType = simpleDataTypesByName[xsdElement.type]
+
+            if (simpleType)         return matchOrCreateValueDomain(simpleType)
+        }
+                                    return null
+    }
+
+    protected ValueDomain matchOrCreateValueDomain(XsdAttribute attribute) {
+        if (!attribute)             return null
+        if (attribute.simpleType)   return matchOrCreateValueDomain(attribute.simpleType)
+        if (attribute.type) {
+            ValueDomain domain = findValueDomain(attribute.type)
+
+            if (domain)             return domain
+
+            XsdSimpleType simpleType = simpleDataTypesByName[attribute.type]
+
+            if (simpleType)         return matchOrCreateValueDomain(simpleType)
+        }
     }
 
     protected createElementFromAttribute(XsdAttribute attribute) {
+        if (!attribute) return null
 
-        Element element = new Element()
-        ValueDomain valueDomain
-        def description = (attribute.description) ?: attribute.section + "." + attribute.name
-        DataElement dataElement = new DataElement(name: attribute.name, description: description).save()
-        dataElement = addClassifications(dataElement)
-        if (attribute?.defaultValue) dataElement.ext.put("defaultValue", attribute.defaultValue)
-        if (attribute?.fixed) dataElement.ext.put("fixed", attribute.fixed)
-        if (attribute?.id) dataElement.ext.put("id", attribute.id)
-        if (attribute?.form) dataElement.ext.put("defaultValue", attribute.form)
-        if (attribute?.ref) dataElement.ext.put("defaultValue", attribute.ref)
-        if (attribute?.type) valueDomain = findValueDomain(attribute.type)
-        else if (attribute?.simpleType) valueDomain = matchOrCreateValueDomain(attribute.simpleType, attribute.fixed)
-        dataElement.valueDomain = valueDomain
-        dataElement.save()
-        def metadata = ["Type": "xs:attribute"]
-        if (attribute?.use) metadata.put("use", attribute.use)
-        element.metadata = metadata
-        element.dataElement = dataElement
-        return element
+        DataElement dataElement = matchOrCreateDataElement(attribute.name,  matchOrCreateValueDomain(attribute), attribute.description ?: attribute.section + "." + attribute.name)
+
+        def metadata = [
+                Type:               XS_ATTRIBUTE,
+                Name:               attribute.name,
+                Form:               attribute.form,
+                ID:                 attribute.id,
+                Fixed:              attribute.fixed,
+                Default:            attribute.defaultValue,
+                Ref:                attribute.ref,
+        ]
+
+        switch (attribute.use) {
+            case 'required':
+                metadata["Min Occurs"] = 1
+                metadata["Max Occurs"] = 1
+            break;
+            case 'prohibited':
+                metadata["Min Occurs"] = 0
+                metadata["Max Occurs"] = 0
+            break;
+            case 'optional':
+                metadata["Min Occurs"] = 0
+                metadata["Max Occurs"] = 1
+            break;
+        }
+
+        new Element(dataElement: dataElement, metadata: metadata)
 
     }
 
-    protected ValueDomain matchOrCreateValueDomain(XsdSimpleType simpleDataType, String fixed = null) {
+    protected ValueDomain matchOrCreateValueDomain(XsdSimpleType simpleDataType) {
+        if (!simpleDataType) {
+            return null
+        }
         log.info("Processing value domain for simple type ${simpleDataType.name}: ${simpleDataType.description}")
         def (dataType, rule, baseValueDomain) = getRestrictionDetails(simpleDataType.restriction, simpleDataType.name)
-        def valueDomain = findValueDomain(simpleDataType.name, dataType, fixed)
+        def valueDomain = findValueDomain(simpleDataType.name, dataType, rule)
         if (!valueDomain) {
-            valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: fixed ? fixedRule(fixed) : rule).save(flush: true, failOnError: true)
+            valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: rule).save(flush: true, failOnError: true)
             valueDomain.addToConceptualDomains(conceptualDomains.first())
 
             if (baseValueDomain) valueDomain.addToIsBasedOn(baseValueDomain)
@@ -528,18 +626,13 @@ class XSDImporter {
         } else if (base) {
             baseValueDomain = findValueDomain(base)
             if (!baseValueDomain) {
-                XsdSimpleType foundSimpleDataType = simpleDataTypes.find { it.name == base }
+                XsdSimpleType foundSimpleDataType = simpleDataTypesByName[base]
                 if (foundSimpleDataType) baseValueDomain = matchOrCreateValueDomain(foundSimpleDataType)
             }
             if (!baseValueDomain) {
                 throw new Exception('imported Simple Type base [ ' + base + ' ] does not exist in the schema or in the system, please validate you schema or import the schema it is dependant on')
             }
             dataType = baseValueDomain.dataType
-            if (rule && baseValueDomain.rule) {
-                rule = addToRule(baseValueDomain.rule, rule)
-            } else if (!rule && baseValueDomain.rule) {
-                rule = baseValueDomain.rule
-            }
         }
 
         if (restriction?.enumeration) dataType = createOrMatchEnumeratedType(simpleTypeName, restriction.enumeration)
@@ -645,10 +738,6 @@ class XSDImporter {
         }
         return enumerations
     }
-//
-//    protected static fixedRule(String fixed) {
-//        "fixed('${fixed.replaceAll("'","\\\\'")}')"
-//    }
 
 }
 
@@ -657,5 +746,14 @@ class Element {
     DataElement dataElement
     Model model
     Map metadata
+
+
+    void setMetadata(Map metadata) {
+        if (metadata) {
+            this.metadata = metadata.findAll { it.value }
+        } else {
+            this.metadata = [:]
+        }
+    }
 
 }

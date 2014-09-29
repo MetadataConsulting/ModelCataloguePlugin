@@ -1,14 +1,14 @@
 package org.modelcatalogue.core.dataarchitect
 
-import grails.transaction.Transactional
 import groovy.xml.QName
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.dataarchitect.xsd.*
 
 
-@Transactional
 class XSDImportService {
 
+    static transactional = false
+    
     def relationshipService
 
     def getClassifications(XsdSchema schema, String classificationName, Collection<QName> namespaces, String description) {
