@@ -229,7 +229,7 @@ class DataArchitectService {
                 left join de.incomingRelationships re
 
             where
-                d.name in (select d.name from DataType d group by d.name having count(d.name) > 1)
+                d.name in (select d.name from DataType d group by d.name having count(d.name) > 1 and name not like '%(in %)')
             and
                 re.relationshipType = :containment
 
