@@ -888,8 +888,8 @@ class DataImportService {
                         vd = importValueDomain(name, description, null, "", cd)
                         //Add union of relationships
                         valueDomains.each {ValueDomain valueDomain ->
-                            vd.addToUnionOf(valueDomain)
-                            valueDomain.addToUnionOf(vd)
+                            vd.addToIsBaseFor(valueDomain)
+                            valueDomain.addToIsBaseFor(vd)
                             vd.save()
                             valueDomain.save()
                         }

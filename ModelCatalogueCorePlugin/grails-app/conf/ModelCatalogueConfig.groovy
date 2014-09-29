@@ -137,15 +137,13 @@ modelcatalogue.defaults.relationshiptypes =  [
             
             return true
         '''],
-        [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement],
+        [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"],
         [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
         [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
         [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
         [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: DataElement, destinationClass: DataElement, bidirectional: true],
-        [name: "union", sourceToDestination: "is union of", destinationToSource: "is united in", sourceClass: CatalogueElement, destinationClass: CatalogueElement]
-
 ]
 
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements

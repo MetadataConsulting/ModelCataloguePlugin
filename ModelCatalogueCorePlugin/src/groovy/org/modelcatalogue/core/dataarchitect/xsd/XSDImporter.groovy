@@ -163,7 +163,7 @@ class XSDImporter {
     protected addUnions(ValueDomain valueDomain, XsdUnion union) {
         union.simpleTypes.each { simpleDataType ->
             def unionValueDomain = matchOrCreateValueDomain(simpleDataType)
-            unionValueDomain.addToIsUnitedIn(valueDomain)
+            unionValueDomain.addToIsBasedOn(valueDomain)
         }
         valueDomain
     }

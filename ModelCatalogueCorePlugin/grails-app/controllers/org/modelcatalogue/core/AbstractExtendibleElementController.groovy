@@ -43,7 +43,7 @@ class AbstractExtendibleElementController<T> extends AbstractCatalogueElementCon
         T helper = createResource(oldProps)
 
         def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
-        def excludeParams = ['ext', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations', 'basedOn', 'unitedIn', 'isBaseFor', 'unionOf']
+        def excludeParams = ['ext', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations', 'basedOn', 'isBaseFor']
         excludeParams.addAll(relationshipDirections)
 
         switch(response.format){

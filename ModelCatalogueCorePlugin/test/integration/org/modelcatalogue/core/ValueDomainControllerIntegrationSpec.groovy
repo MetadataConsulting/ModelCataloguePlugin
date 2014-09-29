@@ -100,12 +100,26 @@ class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementCont
 
     @Override
     ValueDomain getLoadItem() {
-        ValueDomain.findByName("value domain test3")
+        ValueDomain domain = ValueDomain.findByName("school subject")
+
+        domain.addToConceptualDomains(conceptualDomain)
+        conceptualDomain.addToValueDomains(domain)
+
+        domain
     }
 
     @Override
     ValueDomain getAnotherLoadItem() {
-        ValueDomain.findByName("value domain test4")
+        ValueDomain domain = ValueDomain.findByName("school subject2")
+
+        domain.addToConceptualDomains(conceptualDomain)
+        conceptualDomain.addToValueDomains(domain)
+
+        domain
+    }
+
+    ConceptualDomain getConceptualDomain() {
+        ConceptualDomain.findByName('cdtest1')
     }
 
     @Override
