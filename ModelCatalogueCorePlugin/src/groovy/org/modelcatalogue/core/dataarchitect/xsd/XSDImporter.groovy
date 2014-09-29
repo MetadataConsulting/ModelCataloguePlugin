@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.dataarchitect.xsd
 
+import groovy.util.logging.Log4j
 import groovy.xml.QName
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.ListWithTotal
@@ -7,6 +8,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 import static org.modelcatalogue.core.EnumeratedType.quote
 
+@Log4j
 class XSDImporter {
 
     Collection<XsdSimpleType> simpleDataTypes
@@ -24,8 +26,12 @@ class XSDImporter {
     ArrayList<Model> modelsCreated = []
 
     def createAll() {
+        log.info("Processing ${schema.targetNamespace} STARTED")
+        log.info("Processing simple types")
         createValueDomainsAndDataTypes()
+        log.info("Processing complex types")
         createModelsAndElements()
+        log.info("Processing ${schema.targetNamespace} FINISHED")
     }
 
     def createValueDomainsAndDataTypes() {
@@ -86,6 +92,7 @@ class XSDImporter {
     }
 
     def matchOrCreateModel(XsdComplexType complexType) {
+        log.info("Processing model for complex type ${complexType.name}: ${complexType.description}")
         ArrayList<Element> elements = []
         def baseModel = ""
         def model = findModel(complexType.name)
@@ -172,17 +179,25 @@ class XSDImporter {
         model
     }
 
-    protected ValueDomain findValueDomain(String name, DataType dataType = null) {
+    protected ValueDomain findValueDomain(String name, DataType dataType = null, String fixed = null) {
         List<ValueDomain> valueDomains = ValueDomain.findAllByNameOrNameIlike(name, "$name (in %)")
 
         for (ValueDomain domain in valueDomains) {
             if (dataType && domain.dataType == dataType) {
                 if (conceptualDomains.intersect(domain.conceptualDomains)) {
-                    return domain
+//                    if (!fixed) {
+//                        return domain
+//                    } else if (domain.rule.contains(fixedRule(fixed))) {
+                        return domain
+//                    }
                 }
             } else if (!dataType) {
                 if (conceptualDomains.intersect(domain.conceptualDomains)) {
-                    return domain
+//                    if (!fixed) {
+//                        return domain
+//                    } else if (domain.rule.contains(fixedRule(fixed))) {
+                        return domain
+//                    }
                 }
             }
 
@@ -472,7 +487,7 @@ class XSDImporter {
         if (attribute?.form) dataElement.ext.put("defaultValue", attribute.form)
         if (attribute?.ref) dataElement.ext.put("defaultValue", attribute.ref)
         if (attribute?.type) valueDomain = findValueDomain(attribute.type)
-        else if (attribute?.simpleType) valueDomain = matchOrCreateValueDomain(attribute.simpleType)
+        else if (attribute?.simpleType) valueDomain = matchOrCreateValueDomain(attribute.simpleType, attribute.fixed)
         dataElement.valueDomain = valueDomain
         dataElement.save()
         def metadata = ["Type": "xs:attribute"]
@@ -483,11 +498,12 @@ class XSDImporter {
 
     }
 
-    protected ValueDomain matchOrCreateValueDomain(XsdSimpleType simpleDataType) {
+    protected ValueDomain matchOrCreateValueDomain(XsdSimpleType simpleDataType, String fixed = null) {
+        log.info("Processing value domain for simple type ${simpleDataType.name}: ${simpleDataType.description}")
         def (dataType, rule, baseValueDomain) = getRestrictionDetails(simpleDataType.restriction, simpleDataType.name)
-        def valueDomain = findValueDomain(simpleDataType.name, dataType)
+        def valueDomain = findValueDomain(simpleDataType.name, dataType, fixed)
         if (!valueDomain) {
-            valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: rule).save(flush: true, failOnError: true)
+            valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: fixed ? fixedRule(fixed) : rule).save(flush: true, failOnError: true)
             valueDomain.addToConceptualDomains(conceptualDomains.first())
 
             if (baseValueDomain) valueDomain.addToIsBasedOn(baseValueDomain)
@@ -502,7 +518,7 @@ class XSDImporter {
     protected getRestrictionDetails(XsdRestriction restriction, String simpleTypeName) {
 
         DataType dataType = null
-        String rule = getRuleFromPattern(restriction)
+        String rule = getRuleFromRestrictions(restriction)
         String base = restriction?.base
         ValueDomain baseValueDomain = null
 
@@ -520,7 +536,7 @@ class XSDImporter {
             }
             dataType = baseValueDomain.dataType
             if (rule && baseValueDomain.rule) {
-                rule = addToRule(rule, baseValueDomain.rule)
+                rule = addToRule(baseValueDomain.rule, rule)
             } else if (!rule && baseValueDomain.rule) {
                 rule = baseValueDomain.rule
             }
@@ -532,11 +548,47 @@ class XSDImporter {
     }
 
 
-    protected static String getRuleFromPattern(XsdRestriction restriction) {
-        if (!restriction || !restriction.patterns) return null
-        restriction.patterns.inject("") { String rule, XsdPattern pattern ->
-            addToRule(rule, "x ==~ /" + pattern.value + "/")
+    protected static String getRuleFromRestrictions(XsdRestriction restriction) {
+        if (!restriction) {
+            return null
         }
+        String rule = ""
+
+        if (!(restriction.length in ["", null])) {
+            rule = addToRule(rule, "length($restriction.length)")
+        }
+
+        if (!(restriction.minLength in ["", null])) {
+            rule = addToRule(rule, "minLength($restriction.minLength)")
+        }
+
+        if (!(restriction.maxLength in ["", null])) {
+            rule = addToRule(rule, "maxLength($restriction.maxLength)")
+        }
+
+        if (!(restriction.minInclusive in ["", null])) {
+            rule = addToRule(rule, "minInclusive($restriction.minInclusive)")
+        }
+
+        if (!(restriction.minExclusive in ["", null])) {
+            rule = addToRule(rule, "minExclusive($restriction.minExclusive)")
+        }
+
+        if (!(restriction.maxInclusive in ["", null])) {
+            rule = addToRule(rule, "maxInclusive($restriction.maxInclusive)")
+        }
+
+        if (!(restriction.maxExclusive in ["", null])) {
+            rule = addToRule(rule, "maxExclusive($restriction.maxExclusive)")
+        }
+
+        String composedPatterns = restriction?.patterns?.inject(rule) { String acc, XsdPattern pattern ->
+            addToRule(acc, "x ==~ /" + pattern.value + "/")
+        }
+        if (rule || composedPatterns) {
+            rule = addToRule(rule, composedPatterns)
+        }
+        rule ?: null
     }
 
     protected static String addToRule(String rule1, String rule2) {
@@ -586,6 +638,10 @@ class XSDImporter {
         }
         return enumerations
     }
+//
+//    protected static fixedRule(String fixed) {
+//        "fixed('${fixed.replaceAll("'","\\\\'")}')"
+//    }
 
 }
 

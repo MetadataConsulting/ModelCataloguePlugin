@@ -38,7 +38,7 @@ class ValueDomainSpec extends Specification {
         true  | [name: "e", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
         true  | [name: "ground_speed1", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
         false | [name: "ground_speed2", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "x" * 2001, dataType: new DataType(name: "Float")]
-        false | [name: "ground_speed3", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "x" * 501, description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
+        false | [name: "ground_speed3", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "x" * 10001, description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         false | [name: "ground_speed4", unitOfMeasure: "x" * 256, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         false | [name: "x" * 256, unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         true  | [name: "ground_speed6", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
@@ -128,6 +128,23 @@ class ValueDomainSpec extends Specification {
         rule        | x
         "x > 10"    | 20
         "x ==~ /(?i)google/ || x ==~/g01gle/" |  "g01gle"
+    }
+
+
+    def "uses enum type enum constants for validation"() {
+        ValueDomain domain = new ValueDomain(dataType: new EnumeratedType(enumerations: [one: '1', two: '2']), regexDef: /[a-z]{3}/)
+
+        expect:
+        domain.validateRule(value) == result
+
+
+        where:
+        result  | value
+        true    | 'one'
+        true    | 'two'
+        false   | 'six'
+        false   | 'blah'
+
     }
 
 }

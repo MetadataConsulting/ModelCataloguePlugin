@@ -300,7 +300,7 @@ class PublishedElementService {
                 continue
             }
 
-            Relationship existing = destination.outgoingRelationships.find { it.destination.name - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX == rel.destination.name - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX && it.relationshipType == rel.relationshipType }
+            Relationship existing = destination.outgoingRelationships.find { it.destination.name == rel.destination.name && it.relationshipType == rel.relationshipType }
 
             if (existing) {
                 if (rel.destination instanceof PublishedElement && existing.destination instanceof PublishedElement && rel.destination.class == existing.destination.class && existing.destination != destination) {
@@ -335,7 +335,7 @@ class PublishedElementService {
                 continue
             }
 
-            Relationship existing = destination.incomingRelationships.find { it.source.name - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX== rel.source.name - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX && it.relationshipType == rel.relationshipType }
+            Relationship existing = destination.incomingRelationships.find { it.source.name == rel.source.name && it.relationshipType == rel.relationshipType }
 
             if (existing) {
                 if (rel.source instanceof PublishedElement && existing.source instanceof PublishedElement && rel.source.class == existing.source.class && existing.source != destination) {
@@ -398,7 +398,7 @@ class PublishedElementService {
 
         for (Object[] row in results) {
             def info = models[row[0] as Long]
-            info.name = row[1] - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX
+            info.name = row[1]
             if (row[2] == 'containment') {
                 info.elementNames << row[3].toString()
                 info.elementNamesSize = info.elementNames.size()

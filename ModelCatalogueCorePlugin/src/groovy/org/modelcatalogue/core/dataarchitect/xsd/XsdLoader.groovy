@@ -9,7 +9,6 @@ import org.modelcatalogue.core.DataType
 
 class XsdLoader {
 
-    public static final String ABSTRACT_COMPLEX_TYPE_SUFFIX = "_abstract_complexType"
     String logErrors =""
     ArrayList<XsdAttribute> allAttributes = []
     ArrayList<XsdElement> allElements = []
@@ -383,7 +382,7 @@ class XsdLoader {
         }
 
 
-        if (dataTypeName=="") dataTypeName = elementName + ABSTRACT_COMPLEX_TYPE_SUFFIX
+        if (dataTypeName=="") dataTypeName = elementName
 
         def values = node.value()
         values.eachWithIndex{ Node valueNode, int valueNodeIndex ->

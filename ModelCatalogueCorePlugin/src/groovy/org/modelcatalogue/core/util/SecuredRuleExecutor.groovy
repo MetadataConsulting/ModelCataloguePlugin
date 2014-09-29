@@ -9,7 +9,7 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.syntax.Types
 
-class SecuredRuleExecutor {
+class SecuredRuleExecutor<S extends Script> {
 
     static class ValidationResult {
 
@@ -30,10 +30,10 @@ class SecuredRuleExecutor {
         }
     }
 
-    static class ReusableScript {
-        final Script script
+    static class ReusableScript<RS extends Script> {
+        final RS script
 
-        ReusableScript(Script script) {
+        ReusableScript(RS script) {
             this.script = script
         }
 
@@ -49,31 +49,32 @@ class SecuredRuleExecutor {
 
     private final Binding binding
     private final GroovyShell shell
-    private final Class<? extends Script> baseScriptClass
+    private final Class<S> baseScriptClass
 
     SecuredRuleExecutor(Binding binding) {
-        this(Script.class, binding)
+        this.binding            = binding
+        this.baseScriptClass    = Script.class
+        this.shell              = createShell(binding)
     }
 
-    SecuredRuleExecutor(Class<? extends Script> baseScriptClass, Binding binding) {
+    SecuredRuleExecutor(Class<S> baseScriptClass, Binding binding) {
         this.binding            = binding
-        this.shell              = createShell(binding)
         this.baseScriptClass    = baseScriptClass
+        this.shell              = createShell(binding)
     }
 
     private createShell(Binding binding) {
         CompilerConfiguration configuration = new CompilerConfiguration()
 
-        ImportCustomizer importCustomizer = new ImportCustomizer().addStaticStars('java.lang.Math')
+        ImportCustomizer importCustomizer = new ImportCustomizer().addStaticStars(Math.name)
 
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
         secureASTCustomizer.with {
             packageAllowed = false
-            importsWhitelist = []
-            staticImportsWhitelist = []
-            staticStarImportsWhitelist = ['java.lang.Math']
-            indirectImportCheckEnabled = true
-
+            importsWhitelist = withBaseScript(Object)
+            starImportsWhitelist = withBaseScript(Object)
+            staticImportsWhitelist = withBaseScript(Object)
+            staticStarImportsWhitelist = withBaseScript(Math, Object)
         }
 
         secureASTCustomizer.addExpressionCheckers(new SecureASTCustomizer.ExpressionChecker() {
@@ -90,6 +91,8 @@ class SecuredRuleExecutor {
                     }
                 }
                 if (expression instanceof VariableExpression) {
+                    if (expression.name == 'this') return true
+                    if (baseScriptClass && expression.name in baseScriptClass.metaClass.properties*.name) return true
                     return expression.name in names
                 }
                 true
@@ -106,6 +109,15 @@ class SecuredRuleExecutor {
         new GroovyShell(getClass().getClassLoader(), binding, configuration)
     }
 
+    List<String> withBaseScript(Class... classes) {
+        List<Class> ret = []
+        ret.addAll(classes)
+        if (baseScriptClass) {
+            ret << baseScriptClass
+        }
+        ret*.name
+    }
+
     SecuredRuleExecutor(Map binding) {
         this(new Binding(binding))
     }
@@ -119,9 +131,9 @@ class SecuredRuleExecutor {
         }
     }
 
-    ReusableScript reuse(String scriptText) {
+    ReusableScript<S> reuse(String scriptText) {
         try {
-            return new ReusableScript(shell.parse(scriptText))
+            return new ReusableScript<S>((S) shell.parse(scriptText))
         } catch (CompilationFailedException ignored) {
             return null
         }

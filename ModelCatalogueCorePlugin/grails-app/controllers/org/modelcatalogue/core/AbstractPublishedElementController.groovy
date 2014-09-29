@@ -116,6 +116,40 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
         }
     }
 
+    @Transactional
+    def merge() {
+
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if(handleReadOnly()) {
+            return
+        }
+
+        T source = queryForResource(params.souce)
+        if (source == null) {
+            notFound()
+            return
+        }
+
+        T destination = queryForResource(params.destination)
+        if (destination == null) {
+            notFound()
+            return
+        }
+
+        T merged = publishedElementService.merge(source, destination)
+
+        if (merged.hasErrors()) {
+            respond merged.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        reportCapableRespond merged, [status: OK]
+    }
+
     /**
      * Archive element
      * @param id
@@ -173,16 +207,15 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
 
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(PublishedElement instance, Object objectToBind) {
-        if (objectToBind.classifications != null) {
-            for (classification in instance.classifications.findAll { !(it.id in objectToBind.classifications*.id) }) {
-                instance.removeFromClassifications classification
-                classification.removeFromClassifies instance
-            }
-            for (domain in objectToBind.classifications) {
-                Classification classification = Classification.get(domain.id as Long)
-                instance.addToClassifications classification
-                classification.addToClassifies instance
-            }
+        def classifications = objectToBind.classifications ?: []
+        for (classification in instance.classifications.findAll { !(it.id in classifications*.id) }) {
+            instance.removeFromClassifications classification
+            classification.removeFromClassifies instance
+        }
+        for (domain in classifications) {
+            Classification classification = Classification.get(domain.id as Long)
+            instance.addToClassifications classification
+            classification.addToClassifies instance
         }
     }
 

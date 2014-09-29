@@ -336,6 +336,60 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
+  actionsProvider.registerAction 'merge', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.status
+    return undefined if not security.hasRole('CURATOR')
+
+    action = {
+      position:   125
+      label:      'Merge'
+      icon:       'fa fa-code-fork fa-rotate-180 fa-flip-vertical'
+      type:       'danger'
+      action:     ->
+        messages.prompt("Merge #{$scope.element.getElementTypeName()} #{$scope.element.name} to another #{$scope.element.getElementTypeName()}", "All non-system relationships of the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be moved to the following destination and than the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived", {type: 'catalogue-element', resource: $scope.element.elementType}).then (destination)->
+          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/merge/#{destination.id}", method: 'POST')).then (merged) ->
+            merged.show()
+          , showErrorsUsingMessages(messages)
+    }
+
+    updateAction = ->
+      action.disabled = $scope.element.archived
+
+    $scope.$watch 'element.status', updateAction
+    $scope.$watch 'element.archived', updateAction
+    $rootScope.$on 'newVersionCreated', updateAction
+
+    action
+  ]
+
+  actionsProvider.registerChildAction 'finalize', 'finalize-tree', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+    return undefined if not $scope.element
+    return undefined if not $scope.element.isInstanceOf('model')
+    return undefined if not $scope.element.status
+    return undefined if not security.hasRole('CURATOR')
+
+    action = {
+      label:      'Finalize Tree'
+      type:       'primary'
+      action:     ->
+        messages.confirm("Finalize Model Tree", "Do you really want to finalize Model #{$scope.element.name} and and all its child models and elements?" ).then ->
+          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalizeTree", method: 'POST')).then (finalized) ->
+            finalized.show()
+          , showErrorsUsingMessages(messages)
+    }
+
+    updateAction = ->
+      action.disabled = $scope.element.archived or $scope.element?.status == 'FINALIZED'
+
+    $scope.$watch 'element.status', updateAction
+    $scope.$watch 'element.archived', updateAction
+    $rootScope.$on 'newVersionCreated', updateAction
+
+    action
+  ]
+
+
   actionsProvider.registerAction 'archive-batch', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if $scope.action
     return undefined if not $scope.batch

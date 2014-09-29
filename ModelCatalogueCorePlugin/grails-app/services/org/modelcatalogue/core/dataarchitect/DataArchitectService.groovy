@@ -239,7 +239,7 @@ class DataArchitectService {
         Map<Long, Set<String>> suggestions = new LinkedHashMap<Long, Set<String>>().withDefault { new TreeSet<String>() }
 
         for (row in results) {
-            suggestions[row[0]] << (row[1] - XsdLoader.ABSTRACT_COMPLEX_TYPE_SUFFIX)
+            suggestions[row[0]] << row[1]
         }
 
         Map<Long, String> ret = [:]
@@ -291,7 +291,7 @@ class DataArchitectService {
         Map<Long, String> suggestions = dataTypesNamesSuggestions()
         if (suggestions) {
             Batch renameBatch = Batch.findOrSaveByName("Rename Data Types and Value Domains")
-            suggestions.each { id, name ->
+            suggestions.findAll{ id, name -> name }.each { id, name ->
                 DataType type = DataType.get(id)
                 String originalName = type.name
                 String newName = "$originalName (in $name)"

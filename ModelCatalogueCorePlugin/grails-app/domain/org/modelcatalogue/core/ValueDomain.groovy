@@ -64,7 +64,7 @@ class ValueDomain extends ExtendibleElement  {
 		unitOfMeasure   nullable:true
         dataType        nullable: true
 
-		rule nullable:true, maxSize: 200, validator: { val,obj ->
+		rule nullable:true, maxSize: 10000, validator: { val,obj ->
             if(!val){return true}
             SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(x: null, domain: obj).validate(val)
             result ? true : ['wontCompile', result.compilationFailedMessage]
@@ -100,6 +100,11 @@ class ValueDomain extends ExtendibleElement  {
     }
 
     def validateRule(Object x) {
+        if (x && dataType instanceof EnumeratedType) {
+            if (!dataType.enumerations.keySet().contains(x.toString())) {
+                return false
+            }
+        }
         if (!rule) return true
         new SecuredRuleExecutor(x: x, domain: this).execute(rule)
     }
