@@ -6,6 +6,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.actions.MergePublishedElements
 import org.modelcatalogue.core.actions.UpdateCatalogueElement
+import org.modelcatalogue.core.actions.CreateRelationship
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.util.ListAndCount
@@ -282,8 +283,8 @@ class DataArchitectService {
             batch.save()
         }
 
-        Batch.findAllByNameIlike("Merge Model '%'").each reset
-        Batch.findAllByNameIlike("Merge Data Element '%'").each reset
+        Batch.findAllByNameIlike("Create Synonyms for Model '%'").each reset
+        Batch.findAllByNameIlike("Create Synonyms for Data Element '%'").each reset
 
         Batch.findAllByName("Rename Data Types and Value Domains").each reset
 
@@ -306,9 +307,13 @@ class DataArchitectService {
 
         publishedElementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
             DataElement dataElement = DataElement.get(destId)
-            Batch batch = Batch.findOrSaveByName("Merge Data Element '$dataElement.name'")
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Element '$dataElement.name'")
+            RelationshipType type = RelationshipType.findByName("synonym")
             sources.each { srcId ->
-                actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId", deep: true
+                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                if (action.errors) {
+                    log.warn "Error generating create synonym action: $action.errors"
+                }
             }
             batch.archived = false
             batch.save()
@@ -316,9 +321,13 @@ class DataArchitectService {
 
         publishedElementService.findDuplicateModelsSuggestions().each { destId, sources ->
             Model model = Model.get(destId)
-            Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for Model '$model.name'")
+            RelationshipType type = RelationshipType.findByName("synonym")
             sources.each { srcId ->
-                actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", deep: true
+                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                if (action.errors) {
+                    log.warn "Error generating create synonym action: $action.errors"
+                }
             }
             batch.archived = false
             batch.save()
