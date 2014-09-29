@@ -8,7 +8,7 @@ describe "mc.core.ui.catalogueElementProperties", ->
     catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Model.history', hidden: true
     catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Model.ext', label: 'Metadata'
     catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Model.contains', label: 'Data Elements', columns: [
-      {header: 'Name',            value: "ext.name || ext.Name || relation.name",   classes: 'col-md-2', show: "relation.show()"}
+      {header: 'Name',            value: "relation.name",   classes: 'col-md-2', show: "relation.show()"}
       {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-3', show: "relation.show()"}
     ]
     # it's additive, the last value wins

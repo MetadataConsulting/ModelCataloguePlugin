@@ -633,6 +633,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             </span>
           </h3>
           <h3 ng-hide="contained.element">No Selection</h3>
+          <h4 ng-show="contained.element.metadata.name || contained.element.metadata.Name" class="text-muted">{{contained.element.name}}</h4>
         </div>
       </div>
       <div class="row">
