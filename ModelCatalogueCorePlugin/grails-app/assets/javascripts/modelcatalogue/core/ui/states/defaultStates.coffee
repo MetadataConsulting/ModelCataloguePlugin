@@ -825,7 +825,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} <span ng-show="incompleteValueDomainsCount"> / <a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}">Incomplete </a> {{incompleteValueDomainsCount}}</span></div>
-                                        <div><a id="unusedValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'unused'})" ui-sref-opts="{inherit: false}">Unused</a> {{unusedValueDomainsCount}} / <a id="duplicateValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'duplicate'})" ui-sref-opts="{inherit: false}"> Duplicate</a> {{duplicateValueDomainsCount}}</div>
+                                        <div><a id="unusedValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'unused'})" ui-sref-opts="{inherit: false}">Unused Value Domains</a> {{unusedValueDomainsCount}}<!-- / <a id="duplicateValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'duplicate'})" ui-sref-opts="{inherit: false}"> Duplicate</a> {{duplicateValueDomainsCount}}--></div>
                                         <div><a ng-click="validate()">Validate</a> / <a ng-click="convert()">Convert</a></div>
                                     </div>
                                 </div>
