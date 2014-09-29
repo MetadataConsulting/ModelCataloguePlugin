@@ -106,6 +106,15 @@ class ValueDomain extends ExtendibleElement  {
                 return false
             }
         }
+        if (hasProperty('basedOn')) {
+            for (ValueDomain domain in basedOn) {
+                def result = domain.validateRule(x)
+                if (result && (!(result instanceof Boolean) || result.is(false))) {
+                    return result
+                }
+            }
+
+        }
         if (!rule) return true
         new SecuredRuleExecutor(ValueDomainRuleScript, new Binding(x: x, domain: this)).execute(rule)
     }

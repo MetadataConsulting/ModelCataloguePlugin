@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.test.mixin.Mock
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Created by adammilward on 05/02/2014.
@@ -98,7 +99,7 @@ class ValueDomainSpec extends Specification {
     def "check toString works"() {
 
         when:
-        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
+        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: [male: 'male', female: 'female', unknown:'unknown'])).save()
 
         then:
         a.toString() == "ValueDomain[id: 1, name: ground_speed]"
@@ -133,6 +134,26 @@ class ValueDomainSpec extends Specification {
 
     def "uses enum type enum constants for validation"() {
         ValueDomain domain = new ValueDomain(dataType: new EnumeratedType(enumerations: [one: '1', two: '2']), regexDef: /[a-z]{3}/)
+
+        expect:
+        domain.validateRule(value) == result
+
+
+        where:
+        result  | value
+        true    | 'one'
+        true    | 'two'
+        false   | 'six'
+        false   | 'blah'
+
+    }
+
+    @ConfineMetaClassChanges(ValueDomain)
+    def "uses base for validation"() {
+        ValueDomain domain = new ValueDomain(dataType: new EnumeratedType(enumerations: [one: '1', two: '2']), regexDef: /[a-z]{3}/)
+        ValueDomain other  = new ValueDomain()
+
+        other.metaClass.basedOn = [domain]
 
         expect:
         domain.validateRule(value) == result
