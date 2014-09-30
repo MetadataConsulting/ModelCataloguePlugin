@@ -155,6 +155,7 @@ class XsdLoader {
 
     def readElement(Node node, String section){
         String dataItemName=""
+        String dataItemRef=""
         String dataItemType = ""
         String dataItemMinOccurs = ""
         String dataItemMaxOccurs = ""
@@ -164,6 +165,9 @@ class XsdLoader {
         def attributes = node.attributes()
         attributes.eachWithIndex{ def attribute, int attributeIndex ->
             switch (attribute.key){
+                case "ref":
+                    dataItemRef = attribute.value
+                    break
                 case "name":
                     dataItemName = attribute.value
                     break
@@ -209,7 +213,7 @@ class XsdLoader {
         }
         def namespace = node.name()
         if(!(namespace instanceof QName)) namespace = new QName("no namespace", "no namespace")
-        XsdElement result = new XsdElement(name: dataItemName, description: dataItemDescription, type: dataItemType, minOccurs: dataItemMinOccurs, maxOccurs: dataItemMaxOccurs, section: section, simpleType: simpleType, complexType: complexDataType , namespace: namespace)
+        XsdElement result = new XsdElement(name: dataItemName, description: dataItemDescription, type: dataItemType, minOccurs: dataItemMinOccurs, maxOccurs: dataItemMaxOccurs, section: section, simpleType: simpleType, complexType: complexDataType , namespace: namespace, ref: dataItemRef)
         return result
     }
 
@@ -585,8 +589,8 @@ class XsdLoader {
                     break
             }
         }
-        XsdAttribute result = new XsdAttribute (name:name, defaultValue: defaultValue, fixed: fixed, form: form, id: id, ref: ref, type: type, use:use, description: description, simpleType: simpleType, section: elementName)
-        return result
+
+        return new XsdAttribute (name:name, defaultValue: defaultValue, fixed: fixed, form: form, id: id, ref: ref, type: type, use:use, description: description, simpleType: simpleType, section: elementName)
     }
 
 

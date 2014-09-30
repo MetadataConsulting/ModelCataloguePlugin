@@ -65,18 +65,18 @@ class XSDImporter {
         log.info("Publishing elements as DRAFT")
         for (DataElement element in elementsCreated) {
             element.status = PublishedElementStatus.DRAFT
-            element.save()
+            element.save(failOnError: true)
         }
 
         log.info("Publishing models as DRAFT")
         for (Model model in modelsCreated) {
             model.status = PublishedElementStatus.DRAFT
-            model.save()
+            model.save(failOnError: true)
         }
 
         if (containerModel) {
             containerModel.status = PublishedElementStatus.DRAFT
-            containerModel.save()
+            containerModel.save(failOnError: true)
         }
 
 
@@ -95,11 +95,11 @@ class XSDImporter {
 
         if (!containerModelName) containerModelName = classifications.first()?.name + " Complex Types"
         Classification typeClassification = Classification.findByNamespace(classifications.first()?.namespace + " Complex Types")
-        if (!typeClassification) typeClassification = new Classification(name: classifications.first()?.name + " Complex Types", namespace: classifications.first()?.namespace + " Complex Types").save()
+        if (!typeClassification) typeClassification = new Classification(name: classifications.first()?.name + " Complex Types", namespace: classifications.first()?.namespace + " Complex Types").save(failOnError: true)
         classifications.add(typeClassification)
 
         containerModel = findModel(containerModelName)
-        if (!containerModel) containerModel = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save()
+        if (!containerModel) containerModel = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save(failOnError: true)
         complexDataTypes.each { XsdComplexType complexType ->
             matchOrCreateModel(complexType)
         }
@@ -502,13 +502,17 @@ class XSDImporter {
         if (!dataElement) {
             dataElement = new DataElement(name: name, description: description, valueDomain: domain, status: PublishedElementStatus.PENDING)
             dataElement = addClassifications(dataElement)
-            elementsCreated << dataElement.save()
+            elementsCreated << dataElement.save(failOnError: true)
         }
 
         dataElement
     }
 
     protected DataElement findDataElement(String name, ValueDomain domain) {
+        if (!name) {
+            return null
+        }
+
         def elements
 
         if (domain) {

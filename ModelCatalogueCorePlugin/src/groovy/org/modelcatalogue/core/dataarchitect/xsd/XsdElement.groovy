@@ -8,6 +8,7 @@ import groovy.xml.QName
 
 class XsdElement {
     String name
+    String ref
     String description
     String type
     String section
