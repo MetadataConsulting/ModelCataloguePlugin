@@ -59,7 +59,7 @@ class XSDImportService {
         return conceptualDomains
     }
 
-    def createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationName, String conceptualDomainName, XsdSchema schema, Collection<QName> namespaces) {
+    def createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationName, String conceptualDomainName, XsdSchema schema, Collection<QName> namespaces, Boolean createModelsForElements = false) {
 
         try {
             Collection<Classification> classifications = []
@@ -85,13 +85,14 @@ class XSDImportService {
                 classifications.first().addToRelatedTo(conceptualDomains.first())
 
                 new XSDImporter(
-                        simpleDataTypes:    simpleDataTypes,
-                        complexDataTypes:   complexDataTypes,
-                        topLevelElements:   topLevelElements,
-                        classifications:    classifications,
-                        conceptualDomains:  conceptualDomains,
+                        simpleDataTypes:            simpleDataTypes,
+                        complexDataTypes:           complexDataTypes,
+                        topLevelElements:           topLevelElements,
+                        classifications:            classifications,
+                        conceptualDomains:          conceptualDomains,
+                        createModelsForElements:    createModelsForElements,
 
-                        relationshipService: relationshipService
+                        relationshipService:        relationshipService
                 ).createAll()
             }
 

@@ -13,6 +13,9 @@ class XSDImporter {
 
     static final String XS_ATTRIBUTE = "xs:attribute"
 
+    // -- options
+    Boolean createModelsForElements
+    // --
 
     Map<String,XsdSimpleType> simpleDataTypesByName = [:]
 
@@ -54,7 +57,8 @@ class XSDImporter {
     List<Model> modelsCreated = []
     List<DataElement> elementsCreated = []
 
-    Model containerModel
+    Model publicTypesContainer
+    Model rootElementsContainer
 
     def createAll() {
         log.info("Processing simple types")
@@ -74,9 +78,14 @@ class XSDImporter {
             model.save(failOnError: true)
         }
 
-        if (containerModel) {
-            containerModel.status = PublishedElementStatus.DRAFT
-            containerModel.save(failOnError: true)
+        if (publicTypesContainer) {
+            publicTypesContainer.status = PublishedElementStatus.DRAFT
+            publicTypesContainer.save(failOnError: true)
+        }
+
+        if (rootElementsContainer) {
+            rootElementsContainer.status = PublishedElementStatus.DRAFT
+            rootElementsContainer.save(failOnError: true)
         }
 
 
@@ -91,22 +100,30 @@ class XSDImporter {
 
     }
 
-    def createModelsAndElements(String containerModelName = "") {
+    def createModelsAndElements(String containerModelName = "", String rootElementsModelName = "") {
 
         if (!containerModelName) containerModelName = classifications.first()?.name + " Complex Types"
         Classification typeClassification = Classification.findByNamespace(classifications.first()?.namespace + " Complex Types")
         if (!typeClassification) typeClassification = new Classification(name: classifications.first()?.name + " Complex Types", namespace: classifications.first()?.namespace + " Complex Types").save(failOnError: true)
         classifications.add(typeClassification)
 
-        containerModel = findModel(containerModelName)
-        if (!containerModel) containerModel = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save(failOnError: true)
+        publicTypesContainer = findModel(containerModelName)
+        if (!publicTypesContainer) publicTypesContainer = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save(failOnError: true)
+
+        if (!createModelsForElements) {
+            if (!rootElementsModelName) rootElementsModelName = classifications.first()?.name + " Root Elements"
+            rootElementsContainer = findModel(rootElementsModelName)
+            if (!rootElementsContainer) rootElementsContainer = new Model(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save(failOnError: true)
+        }
+
+
         complexDataTypes.each { XsdComplexType complexType ->
             matchOrCreateModel(complexType)
         }
 
         modelsCreated.each { Model model ->
             if (!model.childOf) {
-                model.addToChildOf(containerModel)
+                model.addToChildOf(publicTypesContainer)
                 model.addToClassifications(typeClassification)
             }
         }
@@ -127,11 +144,25 @@ class XSDImporter {
             }
         }
 
-        containerModel = addClassifications(containerModel)
+        publicTypesContainer = addClassifications(publicTypesContainer)
+
+        if (rootElementsContainer) {
+            rootElementsContainer = addClassifications(rootElementsContainer)
+        }
+
 
         topLevelElements.each { XsdElement element ->
-            ArrayList<Element> elements = []
-            elements = getElementsFromXsdElement(elements, element)
+            ArrayList<Element> elements = getElementsFromXsdElement([], element)
+            if (rootElementsContainer) {
+                for (Element e in elements) {
+                    if (e.model) {
+                        Relationship rel = relationshipService.link(rootElementsContainer, e.model, RelationshipType.hierarchyType)
+                        if (!rel.hasErrors()) {
+                            rel.ext.Name = element.name
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -140,14 +171,15 @@ class XSDImporter {
         element
     }
 
-    Model matchOrCreateModel(XsdComplexType complexType) {
-        log.info("Processing model for complex type ${complexType.name}: ${complexType.description}")
+    Model matchOrCreateModel(XsdComplexType complexType, String elementName = null) {
+        String modelName = createModelsForElements && elementName ? elementName : complexType.name
+        log.info("Processing model for complex type ${modelName}: ${complexType?.description}")
         ArrayList<Element> elements = []
         def baseModel = ""
-        def model = findModel(complexType.name)
+        def model = findModel(modelName)
         if (!model) {
 
-            model = new Model(name: complexType.name, description: complexType.description, status: PublishedElementStatus.UPDATED).save(flush: true, failOnError: true)
+            model = new Model(name: modelName, description: complexType?.description, status: PublishedElementStatus.UPDATED).save(flush: true, failOnError: true)
             model = addClassifications(model)
             modelsCreated.add(model)
 
@@ -167,7 +199,7 @@ class XSDImporter {
                 elements = addElements(elements, getElementsFromModel(baseModel), true)
             }
 
-            if (complexType.attributes) elements = addElements(elements, getElementsFromAttributes(complexType.attributes))
+            if (complexType?.attributes) elements = addElements(elements, getElementsFromAttributes(complexType.attributes))
 
             elements.each { Element element ->
                 if (element.dataElement) {
@@ -217,12 +249,18 @@ class XSDImporter {
         valueDomain
     }
 
-    Model findModel(String name) {
-        def models = Model.executeQuery("""
+
+
+    List<Model> findModels(String name) {
+        Model.executeQuery("""
             select m from Model m left join m.classifications c
             where m.name = :name and c in :classifications
             group by m
         """, [name: name, classifications: classifications])
+    }
+
+    Model findModel(String name) {
+        List<Model> models = findModels(name)
         if (models) {
             return models[0]
         }
@@ -304,7 +342,7 @@ class XSDImporter {
         return elements
     }
 
-    protected ArrayList<Element> addElement(ArrayList<Element> elements, Element element, Boolean inherited = false) {
+    protected List<Element> addElement(ArrayList<Element> elements, Element element, Boolean inherited = false) {
         Element overrideElement
         if (element?.dataElement) overrideElement = elements.find {
             it?.dataElement && it?.dataElement.name == element?.dataElement.name
@@ -400,17 +438,46 @@ class XSDImporter {
 
     protected getElementsFromXsdElement(ArrayList<Element> elements, XsdElement el) {
         if (el.type) {
-            Model complexType = findModel(el.type)
+            Model complexType = !createModelsForElements ? findModel(el.type) : findModels(el.type).find {
+                it.ext.from != "xs:element"
+            }
 
             if (!complexType) {
                 XsdComplexType type = inXsdComplexTypes(el.type)
                 if (type) {
+                    // we
                     complexType = matchOrCreateModel(type)
                 }
             }
 
             if (complexType) {
+
+                if (createModelsForElements) {
+                    List<Model> models = findModels(el.name) ?: []
+                    Model model = models.find {
+                        complexType in it.isBasedOn
+                    }
+                    if (!model) {
+                        XsdComplexType type = inXsdComplexTypes(el.type)
+                        if (type) {
+                            model = matchOrCreateModel(type, el.name)
+                            model.addToIsBasedOn complexType
+                            model.ext.from = "xs:element"
+                        }
+                    }
+                    if (model) {
+                        return addElement(elements, createElementModelFromXSDComplexElement(model, el, [
+                                Type        : "xs:element",
+                                Name        : el.name,
+                                "Min Occurs": el.minOccurs,
+                                "Max Occurs": el.maxOccurs,
+
+                        ]))
+                    }
+                }
+
                 return addElement(elements, createElementModelFromXSDComplexElement(complexType, el, [
+                        Type        : "xs:element",
                         Name        : el.name,
                         "Min Occurs": el.minOccurs,
                         "Max Occurs": el.maxOccurs,
@@ -420,6 +487,7 @@ class XSDImporter {
         }
         if (el.complexType) {
             return addElement(elements, createElementModelFromXSDComplexElement(el.complexType, el, [
+                    Type        : "xs:element",
                     Name        : el.name,
                     "Max Occurs": el.maxOccurs,
                     "Min Occurs": el.minOccurs
@@ -446,7 +514,7 @@ class XSDImporter {
     }
 
     protected Element createElementModelFromXSDComplexElement(XsdComplexType complexType, XsdElement el, Map metadata = [:]) {
-        new Element(model: matchOrCreateModel(complexType), metadata: metadata + [Name: el.name])
+        new Element(model: matchOrCreateModel(complexType, el.name), metadata: metadata + [Name: el.name])
     }
 
     protected Element createElementModelFromXSDComplexElement(Model mode, XsdElement el, Map metadata) {
@@ -742,7 +810,6 @@ class XSDImporter {
         }
         return enumerations
     }
-
 }
 
 

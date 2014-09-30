@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
           <alert type="'info'" ng-hide="loading || pendingActions.length > 0">There no pending actions</alert>
           <alert ng-repeat="action in pendingActions" type="getType(action)" id="action-{{action.id}}">
             <div class="action-header">
-              <div class="contextual-actions-right">
+              <div class="pull-right">
                 <contextual-actions group="true" icon-only="true" size="sm" no-colors="true"/>
               </div>
               <h4>{{action.naturalName}}
@@ -33,7 +33,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
           <alert type="'info'" ng-hide="loading || performedActions.length > 0">There no actions performed or failed</alert>
           <alert ng-repeat="action in performedActions" type="getType(action)" id="action-{{action.id}}">
             <div>
-              <div class="contextual-actions-right">
+              <div class="pull-right">
                 <contextual-actions group="true" icon-only="true" size="sm" no-colors="true"/>
               </div>
               <h4>{{action.naturalName}}

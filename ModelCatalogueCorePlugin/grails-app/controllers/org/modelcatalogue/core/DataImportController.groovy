@@ -128,13 +128,14 @@ class DataImportController<T> extends AbstractRestfulController<T>{
         InputStream inputStream = file.inputStream
         def asset = storeAsset(param, file)
         Long id = asset.id
+        Boolean createModelsForElements = params.boolean('createModelsForElements')
 
         executorService.submit {
             Asset updated = Asset.get(id)
             try {
                 XsdLoader parserXSD = new XsdLoader(inputStream)
                 def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrorsSACT) = parserXSD.parse()
-                def (classification, conceptualDomain) = XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces)
+                def (classification, conceptualDomain) = XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
                 updated.status = PublishedElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.ext['Original URL'] = uri
@@ -142,6 +143,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                 updated.addToRelatedTo(classification)
                 updated.addToRelatedTo(conceptualDomain)
             } catch (e) {
+                log.error("Error importing schema", e)
                 updated.refresh()
                 updated.status = PublishedElementStatus.FINALIZED
                 updated.name = updated.name + " - Error during upload"

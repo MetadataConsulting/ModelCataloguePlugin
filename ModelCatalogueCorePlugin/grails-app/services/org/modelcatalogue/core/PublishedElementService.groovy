@@ -372,6 +372,27 @@ class PublishedElementService {
         destination
     }
 
+
+    Map<Long, Long> findModelsToBeInlined() {
+        List<Model> models = Model.executeQuery("""
+            select m
+            from Model m left join m.incomingRelationships inc
+            group by m.name
+            having sum(case when inc.relationshipType = :base then 1 else 0 end) = 1
+            and sum(case when inc.relationshipType = :hierarchy then 1 else 0 end) = 2
+        """, [hierarchy: RelationshipType.hierarchyType, base: RelationshipType.findByName("base")])
+
+        Map<Long, Long> ret = [:]
+
+        for (Model model in models) {
+            if (model.ext.from == 'xs:element') {
+                ret[model.id] = model.isBasedOn[0].id
+            }
+        }
+
+        ret
+    }
+
     Map<Long, Set<Long>> findDuplicateModelsSuggestions() {
         // TODO: create test
         Object[][] results = Model.executeQuery """

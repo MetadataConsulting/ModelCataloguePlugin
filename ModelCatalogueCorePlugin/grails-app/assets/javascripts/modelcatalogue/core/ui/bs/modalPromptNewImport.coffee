@@ -29,6 +29,11 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
                 <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
                 <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
               </div>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="copy.createModelsForElements"> Create models for elements with the same name (XSD import only)
+                </label>
+              </div>
             </form>
         </div>
         <div class="modal-footer">
@@ -69,7 +74,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
 
             $scope.uploading = true
             $scope.upload = $upload.upload({
-              params: {id: $scope.copy.id, name: $scope.copy.name, conceptualDomain: $scope.copy.conceptualDomain}
+              params: {id: $scope.copy.id, name: $scope.copy.name, conceptualDomain: $scope.copy.conceptualDomain, createModelsForElements: $scope.copy.createModelsForElements}
               url:                "#{modelCatalogueApiRoot}/dataArchitect/imports/upload"
               file:               $scope.copy.file
               fileFormDataName:   'file'
