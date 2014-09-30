@@ -2,12 +2,16 @@ package org.modelcatalogue.core.util
 
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.Expression
+import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codehaus.groovy.ast.expr.VariableExpression
+import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.ast.stmt.ThrowStatement
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.syntax.Types
+import org.grails.datastore.gorm.GormStaticApi
 
 class SecuredRuleExecutor<S extends Script> {
 
@@ -71,17 +75,29 @@ class SecuredRuleExecutor<S extends Script> {
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
         secureASTCustomizer.with {
             packageAllowed = false
-            importsWhitelist = withBaseScript(Object)
-            starImportsWhitelist = withBaseScript(Object)
-            staticImportsWhitelist = withBaseScript(Object)
-            staticStarImportsWhitelist = withBaseScript(Math, Object)
+            importsWhitelist = withBaseScript()
+            starImportsWhitelist = withBaseScript()
+            staticImportsWhitelist = withBaseScript()
+            staticStarImportsWhitelist = withBaseScript(Math)
+
+            receiversClassesBlackList = [System, GormStaticApi]
         }
 
+        secureASTCustomizer.addStatementCheckers(new SecureASTCustomizer.StatementChecker() {
+            @Override
+            boolean isAuthorized(Statement expression) {
+                return !(expression instanceof ThrowStatement)
+            }
+        })
+
         secureASTCustomizer.addExpressionCheckers(new SecureASTCustomizer.ExpressionChecker() {
+
 
             Set<String> names = new HashSet(binding.variables.keySet())
 
             @Override boolean isAuthorized(Expression expression) {
+                println expression
+
                 if (expression instanceof BinaryExpression && expression.operation.meaning == Types.ASSIGN) {
                     if (expression.leftExpression instanceof VariableExpression) {
                         names << expression.leftExpression.name
@@ -95,6 +111,11 @@ class SecuredRuleExecutor<S extends Script> {
                     if (baseScriptClass && expression.name in baseScriptClass.metaClass.properties*.name) return true
                     return expression.name in names
                 }
+
+                if (expression instanceof MethodCallExpression) {
+                    return !(expression.methodAsString in ['delete'])
+                }
+
                 true
             }
         })

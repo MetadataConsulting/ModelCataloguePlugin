@@ -55,7 +55,7 @@ describe "mc.core.catalogueElementResource", ->
           expect(result).toBeDefined()
           expect(error).toBeNull()
           expect(result.id).toBe(testElementId)
-          expect(result.name).toBe("value domain test3")
+          expect(result.name).toBe("school subject")
           expect(result.description).toBeDefined()
 
 

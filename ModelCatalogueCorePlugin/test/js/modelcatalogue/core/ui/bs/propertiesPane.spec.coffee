@@ -51,7 +51,7 @@ describe "mc.core.ui.propertiesPane", ->
 
     shown = null
 
-    $httpBackend.expect('GET', /\/api\/modelCatalogue\/core\/dataType\/\d+/).respond({ok: true})
+    $httpBackend.expect('GET', /\/api\/modelCatalogue\/core\/enumeratedType\/\d+/).respond({ok: true})
 
     $rootScope.$on '$stateChangeSuccess', (ignored, ignored2, params) ->
       shown = params

@@ -14,7 +14,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain test3 (public libraries)')
+    expect(element.val()).toBe('school subject (cdtest1)')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -36,7 +36,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain test3')
+    expect(element.val()).toBe('school subject')
 
 
   it "the resource can be specified as string",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
@@ -51,7 +51,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain test3 (public libraries)')
+    expect(element.val()).toBe('school subject (cdtest1)')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -73,7 +73,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain test3 (public libraries)')
+    expect(element.val()).toBe('school subject (cdtest1)')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
