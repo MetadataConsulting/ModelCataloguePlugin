@@ -1,18 +1,19 @@
 package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.runtime.IOGroovyMethods
 
 import javax.annotation.PostConstruct
 
-class ModelCatalogueStorageService implements StorageService {
+class LocalFilesStorageService implements StorageService {
 
     GrailsApplication grailsApplication
+    private File fileStoreBase
     private Long maxSize
 
     @PostConstruct
     private void init() {
-        maxSize = grailsApplication.config.modelcatalogue.storage.maxSize ?: (20 * 1024 * 1024)
+        fileStoreBase   = new File(grailsApplication.config.modelcatalogue.storage.directory ?: 'storage')
+        maxSize         = grailsApplication.config.modelcatalogue.storage.maxSize ?: (20 * 1024 * 1024)
     }
 
     /**
@@ -39,45 +40,33 @@ class ModelCatalogueStorageService implements StorageService {
      * @param withOutputStream the closure which gets files output stream as a parameter
      */
     void store(String directory, String filename, String contentType, Closure withOutputStream) {
-        AssetFile file = AssetFile.findByPath(getPath(directory, filename))
-
-        if (!file) {
-            file = new AssetFile(path: getPath(directory, filename))
-        }
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream()
-
-        IOGroovyMethods.withStream(baos, withOutputStream)
-
-        file.content = baos.toByteArray()
-        file.save(failOnError: true)
+        File dir = new File(fileStoreBase, directory)
+        dir.mkdirs()
+        new File(dir, filename).withOutputStream withOutputStream
     }
 
     /**
-     * Tests if the file exists in the database.
+     * Tests if the file exists in the store.
      * @param directory
      * @param filename
-     * @return <code>true</code> if the file exits in the database
+     * @return <code>true</code> if the file exits in the store
      */
     boolean exists(String directory, String filename) {
-        AssetFile.findByPath(getPath(directory, filename))
+        File dir = new File(fileStoreBase, directory)
+        if (!dir.exists()) return false
+        File file = new File(dir, filename)
+        file.exists()
     }
 
     /**
-     * Fetches the file from the database.
+     * Fetches the file from the storage as input stream.
      * @param directory
      * @param filename
-     * @return the file from the database as input stream
-     * @throws FileNotFoundException if the file does not exist in the database
+     * @return the file from the storage as input stream
+     * @throws FileNotFoundException if the file does not exist in the store
      */
     InputStream fetch(String directory, String filename) {
         if (!exists(directory, filename)) throw new FileNotFoundException("No such file $filename in $directory")
-        byte[] content = AssetFile.findByPath(getPath(directory, filename)).content ?: new byte[0]
-        new ByteArrayInputStream(content)
-    }
-
-
-    private static String getPath(String directory, String filename) {
-        "$directory/$filename"
+        new File(new File(fileStoreBase, directory), filename).newInputStream()
     }
 }
