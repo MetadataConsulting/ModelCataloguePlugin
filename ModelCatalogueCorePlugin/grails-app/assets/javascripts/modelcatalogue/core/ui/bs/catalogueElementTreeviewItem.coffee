@@ -22,7 +22,7 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
           <a ng-if="!currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="select(element)">
             <span ng-class="element.getIcon()"></span>
           </a>
-          <span class="catalogue-element-treeview-name" ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': element.status == 'ARCHIVED'}" ng-click="select(element)">{{element.metadata.name || element.metadata.Name || element.name}}</span>
+          <span class="catalogue-element-treeview-name" ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': element.status == 'ARCHIVED'}" ng-click="select(element)">{{element.metadata.name || element.metadata.Name || element.name}} <small class="text-muted" ng-show="element.metadata.name || element.metadata.Name &amp;&amp; ((element.metadata.name || element.metadata.Name) != element.name)">{{element.name}}</small></span>
         </span>
       </div>
       <ul ng-if="children" ng-hide="collapsed" class="catalogue-element-treeview-list">

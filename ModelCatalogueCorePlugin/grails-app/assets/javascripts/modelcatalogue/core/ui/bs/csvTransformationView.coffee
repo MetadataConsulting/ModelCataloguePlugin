@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.csvTransformationView', ['mc.core.ui.csvTransforma
 
   $templateCache.put 'modelcatalogue/core/ui/csvTransformationView.html', '''
     <div>
-      <span class="pull-right">
+      <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" icon-only="true"></contextual-actions>
       </span>
       <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> {{element.name}} <small><span class="label" ng-show="element.status" ng-class="{'label-warning': element.status == 'DRAFT', 'label-info': element.status == 'PENDING', 'label-primary': element.status == 'FINALIZED', 'label-danger': element.status == 'ARCHIVED'}">{{element.status}}</span></small></h3>

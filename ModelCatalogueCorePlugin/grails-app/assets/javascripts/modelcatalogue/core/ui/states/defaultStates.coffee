@@ -609,7 +609,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   #language=HTML
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-if="resource != 'model' || $stateParams.display != undefined">
-      <span class="pull-right">
+      <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
       <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{title}} List</h2>
@@ -621,19 +621,19 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <div class="col-md-4">
           <h2>
             <small ng-class="catalogue.getIcon('model')"></small>&nbsp; Models
-            <span class="pull-right">
+            <span class="contextual-actions-right">
             <contextual-actions size="sm" icon-only="true" no-colors="true"></contextual-actions>
             </span>
           </h2>
         </div>
         <div class="col-md-8">
           <h3 ng-show="contained.element">{{contained.element.metadata.name || contained.element.metadata.Name || contained.element.name}}
-            <span class="pull-right">
+            <small class="text-muted" ng-show="contained.element.metadata.name || contained.element.metadata.Name  &amp;&amp; ((contained.element.metadata.name || contained.element.metadata.Name ) != contained.element.name)">{{contained.element.name}}</small>
+            <span class="contextual-actions-right">
               <contextual-actions size="sm" no-colors="true" icon-only="true" scope="contained"></contextual-actions>
             </span>
           </h3>
           <h3 ng-hide="contained.element">No Selection</h3>
-          <h4 ng-show="contained.element.metadata.name || contained.element.metadata.Name" class="text-muted">{{contained.element.name}}</h4>
         </div>
       </div>
       <div class="row">
@@ -782,7 +782,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
-                                        <div><a id="modelsLink" ui-sref="mc.dataArchitect.uninstantiatedDataElements" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElementCount}}</div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'uninstantiated'})" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElementCount}}</div>
                                     </div>
                                 </div>
                             </div>

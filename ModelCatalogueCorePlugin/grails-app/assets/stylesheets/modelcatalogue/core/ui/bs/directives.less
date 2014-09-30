@@ -29,6 +29,20 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   height: 440px;
   padding-top: 15px;
   padding-right: 15px;
+  z-index: 100;
+  background-color: rgba(255, 255, 255, 0.7);
+
+  &:hover {
+    position: absolute;
+    min-width: 120%;
+
+    .catalogue-element-treeview-labels {
+      overflow-x: visible;
+      text-overflow:clip;
+      padding-right: 35px;
+     }
+  }
+  
 }
 
 .catalogue-element-treeview-list-root {
@@ -98,6 +112,24 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
 .omnisearch-icon {
   color: #d3d3d3;
   margin-right: 15px;
+}
+
+.contextual-actions-right {
+  z-index: 1000;
+  float: right;
+  position: absolute;
+  right: 15px;
+  top: 20px;
+
+  opacity: 0.6;
+
+  .btn.disabled, .btn[disabled] {
+    color: #c12e2a;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
 }
 
 .contextual-actions {

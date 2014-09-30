@@ -84,7 +84,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       label:      'Uninstantiated Data Elements'
       icon:       'fa fa-fw fa-cube'
       action: ->
-        $state.go 'mc.dataArchitect.uninstantiatedDataElements'
+        $state.go 'mc.resource.list', {resource: 'dataElement', status: 'uninstantiated'}
     }
 
     $scope.$on '$stateChangeSuccess', (ignored, state) ->

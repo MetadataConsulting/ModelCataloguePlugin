@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.decoratedList',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'mc.util.ui.bs.contextualActions' , 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/batchView.html', '''
     <div>
-      <span class="pull-right">
+      <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
       </span>
       <h3 class="ce-name">{{batch.name}} <small ng-show="batch.getElementTypeName()"><span class="label" ng-show="batch.archived" ng-class="{'label-danger': batch.archived}">{{batch.status}}</span> (created {{batch.dateCreated | date:'short'}})</small></h3>
@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
           <alert type="'info'" ng-hide="loading || pendingActions.length > 0">There no pending actions</alert>
           <alert ng-repeat="action in pendingActions" type="getType(action)" id="action-{{action.id}}">
             <div class="action-header">
-              <div class="pull-right">
+              <div class="contextual-actions-right">
                 <contextual-actions group="true" icon-only="true" size="sm" no-colors="true"/>
               </div>
               <h4>{{action.naturalName}}
@@ -33,7 +33,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
           <alert type="'info'" ng-hide="loading || performedActions.length > 0">There no actions performed or failed</alert>
           <alert ng-repeat="action in performedActions" type="getType(action)" id="action-{{action.id}}">
             <div>
-              <div class="pull-right">
+              <div class="contextual-actions-right">
                 <contextual-actions group="true" icon-only="true" size="sm" no-colors="true"/>
               </div>
               <h4>{{action.naturalName}}

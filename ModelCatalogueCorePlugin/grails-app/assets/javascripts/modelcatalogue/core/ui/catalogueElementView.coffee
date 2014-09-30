@@ -97,7 +97,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       onElementUpdate = (element, oldEl) ->
         return if angular.equals element, oldEl
-        applicationTitle "#{$scope.element.getLabel()}"
+
+        applicationTitle "#{element.getLabel()}"
 
         resource = catalogueElementResource(element.elementType) if element and element.elementType
 

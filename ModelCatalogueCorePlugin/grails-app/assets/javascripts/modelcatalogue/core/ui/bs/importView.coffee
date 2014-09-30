@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.importView', ['mc.core.ui.importView', 'mc.core.ui
     $templateCache.put 'modelcatalogue/core/ui/importView.html', '''
     <div>
 
-    <span class="pull-right">
+    <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true"></contextual-actions>
      </span>
 
