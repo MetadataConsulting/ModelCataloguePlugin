@@ -223,7 +223,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
     @Override
     protected getIncludeFields(){
         def fields = super.includeFields
-        fields.removeAll(['versionCreated', 'versionNumber'])
+        fields.removeAll(['versionCreated', 'versionNumber', 'classifications'])
         fields
     }
 
