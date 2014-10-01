@@ -7,18 +7,18 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   ]
 
   localNameAndIdAndMetadata = -> [
-    {header: 'Name',            value: "ext.name || ext.Name || relation.name",                                 classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Name',            value: "ext.name || ext.Name || relation.classifiedName",                                 classes: 'col-md-3', show: "relation.show()"}
     {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()"}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
   nameAndIdent = -> [
-    {header: 'Name',            value: "relation.name ",                                     classes: 'col-md-5', show: "relation.show()"}
+    {header: 'Name',            value: "relation.classifiedName ",                                     classes: 'col-md-5', show: "relation.show()"}
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()"}
   ]
 
   nameAndIdAndMetadata = -> [
-    {header: 'Name',            value: "relation.name",             classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Name',            value: "relation.classifiedName",             classes: 'col-md-3', show: "relation.show()"}
     {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()"}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
@@ -169,13 +169,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     hidden: true
   }
 
-  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.relationships',   {
-    hidden: false
-  }
+#  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.relationships',   {
+#    hidden: false
+#  }
 
-  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.Asset.synonyms',   {
-    hidden: true
-  }
 
 #  catalogueElementPropertiesProvider.configureProperty 'valueDomains',    hidden: (security) -> !security.hasRole('CURATOR')
   catalogueElementPropertiesProvider.configureProperty 'supersededBy',    hidden: true
