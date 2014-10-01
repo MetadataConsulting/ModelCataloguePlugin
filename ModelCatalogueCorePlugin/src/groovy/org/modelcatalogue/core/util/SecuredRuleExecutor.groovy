@@ -96,8 +96,6 @@ class SecuredRuleExecutor<S extends Script> {
             Set<String> names = new HashSet(binding.variables.keySet())
 
             @Override boolean isAuthorized(Expression expression) {
-                println expression
-
                 if (expression instanceof BinaryExpression && expression.operation.meaning == Types.ASSIGN) {
                     if (expression.leftExpression instanceof VariableExpression) {
                         names << expression.leftExpression.name
