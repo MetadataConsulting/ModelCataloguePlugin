@@ -103,14 +103,33 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = results.items
             searchResults.total = results.total
         } else if (CatalogueElement.isAssignableFrom(resource)) {
-            DetachedCriteria criteria = new DetachedCriteria(resource)
-            criteria.or {
-                ilike('name', query)
-                ilike('description', query)
-                ilike('modelCatalogueId', query)
-            }
-            searchResults.searchResults = criteria.list(params)
-            searchResults.total = criteria.count()
+            String alias = CatalogueElement.simpleName[0].toLowerCase()
+            String listQuery = """
+                from ${resource.simpleName} ${alias}
+                where
+                    ${alias}.status in :statuses
+                    and (
+                        lower(${alias}.name) like lower(:query)
+                        or lower(${alias}.description) like lower(:query)
+                        or lower(${alias}.modelCatalogueId) like lower(:query)
+                        or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                    )
+            """
+            def results = Lists.fromQuery(params, resource, listQuery, [
+                    query: query,
+                    statuses: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED]
+            ])
+
+            searchResults.searchResults = results.items
+            searchResults.total = results.total
+
+//            criteria.or {
+//                ilike('name', query)
+//                ilike('description', query)
+//                ilike('modelCatalogueId', query)
+//            }
+//            searchResults.searchResults = criteria.list(params)
+//            searchResults.total = criteria.count()
         } else if (RelationshipType.isAssignableFrom(resource)) {
             searchResults.searchResults = resource.findAllByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query, params)
             searchResults.total = resource.countByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query, params)

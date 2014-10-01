@@ -507,7 +507,7 @@ class DataImportService {
                     dataElement.save()
                 }
                 //remove the old one (will still be in the archived one)
-                if (vd) { vd.removeFromInstantiates(dataElement) }
+//                if (vd) { vd.removeFromInstantiates(dataElement) }
                 //see if there is one that matches or create a new one
                 importValueDomain(vdParams, dataElement, cd)
 
