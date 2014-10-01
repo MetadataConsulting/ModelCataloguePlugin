@@ -400,3 +400,38 @@ a div.panel-footer, .with-pointer {
     content: "\f065";
   }
 }
+
+.inf-table {
+  table-layout: fixed;
+}
+
+.inf-table-item-cell{
+  word-break: break-all;
+}
+
+.inf-table-item-row .contextual-actions {
+  display: none;
+
+  .btn.disabled, .btn[disabled] {
+    color: #c12e2a;
+    opacity: 1;
+  }
+
+}
+
+.inf-table-item-row:hover .contextual-actions {
+  position: absolute;
+  display: inline-block;
+  top: 3px;
+  right: 3px;
+}
+
+
+.inf-table-header {
+  z-index: 1000;
+  background-color: rgba(255, 255, 255, 0.9);
+
+  .table {
+    margin-bottom: 0px;
+  }
+}

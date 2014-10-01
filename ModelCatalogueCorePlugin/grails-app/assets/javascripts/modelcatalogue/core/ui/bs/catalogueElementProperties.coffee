@@ -2,32 +2,32 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
 
   localNameAndIdent = -> [
-    {header: 'Name',            value: "ext.name || ext.Name || relation.name ",                                 classes: 'col-md-5', show: "relation.show()"}
-    {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()"}
+    {header: 'Name',            value: "ext.name || ext.Name || relation.name ",                                 classes: 'col-md-5', show: "relation.show()", href: 'relation.href()', href: 'relation.href()'}
+    {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
   ]
 
   localNameAndIdAndMetadata = -> [
-    {header: 'Name',            value: "ext.name || ext.Name || relation.name",                                 classes: 'col-md-3', show: "relation.show()"}
-    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Name',            value: "ext.name || ext.Name || relation.name",                                 classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
+    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
   nameAndIdent = -> [
-    {header: 'Name',            value: "relation.name ",                                     classes: 'col-md-5', show: "relation.show()"}
-    {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()"}
+    {header: 'Name',            value: "relation.name ",                                     classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
+    {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
   ]
 
   nameAndIdAndMetadata = -> [
-    {header: 'Name',            value: "relation.name",             classes: 'col-md-3', show: "relation.show()"}
-    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()"}
+    {header: 'Name',            value: "relation.name",             classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
+    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
   publishedElement = ->  [
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true }
-    { header: "Name", value: "name", classes: "col-md-3", show: true, sort: {property: 'name', type: 'alphabet'} }
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'href()' }
+    { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'} }
     { header: "Description", value: "description" , classes: "col-md-4"}
-    { header: "Value Domain", value: "valueDomain.name", classes: "col-md-3", show: true}
+    { header: "Value Domain", value: "valueDomain.name", classes: "col-md-3", show: true, href: 'href()'}
   ]
 
 
@@ -50,10 +50,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     return "#{(asset.size)} B"
 
   attachmentColumns = -> [
-    {header: "Name",        value: 'relation.name', class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: 'relation.show()'}
-    {header: "File Name",   value: 'relation.originalFileName',  class: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
-    {header: "Size",        value: computeBytes,                 class: 'col-md-2', sort: {property: 'size', type: 'order'}}
-    {header: "Mime Type",   value: 'relation.contentType',       class: 'col-md-2', sort: {property: 'contentType', type: 'alphabet'}}
+    {header: "Name",        value: 'relation.name', classes: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: 'relation.show()', href: 'relation.href()'}
+    {header: "File Name",   value: 'relation.originalFileName',  classes: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
+    {header: "Size",        value: computeBytes,                 classes: 'col-md-2', sort: {property: 'size', type: 'order'}}
+    {header: "Mime Type",   value: 'relation.contentType',       classes: 'col-md-2', sort: {property: 'contentType', type: 'alphabet'}}
   ]
 
 
@@ -78,9 +78,9 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     hidden: (security) ->
       !security.hasRole('CURATOR')
     columns: [
-      {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
-      {header: "Name", value: 'name', class: 'col-md-5', show: true}
-      {header: "Description", value: 'description', class: 'col-md-6'}
+      {header: "Version", value: 'versionNumber', classes: 'col-md-1', show: true, href: 'href()'}
+      {header: "Name", value: 'name', classes: 'col-md-5', show: true, href: 'href()'}
+      {header: "Description", value: 'description', classes: 'col-md-6'}
     ]
   }
 
@@ -88,10 +88,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     hidden: (security) ->
       !security.hasRole('CURATOR')
     columns: [
-      {header: "Version",   value: 'versionNumber',     class: 'col-md-1', show: true}
-      {header: "Name",      value: 'name',              class: 'col-md-4', show: true}
-      {header: "File Name", value: 'originalFileName',  class: 'col-md-4', show: true}
-      {header: "Size",      class: 'col-md-3', value: (it) -> computeBytes({relation: it})}
+      {header: "Version",   value: 'versionNumber',     classes: 'col-md-1', show: true, href: 'href()'}
+      {header: "Name",      value: 'name',              classes: 'col-md-4', show: true, href: 'href()'}
+      {header: "File Name", value: 'originalFileName',  classes: 'col-md-4', show: true, href: 'href()'}
+      {header: "Size",      classes: 'col-md-3', value: (it) -> computeBytes({relation: it})}
     ]
     actions: ['security', '$window', (security, $window) -> [
       {
@@ -129,8 +129,8 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.actions.Batch.failed', {
     columns: [
-      {header: "Created"     , value: "dateCreated | date:'short'"           , class: 'col-md-2', sort: {property: 'dateCreated', type: 'order'}}
-      {header: "Message"     , value: 'message + "\n\nOutput:\n" + outcome'  , class: 'col-md-7' }
+      {header: "Created"     , value: "dateCreated | date:'short'"           , classes: 'col-md-2', sort: {property: 'dateCreated', type: 'order'}}
+      {header: "Message"     , value: 'message + "\n\nOutput:\n" + outcome'  , classes: 'col-md-7' }
     ]
     actions: ['$http', '$state', ($http, $state) -> [
       {
@@ -146,8 +146,8 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.actions.Batch.performed', {
     columns: [
-      {header: "Created"     , value: "dateCreated | date:'short'"          , class: 'col-md-2', sort: {property: 'dateCreated', type: 'order'}}
-      {header: "Message"     , value: 'message + "\n\nOutput:\n" + outcome' , class: 'col-md-7' }
+      {header: "Created"     , value: "dateCreated | date:'short'"          , classes: 'col-md-2', sort: {property: 'dateCreated', type: 'order'}}
+      {header: "Message"     , value: 'message + "\n\nOutput:\n" + outcome' , classes: 'col-md-7' }
     ]
   }
 

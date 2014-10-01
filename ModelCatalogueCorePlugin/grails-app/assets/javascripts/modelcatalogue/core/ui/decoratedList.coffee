@@ -17,7 +17,9 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
 
     templateUrl: 'modelcatalogue/core/ui/decoratedList.html'
 
-    controller: ['$scope', 'columns', '$q', '$rootScope', '$state', '$stateParams' , ($scope, columns, $q, $rootScope, $state, $stateParams) ->
+    controller: ['$scope', 'columns', '$q', '$rootScope', '$state', '$stateParams' ,'$controller' , ($scope, columns, $q, $rootScope, $state, $stateParams, $controller) ->
+      angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
+
       pageParam   = $scope.pageParam ? 'page'
       sortParam   = $scope.sortParam ? 'sort'
       orderParam  = $scope.orderParam ? 'order'
@@ -148,20 +150,6 @@ angular.module('mc.core.ui.decoratedList', ['mc.core.listEnhancer', 'mc.core.ui.
         $scope.columns = columns($scope.list.itemType)
 
       $scope.$watch 'list', onListChange
-
-      $scope.evaluateClasses = (classes, element) ->
-        if angular.isFunction(classes) then classes(element) else classes
-
-      $scope.evaluateValue = (value, element) ->
-        if angular.isFunction(value) then value(element) else $scope.$eval(value, element)
-
-      $scope.showItem = (show, element) ->
-        show = 'show()' if show == true
-        if angular.isFunction(show) then show(element) else $scope.$eval(show, element)
-
-      $scope.showEnabled = (show, element) ->
-        return 'link' if show == true && angular.isFunction(element?.href)
-        return show?
 
       $scope.getColumnsCount = () ->
         count = $scope.columns.length

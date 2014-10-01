@@ -614,7 +614,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       </span>
       <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{title}} List</h2>
       <decorated-list ng-if="$stateParams.display == undefined || $stateParams.display == 'table'" list="list" columns="columns" state-driven="true" actions="actions"></decorated-list>
-      <infinite-list  ng-if="$stateParams.display == 'grid'" list="list"></infinite-list>
+      <infinite-list  ng-if="$stateParams.display == 'grid'"      list="list"></infinite-list>
+      <infinite-table ng-if="$stateParams.display == 'infinite'"  list="list" columns="columns" ></infinite-table>
     </div>
     <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">
       <div class="row">

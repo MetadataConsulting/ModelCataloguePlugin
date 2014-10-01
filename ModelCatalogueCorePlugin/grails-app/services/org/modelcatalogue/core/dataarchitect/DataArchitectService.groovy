@@ -313,7 +313,7 @@ class DataArchitectService {
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
-                    log.warn "Error generating create synonym action: $action.errors"
+                    log.error "Error generating create synonym action: $action.errors"
                 }
             }
             batch.archived = false
@@ -327,7 +327,7 @@ class DataArchitectService {
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
-                    log.warn "Error generating create synonym action: $action.errors"
+                    log.error "Error generating create synonym action: $action.errors"
                 }
             }
             batch.archived = false
@@ -340,7 +340,7 @@ class DataArchitectService {
             batch.description = """Model '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
             Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$sourceId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
             if (action.hasErrors()) {
-                log.warn "Error generating merge model action: $action.errors"
+                log.error "Error generating merge model action: $action.errors"
             }
             batch.archived = false
             batch.save()

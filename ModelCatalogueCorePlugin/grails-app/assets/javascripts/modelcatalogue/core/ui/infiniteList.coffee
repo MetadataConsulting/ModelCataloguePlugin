@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteList', ['mc.core.listEnhancer', 'mc.core.ui.columns', 'ngAnimate']).directive 'infiniteList',  [-> {
+angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAnimate']).directive 'infiniteList',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -6,10 +6,8 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.listEnhancer', 'mc.core.ui.c
 
     templateUrl: 'modelcatalogue/core/ui/infinitePanels.html'
 
-    controller: ['$scope', '$animate', '$window', ($scope, $animate, $window) ->
-      $scope.loading  = false
-      $scope.elements = $scope.list.list
-      $scope.next     = $scope.list.next
+    controller: ['$scope', '$animate', '$window', '$controller', ($scope, $animate, $window, $controller) ->
+      angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope}))
 
       $scope.extendOrCollapse = ($event)->
         panelContainer = angular.element(angular.element($event.currentTarget).closest('.panel').parent())
@@ -31,15 +29,6 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.listEnhancer', 'mc.core.ui.c
           $animate.addClass(panelContainer, 'col-lg-4')
 
         $window.scrollTo 0, panelContainer.offset().top - 70
-
-      $scope.loadMore = ->
-        if $scope.list.total > $scope.elements.length
-          $scope.loading = true
-          $scope.next().then (result) ->
-            for element in result.list
-              $scope.elements.push element
-            $scope.next = result.next
-            $scope.loading = false
 
     ]
   }

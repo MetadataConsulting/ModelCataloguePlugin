@@ -4,6 +4,9 @@
 #= require modelcatalogue/core/index
 #= require decoratedList
 #= require infiniteList
+#= require infiniteTable
+#= require infiniteListCtrl
+#= require columnsSupportCtrl
 #= require catalogueElementView
 #= require csvTransformationView
 #= require batchView
@@ -27,6 +30,9 @@ angular.module('mc.core.ui', [
   # list of modules
   'mc.core.ui.decoratedList'
   'mc.core.ui.infiniteList'
+  'mc.core.ui.infiniteTable'
+  'mc.core.ui.infiniteListCtrl'
+  'mc.core.ui.columnsSupportCtrl'
   'mc.core.ui.catalogueElementView'
   'mc.core.ui.csvTransformationView'
   'mc.core.ui.importView'
