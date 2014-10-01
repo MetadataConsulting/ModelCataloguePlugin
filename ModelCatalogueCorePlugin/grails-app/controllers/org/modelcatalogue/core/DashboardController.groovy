@@ -4,6 +4,7 @@ import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.dataarchitect.DataImport
 
 class DashboardController {
 
@@ -36,9 +37,10 @@ class DashboardController {
                 valueDomainCount:ValueDomain.count(),
                 incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
                 unusedValueDomainsCount: dataArchitectService.unusedValueDomains(params).total,
-                duplicateValueDomainsCount: dataArchitectService.duplicateValueDomains(params).total,
+                // duplicateValueDomainsCount: dataArchitectService.duplicateValueDomains(params).total,
                 conceptualDomainCount:ConceptualDomain.count(),
                 transformationsCount:CsvTransformation.count(),
+                importCount:DataImport.count(),
                 ]
         respond model
     }

@@ -974,6 +974,28 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
+                    <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-3">
+                                        <a ui-sref="mc.dataArchitect.imports.list" ui-sref-opts="{inherit: false}"><i class="fa fa-cloud-upload fa-5x fa-fw"></i></a>
+                                    </div>
+                                    <div class="col-xs-9 text-right">
+                                        <div><a id="batchesLink" ui-sref="mc.dataArchitect.imports.list" ui-sref-opts="{inherit: false}">Imports</a> {{importCount}}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <a ng-click="create('import')">
+                                <div class="panel-footer">
+                                    <span class="pull-left">Create Import</span>
+                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
       </div>
     </div>
   '''

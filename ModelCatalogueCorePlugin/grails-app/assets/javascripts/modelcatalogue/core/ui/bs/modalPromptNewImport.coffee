@@ -106,4 +106,5 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
       dialog.result
   ]
   messagesProvider.setPromptFactory 'new-import', factory
+  messagesProvider.setPromptFactory 'create-import', factory
 ]

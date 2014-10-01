@@ -169,19 +169,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'create-import', ['security', '$scope', 'messages', (security, $scope, messages)->
-    return undefined unless security.hasRole('CURATOR') and $scope.resource == 'import' and messages.hasPromptFactory('new-import')
-    {
-    position:   100
-    label:      "New Import"
-    icon:       'glyphicon glyphicon-plus-sign'
-    type:       'success'
-    action:     ->
-      messages.prompt('Create Import', '', {type: 'new-import', create: ($scope.resource)}).then (created)->
-        created.show()
-    }
-  ]
-
   actionsProvider.registerAction 'resolveAll', ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
     return undefined unless $scope.element
     return undefined unless $scope.element.isInstanceOf 'dataImport'
