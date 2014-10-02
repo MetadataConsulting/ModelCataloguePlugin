@@ -27,11 +27,14 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       currentTime = new Date().getTime()
 
       $timeout($scope.next, Math.max(1, $scope.lastLoadTime + $scope.timeBetweenLoading - currentTime)).then (result) ->
-        for element in result.list
-          $scope.elements.push element
-        $scope.next = result.next
-        $scope.loading = false
         $scope.lastLoadTime = new Date().getTime()
+        $scope.loading = false
+        if not result?.list?
+          $scope.next = ->
+        else
+          for element in result.list
+            $scope.elements.push element
+          $scope.next = result.next
     else
       $scope.loading = false
 
