@@ -172,7 +172,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'resolveAll', actionsProvider.ROLE_LIST_ACTION, ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
+  actionsProvider.registerActionInRole 'resolveAll', actionsProvider.ROLE_ITEM_ACTION, ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
     return undefined unless $scope.element
     return undefined unless $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
