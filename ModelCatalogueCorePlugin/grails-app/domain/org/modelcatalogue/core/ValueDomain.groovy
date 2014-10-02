@@ -100,12 +100,25 @@ class ValueDomain extends ExtendibleElement  {
         null
     }
 
-    def validateRule(Object x) {
-        if (x && dataType instanceof EnumeratedType) {
-            if (!dataType.enumerations.keySet().contains(x.toString())) {
-                return false
-            }
+    boolean isEnumKey(Object x) {
+        if (!dataType?.instanceOf(EnumeratedType)) {
+            return true
         }
+        if (!x) {
+            return true
+        }
+        Set<String> enums = new HashSet<String>(dataType.enumerations.keySet())
+        if (!enums.contains(x.toString())) {
+            return false
+        }
+        return true
+    }
+
+    def validateRule(Object x) {
+        if (!isEnumKey(x)) {
+            return false
+        }
+
         if (hasProperty('basedOn')) {
             for (ValueDomain domain in basedOn) {
                 def result = domain.validateRule(x)
@@ -115,8 +128,11 @@ class ValueDomain extends ExtendibleElement  {
             }
 
         }
-        if (!rule) return true
-        new SecuredRuleExecutor(ValueDomainRuleScript, new Binding(x: x, domain: this)).execute(rule)
+
+        if (rule) {
+            return new SecuredRuleExecutor(ValueDomainRuleScript, new Binding(x: x, domain: this)).execute(rule)
+        }
+        return true
     }
 
 

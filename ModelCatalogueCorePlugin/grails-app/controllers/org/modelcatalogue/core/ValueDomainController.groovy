@@ -101,8 +101,8 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
             return
         }
 
-        if (!valueDomain.rule) {
-            respond result: "Rule is missing. Don't know how to validate value."
+        if (!valueDomain.rule && !(valueDomain.dataType?.instanceOf(EnumeratedType))) {
+            respond result: "Don't know how to validate value."
             return
         }
 

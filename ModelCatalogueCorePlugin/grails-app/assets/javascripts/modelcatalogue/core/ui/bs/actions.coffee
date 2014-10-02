@@ -542,8 +542,14 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         messages.prompt('', '', {type: 'validate-value-by-domain', domain: $scope.element})
     }
 
-    $scope.$watch 'element.rule', (rule) ->
-      action.disabled = not rule
+    updateDisabled =  ->
+      action.disabled = not $scope.element.rule and not ($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType'))
+
+
+    $scope.$watch 'element.rule',     updateDisabled
+    $scope.$watch 'element.dataType', updateDisabled
+
+    updateDisabled()
 
     action
   ]
