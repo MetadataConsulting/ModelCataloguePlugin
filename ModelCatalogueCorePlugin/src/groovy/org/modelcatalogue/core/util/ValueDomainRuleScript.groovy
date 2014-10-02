@@ -111,7 +111,7 @@ abstract class ValueDomainRuleScript  extends Script {
      * @return true if the numeric representation of the 'x' variable is greater or the same as the limit
      */
     boolean minInclusive(Number limit) {
-        number(x) >= limit
+        is(number) && number(x) >= limit
     }
 
     /**
@@ -120,7 +120,7 @@ abstract class ValueDomainRuleScript  extends Script {
      * @return true if the numeric representation of the 'x' variable is greater or the same as the limit
      */
     boolean maxInclusive(Number limit) {
-        number(x) <= limit
+        is(number) && number(x) <= limit
     }
 
     /**
@@ -129,7 +129,7 @@ abstract class ValueDomainRuleScript  extends Script {
      * @return true if the numeric representation of the 'x' variable is greater or the same as the limit
      */
     boolean minExclusive(Number limit) {
-        number(x) > limit
+        is(number) && number(x) > limit
     }
 
     /**
@@ -138,7 +138,7 @@ abstract class ValueDomainRuleScript  extends Script {
      * @return true if the numeric representation of the 'x' variable is greater or the same as the limit
      */
     boolean maxExclusive(Number limit) {
-        number(x) < limit
+        is(number) && number(x) < limit
     }
 
     Object getX() {
