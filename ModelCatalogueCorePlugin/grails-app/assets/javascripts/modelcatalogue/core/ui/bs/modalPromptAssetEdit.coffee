@@ -9,6 +9,12 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
         windowClass: 'basic-edit-modal-prompt'
         backdrop: 'static'
         keyboard: false
+        resolve:
+          args: -> args
+          classificationInUse: ['$stateParams', 'catalogueElementResource',  ($stateParams, catalogueElementResource)->
+            return undefined if not $stateParams.classification
+            catalogueElementResource('classification').get($stateParams.classification)
+          ]
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>
@@ -17,9 +23,15 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
+                <label for="classification"> Classifications</label>
+                <elements-as-tags elements="copy.classifications"></elements-as-tags>
+                <input id="classification-{{$index}}" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(pending.classification);pending.classification = null">
+              </div>
+              <div class="form-group">
                 <label for="name" class="">Name</label>
                 <input type="text" class="form-control" id="name" placeholder="Name (leave blank to use filename)" ng-model="copy.name">
               </div>
+
               <div class="form-group">
                 <label for="asset" class="">File</label>
                 <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
@@ -35,14 +47,19 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
           <contextual-actions></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance) ->
-          $scope.copy     = angular.copy(args.element ? {})
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', 'classificationInUse', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance, classificationInUse) ->
+          $scope.pending        = {classification: null}
+          $scope.newEntity      = -> {classifications: $scope.copy?.classifications ? []}
+          $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
 
+          if args.create and classificationInUse
+            $scope.copy.classifications.push classificationInUse
+
           $scope.hasChanged   = ->
-            $scope.copy.file or $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
+            $scope.copy.file or $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.classifications != $scope.original.classifications
 
           $scope.cancel = ->
             $scope.progress = undefined
@@ -61,6 +78,12 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
               $scope.copy.name = $scope.copy.file.name
 
           $scope.saveElement = (newVersion) ->
+
+            if angular.isString($scope.pending.classification)
+              promise = promise.then -> catalogueElementResource('classification').save({name: $scope.pending.classification}).then (newClassification) ->
+                $scope.copy.classifications.push newClassification
+                $scope.pending.classification = null
+
             $scope.messages.clearAllMessages()
             if not $scope.copy.name and not $scope.copy.file
               $scope.messages.error 'Empty Name', 'Please fill the name'
@@ -70,7 +93,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
             if $scope.copy.file
               $scope.uploading = true
               $scope.upload = $upload.upload({
-                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description }
+                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description, classifications: $scope.copy.classifications}
                 url:                "#{modelCatalogueApiRoot}/asset/upload"
                 file:               $scope.copy.file
                 fileFormDataName:   'asset'
