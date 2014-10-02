@@ -128,7 +128,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
             return
         }
 
-        T source = queryForResource(params.souce)
+        T source = queryForResource(params.source)
         if (source == null) {
             notFound()
             return
