@@ -14,7 +14,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
       header = $element.find('.inf-table-header')
       body   = $element.find('.inf-table-body')
-      spacer = $element.find('.inf-table-header-spacer')
+      spacer = $element.find('.inf-table-spacer')
 
       initialOffset = angular.copy(header.offset())
 
@@ -36,10 +36,10 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         topPadding = angular.element('.navbar .container').outerHeight() + 1
         if scroll > initialOffset.top - topPadding
           header.css(position: 'fixed', width: body.width(), top: angular.element('.navbar .container').outerHeight() + 1)
-          spacer.height(header.height())
+          spacer.css('min-height': "#{header.outerHeight()}px")
         else
           header.css(position: 'static', width: body.width())
-          spacer.height(0)
+          spacer.css('min-height': "0px")
 
       $scope.$watch 'scroll', updateHeader
 

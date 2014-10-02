@@ -16,13 +16,15 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
           </thead>
         </table>
       </div>
+      <div ng-show="total > 0"  class="inf-table-spacer">
+      </div>
       <div class="inf-table-body">
         <table ng-show="total > 0" class="inf-table table" infinite-scroll="loadMore()" infinite-scroll-disabled="loading" infinite-scroll-distance="1">
           <tbody>
              <tr class="inf-table-item-row" ng-repeat="element in elements"  ng-class="classesForStatus(element)">
                 <td class="inf-table-item-cell" ng-class="evaluateClasses(column.classes, evaluateValue(column.value, element), element)" ng-repeat="column in columns" ng-init="value = evaluateValue(column.value, element); href = evaluateValue(column.href, element)">
                   <span ng-if="$last">
-                      <contextual-actions size="sm" no-colors="true" icon-only="true"></contextual-actions>
+                      <contextual-actions size="sm" no-colors="true" icon-only="true" group="true"></contextual-actions>
                   </span>
                   <a ng-if="href" ng-href="{{href}}" class="preserve-new-lines">{{value}}</a>
                   <span ng-if="!href" ><span ng-bind-html="value" class="preserve-new-lines"></span></span>
