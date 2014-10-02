@@ -381,8 +381,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
   actionsProvider.registerActionInRole 'archive-batch', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if $scope.action
-    return undefined if not $scope.batch
+    return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
     return undefined if not security.hasRole('CURATOR')
 
     action = {
@@ -391,16 +390,18 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:       'glyphicon glyphicon-compressed'
       type:       'danger'
       action:     ->
-        messages.confirm("Do you want to archive batch #{$scope.batch.name} ?", "The batch #{$scope.batch.name} will be archived").then ->
-          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.batch.link}/archive", method: 'POST')).then (archived) ->
-            $scope.batch = archived
+        batch = $scope.batch ? $scope.element
+        messages.confirm("Do you want to archive batch #{batch.name} ?", "The batch #{batch.name} will be archived").then ->
+          enhance(rest(url: "#{modelCatalogueApiRoot}#{batch.link}/archive", method: 'POST')).then (archived) ->
+            angular.extends batch, archived
           , showErrorsUsingMessages(messages)
     }
 
     updateAction = ->
-      action.disabled = $scope.batch.archived
+      action.disabled = ($scope.batch ? $scope.element).archived
 
     $scope.$watch 'batch.archived', updateAction
+    $scope.$watch 'element.archived', updateAction
 
     action
   ]
@@ -829,7 +830,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerActionInRole 'reload-actions', ROLE_ACTION_ACTION, ['$scope', ($scope) ->
+  actionsProvider.registerActionInRoles 'reload-actions', [ROLE_ACTION_ACTION, actionsProvider.ROLE_ITEM_ACTION], ['$scope', ($scope) ->
     return undefined unless angular.isFunction($scope.reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
 
     {
@@ -899,26 +900,34 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerActionInRole 'run-all-actions-in-batch', actionsProvider.ROLE_ITEM_ACTION, ['$scope', '$q', ($scope, $q) ->
-    return undefined unless $scope.pendingActions and not $scope.action
+  actionsProvider.registerActionInRole 'run-all-actions-in-batch', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'modelCatalogueApiRoot', 'enhance', 'rest', '$timeout', 'security', ($scope, messages, modelCatalogueApiRoot, enhance, rest, $timeout, security) ->
+    return undefined if not security.hasRole('CURATOR')
+    return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
 
-    runAllAction = {
+    action = {
       position: 200
       type:     'success'
-      icon:     'glyphicon glyphicon-play'
+      icon:     'glyphicon glyphicon-flash'
       label:    'Run All Pending'
       action:   ->
-        promises = []
-        for action in $scope.pendingActions
-          promises.push action.run() if action.state == 'PENDING' and action.dependencies.length == 0
-        $q.all(promises).then ->
-          $scope.reload() if angular.isFunction($scope.reload)
+        batch = $scope.batch ? $scope.element
+        messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
+          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}#{batch.link}/run")).then (updated) ->
+            angular.extend(batch, updated)
+          $timeout($scope.reload, 1000) if angular.isFunction($scope.reload)
     }
 
-    $scope.$watch 'pendingActions', (pendingActions) ->
-      runAllAction.disabled = pendingActions.length == 0
+    updateDisabled = (batch) ->
+      return unless batch
+      action.disabled = not batch.pending.total
 
-    runAllAction
+    updateDisabled($scope.batch ? $scope.element)
+
+    $scope.$watch 'batch', updateDisabled
+    $scope.$watch 'element', updateDisabled
+
+    action
+
   ]
 
 

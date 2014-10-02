@@ -140,7 +140,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Batch', [
-    {header: "Last Updated", value: "lastUpdated | date:'short'"   , classes: 'col-md-2',               sort: {property: 'lastUpdated', type: 'order'}}
+    {header: "Last Updated", value: "lastUpdated | date:'short'"   , classes: 'col-md-2',                              sort: {property: 'lastUpdated', type: 'order'}}
     {header: "Name"        , value: 'name'                         , classes: 'col-md-4', show: true, href: 'href()' , sort: {property: 'name', type: 'alphabet'}}
     {header: "Pending"     , value: "pending.total"                , classes: 'col-md-1'}
     {header: "Running"     , value: "performing.total"             , classes: 'col-md-1'}

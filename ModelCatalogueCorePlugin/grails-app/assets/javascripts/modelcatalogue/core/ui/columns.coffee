@@ -1,10 +1,10 @@
 angular.module('mc.core.ui.columns', []).provider 'columns', ->
   columns  = {}
   defaultColumns = [
-    {header: "ID",          value: 'id',          class: 'col-md-2', show: true}
-    {header: "Name",        value: 'name',        class: 'col-md-4', show: true}
-    {header: "Description", value: 'description', class: 'col-md-6'}
-    {header: "Type", value: 'getElementTypeName()', class: 'col-md-6'}
+    {header: "ID",          value: 'id',                    classes: 'col-md-2', show: true, href: 'href()'}
+    {header: "Name",        value: 'name',                  classes: 'col-md-4', show: true, href: 'href()'}
+    {header: "Description", value: 'description',           classes: 'col-md-6'}
+    {header: "Type",        value: 'getElementTypeName()',  classes: 'col-md-6'}
   ]
 
   registerColumns = (type, cols) ->
