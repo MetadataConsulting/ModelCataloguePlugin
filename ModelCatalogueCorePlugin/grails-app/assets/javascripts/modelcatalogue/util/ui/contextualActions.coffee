@@ -7,6 +7,7 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
     size:       '@'
     iconOnly:   '@'
     noColors:   '@'
+    role:       '@?'
 
 
   templateUrl: 'modelcatalogue/util/ui/contextualActions.html'
@@ -18,11 +19,10 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
     updateActions = ->
       $element.empty()
-      for action in actions.getActions($scope.scope ? $scope.$parent)
-        unless action.navigation
-          newScope = $scope.$new()
-          newScope.action = action
-          $element.append($compile(getTemplate(action))(newScope))
+      for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role)
+        newScope = $scope.$new()
+        newScope.action = action
+        $element.append($compile(getTemplate(action))(newScope))
 
     updateActions()
 

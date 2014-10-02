@@ -50,7 +50,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions></contextual-actions>
+          <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', '$controller', '$modalInstance', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, catalogueElementResource) ->

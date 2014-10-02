@@ -1,12 +1,8 @@
 angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
-  actionsProvider.registerAction 'navbar-catalogue-elements', ->
-    {
-      navigation: true
-      position:   100
-      abstract:   true
-      label:      'Catalogue'
-    }
+
+  ROLE_ACTION_ACTION = 'action'
+
 
   RESOURCES = [
     'classification'
@@ -22,10 +18,15 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     'batch'
   ]
 
+  actionsProvider.registerActionInRole 'navbar-catalogue-elements', actionsProvider.ROLE_NAVIGATION, -> {
+    position:   100
+    abstract:   true
+    label:      'Catalogue'
+  }
 
 
   angular.forEach RESOURCES, (resource, index) ->
-    actionsProvider.registerChildAction 'navbar-catalogue-elements', 'navbar-' + resource ,['$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($scope, $state, $stateParams, names, security, messages, catalogue) ->
+    actionsProvider.registerChildAction 'navbar-catalogue-elements', 'navbar-' + resource , ['$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($scope, $state, $stateParams, names, security, messages, catalogue) ->
       return undefined if (resource == 'batch' or resource == 'relationshipType' or resource == 'csvTransformation') and not security.hasRole('CURATOR')
 
       label = names.getNaturalName(resource) + 's'
@@ -52,7 +53,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     ]
 
 
-  actionsProvider.registerAction 'navbar-data-architect', ['security', (security) ->
+  actionsProvider.registerActionInRole 'navbar-data-architect', actionsProvider.ROLE_NAVIGATION, ['security', (security) ->
     return undefined if not security.hasRole('CURATOR')
 
     {
@@ -145,7 +146,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           for err in response.data.errors
             messages.error err.message
 
-  actionsProvider.registerAction 'create-catalogue-element', ['$scope', 'names', 'security', 'messages', ($scope, names, security, messages) ->
+  actionsProvider.registerActionInRole 'create-catalogue-element', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'names', 'security', 'messages', ($scope, names, security, messages) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.resource
     return undefined if $scope.resource == 'batch'
@@ -166,10 +167,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then (created)->
         unless args.parent
           created.show()
+
+      # TODO: add element to the list instead of going to the detail screen or handle by event
     }
   ]
 
-  actionsProvider.registerAction 'resolveAll', ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
+  actionsProvider.registerActionInRole 'resolveAll', actionsProvider.ROLE_LIST_ACTION, ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
     return undefined unless $scope.element
     return undefined unless $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
@@ -189,7 +192,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return action
   ]
 
-  actionsProvider.registerAction 'ingestQueue', ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
+  actionsProvider.registerActionInRole 'ingestQueue', actionsProvider.ROLE_ITEM_ACTION, ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', ($scope, $rootScope, modelCatalogueDataArchitect, security)->
     return undefined unless $scope.element
     return undefined unless $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
@@ -210,7 +213,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerAction 'edit-catalogue-element', ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
+  actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
@@ -237,7 +240,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerAction 'create-new-version', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
+  actionsProvider.registerActionInRole 'create-new-version', actionsProvider.ROLE_LIST_ITEM, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -266,7 +269,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'finalize', ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
+  actionsProvider.registerActionInRole 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -296,7 +299,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'archive', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerActionInRole 'archive', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -323,7 +326,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'merge', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerActionInRole 'merge', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -350,7 +353,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerChildAction 'finalize', 'finalize-tree', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerChildActionInRole 'finalize', 'finalize-tree', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.isInstanceOf('model')
     return undefined if not $scope.element.status
@@ -377,7 +380,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerAction 'archive-batch', ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
+  actionsProvider.registerActionInRole 'archive-batch', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if $scope.action
     return undefined if not $scope.batch
     return undefined if not security.hasRole('CURATOR')
@@ -402,7 +405,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'delete', ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
+  actionsProvider.registerActionInRole 'delete', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not security.hasRole('ADMIN')
 
@@ -430,7 +433,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'create-new-relationship', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerActionInRole 'create-new-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.isInstanceOf('org.modelcatalogue.core.CatalogueElement')
     return undefined if $scope.element.isInstanceOf 'dataImport'
@@ -455,7 +458,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'create-new-mapping', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerActionInRole 'create-new-mapping', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.hasOwnProperty('mappings')
     return undefined if not security.hasRole('CURATOR')
@@ -472,7 +475,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
 
-  actionsProvider.registerAction 'download-asset', [ '$scope', '$window', ($scope, $window) ->
+  actionsProvider.registerActionInRole 'download-asset', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', '$window', ($scope, $window) ->
     return undefined if not $scope.element?.downloadUrl?
 
     {
@@ -486,7 +489,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'transform-csv', [ '$scope', 'messages', 'security', ($scope, messages, security) ->
+  actionsProvider.registerActionInRole 'transform-csv', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('csvTransformation')
@@ -503,7 +506,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'convert', [ '$scope', 'messages', 'security', ($scope, messages) ->
+  actionsProvider.registerActionInRole 'convert', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('valueDomain')
@@ -525,7 +528,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   ]
 
-  actionsProvider.registerAction 'validate-value', [ '$scope', 'messages', 'security', ($scope, messages) ->
+  actionsProvider.registerActionInRole 'validate-value', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('valueDomain')
@@ -545,7 +548,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'refresh-asset', [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
+  actionsProvider.registerActionInRole 'refresh-asset', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', '$rootScope', 'catalogueElementResource', ($scope, $rootScope, catalogueElementResource) ->
     return undefined if $scope.element?.elementType != 'org.modelcatalogue.core.Asset'
     return undefined if $scope.element.status != 'PENDING'
 
@@ -562,7 +565,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'generate-merge-models', ['$scope', 'security', 'catalogue', 'modelCatalogueApiRoot', '$http', 'messages', '$state', ($scope, security, catalogue, modelCatalogueApiRoot, $http, messages, $state)->
+  actionsProvider.registerActionInRole 'generate-merge-models', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'security', 'catalogue', 'modelCatalogueApiRoot', '$http', 'messages', '$state', ($scope, security, catalogue, modelCatalogueApiRoot, $http, messages, $state)->
     return undefined unless security.isUserLoggedIn()
     return undefined unless $scope.list
     return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'batch')
@@ -581,7 +584,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'export', ['$scope', 'security', ($scope, security)->
+  actionsProvider.registerActionInRoles 'export', [actionsProvider.ROLE_LIST_ACTION, actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'security', ($scope, security)->
     return undefined unless security.isUserLoggedIn()
     return undefined unless $scope.list or $scope.element
     if $scope.list
@@ -611,7 +614,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             return true
         }
 
-  actionsProvider.registerChildAction 'export', 'catalogue-element-export-specific-reports' , ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
+  actionsProvider.registerChildActionInRole 'export', 'catalogue-element-export-specific-reports', actionsProvider.ROLE_ITEM_ACTION, ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
     return undefined if not $scope.element
 
     {
@@ -633,7 +636,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerChildAction 'export', 'list-exports-current', ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
+  actionsProvider.registerChildAction 'export', 'list-exports-current', actionsProvider.ROLE_LIST_ACTION, ['$scope', '$window', 'enhance', 'rest', ($scope, $window, enhance, rest) ->
     return undefined if not $scope.list?
 
     {
@@ -645,7 +648,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'switch-status', ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
+  actionsProvider.registerActionInRole 'switch-status', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
     return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and not $scope.noStatusSwitch and $stateParams.resource in ['model', 'dataElement', 'asset']
 
     {
@@ -713,7 +716,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerAction 'switch-archived-batches', ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
+  actionsProvider.registerActionInRole 'switch-archived-batches', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
     return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and $stateParams.resource == 'batch'
 
     {
@@ -765,7 +768,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
 
-  actionsProvider.registerAction 'run-action', ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'run-action', ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'PENDING'
 
     {
@@ -781,7 +784,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
 
-  actionsProvider.registerAction 'dismiss-action', ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'dismiss-action', ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'PENDING'
 
     {
@@ -797,7 +800,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
 
-  actionsProvider.registerAction 'reactivate-action', ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'reactivate-action', ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'DISMISSED'
 
     {
@@ -811,7 +814,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'repeat-action', ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'repeat-action', ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.action and $scope.action.state == 'FAILED'
 
     {
@@ -826,7 +829,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerAction 'reload-actions', ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'reload-actions', ROLE_ACTION_ACTION, ['$scope', ($scope) ->
     return undefined unless angular.isFunction($scope.reload) and ($scope.action and $scope.action.state == 'PERFORMING') or ($scope.batch and not $scope.action)
 
     {
@@ -839,7 +842,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'link-actions', ['$scope', '$rootScope', 'messages',($scope, $rootScope, messages) ->
+  actionsProvider.registerActionInRole 'link-actions', ROLE_ACTION_ACTION, ['$scope', '$rootScope', 'messages',($scope, $rootScope, messages) ->
     return undefined unless $scope.action and not ($scope.action.state == 'PERFORMING' or $scope.action.state == 'PERFORMED')
 
     action = {
@@ -896,7 +899,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerAction 'run-all-actions-in-batch', ['$scope', '$q', ($scope, $q) ->
+  actionsProvider.registerActionInRole 'run-all-actions-in-batch', actionsProvider.ROLE_ITEM_ACTION, ['$scope', '$q', ($scope, $q) ->
     return undefined unless $scope.pendingActions and not $scope.action
 
     runAllAction = {
@@ -920,7 +923,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
 
-  actionsProvider.registerAction 'update-action-parameters', ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerActionInRole 'update-action-parameters', ROLE_ACTION_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.action
     return undefined if $scope.action.state in ['PERFORMING', 'PERFORMED']
     return undefined if not security.hasRole('CURATOR')
@@ -945,7 +948,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   ]
 
-  actionsProvider.registerAction 'modal-cancel', ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'modal-cancel', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined if not $scope.$dismiss
 
     {
@@ -957,7 +960,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerAction 'modal-save-element', ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveElement
 
     action = {
@@ -975,7 +978,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'modal-save-and-add-another', ['$scope', ($scope) ->
+  actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother
 
     action = {
@@ -1012,7 +1015,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerAction 'filter-by-classification', ['$scope', '$state', '$stateParams', 'messages', 'catalogueElementResource', 'catalogue', ($scope, $state, $stateParams, messages, catalogueElementResource, catalogue) ->
+  actionsProvider.registerActionInRole 'filter-by-classification', actionsProvider.ROLE_LIST_ACTION, ['$scope', '$state', '$stateParams', 'messages', 'catalogueElementResource', 'catalogue', ($scope, $state, $stateParams, messages, catalogueElementResource, catalogue) ->
     return undefined unless $scope.list and not $scope.element and catalogue.isInstanceOf($scope.list.itemType, 'publishedElement')
 
     action = {

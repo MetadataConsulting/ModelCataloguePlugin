@@ -610,7 +610,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-if="resource != 'model' || $stateParams.display != undefined">
       <span class="contextual-actions-right">
-        <contextual-actions size="sm" no-colors="true"></contextual-actions>
+        <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
       </span>
       <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{title}} List</h2>
       <decorated-list ng-if="$stateParams.display == undefined || $stateParams.display == 'table'" list="list" columns="columns" state-driven="true" actions="actions"></decorated-list>
@@ -623,7 +623,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           <h2>
             <small ng-class="catalogue.getIcon('model')"></small>&nbsp; Models
             <span class="contextual-actions-right">
-            <contextual-actions size="sm" icon-only="true" no-colors="true"></contextual-actions>
+            <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
             </span>
           </h2>
         </div>
@@ -631,7 +631,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           <h3 ng-show="contained.element">{{contained.element.metadata.name || contained.element.metadata.Name || contained.element.name}}
             <small class="text-muted" ng-show="contained.element.metadata.name || contained.element.metadata.Name  &amp;&amp; ((contained.element.metadata.name || contained.element.metadata.Name ) != contained.element.name)">{{contained.element.name}}</small>
             <span class="contextual-actions-right">
-              <contextual-actions size="sm" no-colors="true" icon-only="true" scope="contained"></contextual-actions>
+              <contextual-actions size="sm" no-colors="true" icon-only="true" scope="contained" role="item"></contextual-actions>
             </span>
           </h3>
           <h3 ng-hide="contained.element">No Selection</h3>

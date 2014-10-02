@@ -13,7 +13,7 @@ angular.module('mc.core.ui.bs.infiniteList', ['mc.core.ui.infiniteList', 'ngSani
             </div>
           </div>
           <div class="panel-actions">
-            <contextual-actions size="sm" no-colors="true" icon-only="true" group="true"></contextual-actions>
+            <contextual-actions size="sm" no-colors="true" icon-only="true" group="true" role="item"></contextual-actions>
           </div>
         </div>
       </div>

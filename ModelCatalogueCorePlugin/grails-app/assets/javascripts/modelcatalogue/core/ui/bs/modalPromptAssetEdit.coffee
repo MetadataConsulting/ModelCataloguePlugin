@@ -44,7 +44,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions></contextual-actions>
+          <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', 'classificationInUse', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance, classificationInUse) ->

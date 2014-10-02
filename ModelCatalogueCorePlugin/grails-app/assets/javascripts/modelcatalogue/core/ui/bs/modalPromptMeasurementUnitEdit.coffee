@@ -29,7 +29,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions></contextual-actions>
+          <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->

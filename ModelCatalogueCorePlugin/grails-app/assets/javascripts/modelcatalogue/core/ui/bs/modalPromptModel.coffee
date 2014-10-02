@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['
             </form>
         </div>
         <div class="modal-footer">
-            <contextual-actions></contextual-actions>
+            <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
         controller: 'saveOrUpdatePublishedElementCtrl'

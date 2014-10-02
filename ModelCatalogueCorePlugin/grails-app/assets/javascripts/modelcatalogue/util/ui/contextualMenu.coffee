@@ -13,11 +13,10 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
 
     updateActions = ->
       $element.empty()
-      for action in actions.getActions($scope.scope ? $scope.$parent)
-        if action.navigation
-          newScope = $scope.$new()
-          newScope.action = action
-          $element.append($compile(getTemplate(action))(newScope))
+      for action in actions.getActions($scope.scope ? $scope.$parent, actions.ROLE_NAVIGATION)
+        newScope = $scope.$new()
+        newScope.action = action
+        $element.append($compile(getTemplate(action))(newScope))
 
     updateActions()
 

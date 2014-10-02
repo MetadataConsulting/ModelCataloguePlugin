@@ -55,7 +55,7 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
             </form>
         </div>
         <div class="modal-footer">
-            <contextual-actions></contextual-actions>
+            <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
 

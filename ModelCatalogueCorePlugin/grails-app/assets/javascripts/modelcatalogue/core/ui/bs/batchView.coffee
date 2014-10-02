@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
     $templateCache.put 'modelcatalogue/core/ui/batchView.html', '''
     <div>
       <span class="contextual-actions-right">
-        <contextual-actions size="sm" no-colors="true"></contextual-actions>
+        <contextual-actions size="sm" no-colors="true" role="item"></contextual-actions>
       </span>
       <h3 class="ce-name">{{batch.name}} <small ng-show="batch.getElementTypeName()"><span class="label" ng-show="batch.archived" ng-class="{'label-danger': batch.archived}">{{batch.status}}</span> (created {{batch.dateCreated | date:'short'}})</small></h3>
       <blockquote class="ce-description" ng-show="batch.description" ng-bind-html="'' + batch.description | linky:'_blank'"></blockquote>
@@ -13,7 +13,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
           <alert ng-repeat="action in pendingActions" type="getType(action)" id="action-{{action.id}}">
             <div class="action-header">
               <div class="pull-right">
-                <contextual-actions group="true" icon-only="true" size="sm" no-colors="true"/>
+                <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="action"/>
               </div>
               <h4>{{action.naturalName}}
                 <small>
@@ -34,7 +34,7 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.d
           <alert ng-repeat="action in performedActions" type="getType(action)" id="action-{{action.id}}">
             <div>
               <div class="pull-right">
-                <contextual-actions group="true" icon-only="true" size="sm" no-colors="true"/>
+                <contextual-actions group="true" icon-only="true" size="sm" no-colors="true" role="action"/>
               </div>
               <h4>{{action.naturalName}}
                 <small>

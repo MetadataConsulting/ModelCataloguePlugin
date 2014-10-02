@@ -3,7 +3,7 @@ angular.module('mc.core.ui.bs.importView', ['mc.core.ui.importView', 'mc.core.ui
     <div>
 
     <span class="contextual-actions-right">
-        <contextual-actions size="sm" no-colors="true"></contextual-actions>
+        <contextual-actions size="sm" no-colors="true" role="item"></contextual-actions>
      </span>
 
           <h3 class="ce-name">{{element.name}} <small ng-show="element.getElementTypeName()">({{element.getElementTypeName()}}: {{element.id}})</small></h3>

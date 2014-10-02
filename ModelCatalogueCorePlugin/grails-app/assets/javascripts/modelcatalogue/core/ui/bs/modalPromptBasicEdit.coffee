@@ -25,7 +25,7 @@ angular.module('mc.core.ui.bs.modalPromptBasicEdit', ['mc.util.messages', 'mc.co
             </form>
         </div>
         <div class="modal-footer">
-          <contextual-actions></contextual-actions>
+          <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', 'names', '$modalInstance', '$controller', ($scope, messages, names, $modalInstance, $controller) ->

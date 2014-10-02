@@ -31,7 +31,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             <div collapse="!settings.enumerated"><simple-object-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></simple-object-editor></div>
         </div>
         <div class="modal-footer">
-          <contextual-actions></contextual-actions>
+          <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
         controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->
