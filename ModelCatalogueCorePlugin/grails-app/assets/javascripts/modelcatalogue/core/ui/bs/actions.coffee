@@ -412,6 +412,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   actionsProvider.registerActionInRole 'delete', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
     return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.delete)
     return undefined if not security.hasRole('ADMIN')
 
     action = {

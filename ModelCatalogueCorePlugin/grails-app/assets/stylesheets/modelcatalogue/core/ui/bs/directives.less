@@ -1,3 +1,4 @@
+
 .clearfix() {
   &:before,
   &:after {
@@ -409,28 +410,6 @@ a div.panel-footer, .with-pointer {
   word-break: break-all;
 }
 
-.inf-table-item-row .contextual-actions {
-  display: none;
-
-  .btn.disabled, .btn[disabled] {
-    color: #c12e2a;
-    opacity: 1;
-  }
-
-}
-
-.inf-table-item-row:hover .contextual-actions {
-  position: absolute;
-  display: inline-flex;
-  margin-top: -5px;
-  width: inherit;
-  opacity: 0.6;
-  margin-left: 30px;
-  &:hover {
-    opacity: 1;
-  }
-}
-
 
 .inf-table-header {
   z-index: 1000;
@@ -439,4 +418,17 @@ a div.panel-footer, .with-pointer {
   .table {
     margin-bottom: 0px;
   }
+}
+
+.actions-row.collapsed {
+  display: none;
+}
+
+.inf-cell-expand, .inf-cell-expand:visited, .inf-cell-expand:hover {
+  color: inherit;
+  cursor: pointer;
+}
+
+.pp-table {
+  background-color: transparent!important;
 }
