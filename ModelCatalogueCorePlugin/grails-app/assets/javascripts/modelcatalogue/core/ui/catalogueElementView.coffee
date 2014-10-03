@@ -134,7 +134,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               icon:   'edit'
               type:   'primary'
               action: (rel) ->
-                args = {relationshipType: rel.type, direction: rel.direction, type: 'new-relationship', update: true, element: element, relation: rel.relation, metadata: angular.copy(rel.ext)}
+                args = {relationshipType: rel.type, direction: rel.direction, type: 'create-new-relationship', update: true, element: element, relation: rel.relation, metadata: angular.copy(rel.ext)}
                 messages.prompt('Update Relationship', '', args).then (updated)->
                   rel.ext = updated.ext
             }

@@ -1,4 +1,4 @@
-angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue']).config [ 'enhanceProvider', (enhanceProvider) ->
+angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue', 'mc.core.elementEnhancer']).config [ 'enhanceProvider', (enhanceProvider) ->
   commaSeparatedList = (things)->
     names = []
     angular.forEach(things, (thing)->
@@ -7,7 +7,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
     names.join(', ')
 
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
-  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', 'catalogue', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance, catalogue) ->
+  factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance) ->
     (element) ->
       class CatalogueElement
         constructor: (element) ->
@@ -62,10 +62,6 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
             $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
 
-
-          self.isInstanceOf   = (type) ->
-            catalogue.isInstanceOf @elementType, type
-
           self.getLabel = ->
               return @classifiedName if @classifiedName?
               if @classifications? && @classifications.length > 0
@@ -78,13 +74,6 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
                 return "#{@name} (#{@getElementTypeName()})"
               else
                 return @name
-
-          self.getIcon = ->
-            catalogue.getIcon(@elementType)
-
-          self.getElementTypeName = ->
-            return @elementTypeName if @elementTypeName
-            @elementTypeName = names.getNaturalName(names.getPropertyNameFromType(@elementType))
 
 
         getUpdatableProperties: () -> angular.copy(@updatableProperties)

@@ -23,7 +23,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
           <tbody>
              <tr class="inf-table-item-row" ng-repeat-start="element in elements"  ng-class="classesForStatus(element)" >
                 <td class="inf-table-item-cell" ng-class="evaluateClasses(column.classes, evaluateValue(column.value, element), element)" ng-repeat="column in columns" ng-init="value = evaluateValue(column.value, element); href = evaluateValue(column.href, element)">
-                  <a title="Show row actions" ng-show="$first" class="inf-cell-expand" ng-click="element.$$expanded = !element.$$expanded" class="btn btn-default"><span class="fa fa-fw" ng-class="{'fa-chevron-up': element.$$expanded, 'fa-chevron-down': !element.$$expanded}"></span></a>&nbsp;
+                  <a title="Show row actions" ng-show="$first" class="inf-cell-expand" ng-click="element.$$expanded = !element.$$expanded" class="btn btn-default"><span class="fa fa-fw" ng-class="{'fa-chevron-up': element.$$expanded, 'fa-chevron-down': !element.$$expanded}"></span></a>
                   <a ng-if="href" ng-href="{{href}}" class="preserve-new-lines">{{value}}</a>
                   <span ng-if="!href" ><span ng-bind-html="value" class="preserve-new-lines"></span></span>
                 </td>

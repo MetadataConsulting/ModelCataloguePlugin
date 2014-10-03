@@ -6,6 +6,7 @@
 #= require listEnhancer
 #= require actionEnhancer
 #= require dateEnhancer
+#= require elementEnhancer
 #= require listReferenceEnhancer
 #= require modelCatalogueApiRoot
 #= require removableItemEnhancer
@@ -22,6 +23,7 @@ angular.module 'mc.core', [
   'mc.core.catalogueElementResource'
   'mc.core.catalogue'
   'mc.core.dateEnhancer'
+  'mc.core.elementEnhancer'
   'mc.core.listEnhancer'
   'mc.core.actionEnhancer'
   'mc.core.listReferenceEnhancer'

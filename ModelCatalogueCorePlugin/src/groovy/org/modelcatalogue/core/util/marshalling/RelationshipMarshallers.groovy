@@ -20,7 +20,8 @@ class RelationshipMarshallers extends AbstractMarshallers {
                 destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.destination),
                 type: rel.relationshipType.info,
                 archived: rel.archived,
-                ext: rel.ext
+                ext: rel.ext,
+                elementType: Relationship.name
         ]
     }
 

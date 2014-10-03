@@ -4,7 +4,9 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
   onListUpdate = (newList) ->
     $scope.loading  = false
     if newList
-      $scope.elements = newList.list
+      $scope.elements = []
+      for element in newList.list
+        $scope.elements.push element
       $scope.next     = newList.next
       $scope.total    = newList.total
       if !columnsDefined

@@ -42,6 +42,11 @@ enum RelationshipDirection {
         }
 
         @Override
+        CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
+            relationship.destination
+        }
+
+        @Override
         String getActionName() {
             "incoming"
         }
@@ -78,6 +83,11 @@ enum RelationshipDirection {
         @Override
         CatalogueElement getRelation(CatalogueElement owner, Relationship relationship) {
             relationship.destination
+        }
+
+        @Override
+        CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
+            relationship.source
         }
 
         @Override
@@ -120,6 +130,11 @@ enum RelationshipDirection {
         }
 
         @Override
+        CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
+            owner == relationship.destination ? relationship.source : relationship.destination
+        }
+
+        @Override
         String getActionName() {
             "relationships"
         }
@@ -128,6 +143,7 @@ enum RelationshipDirection {
     abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type)
     abstract String getDirection(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
+    abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)
     abstract String getActionName()
 
     static RelationshipDirection parse(String direction) {

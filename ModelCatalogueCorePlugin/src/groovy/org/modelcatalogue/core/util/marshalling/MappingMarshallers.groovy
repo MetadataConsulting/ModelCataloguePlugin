@@ -18,7 +18,8 @@ class MappingMarshallers extends AbstractMarshallers {
                 id: map.id,
                 source: CatalogueElementMarshallers.minimalCatalogueElementJSON(map.source),
                 destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(map.destination),
-                mapping: map.mapping
+                mapping: map.mapping,
+                elementType: Mapping.name
         ]
     }
 

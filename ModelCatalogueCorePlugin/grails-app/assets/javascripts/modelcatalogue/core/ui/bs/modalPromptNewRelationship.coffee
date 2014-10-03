@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'new-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', ($modal, $q, messages, catalogueElementResource) ->
+  messagesProvider.setPromptFactory 'create-new-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', ($modal, $q, messages, catalogueElementResource) ->
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')

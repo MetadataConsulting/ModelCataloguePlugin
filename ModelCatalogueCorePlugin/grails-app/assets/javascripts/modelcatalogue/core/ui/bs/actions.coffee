@@ -218,7 +218,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not angular.isFunction $scope.element.getResourceName
     return undefined if $scope.element.isInstanceOf 'dataImport'
+    return undefined if not messages.hasPromptFactory('create-' + $scope.element.getResourceName()) and not messages.hasPromptFactory('edit-' + $scope.element.getResourceName())
     return undefined if not security.hasRole('CURATOR')
 
     action =
@@ -439,6 +441,62 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
+
+  actionsProvider.registerActionInRole 'remove-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('relationship')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   150
+      label:      'Remove'
+      icon:       'glyphicon glyphicon-remove'
+      type:       'danger'
+      action:     ->
+        rel   = $scope.element
+        deferred = $q.defer()
+        messages.confirm('Remove Relationship', "Do you really want to remove relation '#{rel.element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
+          rel.remove().then ->
+            messages.success('Relationship removed!', "#{rel.relation.name} is no longer related to #{rel.element.name}")
+            # reloads the table
+            deferred.resolve(true)
+          , (response) ->
+            if response.data?.errors
+              if angular.isString response.data.errors
+                messages.error response.data.errors
+              else
+                for err in response.data.errors
+                  messages.error err.message
+            else if response.status == 404
+              messages.error('Error removing relationship', 'Relationship cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
+              deferred.resolve(true)
+            else
+              messages.error('Error removing relationship', 'Relationship cannot be removed, see application logs for details')
+
+        deferred.promise
+    }
+  ]
+  actionsProvider.registerActionInRole 'edit-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('relationship')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   100
+      label:      'Edit'
+      icon:       'glyphicon glyphicon-edit'
+      type:       'primary'
+      action:     ->
+        rel   = $scope.element
+        rel.element.refresh().then (element) ->
+          args = {relationshipType: rel.type, direction: rel.direction, type: 'create-new-relationship', update: true, element: element, relation: rel.relation, metadata: angular.copy(rel.ext)}
+          messages.prompt('Update Relationship', '', args).then (updated)->
+            rel.ext = updated.ext
+    }
+  ]
+
   actionsProvider.registerActionInRole 'create-new-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
@@ -452,7 +510,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     icon:       'glyphicon glyphicon-link'
     type:       'success'
     action:     ->
-      messages.prompt('Create Relationship', '', {type: 'new-relationship', element: $scope.element}).then (updated)->
+      messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.element}).then (updated)->
         $scope.element = updated
     }
 
