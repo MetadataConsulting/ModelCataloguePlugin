@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
       <div class="inf-table-body">
         <table ng-show="total > 0" class="inf-table table" infinite-scroll="loadMore()" infinite-scroll-disabled="loading" infinite-scroll-distance="1">
           <tbody>
-             <tr class="inf-table-item-row" ng-repeat-start="element in elements"  ng-class="classesForStatus(element)">
+             <tr class="inf-table-item-row" ng-repeat-start="element in elements"  ng-class="classesForStatus(element)" >
                 <td class="inf-table-item-cell" ng-class="evaluateClasses(column.classes, evaluateValue(column.value, element), element)" ng-repeat="column in columns" ng-init="value = evaluateValue(column.value, element); href = evaluateValue(column.href, element)">
                   <a title="Show row actions" ng-show="$first" class="inf-cell-expand" ng-click="element.$$expanded = !element.$$expanded" class="btn btn-default"><span class="fa fa-fw" ng-class="{'fa-chevron-up': element.$$expanded, 'fa-chevron-down': !element.$$expanded}"></span></a>&nbsp;
                   <a ng-if="href" ng-href="{{href}}" class="preserve-new-lines">{{value}}</a>
@@ -37,9 +37,12 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
              </tr>
           </tbody>
           <tfoot ng-show="loading">
-            <tr class="text-center active">
-              <td colspan="{{columns.length}}" class="col-md-12">
-                <span class="fa fa-refresh fa-spin"></span>
+            <tr class="active">
+              <td colspan="{{columns.length}}" class="col-md-3">
+                <div class="text-center">
+                  <span class="fa fa-refresh fa-spin"></span>
+                  <span class="pull-right text-muted"><em>{{elements.length}} of {{total}}</em></span>
+                </div>
               </td>
             </tr>
           </tfoot>
