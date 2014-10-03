@@ -9,7 +9,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
     controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, $injector, applicationTitle) ->
-      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl', 'archived', 'status']
+      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl', 'archived', 'status', '__enhancedBy']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -279,7 +279,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           newProperties = []
           for prop in element.getUpdatableProperties()
             obj = element[prop]
-            if prop in propExcludes
+            if prop in propExcludes or angular.isFunction(obj)
               continue
             if enhance.isEnhancedBy(obj, 'listReference')
               continue
