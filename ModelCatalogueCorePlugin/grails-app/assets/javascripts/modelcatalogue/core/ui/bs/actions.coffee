@@ -442,6 +442,42 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
+  actionsProvider.registerActionInRole 'remove-mapping', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction($scope.element.isInstanceOf)
+    return undefined if not $scope.element.isInstanceOf('mapping')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+      position:   150
+      label:      'Remove'
+      icon:       'glyphicon glyphicon-remove'
+      type:       'danger'
+      action:     ->
+        mapping   = $scope.element
+        deferred = $q.defer()
+        messages.confirm('Remove Mapping', "Do you really want to remove mapping from #{mapping.source.name} to #{mapping.destination.name}?").then ->
+          mapping.remove().then ->
+            messages.success('Mapping removed!', "#{mapping.destination.name} is no longer related to #{mapping.source.name}")
+            # reloads the table
+            deferred.resolve(true)
+          , (response) ->
+            if response.data?.errors
+              if angular.isString response.data.errors
+                messages.error response.data.errors
+              else
+                for err in response.data.errors
+                  messages.error err.message
+            else if response.status == 404
+              messages.error('Error removing mapping', 'Mapping cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
+              deferred.resolve(true)
+            else
+              messages.error('Error removing mapping', 'Mapping cannot be removed, see application logs for details')
+
+        deferred.promise
+    }
+  ]
+
   actionsProvider.registerActionInRole 'remove-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', '$q', ($rootScope, $scope, $state, messages, names, security, $q) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
@@ -574,20 +610,42 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerActionInRole 'convert', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain')
+    return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('mapping')
 
-    action = {
+    {
       position:   -100
       label:      'Convert'
       icon:       'fa fa-long-arrow-right'
       type:       'primary'
       action:     ->
-        messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
+        if $scope.element.isInstanceOf('valueDomain')
+          messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
+        else if $scope.element.isInstanceOf('mapping')
+          messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element.source, destination: $scope.element.destination})
+
+    }
+  ]
+
+  actionsProvider.registerActionInRole 'edit-mapping', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
+    return undefined if not $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined if not $scope.element.isInstanceOf('mapping')
+
+    action =  {
+      position:   100
+      label:      'Edit'
+      icon:       'glyphicon glyphicon-edit'
+      type:       'primary'
+      action:     ->
+        $scope.element.source.refresh().then (element)->
+          args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}
+          messages.prompt('Update Mapping', '', args).then (updated)->
+            angular.extend $scope.element, updated
 
     }
 
     $scope.$watch 'element.mappings.total', (total) ->
-      action.disabled = not total
+      action.disabled = $scope.element.isInstanceOf('valueDomain') and not total
 
     action
 
