@@ -643,7 +643,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <div class="col-md-8" ng-show="contained.element">
           <blockquote class="ce-description" ng-show="contained.element.description">{{contained.element.description}}</blockquote>
           <h4>Data Elements</h4>
-          <decorated-list list="contained.list" columns="contained.columns" stateless="true"></decorated-list>
+          <infinite-table list="contained.list" columns="contained.columns" stateless="true"></infinite-table>
         </div>
         <hr/>
       </div>

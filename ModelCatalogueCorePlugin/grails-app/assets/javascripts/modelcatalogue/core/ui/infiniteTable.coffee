@@ -40,10 +40,12 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         else
           header.css(position: 'static', width: body.width())
           spacer.css('min-height': "0px")
+          initialOffset = angular.copy(header.offset())
 
       $scope.$watch 'scroll', updateHeader
 
-      windowEl.resize updateHeader
+      windowEl.resize ->
+        updateHeader(windowEl.scrollTop())
 
     ]
   }
