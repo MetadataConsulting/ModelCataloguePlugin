@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', ($scope, columns, $timeout) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', ($scope, columns, $timeout, $element) ->
   columnsDefined = $scope.columns?
 
   onListUpdate = (newList) ->
@@ -21,6 +21,8 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
   $scope.timeBetweenLoading = 1000
 
   $scope.lastLoadTime = new Date().getTime()
+
+  $scope.isVisible = -> $element.is(':visible')
 
   $scope.loadMore = ->
     if $scope.total > $scope.elements.length
