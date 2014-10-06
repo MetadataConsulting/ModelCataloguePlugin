@@ -16,6 +16,13 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       body   = $element.find('.inf-table-body')
       spacer = $element.find('.inf-table-spacer')
 
+
+      windowEl = angular.element($window)
+      handler = -> $scope.scroll = windowEl.scrollTop()
+      windowEl.on('scroll', $scope.$apply.bind($scope, handler))
+
+      handler()
+
       initialOffset = undefined
 
       updateOffset = (newOffset = angular.copy(header.offset())) ->
@@ -35,30 +42,43 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         return ret if $scope.list.order == 'asc'
         ret + '-alt'
 
-      windowEl = angular.element($window)
-      handler = -> $scope.scroll = windowEl.scrollTop()
-      windowEl.on('scroll', $scope.$apply.bind($scope, handler))
-
       updateHeader = (scroll) ->
+        header.css(width: body.width())
         return if not initialOffset
         topPadding = angular.element('.navbar .container').outerHeight() + 1
         if scroll > initialOffset.top - topPadding
-          header.css(position: 'fixed', width: body.width(), top: angular.element('.navbar .container').outerHeight() + 1)
+          header.css(position: 'fixed', top: angular.element('.navbar .container').outerHeight() + 1)
           spacer.css('min-height': "#{header.outerHeight()}px")
         else
           updateOffset()
-          header.css(position: 'static', width: body.width())
+          header.css(position: 'static')
           spacer.css('min-height': "0px")
 
+      loadMoreIfNeeded = ->
+        windowBottom = $scope.scroll + windowEl.height()
+        tableBodyBottom = body.offset().top + body.height()
+        if $scope.isVisible() and windowBottom > tableBodyBottom - Math.max(600, windowEl.height())
+          unless $scope.loading
+            $scope.loadMore()
 
-      $scope.$watch 'scroll', updateHeader
-      $scope.$watch 'list', ->
+      loadMoreIfNeeded()
+
+      update = ->
         updateOffset()
         updateHeader(windowEl.scrollTop())
+        loadMoreIfNeeded()
 
-      windowEl.resize ->
-        updateOffset()
-        updateHeader(windowEl.scrollTop())
+      $scope.$watch 'scroll', (scroll) ->
+        updateHeader(scroll)
+        loadMoreIfNeeded()
+
+
+      $scope.$watch 'isVisible()', updateHeader
+      $scope.$watch 'list', update
+      $scope.$watch 'loading', loadMoreIfNeeded
+
+
+      windowEl.resize -> update
 
     ]
   }

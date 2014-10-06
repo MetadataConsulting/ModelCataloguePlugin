@@ -2,7 +2,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
   columnsDefined = $scope.columns?
 
   onListUpdate = (newList) ->
-    $scope.loading  = false
+    $scope.loading  = newList.empty and newList.total > 0
     if newList
       $scope.elements = []
       for element in newList.list

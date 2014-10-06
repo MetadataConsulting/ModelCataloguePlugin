@@ -19,7 +19,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
       <div ng-show="total > 0"  class="inf-table-spacer">
       </div>
       <div class="inf-table-body">
-        <table ng-show="total > 0" class="inf-table table" infinite-scroll="loadMore()" infinite-scroll-disabled="loading" infinite-scroll-distance="1">
+        <table ng-show="total > 0" class="inf-table table">
           <tbody>
              <tr class="inf-table-item-row" ng-repeat-start="element in elements"  ng-class="classesForStatus(element)" >
                 <td class="inf-table-item-cell" ng-class="evaluateClasses(column.classes, evaluateValue(column.value, element), element)" ng-repeat="column in columns" ng-init="value = evaluateValue(column.value, element); href = evaluateValue(column.href, element)">
