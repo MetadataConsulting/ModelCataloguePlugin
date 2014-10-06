@@ -7,7 +7,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
     templateUrl: 'modelcatalogue/core/ui/infiniteTable.html'
 
-    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$state', '$stateParams', ($scope, $animate, $window, $controller, $element, $state, $stateParams) ->
+    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$state', '$stateParams', '$q', ($scope, $animate, $window, $controller, $element, $state, $stateParams, $q) ->
       angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
       angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
 
@@ -54,12 +54,16 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
           header.css(position: 'static')
           spacer.css('min-height': "0px")
 
+      checkLoadingPromise = $q.when true
+
       loadMoreIfNeeded = ->
-        windowBottom = $scope.scroll + windowEl.height()
-        tableBodyBottom = body.offset().top + body.height()
-        if $scope.isVisible() and windowBottom > tableBodyBottom - Math.max(600, windowEl.height())
-          unless $scope.loading
-            $scope.loadMore()
+        checkLoadingPromise = checkLoadingPromise.then ->
+          windowBottom = $scope.scroll + windowEl.height()
+          tableBodyBottom = body.offset().top + body.height()
+          if $scope.isVisible() and windowBottom > tableBodyBottom - Math.max(600, windowEl.height())
+            unless $scope.loading
+              $q.when $scope.loadMore()
+          $q.when true
 
       loadMoreIfNeeded()
 
@@ -75,7 +79,8 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
       $scope.$watch 'isVisible()', updateHeader
       $scope.$watch 'list', update
-      $scope.$watch 'loading', loadMoreIfNeeded
+      $scope.$watch 'loading', (loading) ->
+        loadMoreIfNeeded() unless loading
 
 
       windowEl.resize -> update
