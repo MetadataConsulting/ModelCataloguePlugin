@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/infiniteTable.html', '''
     <div>
-      <div ng-show="total > 0"  class="inf-table-header">
+      <div class="inf-table-header">
         <table class="inf-table table">
           <thead>
             <tr class="inf-table-header-row">
@@ -31,10 +31,10 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
           </thead>
         </table>
       </div>
-      <div ng-show="total > 0"  class="inf-table-spacer">
+      <div class="inf-table-spacer">
       </div>
       <div class="inf-table-body">
-        <table ng-show="total > 0" class="inf-table table">
+        <table class="inf-table table">
           <tbody>
              <tr class="inf-table-item-row" ng-repeat-start="element in elements"  ng-class="classesForStatus(element)" ng-if="isNotFiltered(element)" >
                 <td class="inf-table-item-cell" ng-class="evaluateClasses(column.classes, evaluateValue(column.value, element), element)" ng-repeat="column in columns" ng-init="value = evaluateValue(column.value, element); href = evaluateValue(column.href, element)">
@@ -53,20 +53,19 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
                 </td>
              </tr>
           </tbody>
-          <tfoot ng-show="loading">
+          <tfoot ng-show="loading || total == 0">
             <tr class="active">
               <td colspan="{{columns.length}}" class="col-md-3">
                 <div class="text-center">
-                  <span class="fa fa-refresh fa-spin"></span>
-                  <span class="pull-right text-muted"><em>{{elements.length}} of {{total}}<span ng-if="isFiltered()"> (unfiltered)</span></em></span>
+                  <span class="fa fa-refresh fa-spin" ng-show="loading"></span>
+                  <span class="fa fa-times-circle"    ng-show="total == 0"></span>
+                  <span class="pull-right text-muted" ng-show="total != 0"><em>{{elements.length}} of {{total}}<span ng-if="isFiltered()"> (unfiltered)</span></em></span>
+                  <span class="pull-right text-muted" ng-show="total == 0"><em>Empty</em></span>
                 </div>
               </td>
             </tr>
           </tfoot>
         </table>
-      </div>
-      <div ng-show="total == 0">
-        <div class="alert alert-warning">Empty</div>
       </div>
     </div>
     '''
