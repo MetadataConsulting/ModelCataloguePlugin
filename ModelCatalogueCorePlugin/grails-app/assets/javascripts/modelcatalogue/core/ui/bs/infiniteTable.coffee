@@ -14,15 +14,15 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
                 </a>
               </th>
             </tr>
-            <tr class="actions-row active" ng-if="$$headerExpanded">
+            <tr class="actions-row active" ng-show="$$headerExpanded">
                 <td class="actions-cell col-md-12" ng-repeat="column in columns" >
                   <input class="form-control" placeholder="Filter {{column.header}}" ng-model="filters[column.header]">
                 </td>
             </tr>
-            <tr class="actions-row active hide" ng-if="$$headerExpanded">
+            <tr class="actions-row active" ng-show="$$headerExpanded">
                 <td class="actions-cell col-md-12" colspan="{{columns.length}}">
                   <div class=" text-right">
-                    <contextual-actions size="sm" no-colors="true" role="item" no-actions="true"></contextual-actions>
+                    <contextual-actions size="sm" no-colors="true" role="header" no-actions="true"></contextual-actions>
                   </div>
                 </td>
             </tr>

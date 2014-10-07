@@ -42,16 +42,46 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         return ret if $scope.list.order == 'asc'
         ret + '-alt'
 
+
+
+      $scope.$$headerExpanded = false
+      $scope.triggerHeaderExpanded = ->
+        $scope.$$headerExpanded = !$scope.$$headerExpanded
+        if header.css('position') == 'fixed'
+          header.find('.contextual-actions button.dropdown-toggle').parent().removeClass('dropup')
+        else
+          header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')
+
+        return false
+
+      $scope.isNotFiltered = (element) ->
+        for column in $scope.columns
+          filter = $scope.filters[column.header]
+          continue if not filter
+          return false if ('' + $scope.evaluateValue(column.value, element))?.toLowerCase().indexOf(filter.toLowerCase()) == -1
+        return true
+
+      $scope.isFiltered = ->
+        for column in $scope.columns
+          filter = $scope.filters[column.header]
+          continue if not filter
+          return true
+        return false
+
       updateHeader = (scroll) ->
         header.css(width: body.width())
-        return if not initialOffset
+        if not initialOffset
+          header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')
+          return
         topPadding = angular.element('.navbar .container').outerHeight() + 1
         if scroll > initialOffset.top - topPadding
           header.css(position: 'fixed', top: angular.element('.navbar .container').outerHeight() + 1)
           spacer.css('min-height': "#{header.outerHeight()}px")
+          header.find('.contextual-actions button.dropdown-toggle').parent().removeClass('dropup')
         else
           updateOffset()
           header.css(position: 'static')
+          header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')
           spacer.css('min-height': "0px")
 
       initFilters = (columns) ->
@@ -90,25 +120,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         loadMoreIfNeeded() unless loading
       $scope.$watch 'filters', (-> loadMoreIfNeeded()), true
 
-
-      $scope.$$headerExpanded = false
-      $scope.triggerHeaderExpanded = ->
-        $scope.$$headerExpanded = !$scope.$$headerExpanded
-        return false
-
-      $scope.isNotFiltered = (element) ->
-        for column in $scope.columns
-          filter = $scope.filters[column.header]
-          continue if not filter
-          return false if ('' + $scope.evaluateValue(column.value, element))?.toLowerCase().indexOf(filter.toLowerCase()) == -1
-        return true
-
-      $scope.isFiltered = ->
-        for column in $scope.columns
-          filter = $scope.filters[column.header]
-          continue if not filter
-          return true
-        return false
+#      $timeout((-> header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')), 100)
 
       windowEl.resize -> update
 
