@@ -54,6 +54,11 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
           header.css(position: 'static')
           spacer.css('min-height': "0px")
 
+      initFilters = (columns) ->
+        $scope.filters ?= {}
+        for column in columns
+          $scope.filters[column.header] = ''
+
       checkLoadingPromise = $q.when true
 
       loadMoreIfNeeded = ->
@@ -66,6 +71,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
           $q.when true
 
       loadMoreIfNeeded()
+      initFilters($scope.columns ? [])
 
       update = ->
         updateOffset()
@@ -79,9 +85,30 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
       $scope.$watch 'isVisible()', updateHeader
       $scope.$watch 'list', update
+      $scope.$watch 'columns', update
       $scope.$watch 'loading', (loading) ->
         loadMoreIfNeeded() unless loading
+      $scope.$watch 'filters', (-> loadMoreIfNeeded()), true
 
+
+      $scope.$$headerExpanded = false
+      $scope.triggerHeaderExpanded = ->
+        $scope.$$headerExpanded = !$scope.$$headerExpanded
+        return false
+
+      $scope.isNotFiltered = (element) ->
+        for column in $scope.columns
+          filter = $scope.filters[column.header]
+          continue if not filter
+          return false if ('' + $scope.evaluateValue(column.value, element))?.toLowerCase().indexOf(filter.toLowerCase()) == -1
+        return true
+
+      $scope.isFiltered = ->
+        for column in $scope.columns
+          filter = $scope.filters[column.header]
+          continue if not filter
+          return true
+        return false
 
       windowEl.resize -> update
 

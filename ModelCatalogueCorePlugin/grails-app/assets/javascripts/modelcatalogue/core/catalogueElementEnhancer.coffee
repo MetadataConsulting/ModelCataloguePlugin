@@ -70,6 +70,10 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               else if(@conceptualDomains? && @conceptualDomains.length>0)
                 conceptualDomains = commaSeparatedList(@conceptualDomains)
                 return "#{@name} (#{@getElementTypeName()} in #{conceptualDomains})"
+              else if @isInstanceOf('relationship')
+                return "#{@source.getLabel()} #{@type.sourceToDestination} {@destination.getLabel()}"
+              else if @isInstanceOf('mapping')
+                return "#{@source.getLabel()} #{@type.sourceToDestination} {@destination.getLabel()}"
               else if (@elementType?)
                 return "#{@name} (#{@getElementTypeName()})"
               else

@@ -9,12 +9,14 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         $scope.elements.push element
       $scope.next     = newList.next
       $scope.total    = newList.total
+      $scope.reports  = newList.availableReports
       if !columnsDefined
         $scope.columns = columns(newList.itemType)
     else
       $scope.elements = []
       $scope.next     = undefined
       $scope.total    = 0
+      $scope.reports  = []
 
   onListUpdate($scope.list)
 
