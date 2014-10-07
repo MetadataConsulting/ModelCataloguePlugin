@@ -80,7 +80,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
           $scope.saveElement = (newVersion) ->
 
             if angular.isString($scope.pending.classification)
-              promise = promise.then -> catalogueElementResource('classification').save({name: $scope.pending.classification}).then (newClassification) ->
+              promise.then -> catalogueElementResource('classification').save({name: $scope.pending.classification}).then (newClassification) ->
                 $scope.copy.classifications.push newClassification
                 $scope.pending.classification = null
 
@@ -93,7 +93,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
             if $scope.copy.file
               $scope.uploading = true
               $scope.upload = $upload.upload({
-                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description, classifications: $scope.copy.classifications}
+                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description}
                 url:                "#{modelCatalogueApiRoot}/asset/upload"
                 file:               $scope.copy.file
                 fileFormDataName:   'asset'
@@ -106,11 +106,16 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
                   for err in result.errors
                     $scope.messages.error err.message
                 else
-                  if args?.create
-                    messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
-                  else
-                    messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
-                  $modalInstance.close(result)
+                  promise = $q.when result
+                  if not angular.equals(result.classifications, $scope.copy.classifications)
+                    result.classifications = $scope.copy.classifications
+                    promise = catalogueElementResource(result.elementType).update(result)
+                  promise.then ->
+                    if args?.create
+                      messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
+                    else
+                      messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
+                    $modalInstance.close(result)
               ).error((data) ->
                 for err in data.errors
                   $scope.messages.error err.message
