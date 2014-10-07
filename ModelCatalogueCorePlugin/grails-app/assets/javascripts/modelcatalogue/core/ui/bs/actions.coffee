@@ -139,7 +139,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   showErrorsUsingMessages = (messages) ->
     (response) ->
-      if response.data and response.data.errors
+      if response?.data and response.data.errors
         if angular.isString response.data.errors
           messages.error response.data.errors
         else
