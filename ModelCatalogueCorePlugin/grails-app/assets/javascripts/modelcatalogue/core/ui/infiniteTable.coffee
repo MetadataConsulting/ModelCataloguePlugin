@@ -120,7 +120,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         loadMoreIfNeeded() unless loading
       $scope.$watch 'filters', (-> loadMoreIfNeeded()), true
 
-#      $timeout((-> header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')), 100)
 
       windowEl.resize -> update
 

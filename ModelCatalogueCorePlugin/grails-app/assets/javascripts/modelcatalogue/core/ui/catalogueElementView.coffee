@@ -119,7 +119,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           tabDefinition =
             heading:  propertyConfiguration.label
-            value:    listEnhancer.createEmptyList(fn.itemType, fn.total)
+            value:    angular.extend(listEnhancer.createEmptyList(fn.itemType, fn.total), {base: fn.base})
             disabled: fn.total == 0
             loader:   fn
             type:     'decorated-list'
@@ -256,9 +256,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           $scope.element.refresh().then (refreshed)->
             $scope.element = refreshed
 
-      $scope.$on 'catalogueElementCreated', refreshElement
-      $scope.$on 'catalogueElementDeleted', refreshElement
-
+      $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedOut', refreshElement
 

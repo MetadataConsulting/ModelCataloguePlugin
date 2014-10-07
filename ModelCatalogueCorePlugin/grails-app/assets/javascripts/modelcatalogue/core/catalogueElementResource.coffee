@@ -22,8 +22,9 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
           result
 
       save: (data) ->
-        enhance(rest(method: 'POST', url: "#{@getIndexPath()}", data: data)).then (result)->
-          $rootScope.$broadcast 'catalogueElementCreated', result
+        url = "#{@getIndexPath()}"
+        enhance(rest(method: 'POST', url: url, data: data)).then (result)->
+          $rootScope.$broadcast 'catalogueElementCreated', result, url, data
           result
 
       update: (data, params) ->

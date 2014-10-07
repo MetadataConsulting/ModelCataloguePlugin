@@ -7,6 +7,7 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
         enhance rest method: 'GET', url: "#{link}#{if tail? then '/' + tail else ''}", params: params
       query.total = listReference.count
       query.link = link.toString()
+      query.base = listReference.link
       query.itemType = listReference.itemType
       query.add = (tail, payload) ->
         if not payload?
@@ -14,8 +15,10 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
           tail = null
         if not payload.elementType?
           payload.elementType = listReference.itemType
-        enhance(rest(method: 'POST', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload)).then (result)->
-          $rootScope.$broadcast 'catalogueElementCreated', payload, result
+
+        url = "#{link}#{if tail? then '/' + tail else ''}"
+        enhance(rest(method: 'POST', url: url, data: payload)).then (result)->
+          $rootScope.$broadcast 'catalogueElementCreated', result, url, payload
           result
       query.remove = (tail, payload) ->
         if not payload?
@@ -23,8 +26,10 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
           tail = null
         if not payload.elementType?
           payload.elementType = listReference.itemType
-        enhance(rest(method: 'DELETE', url: "#{link}#{if tail? then '/' + tail else ''}", data: payload)).then (result)->
-          $rootScope.$broadcast 'catalogueElementDeleted', payload, result
+
+        url = "#{link}#{if tail? then '/' + tail else ''}"
+        enhance(rest(method: 'DELETE', url: url, data: payload)).then (result)->
+          $rootScope.$broadcast 'catalogueElementDeleted', payload, result, url
           result
       query
   ]

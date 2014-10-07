@@ -7,8 +7,8 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
       <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> {{element.name}} <small><span class="label" ng-show="element.status" ng-class="{'label-warning': element.status == 'DRAFT', 'label-info': element.status == 'PENDING', 'label-primary': element.status == 'FINALIZED', 'label-danger': element.status == 'ARCHIVED'}">{{element.status}}</span></small></h3>
       <blockquote class="ce-description" ng-show="element.description" ng-bind-html="'' + element.description | linky:'_blank'"></blockquote>
       <tabset ng-show="showTabs">
-        <tab disabled="tab.disabled" ng-repeat="tab in tabs" active="tab.active" select="select(tab)">
-            <tab-heading>{{tab.heading}}<span ng-show="tab.value.total"> <span class="badge">{{tab.value.total}}</span></span></tab-heading>
+        <tab ng-repeat="tab in tabs" active="tab.active" select="select(tab)">
+            <tab-heading><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge">{{tab.value.total}}</span></span></tab-heading>
             <div ng-switch="tab.type" id="{{tab.name}}-tab" class="cev-tab-content">
               <div ng-switch-when="simple-object-editor">
                 <simple-object-editor ng-if="tab.name != 'enumerations'" object="tab.value" title="Key" value-title="Value"></simple-object-editor>

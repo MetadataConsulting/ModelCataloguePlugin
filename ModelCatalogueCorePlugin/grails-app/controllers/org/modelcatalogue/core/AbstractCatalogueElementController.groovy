@@ -5,6 +5,8 @@ import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.SimpleListWrapper
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
+import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
@@ -152,7 +154,8 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         }
 
         response.status = HttpServletResponse.SC_CREATED
-        reportCapableRespond rel
+        RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
+        reportCapableRespond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)),  relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
     }
 
     protected parseOtherSide() {

@@ -98,7 +98,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.numberOfChildren--
 
 
-      $rootScope.$on 'catalogueElementCreated', (_, __, result) ->
+      $rootScope.$on 'catalogueElementCreated', (_, result) ->
         if result and result.destination and result.source and result.type
           currentDescend = $scope.element[$scope.currentDescend]
           if result.destination.link == $scope.element.link and endsWith(currentDescend.link, "/incoming/#{result.type.name}")

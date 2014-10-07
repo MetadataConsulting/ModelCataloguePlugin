@@ -39,7 +39,7 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
         }
     }
 
-    protected static getDeleteLink(theOwner, Relationship rel) {
+    static getDeleteLink(theOwner, Relationship rel) {
         "${theOwner.info.link}/${theOwner == rel.source ? 'outgoing' : 'incoming'}/${rel.relationshipType.name}"
     }
 }

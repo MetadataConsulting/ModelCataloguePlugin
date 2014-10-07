@@ -1,7 +1,10 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', ($scope, columns, $timeout, $element) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', ($scope, columns, $timeout, $element, modelCatalogueApiRoot) ->
+  originalList = undefined
+
   columnsDefined = $scope.columns?
 
   onListUpdate = (newList) ->
+    originalList = newList
     $scope.loading  = newList.empty and newList.total > 0
     if newList
       $scope.elements = []
@@ -48,4 +51,27 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
 
   $scope.$watch 'list', onListUpdate
+
+  $scope.$on 'catalogueElementCreated', (ignored, newElement, url) ->
+    if originalList and originalList.itemType and newElement and newElement.isInstanceOf and newElement.isInstanceOf(originalList.itemType) and url and originalList.base and (url.indexOf("#{modelCatalogueApiRoot}#{originalList.base}") >= 0 or "#{modelCatalogueApiRoot}#{originalList.base}".indexOf(url) >= 0 or url.indexOf("#{modelCatalogueApiRoot}#{originalList.base.replace('/relationships/', '/outgoing/')}") >= 0 or "#{modelCatalogueApiRoot}#{originalList.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0)
+      $scope.total++
+      $scope.elements.unshift newElement
+      originalList.total = $scope.total if originalList
+
+
+  $scope.$on 'catalogueElementDeleted', (ignored, deleted) ->
+    indexOfDeleted = $scope.elements.indexOf(deleted)
+    if indexOfDeleted == -1 and deleted.link
+      for element, i in $scope.elements
+        if element.link == deleted.link
+          indexOfDeleted = i
+          break
+
+    if indexOfDeleted >= 0
+      $scope.total--
+      $scope.elements.splice indexOfDeleted, 1
+      originalList.total = $scope.total if originalList
+      return
+
+
 ]
