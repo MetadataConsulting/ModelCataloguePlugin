@@ -8,10 +8,12 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
               <th class="inf-table-header-cell" ng-repeat="column in columns" ng-class="evaluateClasses(column.classes)">
                 <a title="Show row actions" ng-show="$first" class="inf-cell-expand" ng-click="triggerHeaderExpanded()" class="btn btn-default"><span class="fa fa-fw" ng-class="{'fa-minus-square-o ': $$headerExpanded, 'fa-plus-square-o ': !$$headerExpanded}"></span></a>
                 <span ng-if="!column.sort">{{column.header}}<span ng-show="!$$headerExpanded &amp;&amp; filters[column.header]" class="text-info" ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span></span>
-                <a class="inf-table-header-sortable" ng-click="sortBy(column)" ng-if="column.sort">
+                <span ng-if=" column.sort"><a class="inf-table-header-sortable" ng-click="sortBy(column)" >
                   <span class="glyphicon" ng-class="getSortClass(column)"></span>
-                  {{column.header}}<span ng-show="!$$headerExpanded &amp;&amp; filters[column.header]" class="text-info" ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span>
+                  {{column.header}}
                 </a>
+                <span ng-show="!$$headerExpanded &amp;&amp; filters[column.header]" class="text-info" ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span>
+                </span>
               </th>
             </tr>
             <tr class="actions-row active" ng-show="$$headerExpanded">
@@ -43,6 +45,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
              </tr>
              <tr class="actions-row active" ng-repeat-end="" ng-if="element.$$expanded && isNotFiltered(element)">
                 <td class="actions-cell col-md-12" colspan="{{columns.length}}">
+                  <blockquote ng-show="element.description" class="preserve-new-lines" ng-bind-html="element.description"></blockquote>
                   <div class=" text-right">
                     <span class="pull-left text-muted"><em>Actions for {{element.getElementTypeName()}}</em></span>
                     <contextual-actions size="sm" no-colors="true" role="item" no-actions="true"></contextual-actions>
