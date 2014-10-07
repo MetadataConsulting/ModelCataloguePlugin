@@ -11,7 +11,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
     compile: recursiveCompile.compile
 
-    controller: ['$scope', '$rootScope', ($scope, $rootScope) ->
+    controller: ['$scope', '$rootScope', '$element', '$timeout', ($scope, $rootScope, $element, $timeout) ->
       $scope.loadingChildren = false
 
       endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
@@ -23,6 +23,22 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         return false if a.elementType != b.elementType
         a.id == b.id
 
+      loadMoreIfNeeded = ->
+        return if not $scope.hasMore
+        return if $scope.showingMore
+        showMore = $element.find('.catalogue-element-treeview-show-more')
+        return if showMore.hasClass '.hide'
+        root = $element.closest('.catalogue-element-treeview-list-root')
+        if showMore.offset()?.top < root.offset()?.top + 3 * root.height()
+          $scope.showingMore = true
+          $scope.showMore().then ->
+            root.hide()
+            root.get(0).offsetHeight
+            root.show()
+            $scope.showingMore = false
+
+
+
       createShowMore  = (list) ->
         ->
           list.next().then (nextList) ->
@@ -30,6 +46,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
               $scope.children.push(angular.extend(item.relation, {metadata: item.ext}))
             $scope.hasMore  = $scope.numberOfChildren > $scope.children.length
             $scope.showMore = createShowMore(nextList)
+            loadMoreIfNeeded()
 
 
       onElementUpdate = (element) ->
@@ -95,6 +112,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
 
       $scope.collapseOrExpand = ->
+        root = $element.closest('.catalogue-element-treeview-list-root')
         return if $scope.loadingChildren
         if $scope.collapsed
           if $scope.children.length == 0 and $scope.numberOfChildren > 0
@@ -112,8 +130,11 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
                 $scope.hasMore    = $scope.numberOfChildren > $scope.children.length
                 if $scope.hasMore
                   $scope.showMore = createShowMore(list)
+                  $timeout loadMoreIfNeeded, 100
+                  root.on 'scroll', loadMoreIfNeeded
                 else
                   $scope.showMore = ->
+                  root.off 'scroll', loadMoreIfNeeded
                 $scope.loadingChildren = false
             else
               $scope.loadingChildren = false
@@ -128,6 +149,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         onElementUpdate($scope.element)
 
       onElementUpdate($scope.element)
+      loadMoreIfNeeded()
     ]
   }
 ]
