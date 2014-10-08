@@ -58,8 +58,8 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     return "#{(asset.size)} B"
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.ImportRow', [
-    {header: "Model Path",        value: " parentModelName + ' -> ' + containingModelName",              classes: 'col-md-2', sort: {property: 'containingModelName', type: 'alphabet'}}
-    {header: "Data Element",        value: 'dataElementName',              classes: 'col-md-2', sort: {property: 'dataElementName', type: 'alphabet'}}
+    {header: "Model Path",      value: " parentModelName + ' -> ' + containingModelName",  classes: 'col-md-2', sort: {property: 'containingModelName', type: 'alphabet'}}
+    {header: "Data Element",    value: 'dataElementName',                                  classes: 'col-md-2', sort: {property: 'dataElementName',     type: 'alphabet'}}
     {
       header: "Data Type",
       value: (row) -> if row.dataType then row.dataType.replace /\|/g , "\n"
@@ -75,10 +75,10 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.DataImport', [
-    {header: "Name",        value: 'name',              classes: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: true, href: 'href()'}
-    {header: "Rows Imported",    value: "imported.total",  classes: 'col-md-3', sort: {property: "imported.total", type: 'alphabet'}}
-    {header: "Rows Pending",    value: 'pendingAction.total',  classes: 'col-md-3', sort: {property: 'pendingAction.total', type: 'alphabet'}}
-    {header: "Rows Queue",    value: 'importQueue.total',  classes: 'col-md-3', sort: {property: 'importQueue.total', type: 'alphabet'}}
+    {header: "Name",          value: 'name',                classes: 'col-md-3', sort: {property: 'name',                 type: 'alphabet'}, show: true, href: 'href()'}
+    {header: "Rows Imported", value: "imported.total",      classes: 'col-md-3', sort: {property: "imported.total",       type: 'alphabet'}}
+    {header: "Rows Pending",  value: 'pendingAction.total', classes: 'col-md-3', sort: {property: 'pendingAction.total',  type: 'alphabet'}}
+    {header: "Rows Queue",    value: 'importQueue.total',   classes: 'col-md-3', sort: {property: 'importQueue.total',    type: 'alphabet'}}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Asset', [

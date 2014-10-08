@@ -42,4 +42,44 @@ angular.module('mc.core.ui.bs.importActions', ['mc.util.ui.actions']).config ['a
     return action
   ]
 
+  actionsProvider.registerActionInRole 'resolveRow', actionsProvider.ROLE_ITEM_ACTION, ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', 'messages', ($scope, $rootScope, modelCatalogueDataArchitect, security, messages)->
+    console.log $scope.element
+    return undefined unless $scope.element
+    return undefined if not angular.isFunction $scope.element.isInstanceOf
+    return undefined unless $scope.element.isInstanceOf 'importRow'
+    return undefined if not security.hasRole('CURATOR')
+
+    action = {
+      label:  'Resolve'
+      icon:   'glyphicon glyphicon-thumbs-up'
+      type:   'default'
+      disabled: $scope.element.imported
+
+      action: ->
+        rel = $scope.element
+
+        deferred = $q.defer()
+        messages.confirm('Resolve Actions', "Do you really want to resolve all actions : \n\n#{rel.actions.join('\n\n')}?").then () ->
+          rel.action().then ->
+            messages.success('Row actions resolved!', "actions are resolved")
+            # reloads the table
+            deferred.resolve(true)
+          , (response) ->
+            if response.status == 404
+              messages.error('Error resolving actions', 'Actions cannot be resolve, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
+              deferred.resolve(true)
+            else
+              messages.error('Error on action', 'Actions cannot be resolved. Possibly there is an error that needs user input')
+
+        deferred.promise
+
+    }
+
+
+    $scope.$watch 'element.imported', (imported) ->
+      action.disabled = imported
+
+    action
+  ]
+
 ]

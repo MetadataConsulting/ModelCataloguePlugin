@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.dataarchitect.ImportRow
 import org.modelcatalogue.core.util.ImportRows
 
 /**
@@ -18,9 +19,9 @@ class ImportRowsMarshaller extends ListWrapperMarshaller {
         def ret = super.prepareJsonMap(elements)
         ret.list = elements.items.collect{
             if(!it.imported){
-                [id: it.id, parentModelName: it.parentModelName, containingModelName: it.containingModelName, dataElementName: it.dataElementName, dataType: it.dataType, measurementUnitName: it.measurementUnitName, actionLinks: getActionsLink(elements.base, it.id, it.rowActions.size()), actions: it.rowActions.collect{it.action}]
+                [id: it.id, parentModelName: it.parentModelName, containingModelName: it.containingModelName, dataElementName: it.dataElementName, dataType: it.dataType, measurementUnitName: it.measurementUnitName, actionLinks: getActionsLink(elements.base, it.id, it.rowActions.size()), actions: it.rowActions.collect{it.action}, imported: false, elementType: ImportRow.name]
             }else{
-                [id: it.id, parentModelName: it.parentModelName, containingModelName: it.containingModelName, dataElementName: it.dataElementName, dataType: it.dataType, measurementUnitName: it.measurementUnitName, actions: it.rowActions.collect{it.action}]
+                [id: it.id, parentModelName: it.parentModelName, containingModelName: it.containingModelName, dataElementName: it.dataElementName, dataType: it.dataType, measurementUnitName: it.measurementUnitName, actions: it.rowActions.collect{it.action}, imported: true, elementType: ImportRow.name]
             }
         }
         ret

@@ -170,6 +170,7 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
         if !tab.disabled and tab.value.empty
           tab.loader().then (result) ->
             tab.value       = result
+        $scope.$broadcast 'infiniteTableRedraw'
 
 
       # watches
