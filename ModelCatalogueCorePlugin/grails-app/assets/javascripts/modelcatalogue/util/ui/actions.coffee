@@ -9,6 +9,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     ROLE_ITEM_ACTION:         'item'
     ROLE_MODAL_ACTION:        'modal'
     ROLE_LIST_HEADER_ACTION:  'header'
+    ROLE_LIST_FOOTER_ACTION:  'footer'
 
   getRoleAwareId = (role, id) -> "role(#{role}):#{id}"
 
@@ -133,6 +134,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       ROLE_ITEM_ACTION:           actionsProvider.ROLE_ITEM_ACTION
       ROLE_MODAL_ACTION:          actionsProvider.ROLE_MODAL_ACTION
       ROLE_LIST_HEADER_ACTION:    actionsProvider.ROLE_LIST_HEADER_ACTION
+      ROLE_LIST_FOOTER_ACTION:    actionsProvider.ROLE_LIST_FOOTER_ACTION
 
     actions.getActions = ($scope, role = undefined) ->
       currentActions = []

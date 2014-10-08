@@ -53,11 +53,11 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
                 </td>
              </tr>
           </tbody>
-          <tfoot ng-show="loading || total == 0">
-            <tr class="active">
+          <tfoot>
+            <tr class="active" ng-click="footerAction.run()">
               <td colspan="{{columns.length}}" class="col-md-3">
                 <div class="text-center">
-                  <span class="fa" ng-class="{'fa-refresh': loading, 'fa-spin' : loading, 'fa-times-circle': total == 0}"></span>
+                  <span class="fa" ng-class="footerAction ? (footerAction.icon + ' text-success') : {'fa-refresh': loading, 'fa-spin' : loading, 'fa-times-circle': total == 0}"></span>
                   <span class="pull-right text-muted" ng-show="total != 0"><em>{{elements.length}} of {{total}}<span ng-if="isFiltered()"> (unfiltered)</span></em></span>
                   <span class="pull-right text-muted" ng-show="total == 0"><em>Empty</em></span>
                 </div>

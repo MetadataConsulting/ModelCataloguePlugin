@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', ($scope, columns, $timeout, $element, modelCatalogueApiRoot) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions) ->
   columnsDefined = $scope.columns?
 
   onListUpdate = (newList) ->
@@ -20,6 +20,11 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       $scope.loading  = false
 
   onListUpdate($scope.list)
+
+
+  footerActions = actions.getActions($scope, actions.ROLE_LIST_FOOTER_ACTION)
+
+  $scope.footerAction = if footerActions then footerActions[0]
 
   $scope.timeBetweenLoading = 1000
 
