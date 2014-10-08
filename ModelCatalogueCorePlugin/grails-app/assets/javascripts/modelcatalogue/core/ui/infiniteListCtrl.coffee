@@ -15,7 +15,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     cell
 
   getRowForElement = (element) ->
-    row = {element: element, classesForStatus: $scope.classesForStatus(element), tail: []}
+    row = {element: element, classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll}
     if $scope.columns
       row.head = getCellForColumn(element, $scope.columns[0])
       if $scope.columns.length > 1
@@ -139,7 +139,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       $scope.list.total = $scope.total if $scope.list
       return
 
-  $scope.$on 'actionPerformed', (_,__, result) ->
+  $scope.$on 'actionPerformed', (_, __, result) ->
     result.then ->
       elements          = $scope.elements
       $scope.elements   = []

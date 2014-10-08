@@ -43,7 +43,6 @@ angular.module('mc.core.ui.bs.importActions', ['mc.util.ui.actions']).config ['a
   ]
 
   actionsProvider.registerActionInRole 'resolveRow', actionsProvider.ROLE_ITEM_ACTION, ['$scope', '$rootScope', 'modelCatalogueDataArchitect', 'security', 'messages', ($scope, $rootScope, modelCatalogueDataArchitect, security, messages)->
-    console.log $scope.element
     return undefined unless $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined unless $scope.element.isInstanceOf 'importRow'

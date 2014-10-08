@@ -1047,4 +1047,28 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
+
+  actionsProvider.registerActionInRole 'expand-all-rows', actionsProvider.ROLE_LIST_HEADER_ACTION, ['$scope', ($scope) ->
+    return undefined unless $scope.rows
+
+    {
+      position:   -10000
+      label:      'Expand All'
+      icon:       'fa fa-plus-square-o'
+      type:       'primary'
+      active:     false
+      action: ->
+        $scope.$$expandAll = not @active
+
+        @active = not @active
+        if @active
+          @label = "Collapse All"
+          @icon  = 'fa fa-minus-square-o'
+        else
+          @label = 'Expand All'
+          @icon  = 'fa fa-plus-square-o'
+
+    }
+  ]
+
 ]
