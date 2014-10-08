@@ -9,7 +9,7 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
       query.link = link.toString()
       query.base = listReference.link
       query.itemType = listReference.itemType
-      query.add = (tail, payload) ->
+      query.add = (tail, payload, update = false) ->
         if not payload?
           payload = tail
           tail = null
@@ -18,7 +18,7 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
 
         url = "#{link}#{if tail? then '/' + tail else ''}"
         enhance(rest(method: 'POST', url: url, data: payload)).then (result)->
-          $rootScope.$broadcast 'catalogueElementCreated', result, url, payload
+          $rootScope.$broadcast 'catalogueElementCreated', result, url, payload unless update
           result
       query.remove = (tail, payload) ->
         if not payload?

@@ -99,7 +99,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
             # this is ignored by binding and handled separately
             $scope.relation.metadata = $scope.metadata
 
-            args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, $scope.relation).then (result) ->
+            args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, $scope.relation, args.update).then (result) ->
               if args.update
                 messages.success('Relationship Updated', "You have updated relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{$scope.relation.name}.")
               else
