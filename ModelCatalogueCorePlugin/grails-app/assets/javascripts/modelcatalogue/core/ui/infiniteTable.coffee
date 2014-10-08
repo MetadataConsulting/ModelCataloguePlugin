@@ -9,8 +9,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
     controller: ['$scope', '$animate', '$window', '$controller', '$element', '$state', '$stateParams', '$q', ($scope, $animate, $window, $controller, $element, $state, $stateParams, $q) ->
       angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
-      angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
-
 
       header = $element.find('.inf-table-header')
       body   = $element.find('.inf-table-body')
@@ -54,20 +52,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
         return false
 
-      $scope.isNotFiltered = (element) ->
-        for column in $scope.columns
-          filter = $scope.filters[column.header]
-          continue if not filter
-          return false if ('' + $scope.evaluateValue(column.value, element))?.toLowerCase().indexOf(filter.toLowerCase()) == -1
-        return true
-
-      $scope.isFiltered = ->
-        for column in $scope.columns
-          filter = $scope.filters[column.header]
-          continue if not filter
-          return true
-        return false
-
       updateHeader = (scroll) ->
         header.css(width: body.width())
         if not initialOffset
@@ -84,10 +68,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
           header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')
           spacer.css('min-height': "0px")
 
-      initFilters = (columns) ->
-        $scope.filters ?= {}
-        for column in columns
-          $scope.filters[column.header] = ''
+
 
       checkLoadingPromise = $q.when true
 
@@ -101,7 +82,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
           $q.when true
 
       loadMoreIfNeeded()
-      initFilters($scope.columns ? [])
+
 
       update = ->
         updateOffset()
@@ -112,14 +93,14 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         updateHeader(scroll)
         loadMoreIfNeeded()
 
-
-      $scope.$watch 'isVisible()', updateHeader
       $scope.$watch 'list', update
       $scope.$watch 'columns', update
       $scope.$watch 'loading', (loading) ->
         loadMoreIfNeeded() unless loading
       $scope.$watch 'filters', (-> loadMoreIfNeeded()), true
 
+      $scope.$on 'infiniteTableRedraw', ->
+        updateHeader()
 
       windowEl.resize -> update
 

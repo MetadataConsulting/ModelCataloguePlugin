@@ -249,6 +249,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           loadTab(tab.property)
         else
           $state.go '.', {property: tab.name, q: tab.search}
+        $scope.$broadcast 'infiniteTableRedraw'
 
 
       refreshElement = () ->
