@@ -378,7 +378,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
   actionsProvider.registerActionInRoles 'create-new-relationship-in-header', [actionsProvider.ROLE_LIST_HEADER_ACTION, actionsProvider.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
-    console.log $scope
     return undefined if not $scope.list
     return undefined if not $scope.list.base
     return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'relationship')
@@ -419,6 +418,22 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:       'success'
       action:     ->
         messages.prompt('Create new mapping for ' + $scope.element.name, '', {type: 'new-mapping', element: $scope.element}).catch showErrorsUsingMessages(messages)
+    }
+  ]
+
+
+  actionsProvider.registerActionInRoles 'create-new-mapping-in-header',  [actionsProvider.ROLE_LIST_HEADER_ACTION, actionsProvider.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+    return undefined if not $scope.$parent.element
+    return undefined if not $scope.$parent.element.hasOwnProperty('mappings')
+    return undefined if not security.hasRole('CURATOR')
+
+    {
+    position:   300
+    label:      'Add'
+    icon:       'fa fa-fw fa-plus-circle'
+    type:       'success'
+    action:     ->
+      messages.prompt('Create new mapping for ' + $scope.$parent.element.name, '', {type: 'new-mapping', element: $scope.$parent.element}).catch showErrorsUsingMessages(messages)
     }
   ]
 
