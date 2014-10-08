@@ -351,7 +351,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'create-new-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerActionInRoles 'create-new-relationship', [actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
     return undefined if not $scope.element.isInstanceOf('org.modelcatalogue.core.CatalogueElement')
@@ -372,6 +372,36 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
+
+    action
+  ]
+
+
+  actionsProvider.registerActionInRoles 'create-new-relationship-in-header', [actionsProvider.ROLE_LIST_HEADER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
+    return undefined if not $scope.list
+    return undefined if not $scope.list.base
+    return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'relationship')
+    return undefined if not $scope.$parent
+    return undefined if not $scope.$parent.element
+    return undefined if not security.hasRole('CURATOR')
+
+    direction = if $scope.list.base?.indexOf('/incoming/') > -1 then 'destinationToSource' else 'sourceToDestination'
+    relationshipType = $scope.list.base.substring($scope.list.base.lastIndexOf('/') + 1)
+
+    action = {
+      position:   200
+      label:      'Add'
+      icon:       'glyphicon glyphicon-plus'
+      type:       'success'
+      action:     ->
+        messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.$parent.element, direction: direction, relationshipTypeName: relationshipType}).catch showErrorsUsingMessages(messages)
+    }
+
+    updateAction = ->
+      action.disabled = $scope.$parent.element.archived
+
+    $scope.$parent.$watch 'element.status', updateAction
+    $scope.$parent.$watch 'element.archived', updateAction
 
     action
   ]
