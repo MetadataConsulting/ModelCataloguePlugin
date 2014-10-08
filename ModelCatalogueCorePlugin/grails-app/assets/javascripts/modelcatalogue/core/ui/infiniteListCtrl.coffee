@@ -26,6 +26,11 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
   $scope.footerAction = if footerActions then footerActions[0]
 
+  $scope.getFooterCentralIconClass = ->
+    return 'fa-refresh fa-spin'                         if $scope.loading
+    return "#{$scope.footerAction.icon} text-success"   if $scope.footerAction
+    return 'fa-times-circle'                            if $scope.total == 0
+
   $scope.timeBetweenLoading = 1000
 
   $scope.lastLoadTime = new Date().getTime()
