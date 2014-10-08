@@ -29,6 +29,8 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
   ]
 
   compile: (element, attrs) ->
+    icon  = """<span class="input-group-addon"><catalogue-element-icon type="'#{attrs.catalogueElementPicker ? ''}' ? '#{attrs.catalogueElementPicker ? ''}' : #{attrs.resource ? 'null'}"></catalogue-element-icon></span>"""
+
     label = if attrs.label then attrs.label else 'null'
     element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, '" + (attrs.catalogueElementPicker ? '') + "', '" + (attrs.resource ? '') + "')" )
     element.attr('autocomplete', "off")
@@ -38,8 +40,16 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
     element.removeAttr('data-catalogue-element-picker')
     element.addClass('form-control')
 
+    unless element.parent().hasClass('input-group')
+      group = angular.element("""<span class="input-group"></span>""")
+      group.append(icon)
+      group.append(element.clone())
+      element.replaceWith group
+
     {
-      pre: ()->
+      pre: (scope, element) ->
+        if element.parent().hasClass('input-group')
+          element.parent().prepend($compile(icon)(scope))
       post: (scope, element) -> $compile(element)(scope)
     }
 
