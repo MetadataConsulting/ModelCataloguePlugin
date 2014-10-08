@@ -133,7 +133,6 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
             promise = promise.then (classification) ->
                 messages.success "Classification #{classification.name} created"
                 $scope.finished = true
-                classification.show()
 
           $scope.select = (step) ->
             return if step != 'classification' and not $scope.classification.name

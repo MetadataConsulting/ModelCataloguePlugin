@@ -3,8 +3,7 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
 
   if $scope.create
       $scope.saveAndCreateAnother ?= ->
-        $scope.save().then (result)->
-          result.show() if result.show
+        $scope.save().then ->
           $scope.copy = $scope.newEntity() ? {}
 
   $scope.saveElement ?= (newVersion) ->
