@@ -422,10 +422,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
 
-  actionsProvider.registerActionInRoles 'create-new-mapping-in-header',  [actionsProvider.ROLE_LIST_HEADER_ACTION, actionsProvider.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
+  actionsProvider.registerActionInRoles 'create-new-mapping-in-header',  [actionsProvider.ROLE_LIST_HEADER_ACTION, actionsProvider.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
     return undefined if not $scope.$parent.element
     return undefined if not $scope.$parent.element.hasOwnProperty('mappings')
     return undefined if not security.hasRole('CURATOR')
+    return undefined if not $scope.list
+    return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'mapping')
 
     {
     position:   300
