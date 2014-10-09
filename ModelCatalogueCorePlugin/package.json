@@ -12,7 +12,8 @@
     "karma-safari-launcher": "~0.1.1",
     "karma-junit-reporter": "~0.2.1",
     "karma-ng-html2js-preprocessor": "~0.1.0",
-    "karma-osx-reporter": "0.0.4"
+    "karma-osx-reporter": "0.0.4",
+    "coffeelint": "~1.6.0"
   },
   "keywords": [
     "metadata"
