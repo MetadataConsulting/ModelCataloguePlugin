@@ -3,13 +3,11 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
 
   if $scope.create
       $scope.saveAndCreateAnother ?= ->
-        $scope.save().then (result)->
-          result.show() if result.show
+        $scope.save().then ->
           $scope.copy = $scope.newEntity() ? {}
 
   $scope.saveElement ?= (newVersion) ->
      $scope.save(newVersion).then (result)->
-       result.show() if result.show
        $modalInstance.close(result)
 
   $scope.hasChanged ?= ->
@@ -43,8 +41,9 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
         messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
       result
     , (response) ->
-      for err in response.data.errors
-        $scope.messages.error err.message
+      if response?.data?.errors
+        for err in response.data.errors
+          $scope.messages.error err.message
       $q.reject response
 
 ]

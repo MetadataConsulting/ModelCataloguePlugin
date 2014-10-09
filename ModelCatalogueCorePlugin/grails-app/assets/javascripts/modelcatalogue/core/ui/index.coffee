@@ -14,6 +14,7 @@
 #= require catalogueElementTreeviewItem
 #= require catalogueElementTreeview
 #= require catalogueElementPicker
+#= require catalogueElementIcon
 #= require catalogueElementProperties
 #= require propertiesPane
 #= require messagesPanel
@@ -39,6 +40,7 @@ angular.module('mc.core.ui', [
   'mc.core.ui.batchView'
   'mc.core.ui.catalogueElementTreeviewItem'
   'mc.core.ui.catalogueElementTreeview'
+  'mc.core.ui.catalogueElementIcon'
   'mc.core.ui.catalogueElementPicker'
   'mc.core.ui.catalogueElementProperties'
   'mc.core.ui.propertiesPane'

@@ -9,7 +9,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
     controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, $injector, applicationTitle) ->
-      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl', 'archived', 'status']
+      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'downloadUrl', 'archived', 'status', '__enhancedBy']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -119,93 +119,13 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           tabDefinition =
             heading:  propertyConfiguration.label
-            value:    listEnhancer.createEmptyList(fn.itemType, fn.total)
+            value:    angular.extend(listEnhancer.createEmptyList(fn.itemType, fn.total), {base: fn.base})
             disabled: fn.total == 0
             loader:   fn
             type:     'decorated-list'
             columns:   propertyConfiguration.columns ? columns(fn.itemType)
-            actions:   $injector.invoke propertyConfiguration.actions ? []
             name:     name
             reports:  []
-
-
-          if fn.itemType == 'org.modelcatalogue.core.Relationship' and security.hasRole('CURATOR')
-            tabDefinition.actions.push {
-              icon:   'edit'
-              type:   'primary'
-              action: (rel) ->
-                args = {relationshipType: rel.type, direction: rel.direction, type: 'new-relationship', update: true, element: element, relation: rel.relation, metadata: angular.copy(rel.ext)}
-                messages.prompt('Update Relationship', '', args).then (updated)->
-                  rel.ext = updated.ext
-            }
-            tabDefinition.actions.push {
-              icon:   'remove'
-              type:   'danger'
-              action: (rel) ->
-                deferred = $q.defer()
-                messages.confirm('Remove Relationship', "Do you really want to remove relation '#{element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
-                    rel.remove().then ->
-                      messages.success('Relationship removed!', "#{rel.relation.name} is no longer related to #{element.name}")
-                      # reloads the table
-                      deferred.resolve(true)
-                    , (response) ->
-                      if response.data?.errors
-                        if angular.isString response.data.errors
-                          messages.error response.data.errors
-                        else
-                          for err in response.data.errors
-                            messages.error err.message
-                      else if response.status == 404
-                        messages.error('Error removing relationship', 'Relationship cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
-                        deferred.resolve(true)
-                      else
-                        messages.error('Error removing relationship', 'Relationship cannot be removed, see application logs for details')
-
-                deferred.promise
-            }
-
-          if fn.itemType == 'org.modelcatalogue.core.Mapping'
-            tabDefinition.actions.push {
-              icon:   'arrow-right'
-              type:   'primary'
-              action: (mapping) ->
-                messages.prompt('', '', {type: 'convert-with-value-domain', source: element, destination: mapping.destination})
-            }
-            if security.hasRole('CURATOR')
-              tabDefinition.actions.push {
-                icon:   'edit'
-                type:   'primary'
-                action: (mapping) ->
-                  args = {type: 'new-mapping', update: true, element: element, mapping: mapping}
-                  messages.prompt('Update Mapping', '', args).then (updated)->
-                    angular.extend mapping, updated
-              }
-              tabDefinition.actions.push {
-                icon:   'remove'
-                type:   'danger'
-                action: (mapping) ->
-                  deferred = $q.defer()
-                  messages.confirm('Remove Mapping', "Do you really want to remove mapping from #{element.name} to #{mapping.destination.name}?").then ->
-                      element.mappings.remove(mapping.destination.id, {}).then ->
-                        messages.success('Mapping removed!', "#{mapping.destination.name} is no longer related to #{element.name}")
-                        # reloads the table
-                        deferred.resolve(true)
-                      , (response) ->
-                        if response.data?.errors
-                          if angular.isString response.data.errors
-                            messages.error response.data.errors
-                          else
-                            for err in response.data.errors
-                              messages.error err.message
-                        else if response.status == 404
-                          messages.error('Error removing mapping', 'Mapping cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
-                          deferred.resolve(true)
-                        else
-                          messages.error('Error removing mapping', 'Mapping cannot be removed, see application logs for details')
-
-                  deferred.promise
-              }
-
 
 
           if tabDefinition.name == $scope.property
@@ -279,7 +199,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           newProperties = []
           for prop in element.getUpdatableProperties()
             obj = element[prop]
-            if prop in propExcludes
+            if prop in propExcludes or angular.isFunction(obj)
               continue
             if enhance.isEnhancedBy(obj, 'listReference')
               continue
@@ -329,6 +249,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           loadTab(tab.property)
         else
           $state.go '.', {property: tab.name, q: tab.search}
+        $scope.$broadcast 'infiniteTableRedraw'
 
 
       refreshElement = () ->
@@ -336,9 +257,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           $scope.element.refresh().then (refreshed)->
             $scope.element = refreshed
 
-      $scope.$on 'catalogueElementCreated', refreshElement
-      $scope.$on 'catalogueElementDeleted', refreshElement
-
+      $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedOut', refreshElement
 

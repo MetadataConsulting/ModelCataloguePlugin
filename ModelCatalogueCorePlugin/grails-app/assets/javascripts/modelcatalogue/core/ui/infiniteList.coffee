@@ -6,8 +6,8 @@ angular.module('mc.core.ui.infiniteList', ['mc.core.ui.infiniteListCtrl', 'ngAni
 
     templateUrl: 'modelcatalogue/core/ui/infinitePanels.html'
 
-    controller: ['$scope', '$animate', '$window', '$controller', ($scope, $animate, $window, $controller) ->
-      angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope}))
+    controller: ['$scope', '$animate', '$window', '$controller', '$element', ($scope, $animate, $window, $controller, $element) ->
+      angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
 
       $scope.extendOrCollapse = ($event)->
         panelContainer = angular.element(angular.element($event.currentTarget).closest('.panel').parent())

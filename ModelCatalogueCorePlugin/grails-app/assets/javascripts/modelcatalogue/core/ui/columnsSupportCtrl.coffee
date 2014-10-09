@@ -3,7 +3,7 @@ angular.module('mc.core.ui.columnsSupportCtrl', []).controller 'columnsSupportCt
      if angular.isFunction(classes) then classes(element) else classes
 
    $scope.evaluateValue = (value, element) ->
-     (if angular.isFunction(value) then value(element) else $scope.$eval(value, element)) ? ''
+     '' + ((if angular.isFunction(value) then value(element) else $scope.$eval(value, element)) ? '')
 
    $scope.showItem = (show, element) ->
      show = 'show()' if show == true

@@ -135,7 +135,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
         customPrompt = promptByTypes[args.type]
 
         if not customPrompt?
-          $log.warn("Prompt for type #type is not registered, using default instead")
+          $log.warn("Prompt for type #{args.type} is not registered, using default instead")
           return prompt(title, body, args)
 
         customPrompt title, body, args

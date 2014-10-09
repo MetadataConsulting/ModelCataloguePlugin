@@ -17,7 +17,7 @@ angular.module('mc.core.ui.propertiesPane', []).directive 'propertiesPane',  [->
 
       $scope.printObject = (object) ->
         vals = []
-        for key, value of object
+        for key, value of object when not key.indexOf('_') == 0 and not angular.isFunction(value)
           vals.push "#{key}: #{value ? ''}"
         vals.join('\n')
 

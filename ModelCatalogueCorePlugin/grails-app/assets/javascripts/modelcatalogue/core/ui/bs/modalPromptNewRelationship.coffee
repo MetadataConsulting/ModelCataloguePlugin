@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'new-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', ($modal, $q, messages, catalogueElementResource) ->
+  messagesProvider.setPromptFactory 'create-new-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', ($modal, $q, messages, catalogueElementResource) ->
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')
@@ -60,8 +60,13 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
           appendToRelationshipTypes = (result) ->
             for type in result.list
-              $scope.relationshipTypes.push {type: type, value: type.sourceToDestination, relation: 'destination',  direction: 'outgoing'} if args.element.isInstanceOf(type.sourceClass)
-              $scope.relationshipTypes.push {type: type, value: type.destinationToSource, relation: 'source',       direction: 'incoming'} if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource
+              outgoing = if args.element.isInstanceOf(type.sourceClass) then {type: type, value: type.sourceToDestination, relation: 'destination',  direction: 'outgoing'}
+              incoming = if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource then {type: type, value: type.destinationToSource, relation: 'source',       direction: 'incoming'}
+              $scope.relationshipTypes.push outgoing if outgoing
+              $scope.relationshipTypes.push incoming if incoming
+
+              if args.relationshipTypeName and args.direction and args.relationshipTypeName == type.name
+                $scope.updateInfo(if args.direction == 'sourceToDestination' then outgoing else incoming)
 
             if result.next.size > 0
               result.next().then appendToRelationshipTypes
@@ -94,7 +99,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
             # this is ignored by binding and handled separately
             $scope.relation.metadata = $scope.metadata
 
-            args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, $scope.relation).then (result) ->
+            args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, $scope.relation, args.update).then (result) ->
               if args.update
                 messages.success('Relationship Updated', "You have updated relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{$scope.relation.name}.")
               else

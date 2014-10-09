@@ -27,6 +27,7 @@ class ImportRowMarshaller extends AbstractMarshallers {
                 metadata: el.metadata,
                 parentModelCode: el.parentModelCode,
                 parentModelName: el.parentModelName,
+                imported: el.imported,
                 rowActions: el.rowActions,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id"
                 ]

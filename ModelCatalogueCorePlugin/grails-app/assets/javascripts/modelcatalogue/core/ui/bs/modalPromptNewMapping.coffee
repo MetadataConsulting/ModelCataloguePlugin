@@ -69,7 +69,7 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
               return
 
 
-            args.element.mappings.add($scope.copy.destination.id, {mapping: $scope.copy.mapping}).then (result) ->
+            args.element.mappings.add($scope.copy.destination.id, {mapping: $scope.copy.mapping}, args.update).then (result) ->
               if args.update
                 messages.success('Mapping Updated', "You have updated mapping from #{args.element.name} to #{$scope.copy.destination.name}.")
               else

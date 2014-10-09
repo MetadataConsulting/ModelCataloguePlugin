@@ -87,10 +87,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.title                    = names.getNaturalName($stateParams.resource)
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
-    $scope.contained                = $scope.$new(true)
-    $scope.contained.noStatusSwitch = $scope.$new(true)
-    $scope.contained.list           = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
-    $scope.contained.element        = if list.size > 0 then list.list[0]
+    $scope.element                  = if list.size > 0 then list.list[0]
+    if $scope.element
+      $scope.dataElements           = angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$scope.element.link}/outgoing/containment"})
+    else
+      $scope.dataElements           = listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
 
 
     if $stateParams.resource == 'batch'
@@ -128,7 +129,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         result = result.substring(0,result.lastIndexOf(","))
       result
 
-    $scope.contained.columns        = [
+    $scope.dataElementsColumns = [
       {header: 'Name',          value: "ext.name || ext.Name || relation.name",        classes: 'col-md-3', show: "relation.show()"}
       {header: 'Description',   value: "relation.description", classes: 'col-md-4'}
       {header: 'Local Identifier', value:  printLocalIdentifiers,     classes: 'col-md-2'}
@@ -138,15 +139,15 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     if $scope.resource == 'model'
       for item in list
-        item._containedElements_ = listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
+        item._containedElements_ = listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
 
       $scope.$on 'treeviewElementSelected', (event, element) ->
         unless element._containedElements_?.size?
           element.contains().then (contained)->
             element._containedElements_ = contained
-            $scope.contained.list       = contained
-        $scope.contained.element        = element
-        $scope.contained.list           = element._containedElements_ ? listEnhancer.createEmptyList('org.modelcatalogue.core.DataElement')
+            $scope.dataElements         = contained
+        $scope.element                  = element
+        $scope.dataElements             = element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{element.link}/outgoing/containment"})
 
     else if $scope.resource == 'newRelationships'
       $scope.columns = [
@@ -613,9 +614,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
       </span>
       <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{title}} List</h2>
-      <decorated-list ng-if="$stateParams.display == undefined || $stateParams.display == 'table'" list="list" columns="columns" state-driven="true" actions="actions"></decorated-list>
-      <infinite-list  ng-if="$stateParams.display == 'grid'"      list="list"></infinite-list>
-      <infinite-table ng-if="$stateParams.display == 'infinite'"  list="list" columns="columns" ></infinite-table>
+      <infinite-list  ng-if="$stateParams.display == 'grid'"  list="list"></infinite-list>
+      <infinite-table ng-if="$stateParams.display != 'grid'"  list="list" columns="columns" ></infinite-table>
     </div>
     <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">
       <div class="row">
@@ -628,23 +628,23 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           </h2>
         </div>
         <div class="col-md-8">
-          <h3 ng-show="contained.element">{{contained.element.metadata.name || contained.element.metadata.Name || contained.element.name}}
-            <small class="text-muted" ng-show="contained.element.metadata.name || contained.element.metadata.Name  &amp;&amp; ((contained.element.metadata.name || contained.element.metadata.Name ) != contained.element.name)">{{contained.element.name}}</small>
+          <h3 ng-show="element">{{element.metadata.name || element.metadata.Name || element.name}}
+            <small class="text-muted" ng-show="element.metadata.name || element.metadata.Name  &amp;&amp; ((element.metadata.name || element.metadata.Name ) != element.name)">{{element.name}}</small>
             <span class="contextual-actions-right">
-              <contextual-actions size="sm" no-colors="true" icon-only="true" scope="contained" role="item"></contextual-actions>
+              <contextual-actions size="sm" no-colors="true" icon-only="true" role="item"></contextual-actions>
             </span>
           </h3>
-          <h3 ng-hide="contained.element">No Selection</h3>
+          <h3 ng-hide="element">No Selection</h3>
         </div>
       </div>
       <div class="row">
         <div class="col-md-4">
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
-        <div class="col-md-8" ng-show="contained.element">
-          <blockquote class="ce-description" ng-show="contained.element.description">{{contained.element.description}}</blockquote>
+        <div class="col-md-8" ng-show="element">
+          <blockquote class="ce-description" ng-show="element.description">{{element.description}}</blockquote>
           <h4>Data Elements</h4>
-          <decorated-list list="contained.list" columns="contained.columns" stateless="true"></decorated-list>
+          <infinite-table list="dataElements" columns="dataElementsColumns" stateless="true"></infinite-table>
         </div>
         <hr/>
       </div>
@@ -889,7 +889,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <div class="panel-heading">
                                 <div class="row">
                                     <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}"><i class="fa fa-file-o fa-5x fa-fw"></i></a>
+                                        <a ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}"><i class="fa fa-file-code-o fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>

@@ -25,7 +25,7 @@ angular.module('mc.core.ui.bs.importView', ['mc.core.ui.importView', 'mc.core.ui
                     </div>
                   </div>
                   <properties-pane item="tab.value" properties="tab.properties" ng-switch-when="properties-pane"></properties-pane>
-                  <decorated-list list="tab.value" columns="tab.columns" actions="tab.actions" ng-switch-when="decorated-list" id="{{id + '-' + tab.name}}" reports="tab.reports"></decorated-list>
+                  <infinite-table  list="tab.value" columns="tab.columns"       ng-switch-when="decorated-list"></infinite-table>
                 </div>
             </tab>
           </tabset>

@@ -4,10 +4,12 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
   actionsChildrenByParentId = {}
   availableActionsById      = {}
   actionsProvider           =
-    ROLE_NAVIGATION:  'navigation'
-    ROLE_LIST_ACTION: 'list'
-    ROLE_ITEM_ACTION: 'item'
-    ROLE_MODAL_ACTION: 'modal'
+    ROLE_NAVIGATION:          'navigation'
+    ROLE_LIST_ACTION:         'list'
+    ROLE_ITEM_ACTION:         'item'
+    ROLE_MODAL_ACTION:        'modal'
+    ROLE_LIST_HEADER_ACTION:  'header'
+    ROLE_LIST_FOOTER_ACTION:  'footer'
 
   getRoleAwareId = (role, id) -> "role(#{role}):#{id}"
 
@@ -53,7 +55,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
   actionsProvider.registerChildAction = (parentId, id, actionFactory, roles = undefined) ->
     registerActionInternal(parentId, id, actionFactory, roles)
 
-  actionsProvider.$get = [ '$injector', '$filter', '$rootScope', ($injector, $filter, $rootScope) ->
+  actionsProvider.$get = [ '$injector', '$filter', '$rootScope', '$q', ($injector, $filter, $rootScope, $q) ->
 
     createAction = (parentId, id, actionFactory, actionsService, $scope) ->
       action = $injector.invoke(actionFactory, undefined, {$scope: $scope, actions: actionsService})
@@ -68,7 +70,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       if action.action
         action.run = ->
           unless action.disabled
-            $rootScope.$broadcast "actionPerformed:#{action.id}", action.action()
+            $rootScope.$broadcast "actionPerformed", action.id, $q.when(action.action())
       else
         action.run = action.run ? ->
 
@@ -127,10 +129,12 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
 
 
     actions =
-      ROLE_NAVIGATION:  actionsProvider.ROLE_NAVIGATION
-      ROLE_LIST_ACTION: actionsProvider.ROLE_LIST_ACTION
-      ROLE_ITEM_ACTION: actionsProvider.ROLE_ITEM_ACTION
-      ROLE_MODAL_ACTION: actionsProvider.ROLE_MODAL_ACTION
+      ROLE_NAVIGATION:            actionsProvider.ROLE_NAVIGATION
+      ROLE_LIST_ACTION:           actionsProvider.ROLE_LIST_ACTION
+      ROLE_ITEM_ACTION:           actionsProvider.ROLE_ITEM_ACTION
+      ROLE_MODAL_ACTION:          actionsProvider.ROLE_MODAL_ACTION
+      ROLE_LIST_HEADER_ACTION:    actionsProvider.ROLE_LIST_HEADER_ACTION
+      ROLE_LIST_FOOTER_ACTION:    actionsProvider.ROLE_LIST_FOOTER_ACTION
 
     actions.getActions = ($scope, role = undefined) ->
       currentActions = []
