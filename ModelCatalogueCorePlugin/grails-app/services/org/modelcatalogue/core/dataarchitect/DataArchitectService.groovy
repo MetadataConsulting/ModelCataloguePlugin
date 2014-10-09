@@ -13,7 +13,6 @@ import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.SecuredRuleExecutor
-import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 
 class DataArchitectService {
 
@@ -207,7 +206,7 @@ class DataArchitectService {
             from ValueDomain v
             where
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-        """, [archived: PublishedElementStatus.ARCHIVED]
+        """, [archived: PublishedElementStatus.DEPRECATED]
     }
 
     ListWithTotal<ValueDomain> duplicateValueDomains(Map params) {
@@ -218,7 +217,7 @@ class DataArchitectService {
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
             and
                 v.name in (select vd.name from ValueDomain vd group by vd.name having count(vd.name) > 1)
-        """, [archived: PublishedElementStatus.ARCHIVED]
+        """, [archived: PublishedElementStatus.DEPRECATED]
     }
 
     Map<Long, String> dataTypesNamesSuggestions() {

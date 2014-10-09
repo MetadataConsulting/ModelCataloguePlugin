@@ -3,7 +3,7 @@ angular.module('mc.core.ui.bs.infiniteList', ['mc.core.ui.infiniteList', 'ngSani
     <div>
       <div class="row" infinite-scroll="loadMore()" infinite-scroll-disabled="loading || !isVisible()" infinite-scroll-distance="2" infinite-scroll-immediate-check="isVisible()">
         <div ng-repeat="element in elements" class="col-lg-4 col-sm-6 col-md-4 expandable infinite-scroll-item">
-          <div class="panel panel-fixed-height-300" ng-class="{'panel-warning': element.status == 'DRAFT', 'panel-info': element.status == 'PENDING', 'panel-default': element.status == 'FINALIZED' || !element.status, 'panel-danger': element.status == 'ARCHIVED'}">
+          <div class="panel panel-fixed-height-300" ng-class="{'panel-warning': element.status == 'DRAFT', 'panel-info': element.status == 'PENDING', 'panel-default': element.status == 'FINALIZED' || !element.status, 'panel-danger': element.status == 'DEPRECATED'}">
             <div class="panel-heading">
               <a><span class="fa close" ng-click="extendOrCollapse($event)"></span></a>
               <h3 class="panel-title" title="{{element.name}}" ng-click="element.show()"><span ng-class="element.getIcon()"></span> {{element.name}}</h3>

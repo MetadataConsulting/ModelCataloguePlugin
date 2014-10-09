@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 
 class PublishedElementService {
 
@@ -63,7 +62,7 @@ class PublishedElementService {
         modelCatalogueSearchService.unindex(archived)
 
         //set archived status from updated to archived
-        archived.status = PublishedElementStatus.ARCHIVED
+        archived.status = PublishedElementStatus.DEPRECATED
         archived.save()
     }
 
@@ -82,21 +81,21 @@ class PublishedElementService {
 
         modelCatalogueSearchService.unindex(archived)
 
-        archived.status = PublishedElementStatus.ARCHIVED
+        archived.status = PublishedElementStatus.DEPRECATED
         archived.save()
     }
 
     public <E extends Model> E finalizeTree(Model model, Collection<Model> tree = []){
 
         //check that it isn't already finalized
-        if(model.status==PublishedElementStatus.FINALIZED || model.status==PublishedElementStatus.ARCHIVED) return model
+        if(model.status==PublishedElementStatus.FINALIZED || model.status==PublishedElementStatus.DEPRECATED) return model
 
         //to avoid infinite loop
         if(!tree.contains(model)) tree.add(model)
 
         //finalize data elements
         model.contains.each{ DataElement dataElement ->
-            if(dataElement.status!=PublishedElementStatus.FINALIZED && dataElement.status!=PublishedElementStatus.ARCHIVED){
+            if(dataElement.status!=PublishedElementStatus.FINALIZED && dataElement.status!=PublishedElementStatus.DEPRECATED){
                 dataElement.status = PublishedElementStatus.FINALIZED
                 dataElement.save(flush:true)
             }

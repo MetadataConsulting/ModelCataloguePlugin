@@ -127,11 +127,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     action = {
       position:   150
-      label:      'Archive'
-      icon:       'glyphicon glyphicon-compressed'
+      label:      'Mark as Deprecated'
+      icon:       'glyphicon glyphicon-ban-circle'
       type:       'danger'
       action:     ->
-        messages.confirm("Do you want to archive #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived").then ->
+        messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
             angular.extend $scope.element, archived
           , showErrorsUsingMessages(messages)
@@ -731,15 +731,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     position: 500
 
     type:     (->
-      return 'info'     if $stateParams.status == 'archived'
-      return 'primary'
-    )()
-    icon:     (->
-      return 'glyphicon glyphicon-time'     if $stateParams.status == 'archived'
+      return 'info'        if $stateParams.status == 'archived'
       return 'glyphicon glyphicon-ok'
     )()
     label:    (->
-      return 'Archived'  if $stateParams.status == 'archived'
+      return 'Archived'    if $stateParams.status == 'archived'
       return 'Active'
     )()
     }

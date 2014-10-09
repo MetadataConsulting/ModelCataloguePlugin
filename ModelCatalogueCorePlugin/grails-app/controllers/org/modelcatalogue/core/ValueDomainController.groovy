@@ -44,7 +44,7 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
         reportCapableRespond Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement", "dataElements"){
             eq "valueDomain", valueDomain
             if (!all) {
-                ne 'status', PublishedElementStatus.ARCHIVED
+                ne 'status', PublishedElementStatus.DEPRECATED
                 ne 'status', PublishedElementStatus.UPDATED
                 ne 'status', PublishedElementStatus.REMOVED
             }

@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -66,7 +65,7 @@ class RelationshipService {
             // XXX: this should be in the relationship type!
             if(!ignoreRules) {
                 if (source.instanceOf(PublishedElement) || destination.instanceOf(PublishedElement)) {
-                    if (relationshipType.name == "containment" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED && source.status != PublishedElementStatus.ARCHIVED) {
+                    if (relationshipType.name == "containment" && source.status != PublishedElementStatus.DRAFT && source.status != PublishedElementStatus.UPDATED && source.status != PublishedElementStatus.DEPRECATED) {
                         relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version of the MODEL before removing any additional elements or archive the element first if you want to delete it.")
                         return relationshipInstance
                     }

@@ -71,14 +71,14 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     static protected Boolean checkChildItemsFinalized(Model model, Collection<Model> tree = []){
 
-        if(model.contains.any{it.status!=PublishedElementStatus.FINALIZED && it.status!=PublishedElementStatus.ARCHIVED }) return false
+        if(model.contains.any{it.status!=PublishedElementStatus.FINALIZED && it.status!=PublishedElementStatus.DEPRECATED }) return false
 
         if(!tree.contains(model)) tree.add(model)
 
         def parentOf = model.parentOf
         if(parentOf) {
             return model.parentOf.any { Model md ->
-                if (md.status != PublishedElementStatus.FINALIZED && md.status != PublishedElementStatus.ARCHIVED) return false
+                if (md.status != PublishedElementStatus.FINALIZED && md.status != PublishedElementStatus.DEPRECATED) return false
                 if(!tree.contains(md)) {
                     if (!checkChildItemsFinalized(md, tree)) return false
                 }
