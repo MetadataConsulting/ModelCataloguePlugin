@@ -130,12 +130,12 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', [
-    {header: "Name",        value: 'name',        classes: 'col-md-4', show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'}}
+    {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'}}
     {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', [
-    {header: "Name",        value: 'name',        classes: 'col-md-4', show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'}}
+    {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'}}
     {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6'}
   ]
 
