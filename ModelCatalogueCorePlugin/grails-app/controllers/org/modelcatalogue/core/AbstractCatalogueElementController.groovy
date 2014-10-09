@@ -155,7 +155,16 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
         response.status = HttpServletResponse.SC_CREATED
         RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
-        reportCapableRespond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)),  relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
+
+        withFormat {
+            json {
+                reportCapableRespond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)),  relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
+            }
+            xml {
+                reportCapableRespond rel
+            }
+        }
+
     }
 
     protected parseOtherSide() {

@@ -32,12 +32,12 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         expect:
         controller.response.status == HttpServletResponse.SC_CREATED
-        json.source
-        json.source.id      == expectedSource.id
-        json.destination
-        json.destination.id == expectedDestination.id
+        json.element
+        json.element.id  == anotherLoadItem.id
+        json.relation
+        json.relation.id == loadItem.id
         json.type
-        json.type.id        == relationshipType.id
+        json.type.id     == relationshipType.id
         resource.count() == totalCount
 
         where:
@@ -57,7 +57,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         def expectedDestination =   direction == "outgoing" ? anotherLoadItem : loadItem
 
         expect:
-        controller.response.status             == HttpServletResponse.SC_CREATED
+        controller.response.status  == HttpServletResponse.SC_CREATED
         xml.source
         xml.source.@id.text()       == "${expectedSource.id}"
         xml.destination
