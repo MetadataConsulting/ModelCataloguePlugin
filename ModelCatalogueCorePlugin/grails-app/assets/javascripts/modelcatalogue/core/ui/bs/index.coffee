@@ -30,6 +30,7 @@
 #= require modalPromptNewRelationship
 #= require modalPromptNewMapping
 #= require modalPromptNewImport
+#= require modalPromptXmlValidate
 #= require simpleObjectEditor
 #= require modalPromptAssetEdit
 #= require modalPromptBasicEdit
@@ -87,6 +88,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewRelationship'
   'mc.core.ui.bs.modalPromptNewMapping'
   'mc.core.ui.bs.modalPromptNewImport'
+  'mc.core.ui.bs.modalPromptXmlValidate'
   'mc.core.ui.bs.modalPromptForCatalogueElement'
   'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'

@@ -92,6 +92,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$controllerName/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$controllerName/$id/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$controllerName/$id/download"(controller: controllerName, action: 'download', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$controllerName/$id/validateXml"(controller: controllerName, action: 'validateXml', method: HttpMethod.POST)
                 }
             }
 

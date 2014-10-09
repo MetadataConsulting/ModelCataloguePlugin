@@ -46,6 +46,7 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
       readMetadata type, 'icon'
 
     catalogue.isInstanceOf = (type, supertype) ->
+      return false if not type
       type = names.getPropertyNameFromType(type)
       supertype = names.getPropertyNameFromType(supertype)
       return true if type == supertype

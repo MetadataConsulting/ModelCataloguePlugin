@@ -439,7 +439,19 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerActionInRole 'validate-xsd-schema', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'catalogue', ($scope, messages, catalogue) ->
+    return undefined if not catalogue.isInstanceOf($scope.element?.elementType, 'asset')
 
+    {
+      position:   0
+      label:      'Validate XML'
+      icon:       'fa fa-fw fa-check-circle-o'
+      type:       'default'
+      action:     ->
+        messages.prompt('', '', {type: 'validate-xml-by-schema', asset: $scope.element})
+
+    }
+  ]
 
   actionsProvider.registerActionInRole 'download-asset', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', '$window', ($scope, $window) ->
     return undefined if not $scope.element?.downloadUrl?
