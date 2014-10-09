@@ -55,6 +55,8 @@ grails.project.dependency.resolution = {
             export = false
         }
 
+        runtime ':database-migration:1.3.6'
+
         compile ":asset-pipeline:1.9.4"
         compile ":coffee-asset-pipeline:1.8.0"
         compile ":less-asset-pipeline:1.9.0"
