@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
-import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 
 
