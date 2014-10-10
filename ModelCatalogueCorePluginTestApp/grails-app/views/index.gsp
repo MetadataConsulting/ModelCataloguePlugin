@@ -72,6 +72,7 @@
         </div>
     </div>
     <messages-panel max="3" growl="true"></messages-panel>
+    %{--<shopping-cart></shopping-cart>--}%
 </div>
 </body>
 </html>

@@ -23,6 +23,7 @@
 #= require simpleObjectEditor
 #= require resizable
 #= require elementsAsTags
+#= require shoppingCart
 
 angular.module('mc.core.ui', [
   # depends on
@@ -50,4 +51,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.simpleObjectEditor'
   'mc.core.ui.resizable'
   'mc.core.ui.elementsAsTags'
+  'mc.core.ui.shoppingCart'
 ])
