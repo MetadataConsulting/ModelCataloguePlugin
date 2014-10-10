@@ -471,3 +471,49 @@ a div.panel-footer, .with-pointer {
     }
   }
 }
+
+.ins, ins {
+  color: green;
+  text-decoration: none;
+}
+.del, del {
+  color: red;
+  text-decoration: none;
+}
+
+.monospace {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.del, .ins {
+  margin-left: 25px;
+  .noselect {
+    .monospace();
+    width: 2em;
+    display: inline-block;
+    text-align: center;
+    margin-left: -30px;
+  }
+}
+
+.hide-del {
+  .del {
+    display: none;
+  }
+}
+
+.hide-ins {
+  .ins {
+    display: none;
+  }
+}
+
+.diff-table {
+  td {
+    min-width: 300px;
+  }
+  th {
+    min-width: 250px;
+  }
+}
+

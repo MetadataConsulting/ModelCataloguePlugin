@@ -71,7 +71,7 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
       Returns true if enhanced by any enhancer
     ###
     enhance.isEnhanced = (object) ->
-      object?.__enhancedBy?
+      object?.__enhancedBy? and object.__enhancedBy.length != 0
 
     enhance
   ]

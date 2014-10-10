@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Model Catalogue",
   "dependencies": {
-    "bower": "~1.2.8"
+    "bower": "~1.3.12"
   },
   "devDependencies": {
     "karma": "~0.10",

@@ -61,6 +61,27 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   ]
 
+  actionsProvider.registerActionInRole 'compare-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', '$state', ($scope, messages, $state) ->
+    elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName)
+    diffView = $state.current.name == 'mc.resource.diff'
+
+    return undefined if not elementPresent and not diffView
+
+    element = if elementPresent then $scope.element else $scope.elements[0]
+    ids = if elementPresent then [element.id] else (e.id for e in $scope.elements)
+
+    {
+      position: 500
+      label: if elementPresent then 'Compare' else 'Compare Another'
+      icon: 'fa fa-arrows-h'
+      type: 'primary'
+      action: ->
+        messages.prompt('Compare ' + element.getElementTypeName(), "Select the #{element.getElementTypeName()} for the comparison",
+          {type: 'catalogue-element', resource: element.getResourceName()}).then (toBeCompared)->
+            $state.go 'mc.resource.diff', ids: ids.concat([toBeCompared.id]).join('~')
+    }
+  ]
+
   actionsProvider.registerActionInRole 'create-new-version', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
@@ -391,7 +412,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action = {
       position:   200
       label:      'Add'
-      icon:       'fa fa-fw fa-plus-circle'
+      icon:       'fa fa-plus-circle'
       type:       'success'
       action:     ->
         messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.$parent.element, direction: direction, relationshipTypeName: relationshipType}).catch showErrorsUsingMessages(messages)
@@ -432,7 +453,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
     position:   300
     label:      'Add'
-    icon:       'fa fa-fw fa-plus-circle'
+    icon:       'fa fa-plus-circle'
     type:       'success'
     action:     ->
       messages.prompt('Create new mapping for ' + $scope.$parent.element.name, '', {type: 'new-mapping', element: $scope.$parent.element}).catch showErrorsUsingMessages(messages)
@@ -445,7 +466,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     {
       position:   0
       label:      'Validate XML'
-      icon:       'fa fa-fw fa-check-circle-o'
+      icon:       'fa fa-check-circle-o'
       type:       'default'
       action:     ->
         messages.prompt('', '', {type: 'validate-xml-by-schema', asset: $scope.element})

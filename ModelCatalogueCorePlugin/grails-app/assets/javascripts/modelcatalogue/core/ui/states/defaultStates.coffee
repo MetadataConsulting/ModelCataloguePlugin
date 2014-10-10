@@ -77,6 +77,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.element  = element
 ])
 
+.controller('mc.core.ui.states.DiffCtrl', ['$scope', '$stateParams', '$state', '$log', 'elements', 'applicationTitle', ($scope, $stateParams, $state, $log, elements, applicationTitle) ->
+    $scope.elements = elements
+    applicationTitle "Comparison of #{(element.getLabel() for element in elements).join(' and ')}"
+])
+
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', 'messages', 'modelCatalogueApiRoot', 'rest', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle, messages, modelCatalogueApiRoot, rest) ->
     listEnhancer    = enhance.getEnhancer('list')
 
@@ -221,6 +226,18 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     url: '/:resource'
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
   }
+
+
+  $stateProvider.state 'mc.resource.diff', {
+    url: '/diff/{ids:(?:\\d+)(?:\\~\\d+)+}'
+    templateUrl: 'modelcatalogue/core/ui/state/diff.html'
+    resolve:
+      elements: ['$stateParams','catalogueElementResource', '$q', ($stateParams, catalogueElementResource, $q) ->
+        $q.all (catalogueElementResource($stateParams.resource).get(id) for id in $stateParams.ids.split('~'))
+      ]
+    controller: 'mc.core.ui.states.DiffCtrl'
+  }
+
   $stateProvider.state 'mc.resource.list', {
     url: '/all?page&order&sort&status&q&max&classification&display'
 
@@ -467,7 +484,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         }
 
         actions.push {
-          condition: (term) -> term and $state.$current.params.indexOf('q') >= 0 and $state.params.resource
+          condition: (term) -> term and 'q' in $state.$current.params and $state.params.resource
           label: (term) ->
             naturalName = names.getNaturalName($state.params.resource)
             "Search any <strong>#{naturalName}</strong> for <strong>#{term}</strong>"
@@ -605,6 +622,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   $templateCache.put 'modelcatalogue/core/ui/state/parent.html', '''
     <ui-view></ui-view>
+  '''
+
+  $templateCache.put 'modelcatalogue/core/ui/state/diff.html', '''
+    <span class="contextual-actions-right">
+      <contextual-actions size="sm" no-colors="true" role="item"></contextual-actions>
+    </span>
+    <h2>Comparison</h2>
+    <diff-table elements="elements"></diff-table>
   '''
 
   #language=HTML

@@ -53,6 +53,7 @@
 #= require classificationWizard
 #= require elementsAsTags
 #= require shoppingCart
+#= require diffTable
 
 
 angular.module('mc.core.ui.bs', [
@@ -110,4 +111,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.classificationWizard'
   'mc.core.ui.bs.elementsAsTags'
   'mc.core.ui.bs.shoppingCart'
+  'mc.core.ui.bs.diffTable'
 ])

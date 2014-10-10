@@ -1,6 +1,8 @@
 #= require_self
 #= require angular-ui-router/release/angular-ui-router
-#= require ng-file-upload/angular-file-upload.js
+#= require ng-file-upload/angular-file-upload
+#= require google-diff-match-patch/javascript/diff_match_patch
+#= require angular-diff-match-patch-musketyr/angular-diff-match-patch.js
 #= require modelcatalogue/core/index
 #= require decoratedList
 #= require infiniteList
@@ -24,6 +26,7 @@
 #= require resizable
 #= require elementsAsTags
 #= require shoppingCart
+#= require diffTable
 
 angular.module('mc.core.ui', [
   # depends on
@@ -52,4 +55,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.resizable'
   'mc.core.ui.elementsAsTags'
   'mc.core.ui.shoppingCart'
+  'mc.core.ui.diffTable'
 ])
