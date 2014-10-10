@@ -10,11 +10,15 @@ angular.module('mc.core.ui.bs.diffTable', ['mc.core.ui.diffTable']).run [ '$temp
           </thead>
           <tbody>
             <tr ng-repeat="row in rows">
-              <th class="col-md-2" ng-class="{'warning': !row.noChange, 'success': row.noChange}">{{row.name}}</th>
+              <th class="col-md-2" ng-class="{'warning': !row.noChange, 'success': row.noChange}">{{row.name}} <span class="fa fa-fw fa-plus-square-o" ng-show="row.hasLoaders && !row.loading" ng-click="row.expand()"></span><span class="fa fa-fw fa-refresh" ng-show="row.hasLoaders && row.loading"></span></th>
               <td ng-repeat="value in row.values track by $index" class="col-md-5" ng-class="{'hide-del': row.values[0] == ' ' &amp;&amp; value, 'hide-ins': value == ' '  &amp;&amp; row.values[0], 'warning': !row.noChanges[$index], 'success': row.noChanges[$index]}">
                 <div ng-if=" $first" class="preserve-new-lines"><span ng-if="!row.hrefs[$index]">{{value}}</span><a ng-if="row.hrefs[$index]" ng-href="{{row.hrefs[$index]}}">{{value}}</a></div>
-                <div ng-if="!$first && !row.hrefs[$index]" processing-diff left-obj="row.values[0]" right-obj="value" class="preserve-new-lines"></div>
-                <a   ng-if="!$first &&  row.hrefs[$index]" ng-href="{{row.hrefs[$index]}}"  processing-diff left-obj="row.values[0]" right-obj="value" class="preserve-new-lines"></div>
+                <div ng-if="!$first">
+                  <div ng-if="!row.hrefs[$index] &amp;&amp; !row.multiline" processing-diff left-obj="row.values[0]" right-obj="value" class="preserve-new-lines"></div>
+                  <div ng-if="!row.hrefs[$index] &amp;&amp;  row.multiline"       line-diff left-obj="row.values[0]" right-obj="value" class="preserve-new-lines"></div>
+                  <a   ng-if=" row.hrefs[$index] &amp;&amp; !row.multiline" processing-diff left-obj="row.values[0]" right-obj="value" class="preserve-new-lines" ng-href="{{row.hrefs[$index]}}" ></a>
+                  <a   ng-if=" row.hrefs[$index] &amp;&amp;  row.multiline"       line-diff left-obj="row.values[0]" right-obj="value" class="preserve-new-lines" ng-href="{{row.hrefs[$index]}}" ></a>
+                </div>
               </td>
             </tr>
           </tbody>
