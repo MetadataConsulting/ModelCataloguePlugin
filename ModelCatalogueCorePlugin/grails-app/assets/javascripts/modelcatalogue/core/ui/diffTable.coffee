@@ -51,8 +51,10 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
           row.values[i] = value
         else if angular.isNumber(value)
           row.values[i] = printNumber(value)
+          row.multiline = true
         else if angular.isDate(value)
           row.values[i] = $filter('date')(value, 'medium')
+          row.multiline = true
         else if angular.isFunction(value.getLabel)
           row.values[i] = value.getLabel()
           row.hrefs[i]  = value.href() if angular.isFunction(value.href)
@@ -63,6 +65,7 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
           if enhance.isEnhancedBy(value, 'listReference')
             row.values[i] = printNumber(value.total) + ' item(s)'
             row.loaders[i] = value
+            row.multiline = true
             if value.total > 0
               row.hrefs[i]  = $state.href 'mc.resource.show.property', resource: element.getResourceName(), id: element.id, property: key
 
@@ -104,6 +107,8 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
               promises.push loader(null, max: 100)
 
           $q.all(promises).then (results) =>
+            console.log results
+
             @loading = false
             @hasLoaders = false
 
@@ -111,9 +116,15 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
 
             for result, j in results
               sorted = $filter('orderBy')((getLabel(item) for item in (result.list ? [])), 'toString()')
-              newRow.values[j] = 'TOO MANY RESULTS!\n' + sorted.join('\n') + if result.total > 100 then '\n...' else ''
+              newRow.values[j] = sorted.join('\n') + if result.total > 100 then '\n...' else ''
+              newRow.values[j] = 'No items' unless newRow.values[j]
 
-            $scope.rows.splice($scope.rows.indexOf(@) + 1, 0, handleChangesAndLoaders(newRow))
+              console.log result, j, newRow.values[j]
+
+            newRow = handleChangesAndLoaders(newRow)
+            @noChanges = angular.copy newRow.noChanges
+            @noChange  = newRow.noChange
+            $scope.rows.splice($scope.rows.indexOf(@) + 1, 0, newRow)
 
 
       $scope.rows.push row

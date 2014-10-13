@@ -79,7 +79,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
 .controller('mc.core.ui.states.DiffCtrl', ['$scope', '$stateParams', '$state', '$log', 'elements', 'applicationTitle', ($scope, $stateParams, $state, $log, elements, applicationTitle) ->
     $scope.elements = elements
-    applicationTitle "Comparison of #{(element.getLabel() for element in elements).join(' and ')}"
+    applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
 ])
 
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', 'messages', 'modelCatalogueApiRoot', 'rest', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle, messages, modelCatalogueApiRoot, rest) ->
