@@ -37,7 +37,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
         <table class="inf-table table">
           <tbody ng-if="rows">
              <tr class="inf-table-item-row" ng-repeat-start="row in rows"  ng-class="row.classesForStatus" ng-if="isNotFiltered(row)">
-                <td class="inf-table-item-cell" ng-class="cell.classes" ng-switch="row.head.type">
+                <td class="inf-table-item-cell" ng-class="row.head.classes" ng-switch="row.head.type">
                   <a title="Show row actions" class="inf-cell-expand" ng-click="row.$$expanded = !row.$$expanded" class="btn btn-default"><span class="fa fa-fw" ng-class="{'fa-minus-square-o ': row.$$expanded, 'fa-plus-square-o ': !row.$$expanded}"></span></a>
                   <a    ng-switch-when="link" ng-href="{{row.head.href}}" class="preserve-new-lines">{{row.head.value}}</a>
                   <span ng-switch-when="html" ><span ng-bind-html="row.head.value" class="preserve-new-lines"></span></span>
