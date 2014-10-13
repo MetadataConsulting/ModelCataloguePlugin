@@ -1,19 +1,23 @@
 package org.modelcatalogue.core.security
 
-class User {
+import org.modelcatalogue.core.CatalogueElement
+
+class User extends CatalogueElement {
 
     transient modelCatalogueSecurityService
 
     String username
     String password
+    String email
     boolean enabled
     boolean accountExpired
     boolean accountLocked
     boolean passwordExpired
 
     static constraints = {
-        username blank: false, unique: true
-        password blank: false
+        username blank: false, unique: true, maxSize: 255
+        password blank: false, maxSize: 255
+        email    email: true, maxSize: 255
     }
 
     static mapping = {
