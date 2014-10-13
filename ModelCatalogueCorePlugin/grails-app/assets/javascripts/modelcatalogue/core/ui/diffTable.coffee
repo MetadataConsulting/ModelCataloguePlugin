@@ -5,8 +5,8 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
     elements: '='
   templateUrl: 'modelcatalogue/core/ui/diffTable.html'
 
-  controller: ['$scope', 'names', 'catalogueElementProperties', 'security', 'enhance', '$filter', '$state', '$q', ($scope, names, catalogueElementProperties, security, enhance, $filter, $state, $q)->
-    propExcludes = ['version', 'id', 'link', 'modelCatalogueId', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'downloadUrl', 'archived', 'dateCreated', 'lastUpdated', 'versionCreated',  '__enhancedBy', 'defaultExcludes', 'updatableProperties']
+  controller: ['$scope', 'names', 'catalogueElementProperties', 'security', 'enhance', '$filter', '$state', '$q', 'modelCatalogueApiRoot', '$http', ($scope, names, catalogueElementProperties, security, enhance, $filter, $state, $q, modelCatalogueApiRoot, $http)->
+    propExcludes = ['version', 'id', 'link', 'modelCatalogueId', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'archived', 'dateCreated', 'lastUpdated', 'versionCreated',  '__enhancedBy', 'defaultExcludes', 'updatableProperties']
 
     printNumber = (number) -> '' + number
 
@@ -25,6 +25,22 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
         entries.push "#{key}: #{value}"
 
       printArray entries
+
+
+    entityMap =
+        "&": "&amp;"
+        "<": "&lt;"
+        ">": "&gt;"
+        '"': '&quot;'
+        "'": '&#39;'
+        "/": '&#x2F;'
+
+    escapeString    = (string) -> String(string).replace /[&<>"'\/]/g, (s) -> entityMap[s]
+    unescapeString  = (string) ->
+      ret = string
+      for key, value of entityMap
+        ret = String(ret).split(value).join(key)
+      ret
 
     getLabel = (element) ->
       return element.getLabel()             if angular.isFunction(element.getLabel)
@@ -47,6 +63,18 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
 
         if !value
           row.values[i] = ' ' # empty string won't trigger the diff
+        else if key == 'downloadUrl'
+          row.name = 'Content'
+          row.values[i] = element.originalFileName
+          row.hrefs[i] = modelCatalogueApiRoot + element.link + '/download'
+          row.multiline = true
+          row.html = false
+          ((theRow, ii) ->
+            theRow.loaders[ii] = ->
+              $http(method: 'GET', url: theRow.hrefs[ii].replace('/download', '/content'), responseType: 'text').then (response) ->
+                escapeString response.data
+          )(row, i)
+
         else if angular.isString(value)
           row.values[i] = value
         else if angular.isNumber(value)
@@ -64,10 +92,13 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
         else if angular.isFunction(value)
           if enhance.isEnhancedBy(value, 'listReference')
             row.values[i] = printNumber(value.total) + ' item(s)'
-            row.loaders[i] = value
             row.multiline = true
             if value.total > 0
-              row.hrefs[i]  = $state.href 'mc.resource.show.property', resource: element.getResourceName(), id: element.id, property: key
+              row.loaders[i] = value
+              row.hrefs[i]   = $state.href 'mc.resource.show.property', resource: element.getResourceName(), id: element.id, property: key
+
+
+
 
         else if angular.isObject(value)
           if not enhance.isEnhanced(value)
@@ -82,12 +113,12 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
     handleChangesAndLoaders = (aRow) ->
       aRow.noChanges = []
       aRow.noChange = true
-      aRow.hasLoaders = aRow.loaders[0]? && aRow.loaders[0].total > 0
+      aRow.hasLoaders = aRow.loaders[0]?
       referenceValue = aRow.values[0]
       for value, i in aRow.values.slice(1)
         aRow.noChanges[i+1] = angular.equals(referenceValue, value)
         aRow.noChange = aRow.noChange && angular.equals(referenceValue, value)
-        aRow.hasLoaders = aRow.hasLoaders || aRow.loaders[i+1]? && aRow.loaders[i+1].total > 0
+        aRow.hasLoaders = aRow.hasLoaders || aRow.loaders[i+1]?
       aRow.noChanges[0] = aRow.noChange
       aRow
 
@@ -114,9 +145,14 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
             newRow = values: [], loaders: [], multiline: true
 
             for result, j in results
-              sorted = $filter('orderBy')((getLabel(item) for item in (result.list ? [])), 'toString()')
-              newRow.values[j] = sorted.join('\n') + if result.total > 100 then '\n...' else ''
-              newRow.values[j] = 'No items' unless newRow.values[j]
+              if enhance.isEnhancedBy(result, 'list')
+                sorted = $filter('orderBy')((getLabel(item) for item in (result.list ? [])), 'toString()')
+                newRow.values[j] = sorted.join('\n') + if result.total > 100 then '\n...' else ''
+                newRow.values[j] = 'No items' unless newRow.values[j]
+              else if angular.isString(result)
+                newRow.values[j] = result ? 'Nothing'
+              else if angular.equals(result, [])
+                newRow.values[j] = 'No items'
 
             newRow = handleChangesAndLoaders(newRow)
             @noChanges = angular.copy newRow.noChanges

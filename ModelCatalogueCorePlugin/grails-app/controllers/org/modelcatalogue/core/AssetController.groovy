@@ -63,7 +63,15 @@ class AssetController extends AbstractPublishedElementController<Asset> {
 
     }
 
+    def content() {
+        serveOrDownload(true)
+    }
+
     def download() {
+        serveOrDownload(false)
+    }
+
+    protected serveOrDownload(boolean serve) {
         Asset currentAsset = Asset.get(params.id)
         if (!currentAsset) {
             notFound()
@@ -83,7 +91,9 @@ class AssetController extends AbstractPublishedElementController<Asset> {
             return
         }
 
-        response.setHeader("Content-disposition", "filename=${asset.originalFileName}")
+        if (!serve) {
+            response.setHeader("Content-disposition", "filename=${asset.originalFileName}")
+        }
 
         response.contentType    = asset.contentType
         response.contentLength  = asset.size
