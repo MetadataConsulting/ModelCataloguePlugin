@@ -62,7 +62,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'compare-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', '$state', ($scope, messages, $state) ->
-    elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName)
+    elementPresent = $scope.element and angular.isFunction($scope.element.getResourceName) and angular.isFunction($scope.element.getElementTypeName) and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('catalogueElement')
     diffView = $state.current.name == 'mc.resource.diff'
 
     return undefined if not elementPresent and not diffView

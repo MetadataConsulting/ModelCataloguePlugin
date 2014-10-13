@@ -55,10 +55,13 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
   actionsProvider.registerChildAction = (parentId, id, actionFactory, roles = undefined) ->
     registerActionInternal(parentId, id, actionFactory, roles)
 
-  actionsProvider.$get = [ '$injector', '$filter', '$rootScope', '$q', ($injector, $filter, $rootScope, $q) ->
+  actionsProvider.$get = [ '$injector', '$filter', '$rootScope', '$q', '$log', ($injector, $filter, $rootScope, $q, $log) ->
 
     createAction = (parentId, id, actionFactory, actionsService, $scope) ->
-      action = $injector.invoke(actionFactory, undefined, {$scope: $scope, actions: actionsService})
+      try
+        action = $injector.invoke(actionFactory, undefined, {$scope: $scope, actions: actionsService})
+      catch e
+        $log.error e
 
       return if not action
 
