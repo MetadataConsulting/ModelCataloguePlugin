@@ -50,7 +50,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     return "#{(asset.size)} B"
 
   attachmentColumns = -> [
-    {header: "Name",        value: 'relation.name', class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: 'relation.show()'}
+    {header: "Name",        value: 'relation.name', class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: 'relation.show()', href: 'relation.href()'}
     {header: "File Name",   value: 'relation.originalFileName',  class: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
     {header: "Size",        value: computeBytes,                 class: 'col-md-2', sort: {property: 'size', type: 'order'}}
     {header: "Mime Type",   value: 'relation.contentType',       class: 'col-md-2', sort: {property: 'contentType', type: 'alphabet'}}
@@ -78,8 +78,8 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     hidden: (security) ->
       !security.hasRole('CURATOR')
     columns: [
-      {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true}
-      {header: "Name", value: 'name', class: 'col-md-5', show: true}
+      {header: "Version", value: 'versionNumber', class: 'col-md-1', show: true, href: 'href()'}
+      {header: "Name", value: 'name', class: 'col-md-5', show: true, href: 'href()'}
       {header: "Description", value: 'description', class: 'col-md-6'}
     ]
   }
@@ -88,9 +88,9 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     hidden: (security) ->
       !security.hasRole('CURATOR')
     columns: [
-      {header: "Version",   value: 'versionNumber',     class: 'col-md-1', show: true}
-      {header: "Name",      value: 'name',              class: 'col-md-4', show: true}
-      {header: "File Name", value: 'originalFileName',  class: 'col-md-4', show: true}
+      {header: "Version",   value: 'versionNumber',     class: 'col-md-1', show: true, href: 'href()'}
+      {header: "Name",      value: 'name',              class: 'col-md-4', show: true, href: 'href()'}
+      {header: "File Name", value: 'originalFileName',  class: 'col-md-4', show: true, href: 'href()'}
       {header: "Size",      class: 'col-md-3', value: (it) -> computeBytes({relation: it})}
     ]
     actions: ['security', '$window', (security, $window) -> [
