@@ -14,27 +14,25 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
       listEnhancer = enhance.getEnhancer('list')
 
       $scope.mode     = if $scope.element then 'element' else 'list'
-      $scope.id       = null if !$scope.id
+      $scope.id       = null  if !$scope.id
       $scope.repeat   = false if !$scope.repeat
-      $scope.children = []
-
       $scope.list    ?= listEnhancer.createEmptyList()
 
       nextFun = -> {then: (callback) -> callback($scope.list)}
 
       addItemsFromList = (list) ->
+        return if list.$$children
+        list.$$children = []
         for item in list.list
-          $scope.children.push item
-          $scope.hasMore  = list.total > $scope.children.length
+          $scope.list.$$children.push item
 
       onListChange = (list) ->
-        $scope.children = []
         return if not list
         addItemsFromList(list)
         nextFun = list.next
 
       $scope.showMore = () ->
-        return unless $scope.hasMore
+        return unless $scope.list.total > $scope.list.$$children.length
         nextFun().then (list) ->
           addItemsFromList(list)
           nextFun = list.next

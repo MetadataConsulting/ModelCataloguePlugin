@@ -82,7 +82,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
 ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', 'messages', 'modelCatalogueApiRoot', 'rest', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle, messages, modelCatalogueApiRoot, rest) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle, $rootScope) ->
     listEnhancer    = enhance.getEnhancer('list')
 
     if $stateParams.resource
@@ -98,20 +98,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     else
       $scope.dataElements           = listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
 
-
-    if $stateParams.resource == 'batch'
-      $scope.actions = [
-        {
-          icon:   'flash'
-          type:   'default'
-          action: (batch) ->
-            messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
-              enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}#{batch.link}/run")).then (updated) ->
-                angular.extend(batch, updated)
-        }
-      ]
-    else
-      $scope.actions = []
 
     printMetadata = (relationship) ->
       result  = ''
@@ -143,8 +129,16 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
 
     if $scope.resource == 'model'
-      for item in list
-        item._containedElements_ = listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
+      if $rootScope.$$lastModels? and angular.equals($stateParams,$rootScope.$$lastModels.params)
+        $scope.list = $rootScope.$$lastModels.list
+        $scope.element = $rootScope.$$lastModels.element
+        $scope.dataElements = $rootScope.$$lastModels.element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$rootScope.$$lastModels.element.link}/outgoing/containment"})
+      else
+        $rootScope.$$lastModels =
+          list:   $scope.list
+          params: angular.copy($stateParams)
+        for item in $scope.list
+          item._containedElements_ ?= listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
 
       $scope.$on 'treeviewElementSelected', (event, element) ->
         unless element._containedElements_?.size?
@@ -152,6 +146,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             element._containedElements_ = contained
             $scope.dataElements         = contained
         $scope.element                  = element
+        $rootScope.$$lastModels.element = element
         $scope.dataElements             = element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{element.link}/outgoing/containment"})
 
     else if $scope.resource == 'newRelationships'

@@ -12,40 +12,33 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
     compile: recursiveCompile.compile
 
     controller: ['$scope', '$rootScope', '$element', '$timeout', ($scope, $rootScope, $element, $timeout) ->
-      $scope.loadingChildren = false
+      $scope.element.$$loadingChildren = false
 
       endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
 
-      isEqual = (a, b) ->
-        return false if not a? or not b?
-        return false if not a.elementType? or not b.elementType?
-        return false if not a.id? or not b.id?
-        return false if a.elementType != b.elementType
-        a.id == b.id
-
       loadMoreIfNeeded = ->
-        return if not $scope.hasMore
-        return if $scope.showingMore
+        return if not $scope.element.$$numberOfChildren > $scope.element.$$children.length
+        return if $scope.element.$$showingMore
         showMore = $element.find('.catalogue-element-treeview-show-more')
         return if showMore.hasClass '.hide'
         root = $element.closest('.catalogue-element-treeview-list-root')
         if showMore.offset()?.top < root.offset()?.top + 3 * root.height()
-          $scope.showingMore = true
-          $scope.showMore().then ->
+          $scope.element.$$showingMore = true
+          $scope.element.$$showMore().then ->
             root.hide()
             root.get(0).offsetHeight
             root.show()
-            $scope.showingMore = false
+            $scope.element.$$showingMore = false
 
 
 
       createShowMore  = (list) ->
         ->
           list.next().then (nextList) ->
+            $scope.element.$$children ?= []
             for item in nextList.list when item.relation
-              $scope.children.push(angular.extend(item.relation, {metadata: item.ext}))
-            $scope.hasMore  = $scope.numberOfChildren > $scope.children.length
-            $scope.showMore = createShowMore(nextList)
+              $scope.element.$$children.push(angular.extend(item.relation, {metadata: item.ext}))
+            $scope.element.$$showMore = createShowMore(nextList)
             loadMoreIfNeeded()
 
 
@@ -67,14 +60,19 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.nextDescend    = $scope.descend
 
         if element? and element[$scope.currentDescend]
-          $scope.numberOfChildren = $scope.element[$scope.currentDescend].total
+          $scope.element.$$numberOfChildren = $scope.element[$scope.currentDescend].total
         else
-          $scope.numberOfChildren = 0
-        $scope.children   = []
-        $scope.collapsed  = true
-        $scope.hasMore    = false
-        $scope.showMore   = ->
-        $scope.active     = false
+          $scope.element.$$numberOfChildren = 0
+        $scope.element.$$children         ?= []
+        $scope.element.$$collapsed        ?= true
+        $scope.element.$$showMore         ?= ->
+        $scope.element.$$active           ?= false
+
+
+        if $scope.element.$$numberOfChildren > $scope.element.$$children.length and $scope.element.$$showMore and not $scope.element.$$collapsed
+          root = $element.closest('.catalogue-element-treeview-list-root')
+          $timeout loadMoreIfNeeded, 100
+          root.on 'scroll', loadMoreIfNeeded
 
 
       $scope.select = (element) ->
@@ -82,41 +80,41 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       $rootScope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.catalogue.show'
-        $scope.active = $scope.element and $scope.element.id == parseInt(params.id ? 0, 10) and names.getPropertyNameFromType($scope.element.elementType) == params.resource
+        $scope.element.$$active = $scope.element and $scope.element.id == parseInt(params.id ? 0, 10) and names.getPropertyNameFromType($scope.element.elementType) == params.resource
 
       $rootScope.$on 'treeviewElementSelected', (event, element, id) ->
         return if id and $scope.rootId and id != $scope.rootId
-        $scope.active = isEqual($scope.element, element)
+        $scope.element.$$active = $scope.element.link == element.link
 
       $rootScope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
-        for item, i in $scope.children when element.relation and item.id == element.relation.id and item.elementType == element.relation.elementType
+        for item, i in $scope.element.$$children when element.relation and item.id == element.relation.id and item.elementType == element.relation.elementType
           indexesToRemove.push i
 
         for index, i in indexesToRemove
-          $scope.children.splice index - i, 1
-          $scope.numberOfChildren--
+          $scope.element.$$children.splice index - i, 1
+          $scope.element.$$numberOfChildren--
 
 
       $rootScope.$on 'catalogueElementCreated', (_, result) ->
         if result and result.destination and result.source and result.type
           currentDescend = $scope.element[$scope.currentDescend]
           if result.destination.link == $scope.element.link and endsWith(currentDescend.link, "/incoming/#{result.type.name}")
-            $scope.numberOfChildren++
+            $scope.element.$$numberOfChildren++
             result.source.refresh().then (newOne) ->
-              $scope.children = [newOne].concat $scope.children
+              $scope.element.$$children = [newOne].concat $scope.element.$$children
           if result.source.link == $scope.element.link and endsWith(currentDescend.link, "/outgoing/#{result.type.name}")
-            $scope.numberOfChildren++
+            $scope.element.$$numberOfChildren++
             result.destination.refresh().then (newOne) ->
-              $scope.children = [newOne].concat $scope.children
+              $scope.element.$$children = [newOne].concat $scope.element.$$children
 
 
       $scope.collapseOrExpand = ->
-        root = $element.closest('.catalogue-element-treeview-list-root')
-        return if $scope.loadingChildren
-        if $scope.collapsed
-          if $scope.children.length == 0 and $scope.numberOfChildren > 0
-            $scope.loadingChildren = true
+
+        return if $scope.element.$$loadingChildren
+        if $scope.element.$$collapsed
+          if $scope.element.$$children.length == 0 and $scope.element.$$numberOfChildren > 0
+            $scope.element.$$loadingChildren = true
             fun = $scope.element[$scope.currentDescend]
             if angular.isFunction(fun)
               fun().then (list) ->
@@ -125,31 +123,30 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
                 for item in list.list when item.relation
                   newChildren.push(angular.extend(item.relation, {metadata: item.ext}))
 
-                $scope.children = newChildren
-                $scope.collapsed  = false
-                $scope.hasMore    = $scope.numberOfChildren > $scope.children.length
-                if $scope.hasMore
-                  $scope.showMore = createShowMore(list)
+                $scope.element.$$children = newChildren
+                $scope.element.$$collapsed  = false
+                root = $element.closest('.catalogue-element-treeview-list-root')
+                if $scope.element.$$numberOfChildren > $scope.element.$$children.length
+                  $scope.element.$$showMore = createShowMore(list)
                   $timeout loadMoreIfNeeded, 100
                   root.on 'scroll', loadMoreIfNeeded
                 else
-                  $scope.showMore = ->
+                  $scope.element.$$showMore = ->
                   root.off 'scroll', loadMoreIfNeeded
-                $scope.loadingChildren = false
+                $scope.element.$$loadingChildren = false
             else
-              $scope.loadingChildren = false
+              $scope.element.$$loadingChildren = false
           else
-            $scope.collapsed = false
+            $scope.element.$$collapsed = false
             $scope.select($scope.element)
         else
-          $scope.collapsed = true
+          $scope.element.$$collapsed = true
 
       $scope.$watch 'element', onElementUpdate
       $scope.$watch 'descend', ->
         onElementUpdate($scope.element)
 
       onElementUpdate($scope.element)
-      loadMoreIfNeeded()
     ]
   }
 ]

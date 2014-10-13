@@ -5,8 +5,8 @@ cetiModule.config ['$tooltipProvider', ($tooltipProvider) ->
 cetiModule.run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementTreeviewItem.html', '''
     <li class="catalogue-element-treeview-item">
-      <div class="catalogue-element-treeview-text-content" ng-class="{'active': active}">
-        <span class="badge pull-right" ng-if="currentDescend &amp;&amp; numberOfChildren">{{numberOfChildren}}</span>
+      <div class="catalogue-element-treeview-text-content" ng-class="{'active': element.$$active}">
+        <span class="badge pull-right" ng-if="currentDescend &amp;&amp; element.$$numberOfChildren">{{element.$$numberOfChildren}}</span>
         <span
             class="catalogue-element-treeview-labels"
             ng-dblclick="element.show()"
@@ -14,10 +14,10 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
           >
           <span ng-if="!element.elementType"><a class="btn btn-link"><span class="glyphicon glyphicon-ban-circle"></span></a> No Data</span>
           <a ng-if="currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="collapseOrExpand(element)">
-            <span class="glyphicon glyphicon-folder-close"  ng-if="collapsed &amp;&amp; numberOfChildren &amp;&amp; !loadingChildren"></span>
-            <span class="glyphicon glyphicon-folder-open"   ng-if="!collapsed &amp;&amp; numberOfChildren &amp;&amp; !loadingChildren"></span>
-            <span ng-class="element.getIcon()"              ng-if="!numberOfChildren"></span>
-            <span class="glyphicon glyphicon-refresh"       ng-if="loadingChildren" ></span>
+            <span class="glyphicon glyphicon-folder-close"  ng-if="element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
+            <span class="glyphicon glyphicon-folder-open"   ng-if="!element.$$collapsed &amp;&amp; element.$$numberOfChildren &amp;&amp; !element.$$loadingChildren"></span>
+            <span ng-class="element.getIcon()"              ng-if="!element.$$numberOfChildren"></span>
+            <span class="glyphicon glyphicon-refresh"       ng-if="element.$$loadingChildren" ></span>
           </a>
           <a ng-if="!currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="select(element)">
             <span ng-class="element.getIcon()"></span>
@@ -25,10 +25,10 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
           <span class="catalogue-element-treeview-name" ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': element.status == 'DEPRECATED'}" ng-click="select(element)">{{element.metadata.name || element.metadata.Name || element.name}} <small class="text-muted" ng-show="element.metadata.name || element.metadata.Name &amp;&amp; ((element.metadata.name || element.metadata.Name) != element.name)">{{element.name}}</small></span>
         </span>
       </div>
-      <ul ng-if="children" ng-hide="collapsed" class="catalogue-element-treeview-list">
-        <catalogue-element-treeview-item element="child" descend="nextDescend" repeat="repeat" ng-repeat="child in children track by $index" root-id="rootId"></catalogue-element-treeview-item>
-        <li ng-if="hasMore" class="catalogue-element-treeview-item">
-          <span class="catalogue-element-treeview-labels" ng-click="showMore()">
+      <ul ng-if="element.$$children" ng-hide="element.$$collapsed" class="catalogue-element-treeview-list">
+        <catalogue-element-treeview-item element="child" descend="nextDescend" repeat="repeat" ng-repeat="child in element.$$children track by $index" root-id="rootId"></catalogue-element-treeview-item>
+        <li ng-if="element.$$numberOfChildren > element.$$children.length" class="catalogue-element-treeview-item">
+          <span class="catalogue-element-treeview-labels" ng-click="element.$$showMore()">
             <a class="btn btn-link catalogue-element-treeview-show-more"><span class="fa fa-fw fa-refresh fa-spin"></span></a> <a class="text-muted">Loading</a>
           </span>
         </li>
