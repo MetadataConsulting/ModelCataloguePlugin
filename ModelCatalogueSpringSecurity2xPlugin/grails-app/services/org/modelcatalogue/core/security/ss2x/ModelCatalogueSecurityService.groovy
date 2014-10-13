@@ -3,6 +3,7 @@ package org.modelcatalogue.core.security.ss2x
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.SecurityService
+import org.modelcatalogue.core.security.User
 
 class ModelCatalogueSecurityService implements SecurityService {
 
@@ -28,5 +29,9 @@ class ModelCatalogueSecurityService implements SecurityService {
 
     String encodePassword(String password) {
         return springSecurityService.encodePassword(password)
+    }
+
+    User getCurrentUser() {
+        return springSecurityService.currentUser
     }
 }

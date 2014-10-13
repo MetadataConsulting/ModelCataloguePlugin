@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.security.User
+
 /**
  * Lightweight abstraction of security.
  */
@@ -31,4 +33,10 @@ public interface SecurityService {
      * @return the encoded password or the password argument unchanged if the password encoding is not set up
      */
     String encodePassword(String password)
+
+    /**
+     * Retrieves the currently logged in user or null.
+     * @return currently logged in user or null
+     */
+    User getCurrentUser()
 }
