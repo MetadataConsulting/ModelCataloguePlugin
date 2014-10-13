@@ -1,9 +1,9 @@
 package org.modelcatalogue.core.security
 
-import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.ExtendibleElement
 
-class User extends CatalogueElement {
+class User extends ExtendibleElement {
 
     transient modelCatalogueSecurityService
 
@@ -20,7 +20,8 @@ class User extends CatalogueElement {
     static constraints = {
         username blank: false, unique: true, maxSize: 255
         password blank: false, maxSize: 255
-        email    email: true, maxSize: 255
+        email    nullable: true, email: true, maxSize: 255
+        defaultClassification nullable: true
     }
 
     static mapping = {
@@ -36,7 +37,7 @@ class User extends CatalogueElement {
     }
 
     def beforeUpdate() {
-        if (isDirty('password')) {
+        if (isDirty('password') && !hasErrors()) {
             encodePassword()
         }
     }
