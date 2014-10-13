@@ -3,15 +3,19 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.Lists
 
-class SearchController {
+class SearchController extends AbstractRestfulController<CatalogueElement>{
 
     static responseFormats = ['json', 'xml', 'xlsx']
 
-    def modelCatalogueSearchService
+    SearchController() {
+        super(CatalogueElement, true)
+    }
 
     def index(Integer max){
         setSafeMax(max)
+
         def results =  modelCatalogueSearchService.search(params)
+
         if(results.errors){
             respond results
             return
@@ -29,10 +33,11 @@ class SearchController {
                 offset: params.int('offset') ?: 0,
                 page: params.int('max') ?: 10,
                 sort: params.sort,
-                order: params.order
+                order: params.order,
+                itemType: CatalogueElement
         )
 
-        respond elements
+        reportCapableRespond elements
 
     }
 

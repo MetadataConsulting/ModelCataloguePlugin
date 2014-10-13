@@ -116,12 +116,19 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             String listQuery = """
                 from ${resource.simpleName} ${alias}
                 where
-                    ${alias}.status in :statuses
+                    ${alias}.status is null
                     and (
                         lower(${alias}.name) like lower(:query)
                         or lower(${alias}.description) like lower(:query)
                         or lower(${alias}.modelCatalogueId) like lower(:query)
-                        or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                        or ${alias} in (select c.element from ExtensionValue c where lower(c.extensionValue) like lower(:query))
+                    )
+                    or ${alias}.status in :statuses
+                    and (
+                        lower(${alias}.name) like lower(:query)
+                        or lower(${alias}.description) like lower(:query)
+                        or lower(${alias}.modelCatalogueId) like lower(:query)
+                        or ${alias} in (select c.element from ExtensionValue c where lower(c.extensionValue) like lower(:query))
                     )
             """
             def results = Lists.fromQuery(params, resource, listQuery, [
