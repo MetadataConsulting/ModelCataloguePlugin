@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.security
 
-import org.modelcatalogue.core.SecurityService
-
 class User {
 
     transient modelCatalogueSecurityService
