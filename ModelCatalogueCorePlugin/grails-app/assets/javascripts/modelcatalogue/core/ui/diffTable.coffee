@@ -107,7 +107,6 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
               promises.push loader(null, max: 100)
 
           $q.all(promises).then (results) =>
-            console.log results
 
             @loading = false
             @hasLoaders = false
@@ -118,8 +117,6 @@ angular.module('mc.core.ui.diffTable', ['diff-match-patch']).directive 'diffTabl
               sorted = $filter('orderBy')((getLabel(item) for item in (result.list ? [])), 'toString()')
               newRow.values[j] = sorted.join('\n') + if result.total > 100 then '\n...' else ''
               newRow.values[j] = 'No items' unless newRow.values[j]
-
-              console.log result, j, newRow.values[j]
 
             newRow = handleChangesAndLoaders(newRow)
             @noChanges = angular.copy newRow.noChanges
