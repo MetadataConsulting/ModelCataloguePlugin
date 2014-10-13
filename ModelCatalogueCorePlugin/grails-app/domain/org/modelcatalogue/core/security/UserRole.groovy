@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.testapp
+package org.modelcatalogue.core.security
 
 import org.apache.commons.lang.builder.HashCodeBuilder
 

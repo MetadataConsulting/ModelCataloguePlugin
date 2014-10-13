@@ -5,9 +5,9 @@ import org.modelcatalogue.core.actions.CreateCatalogueElement
 import org.modelcatalogue.core.actions.CreateRelationship
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.core.testapp.UserRole
-import org.modelcatalogue.core.testapp.Role
-import org.modelcatalogue.core.testapp.User
+import org.modelcatalogue.core.security.UserRole
+import org.modelcatalogue.core.security.Role
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.util.ListWrapper
@@ -114,7 +114,7 @@ class BootStrap {
                     println 'Running post init job'
                     println 'Importing data'
                     importService.importData()
-                    def classification =  new Classification(name: "nhic", namespace: "www.nhic.co.uk").save(failOnError: true)
+//                    def classification =  new Classification(name: "nhic", namespace: "www.nhic.co.uk").save(failOnError: true)
 //                    def de = new DataElement(name: "testera", description: "test data architect", classifications: [classification]).save(failOnError: true)
 //                    de.ext.metadata = "test metadata"
 //

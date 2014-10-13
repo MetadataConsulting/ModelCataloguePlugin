@@ -1,10 +1,10 @@
-package org.modelcatalogue.core.testapp
+package org.modelcatalogue.core.security
 
 import org.modelcatalogue.core.SecurityService
 
 class User {
 
-    transient SecurityService modelCatalogueSecurityService
+    transient modelCatalogueSecurityService
 
     String username
     String password
