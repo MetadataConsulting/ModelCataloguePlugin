@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.security
 
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Classification
 
 class User extends CatalogueElement {
 
@@ -13,6 +14,8 @@ class User extends CatalogueElement {
     boolean accountExpired
     boolean accountLocked
     boolean passwordExpired
+
+    Classification defaultClassification
 
     static constraints = {
         username blank: false, unique: true, maxSize: 255
