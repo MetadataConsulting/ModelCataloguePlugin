@@ -14,4 +14,9 @@ class ModelCatalogueSecurityService implements SecurityService {
     boolean hasRole(String role) {
         return true
     }
+
+    @Override
+    String encodePassword(String password) {
+        return password
+    }
 }

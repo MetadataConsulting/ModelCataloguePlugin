@@ -1,11 +1,12 @@
 package org.modelcatalogue.core.security.ss1x
 
+import grails.plugins.springsecurity.SpringSecurityService
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.SecurityService
 
 class ModelCatalogueSecurityService implements SecurityService {
 
-    def springSecurityService
+    SpringSecurityService springSecurityService
 
     boolean isUserLoggedIn() {
         return springSecurityService.isLoggedIn()
@@ -23,5 +24,9 @@ class ModelCatalogueSecurityService implements SecurityService {
             translated = "ROLE_${translated}"
         }
         return SpringSecurityUtils.ifAnyGranted(translated)
+    }
+
+    String encodePassword(String password) {
+        return springSecurityService.encodePassword(password)
     }
 }

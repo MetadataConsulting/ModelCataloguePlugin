@@ -1,8 +1,10 @@
 package org.modelcatalogue.core.testapp
 
+import org.modelcatalogue.core.SecurityService
+
 class User {
 
-    transient springSecurityService
+    transient SecurityService modelCatalogueSecurityService
 
     String username
     String password
@@ -35,6 +37,6 @@ class User {
     }
 
     protected void encodePassword() {
-        password = springSecurityService.encodePassword(password)
+        password = modelCatalogueSecurityService.encodePassword(password)
     }
 }
