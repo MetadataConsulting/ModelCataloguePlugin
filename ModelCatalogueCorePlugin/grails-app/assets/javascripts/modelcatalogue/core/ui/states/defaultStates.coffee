@@ -135,7 +135,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       result
 
     $scope.dataElementsColumns = [
-      {header: 'Name',          value: "ext.name || ext.Name || relation.name",        classes: 'col-md-3', show: "relation.show()"}
+      {header: 'Name',          value: "ext.name || ext.Name || relation.name",        classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
       {header: 'Description',   value: "relation.description", classes: 'col-md-4'}
       {header: 'Local Identifier', value:  printLocalIdentifiers,     classes: 'col-md-2'}
       {header: 'Metadata', value:  printMetadata,     classes: 'col-md-3'}
