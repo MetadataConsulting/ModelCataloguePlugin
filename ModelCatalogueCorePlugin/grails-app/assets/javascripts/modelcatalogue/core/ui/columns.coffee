@@ -1,9 +1,9 @@
 angular.module('mc.core.ui.columns', []).provider 'columns', ->
   columns  = {}
   defaultColumns = [
-    {header: "ID",          value: 'id',                    classes: 'col-md-2', show: true, href: 'href()'}
+    {header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'href()'}
     {header: "Name",        value: 'name',                  classes: 'col-md-4', show: true, href: 'href()'}
-    {header: "Type",        value: 'getElementTypeName()',  classes: 'col-md-6'}
+    {header: "Type",        value: 'elementType',  classes: 'col-md-6', show: true}
   ]
 
   columnsProvider = {}
