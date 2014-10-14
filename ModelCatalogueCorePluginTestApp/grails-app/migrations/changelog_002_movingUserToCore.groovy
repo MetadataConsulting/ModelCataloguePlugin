@@ -14,7 +14,7 @@ databaseChangeLog = {
 
 
         createTable(tableName: "user") {
-            column(autoIncrement: "true", name: "id", type: "BIGINT") {
+            column(name: "id", type: "BIGINT") {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
