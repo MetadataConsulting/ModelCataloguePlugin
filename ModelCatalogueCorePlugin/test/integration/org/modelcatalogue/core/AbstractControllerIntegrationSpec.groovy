@@ -229,8 +229,11 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resource.count() == totalCount
     }
 
+    protected boolean getTestCreateXml() { true }
+
     def "Create new instance from XML"() {
         if (controller.readOnly) return
+        if (!testCreateXml) return
 
         expect:
         !resource.findByName(newInstance.name)
