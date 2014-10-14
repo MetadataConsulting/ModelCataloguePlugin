@@ -14,9 +14,11 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'relationshipType',   "fa fa-fw fa-link"
   catalogueProvider.setIcon 'action',             "fa fa-fw fa-flash"
   catalogueProvider.setIcon 'batch',              "fa fa-fw fa-flash"
+  catalogueProvider.setIcon 'user',               "fa fa-fw fa-user"
   catalogueProvider.setIcon 'csvTransformation',  "fa fa-fw fa-long-arrow-right"
 
   # this should be generated automatically in the future
+  catalogueProvider.setInstanceOf 'user',               'catalogueElement'
   catalogueProvider.setInstanceOf 'extendibleElement',  'catalogueElement'
   catalogueProvider.setInstanceOf 'conceptualDomain',   'catalogueElement'
   catalogueProvider.setInstanceOf 'dataType',           'catalogueElement'
