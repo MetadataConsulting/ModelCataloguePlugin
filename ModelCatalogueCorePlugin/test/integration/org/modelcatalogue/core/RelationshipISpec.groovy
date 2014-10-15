@@ -48,7 +48,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         Relationship rel =  relationshipService.link( de1, de2, hierarchy)
 
         then:
-        rel.hasErrors()
+        rel.errors.errorCount > 0
 
     }
 
@@ -65,7 +65,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         then:
 
-        !rel.hasErrors()
+        rel.errors.errorCount == 0
         de2.getIncomingRelations().contains(de1)
         de1.getOutgoingRelations().contains(de2)
         de2.getIncomingRelationsByType(reltype).contains(de1)
@@ -95,8 +95,8 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         then:
 
-        !rel1.hasErrors()
-        !rel2.hasErrors()
+        rel1.errors.errorCount == 0
+        rel2.errors.errorCount == 0
 
         rel1==rel2
 

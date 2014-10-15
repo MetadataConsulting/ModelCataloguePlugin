@@ -1,6 +1,6 @@
 databaseChangeLog = {
 
-	changeSet(author: "Vladimir Orany", id: "1412847974030-01") {
+	changeSet(author: "Vladimir Orany", id: "1512847974030-01") {
         preConditions (onFail: 'MARK_RAN') {
             not {
                 tableExists tableName: "security_user_old"

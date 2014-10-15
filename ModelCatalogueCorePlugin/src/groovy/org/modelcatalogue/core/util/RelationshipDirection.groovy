@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 
@@ -10,25 +11,23 @@ enum RelationshipDirection {
     INCOMING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element.archived) {
-                if (type) {
-                    return Relationship.where {
-                        destination == element && relationshipType == type
-                    }
-                }
-                return Relationship.where {
-                    destination == element
-                }
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, Classification classification) {
+            DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.eq('destination', element)
+            if (!element.archived) {
+                criteria.eq('archived', false)
             }
             if (type) {
-                return Relationship.where {
-                    archived == false && destination == element && relationshipType == type
+                criteria.eq('relationshipType', type)
+            }
+            if (classification) {
+                criteria.or {
+                    eq('classification', classification)
+                    isNull('classification')
                 }
             }
-            Relationship.where {
-                archived == false && destination == element
-            }
+
+            criteria
         }
 
         @Override
@@ -54,25 +53,23 @@ enum RelationshipDirection {
     OUTGOING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element.archived) {
-                if (type) {
-                    return Relationship.where {
-                        source == element && relationshipType == type
-                    }
-                }
-                return Relationship.where {
-                    source == element
-                }
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, Classification classification) {
+            DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.eq('source', element)
+            if (!element.archived) {
+                criteria.eq('archived', false)
             }
             if (type) {
-                return Relationship.where {
-                    archived == false && source == element && relationshipType == type
+                criteria.eq('relationshipType', type)
+            }
+            if (classification) {
+                criteria.or {
+                    eq('classification', classification)
+                    isNull('classification')
                 }
             }
-            Relationship.where {
-                archived == false && source == element
-            }
+
+            criteria
         }
 
         @Override
@@ -98,25 +95,26 @@ enum RelationshipDirection {
     },
     BOTH {
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element.archived) {
-                if (type) {
-                    return Relationship.where {
-                        (source == element || destination == element) && relationshipType == type
-                    }
-                }
-                return Relationship.where {
-                    (source == element || destination == element)
-                }
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, Classification classification) {
+            DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.or {
+                eq('source', element)
+                eq('destination', element)
+            }
+            if (!element.archived) {
+                criteria.eq('archived', false)
             }
             if (type) {
-                return Relationship.where {
-                    archived == false && (source == element || destination == element) && relationshipType == type
+                criteria.eq('relationshipType', type)
+            }
+            if (classification) {
+                criteria.or {
+                    eq('classification', classification)
+                    isNull('classification')
                 }
             }
-            Relationship.where {
-                archived == false && (source == element || destination == element)
-            }
+
+            criteria
         }
 
         @Override
@@ -140,7 +138,7 @@ enum RelationshipDirection {
         }
     }
 
-    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type)
+    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, Classification classification)
     abstract String getDirection(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)

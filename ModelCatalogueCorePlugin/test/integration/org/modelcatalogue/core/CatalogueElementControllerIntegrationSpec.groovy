@@ -8,7 +8,7 @@ import grails.util.GrailsNameUtils
 class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     def setupSpec(){
-        totalCount = 108
+        totalCount = 120
     }
 
     @Override

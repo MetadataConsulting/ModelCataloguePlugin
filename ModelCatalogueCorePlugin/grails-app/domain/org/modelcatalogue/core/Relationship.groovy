@@ -39,6 +39,8 @@ class Relationship implements Extendible {
 
     RelationshipType relationshipType
 
+    Classification classification
+
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
 
@@ -69,6 +71,7 @@ class Relationship implements Extendible {
             return true;
 
         }
+        classification nullable: true
     }
 
     String toString() {

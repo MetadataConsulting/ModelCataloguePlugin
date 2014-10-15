@@ -9,13 +9,13 @@ class RelationshipService {
     static transactional = true
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
-        Lists.fromCriteria([sort: 'id'] << params, direction.composeWhere(element, type))
+        // TODO: enable classification in relationship fetching
+        Lists.fromCriteria([sort: 'id'] << params, direction.composeWhere(element, type, null))
     }
 
-
-    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, boolean archived = false, boolean ignoreRules = false) {
+    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false) {
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
+            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
             if (relationshipInstance) { return relationshipInstance }
         }
 
@@ -23,6 +23,7 @@ class RelationshipService {
                 source: source?.id ? source : null,
                 destination: destination?.id ? destination : null,
                 relationshipType: relationshipType?.id ? relationshipType : null,
+                classification: classification?.id ? classification : null,
                 archived: archived
         )
 
@@ -56,10 +57,18 @@ class RelationshipService {
     }
 
 
+    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, boolean archived = false, boolean ignoreRules = false) {
+        link source, destination, relationshipType, null, archived, ignoreRules
+    }
+
     Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, boolean ignoreRules = false) {
+        unlink source, destination, relationshipType, null, ignoreRules
+    }
+
+    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean ignoreRules = false) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, relationshipType)
+            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
 
             // specific rules when creating links to and from published elements
             // XXX: this should be in the relationship type!
@@ -75,6 +84,7 @@ class RelationshipService {
             if (relationshipInstance && source && destination) {
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
+                relationshipInstance.classification = null
                 relationshipInstance.delete(flush: true)
                 return relationshipInstance
             }

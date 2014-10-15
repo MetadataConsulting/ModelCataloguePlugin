@@ -13,7 +13,8 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type)
+        // TODO: enable classification in search
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, null)
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
