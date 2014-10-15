@@ -11,6 +11,10 @@ import javax.servlet.http.HttpServletResponse
  */
 class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
 
+    protected boolean getRecord() {
+        true
+    }
+
     def "can covert value"() {
         ValueDomain celsius = ValueDomain.findByName("value domain Celsius")
         ValueDomain fahrenheit = ValueDomain.findByName("value domain Fahrenheit")

@@ -13,8 +13,9 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
 
   controller: ['$scope', '$q', '$attrs', ($scope, $q, $attrs) ->
     $scope.searchForElement = (query, pickerValue, resourceAttr) ->
+
       searchFun     = null
-      resource      = if resourceAttr then $scope.$eval($attrs.resource) ? $scope.$parent.$eval($attrs.resource) else undefined
+      resource      = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
       value         = if pickerValue then pickerValue else resource
 
       if (value)

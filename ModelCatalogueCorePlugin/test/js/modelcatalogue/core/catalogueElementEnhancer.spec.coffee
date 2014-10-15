@@ -43,11 +43,11 @@ describe "mc.core.catalogueElementEnhancer", ->
   it "returns expected results for getLabel()", inject (enhance) ->
     domain  = enhance angular.copy(fixtures.valueDomain.showOne)
     model   = enhance angular.copy(fixtures.model.showOne)
-    element = enhance angular.copy(fixtures.dataElement.showOne)
+    element = enhance angular.copy(fixtures.dataType.showOne)
 
     expect(domain.getLabel()) .toBe("school subject (cdtest1)")
     expect(model.getLabel())  .toBe("mTest3")
-    expect(element.getLabel()).toBe("DE_author")
+    expect(element.getLabel()).toBe("boolean")
 
   it "returns expected results for instance of", inject (enhance) ->
     domain  = enhance angular.copy(fixtures.valueDomain.showOne)

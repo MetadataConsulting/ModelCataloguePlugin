@@ -8,6 +8,10 @@ import spock.lang.Unroll
  */
 class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
+    protected boolean getRecord() {
+        true
+    }
+
     def setupSpec(){
         totalCount = 24
     }

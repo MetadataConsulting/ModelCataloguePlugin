@@ -26,14 +26,23 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     @Shared
     def totalCount
 
+    protected boolean getRecord() {
+        false
+    }
+
     def setupSpec(){
         loadMarshallers()
         loadFixtures()
-        recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-                resourceName
-        )
+        if (record) {
+            recorder = DefaultResultRecorder.create(
+                    "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
+                    "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                    resourceName
+            )
+        } else {
+            recorder = DummyRecorder.INSTANCE
+        }
+
         totalCount = 12
     }
 

@@ -9,6 +9,10 @@ import org.codehaus.groovy.grails.web.json.JSONObject
  */
 class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
+    protected boolean getRecord() {
+        true
+    }
+
     def setupSpec(){
         totalCount = 12
     }

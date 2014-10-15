@@ -63,14 +63,16 @@ describe "mc.core.ui.catalogueElementPicker", ->
   it "the resource can be specified as reference",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
     catEl = enhance angular.copy(fixtures.valueDomain.showOne)
 
-    $rootScope.element = catEl
-    $rootScope.resource = 'valueDomain'
+    $scope = $rootScope.$new(true)
+
+    $scope.element = catEl
+    $scope.resource = 'valueDomain'
 
     element = $compile('''
           <input ng-model="element" catalogue-element-picker resource="resource" typeahead-wait-ms="0">
-        ''')($rootScope)
+        ''')($scope)
 
-    $rootScope.$digest()
+    $scope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
     expect(element.val()).toBe('school subject (cdtest1)')
@@ -82,8 +84,8 @@ describe "mc.core.ui.catalogueElementPicker", ->
 
     $httpBackend.flush()
 
-    $rootScope.resource = 'model'
-    $rootScope.$digest()
+    $scope.resource = 'model'
+    $scope.$digest()
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/model/search?search=other+test").respond(fixtures.model.searchElement13)
 
