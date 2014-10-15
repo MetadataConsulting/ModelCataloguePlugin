@@ -10,7 +10,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeview.html'
 
-    controller: ['$scope', 'enhance', ($scope, enhance) ->
+    controller: ['$scope', 'enhance', '$stateParams', ($scope, enhance, $stateParams) ->
       listEnhancer = enhance.getEnhancer('list')
 
       $scope.mode     = if $scope.element then 'element' else 'list'
@@ -33,7 +33,10 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
       $scope.showMore = () ->
         return unless $scope.list.total > $scope.list.$$children.length
-        nextFun().then (list) ->
+        params = {}
+        params.classification = $stateParams.classification if $stateParams.classification
+
+        nextFun(null, params).then (list) ->
           addItemsFromList(list)
           nextFun = list.next
 

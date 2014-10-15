@@ -30,6 +30,7 @@ module.exports = function(config) {
             'grails-app/assets/bower_components/angular-http-auth/src/http-auth-interceptor.js',
             'grails-app/assets/bower_components/angular-ui-router/release/angular-ui-router.js',
             'grails-app/assets/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+            'grails-app/assets/bower_components/angular-diff-match-patch-musketyr/angular-diff-match-patch.js',
 
             // App under test
             'grails-app/assets/javascripts/**/*.coffee',
