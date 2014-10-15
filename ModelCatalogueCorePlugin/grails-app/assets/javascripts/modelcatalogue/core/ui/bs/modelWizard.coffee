@@ -120,7 +120,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <p class="help-block">Data element is destination for the containment relationship</p>
                 </div>
                 <div ng-click="importFromCSV()">
-                  <alert type="'info'">
+                  <alert type="info">
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
                   </alert>
                 </div>

@@ -60,7 +60,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                 </div>
               </form>
               <div  ng-click="importFromCSV()">
-                <alert type="'info'">
+                <alert type="info">
                   <strong>Hint:</strong> If you have CSV file with sample data  <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
                 </alert>
               </div>

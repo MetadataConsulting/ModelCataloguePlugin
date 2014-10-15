@@ -23,9 +23,9 @@ angular.module('mc.core.ui.bs.modalPromptValidateValue', ['mc.util.messages']).c
             </form>
         </div>
         <div class="modal-footer">
-          <alert type="'success'" ng-show="result === true">VALID</alert>
-          <alert type="'danger'"  ng-show="result === false">INVALID</alert>
-          <alert type="'warning'" ng-hide="result === false || result === true">{{result ? result : defaultResult}}</alert>
+          <alert type="success" ng-show="result === true">VALID</alert>
+          <alert type="danger"  ng-show="result === false">INVALID</alert>
+          <alert type="warning" ng-hide="result === false || result === true">{{result ? result : defaultResult}}</alert>
         </div>
         '''
         controller: [ '$scope', 'rest', 'modelCatalogueApiRoot', ($scope, rest, modelCatalogueApiRoot) ->
