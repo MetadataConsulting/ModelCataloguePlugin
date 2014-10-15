@@ -60,6 +60,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
       onPropertyUpdate = (newProperty, oldProperty) ->
+        return if oldProperty is newProperty
         loadTab(newProperty)
 
         propCfg = catalogueElementProperties.getConfigurationFor("#{$scope.element.elementType}.#{newProperty}")
@@ -244,11 +245,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
       $scope.tabs   = []
       $scope.select = (tab) ->
-        if $state.current.abstract
-          $scope.property = tab.name
-          loadTab(tab.property)
-        else
-          $state.go '.', {property: tab.name, q: tab.search}
+        $scope.property = tab.name
         $scope.$broadcast 'infiniteTableRedraw'
 
 
