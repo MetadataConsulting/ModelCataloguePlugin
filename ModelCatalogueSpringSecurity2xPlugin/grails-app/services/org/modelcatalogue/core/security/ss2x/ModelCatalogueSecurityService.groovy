@@ -7,6 +7,8 @@ import org.modelcatalogue.core.security.User
 
 class ModelCatalogueSecurityService implements SecurityService {
 
+    static transactional = false
+
     SpringSecurityService springSecurityService
 
     boolean isUserLoggedIn() {

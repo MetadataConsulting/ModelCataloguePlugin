@@ -18,7 +18,7 @@ class BatchListPage extends ModelCataloguePage {
         saveButton          { basicEditDialog.find("button.btn-success") }
 
         batchList           { $('table.dl-table') }
-        linkToTestBatch     { $('td.dl-table-item-cell a', text: 'Test Batch') }
+        linkToTestBatch     { $('td.inf-table-item-cell a', text: 'Test Batch') }
 
     }
 }

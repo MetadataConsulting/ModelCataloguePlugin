@@ -44,7 +44,7 @@ environments {
     // See: http://code.google.com/p/selenium/wiki/ChromeDriver
     chrome {
         def chromeDriver = new File('test/drivers/chrome/chromedriver')
-        downloadDriver(chromeDriver, "http://chromedriver.googlecode.com/files/chromedriver_mac_23.0.1240.0.zip")
+        downloadDriver(chromeDriver, "http://chromedriver.storage.googleapis.com/2.11/chromedriver_mac32.zip")
         System.setProperty('webdriver.chrome.driver', chromeDriver.absolutePath)
         driver = { new ChromeDriver() }
     }

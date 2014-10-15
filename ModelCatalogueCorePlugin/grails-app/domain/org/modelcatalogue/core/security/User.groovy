@@ -33,9 +33,7 @@ class User extends ExtendibleElement {
     }
 
     def beforeInsert() {
-        if (isDirty('password') && !hasErrors()) {
-            encodePassword()
-        }
+        encodePassword()
     }
 
     def beforeUpdate() {
