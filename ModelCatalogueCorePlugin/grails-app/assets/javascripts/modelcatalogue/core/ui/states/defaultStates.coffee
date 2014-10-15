@@ -132,7 +132,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       if $rootScope.$$lastModels? and angular.equals($stateParams,$rootScope.$$lastModels.params)
         $scope.list = $rootScope.$$lastModels.list
         $scope.element = $rootScope.$$lastModels.element
-        $scope.dataElements = $rootScope.$$lastModels.element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$rootScope.$$lastModels.element.link}/outgoing/containment"})
+        $scope.dataElements = $rootScope.$$lastModels.element?._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$rootScope.$$lastModels.element.link}/outgoing/containment"})
       else
         $rootScope.$$lastModels =
           list:   $scope.list
