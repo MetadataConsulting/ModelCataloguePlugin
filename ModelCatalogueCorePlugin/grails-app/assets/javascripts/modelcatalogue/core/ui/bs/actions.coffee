@@ -1048,7 +1048,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRole 'filter-by-classification', actionsProvider.ROLE_LIST_ACTION, ['$scope', '$state', '$stateParams', 'messages', 'catalogueElementResource', 'catalogue', ($scope, $state, $stateParams, messages, catalogueElementResource, catalogue) ->
-    return undefined unless $scope.list and not $scope.element and catalogue.isInstanceOf($scope.list.itemType, 'publishedElement')
+    return undefined unless $scope.list and catalogue.isInstanceOf($scope.list.itemType, 'publishedElement')
 
     action = {
       position:   100

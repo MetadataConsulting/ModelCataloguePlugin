@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile']).directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', 'names', (recursiveCompile, names) -> {
+angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.recursiveCompile', 'ui.router']).directive 'catalogueElementTreeviewItem',  [ 'recursiveCompile', 'names', (recursiveCompile, names) -> {
     restrict: 'E'
     replace: true
     scope:
@@ -11,7 +11,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
     compile: recursiveCompile.compile
 
-    controller: ['$scope', '$rootScope', '$element', '$timeout', ($scope, $rootScope, $element, $timeout) ->
+    controller: ['$scope', '$rootScope', '$element', '$timeout', '$stateParams', ($scope, $rootScope, $element, $timeout, $stateParams) ->
       $scope.element.$$loadingChildren = false
 
       endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
@@ -34,7 +34,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       createShowMore  = (list) ->
         ->
-          list.next().then (nextList) ->
+          params = {}
+          params.classification = $stateParams.classification if $stateParams.classification
+          list.next(null, params).then (nextList) ->
             $scope.element.$$children ?= []
             for item in nextList.list when item.relation
               $scope.element.$$children.push(angular.extend(item.relation, {metadata: item.ext}))
@@ -117,7 +119,10 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
             $scope.element.$$loadingChildren = true
             fun = $scope.element[$scope.currentDescend]
             if angular.isFunction(fun)
-              fun().then (list) ->
+              params = {}
+              params.classification = $stateParams.classification if $stateParams.classification
+
+              fun(null, params).then (list) ->
 
                 newChildren = []
                 for item in list.list when item.relation

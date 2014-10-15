@@ -1,4 +1,10 @@
-angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSearch', 'mc.core.catalogueElementResource', 'ui.bootstrap']).directive 'catalogueElementPicker',  ['$compile', 'modelCatalogueSearch', 'catalogueElementResource', ($compile, modelCatalogueSearch, catalogueElementResource)-> {
+catalogueElementPicker = angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSearch', 'mc.core.catalogueElementResource', 'ui.bootstrap'])
+catalogueElementPicker.run ['$templateCache', ($templateCache) ->
+  $templateCache.put "modelcatalogue/core/ui/catalogueElementPickerTypeahead.html", """
+        <a><span class="text-muted" ng-class="match.model.getIcon()"/><span> {{match.model.classifiedName}}</span></a>
+  """
+]
+catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelCatalogueSearch', 'catalogueElementResource', ($compile, modelCatalogueSearch, catalogueElementResource)-> {
   restrict: 'A'
   replace: false
   terminal: true
@@ -8,7 +14,7 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
   controller: ['$scope', '$q', '$attrs', ($scope, $q, $attrs) ->
     $scope.searchForElement = (query, pickerValue, resourceAttr) ->
       searchFun     = null
-      resource      = if resourceAttr then $scope.$eval($attrs.resource) else undefined
+      resource      = if resourceAttr then $scope.$eval($attrs.resource) ? $scope.$parent.$eval($attrs.resource) else undefined
       value         = if pickerValue then pickerValue else resource
 
       if (value)
@@ -35,6 +41,7 @@ angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSear
     element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, '" + (attrs.catalogueElementPicker ? '') + "', '" + (attrs.resource ? '') + "')" )
     element.attr('autocomplete', "off")
     element.attr('typeahead-wait-ms', "500") unless element.attr('typeahead-wait-ms')
+    element.attr('typeahead-template-url', 'modelcatalogue/core/ui/catalogueElementPickerTypeahead.html')
     element.removeAttr('catalogue-element-picker')
     element.removeAttr('catalogueElementPicker')
     element.removeAttr('data-catalogue-element-picker')

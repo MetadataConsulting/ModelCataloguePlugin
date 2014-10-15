@@ -142,7 +142,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
       $scope.$on 'treeviewElementSelected', (event, element) ->
         unless element._containedElements_?.size?
-          element.contains().then (contained)->
+          params = {}
+          params.classification = $stateParams.classification if $stateParams.classification
+
+          element.contains(null, params).then (contained)->
             element._containedElements_ = contained
             $scope.dataElements         = contained
         $scope.element                  = element
