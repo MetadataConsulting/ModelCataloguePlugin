@@ -29,7 +29,11 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                   </tr>
                 </tbody>
               </table>
-              <p ng-show="update">{{element.name}} {{relationshipTypeInfo.value}} {{relation.name}}</p>
+              <p ng-show="update">{{element.name}} {{relationshipTypeInfo.value}} {{relation.name}} <span ng-show="classification"> in classification {{classification.name}}</span></p>
+              <div class="form-group">
+                <label for="classification" class="small">Classification</label>
+                <input id="classification" placeholder="Classification (leave blank for inherited)" ng-model="classification" catalogue-element-picker="classification" label="el.name" class="input-sm" typeahead-on-select="updateClassification(classification)">
+              </div>
               <div class="new-relationship-modal-prompt-metadata">
                 <simple-object-editor object="metadata" title="Metadata" hints="relationshipTypeInfo.type.metadataHints"></simple-object-editor>
               </div>
@@ -44,6 +48,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
           $scope.relationshipTypes    = []
           $scope.relationshipTypeInfo = null
           $scope.relation             = args.relation
+          $scope.classification       = args.classification
           $scope.update               = args.update
 
           $scope.updateInfo = (info) ->
@@ -76,6 +81,9 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
           $scope.updateRelation = (relation) ->
             $scope.relation = relation
 
+          $scope.updateClassification = (classification) ->
+            $scope.classification = classification
+
           $scope.relationType = 'catalogueElement'
 
           $scope.messages = messages.createNewMessages()
@@ -98,6 +106,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
             # this is ignored by binding and handled separately
             $scope.relation.metadata = $scope.metadata
+            $scope.relation.__classification = $scope.classification
 
             args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, $scope.relation, args.update).then (result) ->
               if args.update

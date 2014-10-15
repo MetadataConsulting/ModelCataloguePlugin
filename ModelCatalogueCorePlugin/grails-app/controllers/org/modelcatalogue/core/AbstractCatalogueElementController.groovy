@@ -127,6 +127,16 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
 
         }
+
+        Long classificationId = objectToBind.__classification?.id
+
+        Classification classification = classificationId ? Classification.get(classificationId) : null
+
+        if (classificationId && !classification) {
+            notFound()
+            return
+        }
+
         Class otherSideType
         try {
             otherSideType = Class.forName otherSide.elementType
@@ -140,7 +150,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             notFound()
             return
         }
-        Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType) :  relationshipService.link(destination, source, relationshipType)
+        Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType, classification) :  relationshipService.link(destination, source, relationshipType, classification)
 
         if (rel.hasErrors()) {
             reportCapableRespond rel.errors

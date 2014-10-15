@@ -21,7 +21,8 @@ class RelationshipMarshallers extends AbstractMarshallers {
                 type: rel.relationshipType.info,
                 archived: rel.archived,
                 ext: rel.ext,
-                elementType: Relationship.name
+                elementType: Relationship.name,
+                classification: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.classification)
         ]
     }
 
@@ -31,6 +32,7 @@ class RelationshipMarshallers extends AbstractMarshallers {
             renderInfo('source', rel.source.info, xml)
             renderInfo('destination', rel.destination.info, xml)
             renderInfo('type', rel.relationshipType.info, xml)
+            renderInfo('classification', rel.classification?.info, xml)
         }
         if (rel.ext) {
             xml.build {
@@ -50,6 +52,7 @@ class RelationshipMarshallers extends AbstractMarshallers {
     }
 
     static void renderInfo(String what, Map info, XML xml) {
+        if (!info) return
         xml.build {
             "$what" {
                 for (e in info.entrySet()) {

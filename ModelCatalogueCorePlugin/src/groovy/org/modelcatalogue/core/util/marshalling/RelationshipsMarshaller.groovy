@@ -14,7 +14,7 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
     protected Map<String, Object> prepareJsonMap(Object relationsList) {
         def ret = super.prepareJsonMap(relationsList)
         ret.list = relationsList.items.collect {
-            [id: it.id, type: it.relationshipType, ext: it.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, it)),  relation: relationsList.direction.getRelation(relationsList.owner, it), direction: relationsList.direction.getDirection(relationsList.owner, it), removeLink: getDeleteLink(relationsList.owner, it), archived: it.archived, elementType: Relationship.name]
+            [id: it.id, type: it.relationshipType, ext: it.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, it)),  relation: relationsList.direction.getRelation(relationsList.owner, it), direction: relationsList.direction.getDirection(relationsList.owner, it), removeLink: getDeleteLink(relationsList.owner, it), archived: it.archived, elementType: Relationship.name, classification: CatalogueElementMarshallers.minimalCatalogueElementJSON(it.classification)]
         }
         ret
     }
@@ -25,6 +25,9 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
             for (Relationship rel in relationsList.items) {
                 relationship(id: rel.id, removeLink: getDeleteLink(relationsList.owner, rel)) {
                     'type' rel.relationshipType
+                    if (rel.classification) {
+                        classification rel.classification
+                    }
                     direction relationsList.direction.getDirection(relationsList.owner, rel)
                     relation(relationsList.direction.getRelation(relationsList.owner, rel))
                     if (rel.ext) {
