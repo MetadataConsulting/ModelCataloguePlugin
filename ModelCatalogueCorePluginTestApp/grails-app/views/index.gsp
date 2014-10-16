@@ -19,7 +19,8 @@
                 <sec:ifLoggedIn>
                 currentUser: {
                     roles: ${grails.plugin.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
-                    username: '${sec.username()}'
+                    username: '${sec.username()}',
+                    id: ${sec.loggedInUserInfo(field:"id")}
                 }
                 </sec:ifLoggedIn>
             })

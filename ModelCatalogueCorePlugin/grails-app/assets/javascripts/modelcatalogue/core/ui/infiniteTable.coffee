@@ -4,8 +4,12 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
     scope:
       list: '='
       columns: '=?'
+      transform: '&?'
 
     templateUrl: 'modelcatalogue/core/ui/infiniteTable.html'
+
+    compile: (element, attrs) ->
+      attrs.transform = '$element' unless attrs.transform
 
     controller: ['$scope', '$animate', '$window', '$controller', '$element', '$state', '$stateParams', '$q', ($scope, $animate, $window, $controller, $element, $state, $stateParams, $q) ->
       angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
