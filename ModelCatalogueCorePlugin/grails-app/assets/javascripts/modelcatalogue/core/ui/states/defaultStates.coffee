@@ -493,7 +493,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         }
 
         actions.push {
-          condition: (term) -> term and $state.current.name == 'mc.resource.show.property' and  $state.$current.params.indexOf('q') >= 0 and $rootScope.$$searchContext
+          condition: (term) -> term and $state.current.name == 'mc.resource.show.property' and  'q' in $state.$current.params >= 0 and $rootScope.$$searchContext
           label: (term) ->
             "Search current <strong>#{$rootScope.$$searchContext}</strong> for <strong>#{term}</strong>"
           action: (term) ->
