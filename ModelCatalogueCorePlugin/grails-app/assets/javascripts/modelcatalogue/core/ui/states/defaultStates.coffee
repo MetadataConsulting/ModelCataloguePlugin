@@ -482,7 +482,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         }
 
         actions.push {
-          condition: (term) -> term and 'q' in $state.$current.params and $state.params.resource
+          condition: (term) -> term and $state.$current.params.hasOwnProperty('q') and $state.params.resource
           label: (term) ->
             naturalName = names.getNaturalName($state.params.resource)
             "Search any <strong>#{naturalName}</strong> for <strong>#{term}</strong>"
@@ -493,7 +493,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         }
 
         actions.push {
-          condition: (term) -> term and $state.current.name == 'mc.resource.show.property' and  'q' in $state.$current.params >= 0 and $rootScope.$$searchContext
+          condition: (term) ->
+            term and $state.current.name == 'mc.resource.show.property' and  $state.$current.params.hasOwnProperty('q') and $rootScope.$$searchContext
           label: (term) ->
             "Search current <strong>#{$rootScope.$$searchContext}</strong> for <strong>#{term}</strong>"
           action: (term) ->
