@@ -39,6 +39,7 @@ grails.project.dependency.resolution = {
         mavenRepo 'http://jcenter.bintray.com'
         mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
         mavenRepo "http://dl.dropbox.com/u/326301/repository"
+        mavenRepo "http://www.biojava.org/download/maven/"
 
 
     }
@@ -47,6 +48,7 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.27'
         //test "org.modelcatalogue:simple-fixtures:0.1.3"
         //compile "jlibs:jlibs-xml:1.0"
+        compile 'org.biojava:biojava3-ontology:3.1.0'
     }
 
     plugins {

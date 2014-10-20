@@ -113,6 +113,7 @@ log4j = {
     //}
 
     debug 'grails.app.services.org.modelcatalogue.core.PublishedElementService'
+    debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'

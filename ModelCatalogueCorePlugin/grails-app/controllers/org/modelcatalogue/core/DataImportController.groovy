@@ -11,7 +11,10 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class DataImportController<T> extends AbstractRestfulController<T>{
 
-    def dataImportService, XSDImportService
+    def dataImportService
+    def XSDImportService
+    def OBOService
+
     private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml']
     static responseFormats = ['json']
     static allowedMethods = [upload: "POST"]
@@ -75,6 +78,19 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                     response = importer
                     reportCapableRespond response
 
+                } else if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
+                    // def asset = storeAsset(params, file)
+
+                    OBOService.importOntology(file.inputStream, params?.name, params?.description)
+
+//                    webRequest.currentResponse.with {
+//                        //TODO: remove the base link
+//                        def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
+//                        status = 302
+//                        setHeader("Location", location.toString())
+//                        setHeader("X-Asset-ID", asset.id.toString())
+//                        outputStream.flush()
+//                    }
                 } else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
 
                     Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
