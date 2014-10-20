@@ -29,7 +29,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
     for element in elements
       $scope.elements.push element
-      $scope.rows.push getRowForElement(element)
+      $scope.rows.push getRowForElement($scope.transform $element: element)
 
 
 
@@ -120,11 +120,12 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     if $scope.list and $scope.list.itemType and newElement and newElement.isInstanceOf and newElement.isInstanceOf($scope.list.itemType) and url and $scope.list.base and (url.indexOf("#{modelCatalogueApiRoot}#{$scope.list.base}") >= 0 or "#{modelCatalogueApiRoot}#{$scope.list.base}".indexOf(url) >= 0 or url.indexOf("#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}") >= 0 or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0)
       $scope.total++
       $scope.elements.unshift newElement
-      $scope.rows.unshift getRowForElement(newElement)
+      $scope.rows.unshift getRowForElement($scope.transform(newElement))
       $scope.list.total = $scope.total if $scope.list
 
 
   $scope.$on 'catalogueElementDeleted', (ignored, deleted) ->
+    # TODO: play nicely with transform attr
     indexOfDeleted = $scope.elements.indexOf(deleted)
     if indexOfDeleted == -1 and deleted.link
       for element, i in $scope.elements

@@ -8,6 +8,7 @@ import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeService
+import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementFinder
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,6 +53,18 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         relationships.bidirectional?.each   addRelationsJson('relationships', el, ret, types)
 
         ret.availableReports = getAvailableReports(el)
+
+        if (modelCatalogueSecurityService.currentUser) {
+            RelationshipType favorite = RelationshipType.findByName('favourite')
+            if (favorite) {
+                Number count = Relationship.where {
+                    relationshipType == favorite && destination == el && source == modelCatalogueSecurityService.currentUser
+                }.count()
+                if (count > 0) {
+                    ret.favourite = true
+                }
+            }
+        }
 
         ret
 

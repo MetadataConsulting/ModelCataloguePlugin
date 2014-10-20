@@ -120,6 +120,26 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     action
   ]
 
+
+  actionsProvider.registerActionInRole 'cart', actionsProvider.ROLE_NAVIGATION, ['security', '$state', '$scope', (security, $state, $scope) ->
+    return undefined if not security.isUserLoggedIn()
+
+    action = {
+      position:   2000
+      label:      'Favorites'
+      icon:       'fa fa-fw fa-star'
+      action: ->
+        $state.go 'mc.favorites'
+
+    }
+
+#    $scope.$on '$stateChangeSuccess', (ignored, state) ->
+#      action.active = state.name == 'mc.favorites'
+
+    action
+  ]
+
+
 # TODO: fix or remove
 #  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-export-uninstantiated', ['$window', 'modelCatalogueApiRoot', ($window, modelCatalogueApiRoot) ->
 #    {

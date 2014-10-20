@@ -77,6 +77,19 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.element  = element
 ])
 
+.controller('mc.core.ui.states.FavoritesCtrl', ['$scope', 'modelCatalogueApiRoot', 'user', 'enhance', 'rest', 'columns', ($scope, modelCatalogueApiRoot, user, enhance, rest, columns) ->
+    $scope.title = 'Favorites'
+    $scope.user = user
+
+    listEnhancer = enhance.getEnhancer('list')
+    $scope.list = angular.extend(listEnhancer.createEmptyList(), base: "/user/#{user.id}/outgoing/favourite")
+
+    $scope.columns = columns()
+
+    enhance(rest(url: "#{modelCatalogueApiRoot}#{user.link}/outgoing/favourite")).then (list)->
+      $scope.list = list
+])
+
 .controller('mc.core.ui.states.DiffCtrl', ['$scope', '$stateParams', '$state', '$log', 'elements', 'applicationTitle', ($scope, $stateParams, $state, $log, elements, applicationTitle) ->
     $scope.elements = elements
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
@@ -89,7 +102,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
     $scope.list                     = list
-    $scope.title                    = names.getNaturalName($stateParams.resource)
+    $scope.title                    = names.getNaturalName($stateParams.resource) + ' List'
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
     $scope.element                  = if list.size > 0 then list.list[0]
@@ -180,6 +193,23 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     abstract: true
     url: '/catalogue'
     templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+  }
+
+  $stateProvider.state 'mc.favorites', {
+    url: '/favorites'
+    templateUrl: 'modelcatalogue/core/ui/state/favorites.html'
+    onEnter: ['applicationTitle', (applicationTitle) ->
+      applicationTitle "Favorites"
+    ]
+    resolve:
+      user: [ 'security', 'catalogueElementResource', '$q', (security, catalogueElementResource, $q) ->
+        userId = security.getCurrentUser()?.id
+        return $q.reject('Please, log in!') if not userId
+
+        catalogueElementResource('user').get(userId)
+      ]
+    controller: 'mc.core.ui.states.FavoritesCtrl'
+
   }
 
 
@@ -637,7 +667,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
       </span>
-      <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{title}} List</h2>
+      <h2><small ng-class="catalogue.getIcon(resource)"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> {{title}}</h2>
       <infinite-list  ng-if="$stateParams.display == 'grid'"  list="list"></infinite-list>
       <infinite-table ng-if="$stateParams.display != 'grid'"  list="list" columns="columns" ></infinite-table>
     </div>
@@ -674,6 +704,20 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       </div>
     </div>
   '''
+
+
+  #language=HTML
+  $templateCache.put 'modelcatalogue/core/ui/state/favorites.html', '''
+    <div>
+      <span class="contextual-actions-right">
+        <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
+      </span>
+      <h2><small class="fa fa-fw fa-star text-muted"></small>Favourites</h2>
+      <infinite-table list="list" columns="columns" transform="$element.relation"></infinite-table>
+    </div>
+  '''
+
+
 
   $templateCache.put 'modelcatalogue/core/ui/state/show.html', '''
     <div ng-show="element">
