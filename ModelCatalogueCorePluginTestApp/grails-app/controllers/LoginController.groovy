@@ -127,9 +127,9 @@ class LoginController {
         render([
             success: true,
             username: springSecurityService.authentication.name,
-            roles: springSecurityService.authentication.authorities*.authority] as JSON,
-            id: springSecurityService.authentication.id
-        )
+            roles: springSecurityService.authentication.authorities*.authority,
+            id: springSecurityService.authentication.hasProperty('id') ? springSecurityService.authentication.id : null
+        ] as JSON)
     }
 
     /**
