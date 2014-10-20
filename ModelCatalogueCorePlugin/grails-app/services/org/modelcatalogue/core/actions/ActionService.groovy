@@ -207,7 +207,7 @@ class ActionService {
             return created
         }
 
-        created.save(failOnError: true, flush: true)
+        Map<String, String> extensionParameters = [:]
 
         if (parameters) {
             parameters.each { key, value ->
@@ -215,10 +215,36 @@ class ActionService {
                     return
                 }
                 if (value.hasProperty('id')) {
-                    created.addExtension(key, AbstractActionRunner.encodeEntity(value))
+                    extensionParameters.put(key, AbstractActionRunner.encodeEntity(value))
                 } else {
-                    created.addExtension(key, value?.toString())
+                    extensionParameters.put(key, value?.toString())
                 }
+            }
+        }
+
+        ListWithTotalAndType<Action> existing = listByTypeAndParams(extensionParameters, batch, runner)
+
+        if (existing.total > 0) {
+            Map<String, Action> deps = parameters.findAll{ key, value -> value instanceof Action }
+            outer:
+            for (Action old in existing.items) {
+                if (old.dependencies && old.dependencies.size() != deps.size()) {
+                    continue
+                }
+                for (ActionDependency dependency in old.dependencies) {
+                    if (deps[dependency.role] != dependency.provider) {
+                        continue outer
+                    }
+                }
+                return old
+            }
+        }
+
+        created.save(failOnError: true, flush: true)
+
+        if (parameters) {
+            extensionParameters.each { key, value ->
+                created.addExtension(key, value)
             }
         }
 

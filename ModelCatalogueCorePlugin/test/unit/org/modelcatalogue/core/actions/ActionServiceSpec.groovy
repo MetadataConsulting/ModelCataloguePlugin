@@ -228,6 +228,23 @@ class ActionServiceSpec extends Specification {
         otherTestOneAndTwo.total == 0
     }
 
+    def "reuse existing action"() {
+        Action first = service.create batch, TestActionRunner, one: 12345
+        Action second = service.create batch, TestActionRunner, one: 12345
+
+        expect:
+        first == second
+
+        when:
+        Action third = service.create batch, TestActionRunner, two: 345, action: first
+        Action fourth = service.create batch, TestActionRunner, two: 345, action: second
+        Action fifth = service.create batch, TestActionRunner, two: 345, action: service.create(batch, TestActionRunner, one: 56789)
+
+        then:
+        third  == fourth
+        fourth != fifth
+    }
+
 }
 
 class TestActionRunner extends AbstractActionRunner {
