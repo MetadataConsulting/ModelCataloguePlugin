@@ -20,6 +20,8 @@ class MeasurementUnit extends CatalogueElement {
 
     String symbol
 
+    static hasMany = [valueDomains: ValueDomain]
+
     static constraints = {
         name unique:true
         symbol nullable: true, size: 1..100
