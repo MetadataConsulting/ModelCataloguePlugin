@@ -81,7 +81,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                 } else if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
                     // def asset = storeAsset(params, file)
 
-                    OBOService.importOntology(file.inputStream, params?.name, params?.description)
+                    OBOService.importOntology(file.inputStream, params?.name)
 
 //                    webRequest.currentResponse.with {
 //                        //TODO: remove the base link
