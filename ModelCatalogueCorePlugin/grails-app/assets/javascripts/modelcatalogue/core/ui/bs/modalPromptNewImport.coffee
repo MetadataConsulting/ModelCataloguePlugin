@@ -41,7 +41,7 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
             <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, modelCatalogueDataArchitect, $modalInstance, $upload, modelCatalogueApiRoot, enhance) ->
+        controller: ['$scope', 'messages', 'names', 'modelCatalogueDataArchitect', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', 'catalogue', ($scope, messages, names, modelCatalogueDataArchitect, $modalInstance, $upload, modelCatalogueApiRoot, enhance, catalogue) ->
           $scope.copy     = angular.copy(args.element ? {})
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
@@ -91,6 +91,8 @@ angular.module('mc.core.ui.bs.modalPromptNewImport', ['mc.util.messages', 'angul
                 if args?.create
                   messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
                   $modalInstance.close(result)
+                  if catalogue.isInstanceOf result.elementType, 'asset'
+                    result.show()
             ).error((data) ->
               for err in data.errors
                 $scope.messages.error err.message

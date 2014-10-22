@@ -79,18 +79,41 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                     reportCapableRespond response
 
                 } else if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
-                    // def asset = storeAsset(params, file)
+                    def asset = storeAsset(params, file, 'text/obo')
+                    def id = asset.id
+                    InputStream inputStream = file.inputStream
+                    String name = params?.name
+                    executorService.submit {
+                        try {
+                            Classification classification = OBOService.importOntology(inputStream, name)
+                            Asset updated = Asset.get(id)
+                            updated.status = PublishedElementStatus.FINALIZED
+                            updated.description = "Your import has finished."
+                            updated.save(flush: true, failOnError: true)
+                            updated.addToClassifications(classification)
+                            classification.addToClassifies(updated)
+                            if (classification) {
+                                updated.addToRelatedTo(classification)
+                            }
+                        } catch (Exception e) {
+                            Asset updated = Asset.get(id)
+                            updated.refresh()
+                            updated.status = PublishedElementStatus.FINALIZED
+                            updated.name = updated.name + " - Error during upload"
+                            updated.description = "Error importing obo file: ${e}"
+                            updated.save(flush: true, failOnError: true)
+                        }
+                    }
 
-                    OBOService.importOntology(file.inputStream, params?.name)
-
-//                    webRequest.currentResponse.with {
-//                        //TODO: remove the base link
-//                        def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
-//                        status = 302
-//                        setHeader("Location", location.toString())
-//                        setHeader("X-Asset-ID", asset.id.toString())
-//                        outputStream.flush()
-//                    }
+                    webRequest.currentResponse.with {
+                        //TODO: remove the base link
+                        def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
+                        status = 302
+                        setHeader("Location", location.toString())
+                        setHeader("X-Asset-ID", asset.id.toString())
+                        outputStream.flush()
+                    }
+                    return
                 } else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
 
                     Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
@@ -119,7 +142,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
     }
 
 
-    protected storeAsset(param, file){
+    protected storeAsset(param, file, contentType = 'application/xslt'){
 
         String theName = (param.name ?: param.action)
 

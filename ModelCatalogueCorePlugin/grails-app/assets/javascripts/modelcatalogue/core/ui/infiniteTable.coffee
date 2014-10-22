@@ -11,7 +11,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
     compile: (element, attrs) ->
       attrs.transform = '$element' unless attrs.transform
 
-    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$state', '$stateParams', '$q', ($scope, $animate, $window, $controller, $element, $state, $stateParams, $q) ->
+    controller: ['$scope', '$animate', '$window', '$controller', '$element', '$state', '$stateParams', '$q', '$timeout', ($scope, $animate, $window, $controller, $element, $state, $stateParams, $q, $timeout) ->
       angular.extend(this, $controller('infiniteListCtrl', {$scope: $scope, $element: $element}))
 
       header = $element.find('.inf-table-header')
@@ -105,6 +105,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
       $scope.$on 'infiniteTableRedraw', ->
         updateHeader()
+        $timeout updateHeader, 100
 
       windowEl.resize -> update
 

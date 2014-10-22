@@ -155,18 +155,18 @@ class OBOService {
      * This import is initially tuned up for Human Phenotype ontology, few parts are still missing.
      * See http://www.geneontology.org/GO.format.obo-1_2.shtml#S.1 for full current specification.
      */
-    def importOntology(InputStream is, String name) {
-        try {
-            log.info "Parsing OBO file for ${name}"
-            OBODoc document = new OBOFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
+    Classification importOntology(InputStream is, String name) {
+        log.info "Parsing OBO file for ${name}"
+        OBODoc document = new OBOFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
 
-            Map<String, Model> models = findOrCreateModelsFromTermFrames(findOrCreateClassifications(name, document.headerFrame), document.termFrames)
-            createRelationshipsFromTermFrames models, document.termFrames
-            publishModelsAsDraft models.values()
-            log.info "Import finished for ${name}"
-        } catch (Exception e) {
-            log.error "Exception importing OBO file", e
-        }
+        Map<String, Classification> classificationsMap = findOrCreateClassifications(name, document.headerFrame)
+
+        Map<String, Model> models = findOrCreateModelsFromTermFrames(classificationsMap, document.termFrames)
+        createRelationshipsFromTermFrames models, document.termFrames
+        publishModelsAsDraft models.values()
+        log.info "Import finished for ${name}"
+
+        classificationsMap[DEFAULT_CLASSIFICATION]
     }
 
     private void publishModelsAsDraft(Collection<Model> models) {
