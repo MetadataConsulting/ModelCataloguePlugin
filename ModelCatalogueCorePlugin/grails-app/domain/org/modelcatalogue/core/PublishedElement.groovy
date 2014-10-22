@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import grails.util.GrailsNameUtils
+
 abstract class PublishedElement extends ExtendibleElement  {
 
     //version number - this gets iterated every time a new version is created from a finalized version
@@ -70,7 +72,10 @@ abstract class PublishedElement extends ExtendibleElement  {
     }
 
     Integer countVersions() {
-        getClass().countByModelCatalogueIdLike "$bareModelCatalogueId%"
+        if (!latestVersion) {
+            return 1
+        }
+        getClass().countByLatestVersion(latestVersion)
     }
 
     static protected Boolean checkChildItemsFinalized(Model model, Collection<Model> tree = []){
@@ -90,6 +95,14 @@ abstract class PublishedElement extends ExtendibleElement  {
             }
         }
         return true
+    }
+
+    String getDefaultModelCatalogueId() {
+        String resourceName = GrailsNameUtils.getPropertyName(getClass())
+        if (resourceName.contains('_')) {
+            resourceName = resourceName.substring(0, resourceName.lastIndexOf('_'))
+        }
+        grailsLinkGenerator.link(absolute: true, controller: 'catalogue', action: 'xref', id: id, params: [resource: resourceName, version: versionNumber])
     }
 
 }

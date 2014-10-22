@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import asset.pipeline.grails.LinkGenerator
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -13,11 +14,12 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 abstract class CatalogueElement {
 
+    def grailsLinkGenerator
     def relationshipService
 
     String name
     String description
-	String modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
+	String modelCatalogueId
 
 
     // time stamping
@@ -30,7 +32,7 @@ abstract class CatalogueElement {
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'classifiedName']
+    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'classifiedName', 'defaultModelCatalogueId']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
 
@@ -43,7 +45,7 @@ abstract class CatalogueElement {
     static constraints = {
         name size: 1..255
         description nullable: true, maxSize: 2000
-		modelCatalogueId bindable: false, nullable: true, unique: true, maxSize: 255, matches: '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
+		modelCatalogueId nullable: true, unique: true, maxSize: 255, url: true
         dateCreated bindable: false
         lastUpdated bindable: false
         archived bindable: false
@@ -179,18 +181,6 @@ abstract class CatalogueElement {
 
     boolean isArchived() { false }
 
-
-
-    def afterInsert(){
-       if(!getModelCatalogueId()) {
-           createModelCatalogueId()
-       }
-    }
-
-    def createModelCatalogueId(){
-        modelCatalogueId = "MC_" + UUID.randomUUID() + "_" + 1
-    }
-
     def beforeDelete(){
         new HashSet(outgoingRelationships).each{ Relationship relationship->
             relationship.beforeDelete()
@@ -210,20 +200,13 @@ abstract class CatalogueElement {
         }
     }
 
-	def updateModelCatalogueId() {
-		def newCatalogueId = modelCatalogueId.split("_")
-		newCatalogueId[-1] = newCatalogueId.last().toInteger() + 1
-		modelCatalogueId = newCatalogueId.join("_")
-	}
+    String getDefaultModelCatalogueId() {
+        String resourceName = GrailsNameUtils.getPropertyName(getClass())
+        if (resourceName.contains('_')) {
+            resourceName = resourceName.substring(0, resourceName.lastIndexOf('_'))
+        }
+        grailsLinkGenerator.link(absolute: true, controller: 'catalogue', action: 'xref', id: id, params: [resource: resourceName])
+    }
 
 
-
-	/**
-	 * Get the Model Catalogue ID excluding any version information suffix.
-	 * @return The model catalogue ID, minus any trailing underscore and version numbers
-	 */
-	def getBareModelCatalogueId() {
-		// Match everything from the ID except the final underscore and integers ('_\d+')
-		(modelCatalogueId =~ /(?i)(MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}))/)[0][1]
-	}
 }

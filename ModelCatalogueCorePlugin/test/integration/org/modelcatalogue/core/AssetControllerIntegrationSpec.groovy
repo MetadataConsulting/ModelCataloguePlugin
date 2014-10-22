@@ -86,7 +86,7 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
 
         cleanup:
         if (existing) {
-            for (Asset a in Asset.findAllByModelCatalogueIdLike("${existing.bareModelCatalogueId}%")) {
+            for (Asset a in Asset.findAllByLatestVersion(existing.latestVersion ?: existing)) {
                 a.delete()
             }
         }

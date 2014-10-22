@@ -29,7 +29,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         if (!el) return [:]
         def ret = [
                 id: el.id,
-				modelCatalogueId: el.modelCatalogueId,
+				modelCatalogueId: el.modelCatalogueId ?: el.defaultModelCatalogueId,
                 archived: el.archived,
                 name: el.name,
                 description: el.description,

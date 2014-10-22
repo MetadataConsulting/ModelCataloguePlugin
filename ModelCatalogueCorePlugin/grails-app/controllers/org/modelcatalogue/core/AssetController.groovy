@@ -78,7 +78,7 @@ class AssetController extends AbstractPublishedElementController<Asset> {
             return
         }
 
-        String servingUrl = modelCatalogueStorageService.getServingUrl('assets', currentAsset.modelCatalogueId)
+        String servingUrl = modelCatalogueStorageService.getServingUrl('assets', "${currentAsset.id}")
 
         if (servingUrl) {
             redirect servingUrl
@@ -97,25 +97,31 @@ class AssetController extends AbstractPublishedElementController<Asset> {
 
         response.contentType    = asset.contentType
         response.contentLength  = asset.size
-        response.outputStream << modelCatalogueStorageService.fetch('assets', asset.modelCatalogueId)
+        response.outputStream << modelCatalogueStorageService.fetch('assets',  "${asset.id}")
     }
 
 
     private Asset getAssetWithContent(Asset currentAsset) {
-        String assetName = null
-        for (int i = currentAsset.versionNumber ; i > 0 ; i--) {
-            String testedName = "${currentAsset.bareModelCatalogueId}_${i}"
-            if (modelCatalogueStorageService.exists('assets', testedName)) {
-                assetName = testedName
-                break
+        if (currentAsset.countVersions() == 1) {
+            if (modelCatalogueStorageService.exists('assets', "${currentAsset.id}")) {
+                return currentAsset
             }
-        }
-
-        if (!assetName) {
             return null
         }
 
-        currentAsset.modelCatalogueId == assetName ? currentAsset : Asset.findByModelCatalogueId(assetName)
+        if (!currentAsset.latestVersion) {
+            return null
+        }
+
+        List<Asset> assets = Asset.where {
+            latestVersion == currentAsset.latestVersion && versionNumber < currentAsset.versionNumber
+        }.list()
+        for (Asset asset in assets) {
+            if (modelCatalogueStorageService.exists('assets', "${asset.id}")) {
+                return asset
+            }
+        }
+        return null
     }
 
 }

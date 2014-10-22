@@ -36,8 +36,6 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
         then:
         json.versionNumber          == currentVersionNumber + 1
-        json.modelCatalogueId       != currentModelCatalogueId
-        json.modelCatalogueId       == another.bareModelCatalogueId + '_' + (currentVersionNumber + 1)
         json.name                   == newName
 
         another.countVersions()     == numberOfCurrentVersions + 1

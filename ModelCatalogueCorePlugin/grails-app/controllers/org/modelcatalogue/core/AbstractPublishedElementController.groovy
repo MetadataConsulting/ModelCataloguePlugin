@@ -194,13 +194,20 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
             return
         }
 
+        Long id = element.id
+
+        if (!element.latestVersion) {
+            reportCapableRespond Lists.lazy(params, resource,"/${resourceName}/${params.id}/history", { [resource.get(id)] }, { 1 })
+            return
+        }
+
+        PublishedElement latestVersion = element.latestVersion
+
         def customParams = [:]
         customParams.putAll params
 
         customParams.sort   = 'versionNumber'
         customParams.order  = 'desc'
-
-        PublishedElement latestVersion = element.latestVersion ?: element
 
         reportCapableRespond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
             eq 'latestVersion', latestVersion

@@ -89,7 +89,7 @@ class AssetService {
             MessageDigest md5 = MessageDigest.getInstance('MD5')
             dis = new DigestInputStream(file.inputStream, md5)
             CountingInputStream countingInputStream = new CountingInputStream(dis)
-            modelCatalogueStorageService.store('assets', asset.modelCatalogueId, file.contentType, { OutputStream it -> it << countingInputStream })
+            modelCatalogueStorageService.store('assets', "${asset.id}", file.contentType, { OutputStream it -> it << countingInputStream })
             asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
             asset.size = countingInputStream.byteCount
             asset.save()
@@ -107,7 +107,7 @@ class AssetService {
             MessageDigest md5 = MessageDigest.getInstance('MD5')
             dis = new DigestInputStream(inputStream, md5)
             CountingInputStream countingInputStream = new CountingInputStream(dis)
-            modelCatalogueStorageService.store('assets', asset.modelCatalogueId, contentType, { OutputStream it -> it << countingInputStream })
+            modelCatalogueStorageService.store('assets', "${asset.id}", contentType, { OutputStream it -> it << countingInputStream })
             asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
             asset.size = countingInputStream.byteCount
             asset.save()
@@ -122,7 +122,7 @@ class AssetService {
     void storeAssetWithSteam(Asset asset, String contentType, Closure withOutputStream) {
         if (!asset) throw new IllegalArgumentException("Please, provide valid asset.")
         MessageDigest md5 = MessageDigest.getInstance('MD5')
-        modelCatalogueStorageService.store('assets', asset.modelCatalogueId, contentType) { OutputStream it ->
+        modelCatalogueStorageService.store('assets', "${asset.id}", contentType) { OutputStream it ->
             DigestOutputStream dos      = null
             CountingOutputStream cos    = null
             try {

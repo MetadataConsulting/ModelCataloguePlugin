@@ -128,7 +128,6 @@ class PublishedElementService {
     private PublishedElement createNewVersion(PublishedElement element){
         element.versionNumber++
         element.versionCreated = new Date()
-        element.updateModelCatalogueId()
 
         if (!element.save(flush: true)) {
             log.error(element.errors)
@@ -198,7 +197,6 @@ class PublishedElementService {
         //set archived as updated whilst updates are going on (so it doesn't interfere with regular validation rules)
         archived.status = PublishedElementStatus.UPDATED
         archived.dateCreated = element.dateCreated // keep the original creation date
-        archived.modelCatalogueId = archived.bareModelCatalogueId + "_" + archived.versionNumber
 
 
         if (!archived.save()) {
