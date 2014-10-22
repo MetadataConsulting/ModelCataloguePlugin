@@ -2,12 +2,16 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.runtime.IOGroovyMethods
+import org.hibernate.LobHelper
+import org.hibernate.Session
+import org.hibernate.SessionFactory
 
 import javax.annotation.PostConstruct
 
 class ModelCatalogueStorageService implements StorageService {
 
     GrailsApplication grailsApplication
+    SessionFactory sessionFactory
     private Long maxSize
 
     @PostConstruct
@@ -42,14 +46,11 @@ class ModelCatalogueStorageService implements StorageService {
         AssetFile file = AssetFile.findByPath(getPath(directory, filename))
 
         if (!file) {
-            file = new AssetFile(path: getPath(directory, filename))
+            file = new AssetFile(path: getPath(directory, filename), content: sessionFactory.currentSession.lobHelper.createBlob(new byte[0]))
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream()
+        IOGroovyMethods.withStream(file.content.setBinaryStream(1), withOutputStream)
 
-        IOGroovyMethods.withStream(baos, withOutputStream)
-
-        file.content = baos.toByteArray()
         file.save(failOnError: true)
     }
 
@@ -72,8 +73,7 @@ class ModelCatalogueStorageService implements StorageService {
      */
     InputStream fetch(String directory, String filename) {
         if (!exists(directory, filename)) throw new FileNotFoundException("No such file $filename in $directory")
-        byte[] content = AssetFile.findByPath(getPath(directory, filename)).content ?: new byte[0]
-        new ByteArrayInputStream(content)
+        AssetFile.findByPath(getPath(directory, filename))?.content?.binaryStream ?: new ByteArrayInputStream(new byte[0])
     }
 
 

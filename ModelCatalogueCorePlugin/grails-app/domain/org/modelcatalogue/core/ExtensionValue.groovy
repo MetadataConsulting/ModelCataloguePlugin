@@ -18,7 +18,7 @@ class ExtensionValue implements Extension {
 
     static constraints = {
         name size: 1..255
-        extensionValue maxSize: 1000, nullable: true
+        extensionValue maxSize: 2000, nullable: true
     }
 
 

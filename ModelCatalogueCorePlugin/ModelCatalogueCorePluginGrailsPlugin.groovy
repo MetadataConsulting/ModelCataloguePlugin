@@ -101,6 +101,9 @@ Model catalogue core plugin (metadata registry)
                 CatalogueElementDynamicHelper.addShortcuts(it.clazz)
             }
         }
+        org.codehaus.groovy.grails.web.json.JSONObject.Null.metaClass.getId = {->
+            null
+        }
     }
 
     def doWithApplicationContext = { ctx ->

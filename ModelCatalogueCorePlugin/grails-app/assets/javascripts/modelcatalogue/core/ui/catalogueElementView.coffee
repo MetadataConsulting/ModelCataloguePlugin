@@ -76,6 +76,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
             for tab in $scope.tabs
               tab.active = tab.name == newProperty
+              $scope.$broadcast 'infiniteTableRedraw'
               if tab.active
                 isTable = tab.type == 'decorated-list'
                 if isTable and tab.value.total
@@ -131,6 +132,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
+            $scope.$broadcast 'infiniteTableRedraw'
             activeTabSet = true
 
           tabs.push tabDefinition
@@ -189,6 +191,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
+            $scope.$broadcast 'infiniteTableRedraw'
             activeTabSet = true
 
           tabs.push tabDefinition
@@ -218,6 +221,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
+            $scope.$broadcast 'infiniteTableRedraw'
             activeTabSet = true
 
           tabs.unshift tabDefinition
@@ -233,6 +237,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           for tab in tabs
             if not tab.disabled
               tab.active = true
+              $scope.$broadcast 'infiniteTableRedraw'
               $scope.property = tab.name
               showTabs = true
               break
@@ -262,12 +267,13 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
         $scope.property = params.property
+        $scope.$broadcast 'infiniteTableRedraw'
 
       # init
       onElementUpdate($scope.element)
 
       # watches
-      $scope.$watch 'element', onElementUpdate
+      $scope.$watch 'element', onElementUpdate, true
       $scope.$watch 'property', onPropertyUpdate
     ]
   }
