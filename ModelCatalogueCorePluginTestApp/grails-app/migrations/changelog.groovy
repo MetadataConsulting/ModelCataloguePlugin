@@ -4,4 +4,5 @@ databaseChangeLog = {
     include file: 'changelog_002_movingUserToCore.groovy'
     include file: 'changelog_003_relationshipClassification.groovy'
     include file: 'changelog_004_favourites.groovy'
+    include file: 'changelog_005_newModelCatalogueId.groovy'
 }

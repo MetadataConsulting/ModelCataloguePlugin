@@ -21,7 +21,7 @@ environments {
     }
     test {
         dataSource {
-            dbCreate = "validate"
+            dbCreate = ""
             url = "jdbc:mysql://localhost:3306/modelcatalogue-core-testapp?autoReconnect=true&useUnicode=yes"
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')

@@ -200,8 +200,10 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
         customParams.sort   = 'versionNumber'
         customParams.order  = 'desc'
 
+        PublishedElement latestVersion = element.latestVersion ?: element
+
         reportCapableRespond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
-            ilike 'modelCatalogueId', "$element.bareModelCatalogueId%"
+            eq 'latestVersion', latestVersion
         }
     }
 

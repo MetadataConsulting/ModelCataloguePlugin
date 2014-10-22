@@ -13,6 +13,9 @@ abstract class PublishedElement extends ExtendibleElement  {
 
     Date versionCreated = new Date()
 
+    // id of the latest version
+    PublishedElement latestVersion
+
     Set<Classification> classifications = []
 
     static searchable = {
@@ -53,6 +56,7 @@ abstract class PublishedElement extends ExtendibleElement  {
             return true
          }
         versionNumber bindable: false
+        latestVersion bindable: false, nullable: true
     }
 
     static relationships = [
