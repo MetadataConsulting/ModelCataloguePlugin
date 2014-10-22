@@ -1,6 +1,18 @@
 angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actionsProvider', 'names', (actionsProvider, names)->
   ROLE_ACTION_ACTION = 'action'
 
+
+  updateFrom = (original, update) ->
+    console.log 'before update:' , original, update
+    for key, value of original
+      delete original.key
+
+    for key, value of update
+      original[key] = update[key]
+    console.log 'after update:' , original, update
+    original
+
+
   showErrorsUsingMessages = (messages) ->
     (response) ->
       if response?.data and response.data.errors
@@ -48,7 +60,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
       action:     ->
         messages.prompt('Edit ' + $scope.element.getElementTypeName(), '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
-          angular.extend $scope.element, updated
+          updateFrom $scope.element, updated
 
     updateAction = ->
       action.disabled = $scope.element.archived or $scope.element?.status == 'FINALIZED'
@@ -155,7 +167,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action:     ->
       messages.confirm('Do you want to create new version?', "New version will be created for #{$scope.element.getElementTypeName()} #{$scope.element.name}").then ->
         catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true}).then (updated) ->
-          angular.extend $scope.element, updated
+          updateFrom $scope.element, updated
           messages.success("New version created for #{$scope.element.name}")
           $rootScope.$broadcast 'newVersionCreated', $scope.element
         , showErrorsUsingMessages(messages)
@@ -185,7 +197,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be finalized").then ->
           $scope.element.status = 'FINALIZED'
           catalogueElementResource($scope.element.elementType).update($scope.element).then (updated) ->
-            angular.extend $scope.element, updated
+            updateFrom $scope.element, updated
             messages.success("#{$scope.element.name} finalized")
             $rootScope.$broadcast 'newVersionCreated', $scope.element
           , showErrorsUsingMessages(messages)
@@ -214,7 +226,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:     ->
         messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
-            angular.extend $scope.element, archived
+            updateFrom $scope.element, archived
           , showErrorsUsingMessages(messages)
     }
 
@@ -241,7 +253,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:     ->
         messages.prompt("Merge #{$scope.element.getElementTypeName()} #{$scope.element.name} to another #{$scope.element.getElementTypeName()}", "All non-system relationships of the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be moved to the following destination and than the #{$scope.element.getElementTypeName()} #{$scope.element.name} will be archived", {type: 'catalogue-element', resource: $scope.element.elementType}).then (destination)->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/merge/#{destination.id}", method: 'POST')).then (merged) ->
-            angular.extend $scope.element, merged
+            updateFrom $scope.element, merged
           , showErrorsUsingMessages(messages)
     }
 
@@ -268,7 +280,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:     ->
         messages.confirm("Finalize Model Tree", "Do you really want to finalize Model #{$scope.element.name} and and all its child models and elements?" ).then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalizeTree", method: 'POST')).then (finalized) ->
-            angular.extend $scope.element, finalized
+            updateFrom $scope.element, finalized
           , showErrorsUsingMessages(messages)
     }
 
@@ -296,7 +308,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         batch = $scope.batch ? $scope.element
         messages.confirm("Do you want to archive batch #{batch.name} ?", "The batch #{batch.name} will be archived").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{batch.link}/archive", method: 'POST')).then (archived) ->
-            angular.extends batch, archived
+            updateFroms batch, archived
           , showErrorsUsingMessages(messages)
     }
 
@@ -598,7 +610,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         $scope.element.source.refresh().then (element)->
           args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}
           messages.prompt('Update Mapping', '', args).then (updated)->
-            angular.extend $scope.element, updated
+            updateFrom $scope.element, updated
 
     }
 
@@ -646,7 +658,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:       'primary'
       action:     ->
         catalogueElementResource($scope.element.elementType).get($scope.element.id).then (refreshed) ->
-          angular.extend $scope.element, refreshed
+          updateFrom $scope.element, refreshed
           $rootScope.$broadcast 'redrawContextualActions'
 
     }
@@ -996,7 +1008,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         batch = $scope.batch ? $scope.element
         messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
           enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}#{batch.link}/run")).then (updated) ->
-            angular.extend(batch, updated)
+            updateFrom(batch, updated)
           $timeout($scope.reload, 1000) if angular.isFunction($scope.reload)
     }
 

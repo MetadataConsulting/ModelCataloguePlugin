@@ -267,7 +267,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       onElementUpdate($scope.element)
 
       # watches
-      $scope.$watch 'element', onElementUpdate
+      $scope.$watch 'element', onElementUpdate, true
       $scope.$watch 'property', onPropertyUpdate
     ]
   }
