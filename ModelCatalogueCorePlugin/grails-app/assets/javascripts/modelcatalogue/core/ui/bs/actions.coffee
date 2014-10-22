@@ -3,13 +3,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
 
   updateFrom = (original, update) ->
-    console.log 'before update:' , original, update
-    for key, value of original
-      delete original.key
+    for originalKey of original
+      delete original[originalKey]
 
-    for key, value of update
-      original[key] = update[key]
-    console.log 'after update:' , original, update
+    for newKey of update
+      original[newKey] = update[newKey]
     original
 
 
