@@ -17,7 +17,6 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
         String newName                  = "UPDATED NAME WITH NEW VERSION"
         PublishedElement another        = PublishedElement.get(anotherLoadItem.id)
         String currentName              = another.name
-        String currentModelCatalogueId  = another.modelCatalogueId
         Integer currentVersionNumber    = another.versionNumber
         Integer numberOfCurrentVersions = another.countVersions()
 
@@ -30,7 +29,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
         controller.update()
 
-        PublishedElement oldVersion    = PublishedElement.findByModelCatalogueId(currentModelCatalogueId)
+        PublishedElement oldVersion    = PublishedElement.findByLatestVersionAndVersionNumber(another.latestVersion ?: another, currentVersionNumber)
 
         def json = controller.response.json
 
@@ -41,7 +40,6 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
         another.countVersions()     == numberOfCurrentVersions + 1
 
         oldVersion.versionNumber    == currentVersionNumber
-        oldVersion.modelCatalogueId == currentModelCatalogueId
         oldVersion.name             == currentName
         oldVersion.name             != json.name
     }
@@ -145,7 +143,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
     }
 
     void createArchiveVersions(PublishedElement el) {
-        while (!el.modelCatalogueId.endsWith('_12')) {
+        while (el.versionNumber != 12) {
             publishedElementService.archiveAndIncreaseVersion(el)
         }
     }

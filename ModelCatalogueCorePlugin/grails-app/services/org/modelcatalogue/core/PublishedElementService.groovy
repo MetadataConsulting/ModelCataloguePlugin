@@ -63,6 +63,7 @@ class PublishedElementService {
 
         //set archived status from updated to archived
         archived.status = PublishedElementStatus.DEPRECATED
+        archived.latestVersion = element.latestVersion ?: element
         archived.save()
     }
 
@@ -128,6 +129,10 @@ class PublishedElementService {
     private PublishedElement createNewVersion(PublishedElement element){
         element.versionNumber++
         element.versionCreated = new Date()
+
+        if (!element.latestVersion) {
+            element.latestVersion = element
+        }
 
         if (!element.save(flush: true)) {
             log.error(element.errors)

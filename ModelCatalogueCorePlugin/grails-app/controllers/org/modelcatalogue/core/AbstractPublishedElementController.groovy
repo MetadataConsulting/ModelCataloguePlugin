@@ -197,7 +197,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
         Long id = element.id
 
         if (!element.latestVersion) {
-            reportCapableRespond Lists.lazy(params, resource,"/${resourceName}/${params.id}/history", { [resource.get(id)] }, { 1 })
+            reportCapableRespond Lists.wrap(params,"/${resourceName}/${params.id}/history", Lists.lazy(params, resource, { [resource.get(id)] }, { 1 }))
             return
         }
 

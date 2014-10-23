@@ -20,14 +20,14 @@ class ClassificationDomainSpec extends Specification {
         Classification.list().isEmpty()
 
         when:
-		args.modelCatalogueId = "MC_" + UUID.randomUUID() + "_1"
+		args.modelCatalogueId = "http://example.com/123"
         def conceptInstance = new Classification(args)
 
         conceptInstance.save()
 
         then:
 
-        !conceptInstance.hasErrors() == validates
+        (conceptInstance.errors.errorCount == 0) == validates
 
         where:
 

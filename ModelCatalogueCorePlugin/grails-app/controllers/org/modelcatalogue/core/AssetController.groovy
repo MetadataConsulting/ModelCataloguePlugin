@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
 import org.springframework.web.multipart.MultipartFile
 
@@ -113,7 +114,11 @@ class AssetController extends AbstractPublishedElementController<Asset> {
             return null
         }
 
-        List<Asset> assets = Asset.where {
+        List<Asset> assets = new DetachedCriteria<Asset>(Asset).build {
+            eq 'latestVersion', currentAsset.latestVersion
+            lt 'versionNumber'
+        }.list()
+                Asset.where {
             latestVersion == currentAsset.latestVersion && versionNumber < currentAsset.versionNumber
         }.list()
         for (Asset asset in assets) {

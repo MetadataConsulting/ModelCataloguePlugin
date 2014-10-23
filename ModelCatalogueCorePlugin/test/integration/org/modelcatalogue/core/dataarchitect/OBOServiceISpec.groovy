@@ -3,11 +3,13 @@ package org.modelcatalogue.core.dataarchitect
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.Model
 import org.springframework.transaction.TransactionStatus
+import spock.lang.Ignore
 
 class OBOServiceISpec extends IntegrationSpec {
 
     def OBOService
 
+    @Ignore
     void "test import"() {
         boolean ok = false
         Model.withTransaction { TransactionStatus status ->

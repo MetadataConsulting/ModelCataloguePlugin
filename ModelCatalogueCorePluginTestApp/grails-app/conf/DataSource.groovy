@@ -21,6 +21,12 @@ environments {
     }
     test {
         dataSource {
+            dbCreate = "update" // one of 'create', 'create-drop', 'update', 'validate', ''
+            url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+        }
+    }
+    local {
+        dataSource {
             dbCreate = ""
             url = "jdbc:mysql://localhost:3306/modelcatalogue-core-testapp?autoReconnect=true&useUnicode=yes"
             username = System.getenv('METADATA_DB_USERNAME')

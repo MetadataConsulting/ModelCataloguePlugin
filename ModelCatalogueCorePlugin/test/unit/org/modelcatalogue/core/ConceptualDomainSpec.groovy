@@ -20,14 +20,14 @@ class ConceptualDomainSpec extends Specification {
         ConceptualDomain.list().isEmpty()
 
         when:
-		args.modelCatalogueId = "MC_" + UUID.randomUUID() + "_1"
+        args.modelCatalogueId = "http://example.com/123"
         def conceptInstance = new ConceptualDomain(args)
 
         conceptInstance.save()
 
         then:
 
-        !conceptInstance.hasErrors() == validates
+        (conceptInstance.errors.errorCount == 0) == validates
 
         where:
 
