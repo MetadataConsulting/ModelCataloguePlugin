@@ -200,13 +200,18 @@ abstract class CatalogueElement {
         }
     }
 
+    void setModelCatalogueId(String mcID) {
+        if (mcID != defaultModelCatalogueId) {
+            modelCatalogueId = mcID
+        }
+    }
+
     String getDefaultModelCatalogueId() {
         String resourceName = GrailsNameUtils.getPropertyName(getClass())
         if (resourceName.contains('_')) {
             resourceName = resourceName.substring(0, resourceName.lastIndexOf('_'))
         }
-        grailsLinkGenerator.link(absolute: true, controller: 'catalogue', action: 'xref', id: id, params: [resource: resourceName])
+        grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${id}")
     }
-
 
 }

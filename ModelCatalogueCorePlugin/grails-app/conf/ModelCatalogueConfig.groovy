@@ -93,7 +93,7 @@ modelcatalogue.defaults.datatypes = [
         [name: "xs:positiveInteger", description: "Defines a nonNegativeInteger value with minInclusive to 1"]
 ]
 
-
+// TODO: we should adopt model catalogue ids from http://www.bipm.org/en/publications/si-brochure/
 modelcatalogue.defaults.measurementunits = [
         [name: "celsius", description: "degrees celsius", symbol: "°C"],
         [name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"],

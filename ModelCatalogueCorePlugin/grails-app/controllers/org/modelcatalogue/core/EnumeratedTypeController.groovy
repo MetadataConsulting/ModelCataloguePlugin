@@ -19,7 +19,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
     protected EnumeratedType createResource() {
         EnumeratedType instance = resource.newInstance()
         def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
-        def excludeParams = ['ext', 'modelCatalogueId', 'outgoingRelations', 'incomingRelations']
+        def excludeParams = ['ext', 'outgoingRelations', 'incomingRelations']
         excludeParams.addAll(relationshipDirections)
 
         if(request.format=='xml'){
@@ -70,7 +70,7 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 
 
         def relationshipDirections = relationshipTypeService.getRelationshipTypesFor(resource).collect{it.value}.collectMany {[RelationshipType.toCamelCase(it.sourceToDestination), RelationshipType.toCamelCase(it.destinationToSource)]}
-        def excludeParams = ['ext', 'modelCatalogueId', 'classifiedName', 'outgoingRelations', 'incomingRelations', 'dateCreated', 'lastUpdated', 'archived']
+        def excludeParams = ['ext', 'classifiedName', 'outgoingRelations', 'incomingRelations', 'dateCreated', 'lastUpdated', 'archived']
         excludeParams.addAll(relationshipDirections)
 
         if(request.format == "xml"){

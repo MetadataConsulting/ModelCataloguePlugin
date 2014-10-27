@@ -40,6 +40,10 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                   <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="classification.name" focus-me="step=='classification'" required>
                 </div>
                 <div class="form-group">
+                  <label for="name" class="">Catalogue ID (URL)</label>
+                  <input type="text" class="form-control" id="name" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="classification.modelCatalogueId">
+                </div>
+                <div class="form-group">
                   <label for="description" class="">Description</label>
                   <textarea rows="10" ng-model="classification.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'elements')"></textarea>
                 </div>

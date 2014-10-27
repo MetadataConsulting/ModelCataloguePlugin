@@ -59,7 +59,6 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
         arr.splice($.inArray(item, arr), 1 )
 
       onObjectOrHintsChanged = (object, hints) ->
-        console.log object, hints
         editableProperties = []
         currentHints       = angular.copy(hints ? [])
 

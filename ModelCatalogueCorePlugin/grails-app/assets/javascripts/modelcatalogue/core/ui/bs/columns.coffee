@@ -5,7 +5,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   publishedElementColumns = -> [
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'href()'}
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'modelCatalogueId'}
     { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'} }
     { header: "Description", value: "description" }
   ]
@@ -40,7 +40,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
     { header: 'Classifications',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'href()'}
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'modelCatalogueId'}
     { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'} }
     { header: "Description", value: "description" , classes: "col-md-4"}
   ]

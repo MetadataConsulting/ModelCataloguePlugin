@@ -24,6 +24,10 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
                 <input type="text" class="form-control" id="name" placeholder="Name" ng-model="copy.name">
               </div>
               <div class="form-group">
+                <label for="name" class="">Catalogue ID (URL)</label>
+                <input type="text" class="form-control" id="name" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="copy.modelCatalogueId">
+              </div>
+              <div class="form-group">
                 <label for="description" class="">Description</label>
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
@@ -103,6 +107,7 @@ x in ['apple', 'banana', 'cherry']
 
           $scope.hasChanged   = ->
             return true if $scope.copy.name != $scope.original.name
+            return true if $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId
             return true if $scope.copy.description != $scope.original.description
             return true if $scope.copy.rule != $scope.original.rule
             return true if $scope.copy.multiple != $scope.original.multiple

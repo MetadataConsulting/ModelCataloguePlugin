@@ -19,6 +19,10 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <input type="text" class="form-control" id="name" placeholder="Name" ng-model="copy.name">
               </div>
               <div class="form-group">
+                <label for="name" class="">Catalogue ID (URL)</label>
+                <input type="text" class="form-control" id="name" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="copy.modelCatalogueId">
+              </div>
+              <div class="form-group">
                 <label for="description" class="">Description</label>
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
@@ -54,7 +58,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
           $scope.hasChanged   = ->
-            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {})
+            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {})
 
 
 

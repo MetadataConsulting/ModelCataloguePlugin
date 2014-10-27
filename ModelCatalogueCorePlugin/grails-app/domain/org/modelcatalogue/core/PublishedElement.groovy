@@ -102,7 +102,7 @@ abstract class PublishedElement extends ExtendibleElement  {
         if (resourceName.contains('_')) {
             resourceName = resourceName.substring(0, resourceName.lastIndexOf('_'))
         }
-        grailsLinkGenerator.link(absolute: true, controller: 'catalogue', action: 'xref', id: id, params: [resource: resourceName, version: versionNumber])
+        grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${latestVersionId ?: id}.${versionNumber}")
     }
 
 }

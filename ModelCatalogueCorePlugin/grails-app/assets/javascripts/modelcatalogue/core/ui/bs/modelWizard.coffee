@@ -58,6 +58,10 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="model.name" focus-me="step=='model'" required>
                 </div>
                 <div class="form-group">
+                  <label for="name" class="">Catalogue ID (URL)</label>
+                  <input type="text" class="form-control" id="name" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="model.modelCatalogueId">
+                </div>
+                <div class="form-group">
                   <label for="description" class="">Description</label>
                   <textarea rows="10" ng-model="model.description" placeholder="Description (Optional)" class="form-control" id="description" ng-keydown="navigateOnKey($event, 9, 'metadata')"></textarea>
                 </div>
