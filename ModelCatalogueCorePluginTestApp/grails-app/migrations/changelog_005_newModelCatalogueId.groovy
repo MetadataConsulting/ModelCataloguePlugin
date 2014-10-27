@@ -44,5 +44,9 @@ databaseChangeLog = {
         }
     }
 
+    changeSet(author: "Vladimir Orany", id: "1412847974035-03") {
+        sql """update catalogue_element e set e.model_catalogue_id = (select concat('http://purl.obolibrary.org/obo/', replace(ev.extension_value, ':', '_')) from extension_value ev where ev.name = 'OBO ID' and e.id = ev.element_id);"""
+    }
+
 }
 

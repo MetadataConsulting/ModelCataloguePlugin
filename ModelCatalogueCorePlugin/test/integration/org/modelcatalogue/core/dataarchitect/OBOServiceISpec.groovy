@@ -13,7 +13,7 @@ class OBOServiceISpec extends IntegrationSpec {
     void "test import"() {
         boolean ok = false
         Model.withTransaction { TransactionStatus status ->
-            OBOService.importOntology(new URL('http://compbio.charite.de/hudson/job/hpo/lastStableBuild/artifact/hp/hp.obo').newInputStream(), "Human Phenotype")
+            OBOService.importOntology(new URL('http://compbio.charite.de/hudson/job/hpo/lastStableBuild/artifact/hp/hp.obo').newInputStream(), "Human Phenotype", 'http://purl.obolibrary.org/obo/${id.replace(\':\', \'_\')}')
             ok = true
             status.setRollbackOnly()
         }

@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
+import groovy.text.SimpleTemplateEngine
+import groovy.text.Template
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
@@ -155,13 +157,19 @@ class OBOService {
      * This import is initially tuned up for Human Phenotype ontology, few parts are still missing.
      * See http://www.geneontology.org/GO.format.obo-1_2.shtml#S.1 for full current specification.
      */
-    Classification importOntology(InputStream is, String name) {
+    Classification importOntology(InputStream is, String name, String mcIDPattern) {
         log.info "Parsing OBO file for ${name}"
         OBODoc document = new OBOFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
 
         Map<String, Classification> classificationsMap = findOrCreateClassifications(name, document.headerFrame)
 
-        Map<String, Model> models = findOrCreateModelsFromTermFrames(classificationsMap, document.termFrames)
+        Template idTemplate = null
+        if (mcIDPattern) {
+            SimpleTemplateEngine engine = new SimpleTemplateEngine()
+            idTemplate = engine.createTemplate(mcIDPattern)
+        }
+
+        Map<String, Model> models = findOrCreateModelsFromTermFrames(classificationsMap, document.termFrames, idTemplate)
         createRelationshipsFromTermFrames models, document.termFrames
         publishModelsAsDraft models.values()
         log.info "Import finished for ${name}"
@@ -271,13 +279,13 @@ class OBOService {
         }
     }
 
-    private Map<String, Model> findOrCreateModelsFromTermFrames(Map<String, Classification> classificationMap, Collection<Frame> termFrames) {
+    private Map<String, Model> findOrCreateModelsFromTermFrames(Map<String, Classification> classificationMap, Collection<Frame> termFrames, Template idTemplate) {
         log.info "Creating models for terms"
         Map<String, Model> modelsMap = [:]
 
         termFrames.eachWithIndex { Frame frame, Integer i ->
             log.info "[${(i + 1).toString().padLeft(6, '0')}/${termFrames.size().toString().padLeft(6, '0')}] Importing model ${frame.id}: ${frame.getClause('name')?.value}"
-            modelsMap[frame.id] = findOrCreateModelFromTermFrame classificationMap, frame
+            modelsMap[frame.id] = findOrCreateModelFromTermFrame classificationMap, frame, idTemplate
             if (i % 1000 == 0) {
                 cleanUpGorm()
             }
@@ -286,8 +294,8 @@ class OBOService {
         modelsMap
     }
 
-    private Model findOrCreateModelFromTermFrame(Map<String, Classification> classificationMap, Frame frame) {
-        Model model = findModelByOBOID(frame)
+    private Model findOrCreateModelFromTermFrame(Map<String, Classification> classificationMap, Frame frame, Template idTemplate) {
+        Model model = findModelByOBOID(frame, idTemplate)
 
         handleDefAndComment(model, frame)
         handleCreatedBy(model, frame)
@@ -391,23 +399,41 @@ class OBOService {
         }
     }
 
-    private Model findModelByOBOID(Frame frame) {
-        Iterable<ExtensionValue> extensionValues = ExtensionValue.findAllByNameAndExtensionValue(OBO_ID, frame.id)
-        if (!extensionValues) {
-            extensionValues = []
+    private Model findModelByOBOID(Frame frame, Template idTemplate) {
+        String mcid = null
+
+        if (idTemplate) {
+            StringWriter sw = new StringWriter()
+            idTemplate.make(id: frame.id).writeTo(sw)
+            mcid = sw.toString()
         }
-        for (ExtensionValue value in extensionValues) {
-            if (value.element instanceof Model) {
-                return value.element as Model
+
+        if (!mcid) {
+            Iterable<ExtensionValue> extensionValues = ExtensionValue.findAllByNameAndExtensionValue(OBO_ID, frame.id)
+            if (!extensionValues) {
+                extensionValues = []
+            }
+            for (ExtensionValue value in extensionValues) {
+                if (value.element instanceof Model) {
+                    return value.element as Model
+                }
+            }
+        } else {
+            Model existing = Model.findByModelCatalogueId(mcid)
+            if (existing) {
+                return existing
             }
         }
+
+
+
         Object name = frame.getClause('name')
 
         if (!name) {
             throw new IllegalArgumentException("Frame ${frame.id} is missing the 'name' property")
         }
 
-        Model model = new Model(name: name.value.toString(), status: PublishedElementStatus.PENDING).save(failOnError: true)
+        Model model = new Model(name: name.value.toString(), status: PublishedElementStatus.PENDING, modelCatalogueId: mcid).save(failOnError: true)
         model.ext[OBO_ID] = frame.id
         model
     }

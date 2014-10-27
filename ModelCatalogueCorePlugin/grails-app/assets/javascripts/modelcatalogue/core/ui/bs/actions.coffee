@@ -42,6 +42,41 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
+  actionsProvider.registerActionInRole 'new-import', actionsProvider.ROLE_LIST_ACTION, [
+    '$scope', 'names','security', '$state',
+    ($scope ,  names , security ,  $state ) ->
+      return undefined if not security.hasRole('CURATOR')
+      return undefined if not $state.current.name == 'mc.dataArchitect.imports'
+
+      {
+        position: 100
+        label: "Import"
+        icon: 'fa fa-cloud-upload'
+        type: 'success'
+      }
+  ]
+
+
+  actionsProvider.registerChildAction 'new-import', 'import-excel', ['$scope', 'messages', ($scope, messages) -> {
+    label:  "Import Excel"
+    action: ->
+      messages.prompt('Import Excel File', '', type: 'new-excel-import')
+  }]
+
+  actionsProvider.registerChildAction 'new-import', 'import-obo', ['$scope', 'messages', ($scope, messages) -> {
+    label:  "Import OBO"
+    action: ->
+      messages.prompt('Import OBO File', '', type: 'new-obo-import')
+  }]
+
+  actionsProvider.registerChildAction 'new-import', 'import-xsd', ['$scope', 'messages', ($scope, messages) -> {
+    label:  "Import XSD"
+    action: ->
+      messages.prompt('Import XSD File', '', type: 'new-xsd-import')
+  }]
+
+
+
   actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
