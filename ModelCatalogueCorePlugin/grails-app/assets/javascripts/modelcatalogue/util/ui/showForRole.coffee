@@ -5,9 +5,9 @@ angular.module('mc.util.ui.showForRole', ['mc.util.security']).directive 'showFo
     link: (scope, element, attrs) ->
       updateElement = ->
         if security.hasRole(attrs.showForRole)
-          $animate.removeClass(element, 'ng-hide')
+          $animate.removeClass(element, 'security-hide')
         else
-          $animate.addClass(element, 'ng-hide')
+          $animate.addClass(element, 'security-hide')
 
       updateElement()
 

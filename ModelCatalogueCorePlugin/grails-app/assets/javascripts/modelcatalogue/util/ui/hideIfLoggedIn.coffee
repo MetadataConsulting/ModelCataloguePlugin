@@ -5,9 +5,9 @@ angular.module('mc.util.ui.hideIfLoggedIn', ['mc.util.security']).directive 'hid
     link: (scope, element) ->
       updateElement = ->
         if security.isUserLoggedIn()
-          $animate.addClass(element, 'ng-hide')
+          $animate.addClass(element, 'security-hide')
         else
-          $animate.removeClass(element, 'ng-hide')
+          $animate.removeClass(element, 'security-hide')
 
       updateElement()
 
