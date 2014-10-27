@@ -14,7 +14,7 @@ class BatchAndActionsSpec extends GebSpec {
 
         then:
         at ModalTreeViewPage
-        waitFor {
+        waitFor(60) {
             viewTitle.displayed
         }
 
