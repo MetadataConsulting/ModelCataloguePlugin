@@ -58,8 +58,8 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="model.name" focus-me="step=='model'" required>
                 </div>
                 <div class="form-group">
-                  <label for="name" class="">Catalogue ID (URL)</label>
-                  <input type="text" class="form-control" id="name" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="model.modelCatalogueId">
+                  <label for="modelCatalogueId" class="">Catalogue ID (URL)</label>
+                  <input type="text" class="form-control" id="modelCatalogueId" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="model.modelCatalogueId">
                 </div>
                 <div class="form-group">
                   <label for="description" class="">Description</label>

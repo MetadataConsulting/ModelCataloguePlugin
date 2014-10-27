@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.pages
 
-import geb.Page
-
 class ModalTreeViewPage extends ModelCataloguePage {
 
     static url = "#/catalogue/model/all"

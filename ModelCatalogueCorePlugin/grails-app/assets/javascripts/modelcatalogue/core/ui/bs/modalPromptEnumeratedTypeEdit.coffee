@@ -19,8 +19,8 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <input type="text" class="form-control" id="name" placeholder="Name" ng-model="copy.name">
               </div>
               <div class="form-group">
-                <label for="name" class="">Catalogue ID (URL)</label>
-                <input type="text" class="form-control" id="name" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="copy.modelCatalogueId">
+                <label for="modelCatalogueId" class="">Catalogue ID (URL)</label>
+                <input type="text" class="form-control" id="modelCatalogueId" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="copy.modelCatalogueId">
               </div>
               <div class="form-group">
                 <label for="description" class="">Description</label>
