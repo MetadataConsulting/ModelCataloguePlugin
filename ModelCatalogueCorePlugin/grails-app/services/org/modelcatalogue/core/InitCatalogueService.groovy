@@ -15,9 +15,9 @@ class InitCatalogueService {
 
     def initDefaultDataTypes() {
        def classification = Classification.findByNamespace("http://www.w3.org/2001/XMLSchema")
-       if(!classification) classification = new Classification(name: "XMLSchema", modelCatalogueId: "http://www.w3.org/2001/XMLSchema").save(flush:true)
+       if(!classification) classification = new Classification(name: "XMLSchema").save(flush:true)
        def conceptualDomain = ConceptualDomain.findByNamespace("http://www.w3.org/2001/XMLSchema")
-       if(!conceptualDomain) conceptualDomain = new ConceptualDomain(name: "XMLSchema", modelCatalogueId: "http://www.w3.org/2001/XMLSchema").save(flush:true)
+       if(!conceptualDomain) conceptualDomain = new ConceptualDomain(name: "XMLSchema").save(flush:true)
        conceptualDomain.addToRelatedTo(classification)
 
        def defaultDataTypes = grailsApplication.config.modelcatalogue.defaults.datatypes
