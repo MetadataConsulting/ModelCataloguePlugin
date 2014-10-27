@@ -30,7 +30,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
 
   # you need login to return
   securityProvider.springSecurity = (config = {}) ->
-    securityFactory = ['$http', '$rootScope',  ($http, $rootScope) ->
+    securityFactory = ['$http', '$rootScope', '$q',  ($http, $rootScope, $q) ->
       httpMethod    = config.httpMethod ? 'POST'
       loginUrl      = 'j_spring_security_check'
       logoutUrl     = 'logout'
@@ -94,6 +94,16 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
         logout: ->
           $http(method: httpMethod, url: logoutUrl).then ->
             currentUser = null
+        requireUser: ->
+          $http(method: 'GET', url: userUrl).then(handleUserResponse).then (result)->
+            if result.data?.success
+              return security.getCurrentUser()
+            $q.reject result
+        requireRole: (role) ->
+          security.requireUser().then ->
+            if security.hasRole(role)
+              return security.getCurrentUser()
+            $q.reject security.getCurrentUser()
 
       if currentUser
         currentUser.success = true

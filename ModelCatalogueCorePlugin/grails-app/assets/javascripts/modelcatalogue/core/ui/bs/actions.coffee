@@ -37,8 +37,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
       if $scope.resource == 'model' and $scope.contained?.element
         args.parent = $scope.contained.element
-
-      messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args)
+      security.requireRole('CURATOR')
+      .then ->
+        messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args)
+      , ->
+        messages.error('You don\'t have rights to create new elements')
     }
   ]
 
