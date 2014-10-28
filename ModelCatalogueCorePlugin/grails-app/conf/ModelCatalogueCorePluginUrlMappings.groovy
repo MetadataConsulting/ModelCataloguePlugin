@@ -94,6 +94,12 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                 }
 
+                if (controllerName == 'user') {
+                    "/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$controllerName/classifications/$ids?"(controller: controllerName, action: 'classifications', method: HttpMethod.POST)
+                }
+
                 if (controllerName == 'asset') {
                     "/api/modelCatalogue/core/$controllerName/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)
                     "/api/modelCatalogue/core/$controllerName/$id/upload"(controller: controllerName, action: 'upload', method: HttpMethod.POST)

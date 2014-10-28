@@ -3,6 +3,8 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
   replace:  true
  scope:
     scope:      '=?'
+    role:       '@?'
+    right:      '@?'
 
   templateUrl: 'modelcatalogue/util/ui/contextualMenu.html'
 
@@ -13,7 +15,7 @@ angular.module('mc.util.ui.contextualMenu', ['mc.util.ui.bs.menuItemDropdown','m
 
     updateActions = ->
       $element.empty()
-      for action in actions.getActions($scope.scope ? $scope.$parent, actions.ROLE_NAVIGATION)
+      for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role ? actions.ROLE_NAVIGATION)
         newScope = $scope.$new()
         newScope.action = action
         $element.append($compile(getTemplate(action))(newScope))

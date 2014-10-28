@@ -12,6 +12,7 @@ angular.module('mc.core.ui.bs.modalPromptForCatalogueElement', ['mc.util.message
             <div class="form-group">
                 <label for="value">''' + body + '''</label>
                 <input id="value" ng-model="value" class="form-control" catalogue-element-picker="''' + (args.resource ? 'catalogueElement') + '''" focus-me="true">
+            </div>
             </form>
         </div>
         <div class="modal-footer">

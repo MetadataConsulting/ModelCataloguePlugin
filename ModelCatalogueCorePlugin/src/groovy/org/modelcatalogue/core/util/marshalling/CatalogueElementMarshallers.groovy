@@ -197,7 +197,9 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     static Map<String, Object> minimalCatalogueElementJSON(CatalogueElement element) {
         if (!element) return null
-        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id"]
+        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id"]
     }
+
+
 
 }

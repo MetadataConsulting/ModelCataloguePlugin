@@ -19,11 +19,11 @@ class UserMarshaller extends ExtendibleElementMarshallers {
 
         ret.putAll username: el.username,
                 email: el.email,
-                defaultClassification: minimalCatalogueElementJSON(el.defaultClassification),
                 enabled: el.enabled,
                 accountExpired: el.accountExpired,
                 accountLocked: el.accountLocked,
-                passwordExpired: el.passwordExpired
+                passwordExpired: el.passwordExpired,
+                classifications: el.classifications.collect { minimalCatalogueElementJSON(it) }
         ret
     }
 
@@ -32,7 +32,6 @@ class UserMarshaller extends ExtendibleElementMarshallers {
         xml.build {
             username el.username
             email el.email
-            defaultClassification el.defaultClassification
             enabled el.enabled
             accountExpired el.accountExpired
             accountLocked el.accountLocked

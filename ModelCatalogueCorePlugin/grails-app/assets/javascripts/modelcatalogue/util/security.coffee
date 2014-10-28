@@ -34,7 +34,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
       httpMethod    = config.httpMethod ? 'POST'
       loginUrl      = 'j_spring_security_check'
       logoutUrl     = 'logout'
-      userUrl       = 'login/ajaxSuccess'
+      userUrl       = 'user/current'
       usernameParam = config.username ? 'j_username'
       passwordParam = config.password ? 'j_password'
       rememberParam = config.rememberMe ? '_spring_security_remember_me'
@@ -60,8 +60,9 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
       handleUserResponse = (result) ->
         if result.data.success
           currentUser = result.data
-          currentUser.displayName ?= currentUser.username
-          currentUser.roles       ?= []
+          currentUser.displayName     ?= currentUser.username
+          currentUser.roles           ?= []
+          currentUser.classifications ?= []
 
           for roleName, roleSynonyms of (config.roles ? [])
             for role in roleSynonyms

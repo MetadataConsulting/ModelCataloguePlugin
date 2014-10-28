@@ -18,7 +18,7 @@ class User extends ExtendibleElement {
     /**
      * Set of classifications choosen by the user tobe shown
      */
-    Set<Classification> classifications
+    static hasMany = [classifications: Classification]
 
     static constraints = {
         username blank: false, unique: true, maxSize: 255
