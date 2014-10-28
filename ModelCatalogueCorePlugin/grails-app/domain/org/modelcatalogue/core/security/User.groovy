@@ -15,13 +15,15 @@ class User extends ExtendibleElement {
     boolean accountLocked
     boolean passwordExpired
 
-    Classification defaultClassification
+    /**
+     * Set of classifications choosen by the user tobe shown
+     */
+    Set<Classification> classifications
 
     static constraints = {
         username blank: false, unique: true, maxSize: 255
         password blank: false, maxSize: 255
         email    nullable: true, email: true, maxSize: 255
-        defaultClassification nullable: true
     }
 
     static mapping = {
