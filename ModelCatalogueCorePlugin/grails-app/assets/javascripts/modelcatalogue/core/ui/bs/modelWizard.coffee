@@ -28,19 +28,19 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 <button id="step-model" ng-disabled="step == 'summary'" ng-click="select('model')" class="btn btn-default" ng-class="{'btn-primary': step == 'model'}">1. Model</button>
               </li>
               <li>
-                <button id="step-metadata" ng-disabled="!model.name || step == 'summary'" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata'}">2. Metadata</button>
+                <button id="step-metadata" ng-disabled="!model.name || step == 'summary'" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata', 'btn-info': step != 'metadata' &amp;&amp; hasMetadata()}">2. Metadata</button>
               </li>
               <li>
-                <button id="step-parents" ng-disabled="!model.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents', 'btn-info': args.parent &amp;&amp; !parentsVisited}">3. Parents</button>
+                <button id="step-parents" ng-disabled="!model.name || step == 'summary'" ng-click="select('parents')" class="btn btn-default" ng-class="{'btn-primary': step == 'parents', 'btn-info': step != 'parents' &amp;&amp; parents.length > 0}">3. Parents</button>
               </li>
               <li>
-                <button id="step-children" ng-disabled="!model.name || step == 'summary'" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children'}">4. Children</button>
+                <button id="step-children" ng-disabled="!model.name || step == 'summary'" ng-click="select('children')" class="btn btn-default" ng-class="{'btn-primary': step == 'children', 'btn-info': step != 'children' &amp;&amp; children.length > 0}">4. Children</button>
               </li>
               <li>
-                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">5. Elements</button>
+                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements', 'btn-info': step != 'elements' &amp;&amp; dataElements.length > 0}">5. Elements</button>
               </li>
               <li>
-                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications', 'btn-info': classificationInUse &amp;&amp; !classificationsVisited}">6. Classifications</button>
+                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications', 'btn-info': step != 'classifications' &amp;&amp; classifications.length > 0}">6. Classifications</button>
               </li>
               <li>
                 <button id="step-next" ng-disabled="!model.name || step == 'classifications' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
@@ -55,7 +55,12 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               <form role="form" ng-submit="select('metadata')">
                 <div class="form-group">
                   <label for="name" class="">Name</label>
-                  <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="model.name" focus-me="step=='model'" required>
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="model.name" focus-me="step=='model'" required>
+                    <span class="input-group-btn">
+                      <a class="btn btn-default" ng-click="prefillFrom()"><span class="fa fa-fw fa-copy"></span></a>
+                    </span>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label for="modelCatalogueId" class="">Catalogue ID (URL)</label>
@@ -159,7 +164,9 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', 'delayedQueueExecutor', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args, delayedQueueExecutor) ->
+          execAfter50 = delayedQueueExecutor(50)
+
           $scope.reset = ->
             $scope.args = args
             $scope.model = {classifications: []}
@@ -222,7 +229,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             unless $scope.isEmpty($scope.metadata)
               $scope.pendingActions.push (model)->
                 model.ext = $scope.metadata
-                catalogueElementResource('model').update(model)
+                execAfter50.submit -> catalogueElementResource('model').update(model)
 
             angular.forEach $scope.parents, (parent) ->
               if angular.isString parent.element
@@ -232,7 +239,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     model
               $scope.pendingActions.push (model) ->
                 parent.element.metadata = parent.ext
-                model.childOf.add parent.element
+                execAfter50.submit -> model.childOf.add parent.element
                 model
 
             angular.forEach $scope.children, (child) ->
@@ -243,7 +250,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     model
               $scope.pendingActions.push (model) ->
                 child.element.metadata = child.ext
-                model.parentOf.add child.element
+                execAfter50.submit -> model.parentOf.add child.element
                 model
 
             angular.forEach $scope.dataElements, (element) ->
@@ -254,7 +261,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     model
               $scope.pendingActions.push (model) ->
                 element.element.metadata = element.ext
-                model.contains.add element.element
+                execAfter50.submit -> model.contains.add element.element
                 model
 
             angular.forEach $scope.classifications, (classification) ->
@@ -262,11 +269,11 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 $scope.pendingActions.push (model) ->
                   catalogueElementResource('classification').save({name: classification}).then (newClassification) ->
                     model.classifications.push newClassification
-                    catalogueElementResource('model').update(model)
+                    execAfter50.submit -> catalogueElementResource('model').update(model)
               else
                 $scope.pendingActions.push (model) ->
                     model.classifications.push classification
-                    catalogueElementResource('model').update(model)
+                    execAfter50.submit -> catalogueElementResource('model').update(model)
 
             $scope.totalActions = $scope.pendingActionsCount = $scope.pendingActions.length + 1
             $scope.step = 'summary'
@@ -337,6 +344,36 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 $modalInstance.dismiss(reason)
             else
               $modalInstance.dismiss(reason)
+
+          $scope.prefillFrom = ->
+            modelPromise = messages.prompt('Clone Model', 'Please, select from which Model should be the properties cloned', type: 'catalogue-element', resource: 'model')
+            modelPromise.then (model) ->
+              promises = []
+              $scope.model.name         = model.name
+              $scope.model.description  = model.description
+
+              $scope.metadata           = angular.copy model.ext
+
+              angular.forEach model.classifications, (classification) ->
+                $scope.classifications.push classification
+
+              push = (container, property) ->
+                (result) ->
+                  angular.forEach result.list, (relation) ->
+                    $scope[property] = element: relation.relation, ext: relation.ext
+                    $scope.push container, property
+                  $scope[property] = null
+
+              promises.push model.childOf(null, max: 100).then push('parents', 'parent')
+              promises.push model.parentOf(null, max: 100).then push('children', 'child')
+              promises.push model.contains(null, max: 100).then push('dataElements', 'dataElement')
+
+              $q.all promises
+
+          $scope.hasMetadata = ->
+            for ignored of $scope.metadata
+              return true
+            return false
 
         ]
 

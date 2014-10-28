@@ -12,7 +12,7 @@ describe "mc.util.ui.hideIfLoggedIn", ->
         logout: -> loggedIn = false ; $log.info "Logout requested on custom security service"
     ]
 
-  it "the element has ng-hide class if the user is logged in", inject ($compile, $rootScope, security) ->
+  it "the element has security-hide class if the user is logged in", inject ($compile, $rootScope, security) ->
     security.login()
     expect(security.isUserLoggedIn()).toBeTruthy()
 
@@ -22,9 +22,9 @@ describe "mc.util.ui.hideIfLoggedIn", ->
 
     $rootScope.$digest()
 
-    expect(element.hasClass('ng-hide')).toBeTruthy()
+    expect(element.hasClass('security-hide')).toBeTruthy()
 
-  it "the element has not ng-hide class if the user is logged out", inject ($compile, $rootScope, security) ->
+  it "the element has not security-hide class if the user is logged out", inject ($compile, $rootScope, security) ->
     security.logout()
     expect(security.isUserLoggedIn()).toBeFalsy()
 
@@ -35,7 +35,7 @@ describe "mc.util.ui.hideIfLoggedIn", ->
     $rootScope.$digest()
 
 
-    expect(element.hasClass('ng-hide')).toBeFalsy()
+    expect(element.hasClass('security-hide')).toBeFalsy()
 
   it "the element reacts on logged in and logged out events", inject ($compile, $rootScope, security) ->
     security.login()
@@ -47,19 +47,19 @@ describe "mc.util.ui.hideIfLoggedIn", ->
     $rootScope.$digest()
 
     expect(security.isUserLoggedIn()).toBeTruthy()
-    expect(element.hasClass('ng-hide')).toBeTruthy()
+    expect(element.hasClass('security-hide')).toBeTruthy()
 
     security.logout()
 
     $rootScope.$digest()
 
     expect(security.isUserLoggedIn()).toBeFalsy()
-    expect(element.hasClass('ng-hide')).toBeFalsy()
+    expect(element.hasClass('security-hide')).toBeFalsy()
 
     security.login()
 
     $rootScope.$digest()
 
     expect(security.isUserLoggedIn()).toBeTruthy()
-    expect(element.hasClass('ng-hide')).toBeTruthy()
+    expect(element.hasClass('security-hide')).toBeTruthy()
 

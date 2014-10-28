@@ -98,6 +98,9 @@ abstract class PublishedElement extends ExtendibleElement  {
     }
 
     String getDefaultModelCatalogueId() {
+        if (!grailsLinkGenerator) {
+            return null
+        }
         String resourceName = GrailsNameUtils.getPropertyName(getClass())
         if (resourceName.contains('_')) {
             resourceName = resourceName.substring(0, resourceName.lastIndexOf('_'))

@@ -10,6 +10,7 @@ import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
@@ -399,5 +400,30 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     protected bindRelations(T instance, Object objectToBind) {}
+
+    private Random random = new Random()
+
+    protected <T> T withRetryingTransaction(Map<String, Integer> settings = [:], Closure<T> body) {
+        int MAX_ATTEMPTS = settings.attempts ?: 10
+        int MIN_BACK_OFF = settings.minBackOff ?: 50
+        int INITIAL_BACK_OFF = settings.backOff ?: 200
+
+        int backOff = random.nextInt(INITIAL_BACK_OFF - MIN_BACK_OFF) + MIN_BACK_OFF
+        int attempt = 0
+
+        while (attempt < MAX_ATTEMPTS) {
+            attempt++
+            try {
+                return resource.withTransaction(body)
+            } catch (ConcurrencyFailureException e) {
+                if (attempt >= MAX_ATTEMPTS) {
+                    throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${MAX_ATTEMPTS} attempts", e)
+                }
+                log.warn "Exception executing action ${actionName} on ${resource} controller with parameters ${params} (#${attempt} attempt).", e
+                Thread.sleep(backOff)
+                backOff = 2 * backOff
+            }
+        }
+    }
 
 }

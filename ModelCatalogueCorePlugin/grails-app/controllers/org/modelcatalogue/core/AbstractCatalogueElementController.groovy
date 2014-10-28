@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.transaction.Transactional
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Mappings
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -62,119 +63,124 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     }
 
     private removeRelation(Long id, String type, boolean outgoing) {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
-            return
-        }
+        withRetryingTransaction {
+            if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+                notAuthorized()
+                return
+            }
 
-        def otherSide = parseOtherSide()
+            def otherSide = parseOtherSide()
 
-        CatalogueElement source = resource.get(id)
-        if (!source) {
-            notFound()
-            return
-        }
-        RelationshipType relationshipType = RelationshipType.findByName(otherSide.type ? otherSide.type.name : type)
-        if (!relationshipType) {
-            notFound()
-            return
+            CatalogueElement source = resource.get(id)
+            if (!source) {
+                notFound()
+                return
+            }
+            RelationshipType relationshipType = RelationshipType.findByName(otherSide.type ? otherSide.type.name : type)
+            if (!relationshipType) {
+                notFound()
+                return
 
-        }
-        Class otherSideType
-        try {
-            otherSideType = Class.forName (otherSide.relation ? otherSide.relation.elementType : otherSide.elementType)
-        } catch (ClassNotFoundException ignored) {
-            notFound()
-            return
-        }
+            }
+            Class otherSideType
+            try {
+                otherSideType = Class.forName (otherSide.relation ? otherSide.relation.elementType : otherSide.elementType)
+            } catch (ClassNotFoundException ignored) {
+                notFound()
+                return
+            }
 
-        CatalogueElement destination = otherSideType.get(otherSide.relation ? otherSide.relation.id : otherSide.id )
-        if (!destination) {
-            notFound()
-            return
-        }
-        Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType) :  relationshipService.unlink(destination, source, relationshipType)
-        if (!old) {
-            notFound()
-            return
-        }
+            CatalogueElement destination = otherSideType.get(otherSide.relation ? otherSide.relation.id : otherSide.id )
+            if (!destination) {
+                notFound()
+                return
+            }
+            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType) :  relationshipService.unlink(destination, source, relationshipType)
+            if (!old) {
+                notFound()
+                return
+            }
 
-        if (old.hasErrors()) {
-            reportCapableRespond old.errors
+            if (old.hasErrors()) {
+                reportCapableRespond old.errors
+                return
+            }
+
+            response.status = HttpServletResponse.SC_NO_CONTENT
+            render "DELETED"
             return
         }
-
-        response.status = HttpServletResponse.SC_NO_CONTENT
-        render "DELETED"
     }
 
     private addRelation(Long id, String type, boolean outgoing) {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
-            return
-        }
-
-        def otherSide = parseOtherSide()
-
-        CatalogueElement source = resource.get(id)
-        if (!source) {
-            notFound()
-            return
-        }
-        RelationshipType relationshipType = RelationshipType.findByName(type)
-        if (!relationshipType) {
-            notFound()
-            return
-
-        }
-
-        Long classificationId = objectToBind.__classification?.id
-
-        Classification classification = classificationId ? Classification.get(classificationId) : null
-
-        if (classificationId && !classification) {
-            notFound()
-            return
-        }
-
-        Class otherSideType
-        try {
-            otherSideType = Class.forName otherSide.elementType
-        } catch (ClassNotFoundException ignored) {
-            notFound()
-            return
-        }
-
-        CatalogueElement destination = otherSideType.get(otherSide.id)
-        if (!destination) {
-            notFound()
-            return
-        }
-        Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType, classification) :  relationshipService.link(destination, source, relationshipType, classification)
-
-        if (rel.hasErrors()) {
-            reportCapableRespond rel.errors
-            return
-        }
-
-        def metadata = objectToBind.metadata
-
-        if (metadata != null) {
-            rel.setExt(metadata)
-        }
-
-        response.status = HttpServletResponse.SC_CREATED
-        RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
-
-        withFormat {
-            json {
-                reportCapableRespond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)),  relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
+        withRetryingTransaction {
+            if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+                notAuthorized()
+                return
             }
-            xml {
-                reportCapableRespond rel
-            }
-        }
 
+            def otherSide = parseOtherSide()
+
+            CatalogueElement source = resource.get(id)
+            if (!source) {
+                notFound()
+                return
+            }
+            RelationshipType relationshipType = RelationshipType.findByName(type)
+            if (!relationshipType) {
+                notFound()
+                return
+
+            }
+
+            Long classificationId = objectToBind.__classification?.id
+
+            Classification classification = classificationId ? Classification.get(classificationId) : null
+
+            if (classificationId && !classification) {
+                notFound()
+                return
+            }
+
+            Class otherSideType
+            try {
+                otherSideType = Class.forName otherSide.elementType
+            } catch (ClassNotFoundException ignored) {
+                notFound()
+                return
+            }
+
+            CatalogueElement destination = otherSideType.get(otherSide.id)
+            if (!destination) {
+                notFound()
+                return
+            }
+            Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType, classification) :  relationshipService.link(destination, source, relationshipType, classification)
+
+            if (rel.hasErrors()) {
+                reportCapableRespond rel.errors
+                return
+            }
+
+            def metadata = objectToBind.metadata
+
+            if (metadata != null) {
+                rel.setExt(metadata)
+            }
+
+            response.status = HttpServletResponse.SC_CREATED
+            RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
+
+            withFormat {
+                json {
+                    reportCapableRespond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)),  relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
+                }
+                xml {
+                    reportCapableRespond rel
+                }
+            }
+            return
+        }
     }
 
     protected parseOtherSide() {
@@ -285,51 +291,54 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     }
 
     private addOrRemoveMapping(boolean add) {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
-            return
-        }
-
-        if (!params.destination || !params.id) {
-            notFound()
-            return
-        }
-        CatalogueElement element = queryForResource(params.id)
-        if (!element) {
-            notFound()
-            return
-        }
-
-        CatalogueElement destination = queryForResource(params.destination)
-        if (!destination) {
-            notFound()
-            return
-        }
-        if (add) {
-            String mappingString = null
-            withFormat {
-                json {
-                    mappingString = request.getJSON().mapping
-                }
-                xml {
-                    mappingString = request.getXML().text()
-                }
-            }
-            Mapping mapping = mappingService.map(element, destination, mappingString)
-            if (mapping.hasErrors()) {
-                reportCapableRespond mapping.errors
+        withRetryingTransaction {
+            if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+                notAuthorized()
                 return
             }
-            response.status = HttpServletResponse.SC_CREATED
-            reportCapableRespond mapping
+
+            if (!params.destination || !params.id) {
+                notFound()
+                return
+            }
+            CatalogueElement element = queryForResource(params.id)
+            if (!element) {
+                notFound()
+                return
+            }
+
+            CatalogueElement destination = queryForResource(params.destination)
+            if (!destination) {
+                notFound()
+                return
+            }
+            if (add) {
+                String mappingString = null
+                withFormat {
+                    json {
+                        mappingString = request.getJSON().mapping
+                    }
+                    xml {
+                        mappingString = request.getXML().text()
+                    }
+                }
+                Mapping mapping = mappingService.map(element, destination, mappingString)
+                if (mapping.hasErrors()) {
+                    reportCapableRespond mapping.errors
+                    return
+                }
+                response.status = HttpServletResponse.SC_CREATED
+                reportCapableRespond mapping
+                return
+            }
+            Mapping old = mappingService.unmap(element, destination)
+            if (old) {
+                response.status = HttpServletResponse.SC_NO_CONTENT
+                render "DELETED"
+            } else {
+                notFound()
+            }
             return
-        }
-        Mapping old = mappingService.unmap(element, destination)
-        if (old) {
-            response.status = HttpServletResponse.SC_NO_CONTENT
-            render "DELETED"
-        } else {
-            notFound()
         }
     }
 
