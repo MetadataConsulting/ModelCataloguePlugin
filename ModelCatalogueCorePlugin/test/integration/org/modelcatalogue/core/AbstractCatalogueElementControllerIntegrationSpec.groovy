@@ -1073,6 +1073,29 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         xml.destination.name.text()   == anotherLoadItem.name
     }
 
+    def "update and set metadata"() {
+        if (controller.readOnly) return
+        CatalogueElement another        = CatalogueElement.get(anotherLoadItem.id)
+        String newName                  = "UPDATED NAME"
+        Map keyValue = new HashMap()
+        keyValue.put('testKey', 'testValue')
+
+        when:
+        controller.request.method       = 'PUT'
+        controller.params.id            = another.id
+        controller.params.newVersion    = true
+        controller.request.json         = [name: newName, ext: keyValue]
+        controller.response.format      = "json"
+
+        controller.update()
+        def json = controller.response.json
+
+        then:
+        json.name                   == newName
+        json.ext == keyValue
+
+    }
+
     protected mapToDummyEntities(CatalogueElement toBeLinked) {
         for (domain in toBeLinked.class.list()) {
             if (domain != toBeLinked) {

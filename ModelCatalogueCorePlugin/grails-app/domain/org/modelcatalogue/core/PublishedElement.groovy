@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 
-abstract class PublishedElement extends ExtendibleElement  {
+abstract class PublishedElement extends CatalogueElement  {
 
     //version number - this gets iterated every time a new version is created from a finalized version
     Integer versionNumber = 1

@@ -168,7 +168,7 @@ class PublishedElementService {
         }
 
         //add all the extensions to the archived element as well
-        if (element instanceof ExtendibleElement) {
+        if (element instanceof CatalogueElement) {
             // TODO: this should be more generic
             archived.ext.putAll element.ext
         }

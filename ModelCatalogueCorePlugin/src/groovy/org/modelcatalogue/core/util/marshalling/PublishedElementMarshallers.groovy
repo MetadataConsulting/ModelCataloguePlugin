@@ -7,7 +7,7 @@ import org.modelcatalogue.core.Classification
 /**
  * Created by ladin on 14.02.14.
  */
-abstract class PublishedElementMarshallers extends ExtendibleElementMarshallers {
+abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
 
 
     PublishedElementMarshallers(Class type) {

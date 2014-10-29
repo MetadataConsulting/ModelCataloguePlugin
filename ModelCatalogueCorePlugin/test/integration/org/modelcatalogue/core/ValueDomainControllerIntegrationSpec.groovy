@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ValueDomainControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
+class ValueDomainControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     protected boolean getRecord() {
         true

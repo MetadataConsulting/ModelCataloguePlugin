@@ -35,7 +35,7 @@ import org.modelcatalogue.core.util.ValueDomainRuleScript
  *
 */
 
-class ValueDomain extends ExtendibleElement  {
+class ValueDomain extends CatalogueElement  {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 

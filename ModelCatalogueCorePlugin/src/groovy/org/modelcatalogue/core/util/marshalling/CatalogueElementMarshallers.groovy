@@ -38,6 +38,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
                 classifiedName: el.classifiedName,
+                ext: el.ext,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 relationships: [count: el.countRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
                 outgoingRelationships: [count: el.countOutgoingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing/search"],
@@ -131,6 +132,13 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
             relationships count: (el.countRelations()), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"
             outgoingRelations count: el.countOutgoingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing"
             incomingRelations count: el.countIncomingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming"
+            if (el.ext) {
+                extensions {
+                    for (e in el.ext.entrySet()) {
+                        extension key: e.key, e.value
+                    }
+                }
+            }
         }
 
         def relationships = getRelationshipConfiguration(type)

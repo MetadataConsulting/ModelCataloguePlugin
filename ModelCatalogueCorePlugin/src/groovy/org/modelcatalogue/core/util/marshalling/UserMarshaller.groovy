@@ -7,7 +7,7 @@ import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.security.User
 
-class UserMarshaller extends ExtendibleElementMarshallers {
+class UserMarshaller extends CatalogueElementMarshallers {
 
     UserMarshaller() {
         super(User)

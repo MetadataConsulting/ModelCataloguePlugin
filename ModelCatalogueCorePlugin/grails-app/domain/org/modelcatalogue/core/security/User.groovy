@@ -1,9 +1,9 @@
 package org.modelcatalogue.core.security
 
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ExtendibleElement
 
-class User extends ExtendibleElement {
+class User extends CatalogueElement {
 
     transient modelCatalogueSecurityService
 

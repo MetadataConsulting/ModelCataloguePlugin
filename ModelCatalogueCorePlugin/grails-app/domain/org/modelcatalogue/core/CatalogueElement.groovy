@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import asset.pipeline.grails.LinkGenerator
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
 
@@ -12,7 +13,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 * relationships between them. They also  share a number of characteristics.
 * */
 
-abstract class CatalogueElement {
+abstract class CatalogueElement implements Extendible {
 
     def grailsLinkGenerator
     def relationshipService
@@ -32,9 +33,9 @@ abstract class CatalogueElement {
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'classifiedName', 'defaultModelCatalogueId']
+    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'classifiedName', 'defaultModelCatalogueId', 'ext']
 
-    static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping]
+    static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
             incoming: [base: 'isBasedOn'],
@@ -58,6 +59,7 @@ abstract class CatalogueElement {
 		modelCatalogueId boost:10
         name boost:5
         incomingMappings component: true
+        extensions component:true
         except = ['incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
     }
 
@@ -65,6 +67,7 @@ abstract class CatalogueElement {
         tablePerHierarchy false
         sort "name"
         description type: "text"
+        extensions lazy: false
     }
 
     static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
@@ -167,10 +170,6 @@ abstract class CatalogueElement {
         relationshipService.unlink(source, this, type)
     }
 
-    String toString() {
-        "${getClass().simpleName}[id: ${getId()}, name: ${getName()}, modelCatalogueId: ${modelCatalogueId}]"
-    }
-
     Map<String, Object> getInfo() {
         [
                 id: getId(),
@@ -219,6 +218,41 @@ abstract class CatalogueElement {
             resourceName = resourceName.substring(0, resourceName.indexOf('_'))
         }
         resourceName
+    }
+
+    final Map<String, String> ext = new ExtensionsWrapper(this)
+
+    void setExt(Map<String, String> ext) {
+        this.ext.clear()
+        this.ext.putAll(ext)
+    }
+
+    String toString() {
+        "${getClass().simpleName}[id: ${id}, name: ${name}, modelCatalogueId: ${modelCatalogueId ?: defaultModelCatalogueId}, extensions: ${extensions}]"
+    }
+
+    @Override
+    Set<Extension> listExtensions() {
+        extensions
+    }
+
+    @Override
+    Extension addExtension(String name, String value) {
+        ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
+        newOne.save()
+        assert !newOne.errors.hasErrors()
+        addToExtensions(newOne)
+        newOne
+    }
+
+    @Override
+    void removeExtension(Extension extension) {
+        if (extension instanceof ExtensionValue) {
+            removeFromExtensions(extension)
+            extension.delete(flush: true)
+        } else {
+            throw new IllegalArgumentException("Only instances of ExtensionValue are supported")
+        }
     }
 
 }

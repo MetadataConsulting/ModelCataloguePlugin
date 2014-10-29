@@ -6,7 +6,7 @@ import org.modelcatalogue.core.util.Lists
 
 import static org.springframework.http.HttpStatus.OK
 
-class AbstractPublishedElementController<T extends PublishedElement> extends AbstractExtendibleElementController<T> {
+class AbstractPublishedElementController<T extends PublishedElement> extends AbstractCatalogueElementController<T> {
 
     def publishedElementService, relationshipTypeService
 

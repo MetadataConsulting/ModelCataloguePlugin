@@ -8,7 +8,7 @@ class ModelCatalogueCorePluginUrlMappings {
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
 
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
-        def publishedElements = ['asset', 'dataElement', 'extendibleElement', 'model', 'publishedElement']
+        def publishedElements = ['asset', 'dataElement', 'model', 'publishedElement']
         def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
         def allElements       = catalogueElements + resources
 

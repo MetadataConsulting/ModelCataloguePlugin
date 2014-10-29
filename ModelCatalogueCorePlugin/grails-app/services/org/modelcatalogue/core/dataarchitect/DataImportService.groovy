@@ -7,8 +7,8 @@ import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.ExtendibleElement
 import org.modelcatalogue.core.MeasurementUnit
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.Relationship
@@ -403,7 +403,7 @@ class DataImportService {
         }
     }
 
-    protected ExtendibleElement updateMetadata(Map metadata, ExtendibleElement instance) {
+    protected CatalogueElement updateMetadata(Map metadata, CatalogueElement instance) {
         metadata.each { key, value ->
             if (key) { key = key.toString().take(255) }
             if (value) { value = value.toString().take(255) }

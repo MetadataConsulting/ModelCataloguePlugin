@@ -4,9 +4,7 @@ import grails.converters.JSON
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
-import javax.servlet.http.HttpServletResponse
-
-class UserController extends AbstractExtendibleElementController<User> {
+class UserController extends AbstractCatalogueElementController<User> {
 
     def dataArchitectService
 

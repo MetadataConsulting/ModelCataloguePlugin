@@ -7,7 +7,6 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'enumeratedType',     "fa fa-fw fa-list-alt"
   catalogueProvider.setIcon 'dataType',           "fa fa-fw fa-th-large"
   catalogueProvider.setIcon 'measurementUnit',    "fa fa-fw fa-tachometer"
-  catalogueProvider.setIcon 'extendibleElement',  "fa fa-fw fa-file-excel-o"
   catalogueProvider.setIcon 'publishedElement',   "fa fa-fw fa-file-powerpoint-o"
   catalogueProvider.setIcon 'asset',              "fa fa-fw fa-file-code-o"
   catalogueProvider.setIcon 'catalogueElement',   "fa fa-fw fa-file-o"
@@ -19,14 +18,13 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
   # this should be generated automatically in the future
   catalogueProvider.setInstanceOf 'user',               'catalogueElement'
-  catalogueProvider.setInstanceOf 'extendibleElement',  'catalogueElement'
   catalogueProvider.setInstanceOf 'conceptualDomain',   'catalogueElement'
   catalogueProvider.setInstanceOf 'dataType',           'catalogueElement'
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
   catalogueProvider.setInstanceOf 'measurementUnit',    'catalogueElement'
   catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'
   catalogueProvider.setInstanceOf 'classification',     'catalogueElement'
-  catalogueProvider.setInstanceOf 'publishedElement',   'extendibleElement'
+  catalogueProvider.setInstanceOf 'publishedElement',   'catalogueElement'
   catalogueProvider.setInstanceOf 'asset',              'publishedElement'
   catalogueProvider.setInstanceOf 'model',              'publishedElement'
   catalogueProvider.setInstanceOf 'dataElement',        'publishedElement'

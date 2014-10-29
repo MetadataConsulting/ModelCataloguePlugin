@@ -10,22 +10,24 @@ databaseChangeLog = {
         dropColumn tableName: 'user', columnName: 'default_classification_id'
     }
 
-
-	changeSet(author: "Vladimir Orany", id: "1412847974050-02") {
-        preConditions (onFail: 'MARK_RAN') {
-            not {
-                tableExists tableName: "user_classification"
-            }
+    changeSet(author: "Vladimir Orany", id: "1412847974051-01") {
+        preConditions(onFail: 'MARK_RAN') {
+            tableExists tableName: "extendible_element"
         }
 
-        createTable(tableName: "user_classification") {
-            column(name: "user_classifications_id", type: "BIGINT")
-            column(name: "classification_id", type: "BIGINT")
-        }
-        addForeignKeyConstraint(baseColumnNames: "classification_id", baseTableName: "user_classification", constraintName: "FK2499F01B24A7UCCI", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "classification", referencesUniqueColumn: "false")
-        addForeignKeyConstraint(baseColumnNames: "user_classifications_id", baseTableName: "user_classification", constraintName: "FK2499F01BD363UCUI", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
+        dropAllForeignKeyConstraints baseTableName: 'extension_value'
+        addForeignKeyConstraint(baseColumnNames: "element_id", baseTableName: "extension_value", constraintName: "CAT_EL_EXTENSIONS", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
+
+        dropAllForeignKeyConstraints baseTableName: 'published_element'
+        addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "published_element", constraintName: "FK4C2699AB33E59620", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
+
+        dropAllForeignKeyConstraints baseTableName: 'value_domain'
+        addForeignKeyConstraint(baseColumnNames: "data_type_id", baseTableName: "value_domain", constraintName: "FK1706EF52537B20FA", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "data_type", referencesUniqueColumn: "false")
+        addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "value_domain", constraintName: "FK1706EF5233E59620", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
+        addForeignKeyConstraint(baseColumnNames: "unit_of_measure_id", baseTableName: "value_domain", constraintName: "FK1706EF524DE6923E", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "measurement_unit", referencesUniqueColumn: "false")
+
+        dropTable tableName: 'extendible_element'
     }
-
 
 }
 

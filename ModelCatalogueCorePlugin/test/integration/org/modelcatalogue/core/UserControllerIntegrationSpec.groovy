@@ -8,7 +8,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class UserControllerIntegrationSpec extends AbstractExtendibleElementControllerIntegrationSpec {
+class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){

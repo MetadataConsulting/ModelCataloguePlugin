@@ -35,7 +35,6 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   # default
   columnsProvider.registerColumns 'org.modelcatalogue.core.ConceptualDomain', nameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.PublishedElement', publishedElementColumns()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.ExtendibleElement', publishedElementColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [

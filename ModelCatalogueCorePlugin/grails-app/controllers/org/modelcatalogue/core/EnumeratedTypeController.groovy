@@ -87,7 +87,28 @@ class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
             return
         }
 
+        def ext = params?.ext
+        switch(response.format){
+
+            case "json":
+                if(!ext) ext = request.JSON?.ext
+                break
+
+            case "xml":
+                if(!ext) ext = request.XML?.ext
+                break
+
+            default:
+                break
+
+        }
+        if (ext != null) {
+            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
+        }
+
         instance.save flush:true
+
+
         request.withFormat {
             form {
                 flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
