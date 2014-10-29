@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ValueDomain
 
-class DataTypeMarshaller extends CatalogueElementMarshallers {
+class DataTypeMarshaller extends PublishedElementMarshallers {
 
     DataTypeMarshaller() {
         super(DataType)

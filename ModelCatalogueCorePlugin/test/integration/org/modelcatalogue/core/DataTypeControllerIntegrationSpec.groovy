@@ -6,7 +6,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+class DataTypeControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
     protected boolean getRecord() {
         true

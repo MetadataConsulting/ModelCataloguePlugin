@@ -3,14 +3,14 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.ValueDomains
 
-class DataTypeController<T> extends AbstractCatalogueElementController<DataType> {
+class DataTypeController<T> extends AbstractPublishedElementController<DataType> {
 
     DataTypeController() {
-        super(DataType)
+        super(DataType, false)
     }
 
     DataTypeController(Class<? extends DataType> resource) {
-        super(resource)
+        super(resource, false)
     }
 
 

@@ -12,7 +12,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 */
 
 
-class DataType extends CatalogueElement {
+class DataType extends PublishedElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 

@@ -13,12 +13,12 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "return only finalized elements by default"() {
         expect:
-        elementService.list().size()               == 19
+        elementService.list().size()               == 55
         elementService.list(max: 10).size()        == 10
         elementService.list(DataElement).size()    == 7
         elementService.list(Model).size()          == 5
         elementService.list(Asset).size()          == 7
-        elementService.count()                     == 19
+        elementService.count()                     == 55
         elementService.count(DataElement)          == 7
         elementService.count(Model)                == 5
         elementService.count(Asset)                == 7
@@ -26,9 +26,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "can supply status as parameter"() {
         expect:
-        elementService.list(status: 'DRAFT').size()                                    == 29
+        elementService.list(status: 'DRAFT').size()                                    == 17
         elementService.list(status: 'DRAFT', max: 10).size()                           == 10
-        elementService.list(status: ElementStatus.DRAFT).size()               == 29
+        elementService.list(status: ElementStatus.DRAFT).size()               == 17
         elementService.list(status: ElementStatus.DRAFT, max: 10).size()      == 10
         elementService.list(Model, status: 'DRAFT').size()                             == 7
         elementService.list(Model, status: ElementStatus.DRAFT).size()        == 7
@@ -36,8 +36,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.list(DataElement, status: ElementStatus.DRAFT).size()  == 5
         elementService.list(Asset, status: 'DRAFT').size()                             == 5
         elementService.list(Asset, status: ElementStatus.DRAFT).size()        == 5
-        elementService.count(status: 'DRAFT')                                          == 29
-        elementService.count(status: ElementStatus.DRAFT)                     == 29
+        elementService.count(status: 'DRAFT')                                          == 17
+        elementService.count(status: ElementStatus.DRAFT)                     == 17
         elementService.count(Model, status: 'DRAFT')                                   == 7
         elementService.count(Model, status: ElementStatus.DRAFT)              == 7
         elementService.count(DataElement, status: 'DRAFT')                             == 5
