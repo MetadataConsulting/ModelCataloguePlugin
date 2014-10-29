@@ -9,7 +9,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 *
 * */
 
-class MeasurementUnit extends CatalogueElement {
+class MeasurementUnit extends PublishedElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
@@ -23,7 +23,7 @@ class MeasurementUnit extends CatalogueElement {
     static hasMany = [valueDomains: ValueDomain]
 
     static constraints = {
-        name unique:true
+        name unique: 'versionNumber'
         symbol nullable: true, size: 1..100
     }
 

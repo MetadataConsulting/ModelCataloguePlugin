@@ -2,10 +2,10 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 
-class MeasurementUnitController extends AbstractCatalogueElementController<MeasurementUnit> {
+class MeasurementUnitController extends AbstractPublishedElementController<MeasurementUnit> {
 
     MeasurementUnitController() {
-        super(MeasurementUnit)
+        super(MeasurementUnit, false)
     }
 
     def valueDomains(Integer max){

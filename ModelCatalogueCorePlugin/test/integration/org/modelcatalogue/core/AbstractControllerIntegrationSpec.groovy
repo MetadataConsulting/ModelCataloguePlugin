@@ -130,7 +130,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
         then:
         asset.contentType == XLSXListRenderer.XLSX.name
-//        asset.status == PublishedElementStatus.FINALIZED
+//        asset.status == ElementStatus.FINALIZED
 
 //        XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(controller.response.contentAsByteArray))
 //

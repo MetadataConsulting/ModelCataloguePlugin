@@ -17,15 +17,17 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'csvTransformation',  "fa fa-fw fa-long-arrow-right"
 
   # this should be generated automatically in the future
-  catalogueProvider.setInstanceOf 'user',               'catalogueElement'
+  catalogueProvider.setInstanceOf 'classification',     'catalogueElement'
   catalogueProvider.setInstanceOf 'conceptualDomain',   'catalogueElement'
   catalogueProvider.setInstanceOf 'dataType',           'catalogueElement'
-  catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
-  catalogueProvider.setInstanceOf 'measurementUnit',    'catalogueElement'
-  catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'
-  catalogueProvider.setInstanceOf 'classification',     'catalogueElement'
   catalogueProvider.setInstanceOf 'publishedElement',   'catalogueElement'
+  catalogueProvider.setInstanceOf 'user',               'catalogueElement'
+  catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'
+
+  catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
+
   catalogueProvider.setInstanceOf 'asset',              'publishedElement'
+  catalogueProvider.setInstanceOf 'measurementUnit',    'publishedElement'
   catalogueProvider.setInstanceOf 'model',              'publishedElement'
   catalogueProvider.setInstanceOf 'dataElement',        'publishedElement'
 

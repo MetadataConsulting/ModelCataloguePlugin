@@ -117,8 +117,8 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
         then:
         loaded
-        loaded.sourceClass == PublishedElement
-        loaded.destinationClass == PublishedElement
+        loaded.sourceClass == CatalogueElement
+        loaded.destinationClass == CatalogueElement
         loaded.sourceToDestination == "superseded by"
         loaded.destinationToSource == "supersedes"
         loaded.name == "supersession"
