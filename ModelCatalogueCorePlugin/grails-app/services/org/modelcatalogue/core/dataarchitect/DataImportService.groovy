@@ -10,7 +10,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.dataarchitect.xsd.*
@@ -185,7 +185,7 @@ class DataImportService {
             conceptualDomain.addToRelatedTo(asset)
         }
 
-        asset.status = PublishedElementStatus.FINALIZED
+        asset.status = ElementStatus.FINALIZED
         asset.save()
     }
 
@@ -254,7 +254,7 @@ class DataImportService {
     def updateModel(Model model, String name){
         if(name && name!=model.name){
             model.name = name
-            model.status = PublishedElementStatus.UPDATED
+            model.status = ElementStatus.UPDATED
             model.save()
         }
     }
@@ -270,8 +270,8 @@ class DataImportService {
     }
 
     protected void addUpdatedDataElements(DataImport importer, DataElement dataElement, Model model, ConceptualDomain conceptualDomain ){
-        if(model.status==PublishedElementStatus.FINALIZED){
-            model.status = PublishedElementStatus.UPDATED
+        if(model.status==ElementStatus.FINALIZED){
+            model.status = ElementStatus.UPDATED
             model.save()
         }
         importer.updatedDataElements.add([dataElement, model, conceptualDomain])
@@ -281,7 +281,7 @@ class DataImportService {
         importer.models.each { model ->
             def pendingDataElements = importer.updatedDataElements.findAll { it[1] == model }
 
-            if(model.status == PublishedElementStatus.UPDATED) {
+            if(model.status == ElementStatus.UPDATED) {
                 def archivedModel = publishedElementService.archiveAndIncreaseVersion(model)
                 model.refresh()
             }
@@ -291,12 +291,12 @@ class DataImportService {
                     def dataElement = it[0]
                     def relationship = model.addToContains(dataElement)
 //                    relationship.ext.put("Context" , it[2].name)
-                    dataElement.status = PublishedElementStatus.FINALIZED
+                    dataElement.status = ElementStatus.FINALIZED
                     dataElement.save(flush:true, failOnError:true)
                 }
             }
             model.refresh()
-            model.status = PublishedElementStatus.PENDING
+            model.status = ElementStatus.PENDING
             model.save(flush:true, failOnError:true)
         }
 
@@ -455,8 +455,8 @@ class DataImportService {
     //update data element without value domain info
     protected DataElement updateDataElement(DataImport importer, Map params, DataElement dataElement, Map metadata, Model model, ConceptualDomain conceptualDomain, Classification classification) {
         if (checkDataElementForChanges(params, metadata, dataElement, classification)) {
-            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
-                model.status = PublishedElementStatus.UPDATED
+            if(model.status!=ElementStatus.UPDATED && model.status!=ElementStatus.DRAFT){
+                model.status = ElementStatus.UPDATED
                 model.save()
             }
             addModelToImport(importer, model)
@@ -464,7 +464,7 @@ class DataImportService {
             dataElement.refresh()
             dataElement.name = params.name
             dataElement.description = params.description
-            dataElement.status = PublishedElementStatus.UPDATED
+            dataElement.status = ElementStatus.UPDATED
             dataElement.save()
             dataElement.addToClassifications(classification)
             dataElement = updateMetadata(metadata, dataElement)
@@ -482,8 +482,8 @@ class DataImportService {
 
         if (dataElementChanged || valueDomainChanged) {
 
-            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
-                model.status = PublishedElementStatus.UPDATED
+            if(model.status!=ElementStatus.UPDATED && model.status!=ElementStatus.DRAFT){
+                model.status = ElementStatus.UPDATED
                 model.save()
             }
 
@@ -495,15 +495,15 @@ class DataImportService {
             if(dataElementChanged) {
                 dataElement.name = params.name
                 dataElement.description = params.description
-                dataElement.status = PublishedElementStatus.UPDATED
+                dataElement.status = ElementStatus.UPDATED
                 dataElement.save()
                 dataElement.addToClassifications(classification)
                 dataElement = updateMetadata(metadata, dataElement)
             }
 
             if (valueDomainChanged) {
-                if(dataElement.status != PublishedElementStatus.UPDATED) {
-                    dataElement.status = PublishedElementStatus.UPDATED
+                if(dataElement.status != ElementStatus.UPDATED) {
+                    dataElement.status = ElementStatus.UPDATED
                     dataElement.save()
                 }
                 //remove the old one (will still be in the archived one)
@@ -531,8 +531,8 @@ class DataImportService {
 
         if (dataElementChanged || valueDomainChanged) {
 
-            if(model.status!=PublishedElementStatus.UPDATED && model.status!=PublishedElementStatus.DRAFT){
-                model.status = PublishedElementStatus.UPDATED
+            if(model.status!=ElementStatus.UPDATED && model.status!=ElementStatus.DRAFT){
+                model.status = ElementStatus.UPDATED
                 model.save()
             }
 
@@ -544,15 +544,15 @@ class DataImportService {
             if(dataElementChanged) {
                 dataElement.name = element.name
                 dataElement.description = element.description
-                dataElement.status = PublishedElementStatus.UPDATED
+                dataElement.status = ElementStatus.UPDATED
                 dataElement.save()
                 dataElement.addToClassifications(classification)
                 dataElement = updateMetadata(metadata, dataElement)
             }
 
             if (valueDomainChanged) {
-                if(dataElement.status != PublishedElementStatus.UPDATED) {
-                    dataElement.status = PublishedElementStatus.UPDATED
+                if(dataElement.status != ElementStatus.UPDATED) {
+                    dataElement.status = ElementStatus.UPDATED
                     dataElement.valueDomain = valueDomain
                     dataElement.save()
                 }
@@ -613,7 +613,7 @@ class DataImportService {
         }
 
         if (!de) {
-            params.put('status', PublishedElementStatus.FINALIZED)
+            params.put('status', ElementStatus.FINALIZED)
             de = new DataElement(params)
             de.modelCatalogueId = params.modelCatalogueId
             de.save()
@@ -647,7 +647,7 @@ class DataImportService {
         }
 
         if (!de && params.name) {
-            params.put('status', PublishedElementStatus.FINALIZED)
+            params.put('status', ElementStatus.FINALIZED)
             de = new DataElement(params)
             de.modelCatalogueId = params.modelCatalogueId
             de.save()

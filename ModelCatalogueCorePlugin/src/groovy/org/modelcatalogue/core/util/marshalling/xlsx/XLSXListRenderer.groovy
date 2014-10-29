@@ -11,7 +11,7 @@ import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetService
 import org.modelcatalogue.core.Extendible
-import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
@@ -20,7 +20,6 @@ import org.springframework.web.context.request.RequestContextHolder
 import pl.touk.excel.export.WebXlsxExporter
 
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
 
 /**
  * Created by ladin on 07.04.14.
@@ -106,7 +105,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                 name: theName,
                 originalFileName: theName,
                 description: "Your export will be available in this asset soon. Use Refresh action to reload",
-                status: PublishedElementStatus.PENDING,
+                status: ElementStatus.PENDING,
                 contentType: XLSX.name,
                 size: 0
         )
@@ -174,7 +173,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                     exporter.save(it)
                 }
 
-                updated.status = PublishedElementStatus.FINALIZED
+                updated.status = ElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.save(flush: true, failOnError: true)
             } catch (e) {

@@ -92,7 +92,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                         try {
                             Classification classification = OBOService.importOntology(inputStream, name, idpattern)
                             Asset updated = Asset.get(id)
-                            updated.status = PublishedElementStatus.FINALIZED
+                            updated.status = ElementStatus.FINALIZED
                             updated.description = "Your import has finished."
                             updated.save(flush: true, failOnError: true)
                             updated.addToClassifications(classification)
@@ -103,7 +103,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                         } catch (Exception e) {
                             Asset updated = Asset.get(id)
                             updated.refresh()
-                            updated.status = PublishedElementStatus.FINALIZED
+                            updated.status = ElementStatus.FINALIZED
                             updated.name = updated.name + " - Error during upload"
                             updated.description = "Error importing obo file: ${e}"
                             updated.save(flush: true, failOnError: true)
@@ -155,7 +155,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                 name: "Import for " + theName,
                 originalFileName: theName,
                 description: "Your import will be available in this asset soon. Use Refresh action to reload.",
-                status: PublishedElementStatus.PENDING,
+                status: ElementStatus.PENDING,
                 contentType: 'application/xslt',
                 size: 0
         )
@@ -180,7 +180,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
                 XsdLoader parserXSD = new XsdLoader(inputStream)
                 def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrorsSACT) = parserXSD.parse()
                 def (classification, conceptualDomain) = XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
-                updated.status = PublishedElementStatus.FINALIZED
+                updated.status = ElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.ext['Original URL'] = uri
                 updated.save(flush: true, failOnError: true)
@@ -189,7 +189,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
             } catch (e) {
                 log.error("Error importing schema", e)
                 updated.refresh()
-                updated.status = PublishedElementStatus.FINALIZED
+                updated.status = ElementStatus.FINALIZED
                 updated.name = updated.name + " - Error during upload"
                 updated.description = "Error importing file: please validate that the schema is valid xml and that any dependencies already exist in the catalogue"
                 updated.save(flush: true, failOnError: true)

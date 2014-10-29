@@ -142,11 +142,11 @@ class BootStrap {
 //
 //
                     println 'Finalizing all published elements'
-                    PublishedElement.findAllByStatusNotEqual(PublishedElementStatus.FINALIZED).each {
+                    PublishedElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
                         if (it instanceof Model) {
                             publishedElementService.finalizeTree(it)
                         } else {
-                            it.status = PublishedElementStatus.FINALIZED
+                            it.status = ElementStatus.FINALIZED
                             it.save failOnError: true
                         }
                     }
@@ -169,7 +169,7 @@ class BootStrap {
                         }
                     }
 
-                    def parent = new Model(name:"parent1", status: PublishedElementStatus.FINALIZED).save(flush:true)
+                    def parent = new Model(name:"parent1", status: ElementStatus.FINALIZED).save(flush:true)
                     parent.addToChildOf(parent)
 
                     assert !actionService.create(batch, TestAction, fail: true).hasErrors()

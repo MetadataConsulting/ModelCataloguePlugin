@@ -338,7 +338,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 name: theName,
                 originalFileName: theName,
                 description: "Your export will be available in this asset soon. Use Refresh action to reload.",
-                status: PublishedElementStatus.PENDING,
+                status: ElementStatus.PENDING,
                 contentType: 'application/xml',
                 size: 0
         )
@@ -355,7 +355,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                     (object as XML).render(new OutputStreamWriter(out, 'UTF-8'))
                 }
 
-                updated.status = PublishedElementStatus.FINALIZED
+                updated.status = ElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.save(flush: true, failOnError: true)
                 updated.ext['Original URL'] = uri

@@ -44,9 +44,9 @@ class ValueDomainController extends AbstractCatalogueElementController<ValueDoma
         reportCapableRespond Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement", "dataElements"){
             eq "valueDomain", valueDomain
             if (!all) {
-                ne 'status', PublishedElementStatus.DEPRECATED
-                ne 'status', PublishedElementStatus.UPDATED
-                ne 'status', PublishedElementStatus.REMOVED
+                ne 'status', ElementStatus.DEPRECATED
+                ne 'status', ElementStatus.UPDATED
+                ne 'status', ElementStatus.REMOVED
             }
         }
 

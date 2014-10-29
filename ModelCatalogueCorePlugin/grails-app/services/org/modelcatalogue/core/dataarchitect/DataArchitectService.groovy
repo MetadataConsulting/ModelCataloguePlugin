@@ -23,7 +23,7 @@ class DataArchitectService {
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
         Lists.fromCriteria(params, DataElement) {
-            'in'('status', PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED)
+            'in'('status', ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED)
             isNull 'valueDomain'
         }
     }
@@ -105,25 +105,25 @@ class DataArchitectService {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.FINALIZED)
+            def element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
             if (!element) {
                 element = DataElement.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.FINALIZED)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.FINALIZED)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.DRAFT)
+                element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.DRAFT)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.DRAFT)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
                 }
             }
             if (element) {
@@ -206,7 +206,7 @@ class DataArchitectService {
             from ValueDomain v
             where
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-        """, [archived: PublishedElementStatus.DEPRECATED]
+        """, [archived: ElementStatus.DEPRECATED]
     }
 
     ListWithTotal<ValueDomain> duplicateValueDomains(Map params) {
@@ -217,7 +217,7 @@ class DataArchitectService {
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
             and
                 v.name in (select vd.name from ValueDomain vd group by vd.name having count(vd.name) > 1)
-        """, [archived: PublishedElementStatus.DEPRECATED]
+        """, [archived: ElementStatus.DEPRECATED]
     }
 
     Map<Long, String> dataTypesNamesSuggestions() {

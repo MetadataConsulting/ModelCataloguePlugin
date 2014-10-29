@@ -5,8 +5,6 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.PublishedElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType

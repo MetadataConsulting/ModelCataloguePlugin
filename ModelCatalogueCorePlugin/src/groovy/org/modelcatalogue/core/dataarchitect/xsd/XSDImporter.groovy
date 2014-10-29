@@ -68,23 +68,23 @@ class XSDImporter {
 
         log.info("Publishing elements as DRAFT")
         for (DataElement element in elementsCreated) {
-            element.status = PublishedElementStatus.DRAFT
+            element.status = ElementStatus.DRAFT
             element.save(failOnError: true)
         }
 
         log.info("Publishing models as DRAFT")
         for (Model model in modelsCreated) {
-            model.status = PublishedElementStatus.DRAFT
+            model.status = ElementStatus.DRAFT
             model.save(failOnError: true)
         }
 
         if (publicTypesContainer) {
-            publicTypesContainer.status = PublishedElementStatus.DRAFT
+            publicTypesContainer.status = ElementStatus.DRAFT
             publicTypesContainer.save(failOnError: true)
         }
 
         if (rootElementsContainer) {
-            rootElementsContainer.status = PublishedElementStatus.DRAFT
+            rootElementsContainer.status = ElementStatus.DRAFT
             rootElementsContainer.save(failOnError: true)
         }
 
@@ -108,12 +108,12 @@ class XSDImporter {
         classifications.add(typeClassification)
 
         publicTypesContainer = findModel(containerModelName)
-        if (!publicTypesContainer) publicTypesContainer = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save(failOnError: true)
+        if (!publicTypesContainer) publicTypesContainer = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: ElementStatus.PENDING).save(failOnError: true)
 
         if (!createModelsForElements) {
             if (!rootElementsModelName) rootElementsModelName = classifications.first()?.name + " Root Elements"
             rootElementsContainer = findModel(rootElementsModelName)
-            if (!rootElementsContainer) rootElementsContainer = new Model(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save(failOnError: true)
+            if (!rootElementsContainer) rootElementsContainer = new Model(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: ElementStatus.PENDING).save(failOnError: true)
         }
 
 
@@ -179,7 +179,7 @@ class XSDImporter {
         def model = findModel(modelName)
         if (!model) {
 
-            model = new Model(name: modelName, description: complexType?.description, status: PublishedElementStatus.UPDATED).save(flush: true, failOnError: true)
+            model = new Model(name: modelName, description: complexType?.description, status: ElementStatus.UPDATED).save(flush: true, failOnError: true)
             model = addClassifications(model)
             modelsCreated.add(model)
 
@@ -215,7 +215,7 @@ class XSDImporter {
                 }
             }
 
-            model.status = PublishedElementStatus.PENDING
+            model.status = ElementStatus.PENDING
 
         }
         return model
@@ -568,7 +568,7 @@ class XSDImporter {
         DataElement dataElement = findDataElement(name, domain)
 
         if (!dataElement) {
-            dataElement = new DataElement(name: name, description: description, valueDomain: domain, status: PublishedElementStatus.PENDING)
+            dataElement = new DataElement(name: name, description: description, valueDomain: domain, status: ElementStatus.PENDING)
             dataElement = addClassifications(dataElement)
             elementsCreated << dataElement.save(failOnError: true)
         }

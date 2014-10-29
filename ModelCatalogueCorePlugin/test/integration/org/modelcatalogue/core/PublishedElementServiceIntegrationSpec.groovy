@@ -28,22 +28,22 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         expect:
         publishedElementService.list(status: 'DRAFT').size()                                    == 17
         publishedElementService.list(status: 'DRAFT', max: 10).size()                           == 10
-        publishedElementService.list(status: PublishedElementStatus.DRAFT).size()               == 17
-        publishedElementService.list(status: PublishedElementStatus.DRAFT, max: 10).size()      == 10
+        publishedElementService.list(status: ElementStatus.DRAFT).size()               == 17
+        publishedElementService.list(status: ElementStatus.DRAFT, max: 10).size()      == 10
         publishedElementService.list(Model, status: 'DRAFT').size()                             == 7
-        publishedElementService.list(Model, status: PublishedElementStatus.DRAFT).size()        == 7
+        publishedElementService.list(Model, status: ElementStatus.DRAFT).size()        == 7
         publishedElementService.list(DataElement, status: 'DRAFT').size()                       == 5
-        publishedElementService.list(DataElement, status: PublishedElementStatus.DRAFT).size()  == 5
+        publishedElementService.list(DataElement, status: ElementStatus.DRAFT).size()  == 5
         publishedElementService.list(Asset, status: 'DRAFT').size()                             == 5
-        publishedElementService.list(Asset, status: PublishedElementStatus.DRAFT).size()        == 5
+        publishedElementService.list(Asset, status: ElementStatus.DRAFT).size()        == 5
         publishedElementService.count(status: 'DRAFT')                                          == 17
-        publishedElementService.count(status: PublishedElementStatus.DRAFT)                     == 17
+        publishedElementService.count(status: ElementStatus.DRAFT)                     == 17
         publishedElementService.count(Model, status: 'DRAFT')                                   == 7
-        publishedElementService.count(Model, status: PublishedElementStatus.DRAFT)              == 7
+        publishedElementService.count(Model, status: ElementStatus.DRAFT)              == 7
         publishedElementService.count(DataElement, status: 'DRAFT')                             == 5
-        publishedElementService.count(DataElement, status: PublishedElementStatus.DRAFT)        == 5
+        publishedElementService.count(DataElement, status: ElementStatus.DRAFT)        == 5
         publishedElementService.count(Asset, status: 'DRAFT')                             == 5
-        publishedElementService.count(Asset, status: PublishedElementStatus.DRAFT)        == 5
+        publishedElementService.count(Asset, status: ElementStatus.DRAFT)        == 5
     }
 
 
@@ -87,7 +87,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         author.supersedes.contains(anotherArchived)
         anotherArchived.supersedes.contains(archived)
-        author.status == PublishedElementStatus.DRAFT
+        author.status == ElementStatus.DRAFT
     }
 
     def "archive"() {
@@ -237,26 +237,26 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md2.addToParentOf(md4)
 
         expect:
-        md1.status == PublishedElementStatus.DRAFT
-        md2.status == PublishedElementStatus.DRAFT
-        md3.status == PublishedElementStatus.DRAFT
-        md4.status == PublishedElementStatus.DRAFT
-        de1.status == PublishedElementStatus.DRAFT
-        de2.status == PublishedElementStatus.DRAFT
-        de3.status == PublishedElementStatus.DRAFT
+        md1.status == ElementStatus.DRAFT
+        md2.status == ElementStatus.DRAFT
+        md3.status == ElementStatus.DRAFT
+        md4.status == ElementStatus.DRAFT
+        de1.status == ElementStatus.DRAFT
+        de2.status == ElementStatus.DRAFT
+        de3.status == ElementStatus.DRAFT
 
         when:
 
         publishedElementService.finalizeTree(md1)
 
         then:
-        md1.status == PublishedElementStatus.FINALIZED
-        md2.status == PublishedElementStatus.FINALIZED
-        md3.status == PublishedElementStatus.FINALIZED
-        md4.status == PublishedElementStatus.FINALIZED
-        de1.status == PublishedElementStatus.FINALIZED
-        de2.status == PublishedElementStatus.FINALIZED
-        de3.status == PublishedElementStatus.FINALIZED
+        md1.status == ElementStatus.FINALIZED
+        md2.status == ElementStatus.FINALIZED
+        md3.status == ElementStatus.FINALIZED
+        md4.status == ElementStatus.FINALIZED
+        de1.status == ElementStatus.FINALIZED
+        de2.status == ElementStatus.FINALIZED
+        de3.status == ElementStatus.FINALIZED
 
         cleanup:
         de1.delete()
@@ -281,17 +281,17 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md3.addToParentOf(md1)
 
         expect:
-        md1.status == PublishedElementStatus.DRAFT
-        md2.status == PublishedElementStatus.DRAFT
-        md3.status == PublishedElementStatus.DRAFT
+        md1.status == ElementStatus.DRAFT
+        md2.status == ElementStatus.DRAFT
+        md3.status == ElementStatus.DRAFT
 
         when:
         publishedElementService.finalizeTree(md1)
 
         then:
-        md1.status == PublishedElementStatus.FINALIZED
-        md2.status == PublishedElementStatus.FINALIZED
-        md3.status == PublishedElementStatus.FINALIZED
+        md1.status == ElementStatus.FINALIZED
+        md2.status == ElementStatus.FINALIZED
+        md3.status == ElementStatus.FINALIZED
 
         cleanup:
         md1.delete()

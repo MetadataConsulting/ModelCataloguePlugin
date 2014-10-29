@@ -44,7 +44,7 @@ class PublishedElementService {
         element = createNewVersion(element)
         archived = populateArchivedProperties(archived, element)
 
-        element.status = PublishedElementStatus.DRAFT
+        element.status = ElementStatus.DRAFT
         element.save()
 
         def supersedes = element.supersedes
@@ -62,7 +62,7 @@ class PublishedElementService {
         modelCatalogueSearchService.unindex(archived)
 
         //set archived status from updated to archived
-        archived.status = PublishedElementStatus.DEPRECATED
+        archived.status = ElementStatus.DEPRECATED
         archived.latestVersion = element.latestVersion ?: element
         archived.save()
     }
@@ -82,22 +82,22 @@ class PublishedElementService {
 
         modelCatalogueSearchService.unindex(archived)
 
-        archived.status = PublishedElementStatus.DEPRECATED
+        archived.status = ElementStatus.DEPRECATED
         archived.save()
     }
 
     public <E extends Model> E finalizeTree(Model model, Collection<Model> tree = []){
 
         //check that it isn't already finalized
-        if(model.status==PublishedElementStatus.FINALIZED || model.status==PublishedElementStatus.DEPRECATED) return model
+        if(model.status==ElementStatus.FINALIZED || model.status==ElementStatus.DEPRECATED) return model
 
         //to avoid infinite loop
         if(!tree.contains(model)) tree.add(model)
 
         //finalize data elements
         model.contains.each{ DataElement dataElement ->
-            if(dataElement.status!=PublishedElementStatus.FINALIZED && dataElement.status!=PublishedElementStatus.DEPRECATED){
-                dataElement.status = PublishedElementStatus.FINALIZED
+            if(dataElement.status!=ElementStatus.FINALIZED && dataElement.status!=ElementStatus.DEPRECATED){
+                dataElement.status = ElementStatus.FINALIZED
                 dataElement.save(flush:true)
             }
         }
@@ -109,21 +109,21 @@ class PublishedElementService {
             }
         }
 
-        model.status = PublishedElementStatus.FINALIZED
+        model.status = ElementStatus.FINALIZED
         model.save(flush:true)
 
         return model
 
     }
 
-    static PublishedElementStatus getStatusFromParams(params) {
+    static ElementStatus getStatusFromParams(params) {
         if (!params.status) {
-            return PublishedElementStatus.FINALIZED
+            return ElementStatus.FINALIZED
         }
-        if (params.status instanceof PublishedElementStatus) {
+        if (params.status instanceof ElementStatus) {
             return params.status
         }
-        return PublishedElementStatus.valueOf(params.status.toString().toUpperCase())
+        return ElementStatus.valueOf(params.status.toString().toUpperCase())
     }
 
     private PublishedElement createNewVersion(PublishedElement element){
@@ -200,7 +200,7 @@ class PublishedElementService {
 
     private PublishedElement populateArchivedProperties(PublishedElement archived, PublishedElement element){
         //set archived as updated whilst updates are going on (so it doesn't interfere with regular validation rules)
-        archived.status = PublishedElementStatus.UPDATED
+        archived.status = ElementStatus.UPDATED
         archived.dateCreated = element.dateCreated // keep the original creation date
 
 
@@ -221,7 +221,7 @@ class PublishedElementService {
         }
 
         // fallthrough if already merge in progress or the source and destination are the same
-        if (source == destination || destination.status == PublishedElementStatus.UPDATED || source.status == PublishedElementStatus.UPDATED) {
+        if (source == destination || destination.status == ElementStatus.UPDATED || source.status == ElementStatus.UPDATED) {
             return destination
         }
 
@@ -245,7 +245,7 @@ class PublishedElementService {
             return destination
         }
 
-        PublishedElementStatus originalStatus = destination.status
+        ElementStatus originalStatus = destination.status
 
         GrailsDomainClass grailsDomainClass = grailsApplication.getDomainClass(source.class.name)
 
@@ -269,7 +269,7 @@ class PublishedElementService {
             return destination
         }
 
-        destination.status = PublishedElementStatus.UPDATED
+        destination.status = ElementStatus.UPDATED
         destination.save()
 
 
@@ -414,7 +414,7 @@ class PublishedElementService {
             and
                 (rel.relationshipType = :containment or rel.relationshipType = :hierarchy)
             order by m.name asc, m.dateCreated asc, rel.destination.name asc
-        """, [states: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.FINALIZED], containment: RelationshipType.findByName('containment'), hierarchy: RelationshipType.findByName('hierarchy')]
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], containment: RelationshipType.findByName('containment'), hierarchy: RelationshipType.findByName('hierarchy')]
 
 
         Map<Long, Map<String, Object>> models = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>(), childrenNames: new TreeSet<String>()] }
@@ -460,7 +460,7 @@ class PublishedElementService {
                     de.status in :states
                 group by de.name, vd.id
                 having count(de.id) > 1
-        """, [states: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.FINALIZED]]
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
 
         Map<Long, Set<Long>> elements = new LinkedHashMap<Long, Set<Long>>()
 
@@ -472,7 +472,7 @@ class PublishedElementService {
                     and de.status in :states
 
                     order by de.dateCreated
-            """, [name: row[1], vd: row[2], states: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.FINALIZED]]
+            """, [name: row[1], vd: row[2], states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
 
             elements[duplicates.head()] = new HashSet<Long>(duplicates.tail().toList())
 

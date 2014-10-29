@@ -11,7 +11,7 @@ abstract class PublishedElement extends CatalogueElement  {
     //it's version number is updated and any subsequent update will
     //be mean that the element is superseded. We will provide a supersede function
     //to do this
-    PublishedElementStatus status = PublishedElementStatus.DRAFT
+    ElementStatus status = ElementStatus.DRAFT
 
     Date versionCreated = new Date()
 
@@ -50,7 +50,7 @@ abstract class PublishedElement extends CatalogueElement  {
             if(!val){ return true}
             def oldStatus = null
             if(obj.version!=null){ oldStatus = obj.getPersistentValue('status')}
-            if (obj.instanceOf(Model) && oldStatus != PublishedElementStatus.FINALIZED && val == PublishedElementStatus.FINALIZED) {
+            if (obj.instanceOf(Model) && oldStatus != ElementStatus.FINALIZED && val == ElementStatus.FINALIZED) {
                 if(!checkChildItemsFinalized(obj)) {
                     return ['org.modelcatalogue.core.PublishedElement.status.validator.children']
                 }
@@ -80,14 +80,14 @@ abstract class PublishedElement extends CatalogueElement  {
 
     static protected Boolean checkChildItemsFinalized(Model model, Collection<Model> tree = []){
 
-        if(model.contains.any{it.status!=PublishedElementStatus.FINALIZED && it.status!=PublishedElementStatus.DEPRECATED }) return false
+        if(model.contains.any{it.status!=ElementStatus.FINALIZED && it.status!=ElementStatus.DEPRECATED }) return false
 
         if(!tree.contains(model)) tree.add(model)
 
         def parentOf = model.parentOf
         if(parentOf) {
             return model.parentOf.any { Model md ->
-                if (md.status != PublishedElementStatus.FINALIZED && md.status != PublishedElementStatus.DEPRECATED) return false
+                if (md.status != ElementStatus.FINALIZED && md.status != ElementStatus.DEPRECATED) return false
                 if(!tree.contains(md)) {
                     if (!checkChildItemsFinalized(md, tree)) return false
                 }

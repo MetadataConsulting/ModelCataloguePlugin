@@ -3,7 +3,7 @@ package org.modelcatalogue.core.actions
 import grails.test.mixin.Mock
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.RelationshipType
 import spock.lang.Specification
 
@@ -93,7 +93,7 @@ class CreateCatalogueElementSpec extends Specification {
         !createAction.failed
         Model.count() == 1
         Model.countByName('The Model') == 1
-        Model.countByStatus(PublishedElementStatus.DRAFT) == 1
+        Model.countByStatus(ElementStatus.DRAFT) == 1
         sw.toString() == "New <a href='#/catalogue/model/1'>Model 'The Model'</a> created"
         Model.findByName('The Model').ext.foo == 'bar'
         createAction.result == AbstractActionRunner.encodeEntity(Model.findByName('The Model'))

@@ -80,7 +80,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
             def results = Lists.fromQuery(params, resource, listQuery, [
                     query: query,
-                    statuses: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED]
+                    statuses: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED]
             ])
 
 
