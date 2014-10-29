@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.util
 
-import grails.gorm.DetachedCriteria
-
 /**
  * Created by ladin on 14.07.14.
  */
