@@ -112,7 +112,7 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'grails.app.services.org.modelcatalogue.core.PublishedElementService'
+    debug 'grails.app.services.org.modelcatalogue.core.ElementService'
     debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 //    debug 'org.codehaus.groovy.grails.web.mapping'

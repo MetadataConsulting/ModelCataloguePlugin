@@ -13,7 +13,7 @@ class ActionServiceISpec extends AbstractIntegrationSpec {
         actionService.run(action)
 
         expect:
-        action.outcome != "PublishedElementService is null"
+        action.outcome != "ElementService is null"
     }
 
 }

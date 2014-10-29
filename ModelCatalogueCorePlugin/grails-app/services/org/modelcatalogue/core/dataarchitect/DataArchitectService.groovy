@@ -18,7 +18,7 @@ class DataArchitectService {
 
     def modelCatalogueSearchService
     def relationshipService
-    def publishedElementService
+    def elementService
     def actionService
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
@@ -305,7 +305,7 @@ class DataArchitectService {
             renameBatch.save()
         }
 
-        publishedElementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
+        elementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
             DataElement dataElement = DataElement.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Element '$dataElement.name'")
             RelationshipType type = RelationshipType.findByName("synonym")
@@ -319,7 +319,7 @@ class DataArchitectService {
             batch.save()
         }
 
-        publishedElementService.findDuplicateModelsSuggestions().each { destId, sources ->
+        elementService.findDuplicateModelsSuggestions().each { destId, sources ->
             Model model = Model.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Model '$model.name'")
             RelationshipType type = RelationshipType.findByName("synonym")
@@ -333,7 +333,7 @@ class DataArchitectService {
             batch.save()
         }
 
-        publishedElementService.findModelsToBeInlined().each { sourceId, destId ->
+        elementService.findModelsToBeInlined().each { sourceId, destId ->
             Model model = Model.get(sourceId)
             Batch batch = Batch.findOrSaveByName("Inline Model '$model.name'")
             batch.description = """Model '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""

@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 
-class PublishedElementService {
+class ElementService {
 
     static transactional = true
 

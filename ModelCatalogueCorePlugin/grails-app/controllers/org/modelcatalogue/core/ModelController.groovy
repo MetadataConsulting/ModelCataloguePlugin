@@ -39,7 +39,7 @@ class ModelController extends AbstractPublishedElementController<Model> {
             return
         }
 
-        reportCapableRespond publishedElementService.finalizeTree(instance)
+        reportCapableRespond elementService.finalizeTree(instance)
     }
 
 }

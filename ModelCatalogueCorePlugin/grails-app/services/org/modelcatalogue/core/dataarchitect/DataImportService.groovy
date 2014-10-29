@@ -17,7 +17,7 @@ import org.modelcatalogue.core.dataarchitect.xsd.*
 
 class DataImportService {
     static transactional = false
-    def publishedElementService, sessionFactory, relationshipService
+    def elementService, sessionFactory, relationshipService
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
     private static final REGEX = '(?i)MC_([A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12})_\\d+'
 
@@ -282,7 +282,7 @@ class DataImportService {
             def pendingDataElements = importer.updatedDataElements.findAll { it[1] == model }
 
             if(model.status == ElementStatus.UPDATED) {
-                def archivedModel = publishedElementService.archiveAndIncreaseVersion(model)
+                def archivedModel = elementService.archiveAndIncreaseVersion(model)
                 model.refresh()
             }
 
@@ -301,7 +301,7 @@ class DataImportService {
         }
 
         importer.models.each{ Model model->
-            publishedElementService.finalizeTree(model)
+            elementService.finalizeTree(model)
         }
 
 
@@ -460,7 +460,7 @@ class DataImportService {
                 model.save()
             }
             addModelToImport(importer, model)
-            publishedElementService.archiveAndIncreaseVersion(dataElement)
+            elementService.archiveAndIncreaseVersion(dataElement)
             dataElement.refresh()
             dataElement.name = params.name
             dataElement.description = params.description
@@ -489,7 +489,7 @@ class DataImportService {
 
             addModelToImport(importer, model)
 
-            publishedElementService.archiveAndIncreaseVersion(dataElement)
+            elementService.archiveAndIncreaseVersion(dataElement)
             dataElement.refresh()
 
             if(dataElementChanged) {
@@ -538,7 +538,7 @@ class DataImportService {
 
             addModelToImport(importer, model)
 
-            publishedElementService.archiveAndIncreaseVersion(dataElement)
+            elementService.archiveAndIncreaseVersion(dataElement)
             dataElement.refresh()
 
             if(dataElementChanged) {

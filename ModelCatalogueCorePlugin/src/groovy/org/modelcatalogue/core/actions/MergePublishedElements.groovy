@@ -2,16 +2,15 @@ package org.modelcatalogue.core.actions
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.PublishedElement
-import org.modelcatalogue.core.PublishedElementService
+import org.modelcatalogue.core.ElementService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.validation.ObjectError
 
 /**
  * Action Runner to create new catalogue elements.
  */
 class MergePublishedElements extends AbstractActionRunner {
 
-    @Autowired PublishedElementService publishedElementService
+    @Autowired ElementService elementService
 
     static String description = """
         Merges element 'source' into element 'destination'.
@@ -86,7 +85,7 @@ class MergePublishedElements extends AbstractActionRunner {
 
     public <E extends PublishedElement> E merge() {
         if (source && destination) {
-            publishedElementService.merge(source as PublishedElement, destination as PublishedElement)
+            elementService.merge(source as PublishedElement, destination as PublishedElement)
         } else {
             throw new IllegalStateException("The action wasn't initialized yet with the valid parameters")
         }

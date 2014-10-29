@@ -2,48 +2,48 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.RelationshipDirection
 
-class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
+class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setupSpec() {
         loadFixtures()
     }
 
-    def publishedElementService
+    def elementService
     def relationshipService
 
     def "return only finalized elements by default"() {
         expect:
-        publishedElementService.list().size()               == 19
-        publishedElementService.list(max: 10).size()        == 10
-        publishedElementService.list(DataElement).size()    == 7
-        publishedElementService.list(Model).size()          == 5
-        publishedElementService.list(Asset).size()          == 7
-        publishedElementService.count()                     == 19
-        publishedElementService.count(DataElement)          == 7
-        publishedElementService.count(Model)                == 5
-        publishedElementService.count(Asset)                == 7
+        elementService.list().size()               == 19
+        elementService.list(max: 10).size()        == 10
+        elementService.list(DataElement).size()    == 7
+        elementService.list(Model).size()          == 5
+        elementService.list(Asset).size()          == 7
+        elementService.count()                     == 19
+        elementService.count(DataElement)          == 7
+        elementService.count(Model)                == 5
+        elementService.count(Asset)                == 7
     }
 
     def "can supply status as parameter"() {
         expect:
-        publishedElementService.list(status: 'DRAFT').size()                                    == 17
-        publishedElementService.list(status: 'DRAFT', max: 10).size()                           == 10
-        publishedElementService.list(status: ElementStatus.DRAFT).size()               == 17
-        publishedElementService.list(status: ElementStatus.DRAFT, max: 10).size()      == 10
-        publishedElementService.list(Model, status: 'DRAFT').size()                             == 7
-        publishedElementService.list(Model, status: ElementStatus.DRAFT).size()        == 7
-        publishedElementService.list(DataElement, status: 'DRAFT').size()                       == 5
-        publishedElementService.list(DataElement, status: ElementStatus.DRAFT).size()  == 5
-        publishedElementService.list(Asset, status: 'DRAFT').size()                             == 5
-        publishedElementService.list(Asset, status: ElementStatus.DRAFT).size()        == 5
-        publishedElementService.count(status: 'DRAFT')                                          == 17
-        publishedElementService.count(status: ElementStatus.DRAFT)                     == 17
-        publishedElementService.count(Model, status: 'DRAFT')                                   == 7
-        publishedElementService.count(Model, status: ElementStatus.DRAFT)              == 7
-        publishedElementService.count(DataElement, status: 'DRAFT')                             == 5
-        publishedElementService.count(DataElement, status: ElementStatus.DRAFT)        == 5
-        publishedElementService.count(Asset, status: 'DRAFT')                             == 5
-        publishedElementService.count(Asset, status: ElementStatus.DRAFT)        == 5
+        elementService.list(status: 'DRAFT').size()                                    == 17
+        elementService.list(status: 'DRAFT', max: 10).size()                           == 10
+        elementService.list(status: ElementStatus.DRAFT).size()               == 17
+        elementService.list(status: ElementStatus.DRAFT, max: 10).size()      == 10
+        elementService.list(Model, status: 'DRAFT').size()                             == 7
+        elementService.list(Model, status: ElementStatus.DRAFT).size()        == 7
+        elementService.list(DataElement, status: 'DRAFT').size()                       == 5
+        elementService.list(DataElement, status: ElementStatus.DRAFT).size()  == 5
+        elementService.list(Asset, status: 'DRAFT').size()                             == 5
+        elementService.list(Asset, status: ElementStatus.DRAFT).size()        == 5
+        elementService.count(status: 'DRAFT')                                          == 17
+        elementService.count(status: ElementStatus.DRAFT)                     == 17
+        elementService.count(Model, status: 'DRAFT')                                   == 7
+        elementService.count(Model, status: ElementStatus.DRAFT)              == 7
+        elementService.count(DataElement, status: 'DRAFT')                             == 5
+        elementService.count(DataElement, status: ElementStatus.DRAFT)        == 5
+        elementService.count(Asset, status: 'DRAFT')                             == 5
+        elementService.count(Asset, status: ElementStatus.DRAFT)        == 5
     }
 
 
@@ -56,7 +56,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.valueDomain = domain
 
         int originalVersion     = author.versionNumber
-        DataElement archived    = publishedElementService.archiveAndIncreaseVersion(author)
+        DataElement archived    = elementService.archiveAndIncreaseVersion(author)
         int archivedVersion     = archived.versionNumber
         int newVersion          = author.versionNumber
         author.refresh()
@@ -78,7 +78,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         domain.dataElements.size() == 1
 
         when:
-        def anotherArchived = publishedElementService.archiveAndIncreaseVersion(author)
+        def anotherArchived = elementService.archiveAndIncreaseVersion(author)
 
         then:
         archived.countSupersedes()        == 0
@@ -100,7 +100,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.save(failOnError: true)
 
         int originalVersion     = author.versionNumber
-        DataElement archived    = publishedElementService.archive(author)
+        DataElement archived    = elementService.archive(author)
         int archivedVersion     = archived.versionNumber
         author.refresh()
 
@@ -142,7 +142,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         destination.ext.two = 'two'
         destination.ext.three = 'three'
 
-        def merged = publishedElementService.merge(source, destination)
+        def merged = elementService.merge(source, destination)
 
         expect:
         merged.errors.errorCount == 0
@@ -186,7 +186,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md2.addToParentOf(md3)
 
         int originalVersion     = md2.versionNumber
-        Model archived    = publishedElementService.archiveAndIncreaseVersion(md2)
+        Model archived    = elementService.archiveAndIncreaseVersion(md2)
         int archivedVersion     = archived.versionNumber
         int newVersion          = md2.versionNumber
 
@@ -247,7 +247,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
 
-        publishedElementService.finalizeTree(md1)
+        elementService.finalizeTree(md1)
 
         then:
         md1.status == ElementStatus.FINALIZED
@@ -286,7 +286,7 @@ class PublishedElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md3.status == ElementStatus.DRAFT
 
         when:
-        publishedElementService.finalizeTree(md1)
+        elementService.finalizeTree(md1)
 
         then:
         md1.status == ElementStatus.FINALIZED

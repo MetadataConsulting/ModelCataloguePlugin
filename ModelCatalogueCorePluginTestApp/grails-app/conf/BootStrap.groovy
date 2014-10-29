@@ -21,7 +21,7 @@ class BootStrap {
     def importService
     def domainModellerService
     def initCatalogueService
-    def publishedElementService
+    def elementService
     def executorService
     def actionService
     def mappingService
@@ -144,7 +144,7 @@ class BootStrap {
                     println 'Finalizing all published elements'
                     PublishedElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
                         if (it instanceof Model) {
-                            publishedElementService.finalizeTree(it)
+                            elementService.finalizeTree(it)
                         } else {
                             it.status = ElementStatus.FINALIZED
                             it.save failOnError: true

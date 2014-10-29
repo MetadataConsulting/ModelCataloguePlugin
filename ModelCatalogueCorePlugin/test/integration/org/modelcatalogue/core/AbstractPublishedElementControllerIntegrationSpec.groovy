@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.Elements
 import spock.lang.Unroll
 
 /**
@@ -8,7 +7,7 @@ import spock.lang.Unroll
  */
 abstract class AbstractPublishedElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
-    def publishedElementService
+    def elementService
 
 
     def "update and create new version"() {
@@ -57,7 +56,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 //        Integer numberOfCurrentVersions = another.countVersions()
 //
 //        another.addToRelatedTo(another1)
-//        def archived = publishedElementService.archiveAndIncreaseVersion(another)
+//        def archived = elementService.archiveAndIncreaseVersion(another)
 //
 //
 //        when:
@@ -144,7 +143,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
     void createArchiveVersions(PublishedElement el) {
         while (el.versionNumber != 12) {
-            publishedElementService.archiveAndIncreaseVersion(el)
+            elementService.archiveAndIncreaseVersion(el)
         }
     }
 

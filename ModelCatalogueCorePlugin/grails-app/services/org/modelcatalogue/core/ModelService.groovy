@@ -10,7 +10,7 @@ class ModelService {
 
     ListWithTotalAndType<Model> getTopLevelModels(Map params) {
         RelationshipType hierarchy      = RelationshipType.hierarchyType
-        ElementStatus status   = PublishedElementService.getStatusFromParams(params)
+        ElementStatus status   = ElementService.getStatusFromParams(params)
         Classification classification   = params.classification ? Classification.get(params.classification) : null
 
         if (classification) {

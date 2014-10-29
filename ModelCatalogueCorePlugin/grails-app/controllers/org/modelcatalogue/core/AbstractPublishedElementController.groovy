@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.OK
 
 class AbstractPublishedElementController<T extends PublishedElement> extends AbstractCatalogueElementController<T> {
 
-    def publishedElementService, relationshipTypeService
+    def elementService, relationshipTypeService
 
     AbstractPublishedElementController(Class<T> type, boolean readOnly) {
         super(type, readOnly)
@@ -19,7 +19,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
         handleParams(max)
 
         reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
-            eq 'status', PublishedElementService.getStatusFromParams(params)
+            eq 'status', ElementService.getStatusFromParams(params)
             if (params.classification) {
                 classifications {
                     eq 'id', params.long('classification')
@@ -89,7 +89,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
         }
 
         if (newVersion) {
-            publishedElementService.archiveAndIncreaseVersion(instance)
+            elementService.archiveAndIncreaseVersion(instance)
         }
 
         if (ext) {
@@ -140,7 +140,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
             return
         }
 
-        T merged = publishedElementService.merge(source, destination)
+        T merged = elementService.merge(source, destination)
 
         if (merged.hasErrors()) {
             respond merged.errors, view:'edit' // STATUS CODE 422
@@ -172,7 +172,7 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
             return
         }
 
-        instance = publishedElementService.archive(instance)
+        instance = elementService.archive(instance)
 
         if (instance.hasErrors()) {
             respond instance.errors, view:'edit' // STATUS CODE 422

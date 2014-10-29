@@ -17,7 +17,7 @@ import java.security.MessageDigest
 class AssetService {
 
     StorageService modelCatalogueStorageService
-    PublishedElementService publishedElementService
+    ElementService elementService
 
     private static final long GIGA = 1024 * 1024 * 1024
     private static final long MEGA = 1024 * 1024
@@ -60,7 +60,7 @@ class AssetService {
                 return null
             }
 
-            publishedElementService.archiveAndIncreaseVersion(existing)
+            elementService.archiveAndIncreaseVersion(existing)
 
             existing.name              = asset.name
             existing.description       = asset.description
