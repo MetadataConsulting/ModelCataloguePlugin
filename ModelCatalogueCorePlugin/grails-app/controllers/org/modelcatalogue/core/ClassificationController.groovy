@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
-import org.modelcatalogue.core.util.PublishedElements
 
 class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
 
@@ -17,11 +16,11 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
             return
         }
 
-        reportCapableRespond new PublishedElements(list: Lists.fromCriteria(params, PublishedElement, "/${resourceName}/${params.id}/classifies", "classifies"){
+        reportCapableRespond Lists.fromCriteria(params, PublishedElement, "/${resourceName}/${params.id}/classifies", "classifies"){
             classifications{
                 eq 'id', classification.id
             }
-        })
+        }
 
     }
 
