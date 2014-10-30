@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import asset.pipeline.grails.LinkGenerator
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.ListWithTotal
@@ -12,7 +11,6 @@ import org.modelcatalogue.core.util.RelationshipDirection
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-
 abstract class CatalogueElement implements Extendible {
 
     def grailsLinkGenerator
