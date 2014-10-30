@@ -33,12 +33,12 @@ abstract class CatalogueElement implements Extendible {
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'classifiedName', 'defaultModelCatalogueId', 'ext']
+    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
-            incoming: [base: 'isBasedOn'],
+            incoming: [base: 'isBasedOn', classification: 'classifications'],
             outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf'],
             bidirectional: [relatedTo: 'relatedTo']
     ]
@@ -50,7 +50,6 @@ abstract class CatalogueElement implements Extendible {
         dateCreated bindable: false
         lastUpdated bindable: false
         archived bindable: false
-        classifiedName bindable: false
     }
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
@@ -77,8 +76,6 @@ abstract class CatalogueElement implements Extendible {
      * org.modelcatalogue.core.Relationship class
      * @return list of items which contains incoming and outgoing relations
      */
-
-    String getClassifiedName() { name }
 
     List getRelations() {
         return [

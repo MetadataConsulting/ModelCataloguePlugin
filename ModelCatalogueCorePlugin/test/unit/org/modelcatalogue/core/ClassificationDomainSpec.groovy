@@ -39,20 +39,4 @@ class ClassificationDomainSpec extends Specification {
 
     }
 
-    def "add remove data elements and models from classifiations"(){
-
-        setup:
-        def model = new Model(name: "testmodel").save(flush:true)
-        def dataElement = new DataElement(name: "testDE").save(flush:true)
-        def classification = new Classification(name: "testDE").save(flush:true)
-
-        when:
-        classification.addToClassifies(model)
-        classification.addToClassifies(dataElement)
-
-        then:
-        classification.classifies.contains(dataElement)
-        classification.classifies.contains(model)
-
-    }
 }

@@ -122,13 +122,21 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         Classification cosd = new Classification(name: "COSD").save(failOnError: true)
 
         ValueDomain domain = new ValueDomain(name: "merger test domain").save(failOnError: true)
-        DataElement source = new DataElement(name: "merge tester", valueDomain: domain, classifications: [sact]).save(failOnError: true)
-        DataElement destination = new DataElement(name: "merge tester", classifications: [cosd]).save(failOnError: true)
+
+        DataElement source = new DataElement(name: "merge tester", valueDomain: domain).save(failOnError: true)
+        source.addToClassifications(sact)
+
+        DataElement destination = new DataElement(name: "merge tester").save(failOnError: true)
+        destination.addToClassifications(cosd)
+
         Model m1 = new Model(name: 'merge test container 1').save(failOnError: true)
         Model m2 = new Model(name: 'merge test container 2').save(failOnError: true)
 
-        Model m3cosd = new Model(name: 'merge test container 3', classifications: [cosd]).save(failOnError: true)
-        Model m3sact = new Model(name: 'merge test container 3', classifications: [sact]).save(failOnError: true)
+        Model m3cosd = new Model(name: 'merge test container 3').save(failOnError: true)
+        m3cosd.addToClassifications(cosd)
+
+        Model m3sact = new Model(name: 'merge test container 3').save(failOnError: true)
+        m3sact.addToClassifications(sact)
 
         m1.addToContains(source)
         m2.addToContains(destination)
@@ -160,19 +168,19 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         m3sact.archived
 
         cleanup:
-        source.ext.clear()
-        destination.ext.clear()
-        source.beforeDelete()
-        source.delete()
-        destination.beforeDelete()
-        destination.delete()
-        domain.delete()
-        m1.delete()
-        m2.delete()
-        m3cosd.delete()
-        m3sact.delete()
-        sact.delete()
-        cosd.delete()
+        source?.ext?.clear()
+        destination?.ext?.clear()
+        source?.beforeDelete()
+        source?.delete()
+        destination?.beforeDelete()
+        destination?.delete()
+        domain?.delete()
+        m1?.delete()
+        m2?.delete()
+        m3cosd?.delete()
+        m3sact?.delete()
+        sact?.delete()
+        cosd?.delete()
     }
 
     def "create new version of hierarchy model"() {

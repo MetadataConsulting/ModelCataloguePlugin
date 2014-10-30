@@ -18,26 +18,14 @@ abstract class PublishedElement extends CatalogueElement  {
     // id of the latest version
     PublishedElement latestVersion
 
-    Set<Classification> classifications = []
-
     static searchable = {
         except = ['versionNumber']
     }
-
-    static hasMany = [classifications: Classification]
-
-    static belongsTo = Classification
 
     static mapping = {
         tablePerHierarchy false
     }
 
-    String getClassifiedName() {
-        if (!classifications) {
-            return name
-        }
-        "$name (${classifications*.name.sort().join(', ')})"
-    }
 
     @Override
     boolean isArchived() {

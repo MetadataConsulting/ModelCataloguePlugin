@@ -3,7 +3,10 @@ package org.modelcatalogue.core.actions
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.PublishedElement
 import org.modelcatalogue.core.ElementService
+import org.modelcatalogue.core.RelationshipService
 import org.springframework.beans.factory.annotation.Autowired
+
+import javax.management.relation.RelationService
 
 /**
  * Action Runner to create new catalogue elements.
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 class MergePublishedElements extends AbstractActionRunner {
 
     @Autowired ElementService elementService
+    @Autowired RelationshipService relationshipService
 
     static String description = """
         Merges element 'source' into element 'destination'.
@@ -34,7 +38,7 @@ class MergePublishedElements extends AbstractActionRunner {
     """
 
     String getMessage() {
-        normalizeDescription """Merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${source.classifiedName}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${destination.classifiedName}</a> including all related elements having at least one classification as the source"""
+        normalizeDescription """Merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${relationshipService.getClassifiedName(source)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${relationshipService.getClassifiedName(destination)}</a> including all related elements having at least one classification as the source"""
     }
 
     @Override
@@ -74,10 +78,10 @@ class MergePublishedElements extends AbstractActionRunner {
         PublishedElement merged = merge()
         if (!merged.hasErrors()) {
 
-            out << """Merged ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${source.classifiedName}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${destination.classifiedName}</a>"""
+            out << """Merged ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${relationshipService.getClassifiedName(source)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${relationshipService.getClassifiedName(destination)}</a>"""
             result = encodeEntity merged
         } else {
-            fail("""Unable to merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} ${source.classifiedName} into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} ${destination.classifiedName}""")
+            fail("""Unable to merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} ${relationshipService.getClassifiedName(source)} into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} ${relationshipService.getClassifiedName(destination)}""")
             printErrors(merged.errors.allErrors)
         }
     }

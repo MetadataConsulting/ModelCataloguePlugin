@@ -8,22 +8,6 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
         super(Classification)
     }
 
-    def classifies(Integer max){
-        handleParams(max)
-        Classification classification = queryForResource(params.id)
-        if (!classification) {
-            notFound()
-            return
-        }
-
-        reportCapableRespond Lists.fromCriteria(params, PublishedElement, "/${resourceName}/${params.id}/classifies", "classifies"){
-            classifications{
-                eq 'id', classification.id
-            }
-        }
-
-    }
-
     protected bindRelations(Classification instance, Object objectToBind) {
         if (objectToBind.classifies != null) {
             for (domain in instance.classifies.findAll { !(it.id in objectToBind.classifies*.id) }) {

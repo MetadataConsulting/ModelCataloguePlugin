@@ -91,4 +91,55 @@ class RelationshipService {
         }
         return null
     }
+
+
+    String getClassifiedName(CatalogueElement element) {
+        if (!element) {
+            return null
+        }
+
+        if (!element.id) {
+            return element.name
+        }
+
+        RelationshipType classification = RelationshipType.findByName('classification')
+
+        String classifications = Relationship.executeQuery("""
+            select r.source.name
+            from Relationship as r
+            where r.relationshipType = :classification
+            and r.destination.id = :elementId
+            order by r.source.name
+        """, [classification: classification, elementId: element.id]).join(', ')
+
+        if (classifications) {
+            return "${element.name} (${classifications})"
+        }
+
+        return element.name
+    }
+
+    def getClassificationsInfo(CatalogueElement element) {
+        if (!element) {
+            return []
+        }
+
+        if (!element.id) {
+            return []
+        }
+
+        RelationshipType classification = RelationshipType.findByName('classification')
+
+        Relationship.executeQuery("""
+            select r.source.name, r.source.id
+            from Relationship as r
+            where r.relationshipType = :classification
+            and r.destination.id = :elementId
+            order by r.source.name
+        """, [classification: classification, elementId: element.id]).collect {
+            [name: it[0], id: it[1], elementType: Classification.name, link:  "/classification/${it[1]}"]
+        }
+    }
+
+
 }

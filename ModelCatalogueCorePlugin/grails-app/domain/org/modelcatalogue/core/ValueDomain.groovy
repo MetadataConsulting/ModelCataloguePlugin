@@ -77,6 +77,11 @@ class ValueDomain extends CatalogueElement  {
         outgoing: [base: 'isBaseFor']
     ]
 
+    /**
+     * This needs to be removed as soon as conceptual domains are merged into classifications.
+     * @return
+     */
+    @Deprecated
     String getClassifiedName() {
         if (!conceptualDomains) {
             return name

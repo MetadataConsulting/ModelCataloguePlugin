@@ -15,11 +15,6 @@ class User extends CatalogueElement {
     boolean accountLocked
     boolean passwordExpired
 
-    /**
-     * Set of classifications choosen by the user tobe shown
-     */
-    static hasMany = [classifications: Classification]
-
     static constraints = {
         username blank: false, unique: true, maxSize: 255
         password blank: false, maxSize: 255

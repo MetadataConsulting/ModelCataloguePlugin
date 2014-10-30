@@ -30,6 +30,43 @@ databaseChangeLog = {
     }
 
     changeSet(author: "Vladimir Orany", id: "1412847974051-02") {
+        preConditions (onFail: 'MARK_RAN') {
+            // language=SQL
+            sqlCheck expectedResult: '0', """
+            select count(id) from relationship_type where name = 'classification'
+            """
+        }
+
+
+        // language=SQL
+        sql """
+          insert into relationship_type (name, version, system, bidirectional, source_class, source_to_destination, destination_class, destination_to_source)
+          value ('classification', 1, 0, 0, 'org.modelcatalogue.core.Classification', 'classifies', 'org.modelcatalogue.core.CatalogueElement', 'classifications')
+        """
+
+        grailsChange {
+            change {
+                sql.eachRow "select distinct cc.classification_id, cc.published_element_id, pe.status = 'DEPRECATED' from classification_classifies cc join published_element pe on cc.published_element_id = pe.id", { row ->
+                    def cid = row[0]
+                    def pid = row[1]
+                    def arc = row[2]
+
+                    def existing = sql.firstRow "select * from relationship where destination_id = $pid and source_id = $cid and relationship_type_id = (select id from relationship_type where name = 'classification')"
+
+                    if (!existing) {
+                        sql.executeUpdate """
+                            insert into relationship (version, archived, destination_id, relationship_type_id, source_id)
+                            value (1, $arc, $pid, (select id from relationship_type where name = 'classification'), $cid)
+                        """
+                    }
+                }
+            }
+        }
+
+        dropTable tableName: 'classification_classifies'
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974051-03") {
         preConditions(onFail: 'MARK_RAN') {
             tableExists tableName: "published_element"
         }
@@ -67,11 +104,6 @@ databaseChangeLog = {
         dropAllForeignKeyConstraints baseTableName: 'data_element'
         addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "data_element", constraintName: "DATA_ELEMENT_IS_CE", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
         addForeignKeyConstraint(baseColumnNames: "value_domain_id", baseTableName: "data_element", constraintName: "FK74B46B67E5AA9492", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "value_domain", referencesUniqueColumn: "false")
-
-        dropAllForeignKeyConstraints baseTableName: 'classification_classifies'
-        renameColumn tableName: 'classification_classifies', oldColumnName: "published_element_id", newColumnName: "catalogue_element_id", columnDataType: "BIGINT"
-        addForeignKeyConstraint(baseColumnNames: "classification_id", baseTableName: "classification_classifies", constraintName: "FK2499F01B24A7E205", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "classification", referencesUniqueColumn: "false")
-        addForeignKeyConstraint(baseColumnNames: "catalogue_element_id", baseTableName: "classification_classifies", constraintName: "FK2499F01BD3630CA8", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
 
         grailsChange {
             change {

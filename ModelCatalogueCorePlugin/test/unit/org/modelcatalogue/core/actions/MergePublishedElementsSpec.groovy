@@ -5,6 +5,8 @@ import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipService
+import org.modelcatalogue.core.RelationshipType
 import spock.lang.Ignore
 import spock.lang.Specification
 
@@ -24,8 +26,11 @@ class MergePublishedElementsSpec extends Specification {
         two = new Model(name: 'two').save(failOnError: true)
 
         merge.autowireCapableBeanFactory = Mock(org.springframework.beans.factory.config.AutowireCapableBeanFactory)
-
+        merge.relationshipService = Mock(RelationshipService)
         merge.elementService = Mock(ElementService)
+
+        _ * merge.relationshipService.getClassifiedName(one) >> 'one'
+        _ * merge.relationshipService.getClassifiedName(two) >> 'two'
     }
 
     def "uses default action natural name"() {

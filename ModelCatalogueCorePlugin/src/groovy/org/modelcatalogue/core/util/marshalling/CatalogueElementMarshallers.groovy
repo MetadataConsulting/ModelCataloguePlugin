@@ -4,13 +4,11 @@ import grails.converters.XML
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.RelationshipTypeService
-import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.reports.ReportsRegistry
-import org.modelcatalogue.core.util.CatalogueElementFinder
 import org.springframework.beans.factory.annotation.Autowired
 
 /**
@@ -20,6 +18,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
+    @Autowired RelationshipService relationshipService
 
     CatalogueElementMarshallers(Class type) {
         super(type)
@@ -37,7 +36,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 elementType: el.class.name,
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
-                classifiedName: el.classifiedName,
+                classifiedName: relationshipService.getClassifiedName(el),
+                classifications: relationshipService.getClassificationsInfo(el),
                 ext: el.ext,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 relationships: [count: el.countRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],

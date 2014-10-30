@@ -1,5 +1,6 @@
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ConceptualDomain
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
@@ -204,6 +205,7 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
         [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: PublishedElement, destinationClass: PublishedElement, bidirectional: true, rule: "source.class == destination.class"],
         [name: "favourite", sourceToDestination: "favourites", destinationToSource: "is favourite of", sourceClass: User, destinationClass: CatalogueElement],
+        [name: "classification", sourceToDestination: "classifies", destinationToSource: "classifications", sourceClass: Classification, destinationClass: CatalogueElement],
 
 ]
 

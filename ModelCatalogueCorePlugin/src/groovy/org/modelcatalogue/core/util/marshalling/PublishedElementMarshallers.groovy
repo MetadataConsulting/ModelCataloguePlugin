@@ -18,7 +18,6 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
         ret.putAll(
-                classifications: el.classifications.collect(CatalogueElementMarshallers.&minimalCatalogueElementJSON),
                 versionNumber: el.versionNumber,
                 status: el.status.toString(),
                 versionCreated: el.versionCreated,
@@ -30,7 +29,6 @@ abstract class PublishedElementMarshallers extends CatalogueElementMarshallers {
     @Override
     protected void addXmlAttributes(el, XML xml) {
         super.addXmlAttributes(el, xml)
-        addXmlAttribute(el.classifications, "classifications", xml)
         addXmlAttribute(el.versionNumber, "versionNumber", xml)
         addXmlAttribute(el.status, "status", xml)
         addXmlAttribute(el.versionCreated, "versionCreated", xml)

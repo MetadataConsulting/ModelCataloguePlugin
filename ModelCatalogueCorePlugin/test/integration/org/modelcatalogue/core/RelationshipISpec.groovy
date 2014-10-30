@@ -159,4 +159,44 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     }
 
+
+    def "get classified name"() {
+        expect:
+        relationshipService.getClassifiedName(null)                     ==  null
+        relationshipService.getClassifiedName(new Model(name: 'BLAH'))  == 'BLAH'
+
+        when:
+        Classification classification = new Classification(name: "classy").save(failOnError: true)
+        Model model = new Model(name: "Supermodel").save(failOnError: true)
+        model.addToClassifications(classification)
+
+        then:
+        relationshipService.getClassifiedName(model) == 'Supermodel (classy)'
+
+        cleanup:
+        classification?.delete()
+        model?.delete()
+    }
+
+    def "get classification info"() {
+        expect:
+        relationshipService.getClassificationsInfo(null)                     == []
+        relationshipService.getClassificationsInfo(new Model(name: 'BLAH'))  == []
+
+        when:
+        Classification classification = new Classification(name: "classy").save(failOnError: true)
+        Model model = new Model(name: "Supermodel").save(failOnError: true)
+        model.addToClassifications(classification)
+
+        def info = relationshipService.getClassificationsInfo(model)
+
+        then:
+        info == [
+                [name: classification.name, id: classification.id, elementType: Classification.name, link: "/classification/${classification.id}"]
+        ]
+
+        cleanup:
+        classification?.delete()
+        model?.delete()
+    }
 }

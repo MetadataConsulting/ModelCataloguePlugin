@@ -4,6 +4,9 @@
 thanks to current Groovy language bug. Calling `super.prepareJsonMap(element)` is calling itself causing stack
 overflow when initiated from `EnumeratedTypeMarshaller.prepareJsonMap(element)`.
 
+Classifies is now modeled again as `Relationship` between `Classification` and `PublishedElement`. Grails simply doesn't
+handle complicated many-to-many mappings gracefully.
+
 # 2014-10-27
 
-Reverted test configuration because current `code-coverage` plugin does not support forked mode.
+Reverted test configuration to not-forked because current `code-coverage` plugin does not support forked mode.
