@@ -8,9 +8,11 @@ class RelationshipService {
 
     static transactional = true
 
+    def modelCatalogueSecurityService
+
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
         // TODO: enable classification in relationship fetching
-        Lists.fromCriteria([sort: 'id'] << params, direction.composeWhere(element, type, null))
+        Lists.fromCriteria([sort: 'id'] << params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 
     Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false) {
@@ -139,6 +141,26 @@ class RelationshipService {
         """, [classification: classification, elementId: element.id]).collect {
             [name: it[0], id: it[1], elementType: Classification.name, link:  "/classification/${it[1]}"]
         }
+    }
+
+    def List<Classification> getClassifications(CatalogueElement element) {
+        if (!element) {
+            return []
+        }
+
+        if (!element.id) {
+            return []
+        }
+
+        RelationshipType classification = RelationshipType.findByName('classification')
+
+        Relationship.executeQuery("""
+            select r.source
+            from Relationship as r
+            where r.relationshipType = :classification
+            and r.destination.id = :elementId
+            order by r.source.name
+        """, [classification: classification, elementId: element.id])
     }
 
 

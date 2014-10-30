@@ -18,13 +18,17 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
     def index(Integer max) {
         handleParams(max)
 
+        List<Classification> classificationsInUse = modelCatalogueSecurityService.currentUser?.classifications
+
         reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', ElementService.getStatusFromParams(params)
-            if (params.classification) {
-                classifications {
-                    eq 'id', params.long('classification')
+            if (classificationsInUse) {
+                incomingRelationships {
+                     eq  'relationshipType', RelationshipType.classificationType
+                    'in' 'source', classificationsInUse
                 }
             }
+
         }
     }
 

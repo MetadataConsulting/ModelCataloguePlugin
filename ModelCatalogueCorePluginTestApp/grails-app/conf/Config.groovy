@@ -1,3 +1,4 @@
+import grails.util.Environment
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
@@ -120,6 +121,11 @@ log4j = {
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
+    if (Environment.isDevelopmentMode()) {
+        trace 'org.hibernate.type'
+        debug 'org.hibernate.SQL'
+    }
+
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
             'org.codehaus.groovy.grails.web.sitemesh',       // layouts
@@ -205,7 +211,7 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
         [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: PublishedElement, destinationClass: PublishedElement, bidirectional: true, rule: "source.class == destination.class"],
         [name: "favourite", sourceToDestination: "favourites", destinationToSource: "is favourite of", sourceClass: User, destinationClass: CatalogueElement],
-        [name: "classification", sourceToDestination: "classifies", destinationToSource: "classifications", sourceClass: Classification, destinationClass: CatalogueElement],
+        [name: "classification", sourceToDestination: "classifies", destinationToSource: "classifications", sourceClass: Classification, destinationClass: CatalogueElement, system: true],
 
 ]
 

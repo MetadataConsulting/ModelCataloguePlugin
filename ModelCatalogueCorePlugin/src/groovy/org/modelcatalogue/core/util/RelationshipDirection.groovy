@@ -11,7 +11,7 @@ enum RelationshipDirection {
     INCOMING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, Classification classification) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.eq('destination', element)
             if (!element.archived) {
@@ -20,9 +20,9 @@ enum RelationshipDirection {
             if (type) {
                 criteria.eq('relationshipType', type)
             }
-            if (classification) {
+            if (classifications) {
                 criteria.or {
-                    eq('classification', classification)
+                    'in'('classification', classifications)
                     isNull('classification')
                 }
             }
@@ -53,7 +53,7 @@ enum RelationshipDirection {
     OUTGOING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, Classification classification) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.eq('source', element)
             if (!element.archived) {
@@ -62,9 +62,9 @@ enum RelationshipDirection {
             if (type) {
                 criteria.eq('relationshipType', type)
             }
-            if (classification) {
+            if (classifications) {
                 criteria.or {
-                    eq('classification', classification)
+                    'in'('classification', classifications)
                     isNull('classification')
                 }
             }
@@ -95,7 +95,7 @@ enum RelationshipDirection {
     },
     BOTH {
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, Classification classification) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.or {
                 eq('source', element)
@@ -107,9 +107,9 @@ enum RelationshipDirection {
             if (type) {
                 criteria.eq('relationshipType', type)
             }
-            if (classification) {
+            if (classifications) {
                 criteria.or {
-                    eq('classification', classification)
+                    'in'('classification', classifications)
                     isNull('classification')
                 }
             }
@@ -138,7 +138,7 @@ enum RelationshipDirection {
         }
     }
 
-    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, Classification classification)
+    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications)
     abstract String getDirection(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)

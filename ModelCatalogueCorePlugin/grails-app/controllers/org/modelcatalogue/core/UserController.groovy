@@ -6,8 +6,6 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
 class UserController extends AbstractCatalogueElementController<User> {
 
-    def dataArchitectService
-
     UserController() {
         super(User, false)
     }
@@ -22,7 +20,10 @@ class UserController extends AbstractCatalogueElementController<User> {
         }
 
         User user = modelCatalogueSecurityService.currentUser
-        user.classifications?.clear()
+
+        user.classifications.each { Classification c ->
+            user.removeFromClassifications(c)
+        }
 
         if (!params.ids) {
             user.save(flush: true)

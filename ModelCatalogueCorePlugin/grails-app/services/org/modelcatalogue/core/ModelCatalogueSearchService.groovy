@@ -10,11 +10,13 @@ import org.modelcatalogue.core.util.RelationshipDirection
  */
 class ModelCatalogueSearchService implements SearchCatalogue {
 
+    def modelCatalogueSecurityService
+
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
         // TODO: enable classification in search
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, null)
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, modelCatalogueSecurityService.currentUser?.classifications ?: [])
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
@@ -65,9 +67,11 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         String query = "%$params.search%"
 
         if (PublishedElement.isAssignableFrom(resource)) {
+            List<Classification> classifications = modelCatalogueSecurityService.currentUser?.classifications
+
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
-                from ${resource.simpleName} ${alias}
+                from ${resource.simpleName} ${alias} join ${alias}.incomingRelationship
                 where
                     ${alias}.status in :statuses
                     and (
@@ -78,10 +82,32 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                     )
             """
 
-            def results = Lists.fromQuery(params, resource, listQuery, [
+            Map<String, Object> arguments = [
                     query: query,
                     statuses: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED]
-            ])
+            ]
+
+            if (classifications) {
+                listQuery = """
+                from ${resource.simpleName} ${alias} join ${alias}.incomingRelationships as rel
+                where
+                    ${alias}.status in :statuses
+                    and (
+                        lower(${alias}.name) like lower(:query)
+                        or lower(${alias}.description) like lower(:query)
+                        or lower(${alias}.modelCatalogueId) like lower(:query)
+                        or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                    )
+                    and rel.source in (:classifications)
+                    and rel.relationshipType = :classificationType
+                """
+                arguments.classifications = classifications
+                arguments.classificationclassificationType  = RelationshipType.classificationType
+            }
+
+
+
+            def results = Lists.fromQuery(params, resource, listQuery, arguments)
 
 
             searchResults.searchResults = results.items
@@ -96,6 +122,11 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
+            List<Classification> classifications = modelCatalogueSecurityService.currentUser?.classifications
+            Map<String, Object> arguments = [
+                    query: query
+            ]
+
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
                 from ${resource.simpleName} ${alias}
@@ -106,9 +137,25 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                     or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
             """
 
-            def results = Lists.fromQuery(params, resource, listQuery, [
-                    query: query
-            ])
+            if (classifications) {
+                // language=HQL
+                listQuery = """
+                from ${resource.simpleName} ${alias} join ${alias}.incomingRelationships as rel
+                where (
+                    lower(${alias}.name) like lower(:query)
+                    or lower(${alias}.description) like lower(:query)
+                    or lower(${alias}.modelCatalogueId) like lower(:query)
+                    or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                    )
+                    and rel.source in (:classifications)
+                    and rel.relationshipType = :classificationType
+                """
+                arguments.classifications = classifications
+                arguments.classificationType  = RelationshipType.classificationType
+            }
+
+
+            def results = Lists.fromQuery(params, resource, listQuery, arguments)
 
             searchResults.searchResults = results.items
             searchResults.total = results.total

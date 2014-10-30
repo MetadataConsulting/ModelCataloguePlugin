@@ -22,8 +22,7 @@ class UserMarshaller extends CatalogueElementMarshallers {
                 enabled: el.enabled,
                 accountExpired: el.accountExpired,
                 accountLocked: el.accountLocked,
-                passwordExpired: el.passwordExpired,
-                classifications: el.classifications.collect { minimalCatalogueElementJSON(it) }
+                passwordExpired: el.passwordExpired
         ret
     }
 

@@ -8,28 +8,37 @@ import org.modelcatalogue.core.util.Lists
 @Transactional
 class ModelService {
 
+    SecurityService modelCatalogueSecurityService
+
     ListWithTotalAndType<Model> getTopLevelModels(Map params) {
         RelationshipType hierarchy      = RelationshipType.hierarchyType
         ElementStatus status   = ElementService.getStatusFromParams(params)
-        Classification classification   = params.classification ? Classification.get(params.classification) : null
 
-        if (classification) {
+        List<Classification> classifications = modelCatalogueSecurityService.currentUser?.classifications
+        RelationshipType classification = RelationshipType.classificationType
+
+
+        if (classifications) {
+            // language=HQL
             Lists.fromQuery params, Model, """
             select distinct m
-            from Model m
+            from Model as m join m.incomingRelationships as rel
             where m.status = :status
                 and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                and :classification in elements(m.classifications)
+                and rel.source in (:classifications)
+                and rel.relationshipType = :classificationType
             group by m.name, m.id
             order by m.name
         ""","""
             select count(m.id)
-            from Model m
+            from Model as m join m.incomingRelationships as rel
             where m.status = :status
                 and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                and :classification in elements(m.classifications)
-        """, [type: hierarchy, status: status, classification: classification]
+                and rel.source in (:classifications)
+                and rel.relationshipType = :classificationType
+        """, [type: hierarchy, status: status, classifications: classifications, classificationType: classification ]
         } else {
+            // language=HQL
             Lists.fromQuery params, Model, """
             select distinct m
             from Model m

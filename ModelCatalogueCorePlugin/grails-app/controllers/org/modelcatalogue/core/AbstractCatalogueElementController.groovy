@@ -217,16 +217,10 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        Classification classification = params.classification ? Classification.get(params.classification as Long) : null
-        if (params.classification && !classification) {
-            notFound()
-            return
-        }
-
         reportCapableRespond new Relationships(
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type, classification))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type, modelCatalogueSecurityService.currentUser?.classifications ?: []))
         )
     }
 
@@ -349,6 +343,21 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
     def relationshipTypeService
+
+    @Override
+    def index(Integer max) {
+        handleParams(max)
+        List<Classification> classificationsInUse = modelCatalogueSecurityService.currentUser?.classifications
+
+        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            if (classificationsInUse && resource != Classification) {
+                incomingRelationships {
+                    eq  'relationshipType', RelationshipType.classificationType
+                    'in' 'source', classificationsInUse
+                }
+            }
+        }
+    }
 
     /**
      * Updates a resource for the given id

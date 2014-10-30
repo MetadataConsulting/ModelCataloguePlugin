@@ -26,7 +26,7 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
         if (!query.trim().startsWith(expectedStart)) {
             throw new IllegalArgumentException("Query must start with '$expectedStart' but was ${query.trim()}")
         }
-        new QueryListWithTotalAndType<T>(query, "select count($alias) $query", type, new HashMap(params), arguments)
+        new QueryListWithTotalAndType<T>("select $alias $query", "select count($alias) $query", type, new HashMap(params), arguments)
     }
 
     public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery){

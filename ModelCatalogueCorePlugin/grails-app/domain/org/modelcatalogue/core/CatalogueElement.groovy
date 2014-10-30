@@ -31,7 +31,7 @@ abstract class CatalogueElement implements Extendible {
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext']
+    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -248,6 +248,10 @@ abstract class CatalogueElement implements Extendible {
         } else {
             throw new IllegalArgumentException("Only instances of ExtensionValue are supported")
         }
+    }
+
+    List<Classification> getClassifications() {
+        relationshipService.getClassifications(this)
     }
 
 }
