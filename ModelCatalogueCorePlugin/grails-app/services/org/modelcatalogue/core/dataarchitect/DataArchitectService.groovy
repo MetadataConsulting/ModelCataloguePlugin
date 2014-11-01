@@ -16,12 +16,14 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class DataArchitectService {
 
+    def modelCatalogueSecurityService
     def modelCatalogueSearchService
     def relationshipService
     def elementService
     def actionService
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
+        // TODO: count with classificaitons in use
         Lists.fromCriteria(params, DataElement) {
             'in'('status', ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED)
             isNull 'valueDomain'
@@ -29,6 +31,7 @@ class DataArchitectService {
     }
 
     ListWithTotal<ValueDomain> incompleteValueDomains(Map params){
+        // TODO: count with classificaitons in use
         Lists.fromCriteria(params, ValueDomain) {
             isNull 'dataType'
         }
@@ -202,6 +205,7 @@ class DataArchitectService {
 
     ListWithTotal<ValueDomain> unusedValueDomains(Map params) {
         // TODO: create test
+        // TODO: count with classificaitons in use
         Lists.fromQuery params, ValueDomain, """
             from ValueDomain v
             where
@@ -211,6 +215,7 @@ class DataArchitectService {
 
     ListWithTotal<ValueDomain> duplicateValueDomains(Map params) {
         // TODO: create test
+        // TODO: count with classificaitons in use
         Lists.fromQuery params, ValueDomain, """
             from ValueDomain v
             where

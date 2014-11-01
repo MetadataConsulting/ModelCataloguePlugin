@@ -71,7 +71,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
-                from ${resource.simpleName} ${alias} join ${alias}.incomingRelationship
+                from ${resource.simpleName} ${alias}
                 where
                     ${alias}.status in :statuses
                     and (
