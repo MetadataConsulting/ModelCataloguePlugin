@@ -22,9 +22,9 @@ class DataTypeController<T> extends AbstractPublishedElementController<DataType>
             return
         }
 
-        reportCapableRespond new ValueDomains(list: Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain", "valueDomains"){
+        reportCapableRespond new ValueDomains(list: classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain", "valueDomains"){
             eq "dataType", dataType
-        })
+        }))
 
     }
 
