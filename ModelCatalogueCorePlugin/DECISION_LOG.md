@@ -1,3 +1,6 @@
+# 2014-11-02
+We want to use Spring security as a dependency, so we can do auditing etc. on users
+
 # 2014-10-29
 
 `EnumeratedTypeMarshaller` does not extend `DataTypeMarshaller` directly because if so we got into infinite loop
