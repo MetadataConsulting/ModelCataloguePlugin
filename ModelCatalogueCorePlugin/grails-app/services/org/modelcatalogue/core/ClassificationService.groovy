@@ -41,22 +41,18 @@ class ClassificationService {
             return criteria
         }
 
-        if (!modelCatalogueSecurityService.isUserLoggedIn()) {
-            return criteria
-        }
-
-        if (!modelCatalogueSecurityService.currentUser.classifications) {
+        if (classificationsInUse) {
             return criteria
         }
 
         if (CatalogueElement.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.incomingRelationships {
                 'eq' 'relationshipType', RelationshipType.classificationType
-                'in' 'source', modelCatalogueSecurityService.currentUser.classifications
+                'in' 'source', classificationsInUse
             }
         } else if (Relationship.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.or {
-                'in'('classification',  modelCatalogueSecurityService.currentUser.classifications)
+                'in'('classification',  classificationsInUse)
                 isNull('classification')
             }
         }
@@ -65,5 +61,20 @@ class ClassificationService {
 
     public <T> DetachedCriteria<T> classified (Class<T> resource) {
         classified(new DetachedCriteria<T>(resource))
+    }
+
+    public List<Classification> getClassificationsInUse() {
+        if (!modelCatalogueSecurityService.isUserLoggedIn()) {
+            return Collections.emptyList()
+        }
+
+        if (!modelCatalogueSecurityService.currentUser) {
+            return Collections.emptyList()
+        }
+
+        if (!modelCatalogueSecurityService.currentUser.classifications) {
+            return Collections.emptyList()
+        }
+        modelCatalogueSecurityService.currentUser.classifications
     }
 }

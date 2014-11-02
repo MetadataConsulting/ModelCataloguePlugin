@@ -109,6 +109,7 @@ environments {
 hibernate {
     format_sql = true
     use_sql_comments = true
+    generate_statistics = true
 }
 
 // log4j configuration
@@ -128,6 +129,7 @@ log4j = {
 
     if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
         trace 'org.hibernate.type'
+        trace 'org.hibernate.stat'
         debug 'org.hibernate.SQL'
     }
 
