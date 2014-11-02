@@ -9,8 +9,6 @@ import static org.springframework.http.HttpStatus.OK
 
 class EnumeratedTypeController extends DataTypeController<EnumeratedType> {
 
-    def relationshipTypeService
-
     EnumeratedTypeController() {
         super(EnumeratedType)
     }

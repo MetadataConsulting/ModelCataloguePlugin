@@ -6,12 +6,13 @@ import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.dataarchitect.DataImport
+import org.modelcatalogue.core.util.Lists
 
 class DashboardController {
 
     static responseFormats = ['json', 'xml', 'xlsx']
     def dataArchitectService
-    def modelCatalogueSecurityService
+    def classificationService
 
     def index() {
 
@@ -47,36 +48,13 @@ class DashboardController {
         respond model
     }
 
-    Long countWithClassification(Class resource) {
-        List<Classification> classificationsInUse = modelCatalogueSecurityService.currentUser?.classifications ?: []
-
-        if (!classificationsInUse) {
-            return resource.count()
-        }
-
-        DetachedCriteria criteria = new DetachedCriteria(resource)
-        criteria.build {
-            incomingRelationships {
-                'eq' 'relationshipType', RelationshipType.classificationType
-                'in' 'source', classificationsInUse
-            }
-        }.count()
+    private Long countWithClassification(Class resource) {
+        classificationService.classified(Lists.all([:], resource)).total
     }
 
-    Long countWithClassificationAndStatus(Class resource, ElementStatus desiredStatus) {
-        List<Classification> classificationsInUse = modelCatalogueSecurityService.currentUser?.classifications ?: []
-
-        if (!classificationsInUse) {
-            return resource.countByStatus(desiredStatus)
-        }
-
-        DetachedCriteria criteria = new DetachedCriteria(resource)
-        criteria.build {
+    private Long countWithClassificationAndStatus(Class resource, ElementStatus desiredStatus) {
+        classificationService.classified(resource).build {
             eq 'status', desiredStatus
-            incomingRelationships {
-                'eq' 'relationshipType', RelationshipType.classificationType
-                'in' 'source', classificationsInUse
-            }
         }.count()
     }
 }

@@ -111,7 +111,6 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
             response.status = HttpServletResponse.SC_NO_CONTENT
             render "DELETED"
-            return
         }
     }
 
@@ -182,7 +181,6 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
                     reportCapableRespond rel
                 }
             }
-            return
         }
     }
 
@@ -335,7 +333,6 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             } else {
                 notFound()
             }
-            return
         }
     }
 
@@ -343,20 +340,12 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
     def relationshipTypeService
+    def classificationService
 
     @Override
     def index(Integer max) {
         handleParams(max)
-        List<Classification> classificationsInUse = modelCatalogueSecurityService.currentUser?.classifications
-
-        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
-            if (classificationsInUse && resource != Classification) {
-                incomingRelationships {
-                    eq  'relationshipType', RelationshipType.classificationType
-                    'in' 'source', classificationsInUse
-                }
-            }
-        }
+        reportCapableRespond classificationService.classified(Lists.all(params, resource, "/${resourceName}/"))
     }
 
     /**
@@ -430,10 +419,6 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
                 redirect instance
             }
             '*'{
-                response.addHeader(HttpHeaders.LOCATION,
-                        g.createLink(
-                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
-                                namespace: hasProperty('namespace') ? this.namespace : null ))
                 reportCapableRespond instance, [status: OK]
             }
         }

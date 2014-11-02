@@ -17,7 +17,7 @@ class ListWithTotalAndTypeWrapper<T> implements ListWrapper<T> {
     String next
     String previous
 
-    @Delegate private ListWithTotalAndType<T> list = null
+    @Delegate ListWithTotalAndType<T> list = null
 
     public static <T> ListWrapper<T> create(Map params, String base, ListWithTotalAndType<T> list){
         create(params, base, null, list)

@@ -21,18 +21,18 @@ class DataArchitectService {
     def relationshipService
     def elementService
     def actionService
+    def classificationService
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
-        // TODO: count with classificaitons in use
-        Lists.fromCriteria(params, DataElement) {
+        classificationService.classified Lists.fromCriteria(params, DataElement) {
             'in'('status', ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED)
             isNull 'valueDomain'
+
         }
     }
 
     ListWithTotal<ValueDomain> incompleteValueDomains(Map params){
-        // TODO: count with classificaitons in use
-        Lists.fromCriteria(params, ValueDomain) {
+        classificationService.classified Lists.fromCriteria(params, ValueDomain) {
             isNull 'dataType'
         }
     }

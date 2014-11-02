@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.OK
 
 class AbstractPublishedElementController<T extends PublishedElement> extends AbstractCatalogueElementController<T> {
 
-    def elementService, relationshipTypeService
+    def elementService
 
     AbstractPublishedElementController(Class<T> type, boolean readOnly) {
         super(type, readOnly)
@@ -18,18 +18,9 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
     def index(Integer max) {
         handleParams(max)
 
-        List<Classification> classificationsInUse = modelCatalogueSecurityService.currentUser?.classifications
-
-        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', ElementService.getStatusFromParams(params)
-            if (classificationsInUse) {
-                incomingRelationships {
-                     eq  'relationshipType', RelationshipType.classificationType
-                    'in' 'source', classificationsInUse
-                }
-            }
-
-        }
+        })
     }
 
     /**

@@ -38,7 +38,25 @@ class Lists {
     }
 
     /**
+     * Returns ListWithTotalAndType which contains all elements of given type, optionaly paginated by params.
+     *
+     * This list supports classification.
+     *
+     * @param params    url parameters used to determine pagination and sort settings
+     * @param type      type to be used as wrapper's itemType
+     * @param base      base url of the list returned
+     * @param name      name of the list used currently only in XML exports
+     * @return
+     */
+    static <T> ListWithTotalAndType<T> all(Map params, Class<T> type){
+        fromCriteria(params, type, {})
+    }
+
+    /**
      * Returns ListWrapper which contains all elements of given type, optionaly paginated by params.
+     *
+     * This list supports classification.
+     *
      * @param params    url parameters used to determine pagination and sort settings
      * @param type      type to be used as wrapper's itemType
      * @param base      base url of the list returned
@@ -52,6 +70,9 @@ class Lists {
     //>-- not using default parameters, because @DelegatesTo is failing
     /**
      * Creates new ListWrapper for given criteria specified by the build closure.
+     *
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              base type for the DetachedCriteria
      * @param base              base url of the list returned
@@ -66,6 +87,9 @@ class Lists {
 
     /**
      * Creates new ListWrapper for given criteria specified by the build closure.
+     *
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              base type for the DetachedCriteria
      * @param base              base url of the list returned
@@ -82,6 +106,9 @@ class Lists {
 
     /**
      * Creates new ListWithTotalAndType for given criteria specified by the build closure.
+     *
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              type to be used as wrapper's itemType
      * @param buildClosure      DetachedCriteria build closure
@@ -95,6 +122,9 @@ class Lists {
 
     /**
      * Creates new ListWrapper for existing criteria.
+     *
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              type to be used as wrapper's itemType
      * @param base              base url of the list returned
@@ -110,6 +140,9 @@ class Lists {
 
     /**
      * Creates new ListWithTotalAndType for existing criteria.
+     *
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param criteria          existing criteria
      * @return new ListWithTotalAndType for existing criteria

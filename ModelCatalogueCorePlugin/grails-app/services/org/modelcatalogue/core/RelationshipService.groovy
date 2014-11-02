@@ -11,7 +11,6 @@ class RelationshipService {
     def modelCatalogueSecurityService
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
-        // TODO: enable classification in relationship fetching
         Lists.fromCriteria([sort: 'id'] << params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 
@@ -154,13 +153,14 @@ class RelationshipService {
 
         RelationshipType classification = RelationshipType.findByName('classification')
 
-        Relationship.executeQuery("""
-            select r.source
-            from Relationship as r
-            where r.relationshipType = :classification
-            and r.destination.id = :elementId
-            order by r.source.name
-        """, [classification: classification, elementId: element.id])
+        Classification.executeQuery """
+            select c
+            from Classification as c
+            join c.outgoingRelationships as rel
+            where rel.relationshipType = :classification
+            and rel.destination.id = :elementId
+            order by c.name
+        """, [classification: classification, elementId: element.id]
     }
 
 

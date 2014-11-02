@@ -106,6 +106,11 @@ environments {
     }
 }
 
+hibernate {
+    format_sql = true
+    use_sql_comments = true
+}
+
 // log4j configuration
 log4j = {
     // Example of changing the log pattern for the default console appender:
@@ -121,7 +126,7 @@ log4j = {
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
-    if (Environment.isDevelopmentMode()) {
+    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
         trace 'org.hibernate.type'
         debug 'org.hibernate.SQL'
     }
