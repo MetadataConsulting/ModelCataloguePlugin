@@ -24,7 +24,6 @@ class DetachedListWrapperSpec extends Specification {
         wrapper.total        == 2
         wrapper.offset       == 0
         wrapper.page         == max
-        wrapper.elementName  == 'elements'
         wrapper.sort         == 'name'
         wrapper.order        == 'asc'
         wrapper.itemType     == DataElement
