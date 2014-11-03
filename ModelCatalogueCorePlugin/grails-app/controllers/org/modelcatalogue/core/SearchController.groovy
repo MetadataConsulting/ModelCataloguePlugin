@@ -46,9 +46,6 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
             json {
                 params.max = Math.min(max ?: 10, 100)
             }
-            xml {
-                params.max = Math.min(max ?: 10000, 10000)
-            }
             xlsx {
                 params.max = Math.min(max ?: 10000, 10000)
             }

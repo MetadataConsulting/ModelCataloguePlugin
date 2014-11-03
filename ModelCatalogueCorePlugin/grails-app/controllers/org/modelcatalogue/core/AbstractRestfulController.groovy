@@ -1,11 +1,9 @@
 package org.modelcatalogue.core
 
-import grails.converters.XML
 import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
@@ -23,7 +21,7 @@ import static org.springframework.http.HttpStatus.OK
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
-    static responseFormats = ['json', 'xml', 'xlsx']
+    static responseFormats = ['json', 'xlsx']
 
     AssetService assetService
     SearchCatalogue modelCatalogueSearchService
@@ -79,7 +77,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Override
     def index(Integer max) {
         handleParams(max)
-        reportCapableRespond Lists.all(params, resource, basePath)
+        respond Lists.all(params, resource, basePath)
     }
 
 
@@ -186,19 +184,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         bindRelations(instance)
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: "${resourceName}.label".toString(), default: resourceClassName), instance.id])
-                redirect instance
-            }
-            '*' {
-                response.addHeader(HttpHeaders.LOCATION,
-                        g.createLink(
-                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
-                                namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: CREATED]
-            }
-        }
+
+        respond instance, [status: CREATED]
     }
 
     /**
@@ -235,19 +222,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         bindRelations(instance)
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
-                redirect instance
-            }
-            '*'{
-                response.addHeader(HttpHeaders.LOCATION,
-                        g.createLink(
-                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
-                                namespace: hasProperty('namespace') ? this.namespace : null ))
-                respond instance, [status: OK]
-            }
-        }
+        respond instance, [status: OK]
     }
 
     /**
@@ -275,6 +250,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         reportCapableRespond withLinks(listWrapper)
     }
 
+    @Deprecated
     private <T> ListWrapper<T> withLinks(ListWrapper<T> listWrapper) {
         def links = Lists.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
         listWrapper.previous = links.previous
@@ -302,10 +278,12 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         return super.countResources()
     }
 
+    @Deprecated
     protected void reportCapableRespond(Map args, Object value) {
         reportCapableRespond((Object)value, (Map) args)
     }
 
+    @Deprecated
     protected void reportCapableRespond(Object value) {
         reportCapableRespond((Object)value, (Map)[:])
     }
@@ -313,59 +291,9 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * Respond which is able to capture XML exports to asset if URL parameter is {@code asset=true}.
      * @param param object to be rendered
      */
+    @Deprecated
     protected void reportCapableRespond(Object param, Map args) {
-        if (modelCatalogueSecurityService.isUserLoggedIn() && params.format == 'xml' && params.boolean('asset')) {
-            Asset asset = renderXMLAsAsset(param)
-
-            webRequest.currentResponse.with {
-                def location = g.createLink(controller: 'asset', id: asset.id, action: 'show')
-                status = 302
-                setHeader("Location", location.toString())
-                setHeader("X-Asset-ID", asset.id.toString())
-                outputStream.flush()
-            }
-        } else {
-            respond((Object)param, (Map) args)
-        }
-    }
-
-    protected Asset renderXMLAsAsset(object) {
-        String theName = (params.name ?: params.action)
-
-        String uri = request.forwardURI + '?' + request.queryString
-
-        Asset asset = new Asset(
-                name: theName,
-                originalFileName: theName,
-                description: "Your export will be available in this asset soon. Use Refresh action to reload.",
-                status: ElementStatus.PENDING,
-                contentType: 'application/xml',
-                size: 0
-        )
-
-        asset.save(flush: true, failOnError: true)
-
-        Long id = asset.id
-
-        executorService.submit {
-            try {
-                Asset updated = Asset.get(id)
-
-                assetService.storeAssetWithSteam(updated, 'application/xml') { OutputStream out ->
-                    (object as XML).render(new OutputStreamWriter(out, 'UTF-8'))
-                }
-
-                updated.status = ElementStatus.FINALIZED
-                updated.description = "Your export is ready. Use Download button to view it."
-                updated.save(flush: true, failOnError: true)
-                updated.ext['Original URL'] = uri
-            } catch (e) {
-                log.error "Exception of type ${e.class} exporting asset ${id}", e
-                throw e
-            }
-        }
-
-        asset
+        respond((Object)param, (Map) args)
     }
 
     protected void notAuthorized() {
@@ -424,6 +352,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
                 backOff = 2 * backOff
             }
         }
+        throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${attempt} attempts")
     }
 
 }

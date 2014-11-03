@@ -1,16 +1,9 @@
 package org.modelcatalogue.core
 
-import grails.converters.XML
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
-import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataImportController
-import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
-import org.springframework.mock.web.MockMultipartFile
-import org.springframework.mock.web.MockMultipartHttpServletRequest
 import spock.lang.Shared
 
 /**
@@ -160,11 +153,6 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     }
 
     @Override
-    File recordResult(String fixtureName, GPathResult xml) {
-        recorder.recordResult(fixtureName, xml)
-    }
-
-    @Override
     File recordInputJSON(String fixtureName, Map json) {
         recorder.recordInputJSON(fixtureName, json)
     }
@@ -173,20 +161,4 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     File recordInputJSON(String fixtureName, String json) {
         recorder.recordInputJSON(fixtureName, json)
     }
-
-    @Override
-    File recordInputXML(String fixtureName, String xml) {
-        recorder.recordInputXML(fixtureName, xml)
-    }
-
-    @Override
-    File recordInputXML(String fixtureName, Map xml) {
-        recorder.recordInputXML(fixtureName, xml)
-    }
-
-    @Override
-    File recordInputXML(String fixtureName, XML xml) {
-        recorder.recordInputXML(fixtureName, xml)
-    }
-
 }

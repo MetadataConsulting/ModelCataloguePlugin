@@ -25,10 +25,6 @@ class BatchControllerIntegrationSpec extends AbstractControllerIntegrationSpec {
         [name: "t"*300]
     }
 
-    @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.actions.Batch] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-    }
 
     @Override
     Class getResource() {
@@ -48,21 +44,6 @@ class BatchControllerIntegrationSpec extends AbstractControllerIntegrationSpec {
     @Override
     Batch getLoadItem() {
         Batch.findByName("Generic Batch")
-    }
-
-
-    @Override
-    def xmlCustomPropertyCheck(xml, item){
-        super.xmlCustomPropertyCheck(xml, item)
-        // checkProperty(xml.@archived, item.archived, "archived")
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        // checkProperty(xml.@archived, inputItem.archived, "archived")
-        return true
     }
 
     @Override

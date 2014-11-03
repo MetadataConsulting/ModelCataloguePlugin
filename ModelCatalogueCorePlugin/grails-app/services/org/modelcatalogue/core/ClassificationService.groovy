@@ -41,7 +41,7 @@ class ClassificationService {
             return criteria
         }
 
-        if (classificationsInUse) {
+        if (!classificationsInUse) {
             return criteria
         }
 

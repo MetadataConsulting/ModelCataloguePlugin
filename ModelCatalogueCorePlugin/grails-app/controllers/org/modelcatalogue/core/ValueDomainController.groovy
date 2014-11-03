@@ -41,7 +41,7 @@ class ValueDomainController extends AbstractCatalogueElementController<ValueDoma
             return
         }
 
-        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement", "dataElements"){
+        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement"){
             eq "valueDomain", valueDomain
             if (!all) {
                 ne 'status', ElementStatus.DEPRECATED

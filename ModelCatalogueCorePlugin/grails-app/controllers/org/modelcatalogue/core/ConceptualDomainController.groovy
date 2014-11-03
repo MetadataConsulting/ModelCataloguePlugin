@@ -17,7 +17,7 @@ class ConceptualDomainController extends AbstractCatalogueElementController<Conc
             return
         }
 
-        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain", "valueDomain"){
+        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain"){
             conceptualDomains {
                 eq 'id', conceptualDomain.id
             }

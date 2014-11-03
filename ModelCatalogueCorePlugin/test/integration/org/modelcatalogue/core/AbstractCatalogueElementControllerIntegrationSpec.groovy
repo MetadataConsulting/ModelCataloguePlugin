@@ -45,34 +45,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "Link existing elements using add to #direction endpoint with XML result"(){
-
-        controller.request.method       = 'POST'
-        controller.response.format = 'xml'
-        controller.request.xml = anotherLoadItem.encodeAsXML()
-        controller."add${direction.capitalize()}"(loadItem.id, relationshipType.name)
-        def xml = controller.response.xml
-        recordResult "add${direction.capitalize()}", xml
-        def expectedSource =        direction == "outgoing" ? loadItem : anotherLoadItem
-        def expectedDestination =   direction == "outgoing" ? anotherLoadItem : loadItem
-
-        expect:
-        controller.response.status  == HttpServletResponse.SC_CREATED
-        xml.source
-        xml.source.@id.text()       == "${expectedSource.id}"
-        xml.destination
-        xml.destination.@id.text()  == "${expectedDestination.id}"
-        xml.type
-        xml.type.@id.text()         == "${relationshipType.id}"
-        resource.count() == totalCount
-
-        where:
-        direction << ["incoming", "outgoing"]
-    }
-
-
-    @Unroll
-    def "Unlink non existing elements using add to #direction endpoint with #format result"(){
+    def "Unlink non existing elements using add to #direction endpoint with json result"(){
 
         controller.request.method       = 'DELETE'
         if (direction == "outgoing") {
@@ -80,16 +53,11 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         } else {
             controller.relationshipService.unlink(anotherLoadItem, loadItem, relationshipType)
         }
-        controller.response.format = format.toLowerCase()
-        def input = anotherLoadItem."encodeAs$format"()
-        String fixtureName = "removeNonExisting${direction.capitalize()}$format"
-        if(format=="JSON"){
-            recordInputJSON fixtureName, input.toString()
-        }
-        if(format=="XML"){
-            recordInputXML fixtureName, input
-        }
-        controller.request."${format.toLowerCase()}"= input
+        controller.response.format = 'json'
+        def input = anotherLoadItem.encodeAsJSON()
+        String fixtureName = "removeNonExisting${direction.capitalize()}JSON"
+        recordInputJSON fixtureName, input.toString()
+        controller.request.json = input
         controller."remove${direction.capitalize()}"(loadItem.id, relationshipType.name)
 
         expect:
@@ -97,31 +65,24 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        format | direction
-        "XML"  | "outgoing"
-        "JSON" | "outgoing"
-        "XML"  | "incoming"
-        "JSON" | "incoming"
+        _ | direction
+        _ | "outgoing"
+        _ | "incoming"
     }
 
     @Unroll
-    def "Unlink existing elements using add to #direction endpoint with #format result"(){
+    def "Unlink existing elements using add to #direction endpoint with json result"(){
         controller.request.method       = 'DELETE'
         if (direction == "outgoing") {
             controller.relationshipService.link(loadItem, anotherLoadItem, relationshipType)
         } else {
             controller.relationshipService.link(anotherLoadItem, loadItem, relationshipType)
         }
-        controller.response.format = format.toLowerCase()
-        def input = anotherLoadItem."encodeAs$format"()
-        String fixtureName = "removeNonExisting${direction.capitalize()}$format"
-        if(format=="JSON"){
-            recordInputJSON fixtureName, input.toString()
-        }
-        if(format=="XML"){
-            recordInputXML fixtureName, input
-        }
-        controller.request."${format.toLowerCase()}"= input
+        controller.response.format = 'json'
+        def input = anotherLoadItem.encodeAsJSON()
+        String fixtureName = "removeNonExisting${direction.capitalize()}json"
+        recordInputJSON fixtureName, input.toString()
+        controller.request.json = input
         controller."remove${direction.capitalize()}"(loadItem.id, relationshipType.name)
 
         expect:
@@ -129,11 +90,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        format | direction
-        "XML"  | "outgoing"
-        "JSON" | "outgoing"
-        "XML"  | "incoming"
-        "JSON" | "incoming"
+        _ | direction
+        _ | "outgoing"
+        _ | "incoming"
     }
 
 
@@ -160,41 +119,15 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     @Unroll
-    def "Link existing elements using add to #direction endpoint with failing constraint as XML result"(){
-        controller.request.method       = 'POST'
-        RelationshipType relationshipType = RelationshipType.findByName("falseRuleReturn")
-        controller.response.format = 'xml'
-        controller.request.xml = anotherLoadItem.encodeAsXML()
-        controller."add${direction.capitalize()}"(loadItem.id, relationshipType.name)
-        def xml = controller.response.xml
-        recordResult "add${direction.capitalize()}Failed", xml
-
-        expect:
-        controller.response.status == 422 // unprocessable entity
-        xml.name() == "errors"
-        xml.error.size() >= 1
-        xml.error[0].@field.text() == 'relationshipType'
-        resource.count() == totalCount
-
-        where:
-        direction << ["incoming", "outgoing"]
-    }
-
-    @Unroll
-    def "#action with non-existing one to #direction endpoint with #format result"(){
+    def "#action with non-existing one to #direction endpoint with json result"(){
         controller.request.method       = method
-        controller.response.format = format.toLowerCase()
+        controller.response.format = 'json'
         def item = newResourceInstance()
         item.id = 1000000
-        def input = item."encodeAs$format"()
-        String fixtureName = "removeNonExisting${direction.capitalize()}$format"
-        if(format=="JSON"){
-            recordInputJSON fixtureName, input.toString()
-        }
-        if(format=="XML"){
-            recordInputXML fixtureName, input
-        }
-        controller.request."${format.toLowerCase()}"= input
+        def input = item.encodeAsJSON()
+        String fixtureName = "removeNonExisting${direction.capitalize()}JSON"
+        recordInputJSON fixtureName, input.toString()
+        controller.request.json = input
         controller."${action}${direction.capitalize()}"(loadItem.id, relationshipType.name)
 
         expect:
@@ -202,15 +135,15 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        action   | format | direction  | method
-        "add"    | "XML"  | "outgoing" | "POST"
-        "add"    | "JSON" | "outgoing" | "POST"
-        "add"    | "XML"  | "incoming" | "POST"
-        "add"    | "JSON" | "incoming" | "POST"
-        "remove" | "XML"  | "outgoing" | "DELETE"
-        "remove" | "JSON" | "outgoing" | "DELETE"
-        "remove" | "XML"  | "incoming" | "DELETE"
-        "remove" | "JSON" | "incoming" | "DELETE"
+        action   | direction  | method
+        "add"    | "outgoing" | "POST"
+        "add"    | "outgoing" | "POST"
+        "add"    | "incoming" | "POST"
+        "add"    | "incoming" | "POST"
+        "remove" | "outgoing" | "DELETE"
+        "remove" | "outgoing" | "DELETE"
+        "remove" | "incoming" | "DELETE"
+        "remove" | "incoming" | "DELETE"
     }
 
     protected CatalogueElement newResourceInstance() {
@@ -218,18 +151,13 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     @Unroll
-    def "#action with not-existing type to #direction endpoint with #format result"(){
-        controller.request.method       = httpMethod
-        controller.response.format = format.toLowerCase()
-        def input = anotherLoadItem."encodeAs$format"()
-        String fixtureName = "removeNonExisting${direction.capitalize()}$format"
-        if(format=="JSON"){
-            recordInputJSON fixtureName, input.toString()
-        }
-        if(format=="XML"){
-            recordInputXML fixtureName, input
-        }
-        controller.request."${format.toLowerCase()}" = input
+    def "#action with not-existing type to #direction endpoint with json result"(){
+        controller.request.method = httpMethod
+        controller.response.format = 'json'
+        def input = anotherLoadItem.encodeAsJSON()
+        String fixtureName = "removeNonExisting${direction.capitalize()}JSON"
+        recordInputJSON fixtureName, input.toString()
+        controller.request.json = input
         controller."${action}${direction.capitalize()}"(loadItem.id, "no-such-type")
 
         expect:
@@ -237,15 +165,15 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        action   | format | direction  | httpMethod
-        "add"    | "XML"  | "outgoing" | "POST"
-        "add"    | "JSON" | "outgoing" | "POST"
-        "add"    | "XML"  | "incoming" | "POST"
-        "add"    | "JSON" | "incoming" | "POST"
-        "remove" | "XML"  | "outgoing" | "DELETE"
-        "remove" | "JSON" | "outgoing" | "DELETE"
-        "remove" | "XML"  | "incoming" | "DELETE"
-        "remove" | "JSON" | "incoming" | "DELETE"
+        action   | direction  | httpMethod
+        "add"    | "outgoing" | "POST"
+        "add"    | "outgoing" | "POST"
+        "add"    | "incoming" | "POST"
+        "add"    | "incoming" | "POST"
+        "remove" | "outgoing" | "DELETE"
+        "remove" | "outgoing" | "DELETE"
+        "remove" | "incoming" | "DELETE"
+        "remove" | "incoming" | "DELETE"
 
     }
 
@@ -275,37 +203,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
     }
 
-    def checkXmlRelationsInternal(typeParam, no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        def method = incomingOrOutgoing
-        if (incomingOrOutgoing == 'relationships') {
-            incomingOrOutgoing = 'incoming'
-        }
-        def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
-        controller.response.format = "xml"
-        controller.params.offset = offset
-        controller.params.id = first.id
-        controller."${method}"(max, typeParam)
-        GPathResult result = controller.response.xml
-        recordResult "${method}${no}", result
-        assert result
-        checkXmlCorrectListValues(result, total, size, offset, max, next, previous)
-        assert result.relationship
-        assert result.relationship.size() == size
-        def item = result.relationship[0]
-        assert item.type
-        assert item.type.name == "relationship"
-        assert item.type.sourceToDestination == "relates to"
-        assert item.direction == incomingOrOutgoing == "incoming" ? "destinationToSource" : "sourceToDestination"
-        assert item.type.destinationToSource == "is relationship of"
-        assert item.relation
-        assert item.relation.@id
-        assert item.relation.@elementType
-        assert item.@removeLink.text() ==  "/${GrailsNameUtils.getPropertyName(first.class)}/${first.id}/${incomingOrOutgoing}/relationship"
-        def relation = Class.forName(item.relation.@elementType.text()).get(item.relation.@id.text() as Long)
-        assert item.relation.name == relation.name
-        assert item.relation.@id == "${relation.id}"
-        resource.count() == totalCount
-    }
 
     def checkJsonRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
         checkJsonRelationsInternal(null, no, size, max, offset, total, next, previous, incomingOrOutgoing)
@@ -317,54 +214,8 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
     }
 
-    def checkXmlRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        checkXmlRelationsInternal(null, no, size, max, offset, total, next, previous, incomingOrOutgoing)
-        resource.count() == totalCount
-    }
-
-    def checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        checkXmlRelationsInternal("relationship", no, size, max, offset, total, next, previous, incomingOrOutgoing)
-        resource.count() == totalCount
-    }
-
-    def checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        def method = incomingOrOutgoing
-        if (incomingOrOutgoing == 'relationships') {
-            incomingOrOutgoing = 'incoming'
-        }
-        def first = linkRelationshipsToDummyEntities(incomingOrOutgoing)
-        controller.response.format = "xml"
-        controller.params.offset = offset
-        controller.params.id = first.id
-        RelationshipType type2 = new RelationshipType(name: "xyz", sourceClass: CatalogueElement, destinationClass: CatalogueElement, sourceToDestination: "xyz", destinationToSource: "zyx")
-        assert type2.save()
-        controller."${method}"(max, type2.name)
-        GPathResult result = controller.response.xml
-        recordResult "${method}WithNonExistingType${no}", result
-        assert result
-        assert result.@success.text() == "true"
-        assert result.@total.text() == "0"
-        assert result.@offset.text() == "${offset}"
-        assert result.@page.text() == "${max}"
-        assert result.@size.text() == "0"
-        assert result.relationship.isEmpty()
-        type2.delete()
-        resource.count() == totalCount
-    }
-
     def "Return 404 for non-existing item as JSON for incoming relationships queried by type"() {
         controller.response.format = "json"
-        controller.params.id = "1"
-        controller.incoming(10, "no-such-type")
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
-    }
-
-    def "Return 404 for non-existing item as XML for incoming relationships queried by type"() {
-        controller.response.format = "xml"
         controller.params.id = "1"
         controller.incoming(10, "no-such-type")
 
@@ -386,30 +237,8 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
     }
 
-    def "Return 404 for non-existing item as XML for combined relationships queried by type"() {
-        controller.response.format = "xml"
-        controller.params.id = "1"
-        controller.relationships(10, "no-such-type")
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
-    }
-
     def "Return 404 for non-existing item as JSON for outgoing relationships queried by type"() {
         controller.response.format = "json"
-        controller.params.id = "1"
-        controller.outgoing(10, "no-such-type")
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
-    }
-
-    def "Return 404 for non-existing item as XML for outgoing relationships queried by type"() {
-        controller.response.format = "xml"
         controller.params.id = "1"
         controller.outgoing(10, "no-such-type")
 
@@ -430,30 +259,8 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
     }
 
-    def "Return 404 for non-existing item as XML for combined relationships"() {
-        controller.response.format = "xml"
-        controller.params.id = "1000000"
-        controller.relationships(10, null)
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
-    }
-
     def "Return 404 for non-existing item as JSON for incoming relationships"() {
         controller.response.format = "json"
-        controller.params.id = "1000000"
-        controller.incoming(10, null)
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
-    }
-
-    def "Return 404 for non-existing item as XML for incoming relationships"() {
-        controller.response.format = "xml"
         controller.params.id = "1000000"
         controller.incoming(10, null)
 
@@ -474,16 +281,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
     }
 
-    def "Return 404 for non-existing item as XML for outgoing relationships"() {
-        controller.response.format = "xml"
-        controller.params.id = "1000000"
-        controller.outgoing(10, null)
-
-        expect:
-        controller.response.text == ""
-        controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
-    }
 
     @Unroll
     def "get json outgoing relationships pagination: #no where max: #max offset: #offset"() {
@@ -587,111 +384,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/xyz")
     }
 
-    @Unroll
-    def "get xml outgoing relationships pagination: #no where max: #max offset: #offset"() {
-        checkXmlRelations(no, size, max, offset, total, next, previous, "outgoing")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing")
-    }
-
-    @Unroll
-    def "get xml incoming relationships pagination: #no where max: #max offset: #offset"() {
-        checkXmlRelations(no, size, max, offset, total, next, previous, "incoming")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming")
-    }
-
-
-    @Unroll
-    def "get xml combined relationships pagination: #no where max: #max offset: #offset"() {
-        checkXmlRelations(no, size, max, offset, total, next, previous, "relationships")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships")
-    }
-
-
-    @Unroll
-    def "get xml outgoing relationships pagination with type: #no where max: #max offset: #offset"() {
-        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/relationship")
-    }
-
-    @Unroll
-    def "get xml incoming relationships pagination with type: #no where max: #max offset: #offset"() {
-        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/relationship")
-    }
-
-
-    @Unroll
-    def "get xml comibined relationships pagination with type: #no where max: #max offset: #offset"() {
-        checkXmlRelationsWithRightType(no, size, max, offset, total, next, previous, "relationships")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relationship")
-    }
-
-
-    @Unroll
-    def "get xml outgoing relationships pagination with wrong type: #no where max: #max offset: #offset"() {
-        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/xyz")
-    }
-
-    @Unroll
-    def "get xml incoming relationships pagination with wrong type: #no where max: #max offset: #offset"() {
-        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/xyz")
-    }
-
-
-    @Unroll
-    def "get xml combined relationships pagination with wrong type: #no where max: #max offset: #offset"() {
-        checkXmlRelationsWithWrongType(no, size, max, offset, total, next, previous, "relationships")
-
-        expect:
-        resource.count() == totalCount
-
-        where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/xyz")
-    }
-
-
     abstract Object getAnotherLoadItem()
 
 
@@ -763,42 +455,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert json.next == next
         assert json.previous == previous
         true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(xml, item){
-        super.xmlCustomPropertyCheck(xml, item)
-        checkProperty(xml.name, item.name, "name")
-        checkProperty(xml.description, item.description, "description")
-        checkProperty(xml.@elementType, item.class.name, "elementType")
-        checkProperty(xml.relationships.@count, (item?.incomingRelationships ? item.incomingRelationships.size(): 0) + (item?.outgoingRelationships ? item.outgoingRelationships.size(): 0), "relationships")
-        checkProperty(xml.relationships.@link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/relationships", "relationships")
-        checkProperty(xml.relationships.@itemType, Relationship.name, "itemType")
-        checkProperty(xml.incomingRelationships.@count, (item?.incomingRelationships ? item.incomingRelationships.size(): 0) + (item?.outgoingRelationships ? item.outgoingRelationships.size(): 0), "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/incoming", "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@itemType, Relationship.name, "itemType")
-        checkProperty(xml.outgoingRelationships.@count, (item?.outgoingRelationships)?item.outgoingRelationships.size(): 0, "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@link, "/${GrailsNameUtils.getPropertyName(item.class.simpleName)}/${item.id}/outgoing", "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@itemType, Relationship.name, "itemType")
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkProperty(xml.name, inputItem.name, "name")
-        checkProperty(xml.description, inputItem.description, "description")
-        checkProperty(xml.@elementType, outputItem.class.name, "elementType")
-        checkProperty(xml.relationships.@count, (outputItem?.incomingRelationships ? outputItem.incomingRelationships.size(): 0) + (outputItem?.outgoingRelationships ? outputItem.outgoingRelationships.size(): 0), "relationships")
-        checkProperty(xml.relationships.@link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/relationships", "relationships")
-        checkProperty(xml.relationships.@itemType, Relationship.name, "itemType")
-        checkProperty(xml.incomingRelationships.@count, (outputItem?.incomingRelationships ? outputItem.incomingRelationships.size(): 0) + (outputItem?.outgoingRelationships ? outputItem.outgoingRelationships.size(): 0), "relationships")
-        checkProperty(xml.incomingRelationships.@link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/incoming", "incomingRelationships")
-        checkProperty(xml.incomingRelationships.@itemType, Relationship.name, "itemType")
-        checkProperty(xml.outgoingRelationships.@count, (outputItem?.outgoingRelationships)?outputItem.outgoingRelationships.size(): 0, "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@link, "/${GrailsNameUtils.getPropertyName(outputItem.class.simpleName)}/${outputItem.id}/outgoing", "outgoingRelationships")
-        checkProperty(xml.outgoingRelationships.@itemType, Relationship.name, "itemType")
-        return true
     }
 
     @Override
@@ -896,45 +552,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     @Unroll
-    def "get xml mapping: #no where max: #max offset: #offset"() {
-        CatalogueElement first = loadItem
-        mapToDummyEntities(first)
-
-        when:
-        controller.params.id = first.id
-        controller.params.offset = offset
-        controller.params.max = max
-        controller.response.format = "xml"
-        controller.mappings(max)
-        def xml = controller.response.xml
-
-        recordResult "mapping$no", xml
-
-        then:
-        checkXmlCorrectListValues(xml, total, size, offset, max, next, previous)
-        xml.mapping.size() == size
-
-
-        when:
-        def item  = xml.mapping[0]
-        def mapping = first.outgoingMappings.find {it.id == item.@id.text() as Long}
-
-        then:
-        item.mapping.text() == mapping.mapping
-        item.destination
-        item.destination.@id.text() == "$mapping.destination.id"
-        item.destination.@elementType
-        item.destination.@elementType.text() == mapping.destination.class.name
-
-        where:
-        [no, size, max, offset, total, next, previous] << getMappingPaginationParameters("/${resourceName}/${loadItem.id}/mapping")
-    }
-
-
-    @Unroll
-    def "return 404 for non existing domain calling #method method with #format format"() {
+    def "return 404 for non existing domain calling #method method with json format"() {
         controller.request.method = httpMethod
-        controller.response.format = format
+        controller.response.format = 'json'
         controller.params.id = 1000000
 
         when:
@@ -944,23 +564,20 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
 
         where:
-        format | httpMethod | method
-        "json" | "GET"      |"mappings"
-        "xml"  | "GET"      |"mappings"
-        "json" | "POST"      |"addMapping"
-        "xml"  | "POST"      |"addMapping"
-        "json" | "DELETE"      |"removeMapping"
-        "xml"  | "DELETE"      |"removeMapping"
+        httpMethod  | method
+        "GET"       |"mappings"
+        "POST"      |"addMapping"
+        "DELETE"    |"removeMapping"
     }
 
     @Unroll
-    def "return 404 for non existing other side calling #method method with #format format"() {
+    def "return 404 for non existing other side calling #method method with json format"() {
         controller.request.method = httpMethod
-        controller.response.format = format
+        controller.response.format = 'json'
         controller.params.id = loadItem.id
         controller.params.destination = 10000000
 
-        controller.request."$format" = payload
+        controller.request.json = payload
 
         when:
         controller."$method"()
@@ -969,22 +586,20 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
 
         where:
-        format | httpMethod | method          | payload
-        "json" | "POST"     | "addMapping"    | """{"mapping":"x"}"""
-        "json" | "DELETE"   | "removeMapping" | """{"mapping":"x"}"""
-        "xml"  | "POST"     | "addMapping"    | """<mapping>x</mapping>"""
-        "xml"  | "DELETE"   | "removeMapping" | """<mapping>x</mapping>"""
+        httpMethod | method          | payload
+        "POST"     | "addMapping"    | """{"mapping":"x"}"""
+        "DELETE"   | "removeMapping" | """{"mapping":"x"}"""
     }
 
     @Unroll
-    def "Map existing domains with failing constraint #format"(){
-        controller.response.format = format
-        controller.request."$format" = payload
+    def "Map existing domains with failing constraint json"(){
+        controller.response.format = 'json'
+        controller.request.json = payload
         controller.request.method = "POST"
         controller.params.id           = loadItem.id
         controller.params.destination  = anotherLoadItem.id
         controller.addMapping()
-        def result = controller.response."$format"
+        def result = controller.response.json
         recordResult "addMappingFailed", result
 
         expect:
@@ -992,14 +607,13 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         test.call(result)
 
         where:
-        format | payload                      | test
-        "json" | """{"mapping":"y"}"""        | { it.errors && it.errors.first().field == "mapping" }
-        "xml"  | """<mapping>y</mapping>"""   | { it.name() == "errors" && it.error[0].@field.text() == "mapping" }
+        payload                      | test
+        """{"mapping":"y"}"""        | { it.errors && it.errors.first().field == "mapping" }
     }
 
     @Unroll
-    def "unmap non existing mapping will return 404 for #format request"(){
-        controller.response.format = format
+    def "unmap non existing mapping will return 404 for json request"(){
+        controller.response.format = 'json'
         controller.request.method = "DELETE"
         controller.mappingService.unmap(loadItem, anotherLoadItem)
         controller.params.id           = loadItem.id
@@ -1008,15 +622,12 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         expect:
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-
-        where:
-        format << ["json", "xml"]
     }
 
 
     @Unroll
-    def "unmap existing mapping will return 204 for #format request"(){
-        controller.response.format = format
+    def "unmap existing mapping will return 204 for json request"(){
+        controller.response.format = 'json'
         controller.request.method = "DELETE"
         controller.mappingService.map(loadItem, anotherLoadItem, [one: "one"])
         controller.params.id           = loadItem.id
@@ -1025,9 +636,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         expect:
         controller.response.status == HttpServletResponse.SC_NO_CONTENT
-
-        where:
-        format << ["json", "xml"]
     }
 
     def "map valid domains with json"() {
@@ -1050,28 +658,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         json.destination.link   == anotherLoadItem.info.link
     }
 
-
-    def "map valid domains with xml"() {
-        controller.request.method = "POST"
-        controller.response.format = "xml"
-        controller.request.xml = """<mapping>x</mapping>"""
-        controller.params.id           = loadItem.id
-        controller.params.destination  = anotherLoadItem.id
-        controller.addMapping()
-        def xml = controller.response.xml
-        recordResult "addMapping", xml
-
-        expect:
-        xml.mapping.text()            == "x"
-        xml.source
-        xml.source.@id.text()         == "$loadItem.id"
-        xml.source.link.text()        == loadItem.info.link
-        xml.source.name.text()        == loadItem.name
-        xml.destination
-        xml.destination.@id.text()    == "$anotherLoadItem.id"
-        xml.destination.link.text()   == anotherLoadItem.info.link
-        xml.destination.name.text()   == anotherLoadItem.name
-    }
 
     def "update and set metadata"() {
         if (controller.readOnly) return

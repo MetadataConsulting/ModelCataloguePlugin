@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
-import org.modelcatalogue.core.util.ValueDomains
 
 class DataTypeController<T> extends AbstractPublishedElementController<DataType> {
 
@@ -22,9 +21,9 @@ class DataTypeController<T> extends AbstractPublishedElementController<DataType>
             return
         }
 
-        reportCapableRespond new ValueDomains(list: classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain", "valueDomains"){
+        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain"){
             eq "dataType", dataType
-        }))
+        })
 
     }
 

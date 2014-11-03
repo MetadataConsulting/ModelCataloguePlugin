@@ -18,9 +18,9 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
     def index(Integer max) {
         handleParams(max)
 
-        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+        respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', ElementService.getStatusFromParams(params)
-        })
+        }
     }
 
     /**
@@ -54,24 +54,9 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
 
         def includeParams = includeFields
 
+        if(!newVersion) newVersion = (request.JSON?.newVersion)?request.JSON?.newVersion?.toBoolean():false
+        if(!ext) ext = request.JSON?.ext
 
-        switch(response.format){
-
-            case "json":
-                if(!newVersion) newVersion = (request.JSON?.newVersion)?request.JSON?.newVersion?.toBoolean():false
-                if(!ext) ext = request.JSON?.ext
-                break
-
-            case "xml":
-                if(!newVersion) newVersion = (request.XML?.newVersion)?request.XML?.newVersion?.toBoolean():false
-                if(!ext) ext = request.XML?.ext
-                break
-
-            default:
-                newVersion = false
-                break
-
-        }
 
         if (newVersion) includeParams.remove('status')
 
@@ -96,19 +81,8 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
 
         bindRelations(instance)
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
-                redirect instance
-            }
-            '*'{
-                response.addHeader(HttpHeaders.LOCATION,
-                        g.createLink(
-                                resource: this.controllerName, action: 'show',id: instance.id, absolute: true,
-                                namespace: hasProperty('namespace') ? this.namespace : null ))
-                reportCapableRespond instance, [status: OK]
-            }
-        }
+
+        reportCapableRespond instance, [status: OK]
     }
 
     @Transactional

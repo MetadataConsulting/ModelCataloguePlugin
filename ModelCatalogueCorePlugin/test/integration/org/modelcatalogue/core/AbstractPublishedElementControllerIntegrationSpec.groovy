@@ -102,33 +102,6 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
         [no, size, max, offset, total, next, previous] << getHistoryPaginationParameters("/${resourceName}/${loadItem.id}/history")
     }
 
-
-    @Unroll
-    def "get xml history: #no where max: #max offset: #offset"() {
-        CatalogueElement first = CatalogueElement.get(loadItem.id)
-        createArchiveVersions(first)
-
-        when:
-        controller.params.id = first.id
-        controller.params.offset = offset
-        controller.params.max = max
-        controller.response.format = "xml"
-        controller.history(max)
-        def xml = controller.response.xml
-
-        recordResult "history$no", xml
-
-        then:
-        checkXmlCorrectListValues(xml, total, size, offset, max, next, previous)
-        xml.element.size() == size
-
-
-        // todo add more verification
-
-        where:
-        [no, size, max, offset, total, next, previous] << getHistoryPaginationParameters("/${resourceName}/${loadItem.id}/history")
-    }
-
     def getHistoryPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous

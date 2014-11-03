@@ -17,7 +17,7 @@ import static org.springframework.http.HttpStatus.OK
 
 abstract class AbstractCatalogueElementController<T> extends AbstractRestfulController<T> {
 
-    static responseFormats = ['json', 'xml', 'xlsx']
+    static responseFormats = ['json', 'xlsx']
     static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE", mappings: "GET", removeMapping: "DELETE", addMapping: "POST"]
 
     def relationshipService
@@ -173,31 +173,12 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             response.status = HttpServletResponse.SC_CREATED
             RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
 
-            withFormat {
-                json {
-                    reportCapableRespond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)),  relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
-                }
-                xml {
-                    reportCapableRespond rel
-                }
-            }
+            reportCapableRespond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)),  relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
         }
     }
 
     protected parseOtherSide() {
-        def otherSide = [:]
-
-        withFormat {
-            json {
-                otherSide = request.getJSON()
-            }
-            xml {
-                def xml = request.getXML()
-                otherSide.id = xml.@id.text() as Long
-                otherSide.elementType = xml.@elementType.text() as String
-            }
-        }
-        otherSide
+        request.getJSON()
     }
 
     private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
@@ -218,7 +199,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         reportCapableRespond new Relationships(
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type, modelCatalogueSecurityService.currentUser?.classifications ?: []))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, modelCatalogueSecurityService.currentUser?.classifications ?: []))
         )
     }
 
@@ -272,7 +253,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        reportCapableRespond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping", "mappings") {
+        reportCapableRespond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping") {
             eq 'source', element
         })
     }
@@ -309,14 +290,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             }
             if (add) {
                 String mappingString = null
-                withFormat {
-                    json {
-                        mappingString = request.getJSON().mapping
-                    }
-                    xml {
-                        mappingString = request.getXML().text()
-                    }
-                }
+                mappingString = request.getJSON().mapping
                 Mapping mapping = mappingService.map(element, destination, mappingString)
                 if (mapping.hasErrors()) {
                     reportCapableRespond mapping.errors
@@ -345,7 +319,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
     @Override
     def index(Integer max) {
         handleParams(max)
-        reportCapableRespond classificationService.classified(Lists.all(params, resource, "/${resourceName}/"))
+        respond classificationService.classified(Lists.all(params, resource, "/${resourceName}/"))
     }
 
     /**
@@ -388,21 +362,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        def ext = params?.ext
-        switch(response.format){
-
-            case "json":
-                if(!ext) ext = request.JSON?.ext
-                break
-
-            case "xml":
-                if(!ext) ext = request.XML?.ext
-                break
-
-            default:
-                break
-
-        }
+        def ext = request.JSON?.ext
         if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
@@ -413,15 +373,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
 
         bindRelations instance
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: "${resourceClassName}.label".toString(), default: resourceClassName), instance.id])
-                redirect instance
-            }
-            '*'{
-                reportCapableRespond instance, [status: OK]
-            }
-        }
+        reportCapableRespond instance, [status: OK]
     }
 
     @Override

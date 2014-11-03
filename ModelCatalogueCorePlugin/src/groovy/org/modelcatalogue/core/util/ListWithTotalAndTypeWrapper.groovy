@@ -7,7 +7,6 @@ class ListWithTotalAndTypeWrapper<T> implements ListWrapper<T> {
     final Map<String, Object> params
 
     final String base
-    final String elementName
     final String sort
 
     final String order
@@ -20,18 +19,13 @@ class ListWithTotalAndTypeWrapper<T> implements ListWrapper<T> {
     @Delegate ListWithTotalAndType<T> list = null
 
     public static <T> ListWrapper<T> create(Map params, String base, ListWithTotalAndType<T> list){
-        create(params, base, null, list)
+        new ListWithTotalAndTypeWrapper<T>(list, base, params)
     }
 
-    public static <T> ListWrapper<T> create(Map params, String base, String name, ListWithTotalAndType<T> list){
-        new ListWithTotalAndTypeWrapper<T>(list, base, name, params)
-    }
-
-    private ListWithTotalAndTypeWrapper(ListWithTotalAndType<T> list, String base, String name, Map<String, Object> params) {
+    private ListWithTotalAndTypeWrapper(ListWithTotalAndType<T> list, String base, Map<String, Object> params) {
         this.list = list
 
         this.base = base
-        this.elementName = name
         this.params = Collections.unmodifiableMap(new HashMap(params))
 
         this.sort = params.sort

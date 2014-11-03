@@ -22,11 +22,6 @@ class MeasurementUnitControllerIntegrationSpec extends AbstractPublishedElementC
         [name: "t"*300, description: "asdf"]
     }
 
-    @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.MeasurementUnit] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
-    }
 
     @Override
     Class getResource() {
@@ -51,20 +46,6 @@ class MeasurementUnitControllerIntegrationSpec extends AbstractPublishedElementC
     @Override
     MeasurementUnit getAnotherLoadItem() {
         MeasurementUnit.findByName("Kilometers per hour")
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(xml, item){
-        super.xmlCustomPropertyCheck(xml, item)
-        checkProperty(xml.symbol.toString(), item.symbol, "symbol")
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkProperty(xml.symbol, inputItem.symbol, "symbol")
-        return true
     }
 
     @Override

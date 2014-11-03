@@ -43,41 +43,6 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
         [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/${loadItem.id}/valueDomain")
     }
 
-
-    @Unroll
-    def "get xml mapping: #no where max: #max offset: #offset"() {
-        EnumeratedType first = loadItem
-        createValueDomainsUsingEnumeratedType(first, 12)
-
-        when:
-        controller.params.id = first.id
-        controller.params.offset = offset
-        controller.params.max = max
-        controller.response.format = "xml"
-        controller.valueDomains(max)
-        def xml = controller.response.xml
-        recordResult "valueDomains$no", xml
-
-        then:
-        checkXmlCorrectListValues(xml, total, size, offset, max, next, previous)
-        xml.valueDomain.size() == size
-
-        when:
-        def item  = xml.valueDomain[0]
-        def valueDomain = first.relatedValueDomains.find {it.id == item.@id.text() as Long}
-
-        then:
-        item.@id == valueDomain.id
-        item.dataType.@id == valueDomain.dataType.id
-        resource.count() == 12
-
-        cleanup:
-        deleteValueDomains(first, 12)
-
-        where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/${loadItem.id}/valueDomain")
-    }
-
     @Override
     Map getPropertiesToEdit(){
         [name: "changedName", description: "edited description ", enumerations:['d26':'test28', 'sadf':'asdgsadg']]
@@ -91,13 +56,6 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
     @Override
     Map getBadInstance(){
         [name: "t"*300, description: "asdf"]
-    }
-
-    @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.EnumeratedType] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
     }
 
     @Override
@@ -123,30 +81,6 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
     @Override
     EnumeratedType getAnotherLoadItem() {
         EnumeratedType.findByName("sub1")
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(xml, item){
-        super.xmlCustomPropertyCheck(xml, item)
-        def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
-        if (xmlProp) {
-            def propMap = [:]
-            xmlProp.enumeration.each{ propMap.put(it.@key.toString(), it.text()) }
-            checkPropertyMapMapString(propMap, item.getProperty("enumerations"), "enumerations")
-        }
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        def xmlProp = xml.depthFirst().find { it.name() == "enumerations" }
-        if (xmlProp) {
-            def propMap = [:]
-            xmlProp.enumeration.each{ propMap.put(it.@key.toString(), it.text()) }
-            checkPropertyMapMapString(propMap, outputItem.getProperty("enumerations"), "enumerations")
-        }
-        return true
     }
 
     @Override

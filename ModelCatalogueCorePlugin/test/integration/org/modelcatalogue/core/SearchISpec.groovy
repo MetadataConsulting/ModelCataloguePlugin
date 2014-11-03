@@ -47,72 +47,41 @@ class SearchISpec extends AbstractIntegrationSpec{
                 "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
                 className[0].toLowerCase() + className.substring(1)
         )
-        JSONElement json
-        GPathResult xml
+
 
         expect:
         def domain = grailsApplication.getArtefact("Domain", "org.modelcatalogue.core.${className}")?.getClazz()
         def expectedResult = domain.findByName(expectedResultName)
 
         when:
-        controller.response.format = response
+        controller.response.format = 'json'
         controller.params.search = searchString
         controller.search()
         String recordName = "searchElement${no}"
-        if(response=="json"){
-            json = controller.response.json
-            recorder.recordResult recordName, json
-        }else{
-            xml = controller.response.xml
-            recorder.recordResult recordName, xml
-        }
+        JSONElement json = controller.response.json
+        recorder.recordResult recordName, json
+
 
         then:
-        if(json){
-            assert json
-            assert json.total == total
-            assert json.list.get(0).id == expectedResult.id
-            assert json.list.get(0).name == expectedResult.name
-        }else if(xml){
-            assert xml
-            assert xml.@success.text() == "true"
-            assert xml.@size == total
-            assert xml.@total == total
-            assert xml.@offset.text() == "0"
-            assert xml.@page.text() ==  "10000"
-            assert xml.element
-            assert xml.element.size() ==  total
-            assert xml.depthFirst().find {  it.name == expectedResult.name }
-        }else{
-            throw new AssertionError("no result returned")
-        }
+        assert json
+        assert json.total == total
+        assert json.list.get(0).id == expectedResult.id
+        assert json.list.get(0).name == expectedResult.name
 
         where:
 
         no| className           | controller                          | searchString                    | response  | expectedResultName        | total
         1 | "DataType"          | new DataTypeController()            | "boolean"                       | "json"    | "boolean"                 | 1
         2 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "json"    | "boolean"                 | 1
-        3 | "DataType"          | new DataTypeController()            | "boolean"                       | "xml"     | "boolean"                 | 1
-        4 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "xml"     | "boolean"                 | 1
-        5 | "DataElement"       | new DataElementController()         | "de_author1"                         | "json"    | "DE_author1"              | 1
-        6 | "DataElement"       | new DataElementController()         | "de_author1"                         | "xml"     | "DE_author1"              | 1
+        5 | "DataElement"       | new DataElementController()         | "de_author1"                    | "json"    | "DE_author1"              | 1
         7 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "json"    | "public libraries"        | 1
-        8 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "xml"     | "public libraries"        | 1
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1
-       10 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "xml"     | "sub1"                    | 1
        11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees Celsius"         | 1
-       12 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "xml"     | "Degrees Celsius"         | 1
        13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1
-       14 | "Model"             | new ModelController()               | "Jabberwocky"                   | "xml"     | "chapter1"                | 1
        15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1
-       16 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "xml"     | "value domain Celsius"    | 1
        17 | "RelationshipType"  | new RelationshipTypeController()    | "context"                       | "json"    | "context"                 | 1
-       18 | "RelationshipType"  | new RelationshipTypeController()    | "context"                       | "xml"     | "context"                 | 1
 // search in nested elements not supported
-//       19 | "ValueDomain"       | new ValueDomainController()         | "°F"                            | "xml"     | "value domain Fahrenheit" | 1
-//       20 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                          | "json"    | "gender"                  | 1
-//       21 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                          | "xml"     | "gender"                  | 1
-//       22 | "DataElement"       | new DataElementController()         | "metadata"                      | "xml"     | "DE_author1"              | 1
+//       20 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                        | "json"    | "gender"                  | 1
 
     }
 

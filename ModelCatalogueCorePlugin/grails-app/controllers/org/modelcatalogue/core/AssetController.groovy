@@ -114,13 +114,10 @@ class AssetController extends AbstractPublishedElementController<Asset> {
             return null
         }
 
-        List<Asset> assets = new DetachedCriteria<Asset>(Asset).build {
-            eq 'latestVersion', currentAsset.latestVersion
-            lt 'versionNumber'
-        }.list()
-                Asset.where {
+        List<Asset> assets = Asset.where {
             latestVersion == currentAsset.latestVersion && versionNumber < currentAsset.versionNumber
         }.list()
+
         for (Asset asset in assets) {
             if (modelCatalogueStorageService.exists('assets', "${asset.id}")) {
                 return asset

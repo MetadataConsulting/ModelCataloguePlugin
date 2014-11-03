@@ -33,12 +33,6 @@ class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerI
     }
 
     @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.Model] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
-    }
-
-    @Override
     Class getResource() {
         Model
     }
@@ -61,22 +55,6 @@ class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerI
     @Override
     Model getAnotherLoadItem() {
         Model.findByName("mTest4")
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(xml, item){
-        super.xmlCustomPropertyCheck(xml, item)
-        checkStatusProperty(xml.@status, item.status, "status")
-        checkProperty(xml.@versionNumber, item.versionNumber, "versionNumber")
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkStatusProperty(xml.@status, outputItem.status, "status")
-        checkProperty(xml.@versionNumber, outputItem.versionNumber, "versionNumber")
-        return true
     }
 
     @Override

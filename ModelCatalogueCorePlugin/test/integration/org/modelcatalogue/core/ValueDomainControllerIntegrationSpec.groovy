@@ -82,12 +82,6 @@ class ValueDomainControllerIntegrationSpec extends AbstractCatalogueElementContr
     }
 
     @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.ValueDomain] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
-    }
-
-    @Override
     Class getResource() {
         ValueDomain
     }
@@ -124,24 +118,6 @@ class ValueDomainControllerIntegrationSpec extends AbstractCatalogueElementContr
 
     ConceptualDomain getConceptualDomain() {
         ConceptualDomain.findByName('cdtest1')
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(xml, item){
-        super.xmlCustomPropertyCheck(xml, item)
-        checkProperty(xml.unitOfMeasure.name, item.unitOfMeasure.name, "unitOfMeasure")
-        checkProperty(xml.dataType.@id, item.dataType.id, "dataType")
-        checkProperty(xml.@multiple, item.multiple, "multiple")
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkProperty(xml.unitOfMeasure.name, inputItem.unitOfMeasure.name, "unitOfMeasure")
-        checkProperty(xml.dataType.@id, inputItem.dataType.id, "dataType")
-        checkProperty(xml.@multiple, outputItem.multiple, "multiple")
-        return true
     }
 
     @Override

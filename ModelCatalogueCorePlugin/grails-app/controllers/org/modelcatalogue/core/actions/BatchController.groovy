@@ -103,7 +103,7 @@ class BatchController extends AbstractRestfulController<Batch> {
             render status: HttpStatus.METHOD_NOT_ALLOWED
             return
         }
-        actionService.updateParameters(action, request.getJSON())
+        actionService.updateParameters(action, request.getJSON() as Map<String, String>)
 
         if (action.hasErrors()) {
             respond action.errors
@@ -133,7 +133,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
         ActionState state = params.state ? ActionState.valueOf(params.state.toString().toUpperCase()) : null
 
-        reportCapableRespond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params.state ?: ''}", "actions", actionService.list(params, batch, state))
+        reportCapableRespond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params.state ?: ''}", actionService.list(params, batch, state))
     }
 
     def dismiss() {

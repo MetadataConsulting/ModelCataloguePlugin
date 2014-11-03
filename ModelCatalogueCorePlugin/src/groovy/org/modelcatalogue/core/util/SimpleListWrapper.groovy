@@ -18,8 +18,4 @@ class SimpleListWrapper<T> implements ListWrapper<T>{
     int offset
     List<T> items
 
-    @Override
-    String getElementName() {
-        return name ?: GrailsNameUtils.getPropertyName(getClass().getSimpleName())
-    }
 }

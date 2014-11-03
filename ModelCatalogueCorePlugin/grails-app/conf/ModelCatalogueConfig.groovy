@@ -32,7 +32,7 @@ grails.databinding.dateFormats = ['MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', "yyyy-MM-
 
 grails.mime.types = [
         json:          ['application/json', 'text/json'],
-        xml:           ['text/xml', 'application/xml'],
+//        xml:           ['text/xml', 'application/xml'],
         xlsx:          ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
 ]
 

@@ -71,7 +71,6 @@ Model catalogue core plugin (metadata registry)
                     new DataElementMarshaller(),
                     new DataTypeMarshaller(),
                     new ElementsMarshaller(),
-                    new ValueDomainsMarshaller(),
                     new EnumeratedTypeMarshaller(),
                     new MeasurementUnitMarshallers(),
                     new ModelMarshaller(),
@@ -374,7 +373,7 @@ Model catalogue core plugin (metadata registry)
 
     def static getClassificationString(DataElement dataElement){
         String classifications = ""
-        dataElement.classifications.eachWithIndex{ def classification, int i ->
+        dataElement.classifications.eachWithIndex{ def classification, Integer i ->
             if (classifications != "") classifications += (stringSeparator + classification.name)
             else classifications = classification.name
         }
@@ -384,7 +383,7 @@ Model catalogue core plugin (metadata registry)
     def static getValueDomainString(DataType dataType){
         String valueDomains = ""
 
-        dataType.relatedValueDomains.eachWithIndex{ ValueDomain valueDomain, int i ->
+        dataType.relatedValueDomains.eachWithIndex{ ValueDomain valueDomain, Integer i ->
             String vdText = valueDomain.id + " \t " + valueDomain.name + " \t "
             if (valueDomains!="") valueDomains += (stringSeparator + vdText )
             else valueDomains = vdText
@@ -402,7 +401,7 @@ Model catalogue core plugin (metadata registry)
     def static getConceptualDomainString(ValueDomain valueDomain){
         String conceptualDomains = ""
 
-        valueDomain.conceptualDomains.eachWithIndex{ ConceptualDomain conceptualDomain, int i ->
+        valueDomain.conceptualDomains.eachWithIndex{ ConceptualDomain conceptualDomain, Integer i ->
             if (conceptualDomains!="") conceptualDomains += (stringSeparator + conceptualDomain.name )
             else conceptualDomains = conceptualDomain.name
         }

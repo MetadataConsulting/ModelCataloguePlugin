@@ -20,7 +20,7 @@ class ModelController extends AbstractPublishedElementController<Model> {
         }
         handleParams(max)
 
-        reportCapableRespond Lists.wrap(params, "/${resourceName}/", "elements", modelService.getTopLevelModels(params))
+        reportCapableRespond Lists.wrap(params, "/${resourceName}/", modelService.getTopLevelModels(params))
     }
 
 
