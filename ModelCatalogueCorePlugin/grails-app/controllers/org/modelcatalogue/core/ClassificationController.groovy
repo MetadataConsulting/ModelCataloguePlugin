@@ -1,11 +1,9 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.Lists
-
-class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
+class ClassificationController<T> extends AbstractPublishedElementController<Classification> {
 
     ClassificationController() {
-        super(Classification)
+        super(Classification, false)
     }
 
     protected bindRelations(Classification instance, Object objectToBind) {

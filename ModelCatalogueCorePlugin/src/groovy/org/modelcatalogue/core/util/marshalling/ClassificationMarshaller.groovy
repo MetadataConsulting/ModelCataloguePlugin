@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import org.modelcatalogue.core.Classification
 
-class ClassificationMarshaller extends CatalogueElementMarshallers {
+class ClassificationMarshaller extends PublishedElementMarshallers {
 
     ClassificationMarshaller() {
         super(Classification)

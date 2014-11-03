@@ -6,7 +6,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+class ClassificationControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){

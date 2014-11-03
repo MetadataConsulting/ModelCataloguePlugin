@@ -84,7 +84,7 @@ def "json -  get uninstantiated data elements from the catalogue"(){
 
     when:
     controller.response.format = "json"
-    controller.uninstantiatedDataElements(Integer.MAX_VALUE)
+    controller.uninstantiatedDataElements(10)
     JSONElement json = controller.response.json
     String list = "metadata_uninstantiated"
     recorder.recordResult list, json
@@ -114,7 +114,7 @@ def "json -  get data elements without metadata key from the catalogue"(){
     when:
     controller.response.format = "json"
     controller.params.put("key", "metadata")
-    controller.metadataKeyCheck(Integer.MAX_VALUE)
+    controller.metadataKeyCheck(10)
     JSONElement json = controller.response.json
     String list = "metadataKey_missing_key_metadata"
     recorder.recordResult list, json
@@ -144,7 +144,7 @@ def "json -  create dataElement relationships"(){
     controller.response.format = "json"
     controller.params.put("keyOne", "Data item No.")
     controller.params.put("keyTwo", "Optional_Local_Identifier")
-    controller.findRelationsByMetadataKeys(Integer.MAX_VALUE)
+    controller.findRelationsByMetadataKeys(10)
     JSONElement json = controller.response.json
     String list = "dataElement_Relationships"
     recorder.recordResult list, json

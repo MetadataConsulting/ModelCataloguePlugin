@@ -1,8 +1,11 @@
 package org.modelcatalogue.core
 
 
-class Classification extends CatalogueElement {
+class Classification extends PublishedElement {
 
+    /**
+     * @deprecated use model catalogue id instead
+     */
     String namespace
 
     static constraints = {
