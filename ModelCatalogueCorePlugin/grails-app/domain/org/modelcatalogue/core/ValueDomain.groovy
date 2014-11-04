@@ -54,9 +54,7 @@ class ValueDomain extends CatalogueElement  {
 	String rule
     Boolean multiple = Boolean.FALSE
 
-    static hasMany = [dataElements: DataElement]
-
-    static transients = ['regexDef']
+    static transients = ['regexDef', 'dataElements']
 
     static constraints = {
 		description     nullable:true, maxSize: 2000
@@ -129,6 +127,20 @@ class ValueDomain extends CatalogueElement  {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
+    List<DataElement> getDataElements() {
+        if (!readyForQueries) {
+            return []
+        }
+        return DataElement.findAllByValueDomainAndStatus(this, ElementStatus.DEPRECATED)
+    }
+
+    Long countDataElements() {
+        if (!readyForQueries) {
+            return 0
+        }
+        return DataElement.countByValueDomainAndStatus(this, ElementStatus.FINALIZED)
     }
 
 

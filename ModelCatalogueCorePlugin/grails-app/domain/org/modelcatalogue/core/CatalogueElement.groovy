@@ -254,4 +254,8 @@ abstract class CatalogueElement implements Extendible {
         relationshipService.getClassifications(this)
     }
 
+    boolean isReadyForQueries() {
+        isAttached() && !hasErrors()
+    }
+
 }
