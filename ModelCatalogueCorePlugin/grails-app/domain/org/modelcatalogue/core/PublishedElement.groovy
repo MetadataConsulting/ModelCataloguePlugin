@@ -16,7 +16,7 @@ abstract class PublishedElement extends CatalogueElement  {
     Date versionCreated = new Date()
 
     // id of the latest version
-    PublishedElement latestVersion
+    Long latestVersionId
 
     static searchable = {
         except = ['versionNumber']
@@ -46,7 +46,7 @@ abstract class PublishedElement extends CatalogueElement  {
             return true
          }
         versionNumber bindable: false
-        latestVersion bindable: false, nullable: true
+        latestVersionId bindable: false, nullable: true
     }
 
     static relationships = [
@@ -60,10 +60,10 @@ abstract class PublishedElement extends CatalogueElement  {
     }
 
     Integer countVersions() {
-        if (!latestVersion) {
+        if (!latestVersionId) {
             return 1
         }
-        getClass().countByLatestVersion(latestVersion)
+        getClass().countByLatestVersionId(latestVersionId)
     }
 
     static protected Boolean checkChildItemsFinalized(Model model, Collection<Model> tree = []){

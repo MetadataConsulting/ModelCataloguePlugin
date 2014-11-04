@@ -86,7 +86,7 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
 
         cleanup:
         if (existing) {
-            for (Asset a in Asset.findAllByLatestVersion(existing.latestVersion ?: existing)) {
+            for (Asset a in Asset.findAllByLatestVersionId(existing.latestVersionId ?: existing.id)) {
                 a.delete()
             }
         }

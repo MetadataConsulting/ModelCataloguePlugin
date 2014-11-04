@@ -1,3 +1,7 @@
+# 2014-11-04
+Reverted `CatalogueElement.latestVersion` to be a just `Long` because otherwise Hibernate is pretty confused by it (or
+at least Fixtures plugin).
+
 # 2014-11-02
 
 Mappings returned from the application are not filtered by any classification because the nature of mappings is to be

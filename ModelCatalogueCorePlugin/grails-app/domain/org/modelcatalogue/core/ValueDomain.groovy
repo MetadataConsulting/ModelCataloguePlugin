@@ -35,7 +35,7 @@ import org.modelcatalogue.core.util.ValueDomainRuleScript
  *
 */
 
-class ValueDomain extends CatalogueElement  {
+class ValueDomain extends PublishedElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
@@ -57,8 +57,8 @@ class ValueDomain extends CatalogueElement  {
     static transients = ['regexDef', 'dataElements']
 
     static constraints = {
-		description     nullable:true, maxSize: 2000
-		unitOfMeasure   nullable:true
+        description nullable: true, maxSize: 2000
+        unitOfMeasure nullable: true
         dataType        nullable: true
 
 		rule nullable:true, maxSize: 10000, validator: { val,obj ->

@@ -12,7 +12,7 @@ class ElementService {
     def modelCatalogueSearchService
     def messageSource
 
-    List<PublishedElement> list(params = [:]) {
+    List<PublishedElement> list(Map params = [:]) {
         PublishedElement.findAllByStatus(getStatusFromParams(params), params)
     }
 
@@ -63,7 +63,7 @@ class ElementService {
 
         //set archived status from updated to archived
         archived.status = ElementStatus.DEPRECATED
-        archived.latestVersion = element.latestVersion ?: element
+        archived.latestVersionId = element.latestVersionId ?: element
         archived.save()
     }
 
@@ -130,8 +130,8 @@ class ElementService {
         element.versionNumber++
         element.versionCreated = new Date()
 
-        if (!element.latestVersion) {
-            element.latestVersion = element
+        if (!element.latestVersionId) {
+            element.latestVersionId = element.id
         }
 
         if (!element.save(flush: true)) {

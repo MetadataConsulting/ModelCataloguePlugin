@@ -19,11 +19,11 @@ class MeasurementUnitController extends AbstractPublishedElementController<Measu
 
         respond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain") {
             eq "unitOfMeasure", unit
-//            if (!unit.attach().archived) {
-//                ne 'status', ElementStatus.DEPRECATED
-//                ne 'status', ElementStatus.UPDATED
-//                ne 'status', ElementStatus.REMOVED
-//            }
+            if (!unit.attach().archived) {
+                ne 'status', ElementStatus.DEPRECATED
+                ne 'status', ElementStatus.UPDATED
+                ne 'status', ElementStatus.REMOVED
+            }
         })
 
     }

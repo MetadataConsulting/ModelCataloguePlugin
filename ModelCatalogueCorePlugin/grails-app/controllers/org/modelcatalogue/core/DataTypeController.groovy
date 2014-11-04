@@ -23,11 +23,11 @@ class DataTypeController<T> extends AbstractPublishedElementController<DataType>
 
         respond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain") {
             eq "dataType", dataType
-//            if (!dataType.attach().archived) {
-//                ne 'status', ElementStatus.DEPRECATED
-//                ne 'status', ElementStatus.UPDATED
-//                ne 'status', ElementStatus.REMOVED
-//            }
+            if (!dataType.attach().archived) {
+                ne 'status', ElementStatus.DEPRECATED
+                ne 'status', ElementStatus.UPDATED
+                ne 'status', ElementStatus.REMOVED
+            }
         })
 
     }

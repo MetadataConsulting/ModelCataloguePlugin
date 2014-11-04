@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
-import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.Lists
 
 import static org.springframework.http.HttpStatus.OK
@@ -165,12 +164,14 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
 
         Long id = element.id
 
-        if (!element.latestVersion) {
-            reportCapableRespond Lists.wrap(params,"/${resourceName}/${params.id}/history", Lists.lazy(params, resource, { [resource.get(id)] }, { 1 }))
+        if (!element.latestVersionId) {
+            respond Lists.wrap(params, "/${resourceName}/${params.id}/history", Lists.lazy(params, resource, {
+                [resource.get(id)]
+            }, { 1 }))
             return
         }
 
-        PublishedElement latestVersion = element.latestVersion
+        Long latestVersionId = element.latestVersionId
 
         def customParams = [:]
         customParams.putAll params
@@ -178,8 +179,8 @@ class AbstractPublishedElementController<T extends PublishedElement> extends Abs
         customParams.sort   = 'versionNumber'
         customParams.order  = 'desc'
 
-        reportCapableRespond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
-            eq 'latestVersion', latestVersion
+        respond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
+            eq 'latestVersionId', latestVersionId
         }
     }
 

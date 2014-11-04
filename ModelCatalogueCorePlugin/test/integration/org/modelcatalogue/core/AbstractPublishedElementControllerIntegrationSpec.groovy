@@ -28,7 +28,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
         controller.update()
 
-        PublishedElement oldVersion    = PublishedElement.findByLatestVersionAndVersionNumber(another.latestVersion ?: another, currentVersionNumber)
+        PublishedElement oldVersion = PublishedElement.findByLatestVersionIdAndVersionNumber(another.latestVersionId ?: another.id, currentVersionNumber)
 
         def json = controller.response.json
 
@@ -78,7 +78,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
 
     @Unroll
     def "get json history: #no where max: #max offset: #offset\""() {
-        CatalogueElement first = CatalogueElement.get(loadItem.id)
+        PublishedElement first = PublishedElement.get(loadItem.id)
         createArchiveVersions(first)
 
         when:
