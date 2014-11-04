@@ -17,7 +17,7 @@ class MeasurementUnitMarshallers extends PublishedElementMarshallers {
         if (!unit) return [:]
         def ret = super.prepareJsonMap(unit)
         ret.putAll(symbol: unit.symbol)
-        ret.valueDomains = [count: unit.valueDomains?.size() ?: 0, itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(unit.getClass())}/$unit.id/valueDomain"]
+        ret.valueDomains = [count: unit.countValueDomains(), itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(unit.getClass())}/$unit.id/valueDomain"]
         return ret
     }
 }

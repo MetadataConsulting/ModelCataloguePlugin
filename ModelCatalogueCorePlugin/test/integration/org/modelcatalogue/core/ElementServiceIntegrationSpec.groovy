@@ -75,7 +75,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         author.valueDomain
         archived.valueDomain
-        domain.dataElements.size() == 1
 
         when:
         def anotherArchived = elementService.archiveAndIncreaseVersion(author)

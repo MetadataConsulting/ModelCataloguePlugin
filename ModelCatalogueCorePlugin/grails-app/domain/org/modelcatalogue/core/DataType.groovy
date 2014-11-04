@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
 
 /*
 * A Data Type is like a primitive type
@@ -16,8 +14,6 @@ class DataType extends PublishedElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
-    static hasMany  = [relatedValueDomains: ValueDomain]
-
     static searchable = {
         name boost:5
         except = ['relatedValueDomains', 'incomingRelationships', 'outgoingRelationships']
@@ -29,8 +25,9 @@ class DataType extends PublishedElement {
 
     static mapping = {
         tablePerHierarchy false
-        relatedValueDomains cascade: "all-delete-orphan"
     }
+
+    static transients = ['relatedValueDomains']
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
@@ -73,5 +70,25 @@ class DataType extends PublishedElement {
         }
 
         result.join(" ")
+    }
+
+    List<ValueDomain> getRelatedValueDomains() {
+        if (!readyForQueries) {
+            return []
+        }
+        return ValueDomain.findAllByDataType(this)
+    }
+
+    Long countRelatedValueDomains() {
+        if (!readyForQueries) {
+            return 0
+        }
+        return ValueDomain.countByDataType(this)
+    }
+
+    DataType removeFromRelatedValueDomains(ValueDomain domain) {
+        domain.dataType = null
+        domain.save(failOnError: true)
+        this
     }
 }

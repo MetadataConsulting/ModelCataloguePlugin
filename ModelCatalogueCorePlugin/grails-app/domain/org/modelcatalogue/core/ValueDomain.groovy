@@ -133,12 +133,18 @@ class ValueDomain extends CatalogueElement  {
         if (!readyForQueries) {
             return []
         }
-        return DataElement.findAllByValueDomainAndStatus(this, ElementStatus.DEPRECATED)
+        if (archived) {
+            return DataElement.findAllByValueDomain(this)
+        }
+        return DataElement.findAllByValueDomainAndStatus(this, ElementStatus.FINALIZED)
     }
 
     Long countDataElements() {
         if (!readyForQueries) {
             return 0
+        }
+        if (archived) {
+            return DataElement.countByValueDomain(this)
         }
         return DataElement.countByValueDomainAndStatus(this, ElementStatus.FINALIZED)
     }

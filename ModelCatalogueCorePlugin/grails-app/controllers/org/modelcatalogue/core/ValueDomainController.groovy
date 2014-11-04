@@ -14,17 +14,17 @@ class ValueDomainController extends AbstractCatalogueElementController<ValueDoma
     def index(Integer max) {
         if (params.status == 'incomplete') {
             handleParams(max)
-            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.incompleteValueDomains(params))
+            respond Lists.wrap(params, resource, basePath, dataArchitectService.incompleteValueDomains(params))
             return
         }
         if (params.status == 'duplicate') {
             handleParams(max)
-            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.duplicateValueDomains(params))
+            respond Lists.wrap(params, resource, basePath, dataArchitectService.duplicateValueDomains(params))
             return
         }
         if (params.status == 'unused') {
             handleParams(max)
-            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.unusedValueDomains(params))
+            respond Lists.wrap(params, resource, basePath, dataArchitectService.unusedValueDomains(params))
             return
         }
         super.index(max)
@@ -41,9 +41,9 @@ class ValueDomainController extends AbstractCatalogueElementController<ValueDoma
             return
         }
 
-        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement"){
+        respond classificationService.classified(Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement") {
             eq "valueDomain", valueDomain
-            if (!all) {
+            if (!all && !valueDomain.attach().archived) {
                 ne 'status', ElementStatus.DEPRECATED
                 ne 'status', ElementStatus.UPDATED
                 ne 'status', ElementStatus.REMOVED

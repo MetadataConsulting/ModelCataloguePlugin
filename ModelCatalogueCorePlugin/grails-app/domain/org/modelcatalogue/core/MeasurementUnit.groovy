@@ -1,8 +1,4 @@
 package org.modelcatalogue.core
-
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
 /*
 * Measurement units are units such as MPH, cm3, cm2, m etc.
 * They are used by value domains to instantiate a data element
@@ -20,15 +16,29 @@ class MeasurementUnit extends PublishedElement {
 
     String symbol
 
-    static hasMany = [valueDomains: ValueDomain]
-
     static constraints = {
         name unique: 'versionNumber'
         symbol nullable: true, size: 1..100
     }
 
+    static transients = ['valueDomains']
+
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
+    List<ValueDomain> getValueDomains() {
+        if (!readyForQueries) {
+            return []
+        }
+        return ValueDomain.findAllByUnitOfMeasure(this)
+    }
+
+    Long countValueDomains() {
+        if (!readyForQueries) {
+            return 0
+        }
+        return ValueDomain.countByUnitOfMeasure(this)
     }
 
 }

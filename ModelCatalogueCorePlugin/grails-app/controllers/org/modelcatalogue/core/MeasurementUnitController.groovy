@@ -17,8 +17,13 @@ class MeasurementUnitController extends AbstractPublishedElementController<Measu
             return
         }
 
-        reportCapableRespond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain"){
+        respond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain") {
             eq "unitOfMeasure", unit
+//            if (!unit.attach().archived) {
+//                ne 'status', ElementStatus.DEPRECATED
+//                ne 'status', ElementStatus.UPDATED
+//                ne 'status', ElementStatus.REMOVED
+//            }
         })
 
     }
