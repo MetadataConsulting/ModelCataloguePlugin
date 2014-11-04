@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
@@ -18,20 +17,16 @@ class SearchISpec extends AbstractIntegrationSpec{
     @Shared
     RelationshipService relationshipService
     @Shared
-    def grailsApplication, de, vd, cd, mod
+    def grailsApplication, de, vd, mod
 
 
     def setupSpec(){
         loadFixtures()
         de = DataElement.findByName("auth7")
         vd = ValueDomain.findByName("value domain Celsius")
-        cd = ConceptualDomain.findByName("public libraries")
         mod = Model.findByName("book")
         relationshipService = new RelationshipService()
 
-
-
-        relationshipService.link(cd, mod, RelationshipType.findByName("context"))
         relationshipService.link(mod, de, RelationshipType.findByName("containment"))
     }
 
@@ -43,7 +38,6 @@ class SearchISpec extends AbstractIntegrationSpec{
     def "#no - text search for #className "(){
 
         ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
                 "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
                 className[0].toLowerCase() + className.substring(1)
         )
@@ -56,7 +50,7 @@ class SearchISpec extends AbstractIntegrationSpec{
         when:
         controller.response.format = 'json'
         controller.params.search = searchString
-        controller.search()
+        controller.search(10)
         String recordName = "searchElement${no}"
         JSONElement json = controller.response.json
         recorder.recordResult recordName, json
@@ -74,14 +68,11 @@ class SearchISpec extends AbstractIntegrationSpec{
         1 | "DataType"          | new DataTypeController()            | "boolean"                       | "json"    | "boolean"                 | 1
         2 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "json"    | "boolean"                 | 1
         5 | "DataElement"       | new DataElementController()         | "de_author1"                    | "json"    | "DE_author1"              | 1
-        7 | "ConceptualDomain"  | new ConceptualDomainController()    | "domain for public libraries"   | "json"    | "public libraries"        | 1
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1
        11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees Celsius"         | 1
        13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1
        15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1
-       17 | "RelationshipType"  | new RelationshipTypeController()    | "context"                       | "json"    | "context"                 | 1
-// search in nested elements not supported
-//       20 | "EnumeratedType"    | new EnumeratedTypeController()      | "male"                        | "json"    | "gender"                  | 1
+        17 | "RelationshipType" | new RelationshipTypeController() | "classification" | "json" | "classification" | 1
 
     }
 
@@ -90,7 +81,6 @@ class SearchISpec extends AbstractIntegrationSpec{
 
         def controller = new SearchController()
         ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
                 "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
                 "search"
         )
@@ -128,13 +118,13 @@ class SearchISpec extends AbstractIntegrationSpec{
     protected static getPaginationParameters() {
         [
                 // no, size, max, offset, total, next, previous, searchString, sort, order
-                [1, 10, 10, 0, 22, "/search/?search=domain&max=10&offset=10",                      "",                                                              "domain"],
-                [2,  5,  5, 0, 22, "/search/?search=domain&max=5&sort=name&order=ASC&offset=5",    "",                                                              "domain", "name",   "ASC"],
-                [3,  2,  2, 6, 22, "/search/?search=domain&max=2&sort=name&order=ASC&offset=8",    "/search/?search=domain&max=2&sort=name&order=ASC&offset=4",     "domain", "name",   "ASC"],
-                [4,  4,  4, 1, 22, "/search/?search=domain&max=4&sort=name&order=ASC&offset=5",    "",                                                              "domain", "name",   "ASC"],
-                [5,  2,  2, 2, 22, "/search/?search=domain&max=2&sort=name&order=ASC&offset=4",    "/search/?search=domain&max=2&sort=name&order=ASC&offset=0",     "domain", "name",   "ASC"],
-                [6,  2,  2, 4, 22, "/search/?search=domain&max=2&sort=name&offset=6",              "/search/?search=domain&max=2&sort=name&offset=2",               "domain", "name",   ""],
-                [7,  2,  2, 4, 22, "/search/?search=domain&max=2&offset=6",                        "/search/?search=domain&max=2&offset=2",                         "domain", null,     null]
+                [1, 10, 10, 0, 75, "/search/?search=a&max=10&offset=10", "", "a"],
+                [2, 5, 5, 0, 75, "/search/?search=a&max=5&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
+                [3, 2, 2, 6, 75, "/search/?search=a&max=2&sort=name&order=ASC&offset=8", "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "a", "name", "ASC"],
+                [4, 4, 4, 1, 75, "/search/?search=a&max=4&sort=name&order=ASC&offset=5", "", "a", "name", "ASC"],
+                [5, 2, 2, 2, 75, "/search/?search=a&max=2&sort=name&order=ASC&offset=4", "/search/?search=a&max=2&sort=name&order=ASC&offset=0", "a", "name", "ASC"],
+                [6, 2, 2, 4, 75, "/search/?search=a&max=2&sort=name&offset=6", "/search/?search=a&max=2&sort=name&offset=2", "a", "name", ""],
+                [7, 2, 2, 4, 75, "/search/?search=a&max=2&offset=6", "/search/?search=a&max=2&offset=2", "a", null, null]
         ]
     }
 

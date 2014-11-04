@@ -2,7 +2,6 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'classification',     "fa fa-fw fa-tags"
   catalogueProvider.setIcon 'model',              "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'dataElement',        "fa fa-fw fa-cube"
-  catalogueProvider.setIcon 'conceptualDomain',   "fa fa-fw fa-cogs"
   catalogueProvider.setIcon 'valueDomain',        "fa fa-fw fa-cog"
   catalogueProvider.setIcon 'enumeratedType',     "fa fa-fw fa-list-alt"
   catalogueProvider.setIcon 'dataType',           "fa fa-fw fa-th-large"
@@ -17,15 +16,16 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'csvTransformation',  "fa fa-fw fa-long-arrow-right"
 
   # this should be generated automatically in the future
-  catalogueProvider.setInstanceOf 'classification',     'catalogueElement'
-  catalogueProvider.setInstanceOf 'conceptualDomain',   'catalogueElement'
-  catalogueProvider.setInstanceOf 'dataType',           'catalogueElement'
+
+
   catalogueProvider.setInstanceOf 'publishedElement',   'catalogueElement'
   catalogueProvider.setInstanceOf 'user',               'catalogueElement'
   catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
 
+  catalogueProvider.setInstanceOf 'dataType', 'publishedElement'
+  catalogueProvider.setInstanceOf 'classification', 'publishedElement'
   catalogueProvider.setInstanceOf 'asset',              'publishedElement'
   catalogueProvider.setInstanceOf 'measurementUnit',    'publishedElement'
   catalogueProvider.setInstanceOf 'model',              'publishedElement'

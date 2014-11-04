@@ -1,11 +1,5 @@
 import grails.util.Environment
-import org.modelcatalogue.core.Asset
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ConceptualDomain
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElement
+import org.modelcatalogue.core.*
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -212,7 +206,6 @@ modelcatalogue.defaults.relationshiptypes =  [
         '''],
         [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"],
         [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
-        [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
         [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
         [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],

@@ -46,9 +46,9 @@ class XSDImporter {
 
     Collection<XsdElement> topLevelElements
     Collection<Classification> classifications
-    Collection<ConceptualDomain> conceptualDomains
 
     RelationshipService relationshipService
+    ClassificationService classificationService
 
     XsdSchema schema
     Collection<QName> namespaces
@@ -250,13 +250,8 @@ class XSDImporter {
     }
 
 
-
-    List<Model> findModels(String name) {
-        Model.executeQuery("""
-            select m from Model m left join m.classifications c
-            where m.name = :name and c in :classifications
-            group by m
-        """, [name: name, classifications: classifications])
+    List<Model> findModels(String modelName) {
+        classificationService.classified(Model.where { name == modelName }, classifications).list()
     }
 
     Model findModel(String name) {
@@ -271,11 +266,11 @@ class XSDImporter {
 
         for (ValueDomain domain in valueDomains) {
             if (dataType && domain.dataType == dataType) {
-                if (conceptualDomains.intersect(domain.conceptualDomains) && domain.rule == rule) {
+                if (classifications.intersect(domain.classifications) && domain.rule == rule) {
                         return domain
                 }
             } else if (!dataType) {
-                if (conceptualDomains.intersect(domain.conceptualDomains) && domain.rule == rule) {
+                if (classifications.intersect(domain.classifications) && domain.rule == rule) {
                         return domain
                 }
             }
@@ -576,25 +571,21 @@ class XSDImporter {
         dataElement
     }
 
-    protected DataElement findDataElement(String name, ValueDomain domain) {
-        if (!name) {
+    protected DataElement findDataElement(String theName, ValueDomain domain) {
+        if (!theName) {
             return null
         }
 
-        def elements
+        List<DataElement> elements
 
         if (domain) {
-            elements = DataElement.executeQuery("""
-                select de from DataElement de left join de.classifications c
-                where de.name = :name and de.valueDomain = :domain and c in :classifications
-                group by de
-            """, [name: name, domain: domain, classifications: classifications])
+            elements = classificationService.classified(DataElement.where {
+                name == theName && valueDomain == domain
+            }, classifications).list()
         } else {
-            elements = DataElement.executeQuery("""
-                select de from DataElement de left join de.classifications c
-                where de.name = :name and de.valueDomain is null and c in :classifications
-                group by de
-            """, [name: name, classifications: classifications])
+            elements = classificationService.classified(DataElement.where {
+                name == theName && valueDomain == null
+            }, classifications).list()
         }
 
         if (elements) {
@@ -674,7 +665,9 @@ class XSDImporter {
         def valueDomain = findValueDomain(simpleDataType.name, dataType, rule)
         if (!valueDomain) {
             valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: rule).save(flush: true, failOnError: true)
-            valueDomain.addToConceptualDomains(conceptualDomains.first())
+            for (Classification classification in classifications) {
+                valueDomain.addToClassifications(classification)
+            }
 
             if (baseValueDomain) valueDomain.addToIsBasedOn(baseValueDomain)
             if (simpleDataType.union) valueDomain = addUnions(valueDomain, simpleDataType.union)

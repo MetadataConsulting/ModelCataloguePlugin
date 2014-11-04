@@ -45,7 +45,7 @@ class ValueDomain extends CatalogueElement  {
         unitOfMeasure component:true
         extensions component:true
 
-        except = ['incomingRelationships', 'outgoingRelationships', 'dataElements', 'conceptualDomains']
+        except = ['incomingRelationships', 'outgoingRelationships', 'dataElements']
     }
 
     DataType dataType
@@ -54,9 +54,7 @@ class ValueDomain extends CatalogueElement  {
 	String rule
     Boolean multiple = Boolean.FALSE
 
-    static belongsTo = ConceptualDomain
-
-    static hasMany = [dataElements: DataElement, conceptualDomains: ConceptualDomain]
+    static hasMany = [dataElements: DataElement]
 
     static transients = ['regexDef']
 
@@ -76,18 +74,6 @@ class ValueDomain extends CatalogueElement  {
         incoming: [base: 'basedOn'],
         outgoing: [base: 'isBaseFor']
     ]
-
-    /**
-     * This needs to be removed as soon as conceptual domains are merged into classifications.
-     * @return
-     */
-    @Deprecated
-    String getClassifiedName() {
-        if (!conceptualDomains) {
-            return name
-        }
-        "$name (${conceptualDomains*.name.sort().join(', ')})"
-    }
 
     void setRegexDef(String regex) {
         if (!regex) {

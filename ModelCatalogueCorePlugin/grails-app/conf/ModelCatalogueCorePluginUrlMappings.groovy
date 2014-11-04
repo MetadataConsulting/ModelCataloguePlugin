@@ -9,7 +9,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
         def publishedElements = ['asset', 'dataElement', 'model', 'publishedElement']
-        def catalogueElements = publishedElements + ['catalogueElement', 'conceptualDomain','dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
+        def catalogueElements = publishedElements + ['catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
         def allElements       = catalogueElements + resources
 
         for (String controllerName in allElements) {
@@ -88,10 +88,6 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$controllerName/$id/dataElement"(controller: controllerName, action: 'dataElements', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/$id/convert/$destination"(controller: controllerName, action: 'convert', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/$id/validateValue"(controller: controllerName, action: 'validateValue', method: HttpMethod.GET)
-                }
-
-                if (controllerName == 'conceptualDomain') {
-                    "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'user') {

@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.elasticsearch
 
-import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.SearchCatalogue
@@ -113,7 +112,7 @@ class ModelCatalogueSearchService implements SearchCatalogue{
             return searchResults
         }
         searchParams.put("indices", "org.modelcatalogue.core")
-        searchParams.put("types", ["org.modelcatalogue.core.Asset","org.modelcatalogue.core.DataElement", "org.modelcatalogue.core.ValueDomain", "org.modelcatalogue.core.ConceptualDomain", "org.modelcatalogue.core.DataType", "org.modelcatalogue.core.EnumeratedType", "org.modelcatalogue.core.MeasurementUnit", "org.modelcatalogue.core.Model"])
+        searchParams.put("types", ["org.modelcatalogue.core.Asset", "org.modelcatalogue.core.DataElement", "org.modelcatalogue.core.ValueDomain", "org.modelcatalogue.core.DataType", "org.modelcatalogue.core.EnumeratedType", "org.modelcatalogue.core.MeasurementUnit", "org.modelcatalogue.core.Model"])
         try{
             searchResults = elasticSearchService.search(searchParams){
                 bool {

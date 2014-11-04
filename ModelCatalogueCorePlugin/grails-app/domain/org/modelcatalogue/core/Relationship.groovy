@@ -12,7 +12,6 @@ import org.modelcatalogue.core.util.ExtensionsWrapper
         * ----------------- ------------------ ------------- -----------------------  ----------------------
         | Source           | Relationship     | Destination | Source->Destination    |  Destination<-Source |
         | ---------------- | -----------------| ----------- | ---------------------- | -------------------- |
-        | ConceptualDomain |  [context]       |  Model      | "provides context for" | "has context of"     |
         | Model            | [containment]    | DataElement |  "contains"            |  "contained in"      |
         | DataElement      | [instantiation]  | ValueDomain | "instantiated by"      | "instantiates"       |
         | Model            | [heirachical]    | Model       | "parentOf"             | "ChildOf"            |

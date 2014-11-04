@@ -16,24 +16,13 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     enumerations.push "#{key}: #{value}" for key, value of enumeratedType.enumerations
     enumerations.join('\n')
 
-  getConceptualDomainsForValueDomain = (valueDomain) ->
-    return '' if not valueDomain.conceptualDomains
-    domainNames = for domain in valueDomain.conceptualDomains
-      "<a href='#/catalogue/conceptualDomain/#{domain.id}'>#{domain.name}</a>"
-    domainNames.join(', ')
-
   getClassificationsForDataElement = (dataElement) ->
     return '' if not dataElement.classifications
     classificationNames = for classification in dataElement.classifications
       "<a href='#/catalogue/classification/#{classification.id}'>#{classification.name}</a>"
     classificationNames.join(', ')
 
-#  getConceptualDomainsForDataElement = (dataElement) ->
-#    return '' unless dataElement and dataElement.valueDomain
-#    return getConceptualDomainsForValueDomain(dataElement.valueDomain)
-
   # default
-  columnsProvider.registerColumns 'org.modelcatalogue.core.ConceptualDomain', nameAndDescription()
   columnsProvider.registerColumns 'org.modelcatalogue.core.PublishedElement', publishedElementColumns()
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
 
@@ -122,7 +111,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.ValueDomain', [
-    {header: 'Conceptual Domains',  value: getConceptualDomainsForValueDomain,    classes: 'col-md-3'}
+    {header: 'Classifications', value: getClassificationsForDataElement, classes: 'col-md-3'}
     {header: 'Name',                value: 'name',                                classes: 'col-md-3', href: 'href()',                show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'}}
     {header: 'Unit',                value: 'unitOfMeasure.name',                  classes: 'col-md-3', href: 'unitOfMeasure.href()',  show: 'unitOfMeasure.show()'}
     {header: 'Data Type',           value: 'dataType.name',                       classes: 'col-md-3', href: 'dataType.href()',       show: 'dataType.show()'}

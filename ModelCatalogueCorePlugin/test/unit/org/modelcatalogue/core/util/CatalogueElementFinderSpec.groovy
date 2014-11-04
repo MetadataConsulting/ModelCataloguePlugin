@@ -9,7 +9,6 @@ class CatalogueElementFinderSpec extends Specification {
         def candidatesClasses = CatalogueElementFinder.catalogueElementClasses
 
         expect:
-        ConceptualDomain.name   in candidatesClasses
         DataElement.name        in candidatesClasses
         DataType.name           in candidatesClasses
         MeasurementUnit.name    in candidatesClasses

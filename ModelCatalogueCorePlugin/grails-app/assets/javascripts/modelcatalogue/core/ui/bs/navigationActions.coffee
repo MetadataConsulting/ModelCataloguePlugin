@@ -4,7 +4,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     'classification'
     'model'
     'dataElement'
-    'conceptualDomain'
     'valueDomain'
     'dataType'
     'measurementUnit'

@@ -112,7 +112,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
             searchResults.searchResults = results.items
             searchResults.total = results.total
-        } else if (ConceptualDomain.isAssignableFrom(resource) || Classification.isAssignableFrom(resource) || DataType.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource) ) {
+        } else if (Classification.isAssignableFrom(resource) || DataType.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
             DetachedCriteria criteria = new DetachedCriteria(resource)
             criteria.or {
                 ilike('name', query)

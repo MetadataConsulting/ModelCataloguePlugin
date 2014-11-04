@@ -19,7 +19,6 @@ class ValueDomainMarshaller extends CatalogueElementMarshallers {
                 rule: el.rule,
                 dataType: minimalCatalogueElementJSON(el.dataType),
                 multiple: el.multiple ?: false,
-                conceptualDomains: el.conceptualDomains.collect(CatalogueElementMarshallers.&minimalCatalogueElementJSON),
                 mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"],
                 dataElements: [count: el.dataElements?.size() ?: 0, itemType: DataElement.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/dataElement"]
         ret

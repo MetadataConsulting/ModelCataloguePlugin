@@ -37,7 +37,7 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         when:
         initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType dt1 = RelationshipType.findByName("containment")
-        RelationshipType dt2 = RelationshipType.findByName("context")
+        RelationshipType dt2 = RelationshipType.findByName("classification")
         RelationshipType dt3 = RelationshipType.findByName("supersession")
         RelationshipType dt4 = RelationshipType.findByName("hierarchy")
 
@@ -77,21 +77,6 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         loaded.sourceToDestination == "contains"
         loaded.destinationToSource == "contained in"
         loaded.name == "containment"
-
-    }
-
-    def "The context is present withing default relations types"(){
-        when:
-        initCatalogueService.initDefaultRelationshipTypes()
-        RelationshipType loaded = RelationshipType.contextType
-
-        then:
-        loaded
-        loaded.sourceClass == ConceptualDomain
-        loaded.destinationClass == Model
-        loaded.sourceToDestination == "provides context for"
-        loaded.destinationToSource == "has context of"
-        loaded.name == "context"
 
     }
 

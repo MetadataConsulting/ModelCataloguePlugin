@@ -5,7 +5,6 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
-import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 
@@ -66,7 +65,6 @@ Model catalogue core plugin (metadata registry)
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
                     new AssetMarshaller(),
-                    new ConceptualDomainMarshaller(),
                     new ClassificationMarshaller(),
                     new DataElementMarshaller(),
                     new DataTypeMarshaller(),
@@ -121,38 +119,6 @@ Model catalogue core plugin (metadata registry)
             }
         }
 
-        xlsxListRenderer.registerRowWriter ('ConceptualDomainsFromContextRelationship'){
-            title "Conceptual Domains to Excel"
-            headers  'Model Catalogue ID',  'Name', 'Description'
-            when { ListWrapper container, RenderContext context ->
-                ((context.actionName in [null,  'incoming' ] ) && (context.getWebRequest().getParams().get("type") in ['context'])  && (!container.itemType || Relationship.isAssignableFrom(container.itemType)) && (context.controllerName == 'model') )
-            } then { Relationship relationship ->
-                [[ relationship.source.modelCatalogueId,  relationship.source.name, relationship.source.description]]
-            }
-        }
-
-        xlsxListRenderer.registerRowWriter ('ConceptualDomains'){
-            title "Conceptual Domains to Excel"
-            headers  'Model Catalogue ID',  'Name', 'Description'
-            when { ListWrapper container, RenderContext context ->
-                ((context.actionName in [null,  'index' ] ) && (context.getWebRequest().getParams().get("type") in [null])  && (!container.itemType || ConceptualDomain.isAssignableFrom(container.itemType)) && (context.controllerName == 'model') )
-            } then { ConceptualDomain conceptualDomain ->
-                [[ conceptualDomain.modelCatalogueId, conceptualDomain.name, conceptualDomain.description]]
-            }
-        }
-
-        xlsxListRenderer.registerRowWriter ('ConceptualDomainsIndex') {
-            title "Conceptual Domains to Excel"
-            //headers ' Model Catalogue ID',  'Symbol', 'Unit of Measurement', 'Description'
-            headers  'Model Catalogue ID',  'Name', 'Description'
-            when { ListWrapper container, RenderContext context ->
-                context.actionName in [null, 'index'] && (!container.itemType || ConceptualDomain.isAssignableFrom(container.itemType))
-            } then { ConceptualDomain conceptualDomain ->
-                [[ conceptualDomain.modelCatalogueId, conceptualDomain.name, conceptualDomain.description]]
-            }
-        }
-
-
         xlsxListRenderer.registerRowWriter ('DataTypes') {
             title "DataTypes to Excel"
             headers 'Model Catalogue ID', 'Name', 'Enumerations', 'Value Domains'
@@ -166,11 +132,11 @@ Model catalogue core plugin (metadata registry)
 
         xlsxListRenderer.registerRowWriter ('ValueDomains') {
             title "ValueDomains to Excel"
-            headers 'Model Catalogue ID', 'Name', 'Conceptual Domains', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
+            headers 'Model Catalogue ID', 'Name', 'Classifications', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'valueDomains'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
             } then { ValueDomain valueDomain ->
-                [[valueDomain.modelCatalogueId, valueDomain.name, getConceptualDomainString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
+                [[valueDomain.modelCatalogueId, valueDomain.name, getClassificationString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
             }
         }
 
@@ -257,7 +223,7 @@ Model catalogue core plugin (metadata registry)
         xlsxListRenderer.registerRowWriter('NHIC') {
             title "Data Elements to Excel"
             append metadata
-            headers "Classification", "Conceptual Domain", "Parent Model Unique Code",
+            headers "Classification", "Parent Model Unique Code",
             "Parent Model", "Model Unique Code", "Model",
             "Data Item Unique Code", "Data Item Name", "Data Item Description",
             "Measurement Unit","Measurement Unit Symbol", "Data type", "Metadata"
@@ -265,7 +231,7 @@ Model catalogue core plugin (metadata registry)
             when { ListWrapper container, RenderContext context ->
                 container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
-                [[getClassificationString(element), getConceptualDomainString(element), getParentModel(element)?.modelCatalogueId,
+                [[getClassificationString(element), getParentModel(element)?.modelCatalogueId,
                   getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name,
                   element.modelCatalogueId, element.name, element.description,
                   getUnitOfMeasure(element), getUnitOfMeasureSymbol(element) , getDataType(element), "-"]]
@@ -330,11 +296,6 @@ Model catalogue core plugin (metadata registry)
         }
         return null
     }
-    def static getConceptualDomainString(DataElement dataElement){
-        return getConceptualDomainString(dataElement.valueDomain)
-    }
-
-
 
 
     def static getValueDomain(DataElement dataElement){
@@ -371,7 +332,7 @@ Model catalogue core plugin (metadata registry)
         return null
     }
 
-    def static getClassificationString(DataElement dataElement){
+    def static getClassificationString(CatalogueElement dataElement) {
         String classifications = ""
         dataElement.classifications.eachWithIndex{ def classification, Integer i ->
             if (classifications != "") classifications += (stringSeparator + classification.name)
@@ -396,16 +357,6 @@ Model catalogue core plugin (metadata registry)
             return dataType.enumAsString
         }
         return null
-    }
-
-    def static getConceptualDomainString(ValueDomain valueDomain){
-        String conceptualDomains = ""
-
-        valueDomain.conceptualDomains.eachWithIndex{ ConceptualDomain conceptualDomain, Integer i ->
-            if (conceptualDomains!="") conceptualDomains += (stringSeparator + conceptualDomain.name )
-            else conceptualDomains = conceptualDomain.name
-        }
-        return conceptualDomains
     }
 
     def static getValueDomainRuleString(ValueDomain valueDomain){

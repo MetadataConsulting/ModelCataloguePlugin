@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
@@ -39,7 +38,6 @@ class DashboardController {
                 dataTypeCount: countWithClassificationAndStatus(DataType, ElementStatus.FINALIZED),
                 valueDomainCount:countWithClassification(ValueDomain),
                 incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
-                conceptualDomainCount:countWithClassification(ConceptualDomain),
                 transformationsCount:CsvTransformation.count(),
                 importCount:DataImport.count(),
                 ]

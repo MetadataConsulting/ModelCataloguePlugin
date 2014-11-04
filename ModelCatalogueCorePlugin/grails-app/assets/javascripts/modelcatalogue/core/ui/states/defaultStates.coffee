@@ -51,7 +51,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       $scope.dataTypeCount = ''
       $scope.valueDomainCount = ''
       $scope.incompleteValueDomainsCount = ''
-      $scope.conceptualDomainCount = ''
       $scope.totalAssetCount = ''
       $scope.draftAssetCount = ''
       $scope.finalizedAssetCount = ''
@@ -864,28 +863,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'conceptualDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cogs fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="conceptualDomainLink" ui-sref="mc.resource.list({resource: 'conceptualDomain'})" ui-sref-opts="{inherit: false}"> Conceptual Domains</a> {{conceptualDomainCount}} </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <a show-for-role="CURATOR" ng-click="create('conceptualDomain')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Conceptual Domain</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
                     <div class="col-lg-4 col-sm-6 col-md-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
