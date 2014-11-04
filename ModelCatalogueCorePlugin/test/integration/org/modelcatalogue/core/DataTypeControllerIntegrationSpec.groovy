@@ -115,15 +115,6 @@ class DataTypeControllerIntegrationSpec extends AbstractPublishedElementControll
             ]
     }
 
-//    def getMappingPaginationParameters(baseLink){
-//        [
-//                // no,size, max , off. tot. next                           , previous
-//                [1, 2, 10, 0, 2, "", ""],
-//                [2, 2, 5, 0, 2, "", ""],
-//        ]
-//
-//    }
-
 
     private createValueDomainsUsingDataType(DataType DataType, Integer max){
         max.times {new ValueDomain(name: "dataTypeValueDomain${it}", description: "the ground speed of the moving vehicle", dataType: DataType).save()}
@@ -134,9 +125,5 @@ class DataTypeControllerIntegrationSpec extends AbstractPublishedElementControll
             DataType.removeFromRelatedValueDomains(ValueDomain.findByName("dataTypeValueDomain${it}"))
         }
     }
-
-
-
-
 
 }

@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.util.ValueDomains
 import spock.lang.Unroll
 
 /**
@@ -40,7 +39,7 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
         deleteValueDomains(first, 12)
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/${loadItem.id}/valueDomain")
+        [no, size, max, offset, total, next, previous] << optimize(getPaginationParameters("/${resourceName}/${loadItem.id}/valueDomain"))
     }
 
     @Override

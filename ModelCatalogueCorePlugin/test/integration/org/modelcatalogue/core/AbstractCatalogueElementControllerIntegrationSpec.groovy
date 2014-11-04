@@ -2,11 +2,8 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import grails.util.GrailsNameUtils
-import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
-import org.modelcatalogue.core.util.Mappings
-import org.modelcatalogue.core.util.Relationships
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Unroll
 
@@ -290,7 +287,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing"))
     }
 
     @Unroll
@@ -301,7 +298,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming"))
     }
 
 
@@ -313,7 +310,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships"))
     }
 
     @Unroll
@@ -324,7 +321,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/relationship")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/relationship"))
     }
 
     @Unroll
@@ -335,7 +332,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/relationship")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/relationship"))
     }
 
     @Unroll
@@ -346,7 +343,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relationship")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relationship"))
     }
 
 
@@ -358,7 +355,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/xyz")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/xyz"))
     }
 
     @Unroll
@@ -369,7 +366,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/xyz")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/xyz"))
     }
 
 
@@ -381,7 +378,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/xyz")
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/xyz"))
     }
 
     abstract Object getAnotherLoadItem()
@@ -507,9 +504,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
                 [1, 10, 10, 0, 11, "${baseLink}?max=10&offset=10", ""],
                 [2, 5, 5, 0, 11, "${baseLink}?max=5&offset=5", ""],
                 [3, 5, 5, 5, 11, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 3, 4, 8, 11, "", "${baseLink}?max=4&offset=4"],
-                [5, 1, 10, 10, 11, "", "${baseLink}?max=10&offset=0"],
-                [6, 1, 2, 10, 11, "", "${baseLink}?max=2&offset=8"]
         ]
     }
 
@@ -547,7 +541,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         item.destination.elementType == mapping.destination.class.name
 
         where:
-        [no, size, max, offset, total, next, previous] << getMappingPaginationParameters("/${resourceName}/${loadItem.id}/mapping")
+        [no, size, max, offset, total, next, previous] << optimize(getMappingPaginationParameters("/${resourceName}/${loadItem.id}/mapping"))
     }
 
 
@@ -704,9 +698,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
                 [1, 10, 10, 0, 11, "${baseLink}?max=10&offset=10", ""],
                 [2, 5, 5, 0, 11, "${baseLink}?max=5&offset=5", ""],
                 [3, 5, 5, 5, 11, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 3, 4, 8, 11, "", "${baseLink}?max=4&offset=4"],
-                [5, 1, 10, 10, 11, "", "${baseLink}?max=10&offset=0"],
-                [6, 1, 2, 10, 11, "", "${baseLink}?max=2&offset=8"]
         ]
 
     }

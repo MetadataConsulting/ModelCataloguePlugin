@@ -73,7 +73,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         resource.count() == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationParameters("/${resourceName}/")
+        [no, size, max, offset, total, next, previous] << optimize(getPaginationParameters("/${resourceName}/"))
     }
 
 
@@ -318,6 +318,13 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
     abstract String getResourceName()
     //i.e. {GrailsNameUtils.getLogicalPropertyName(getClass().getSimpleName(), "ControllerIntegrationSpec")}
+
+    protected final optimize(params, boolean skipRest = record) {
+        if (skipRest) {
+            return params
+        }
+        return [params[0]]
+    }
 
     def getPaginationParameters(String baseLink) {
         [

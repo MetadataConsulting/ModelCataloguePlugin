@@ -99,7 +99,7 @@ abstract class AbstractPublishedElementControllerIntegrationSpec extends Abstrac
         // TODO: add more verification
 
         where:
-        [no, size, max, offset, total, next, previous] << getHistoryPaginationParameters("/${resourceName}/${loadItem.id}/history")
+        [no, size, max, offset, total, next, previous] << optimize(getHistoryPaginationParameters("/${resourceName}/${loadItem.id}/history"))
     }
 
     def getHistoryPaginationParameters(String baseLink) {
