@@ -10,6 +10,8 @@ map elements from different classifications.
 History is not filtered by classifications chosen because this will barely happen but if it does happen it is probably
 something the user wants to be always aware.
 
+We want to use Spring security as a dependency, so we can do auditing etc. on users
+
 # 2014-10-29
 
 `EnumeratedTypeMarshaller` does not extend `DataTypeMarshaller` directly because if so we got into infinite loop
