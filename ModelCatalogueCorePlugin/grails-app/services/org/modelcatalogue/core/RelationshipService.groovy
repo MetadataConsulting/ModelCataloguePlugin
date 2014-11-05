@@ -31,17 +31,14 @@ class RelationshipService {
         //specific rules when creating links to and from published elements
         // TODO: it doesn't seem to be good idea place it here. would be nice if you can put it somewhere where it is more pluggable
         if(!ignoreRules) {
-            if (source.instanceOf(PublishedElement) || destination.instanceOf(PublishedElement)) {
-                if (relationshipType.name == "containment" && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new data elements to {0} models. Please create a new version before adding any additional elements")
-                    return relationshipInstance
-                }
+            if (relationshipType.name == "containment" && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+                relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new data elements to {0} models. Please create a new version before adding any additional elements")
+                return relationshipInstance
+            }
 
-                if (relationshipType.name == "instantiation" && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new value domain elements to {0} data element. Please create a new version before adding any additional values")
-                    return relationshipInstance
-                }
-
+            if (relationshipType.name == "instantiation" && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+                relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new value domain elements to {0} data element. Please create a new version before adding any additional values")
+                return relationshipInstance
             }
         }
 
@@ -74,11 +71,9 @@ class RelationshipService {
             // specific rules when creating links to and from published elements
             // XXX: this should be in the relationship type!
             if(!ignoreRules) {
-                if (source.instanceOf(PublishedElement) || destination.instanceOf(PublishedElement)) {
-                    if (relationshipType.name == "containment" && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
-                        relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version of the MODEL before removing any additional elements or archive the element first if you want to delete it.")
-                        return relationshipInstance
-                    }
+                if (relationshipType.name == "containment" && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
+                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version of the MODEL before removing any additional elements or archive the element first if you want to delete it.")
+                    return relationshipInstance
                 }
             }
 

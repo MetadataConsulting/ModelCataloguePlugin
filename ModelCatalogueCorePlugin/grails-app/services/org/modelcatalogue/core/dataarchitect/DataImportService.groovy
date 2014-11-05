@@ -249,7 +249,7 @@ class DataImportService {
 
     protected static Model addModelToImport(DataImport importer, Model model) {
         if (!importer.models.find{it.id == model.id}) {
-            //if(model.status != PublishedElementStatus.UPDATED && model.status != PublishedElementStatus.PENDING){model.status = PublishedElementStatus.DRAFT}
+            //if(model.status != ElementStatus.UPDATED && model.status != ElementStatus.PENDING){model.status = ElementStatus.DRAFT}
 //            model.save()
             importer.models.add(model)
         }

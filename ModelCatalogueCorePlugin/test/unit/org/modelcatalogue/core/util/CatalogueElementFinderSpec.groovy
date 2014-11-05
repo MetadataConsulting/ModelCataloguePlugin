@@ -13,7 +13,6 @@ class CatalogueElementFinderSpec extends Specification {
         DataType.name           in candidatesClasses
         MeasurementUnit.name    in candidatesClasses
         Model.name              in candidatesClasses
-        PublishedElement.name   in candidatesClasses
         ValueDomain.name        in candidatesClasses
         CatalogueElement.name   in candidatesClasses
 

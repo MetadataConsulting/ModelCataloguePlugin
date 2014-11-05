@@ -13,9 +13,9 @@ class ClassificationController<T> extends AbstractPublishedElementController<Cla
                 domain.removeFromClassifications(instance)
             }
             for (domain in objectToBind.classifies) {
-                PublishedElement publishedElement = PublishedElement.get(domain.id as Long)
-                instance.addToClassifies publishedElement
-                publishedElement.addToClassifications instance
+                CatalogueElement catalogueElement = CatalogueElement.get(domain.id as Long)
+                instance.addToClassifies catalogueElement
+                catalogueElement.addToClassifications instance
             }
         }
     }

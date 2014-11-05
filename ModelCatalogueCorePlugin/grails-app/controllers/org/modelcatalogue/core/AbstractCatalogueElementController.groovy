@@ -452,7 +452,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
         handleParams(max)
-        PublishedElement element = queryForResource(params.id)
+        CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
             return

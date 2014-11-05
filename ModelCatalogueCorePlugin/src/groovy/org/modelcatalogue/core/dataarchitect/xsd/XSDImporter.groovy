@@ -166,7 +166,7 @@ class XSDImporter {
         }
     }
 
-    protected <E extends PublishedElement> E  addClassifications(E element) {
+    protected <E extends CatalogueElement> E addClassifications(E element) {
         element.addToClassifications(classifications.first())
         element
     }

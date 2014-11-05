@@ -1,19 +1,13 @@
-import grails.rest.render.RenderContext
-import org.modelcatalogue.core.actions.Action
-import org.modelcatalogue.core.actions.Batch
-import org.modelcatalogue.core.actions.CreateCatalogueElement
-import org.modelcatalogue.core.actions.CreateRelationship
+import org.modelcatalogue.core.*
+import org.modelcatalogue.core.actions.*
+import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
+import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.reports.ReportsRegistry
-import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.dataarchitect.CsvTransformation
-import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
-import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.security.UserRole
+import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
-import org.modelcatalogue.core.*
-import org.modelcatalogue.core.actions.TestAction
 import org.springframework.http.HttpMethod
 
 class BootStrap {
@@ -142,7 +136,7 @@ class BootStrap {
 //
 //
                     println 'Finalizing all published elements'
-                    PublishedElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
+                    CatalogueElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
                         if (it instanceof Model) {
                             elementService.finalizeTree(it)
                         } else {

@@ -13,12 +13,12 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "return only finalized elements by default"() {
         expect:
-        elementService.list().size()               == PublishedElement.countByStatus(ElementStatus.FINALIZED)
+        elementService.list().size() == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
         elementService.list(max: 10).size()        == 10
         elementService.list(DataElement).size()    == DataElement.countByStatus(ElementStatus.FINALIZED)
         elementService.list(Model).size()          == Model.countByStatus(ElementStatus.FINALIZED)
         elementService.list(Asset).size()          == Asset.countByStatus(ElementStatus.FINALIZED)
-        elementService.count()                     == PublishedElement.countByStatus(ElementStatus.FINALIZED)
+        elementService.count() == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
         elementService.count(DataElement)          == DataElement.countByStatus(ElementStatus.FINALIZED)
         elementService.count(Model)                == Model.countByStatus(ElementStatus.FINALIZED)
         elementService.count(Asset)                == Asset.countByStatus(ElementStatus.FINALIZED)

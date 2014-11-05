@@ -21,7 +21,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         if (controller.readOnly) return
 
         String newName = "UPDATED NAME WITH NEW VERSION"
-        PublishedElement another = PublishedElement.get(anotherLoadItem.id)
+        CatalogueElement another = CatalogueElement.get(anotherLoadItem.id)
         String currentName = another.name
         Integer currentVersionNumber = another.versionNumber
         Integer numberOfCurrentVersions = another.countVersions()
@@ -35,7 +35,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         controller.update()
 
-        PublishedElement oldVersion = PublishedElement.findByLatestVersionIdAndVersionNumber(another.latestVersionId ?: another.id, currentVersionNumber)
+        CatalogueElement oldVersion = CatalogueElement.findByLatestVersionIdAndVersionNumber(another.latestVersionId ?: another.id, currentVersionNumber)
 
         def json = controller.response.json
 
@@ -52,7 +52,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "get json history: #no where max: #max offset: #offset\""() {
-        PublishedElement first = PublishedElement.get(loadItem.id)
+        CatalogueElement first = CatalogueElement.get(loadItem.id)
         createArchiveVersions(first)
 
         when:
@@ -88,7 +88,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         ]
     }
 
-    void createArchiveVersions(PublishedElement el) {
+    void createArchiveVersions(CatalogueElement el) {
         while (el.versionNumber != 12) {
             elementService.archiveAndIncreaseVersion(el)
         }

@@ -66,7 +66,16 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         String query = "%$params.search%"
 
-        if (PublishedElement.isAssignableFrom(resource)) {
+        if (Classification.isAssignableFrom(resource) || DataType.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
+            DetachedCriteria criteria = new DetachedCriteria(resource)
+            criteria.or {
+                ilike('name', query)
+                ilike('description', query)
+                ilike('modelCatalogueId', query)
+            }
+            searchResults.searchResults = criteria.list(params)
+            searchResults.total = criteria.count()
+        } else if (CatalogueElement.isAssignableFrom(resource)) {
             List<Classification> classifications = modelCatalogueSecurityService.currentUser?.classifications
 
             String alias = resource.simpleName[0].toLowerCase()
@@ -109,53 +118,6 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
             def results = Lists.fromQuery(params, resource, listQuery, arguments)
 
-
-            searchResults.searchResults = results.items
-            searchResults.total = results.total
-        } else if (Classification.isAssignableFrom(resource) || DataType.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
-            DetachedCriteria criteria = new DetachedCriteria(resource)
-            criteria.or {
-                ilike('name', query)
-                ilike('description', query)
-                ilike('modelCatalogueId', query)
-            }
-            searchResults.searchResults = criteria.list(params)
-            searchResults.total = criteria.count()
-        } else if (CatalogueElement.isAssignableFrom(resource)) {
-            List<Classification> classifications = modelCatalogueSecurityService.currentUser?.classifications
-            Map<String, Object> arguments = [
-                    query: query
-            ]
-
-            String alias = resource.simpleName[0].toLowerCase()
-            String listQuery = """
-                from ${resource.simpleName} ${alias}
-                where
-                    lower(${alias}.name) like lower(:query)
-                    or lower(${alias}.description) like lower(:query)
-                    or lower(${alias}.modelCatalogueId) like lower(:query)
-                    or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
-            """
-
-            if (classifications) {
-                // language=HQL
-                listQuery = """
-                from ${resource.simpleName} ${alias} join ${alias}.incomingRelationships as rel
-                where (
-                    lower(${alias}.name) like lower(:query)
-                    or lower(${alias}.description) like lower(:query)
-                    or lower(${alias}.modelCatalogueId) like lower(:query)
-                    or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
-                    )
-                    and rel.source in (:classifications)
-                    and rel.relationshipType = :classificationType
-                """
-                arguments.classifications = classifications
-                arguments.classificationType  = RelationshipType.classificationType
-            }
-
-
-            def results = Lists.fromQuery(params, resource, listQuery, arguments)
 
             searchResults.searchResults = results.items
             searchResults.total = results.total

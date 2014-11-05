@@ -27,7 +27,7 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", sourceClass: PublishedElement, destinationClass: PublishedElement]
+        [name: "changedName", sourceClass: CatalogueElement, destinationClass: CatalogueElement]
     }
 
     @Override

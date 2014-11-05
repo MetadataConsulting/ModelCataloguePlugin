@@ -8,8 +8,7 @@ class ModelCatalogueCorePluginUrlMappings {
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
 
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
-        def publishedElements = ['asset', 'dataElement', 'model', 'publishedElement']
-        def catalogueElements = publishedElements + ['catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
+        def catalogueElements = ['asset', 'dataElement', 'model', 'catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
         def allElements       = catalogueElements + resources
 
         for (String controllerName in allElements) {
@@ -62,11 +61,9 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/$id/mapping/$destination" (controller: controllerName, action: 'removeMapping', method: HttpMethod.DELETE)
                 "/api/modelCatalogue/core/$controllerName/$id/mapping" (controller: controllerName, action: 'mappings', method: HttpMethod.GET)
 
-                if (controllerName in publishedElements) {
-                    "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
-                    "/api/modelCatalogue/core/$controllerName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
-                }
+                "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
+                "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
 
                 if (controllerName == 'model') {
                     "/api/modelCatalogue/core/$controllerName/$id/finalizeTree"(controller: controllerName, action: 'finalizeTree', method: HttpMethod.POST)

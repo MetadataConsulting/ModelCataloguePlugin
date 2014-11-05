@@ -1,12 +1,10 @@
 package org.modelcatalogue.core.actions
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.PublishedElement
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.RelationshipService
 import org.springframework.beans.factory.annotation.Autowired
-
-import javax.management.relation.RelationService
 
 /**
  * Action Runner to create new catalogue elements.
@@ -57,11 +55,11 @@ class MergePublishedElements extends AbstractActionRunner {
         }
 
 
-        if (source && !(source instanceof PublishedElement)) {
+        if (source && !(source instanceof CatalogueElement)) {
             ret.source = 'Source must be published element'
         }
 
-        if (destination && !(destination instanceof PublishedElement)) {
+        if (destination && !(destination instanceof CatalogueElement)) {
             ret.destination = 'Destination must be published element'
         }
 
@@ -75,21 +73,33 @@ class MergePublishedElements extends AbstractActionRunner {
     }
 
     @Override void run() {
-        PublishedElement merged = merge()
+        CatalogueElement merged = merge()
         if (!merged.hasErrors()) {
 
-            out << """Merged ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${relationshipService.getClassifiedName(source)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${relationshipService.getClassifiedName(destination)}</a>"""
+            out << """Merged ${
+                GrailsNameUtils.getNaturalName(source.class.simpleName)
+            } <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${
+                source.id
+            }">${relationshipService.getClassifiedName(source as CatalogueElement)}</a> into ${
+                GrailsNameUtils.getNaturalName(destination.class.simpleName)
+            } <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${
+                destination.id
+            }">${relationshipService.getClassifiedName(destination as CatalogueElement)}</a>"""
             result = encodeEntity merged
         } else {
-            fail("""Unable to merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} ${relationshipService.getClassifiedName(source)} into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} ${relationshipService.getClassifiedName(destination)}""")
+            fail("""Unable to merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} ${
+                relationshipService.getClassifiedName(source as CatalogueElement)
+            } into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} ${
+                relationshipService.getClassifiedName(destination as CatalogueElement)
+            }""")
             printErrors(merged.errors.allErrors)
         }
     }
 
 
-    public <E extends PublishedElement> E merge() {
+    public <E extends CatalogueElement> E merge() {
         if (source && destination) {
-            elementService.merge(source as PublishedElement, destination as PublishedElement)
+            elementService.merge(source as CatalogueElement, destination as CatalogueElement)
         } else {
             throw new IllegalStateException("The action wasn't initialized yet with the valid parameters")
         }

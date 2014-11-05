@@ -1,5 +1,4 @@
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.PublishedElement
 import org.modelcatalogue.core.RelationshipType
 
 fixture {
