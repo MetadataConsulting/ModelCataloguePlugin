@@ -4,9 +4,9 @@ import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
-import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.dao.DataIntegrityViolationException
@@ -15,9 +15,7 @@ import org.springframework.http.HttpStatus
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
 
-import static org.springframework.http.HttpStatus.CREATED
-import static org.springframework.http.HttpStatus.NO_CONTENT
-import static org.springframework.http.HttpStatus.OK
+import static org.springframework.http.HttpStatus.*
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
@@ -44,7 +42,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         def results =  modelCatalogueSearchService.search(resource, params)
 
         if(results.errors){
-            reportCapableRespond results
+            respond results
             return
         }
 
@@ -94,11 +92,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.validate()
         if (instance.hasErrors()) {
-            reportCapableRespond instance.errors, view:'create' // STATUS CODE 422
+            respond instance.errors, view: 'create' // STATUS CODE 422
             return
         }
 
-        reportCapableRespond instance
+        respond instance
     }
 
     @Override
@@ -122,7 +120,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         checkAssociationsBeforeDelete(instance)
 
         if (instance.hasErrors()) {
-            reportCapableRespond instance.errors
+            respond instance.errors
             return
         }
 
@@ -130,11 +128,13 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             instance.delete flush:true
         }catch (DataIntegrityViolationException ignored){
             response.status = HttpServletResponse.SC_CONFLICT
-            reportCapableRespond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, ignored.message]) // STATUS CODE 409
+            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, ignored.message])
+            // STATUS CODE 409
             return
         } catch (Exception ignored){
             response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
-            reportCapableRespond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])  // STATUS CODE 501
+            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])
+            // STATUS CODE 501
             return
         }
 
@@ -247,7 +247,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if (!listWrapper.itemType) {
             listWrapper.itemType = itemType
         }
-        reportCapableRespond withLinks(listWrapper)
+        respond withLinks(listWrapper)
     }
 
     @Deprecated
@@ -276,24 +276,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Override @Deprecated
     protected Integer countResources() {
         return super.countResources()
-    }
-
-    @Deprecated
-    protected void reportCapableRespond(Map args, Object value) {
-        reportCapableRespond((Object)value, (Map) args)
-    }
-
-    @Deprecated
-    protected void reportCapableRespond(Object value) {
-        reportCapableRespond((Object)value, (Map)[:])
-    }
-    /**
-     * Respond which is able to capture XML exports to asset if URL parameter is {@code asset=true}.
-     * @param param object to be rendered
-     */
-    @Deprecated
-    protected void reportCapableRespond(Object param, Map args) {
-        respond((Object)param, (Map) args)
     }
 
     protected void notAuthorized() {

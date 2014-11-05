@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
-import groovy.util.slurpersupport.GPathResult
-import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import org.modelcatalogue.core.util.CatalogueElementFinder
 import org.modelcatalogue.core.util.Lists
 
@@ -24,7 +22,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     @Override
     def index(Integer max) {
         handleParams(max)
-        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+        respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             if (!params.boolean('system')) {
                 eq 'system', false
             }
@@ -32,7 +30,7 @@ class RelationshipTypeController extends AbstractRestfulController<RelationshipT
     }
 
     def elementClasses() {
-        reportCapableRespond CatalogueElementFinder.catalogueElementClasses
+        respond CatalogueElementFinder.catalogueElementClasses
     }
 
     @Override

@@ -21,7 +21,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     @Shared
     ResultRecorder recorder
     @Shared
-    def totalCount
+    Long totalCount
 
     protected boolean getRecord() {
         false
@@ -48,7 +48,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
     def "list json items test: #no where max: #max offset: #offset"() {
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         when:
         controller.response.format = "json"
@@ -70,10 +70,14 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         json.next == next
         json.previous == previous
         json.itemType == resource.name
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getPaginationParameters("/${resourceName}/"))
+    }
+
+    protected Long getResourceCount() {
+        resource.count()
     }
 
 
@@ -124,7 +128,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         json
         json.link == "/${GrailsNameUtils.getPropertyName(loadItem.class)}/${loadItem.id}"
         customJsonPropertyCheck loadItem, json
-        resource.count() == totalCount
+        resourceCount == totalCount
 
     }
 
@@ -151,7 +155,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         created.errors
         created.errors.size() >= 1
         created.errors.find{it.field == "name"}
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         action << ['save', 'validate']
@@ -181,7 +185,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         removeAllRelations stored
 
         stored.delete()
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     @Deprecated final boolean getTestCreateXml() { true }
@@ -214,7 +218,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         then:
         updated
         customJsonPropertyCheck instance, updated, resource.get(updated.id)
-        resource.count() == totalCount
+        resourceCount == totalCount
 
     }
 
@@ -240,7 +244,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         updated.errors
         updated.errors.size() == 1
         updated.errors.first().field == 'name'
-        resource.count() == totalCount
+        resourceCount == totalCount
 
 
     }
@@ -254,7 +258,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         expect:
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     def "Return 404 for non-existing item as JSON on delete"() {
@@ -267,7 +271,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         expect:
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
 
@@ -295,7 +299,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NO_CONTENT
         !resource.get(controller.params.id)
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     abstract Map getPropertiesToEdit()

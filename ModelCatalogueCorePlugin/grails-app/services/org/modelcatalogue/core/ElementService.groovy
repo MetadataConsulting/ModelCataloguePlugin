@@ -12,32 +12,32 @@ class ElementService {
     def modelCatalogueSearchService
     def messageSource
 
-    List<PublishedElement> list(Map params = [:]) {
-        PublishedElement.findAllByStatus(getStatusFromParams(params), params)
+    List<CatalogueElement> list(Map params = [:]) {
+        CatalogueElement.findAllByStatus(getStatusFromParams(params), params)
     }
 
-    public <E extends PublishedElement>  List<E> list(params = [:], Class<E> resource) {
+    public <E extends CatalogueElement> List<E> list(params = [:], Class<E> resource) {
         resource.findAllByStatus(getStatusFromParams(params), params)
     }
 
     Long count(params = [:]) {
-        PublishedElement.countByStatus(getStatusFromParams(params))
+        CatalogueElement.countByStatus(getStatusFromParams(params))
     }
 
-    public <E extends PublishedElement>  Long count(params = [:], Class<E> resource) {
+    public <E extends CatalogueElement> Long count(params = [:], Class<E> resource) {
         resource.countByStatus(getStatusFromParams(params))
     }
 
-    public <E extends PublishedElement> E archiveAndIncreaseVersion(PublishedElement element) {
+    public <E extends CatalogueElement> E archiveAndIncreaseVersion(E element) {
         if (element.archived) throw new IllegalArgumentException("You cannot archive already archived element $element")
 
-        GrailsDomainClass domainClass = grailsApplication.getDomainClass(element.class.name)
+        GrailsDomainClass domainClass = grailsApplication.getDomainClass(element.class.name) as GrailsDomainClass
 
-        E archived = element.class.newInstance()
+        E archived = element.class.newInstance() as E
 
         for (prop in domainClass.persistentProperties) {
             if (!prop.association) {
-                archived[prop.name] = element[prop.name]
+                archived.setProperty(prop.name, element[prop.name])
             }
         }
 
@@ -63,11 +63,11 @@ class ElementService {
 
         //set archived status from updated to archived
         archived.status = ElementStatus.DEPRECATED
-        archived.latestVersionId = element.latestVersionId ?: element
+        archived.latestVersionId = element.latestVersionId ?: element.id
         archived.save()
     }
 
-    public <E extends PublishedElement> E archive(PublishedElement archived) {
+    public <E extends CatalogueElement> E archive(CatalogueElement archived) {
         if (archived.archived) throw new IllegalArgumentException("You cannot archive already archived element $element")
 
         archived.incomingRelationships.each {
@@ -86,7 +86,7 @@ class ElementService {
         archived.save()
     }
 
-    public <E extends Model> E finalizeTree(Model model, Collection<Model> tree = []){
+    public <E extends Model> E finalizeTree(E model, Collection<E> tree = []) {
 
         //check that it isn't already finalized
         if(model.status==ElementStatus.FINALIZED || model.status==ElementStatus.DEPRECATED) return model
@@ -103,7 +103,7 @@ class ElementService {
         }
 
         //finalize child models
-        model.parentOf.each{ Model child ->
+        model.parentOf.each { E child ->
             if(!tree.contains(child)) {
                 finalizeTree(child, tree)
             }
@@ -126,7 +126,7 @@ class ElementService {
         return ElementStatus.valueOf(params.status.toString().toUpperCase())
     }
 
-    private PublishedElement createNewVersion(PublishedElement element){
+    private <E extends CatalogueElement> E createNewVersion(E element) {
         element.versionNumber++
         element.versionCreated = new Date()
 
@@ -142,7 +142,7 @@ class ElementService {
         element
     }
 
-    private PublishedElement elementSpecificActions(PublishedElement archived, PublishedElement element){
+    private <E extends CatalogueElement> E elementSpecificActions(E archived, E element) {
 
         //don't add parent relationships to new version of model - this should be manually done
         //children on the other hand should be added
@@ -153,7 +153,6 @@ class ElementService {
                 }
             }
         }
-
 
         //don't add a data element to the model if it's updated (the old model should still reference the archived one)
         if(element instanceof DataElement) {
@@ -168,15 +167,13 @@ class ElementService {
         }
 
         //add all the extensions to the archived element as well
-        if (element instanceof CatalogueElement) {
-            // TODO: this should be more generic
-            archived.ext.putAll element.ext
-        }
+        // TODO: this should be more generic
+        archived.ext.putAll element.ext
 
         archived
     }
 
-    private PublishedElement addRelationshipsToArchived(PublishedElement archived, PublishedElement element){
+    private <E extends CatalogueElement> E addRelationshipsToArchived(E archived, E element) {
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession') continue
             if (r.archived || r.relationshipType.name == 'hierarchy' || r.relationshipType.name == 'containment') {
@@ -198,7 +195,7 @@ class ElementService {
         archived
     }
 
-    private PublishedElement populateArchivedProperties(PublishedElement archived, PublishedElement element){
+    private <E extends CatalogueElement> E populateArchivedProperties(E archived, E element) {
         //set archived as updated whilst updates are going on (so it doesn't interfere with regular validation rules)
         archived.status = ElementStatus.UPDATED
         archived.dateCreated = element.dateCreated // keep the original creation date
@@ -211,7 +208,7 @@ class ElementService {
         archived
     }
 
-    public <E extends PublishedElement> E merge(E source, E destination, Set<Classification> classifications = new HashSet(source.classifications)) {
+    public <E extends CatalogueElement> E merge(E source, E destination, Set<Classification> classifications = new HashSet(source.classifications)) {
         log.info "Merging $source into $destination"
         if (destination == null) return null
 
@@ -247,19 +244,19 @@ class ElementService {
 
         ElementStatus originalStatus = destination.status
 
-        GrailsDomainClass grailsDomainClass = grailsApplication.getDomainClass(source.class.name)
+        GrailsDomainClass grailsDomainClass = grailsApplication.getDomainClass(source.class.name) as GrailsDomainClass
 
         for (GrailsDomainClassProperty property in grailsDomainClass.persistentProperties) {
             if (property.manyToOne || property.oneToOne) {
-                def dstProperty = destination[property.name]
-                def srcProperty = source[property.name]
+                def dstProperty = destination.getProperty(property.name)
+                def srcProperty = source.getProperty(property.name)
 
                 if (dstProperty && srcProperty && dstProperty != dstProperty) {
                     destination.errors.rejectValue property.name, 'merge.both.set.' + property.name, "Property '$property.name' is set in both source and destination. Delete it prior the merge."
                     return destination
                 }
 
-                destination[property.name] = dstProperty ?: srcProperty
+                destination.setProperty(property.name, dstProperty ?: srcProperty)
             }
         }
 
@@ -305,7 +302,7 @@ class ElementService {
             Relationship existing = destination.outgoingRelationships.find { it.destination.name == rel.destination.name && it.relationshipType == rel.relationshipType }
 
             if (existing) {
-                if (rel.destination instanceof PublishedElement && existing.destination instanceof PublishedElement && rel.destination.class == existing.destination.class && existing.destination != destination) {
+                if (rel.destination instanceof CatalogueElement && existing.destination instanceof CatalogueElement && rel.destination.class == existing.destination.class && existing.destination != destination) {
                     if (rel.destination.classifications.intersect(classifications)) {
                         merge rel.destination, existing.destination, classifications
                     }
@@ -340,7 +337,7 @@ class ElementService {
             Relationship existing = destination.incomingRelationships.find { it.source.name == rel.source.name && it.relationshipType == rel.relationshipType }
 
             if (existing) {
-                if (rel.source instanceof PublishedElement && existing.source instanceof PublishedElement && rel.source.class == existing.source.class && existing.source != destination) {
+                if (rel.source.class == existing.source.class && existing.source != destination) {
                     if (rel.source.classifications.intersect(classifications)) {
                         merge rel.source, existing.source, classifications
                     }

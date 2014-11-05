@@ -15,7 +15,7 @@ class DataElementController extends AbstractPublishedElementController<DataEleme
     def index(Integer max) {
         if (params.status == 'uninstantiated') {
             handleParams(max)
-            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.uninstantiatedDataElements(params))
+            respond Lists.wrap(params, resource, basePath, dataArchitectService.uninstantiatedDataElements(params))
             return
         }
         super.index(max)

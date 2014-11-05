@@ -72,7 +72,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     def getSubModelElements(){
         Long id = params.long('modelId') ?: params.long('id')
-        reportCapableRespond Lists.lazy(params, DataElement, "/dataArchitect/getSubModelElements")  {
+        respond Lists.lazy(params, DataElement, "/dataArchitect/getSubModelElements") {
             if (id){
                 Model model = Model.get(id)
                 ListWithTotalAndType<Model> subModels = modelService.getSubModels(model)
@@ -113,7 +113,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
             respondWithLinks elements
 
         }else{
-            reportCapableRespond "please enter keys"
+            respond "please enter keys"
         }
 
     }

@@ -1,15 +1,15 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
-import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.dataarchitect.ImportRow
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 import org.modelcatalogue.core.util.ImportRows
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
-class DataImportController<T> extends AbstractRestfulController<T>{
+class DataImportController extends AbstractRestfulController<DataImport> {
 
     def dataImportService
     def XSDImportService
@@ -29,7 +29,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
     }
 
 
-    protected getErrors(Map params, MultipartFile file){
+    protected static getErrors(Map params, MultipartFile file) {
         def errors = []
         if (!file) {
             if (!params?.conceptualDomain) errors.add("no conceptual domain!")
@@ -41,7 +41,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
         return errors
     }
 
-    protected trimString(string){
+    protected static trimString(string) {
         string.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
         return string
     }
@@ -54,96 +54,102 @@ class DataImportController<T> extends AbstractRestfulController<T>{
             return
         }
         handleParams(max)
-        def errors = [], response
+
 
         if (!(request instanceof MultipartHttpServletRequest)) {
-            errors.add("No file")
-            response =  ["errors": errors]
-        }else {
-            String conceptualDomainName, conceptualDomainDescription, importName
-            MultipartFile file = request.getFile("file")
-            errors.addAll(getErrors(params, file))
-
-            if (!errors) {
-                conceptualDomainName = trimString(params.conceptualDomain)
-                if (params?.conceptualDomainDescription) conceptualDomainDescription = trimString(params.conceptualDomainDescription) else conceptualDomainDescription = ""
-                if (params?.name) importName = trimString(params.name) else importName = ""
-                def confType = file.getContentType()
-
-
-                if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
-
-                    InputStream inputStream = file.inputStream
-                    def asset = storeAsset(params, file)
-                    ExcelLoader parser = new ExcelLoader(inputStream)
-                    def (headers, rows) = parser.parse()
-                    HeadersMap headersMap = populateHeaders()
-                    DataImport importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap, asset)
-                    response = importer
-                    reportCapableRespond response
-
-                } else if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
-                    def asset = storeAsset(params, file, 'text/obo')
-                    def id = asset.id
-                    InputStream inputStream = file.inputStream
-                    String name = params?.name
-                    String idpattern = params.idpattern
-                    executorService.submit {
-                        try {
-                            Classification classification = OBOService.importOntology(inputStream, name, idpattern)
-                            Asset updated = Asset.get(id)
-                            updated.status = ElementStatus.FINALIZED
-                            updated.description = "Your import has finished."
-                            updated.save(flush: true, failOnError: true)
-                            updated.addToClassifications(classification)
-                            classification.addToClassifies(updated)
-                            if (classification) {
-                                updated.addToRelatedTo(classification)
-                            }
-                        } catch (Exception e) {
-                            Asset updated = Asset.get(id)
-                            updated.refresh()
-                            updated.status = ElementStatus.FINALIZED
-                            updated.name = updated.name + " - Error during upload"
-                            updated.description = "Error importing obo file: ${e}"
-                            updated.save(flush: true, failOnError: true)
-                        }
-                    }
-
-                    webRequest.currentResponse.with {
-                        //TODO: remove the base link
-                        def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
-                        status = 302
-                        setHeader("Location", location.toString())
-                        setHeader("X-Asset-ID", asset.id.toString())
-                        outputStream.flush()
-                    }
-                    return
-                } else if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
-
-                    Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
-
-                    webRequest.currentResponse.with {
-                        //TODO: remove the base link
-                        def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
-                        status = 302
-                        setHeader("Location", location.toString())
-                        setHeader("X-Asset-ID", asset.id.toString())
-                        outputStream.flush()
-                    }
-
-                } else {
-                    if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
-                    if (file.size <= 0) errors.add("The uploaded file is empty")
-                    response =  ["errors": errors]
-                    reportCapableRespond response
-                }
-            }else{
-                response =  ["errors": errors]
-                reportCapableRespond response
-            }
+            respond "errors": [message: 'No file selected']
+            return
         }
 
+        def errors = [], response
+
+        String conceptualDomainName, conceptualDomainDescription, importName
+        MultipartFile file = request.getFile("file")
+        errors.addAll(getErrors(params, file))
+
+        if (errors) {
+            response = ["errors": errors]
+            respond response
+        }
+
+        conceptualDomainName = trimString(params.conceptualDomain)
+        if (params?.conceptualDomainDescription) conceptualDomainDescription = trimString(params.conceptualDomainDescription) else conceptualDomainDescription = ""
+        if (params?.name) importName = trimString(params.name) else importName = ""
+        def confType = file.getContentType()
+
+
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
+
+            InputStream inputStream = file.inputStream
+            def asset = storeAsset(params, file)
+            ExcelLoader parser = new ExcelLoader(inputStream)
+            def (headers, rows) = parser.parse()
+            HeadersMap headersMap = populateHeaders()
+            DataImport importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap, asset)
+            response = importer
+            respond response
+            return
+        }
+
+        if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
+            def asset = storeAsset(params, file, 'text/obo')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+            String name = params?.name
+            String idpattern = params.idpattern
+            executorService.submit {
+                try {
+                    Classification classification = OBOService.importOntology(inputStream, name, idpattern)
+                    Asset updated = Asset.get(id)
+                    updated.status = ElementStatus.FINALIZED
+                    updated.description = "Your import has finished."
+                    updated.save(flush: true, failOnError: true)
+                    updated.addToClassifications(classification)
+                    classification.addToClassifies(updated)
+                    if (classification) {
+                        updated.addToRelatedTo(classification)
+                    }
+                } catch (Exception e) {
+                    Asset updated = Asset.get(id)
+                    updated.refresh()
+                    updated.status = ElementStatus.FINALIZED
+                    updated.name = updated.name + " - Error during upload"
+                    updated.description = "Error importing obo file: ${e}"
+                    updated.save(flush: true, failOnError: true)
+                }
+            }
+
+            webRequest.currentResponse.with {
+                //TODO: remove the base link
+                def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
+                status = 302
+                setHeader("Location", location.toString())
+                setHeader("X-Asset-ID", asset.id.toString())
+                outputStream.flush()
+            }
+            return
+        }
+
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
+
+            Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
+
+            webRequest.currentResponse.with {
+                //TODO: remove the base link
+                def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
+                status = 302
+                setHeader("Location", location.toString())
+                setHeader("X-Asset-ID", asset.id.toString())
+                outputStream.flush()
+            }
+            return
+
+        }
+
+        if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
+        if (file.size <= 0) errors.add("The uploaded file is empty")
+        response = ["errors": errors]
+        respond response
     }
 
 
@@ -178,7 +184,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
             Asset updated = Asset.get(id)
             try {
                 XsdLoader parserXSD = new XsdLoader(inputStream)
-                def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces, logErrorsSACT) = parserXSD.parse()
+                def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces) = parserXSD.parse()
                 def (classification, conceptualDomain) = XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
                 updated.status = ElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
@@ -207,13 +213,13 @@ class DataImportController<T> extends AbstractRestfulController<T>{
     def pendingAction(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        def total = (importer?.pendingAction)? importer?.pendingAction.size() : 0
-        def offset = 0
+        long total = (importer?.pendingAction) ? importer?.pendingAction?.size() : 0
+        long offset = 0
         List<ImportRow> items = []
         if (importer.pendingAction) items.addAll(importer?.pendingAction)
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/pendingAction",
-                items: items.subList(offset, Math.min( offset + params.max, total )),
+                items: items.subList(offset, Math.min(offset + params.long('max'), total)),
                 total: total
         )
     }
@@ -221,14 +227,14 @@ class DataImportController<T> extends AbstractRestfulController<T>{
     def imported(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        def total = (importer?.imported)? importer?.imported.size() : 0
-        def offset = 0
+        long total = (importer?.imported) ? importer?.imported?.size() : 0
+        long offset = 0
         List<ImportRow> items = []
         if (importer.imported) items.addAll(importer?.imported)
 
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/imported",
-                items: items.subList(offset, Math.min( offset + params.max, total )),
+                items: items.subList(offset, Math.min(offset + params.long('max'), total)),
                 total: total
         )
     }
@@ -236,14 +242,14 @@ class DataImportController<T> extends AbstractRestfulController<T>{
     def importQueue(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        def total = (importer?.importQueue)? importer?.importQueue.size() : 0
-        def offset = 0
+        long total = (importer?.importQueue) ? importer?.importQueue?.size() : 0
+        long offset = 0
         List<ImportRow> items = []
         if (importer.importQueue) items.addAll(importer?.importQueue)
 
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/importQueue",
-                items: items.subList(offset, Math.min( offset + params.max, total )),
+                items: items.subList(offset, Math.min(params.long('max'), total)),
                 total: total
         )
     }
@@ -258,7 +264,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
         }else{
             response = ["error": "import or import row not found"]
         }
-        reportCapableRespond response
+        respond response
     }
 
     def ingestRow(Long id, Long rowId){
@@ -272,7 +278,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
         }else{
             response = ["error": "import or import row not found"]
         }
-        reportCapableRespond response
+        respond response
     }
 
     def resolveAll(Long id){
@@ -284,7 +290,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
         }else{
             response = ["error": "import or import row not found"]
         }
-        reportCapableRespond response
+        respond response
     }
 
     def ingestQueue(Long id){
@@ -296,7 +302,7 @@ class DataImportController<T> extends AbstractRestfulController<T>{
         }else{
             response = ["error": "import or import row not found"]
         }
-        reportCapableRespond response
+        respond response
     }
 
 

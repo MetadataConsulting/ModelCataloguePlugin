@@ -37,7 +37,7 @@ class SearchController extends AbstractRestfulController<CatalogueElement>{
                 itemType: CatalogueElement
         )
 
-        reportCapableRespond elements
+        respond elements
 
     }
 

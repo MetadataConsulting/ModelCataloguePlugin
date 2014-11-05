@@ -8,7 +8,12 @@ import grails.util.GrailsNameUtils
 class CatalogueElementControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     def setupSpec(){
-        totalCount = CatalogueElement.count()
+        totalCount = resource.countByStatus(ElementStatus.FINALIZED)
+    }
+
+    @Override
+    protected Long getResourceCount() {
+        resource.countByStatus(ElementStatus.FINALIZED)
     }
 
     @Override

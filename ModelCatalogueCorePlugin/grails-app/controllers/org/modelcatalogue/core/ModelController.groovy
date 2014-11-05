@@ -1,8 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.transaction.Transactional
-import org.modelcatalogue.core.util.Elements
-import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 
 class ModelController extends AbstractPublishedElementController<Model> {
@@ -20,7 +17,7 @@ class ModelController extends AbstractPublishedElementController<Model> {
         }
         handleParams(max)
 
-        reportCapableRespond Lists.wrap(params, "/${resourceName}/", modelService.getTopLevelModels(params))
+        respond Lists.wrap(params, "/${resourceName}/", modelService.getTopLevelModels(params))
     }
 
 
@@ -39,7 +36,7 @@ class ModelController extends AbstractPublishedElementController<Model> {
             return
         }
 
-        reportCapableRespond elementService.finalizeTree(instance)
+        respond elementService.finalizeTree(instance)
     }
 
 }

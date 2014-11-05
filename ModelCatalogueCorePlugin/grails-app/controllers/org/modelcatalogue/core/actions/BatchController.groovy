@@ -74,7 +74,7 @@ class BatchController extends AbstractRestfulController<Batch> {
             return
         }
         handleParams(max)
-        reportCapableRespond Lists.fromCriteria(params, resource, "/${resourceName}/") {
+        respond Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'archived', params.boolean('archived') || params.status == 'archived'
         }
     }
@@ -133,7 +133,7 @@ class BatchController extends AbstractRestfulController<Batch> {
 
         ActionState state = params.state ? ActionState.valueOf(params.state.toString().toUpperCase()) : null
 
-        reportCapableRespond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params.state ?: ''}", actionService.list(params, batch, state))
+        respond Lists.wrap(params, "/${resourceName}/${batch.id}/actions/${params.state ?: ''}", actionService.list(params, batch, state))
     }
 
     def dismiss() {

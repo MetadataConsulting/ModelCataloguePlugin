@@ -15,6 +15,85 @@ import javax.servlet.http.HttpServletResponse
 abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends AbstractControllerIntegrationSpec implements ResultRecorder{
 
 
+    def elementService
+
+    def "update and create new version"() {
+        if (controller.readOnly) return
+
+        String newName = "UPDATED NAME WITH NEW VERSION"
+        PublishedElement another = PublishedElement.get(anotherLoadItem.id)
+        String currentName = another.name
+        Integer currentVersionNumber = another.versionNumber
+        Integer numberOfCurrentVersions = another.countVersions()
+
+        when:
+        controller.request.method = 'PUT'
+        controller.params.id = another.id
+        controller.params.newVersion = true
+        controller.request.json = [name: newName]
+        controller.response.format = "json"
+
+        controller.update()
+
+        PublishedElement oldVersion = PublishedElement.findByLatestVersionIdAndVersionNumber(another.latestVersionId ?: another.id, currentVersionNumber)
+
+        def json = controller.response.json
+
+        then:
+        json.versionNumber == currentVersionNumber + 1
+        json.name == newName
+
+        another.countVersions() == numberOfCurrentVersions + 1
+
+        oldVersion.versionNumber == currentVersionNumber
+        oldVersion.name == currentName
+        oldVersion.name != json.name
+    }
+
+    @Unroll
+    def "get json history: #no where max: #max offset: #offset\""() {
+        PublishedElement first = PublishedElement.get(loadItem.id)
+        createArchiveVersions(first)
+
+        when:
+        controller.params.id = first.id
+        controller.params.offset = offset
+        controller.params.max = max
+        controller.response.format = "json"
+        controller.history(max)
+        def json = controller.response.json
+
+        recordResult "history$no", json
+
+
+        then:
+        checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
+        json.itemType == resource.name
+
+        // TODO: add more verification
+
+        where:
+        [no, size, max, offset, total, next, previous] << optimize(getHistoryPaginationParameters("/${resourceName}/${loadItem.id}/history"))
+    }
+
+    def getHistoryPaginationParameters(String baseLink) {
+        [
+                // no,size, max , off. tot. next                           , previous
+                [1, 10, 10, 0, 12, "${baseLink}?max=10&sort=versionNumber&order=desc&offset=10", ""],
+                [2, 5, 5, 0, 12, "${baseLink}?max=5&sort=versionNumber&order=desc&offset=5", ""],
+                [3, 5, 5, 5, 12, "${baseLink}?max=5&sort=versionNumber&order=desc&offset=10", "${baseLink}?max=5&sort=versionNumber&order=desc&offset=0"],
+                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&sort=versionNumber&order=desc&offset=4"],
+                [5, 2, 10, 10, 12, "", "${baseLink}?max=10&sort=versionNumber&order=desc&offset=0"],
+                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&sort=versionNumber&order=desc&offset=8"]
+        ]
+    }
+
+    void createArchiveVersions(PublishedElement el) {
+        while (el.versionNumber != 12) {
+            elementService.archiveAndIncreaseVersion(el)
+        }
+    }
+
     @Unroll
     def "Link existing elements using add to #direction endpoint with JSON result"(){
 
@@ -35,7 +114,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         json.relation.id == loadItem.id
         json.type
         json.type.id     == relationshipType.id
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         direction << ["incoming", "outgoing"]
@@ -59,7 +138,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         expect:
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         _ | direction
@@ -84,7 +163,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         expect:
         controller.response.status == HttpServletResponse.SC_NO_CONTENT
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         _ | direction
@@ -108,7 +187,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         json.errors
         json.errors.size() >= 1
         json.errors.first().field == 'relationshipType'
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         direction << ["incoming", "outgoing"]
@@ -129,7 +208,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         expect:
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         action   | direction  | method
@@ -159,7 +238,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         expect:
         controller. response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         action   | direction  | httpMethod
@@ -197,18 +276,18 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert json.page == max
         assert json.availableReports != null
         type2.delete()
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
 
     def checkJsonRelations(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
         checkJsonRelationsInternal(null, no, size, max, offset, total, next, previous, incomingOrOutgoing)
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     def checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
         checkJsonRelationsInternal("relationship", no, size, max, offset, total, next, previous, incomingOrOutgoing)
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     def "Return 404 for non-existing item as JSON for incoming relationships queried by type"() {
@@ -219,7 +298,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         expect:
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
 
@@ -231,7 +310,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         expect:
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     def "Return 404 for non-existing item as JSON for outgoing relationships queried by type"() {
@@ -242,7 +321,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         expect:
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     def "Return 404 for non-existing item as JSON for combined relationships"() {
@@ -253,7 +332,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         expect:
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     def "Return 404 for non-existing item as JSON for incoming relationships"() {
@@ -264,7 +343,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         expect:
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
     def "Return 404 for non-existing item as JSON for outgoing relationships"() {
@@ -275,7 +354,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         expect:
         controller.response.text == ""
         controller.response.status == HttpServletResponse.SC_NOT_FOUND
-        resource.count() == totalCount
+        resourceCount == totalCount
     }
 
 
@@ -284,7 +363,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelations(no, size, max, offset, total, next, previous, "outgoing")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing"))
@@ -295,7 +374,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelations(no, size, max, offset, total, next, previous, "incoming")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming"))
@@ -307,7 +386,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelations(no, size, max, offset, total, next, previous, "relationships")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships"))
@@ -318,7 +397,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "outgoing")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/relationship"))
@@ -329,7 +408,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "incoming")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/relationship"))
@@ -340,7 +419,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, "relationships")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relationship"))
@@ -352,7 +431,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "outgoing")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/xyz"))
@@ -363,7 +442,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "incoming")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/xyz"))
@@ -375,7 +454,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         checkJsonRelationsWithWrongType(no, size, max, offset, total, next, previous, "relationships")
 
         expect:
-        resource.count() == totalCount
+        resourceCount == totalCount
 
         where:
         [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/xyz"))

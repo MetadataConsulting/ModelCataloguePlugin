@@ -29,11 +29,11 @@ class AssetController extends AbstractPublishedElementController<Asset> {
         }
 
         if (asset.hasErrors()) {
-            reportCapableRespond asset.errors, view: 'create' // STATUS CODE 422
+            respond asset.errors, view: 'create' // STATUS CODE 422
             return
         }
 
-        reportCapableRespond asset
+        respond asset
     }
 
     def validateXml() {

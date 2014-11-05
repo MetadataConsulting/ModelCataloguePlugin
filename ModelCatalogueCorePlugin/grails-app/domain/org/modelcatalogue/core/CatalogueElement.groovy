@@ -20,6 +20,19 @@ abstract class CatalogueElement implements Extendible {
     String description
 	String modelCatalogueId
 
+    //version number - this gets iterated every time a new version is created from a finalized version
+    Integer versionNumber = 1
+
+    //status: once an object is finalized it cannot be changed
+    //it's version number is updated and any subsequent update will
+    //be mean that the element is superseded. We will provide a supersede function
+    //to do this
+    ElementStatus status = ElementStatus.DRAFT
+
+    Date versionCreated = new Date()
+
+    // id of the latest version
+    Long latestVersionId
 
     // time stamping
     Date dateCreated
@@ -36,8 +49,8 @@ abstract class CatalogueElement implements Extendible {
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
-            incoming: [base: 'isBasedOn', classification: 'classifications'],
-            outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf'],
+            incoming: [base: 'isBasedOn', classification: 'classifications', supersession: 'supersedes'],
+            outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy'],
             bidirectional: [relatedTo: 'relatedTo']
     ]
 
@@ -48,6 +61,23 @@ abstract class CatalogueElement implements Extendible {
         dateCreated bindable: false
         lastUpdated bindable: false
         archived bindable: false
+        status validator: { val, obj ->
+            if (!val) {
+                return true
+            }
+            def oldStatus = null
+            if (obj.version != null) {
+                oldStatus = obj.getPersistentValue('status')
+            }
+            if (obj.instanceOf(Model) && oldStatus != ElementStatus.FINALIZED && val == ElementStatus.FINALIZED) {
+                if (!checkChildItemsFinalized(obj)) {
+                    return ['org.modelcatalogue.core.PublishedElement.status.validator.children']
+                }
+            }
+            return true
+        }
+        versionNumber bindable: false
+        latestVersionId bindable: false, nullable: true
     }
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
@@ -57,7 +87,7 @@ abstract class CatalogueElement implements Extendible {
         name boost:5
         incomingMappings component: true
         extensions component:true
-        except = ['incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
+        except = ['versionNumber', 'incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
     }
 
     static mapping = {
@@ -173,7 +203,10 @@ abstract class CatalogueElement implements Extendible {
         ]
     }
 
-    boolean isArchived() { false }
+    boolean isArchived() {
+        if (!status) return false
+        !status.modificable
+    }
 
     def beforeDelete(){
         new HashSet(outgoingRelationships).each{ Relationship relationship->
@@ -200,13 +233,46 @@ abstract class CatalogueElement implements Extendible {
         }
     }
 
+    Integer countVersions() {
+        if (!latestVersionId) {
+            return 1
+        }
+        getClass().countByLatestVersionId(latestVersionId)
+    }
+
+    static protected Boolean checkChildItemsFinalized(Model model, Collection<Model> tree = []) {
+
+        if (model.contains.any {
+            it.status != ElementStatus.FINALIZED && it.status != ElementStatus.DEPRECATED
+        }) return false
+
+        if (!tree.contains(model)) tree.add(model)
+
+        def parentOf = model.parentOf
+        if (parentOf) {
+            return model.parentOf.any { Model md ->
+                if (md.status != ElementStatus.FINALIZED && md.status != ElementStatus.DEPRECATED) return false
+                if (!tree.contains(md)) {
+                    if (!checkChildItemsFinalized(md, tree)) return false
+                }
+                return true
+            }
+        }
+        return true
+    }
+
     String getDefaultModelCatalogueId() {
         if (!grailsLinkGenerator) {
             return null
         }
         String resourceName = fixResourceName GrailsNameUtils.getPropertyName(getClass())
-        grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${id}")
+        grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${latestVersionId ?: id}.${versionNumber}")
     }
+
+    /**
+     * Called before the archived element is persisted to the data store.
+     */
+    protected void beforeArchive() {}
 
     static String fixResourceName(String resourceName) {
         if (resourceName.contains('_')) {
@@ -223,7 +289,7 @@ abstract class CatalogueElement implements Extendible {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, modelCatalogueId: ${modelCatalogueId ?: defaultModelCatalogueId}, extensions: ${extensions}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
     }
 
     @Override
