@@ -6,7 +6,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class DataTypeControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     protected boolean getRecord() {
         true
@@ -116,11 +116,11 @@ class DataTypeControllerIntegrationSpec extends AbstractPublishedElementControll
     }
 
 
-    private createValueDomainsUsingDataType(DataType DataType, Integer max){
+    private static createValueDomainsUsingDataType(DataType DataType, Integer max) {
         max.times {new ValueDomain(name: "dataTypeValueDomain${it}", description: "the ground speed of the moving vehicle", dataType: DataType).save()}
     }
 
-    private deleteValueDomains(DataType DataType, Integer max){
+    private static deleteValueDomains(DataType DataType, Integer max) {
         max.times {
             DataType.removeFromRelatedValueDomains(ValueDomain.findByName("dataTypeValueDomain${it}"))
         }

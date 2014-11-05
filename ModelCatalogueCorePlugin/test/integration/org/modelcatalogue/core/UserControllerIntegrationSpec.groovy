@@ -6,7 +6,7 @@ import org.modelcatalogue.core.security.User
 /**
  * Created by adammilward on 27/02/2014.
  */
-class UserControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){

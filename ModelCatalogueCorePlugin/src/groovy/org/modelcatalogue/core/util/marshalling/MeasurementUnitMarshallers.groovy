@@ -7,7 +7,7 @@ import org.modelcatalogue.core.ValueDomain
 /**
  * Marshallers for MeasurementUnit.
  */
-class MeasurementUnitMarshallers extends PublishedElementMarshallers {
+class MeasurementUnitMarshallers extends CatalogueElementMarshallers {
 
     MeasurementUnitMarshallers() {
         super(MeasurementUnit)

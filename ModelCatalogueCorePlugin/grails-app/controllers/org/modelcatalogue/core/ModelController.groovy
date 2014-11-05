@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 
-class ModelController extends AbstractPublishedElementController<Model> {
+class ModelController extends AbstractCatalogueElementController<Model> {
 
     def modelService
 

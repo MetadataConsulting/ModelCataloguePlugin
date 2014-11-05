@@ -4,7 +4,7 @@ import grails.converters.JSON
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
-class UserController extends AbstractPublishedElementController<User> {
+class UserController extends AbstractCatalogueElementController<User> {
 
     UserController() {
         super(User, false)

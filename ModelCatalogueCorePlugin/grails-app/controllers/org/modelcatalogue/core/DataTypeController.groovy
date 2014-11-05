@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 
-class DataTypeController<T> extends AbstractPublishedElementController<DataType> {
+class DataTypeController<T> extends AbstractCatalogueElementController<DataType> {
 
     DataTypeController() {
         super(DataType, false)

@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
 import org.springframework.web.multipart.MultipartFile
 
-class AssetController extends AbstractPublishedElementController<Asset> {
+class AssetController extends AbstractCatalogueElementController<Asset> {
 
     StorageService modelCatalogueStorageService
     SchemaValidatorService schemaValidatorService

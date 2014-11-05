@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 
-class MeasurementUnitController extends AbstractPublishedElementController<MeasurementUnit> {
+class MeasurementUnitController extends AbstractCatalogueElementController<MeasurementUnit> {
 
     MeasurementUnitController() {
         super(MeasurementUnit, false)

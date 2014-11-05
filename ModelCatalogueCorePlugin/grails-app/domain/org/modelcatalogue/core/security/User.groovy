@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.security
 
-import org.modelcatalogue.core.PublishedElement
+import org.modelcatalogue.core.CatalogueElement
 
-class User extends PublishedElement {
+class User extends CatalogueElement {
 
     transient modelCatalogueSecurityService
 

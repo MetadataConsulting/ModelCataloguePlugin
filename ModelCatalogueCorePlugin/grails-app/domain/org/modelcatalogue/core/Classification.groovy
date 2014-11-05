@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 
-class Classification extends PublishedElement {
+class Classification extends CatalogueElement {
 
     /**
      * @deprecated use model catalogue id instead

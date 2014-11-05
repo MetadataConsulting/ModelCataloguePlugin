@@ -9,7 +9,7 @@ import org.modelcatalogue.core.util.Lists
 
 class DashboardController {
 
-    static responseFormats = ['json', 'xml', 'xlsx']
+    static responseFormats = ['json', 'xlsx']
     def dataArchitectService
     def classificationService
 

@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.dataarchitect.DataArchitectService
 import org.modelcatalogue.core.util.Lists
 
-class DataElementController extends AbstractPublishedElementController<DataElement> {
+class DataElementController extends AbstractCatalogueElementController<DataElement> {
 
     DataArchitectService dataArchitectService
 

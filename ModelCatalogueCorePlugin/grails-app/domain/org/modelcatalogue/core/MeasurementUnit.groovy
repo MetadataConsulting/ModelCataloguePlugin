@@ -5,7 +5,7 @@ package org.modelcatalogue.core
 *
 * */
 
-class MeasurementUnit extends PublishedElement {
+class MeasurementUnit extends CatalogueElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 

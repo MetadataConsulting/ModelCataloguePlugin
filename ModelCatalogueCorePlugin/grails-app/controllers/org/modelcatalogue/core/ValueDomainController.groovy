@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 
-class ValueDomainController extends AbstractPublishedElementController<ValueDomain> {
+class ValueDomainController extends AbstractCatalogueElementController<ValueDomain> {
 
     def dataArchitectService
 

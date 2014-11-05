@@ -7,7 +7,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Unroll
     def "expect uploaded asset will have #expectedName if params are #params"() {

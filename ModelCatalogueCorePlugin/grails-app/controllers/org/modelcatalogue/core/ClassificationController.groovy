@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-class ClassificationController<T> extends AbstractPublishedElementController<Classification> {
+class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
 
     ClassificationController() {
         super(Classification, false)

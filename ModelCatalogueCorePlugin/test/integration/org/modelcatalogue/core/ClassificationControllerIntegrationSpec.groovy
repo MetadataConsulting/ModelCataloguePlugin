@@ -1,12 +1,11 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import spock.lang.Unroll
 
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ClassificationControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){

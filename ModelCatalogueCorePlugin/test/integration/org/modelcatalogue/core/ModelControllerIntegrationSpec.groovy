@@ -5,7 +5,7 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+class ModelControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     protected boolean getRecord() {
         true

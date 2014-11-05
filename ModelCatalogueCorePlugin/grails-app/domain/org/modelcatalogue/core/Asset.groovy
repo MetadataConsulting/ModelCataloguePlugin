@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-class Asset extends PublishedElement {
+class Asset extends CatalogueElement {
 
     Long    size
     String  contentType

@@ -4,7 +4,7 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.ValueDomain
 
-class EnumeratedTypeMarshaller extends PublishedElementMarshallers {
+class EnumeratedTypeMarshaller extends CatalogueElementMarshallers {
 
     EnumeratedTypeMarshaller() {
         super(EnumeratedType)
