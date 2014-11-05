@@ -49,30 +49,36 @@ class DataElementWizardSpec extends GebReportingSpec  {
             when: 'the data element details are filled in'
 
             classifications = "NT1"
-            name        = "New"
+            name        = "NewDE1"
             description = "NT1 Description"
             valueDomain = "VD4Dent1"
 
             and: 'save button clicked'
             saveButton.click()
-
-            then: 'the data element is saved'
-
-            waitFor {
-                $('td.inf-table-item-cell.ng-scope.col-md-3', text: "New").displayed
-            }
+            then: 'the data element is saved and displayed at the top of the table'
+             waitFor {
+                    $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)', text: "NewDE1").displayed
+             }
 
     }
 
 
-    def "Check the value domain exists"(){
+    def "Check the data element shows up with own details"(){
 
 
+        when: 'Data Element is located'
+
+        waitFor {
+            $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)', text: "NewDE1").displayed
+            //newDataElement.text()== "NewDE1"
+        }
+        then: 'Click the element'
+
+        waitFor {
+            $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)').click()
+        }
 
     }
 
-    def "Add an enumerated datatype to the value domain"(){
-
-    }
 
 }
