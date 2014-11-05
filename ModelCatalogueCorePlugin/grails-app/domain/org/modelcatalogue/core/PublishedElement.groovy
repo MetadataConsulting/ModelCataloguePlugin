@@ -93,4 +93,9 @@ abstract class PublishedElement extends CatalogueElement  {
         grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${latestVersionId ?: id}.${versionNumber}")
     }
 
+    /**
+     * Called before the archived element is persisted to the data store.
+     */
+    protected void beforeArchive() {}
+
 }

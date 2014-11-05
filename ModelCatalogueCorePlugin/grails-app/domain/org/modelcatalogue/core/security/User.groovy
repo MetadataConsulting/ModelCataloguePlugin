@@ -1,9 +1,8 @@
 package org.modelcatalogue.core.security
 
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.PublishedElement
 
-class User extends CatalogueElement {
+class User extends PublishedElement {
 
     transient modelCatalogueSecurityService
 
@@ -41,5 +40,20 @@ class User extends CatalogueElement {
 
     protected void encodePassword() {
         password = modelCatalogueSecurityService.encodePassword(password)
+    }
+
+    @Override
+    protected void beforeArchive() {
+        super.beforeArchive()
+        String randomUsername = username
+        while (User.countByUsername(randomUsername)) {
+            randomUsername = "$username (${UUID.randomUUID().toString()})"
+        }
+        username = randomUsername
+        // made the user account unable to sign in
+        enabled = false
+        accountExpired = true
+        accountLocked = true
+        passwordExpired = true
     }
 }

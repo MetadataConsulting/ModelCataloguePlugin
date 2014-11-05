@@ -2,13 +2,11 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.security.User
-import spock.lang.Ignore
-import spock.lang.Unroll
 
 /**
  * Created by adammilward on 27/02/2014.
  */
-class UserControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+class UserControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){

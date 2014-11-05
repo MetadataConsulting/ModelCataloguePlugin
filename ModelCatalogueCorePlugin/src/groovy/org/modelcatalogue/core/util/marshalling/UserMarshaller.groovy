@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import org.modelcatalogue.core.security.User
 
-class UserMarshaller extends CatalogueElementMarshallers {
+class UserMarshaller extends PublishedElementMarshallers {
 
     UserMarshaller() {
         super(User)

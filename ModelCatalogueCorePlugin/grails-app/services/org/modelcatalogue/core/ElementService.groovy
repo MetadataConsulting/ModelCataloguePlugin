@@ -202,7 +202,7 @@ class ElementService {
         //set archived as updated whilst updates are going on (so it doesn't interfere with regular validation rules)
         archived.status = ElementStatus.UPDATED
         archived.dateCreated = element.dateCreated // keep the original creation date
-
+        archived.beforeArchive()
 
         if (!archived.save()) {
             log.error(archived.errors)
