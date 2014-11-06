@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           for err in response.data.errors
             messages.error err.message
 
-  actionsProvider.registerActionInRole 'create-catalogue-element', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'names', 'security', 'messages', ($scope, names, security, messages) ->
+  actionsProvider.registerActionInRole 'create-catalogue-element', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'names', 'security', 'messages', '$state', ($scope, names, security, messages, $state) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.resource
     return undefined if $scope.resource == 'batch'
@@ -35,11 +35,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       args      = {create: ($scope.resource)}
       args.type = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
 
-      if $scope.resource == 'model' and $scope.contained?.element
-        args.parent = $scope.contained.element
       security.requireRole('CURATOR')
       .then ->
-        messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args)
+        messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then ->
+          if $scope.resource == 'model' and $state.current.name == 'mc.resource.list'
+            $state.go '.', {status: 'draft'}, {reload: true}
       , ->
         messages.error('You don\'t have rights to create new elements')
     }

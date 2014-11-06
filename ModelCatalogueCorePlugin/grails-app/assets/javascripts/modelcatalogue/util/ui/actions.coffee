@@ -13,7 +13,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     ROLE_LIST_HEADER_ACTION:      'header'
     ROLE_LIST_FOOTER_ACTION:      'footer'
 
-  getRoleAwareId = (role, id) -> "role(#{role}):#{id}"
+  getRoleAwareId = (role, id) -> "role_#{role}_#{id}"
 
 
   registerActionInternal = (parentId, id, actionFactory, roles) ->
@@ -146,7 +146,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     actions.getActions = ($scope, role = undefined) ->
       currentActions = []
       for id, actionConfig of availableActionsById
-        match = id.match(/^role\((.*)\):(.*)$/)
+        match = id.match(/^role_(.*)_(.*)$/)
         if not role and not match or role and match and match[1] == role
           action = createAction(undefined, id, actionConfig, actions, $scope)
           currentActions.push action if action
