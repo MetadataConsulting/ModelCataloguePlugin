@@ -1,9 +1,4 @@
 #= require_self
-#= require angular-bootstrap/ui-bootstrap-tpls
-#= require angular-cookies/angular-cookies
-#= require angular-sanitize/angular-sanitize
-#= require angular-animate/angular-animate
-#= require ngInfiniteScroll/build/ng-infinite-scroll
 #= require modelcatalogue/core/index
 #= require modelcatalogue/util/ui/index
 #= require modelcatalogue/util/ui/bs/index

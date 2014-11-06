@@ -226,10 +226,51 @@ grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.tes
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
 
-grails.assets.excludes = ["bootstrap/**/*.less", "jquery/**/*.js", "angular/**/*.js"]
+grails.assets.excludes = [
+        "bootstrap/**/*.less",
+        "bootstrap/**/*.js",
+        "font-awesome/**/*.less",
+        "jquery/**/*.js",
+        "angular/**/*.js",
+        "angular-animate/**/*.js",
+        "angular-bootstrap/**/*.js",
+        "angular-cookies/**/*.js",
+        "angular-dif-match-patch-musketyr/**/*.js",
+        "angular-http-auth/**/*.js",
+        "angular-i18n/**/*.js",
+        "angular-loading-bar/**/*.js",
+        "angular-mocks/**/*.js",
+        "angular-sanitize/**/*.js",
+        "angular-ui-router/**/*.js",
+        "google-diff-match-patch/**/*.js",
+        "jasmine/**/*.js",
+        "ng-file-upload/**/*.js",
+        "ng-file-upload-shim/**/*.js",
+        "ngInfiniteScroll/**/*.js",
+]
 
-grails.assets.plugin."model-catalogue-core-plugin".excludes = ["bootstrap/**/*.less", "jquery/**/*.js", "angular/**/*.js"]
-grails.assets.plugin."model-catalogue-core-plugin".includes = ["bootstrap.less"]
+grails.assets.plugin."model-catalogue-core-plugin".excludes = [
+        "bootstrap/**/*.less",
+        "bootstrap/**/*.js",
+        "font-awesome/**/*.less",
+        "jquery/**/*.js",
+        "angular/**/*.js",
+        "angular-animate/**/*.js",
+        "angular-bootstrap/**/*.js",
+        "angular-cookies/**/*.js",
+        "angular-dif-match-patch-musketyr/**/*.js",
+        "angular-http-auth/**/*.js",
+        "angular-i18n/**/*.js",
+        "angular-loading-bar/**/*.js",
+        "angular-mocks/**/*.js",
+        "angular-sanitize/**/*.js",
+        "angular-ui-router/**/*.js",
+        "google-diff-match-patch/**/*.js",
+        "jasmine/**/*.js",
+        "ng-file-upload/**/*.js",
+        "ng-file-upload-shim/**/*.js",
+        "ngInfiniteScroll/**/*.js",
+]
 
 grails.assets.minifyOptions = [
         strictSemicolons: false,

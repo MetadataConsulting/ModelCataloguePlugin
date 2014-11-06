@@ -38,10 +38,6 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def current() {
-        if (!modelCatalogueSecurityService.isUserLoggedIn()) {
-            notAuthorized()
-            return
-        }
         render([
                 success: true,
                 username: modelCatalogueSecurityService.currentUser.username,

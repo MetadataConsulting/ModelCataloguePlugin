@@ -1,11 +1,45 @@
-<%@ page contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<%@ page import="grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
 
     <title>Model Catalogue Demo App</title>
-    <asset:stylesheet href="metaDataCurator.css"/>
-    <asset:javascript src="metaDataCurator.js"/>
+    <g:if test="${Environment.current in [Environment.PRODUCTION, Environment.TEST, Environment.CUSTOM]}">
+        <!-- CDNs -->
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
+
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular.min.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap-tpls.min.js"></script>
+
+        <!-- i18n 1.3.0 not present but hopefuly it's the same -->
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.2.15/angular-locale_en-gb.js"></script>
+
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular-animate.min.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular-sanitize.min.js"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular-cookies.min.js"></script>
+
+        <!-- code -->
+        <asset:stylesheet href="metadataCurator.css"/>
+        <asset:javascript src="metadataCurator.js"/>
+    </g:if>
+    <g:else>
+        <asset:stylesheet href="bootstrap/dist/css/bootstrap.css"/>
+        <asset:stylesheet href="font-awesome/css/font-awesome"/>
+        <asset:stylesheet href="metadataCurator.css"/>
+
+        <asset:javascript src="jquery/dist/jquery.js"/>
+        <asset:javascript src="bootstrap/dist/js/bootstrap.js"/>
+        <asset:javascript src="angular/angular.js"/>
+        <asset:javascript src="angular-animate/angular-animate.js"/>
+        <asset:javascript src="angular-bootstrap/ui-bootstrap-tpls.js"/>
+        <asset:javascript src="angular-cookies/angular-cookies.js"/>
+        <asset:javascript src="angular-sanitize/angular-sanitize.js"/>
+        <asset:javascript src="angular-animate/angular-animate.js"/>
+        <asset:javascript src="metadataCurator.js"/>
+    </g:else>
     <script type="text/javascript">
         var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security']);
         demoConfig.config(['securityProvider', function (securityProvider) {

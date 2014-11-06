@@ -1,8 +1,4 @@
 #= require_self
-#= require angular-ui-router/release/angular-ui-router
-#= require ng-file-upload/angular-file-upload
-#= require google-diff-match-patch/javascript/diff_match_patch
-#= require angular-diff-match-patch-musketyr/angular-diff-match-patch.js
 #= require modelcatalogue/core/index
 #= require decoratedList
 #= require infiniteList
