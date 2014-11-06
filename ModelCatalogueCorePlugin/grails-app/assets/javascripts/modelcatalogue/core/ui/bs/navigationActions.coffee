@@ -137,7 +137,15 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     action
   ]
 
-  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state) ->
+  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, ['security',
+                                                                                                        'messages',
+                                                                                                        '$scope',
+                                                                                                        'rest',
+                                                                                                        'enhance',
+                                                                                                        'modelCatalogueApiRoot',
+                                                                                                        '$state',
+                                                                                                        '$stateParams',
+    (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
     return undefined if not security.isUserLoggedIn()
 
     getLabel = (user) ->
@@ -156,7 +164,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
           enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications/#{(el.id for el in elements).join(',')}")).then (user)->
             action.label = getLabel(user)
             security.getCurrentUser().classifications = user.classifications
-            $state.reload()
+            $state.go '.', $stateParams, reload: true
 
     }
 

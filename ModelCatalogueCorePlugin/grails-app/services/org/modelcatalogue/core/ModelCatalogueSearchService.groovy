@@ -10,13 +10,13 @@ import org.modelcatalogue.core.util.RelationshipDirection
  */
 class ModelCatalogueSearchService implements SearchCatalogue {
 
-    def modelCatalogueSecurityService
+    def classificationService
 
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
-        // TODO: enable classification in search
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, modelCatalogueSecurityService.currentUser?.classifications ?: [])
+
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, classificationService.classificationsInUse)
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
@@ -66,7 +66,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         String query = "%$params.search%"
 
-        if (Classification.isAssignableFrom(resource) || DataType.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
+        if (Classification.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
             DetachedCriteria criteria = new DetachedCriteria(resource)
             criteria.or {
                 ilike('name', query)
@@ -76,7 +76,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
-            List<Classification> classifications = modelCatalogueSecurityService.currentUser?.classifications
+            List<Classification> classifications = classificationService.classificationsInUse
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
@@ -111,7 +111,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                     and rel.relationshipType = :classificationType
                 """
                 arguments.classifications = classifications
-                arguments.classificationclassificationType  = RelationshipType.classificationType
+                arguments.classificationType = RelationshipType.classificationType
             }
 
 
