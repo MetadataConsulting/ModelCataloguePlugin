@@ -72,7 +72,5 @@ describe "mc.core.catalogueElementEnhancer", ->
         expect(model.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
       it "test model is Model", ->
         expect(model.isInstanceOf('org.modelcatalogue.core.Model')).toBeTruthy()
-      it "test model is PublishedElement", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.PublishedElement')).toBeTruthy()
 
 

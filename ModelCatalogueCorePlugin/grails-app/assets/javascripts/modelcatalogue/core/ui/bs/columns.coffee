@@ -1,10 +1,10 @@
 angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsProvider)->
   nameAndDescription = -> [
-    {header: "Name",        value: 'name',        classes: 'col-md-4', show: true, href: 'href()',  sort: {property: 'name', type: 'alphabet'}}
+    {header: "Name", value: 'classifiedName', classes: 'col-md-4', show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'}}
     {header: "Description", value: 'description', classes: 'col-md-6'}
   ]
 
-  publishedElementColumns = -> [
+  idNameAndDescription = -> [
     { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'modelCatalogueId'}
     { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'} }
     { header: "Description", value: "description" }
@@ -23,8 +23,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     classificationNames.join(', ')
 
   # default
-  columnsProvider.registerColumns 'org.modelcatalogue.core.PublishedElement', publishedElementColumns()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', idNameAndDescription()
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
     { header: 'Classifications',  value: getClassificationsForDataElement,  classes: 'col-md-2'}

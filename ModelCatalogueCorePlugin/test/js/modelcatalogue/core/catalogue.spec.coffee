@@ -14,4 +14,5 @@ describe "mc.core.catalogue", ->
     expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
     expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
     expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.Model')).toBeTruthy()
-    expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model', 'org.modelcatalogue.core.PublishedElement')).toBeTruthy()
+    expect(catalogue.isInstanceOf('org.modelcatalogue.core.Model',
+      'org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
