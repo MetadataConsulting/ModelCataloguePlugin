@@ -71,10 +71,9 @@ environments {
         capabillities.setCapability("name", "ModelCatalogueCoreTestApp");
         capabillities.setCapability("platform", Platform.LINUX);
         capabillities.setCapability("selenium-version", "2.40.0");
+        capabillities.setCapability("screen-resolution", "1280x1024");
         driver = {
-            def d = new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), capabillities)
-            d.manage().window().setSize(new Dimension(1280, 800))
-            d
+            new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), capabillities)
         }
     }
 }
