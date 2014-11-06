@@ -27,17 +27,6 @@ class BootStrap {
 
         initCatalogueService.initCatalogue()
 
-//        xlsxListRenderer.registerRowWriter('reversed') {
-//            title "Reversed DEMO Export"
-//            append metadata
-//            headers 'Description', 'Name', 'ID'
-//            when { ListWrapper container, RenderContext context ->
-//                context.actionName in ['index', 'search'] && container.itemType && CatalogueElement.isAssignableFrom(container.itemType)
-//            } then { CatalogueElement element ->
-//                [[element.description, element.name, element.id]]
-//            }
-//        }
-
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
@@ -124,11 +113,11 @@ class BootStrap {
             importService.importData()
 
             println 'Finalizing all published elements'
-            PublishedElement.findAllByStatusNotEqual(PublishedElementStatus.FINALIZED).each {
+            CatalogueElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
                 if (it instanceof Model) {
-                    publishedElementService.finalizeTree(it)
+                    elementService.finalizeTree(it)
                 } else {
-                    it.status = PublishedElementStatus.FINALIZED
+                    it.status = ElementStatus.FINALIZED
                     it.save failOnError: true
                 }
             }
@@ -151,7 +140,7 @@ class BootStrap {
                 }
             }
 
-            def parent = new Model(name:"parent1", status: PublishedElementStatus.FINALIZED).save(flush:true)
+            def parent = new Model(name:"parent1", status: ElementStatus.FINALIZED).save(flush:true)
             parent.addToChildOf(parent)
 
             assert !actionService.create(batch, TestAction, fail: true).hasErrors()
@@ -173,7 +162,6 @@ class BootStrap {
         } catch (e) {
             e.printStackTrace()
         }
-        //domainModellerService.modelDomains()
     }
 
     def setupSimpleCsvTransformation() {
