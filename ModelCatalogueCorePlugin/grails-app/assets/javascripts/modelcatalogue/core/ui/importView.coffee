@@ -8,7 +8,7 @@ angular.module('mc.core.ui.importView', ['mc.core.catalogueElementEnhancer', 'mc
 
     templateUrl: 'modelcatalogue/core/ui/importView.html'
 
-    controller: ['$scope', '$log', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource','modelCatalogueDataArchitect', 'security', ($scope, $log, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, modelCatalogueDataArchitect, security) ->
+    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource','modelCatalogueDataArchitect', 'security', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, modelCatalogueDataArchitect, security) ->
       propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->

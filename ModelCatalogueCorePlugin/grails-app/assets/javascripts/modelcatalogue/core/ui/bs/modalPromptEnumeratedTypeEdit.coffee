@@ -15,6 +15,11 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
+                <label for="classification"> Classifications</label>
+                <elements-as-tags elements="copy.classifications"></elements-as-tags>
+                <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(pending.classification);pending.classification = null">
+              </div>
+              <div class="form-group">
                 <label for="name" class="">Name</label>
                 <input type="text" class="form-control" id="name" placeholder="Name" ng-model="copy.name">
               </div>
@@ -39,7 +44,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
         </div>
         '''
         controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->
-          $scope.newEntity = -> {enumerations: {}}
+          $scope.newEntity = -> {enumerations: {}, classifications: []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.original = args.element ? $scope.newEntity()
           $scope.messages = messages.createNewMessages()
@@ -58,7 +63,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
           $scope.hasChanged   = ->
-            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {})
+            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.classifications ? {}, $scope.copy.classifications ? {})
 
 
 

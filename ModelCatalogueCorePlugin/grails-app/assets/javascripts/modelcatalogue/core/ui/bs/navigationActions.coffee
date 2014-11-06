@@ -137,15 +137,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     action
   ]
 
-  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, ['security',
-                                                                                                        'messages',
-                                                                                                        '$scope',
-                                                                                                        'rest',
-                                                                                                        'enhance',
-                                                                                                        'modelCatalogueApiRoot',
-                                                                                                        '$state',
-                                                                                                        '$stateParams',
-    (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
+  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
     return undefined if not security.isUserLoggedIn()
 
     getLabel = (user) ->
@@ -172,18 +164,5 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
 
 
   ]
-
-
-# TODO: fix or remove
-#  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-export-uninstantiated', ['$window', 'modelCatalogueApiRoot', ($window, modelCatalogueApiRoot) ->
-#    {
-#      position:    500
-#      label:      'Export Uninstantiated Elements'
-#      icon:       'fa fa-fw fa-download'
-#      action: ->
-#        # will need special handling since it's exported to asset?
-#        $window.open "#{modelCatalogueApiRoot}/dataArchitect/uninstantiatedDataElements?format=xlsx&report=NHIC", '_blank'; return true
-#    }
-#  ]
 
 ]

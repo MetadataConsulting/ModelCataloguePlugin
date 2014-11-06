@@ -16,7 +16,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
                 <label for="classification"> Classifications</label>
-                <elements-as-tags elements="copy.classification"></elements-as-tags>
+                <elements-as-tags elements="copy.classifications"></elements-as-tags>
                 <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(pending.classification);pending.classification = null">
               </div>
               <div class="form-group">
@@ -58,7 +58,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
         </div>
         '''
         controller: ['$scope', 'messages', '$controller', '$modalInstance', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, catalogueElementResource) ->
-          $scope.newEntity = -> {classification: $scope.copy?.classifications ? []}
+          $scope.newEntity      = -> {classifications: $scope.copy?.classifications ? []}
           $scope.copy           = angular.copy(args.element ? $scope.newEntity())
           $scope.original       = args.element ? $scope.newEntity()
           $scope.messages       = messages.createNewMessages()

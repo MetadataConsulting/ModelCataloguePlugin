@@ -41,7 +41,7 @@ databaseChangeLog = {
         // language=SQL
         sql """
           insert into relationship_type (name, version, system, bidirectional, source_class, source_to_destination, destination_class, destination_to_source)
-          value ('classification', 1, 0, 1, 'org.modelcatalogue.core.Classification', 'classifies', 'org.modelcatalogue.core.CatalogueElement', 'classifications')
+          value ('classification', 1, 1, 0, 'org.modelcatalogue.core.Classification', 'classifies', 'org.modelcatalogue.core.CatalogueElement', 'classifications')
         """
 
         grailsChange {

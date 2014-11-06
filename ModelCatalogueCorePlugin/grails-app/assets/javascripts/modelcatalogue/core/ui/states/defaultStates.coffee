@@ -1,6 +1,6 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
-.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', '$log', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', ($rootScope, $scope, $stateParams, $state, $log, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics) ->
+.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', ($rootScope, $scope, $stateParams, $state, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics) ->
     applicationTitle "Model Catalogue"
 
     angular.extend $scope, statistics
@@ -58,21 +58,21 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   ])
 
-.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', '$rootScope', ($scope, $stateParams, $state, $log, element, $rootScope) ->
+.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', ($scope, $stateParams, $state, element, $rootScope) ->
     $scope.element = element
     $rootScope.elementToShow = element
 ])
 
-.controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+.controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', 'element', ($scope, $stateParams, $state, element) ->
     $scope.element  = element
 ])
 
-.controller('mc.core.ui.states.BatchCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', 'applicationTitle', ($scope, $stateParams, $state, $log, element, applicationTitle) ->
+.controller('mc.core.ui.states.BatchCtrl', ['$scope', '$stateParams', '$state', 'element', 'applicationTitle', ($scope, $stateParams, $state, element, applicationTitle) ->
     $scope.element  = element
     applicationTitle "Actions in batch #{element.name}"
 ])
 
-.controller('mc.core.ui.states.CsvTransformationCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+.controller('mc.core.ui.states.CsvTransformationCtrl', ['$scope', '$stateParams', '$state', 'element', ($scope, $stateParams, $state, element) ->
     $scope.element  = element
 ])
 
@@ -89,12 +89,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       $scope.list = list
 ])
 
-.controller('mc.core.ui.states.DiffCtrl', ['$scope', '$stateParams', '$state', '$log', 'elements', 'applicationTitle', ($scope, $stateParams, $state, $log, elements, applicationTitle) ->
+.controller('mc.core.ui.states.DiffCtrl', ['$scope', '$stateParams', '$state', 'elements', 'applicationTitle', ($scope, $stateParams, $state, elements, applicationTitle) ->
     $scope.elements = elements
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
 ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle, $rootScope) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope) ->
     listEnhancer    = enhance.getEnhancer('list')
 
     if $stateParams.resource
@@ -482,8 +482,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   }
 ])
 
-.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$log', '$q', '$state', 'names', 'messages', 'actions'
-    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $log, $q, $state, names, messages, actions)->
+.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions'
+    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions)->
       actions = []
 
       $scope.search = (item, model, label) ->
