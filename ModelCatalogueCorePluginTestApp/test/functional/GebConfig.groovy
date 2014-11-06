@@ -4,6 +4,7 @@
  */
 
 
+import org.openqa.selenium.Dimension
 import org.openqa.selenium.Platform
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.chrome.ChromeDriver
@@ -70,6 +71,10 @@ environments {
         capabillities.setCapability("name", "ModelCatalogueCoreTestApp");
         capabillities.setCapability("platform", Platform.LINUX);
         capabillities.setCapability("selenium-version", "2.40.0");
-        driver = { new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), capabillities) }
+        driver = {
+            def d = new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), capabillities)
+            d.manage().window().setSize(new Dimension(1280, 800))
+            d
+        }
     }
 }
