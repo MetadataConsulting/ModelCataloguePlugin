@@ -37,7 +37,7 @@ class CatalogueElementFinderSpec extends Specification {
 
         then:
         assetTypes
-        assetTypes.size() == 3
+        assetTypes.size() == 2
 
         CatalogueElement.name in assetTypes
         Asset.name in assetTypes

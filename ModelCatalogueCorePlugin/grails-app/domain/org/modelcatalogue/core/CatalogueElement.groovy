@@ -208,6 +208,15 @@ abstract class CatalogueElement implements Extendible {
         !status.modificable
     }
 
+    def beforeValidate() {
+        if (modelCatalogueId) {
+            String defaultId = getDefaultModelCatalogueId(true)
+            if (defaultId && modelCatalogueId.startsWith(defaultId)) {
+                modelCatalogueId = null
+            }
+        }
+    }
+
     def beforeDelete(){
         new HashSet(outgoingRelationships).each{ Relationship relationship->
             relationship.beforeDelete()
@@ -261,12 +270,15 @@ abstract class CatalogueElement implements Extendible {
         return true
     }
 
-    String getDefaultModelCatalogueId() {
+    String getDefaultModelCatalogueId(boolean withoutVersion = false) {
         if (!grailsLinkGenerator) {
             return null
         }
         String resourceName = fixResourceName GrailsNameUtils.getPropertyName(getClass())
-        grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${latestVersionId ?: id}.${versionNumber}")
+        if (withoutVersion) {
+            return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${latestVersionId ?: id}")
+        }
+        return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${latestVersionId ?: id}.${versionNumber}")
     }
 
     /**
