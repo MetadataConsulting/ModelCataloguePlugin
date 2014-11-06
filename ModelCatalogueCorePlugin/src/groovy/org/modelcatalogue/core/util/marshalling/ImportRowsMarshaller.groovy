@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.dataarchitect.ImportRow
 import org.modelcatalogue.core.util.ImportRows
 
@@ -27,15 +26,6 @@ class ImportRowsMarshaller extends ListWrapperMarshaller {
         ret
     }
 
-
-    protected String getItemNodeName() {
-        "element"
-    }
-
-    private static getList(Object elements){
-
-
-    }
 
     private static getActionsLink(String base, Long id, Long actionCount){
         def actionLink

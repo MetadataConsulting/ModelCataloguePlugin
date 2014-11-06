@@ -9,12 +9,10 @@ class CatalogueElementFinderSpec extends Specification {
         def candidatesClasses = CatalogueElementFinder.catalogueElementClasses
 
         expect:
-        ConceptualDomain.name   in candidatesClasses
         DataElement.name        in candidatesClasses
         DataType.name           in candidatesClasses
         MeasurementUnit.name    in candidatesClasses
         Model.name              in candidatesClasses
-        PublishedElement.name   in candidatesClasses
         ValueDomain.name        in candidatesClasses
         CatalogueElement.name   in candidatesClasses
 
@@ -39,11 +37,9 @@ class CatalogueElementFinderSpec extends Specification {
 
         then:
         assetTypes
-        assetTypes.size() == 4
+        assetTypes.size() == 2
 
         CatalogueElement.name in assetTypes
-        ExtendibleElement.name in assetTypes
-        PublishedElement.name in assetTypes
         Asset.name in assetTypes
 
 

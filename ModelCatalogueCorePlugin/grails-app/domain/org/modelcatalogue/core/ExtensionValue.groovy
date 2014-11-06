@@ -14,7 +14,7 @@ class ExtensionValue implements Extension {
     String name
     String extensionValue
 
-    static belongsTo = [element: ExtendibleElement]
+    static belongsTo = [element: CatalogueElement]
 
     static constraints = {
         name size: 1..255

@@ -16,20 +16,23 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class DataArchitectService {
 
+    def modelCatalogueSecurityService
     def modelCatalogueSearchService
     def relationshipService
-    def publishedElementService
+    def elementService
     def actionService
+    def classificationService
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
-        Lists.fromCriteria(params, DataElement) {
-            'in'('status', PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED)
+        classificationService.classified Lists.fromCriteria(params, DataElement) {
+            'in'('status', ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED)
             isNull 'valueDomain'
+
         }
     }
 
     ListWithTotal<ValueDomain> incompleteValueDomains(Map params){
-        Lists.fromCriteria(params, ValueDomain) {
+        classificationService.classified Lists.fromCriteria(params, ValueDomain) {
             isNull 'dataType'
         }
     }
@@ -105,25 +108,25 @@ class DataArchitectService {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.FINALIZED)
+            def element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
             if (!element) {
                 element = DataElement.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.FINALIZED)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.FINALIZED)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = DataElement.findByNameIlikeAndStatus(header, PublishedElementStatus.DRAFT)
+                element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), PublishedElementStatus.DRAFT)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), PublishedElementStatus.DRAFT)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
                 }
             }
             if (element) {
@@ -202,22 +205,24 @@ class DataArchitectService {
 
     ListWithTotal<ValueDomain> unusedValueDomains(Map params) {
         // TODO: create test
+        // TODO: count with classificaitons in use
         Lists.fromQuery params, ValueDomain, """
             from ValueDomain v
             where
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-        """, [archived: PublishedElementStatus.DEPRECATED]
+        """, [archived: ElementStatus.DEPRECATED]
     }
 
     ListWithTotal<ValueDomain> duplicateValueDomains(Map params) {
         // TODO: create test
+        // TODO: count with classificaitons in use
         Lists.fromQuery params, ValueDomain, """
             from ValueDomain v
             where
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
             and
                 v.name in (select vd.name from ValueDomain vd group by vd.name having count(vd.name) > 1)
-        """, [archived: PublishedElementStatus.DEPRECATED]
+        """, [archived: ElementStatus.DEPRECATED]
     }
 
     Map<Long, String> dataTypesNamesSuggestions() {
@@ -305,7 +310,7 @@ class DataArchitectService {
             renameBatch.save()
         }
 
-        publishedElementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
+        elementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
             DataElement dataElement = DataElement.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Element '$dataElement.name'")
             RelationshipType type = RelationshipType.findByName("synonym")
@@ -319,7 +324,7 @@ class DataArchitectService {
             batch.save()
         }
 
-        publishedElementService.findDuplicateModelsSuggestions().each { destId, sources ->
+        elementService.findDuplicateModelsSuggestions().each { destId, sources ->
             Model model = Model.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Model '$model.name'")
             RelationshipType type = RelationshipType.findByName("synonym")
@@ -333,7 +338,7 @@ class DataArchitectService {
             batch.save()
         }
 
-        publishedElementService.findModelsToBeInlined().each { sourceId, destId ->
+        elementService.findModelsToBeInlined().each { sourceId, destId ->
             Model model = Model.get(sourceId)
             Batch batch = Batch.findOrSaveByName("Inline Model '$model.name'")
             batch.description = """Model '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""

@@ -4,7 +4,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     'classification'
     'model'
     'dataElement'
-    'conceptualDomain'
     'valueDomain'
     'dataType'
     'measurementUnit'
@@ -121,35 +120,49 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
   ]
 
 
-  actionsProvider.registerActionInRole 'cart', actionsProvider.ROLE_NAVIGATION, ['security', '$state', '$scope', (security, $state, $scope) ->
+  actionsProvider.registerActionInRole 'cart', actionsProvider.ROLE_NAVIGATION, ['security', '$state', (security, $state) ->
     return undefined if not security.isUserLoggedIn()
 
     action = {
       position:   2000
       label:      'Favorites'
-      icon:       'fa fa-fw fa-star'
+      icon:       'fa fa-star'
       action: ->
         $state.go 'mc.favorites'
 
     }
-
 #    $scope.$on '$stateChangeSuccess', (ignored, state) ->
 #      action.active = state.name == 'mc.favorites'
 
     action
   ]
 
+  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
+    return undefined if not security.isUserLoggedIn()
 
-# TODO: fix or remove
-#  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-export-uninstantiated', ['$window', 'modelCatalogueApiRoot', ($window, modelCatalogueApiRoot) ->
-#    {
-#      position:    500
-#      label:      'Export Uninstantiated Elements'
-#      icon:       'fa fa-fw fa-download'
-#      action: ->
-#        # will need special handling since it's exported to asset?
-#        $window.open "#{modelCatalogueApiRoot}/dataArchitect/uninstantiatedDataElements?format=xlsx&report=NHIC", '_blank'; return true
-#    }
-#  ]
+    getLabel = (user) ->
+      if not user or not user.classifications
+        return 'All Classifications'
+      if user.classifications.length == 0
+        return 'All Classifications'
+      return (classification.name for classification in user.classifications).join(', ')
+
+    action = {
+      position:   2100
+      label:      getLabel(security.getCurrentUser())
+      icon:       'fa fa-tags'
+      action: -> messages.prompt('Select Classifications', 'Select which classifications should be visible to you', type: 'catalogue-elements', resource: 'classification', elements: security.getCurrentUser().classifications).then (elements) ->
+        security.requireUser().then ->
+          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications/#{(el.id for el in elements).join(',')}")).then (user)->
+            action.label = getLabel(user)
+            security.getCurrentUser().classifications = user.classifications
+            $state.go '.', $stateParams, reload: true
+
+    }
+
+    action
+
+
+  ]
 
 ]

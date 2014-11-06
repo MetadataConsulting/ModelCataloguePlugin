@@ -3,10 +3,9 @@ package org.modelcatalogue.core
 
 class Classification extends CatalogueElement {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    Set classifies = []
-
+    /**
+     * @deprecated use model catalogue id instead
+     */
     String namespace
 
     static constraints = {
@@ -18,7 +17,9 @@ class Classification extends CatalogueElement {
         except = ['incomingRelationships', 'outgoingRelationships']
     }
 
-    static hasMany = [classifies: PublishedElement]
+    static relationships = [
+            outgoing: [classification: 'classifies']
+    ]
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"

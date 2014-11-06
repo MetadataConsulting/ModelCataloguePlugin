@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.dataarchitect.DataArchitectService
 import org.modelcatalogue.core.util.Lists
 
-class DataElementController extends AbstractPublishedElementController<DataElement> {
+class DataElementController extends AbstractCatalogueElementController<DataElement> {
 
     DataArchitectService dataArchitectService
 
@@ -15,7 +15,7 @@ class DataElementController extends AbstractPublishedElementController<DataEleme
     def index(Integer max) {
         if (params.status == 'uninstantiated') {
             handleParams(max)
-            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.uninstantiatedDataElements(params))
+            respond Lists.wrap(params, resource, basePath, dataArchitectService.uninstantiatedDataElements(params))
             return
         }
         super.index(max)

@@ -39,12 +39,6 @@ class CsvTransformationControllerIntegrationSpec extends AbstractControllerInteg
     }
 
     @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.dataarchitect.CsvTransformation] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
-    }
-
-    @Override
     Class getResource() {
         CsvTransformation
     }

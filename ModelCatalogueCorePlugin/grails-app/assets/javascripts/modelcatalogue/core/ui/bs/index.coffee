@@ -41,6 +41,7 @@
 #= require modalPromptCsvTransform
 #= require modalPromptLogin
 #= require modalPromptForCatalogueElement
+#= require modalPromptForCatalogueElements
 #= require modalPromptMeasurementUnitEdit
 #= require modalPromptActionParametersEdit
 #= require modalPromptValueDomainEdit
@@ -55,7 +56,6 @@
 #= require modelWizard
 #= require classificationWizard
 #= require elementsAsTags
-#= require shoppingCart
 #= require diffTable
 
 
@@ -98,6 +98,8 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewMapping'
   'mc.core.ui.bs.modalPromptXmlValidate'
   'mc.core.ui.bs.modalPromptForCatalogueElement'
+  'mc.core.ui.bs.modalPromptForCatalogueElements'
+  'mc.core.ui.bs.modalPromptForCatalogueElements'
   'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'
   'mc.core.ui.bs.modalPromptLogin'
@@ -116,6 +118,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modelWizard'
   'mc.core.ui.bs.classificationWizard'
   'mc.core.ui.bs.elementsAsTags'
-  'mc.core.ui.bs.shoppingCart'
   'mc.core.ui.bs.diffTable'
 ])

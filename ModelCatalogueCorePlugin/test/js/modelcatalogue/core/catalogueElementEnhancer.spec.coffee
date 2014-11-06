@@ -45,7 +45,7 @@ describe "mc.core.catalogueElementEnhancer", ->
     model   = enhance angular.copy(fixtures.model.showOne)
     element = enhance angular.copy(fixtures.dataType.showOne)
 
-    expect(domain.getLabel()) .toBe("school subject (cdtest1)")
+    expect(domain.getLabel()) .toBe("school subject")
     expect(model.getLabel())  .toBe("mTest3")
     expect(element.getLabel()).toBe("boolean")
 
@@ -72,9 +72,5 @@ describe "mc.core.catalogueElementEnhancer", ->
         expect(model.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
       it "test model is Model", ->
         expect(model.isInstanceOf('org.modelcatalogue.core.Model')).toBeTruthy()
-      it "test model is ExtendibleElement", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.ExtendibleElement')).toBeTruthy()
-      it "test model is PublishedElement", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.PublishedElement')).toBeTruthy()
 
 

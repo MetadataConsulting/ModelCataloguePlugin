@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.converters.XML
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.Relationships
 
@@ -17,29 +16,6 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
             [id: it.id, type: it.relationshipType, ext: it.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, it)),  relation: relationsList.direction.getRelation(relationsList.owner, it), direction: relationsList.direction.getDirection(relationsList.owner, it), removeLink: getDeleteLink(relationsList.owner, it), archived: it.archived, elementType: Relationship.name, classification: CatalogueElementMarshallers.minimalCatalogueElementJSON(it.classification)]
         }
         ret
-    }
-
-    @Override
-    protected void buildItemsXml(Object relationsList, XML xml) {
-        xml.build {
-            for (Relationship rel in relationsList.items) {
-                relationship(id: rel.id, removeLink: getDeleteLink(relationsList.owner, rel)) {
-                    'type' rel.relationshipType
-                    if (rel.classification) {
-                        classification rel.classification
-                    }
-                    direction relationsList.direction.getDirection(relationsList.owner, rel)
-                    relation(relationsList.direction.getRelation(relationsList.owner, rel))
-                    if (rel.ext) {
-                        extensions {
-                            for (e in rel.ext.entrySet()) {
-                                extension key: e.key, e.value
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     static getDeleteLink(theOwner, Relationship rel) {

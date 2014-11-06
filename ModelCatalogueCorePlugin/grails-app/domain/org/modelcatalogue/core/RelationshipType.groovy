@@ -127,8 +127,16 @@ class RelationshipType {
         readByName("containment")
     }
 
+    static getClassificationType() {
+        readByName("classification")
+    }
+
     static getContextType() {
         readByName("context")
+    }
+
+    static getRelationshipType() {
+        readByName("relationship")
     }
 
     static getHierarchyType() {

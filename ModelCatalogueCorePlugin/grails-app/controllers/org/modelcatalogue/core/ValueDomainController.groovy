@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 
-class ValueDomainController extends AbstractExtendibleElementController<ValueDomain> {
+class ValueDomainController extends AbstractCatalogueElementController<ValueDomain> {
 
     def dataArchitectService
 
@@ -14,17 +14,17 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
     def index(Integer max) {
         if (params.status == 'incomplete') {
             handleParams(max)
-            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.incompleteValueDomains(params))
+            respond Lists.wrap(params, resource, basePath, dataArchitectService.incompleteValueDomains(params))
             return
         }
         if (params.status == 'duplicate') {
             handleParams(max)
-            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.duplicateValueDomains(params))
+            respond Lists.wrap(params, resource, basePath, dataArchitectService.duplicateValueDomains(params))
             return
         }
         if (params.status == 'unused') {
             handleParams(max)
-            reportCapableRespond Lists.wrap(params, resource, basePath, dataArchitectService.unusedValueDomains(params))
+            respond Lists.wrap(params, resource, basePath, dataArchitectService.unusedValueDomains(params))
             return
         }
         super.index(max)
@@ -41,14 +41,14 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
             return
         }
 
-        reportCapableRespond Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement", "dataElements"){
+        respond classificationService.classified(Lists.fromCriteria(params, DataElement, "/${resourceName}/${params.id}/dataElement") {
             eq "valueDomain", valueDomain
-            if (!all) {
-                ne 'status', PublishedElementStatus.DEPRECATED
-                ne 'status', PublishedElementStatus.UPDATED
-                ne 'status', PublishedElementStatus.REMOVED
+            if (!all && !valueDomain.attach().archived) {
+                ne 'status', ElementStatus.DEPRECATED
+                ne 'status', ElementStatus.UPDATED
+                ne 'status', ElementStatus.REMOVED
             }
-        }
+        })
 
     }
 
@@ -118,30 +118,5 @@ class ValueDomainController extends AbstractExtendibleElementController<ValueDom
         }
 
         respond result: result
-    }
-
-
-
-    // conceptual domains are marshalled with the value domain so no need for special method to fetch them
-
-    protected bindRelations(ValueDomain instance, Object objectToBind) {
-        if (objectToBind.conceptualDomains != null) {
-            for (domain in instance.conceptualDomains.findAll { !(it.id in objectToBind.conceptualDomains*.id) }) {
-                instance.removeFromConceptualDomains(domain)
-                domain.removeFromValueDomains(instance)
-            }
-            for (domain in objectToBind.conceptualDomains) {
-                ConceptualDomain conceptualDomain = ConceptualDomain.get(domain.id as Long)
-                instance.addToConceptualDomains conceptualDomain
-                conceptualDomain.addToValueDomains instance
-            }
-        }
-    }
-
-    @Override
-    protected getIncludeFields(){
-        def fields = super.includeFields
-        fields.removeAll(['conceptualDomains'])
-        fields
     }
 }

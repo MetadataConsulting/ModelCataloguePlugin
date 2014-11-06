@@ -11,13 +11,12 @@ import spock.lang.Unroll
 class RelationshipISpec extends AbstractIntegrationSpec{
 
     @Shared
-    def cd1, md1, de1, vd1, de2, reltype, dt, ms, relationshipService
+    def md1, de1, vd1, de2, reltype, dt, ms, relationshipService
 
     def setupSpec(){
 
         loadFixtures()
 
-        cd1 =  ConceptualDomain.findByName("university libraries")
         md1 = Model.findByName("book")
         de1 = DataElement.findByName("auth5")
         de2 = DataElement.findByName("title")
@@ -29,7 +28,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     /*def cleanupSpec(){
 
-        cd1.delete()
         de1.delete()
         de2.delete()
         dt.delete()
@@ -141,13 +139,11 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         1  | false | [:]
         2  | false | [source: new DataElement(name: 'element1'), destination: de1]
         3  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.contextType]
-        4  | true  | [source: cd1, destination: md1, relationshipType: RelationshipType.contextType]
         5  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.containmentType]
         6  | true  | [source: md1, destination: de1, relationshipType: RelationshipType.containmentType]
         7  | false | [source: new DataElement(name: 'parentModel'), destination: md1, relationshipType: RelationshipType.hierarchyType]
         8  | true  | [source: md1, destination: md1, relationshipType: RelationshipType.hierarchyType]
         14 | true  | [source: de1, destination: de2, relationshipType: reltype]
-        15 | false | [source: cd1, destination: md1, relationshipType: RelationshipType.supersessionType]
         16 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType]
         17 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': -1]]
         18 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Max Occurs': -1]]
@@ -159,4 +155,44 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     }
 
+
+    def "get classified name"() {
+        expect:
+        relationshipService.getClassifiedName(null)                     ==  null
+        relationshipService.getClassifiedName(new Model(name: 'BLAH'))  == 'BLAH'
+
+        when:
+        Classification classification = new Classification(name: "classy").save(failOnError: true)
+        Model model = new Model(name: "Supermodel").save(failOnError: true)
+        model.addToClassifications(classification)
+
+        then:
+        relationshipService.getClassifiedName(model) == 'Supermodel (classy)'
+
+        cleanup:
+        classification?.delete()
+        model?.delete()
+    }
+
+    def "get classification info"() {
+        expect:
+        relationshipService.getClassificationsInfo(null)                     == []
+        relationshipService.getClassificationsInfo(new Model(name: 'BLAH'))  == []
+
+        when:
+        Classification classification = new Classification(name: "classy").save(failOnError: true)
+        Model model = new Model(name: "Supermodel").save(failOnError: true)
+        model.addToClassifications(classification)
+
+        def info = relationshipService.getClassificationsInfo(model)
+
+        then:
+        info == [
+                [name: classification.name, id: classification.id, elementType: Classification.name, link: "/classification/${classification.id}"]
+        ]
+
+        cleanup:
+        classification?.delete()
+        model?.delete()
+    }
 }

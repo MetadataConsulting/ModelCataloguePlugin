@@ -27,6 +27,7 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'angularFileUplo
 
 
       $scope.uploading = true
+      # TODO: rename conceptualDomain to classification and let user pick from existing classification
       $scope.upload = $upload.upload({
         params: {id: $scope.copy.id, name: $scope.copy.name, conceptualDomain: $scope.copy.conceptualDomain, createModelsForElements: $scope.copy.createModelsForElements, idpattern: $scope.copy.idpattern}
         url:                "#{modelCatalogueApiRoot}/dataArchitect/imports/upload"

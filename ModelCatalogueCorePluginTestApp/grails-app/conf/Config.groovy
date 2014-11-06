@@ -1,9 +1,5 @@
-import org.modelcatalogue.core.Asset
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ConceptualDomain
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElement
+import grails.util.Environment
+import org.modelcatalogue.core.*
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -34,7 +30,7 @@ grails.mime.types = [ // the first one is the default format
                       rss          : 'application/rss+xml',
                       text         : 'text/plain',
                       hal          : ['application/hal+json', 'application/hal+xml'],
-                      xml          : ['text/xml', 'application/xml'],
+//                      xml          : ['text/xml', 'application/xml'],
                       xlsx         : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                       all          : '*/*', // 'all' maps to '*' or the first available format in withFormat
 ]
@@ -104,6 +100,12 @@ environments {
     }
 }
 
+hibernate {
+    format_sql = true
+    use_sql_comments = true
+    generate_statistics = true
+}
+
 // log4j configuration
 log4j = {
     // Example of changing the log pattern for the default console appender:
@@ -112,14 +114,20 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'grails.app.services.org.modelcatalogue.core.PublishedElementService'
+    debug 'grails.app.services.org.modelcatalogue.core.ElementService'
     debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
-    warn 'org.codehaus.groovy.grails.web.servlet',           // controllers
+    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
+        trace 'org.hibernate.type'
+        trace 'org.hibernate.stat'
+        debug 'org.hibernate.SQL'
+    }
+
+    error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
             'org.codehaus.groovy.grails.web.sitemesh',       // layouts
             'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -198,11 +206,12 @@ modelcatalogue.defaults.relationshiptypes =  [
         '''],
         [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"],
         [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
-        [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
         [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
-        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
+        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class", system: true],
         [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
-        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: PublishedElement, destinationClass: PublishedElement, bidirectional: true, rule: "source.class == destination.class"],
+        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true, rule: "source.class == destination.class"],
+        [name: "favourite", sourceToDestination: "favourites", destinationToSource: "is favourite of", sourceClass: User, destinationClass: CatalogueElement],
+        [name: "classification", sourceToDestination: "classifies", destinationToSource: "classifications", sourceClass: Classification, destinationClass: CatalogueElement, system: true],
 
 ]
 

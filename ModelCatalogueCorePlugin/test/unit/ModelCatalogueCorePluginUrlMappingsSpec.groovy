@@ -4,14 +4,13 @@ import junit.framework.AssertionFailedError
 import org.codehaus.groovy.grails.commons.GrailsControllerClass
 import org.codehaus.groovy.grails.web.mapping.UrlMappingsHolder
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.actions.*
+import org.modelcatalogue.core.actions.BatchController
 import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
 @TestFor(ModelCatalogueCorePluginUrlMappings)
 @Mock([
-    ConceptualDomainController,
     DataElementController,
     DataTypeController,
     EnumeratedTypeController,
@@ -31,7 +30,7 @@ class ModelCatalogueCorePluginUrlMappingsSpec extends Specification {
         assertRestForwardUrlMapping(method, "/api/modelCatalogue/core$url".toString(), controller: controller, action: action, paramsAssertions)
 
         where:
-        [method, url, controller, action, paramsAssertions] << generateAssertionsForCatalogueElementControllers('conceptualDomain', 'dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'model', 'valueDomain')
+        [method, url, controller, action, paramsAssertions] << generateAssertionsForCatalogueElementControllers('dataElement', 'dataType', 'enumeratedType', 'measurementUnit', 'model', 'valueDomain')
     }
 
     def "value domain extra mappings mehtod #method maps and url #url maps to action #action"() {

@@ -12,9 +12,9 @@ class CatalogueController  {
        CatalogueElement element
 
        if (version) {
-           PublishedElement lastVersion = PublishedElement.get(id)
-           element = PublishedElement.where {
-               versionNumber == version && latestVersion == lastVersion
+           Long lastVersion = id
+           element = CatalogueElement.where {
+               versionNumber == version && latestVersionId == lastVersion
            }.get()
        } else {
            element = CatalogueElement.get(id)

@@ -51,7 +51,6 @@ def cleanupSpec(){
 def "json get sub model elements"(){
     def controller = new DataArchitectController()
     ResultRecorder recorder = DefaultResultRecorder.create(
-            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
             "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
             "dataArchitect"
     )
@@ -75,47 +74,17 @@ def "json get sub model elements"(){
     json.previous == ""
 }
 
-def "xml get sub model elements"(){
-    def controller = new DataArchitectController()
-    ResultRecorder recorder = DefaultResultRecorder.create(
-            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-            "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-            "dataArchitect"
-    )
-
-    when:
-    controller.params.put("modelId", md.id)
-    controller.response.format = "xml"
-    controller.getSubModelElements()
-    GPathResult xml = controller.response.xml
-    String list = "sub_model_elements"
-    recorder.recordResult list, xml
-
-    then:
-
-    xml.@success.text() == "true"
-    xml.@total.text() == "2"
-    xml.@offset.text() == "0"
-    xml.@page.text() =="10"
-    xml.element
-    xml.element.size() == 2
-    xml.next.text() == ""
-    xml.previous.text() == ""
-}
-
-
 @Unroll
 def "json -  get uninstantiated data elements from the catalogue"(){
     def controller = new DataArchitectController()
     ResultRecorder recorder = DefaultResultRecorder.create(
-            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
             "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
             "dataArchitect"
     )
 
     when:
     controller.response.format = "json"
-    controller.uninstantiatedDataElements()
+    controller.uninstantiatedDataElements(10)
     JSONElement json = controller.response.json
     String list = "metadata_uninstantiated"
     recorder.recordResult list, json
@@ -139,14 +108,13 @@ def "json -  get data elements without metadata key from the catalogue"(){
 
     def controller = new DataArchitectController()
     ResultRecorder recorder = DefaultResultRecorder.create(
-            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
             "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
             "dataArchitect"
     )
     when:
     controller.response.format = "json"
     controller.params.put("key", "metadata")
-    controller.metadataKeyCheck()
+    controller.metadataKeyCheck(10)
     JSONElement json = controller.response.json
     String list = "metadataKey_missing_key_metadata"
     recorder.recordResult list, json
@@ -164,68 +132,11 @@ def "json -  get data elements without metadata key from the catalogue"(){
 
 }
 
-
-@Unroll
-def "xml -  get uninstantiated data elements from the catalogue"(){
-    def controller = new DataArchitectController()
-    ResultRecorder recorder = DefaultResultRecorder.create(
-            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-            "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-            "dataArchitect"
-    )
-
-    when:
-    controller.response.format = "xml"
-    controller.uninstantiatedDataElements()
-    GPathResult xml = controller.response.xml
-    String list = "metadata_uninstantiated"
-    recorder.recordResult list, xml
-
-    then:
-
-    xml.@success.text() == "true"
-    xml.@offset.text() == "0"
-    xml.@page.text() =="10000"
-    xml.element
-    xml.next.text() == ""
-    xml.previous.text() == ""
-}
-
-@Unroll
-def "xml -  get data elements without metadata key from the catalogue"(){
-    def controller = new DataArchitectController()
-    ResultRecorder recorder = DefaultResultRecorder.create(
-            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-            "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-            "dataArchitect"
-    )
-
-    when:
-    controller.response.format = "xml"
-    controller.params.put("key", "metadata")
-    controller.metadataKeyCheck()
-    GPathResult xml = controller.response.xml
-    String list = "metadataKey_missing_key_metadata"
-    recorder.recordResult list, xml
-
-    then:
-
-    xml.@success.text() == "true"
-    //xml.@total.text() == "11"
-    xml.@offset.text() == "0"
-    xml.@page.text() =="10000"
-    xml.element
-//        xml.element.size() == 11
-    //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
-    xml.previous.text() == ""
-}
-
 @Unroll
 def "json -  create dataElement relationships"(){
 
     def controller = new DataArchitectController()
     ResultRecorder recorder = DefaultResultRecorder.create(
-            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
             "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
             "dataArchitect"
     )
@@ -233,7 +144,7 @@ def "json -  create dataElement relationships"(){
     controller.response.format = "json"
     controller.params.put("keyOne", "Data item No.")
     controller.params.put("keyTwo", "Optional_Local_Identifier")
-    controller.findRelationsByMetadataKeys()
+    controller.findRelationsByMetadataKeys(10)
     JSONElement json = controller.response.json
     String list = "dataElement_Relationships"
     recorder.recordResult list, json
@@ -250,40 +161,10 @@ def "json -  create dataElement relationships"(){
     json.previous == ""
 
 }
-@Unroll
-def "xml -  create dataElement relationships"(){
-    def controller = new DataArchitectController()
-    ResultRecorder recorder = DefaultResultRecorder.create(
-            "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
-            "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
-            "dataArchitect"
-    )
-
-    when:
-    controller.response.format = "xml"
-    controller.params.put("keyOne", "Data item No.")
-    controller.params.put("keyTwo", "Optional_Local_Identifier")
-    controller.findRelationsByMetadataKeys()
-    GPathResult xml = controller.response.xml
-    String list = "dataElement_Relationships"
-    recorder.recordResult list, xml
-
-    then:
-
-    xml.@success.text() == "true"
-    xml.@total.text() == "1"
-    xml.@offset.text() == "0"
-    xml.@page.text() =="10000"
-    xml.element
-    xml.element.size() == 1
-    //xml.next.text() == "/dataArchitect/metadataKeyCheck?max=10&key=metadata&offset=10"
-    xml.previous.text() == ""
-}
 
     def "find some elements and return just string for not found from elementsFromCSV"(){
         def controller = new DataArchitectController()
         ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
                 "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
                 "dataArchitect"
         )

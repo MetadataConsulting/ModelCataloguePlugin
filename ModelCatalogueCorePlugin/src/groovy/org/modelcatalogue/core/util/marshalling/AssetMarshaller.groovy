@@ -1,18 +1,16 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.converters.XML
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.modelcatalogue.core.Asset
 import org.springframework.beans.factory.annotation.Autowired
 
-class AssetMarshaller extends PublishedElementMarshallers {
+class AssetMarshaller extends CatalogueElementMarshallers {
 
     @Autowired LinkGenerator linkGenerator
 
     AssetMarshaller() {
         super(Asset)
     }
-
 
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
@@ -27,19 +25,6 @@ class AssetMarshaller extends PublishedElementMarshallers {
             ret.downloadUrl = linkGenerator.link(controller: 'asset', action: 'download', id: el.id, absolute: true)
         }
         ret
-    }
-
-    @Override
-    protected void addXmlAttributes(el, XML xml) {
-        super.addXmlAttributes(el, xml)
-        addXmlAttribute(el.contentType, "contentType", xml)
-        addXmlAttribute(el.originalFileName, "originalFileName", xml)
-        addXmlAttribute(el.md5, "md5", xml)
-        if (el.md5) {
-            addXmlAttribute(linkGenerator.link(controller: 'asset', action: 'download', id: el.id, absolute: true), 'downloadUrl', xml)
-        }
-        addXmlAttribute(el.size, "size", xml)
-
     }
 
 }

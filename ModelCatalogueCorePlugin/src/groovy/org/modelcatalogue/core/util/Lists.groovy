@@ -13,13 +13,12 @@ class Lists {
      *
      * @param params    url parameters used to determine pagination and sort settings
      * @param base      base url of the list returned
-     * @param name      name of the list used currently only in XML exports
      * @param list      the list with count and type to be wrapped
      * @return given list as list wrapper
      */
-    static <T> ListWrapper<T> wrap(Map params, String base, String name = null, ListWithTotalAndType<T> list){
+    static <T> ListWrapper<T> wrap(Map params, String base, ListWithTotalAndType<T> list){
         if (list instanceof ListWrapper) return list
-        ListWithTotalAndTypeWrapper.create(params, base, name, list)
+        ListWithTotalAndTypeWrapper.create(params, base, list)
     }
 
     /**
@@ -32,40 +31,45 @@ class Lists {
      * @param list      the list with count to be wrapped
      * @return given list as list wrapper
      */
-    static <T> ListWrapper<T> wrap(Map params, Class<T> type, String base, String name = null, ListWithTotal<T> list){
+    static <T> ListWrapper<T> wrap(Map params, Class<T> type, String base, ListWithTotal<T> list){
         if (list instanceof ListWrapper) return list
-        ListWithTotalAndTypeWrapper.create(params, base, name, list instanceof ListWithTotalAndType ? list : new ListWithTotalWrapper<T>(type, list))
+        ListWithTotalAndTypeWrapper.create(params, base, list instanceof ListWithTotalAndType ? list : new ListWithTotalWrapper<T>(type, list))
+    }
+
+    /**
+     * Returns ListWithTotalAndType which contains all elements of given type, optionaly paginated by params.
+     *
+     * This list supports classification.
+     *
+     * @param params    url parameters used to determine pagination and sort settings
+     * @param type      type to be used as wrapper's itemType
+     * @return
+     */
+    static <T> ListWithTotalAndType<T> all(Map params, Class<T> type){
+        fromCriteria(params, type, {})
     }
 
     /**
      * Returns ListWrapper which contains all elements of given type, optionaly paginated by params.
+     *
+     * This list supports classification.
+     *
      * @param params    url parameters used to determine pagination and sort settings
      * @param type      type to be used as wrapper's itemType
      * @param base      base url of the list returned
      * @param name      name of the list used currently only in XML exports
      * @return
      */
-    static <T> ListWrapper<T> all(Map params, Class<T> type, String base, String name = null){
-        fromCriteria(params, type, base, name, {})
+    static <T> ListWrapper<T> all(Map params, Class<T> type, String base){
+        fromCriteria(params, type, base, {})
     }
 
-    //>-- not using default parameters, because @DelegatesTo is failing
+
     /**
      * Creates new ListWrapper for given criteria specified by the build closure.
-     * @param params            url parameters used to determine pagination and sort settings
-     * @param type              base type for the DetachedCriteria
-     * @param base              base url of the list returned
-     * @param buildClosure      DetachedCriteria build closure
-     * @return new ListWrapper for given criteria specified by the build closure
      *
-     * @see DetachedCriteria
-     */
-    static <T> ListWrapper<T> fromCriteria(Map params, Class<T> type, String base, @DelegatesTo(DetachedCriteria) Closure buildClosure){
-        fromCriteria(params, type, base, null, buildClosure)
-    }
-
-    /**
-     * Creates new ListWrapper for given criteria specified by the build closure.
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              base type for the DetachedCriteria
      * @param base              base url of the list returned
@@ -75,13 +79,15 @@ class Lists {
      *
      * @see DetachedCriteria
      */
-    static <T> ListWrapper<T> fromCriteria(Map params, Class<T> type, String base, String name, @DelegatesTo(DetachedCriteria) Closure buildClosure){
-        wrap(params, base, name, DetachedListWithTotalAndType.create(params, type, buildClosure))
+    static <T> ListWrapper<T> fromCriteria(Map params, Class<T> type, String base, @DelegatesTo(DetachedCriteria) Closure buildClosure){
+        wrap(params, base, DetachedListWithTotalAndType.create(params, type, buildClosure))
     }
-    //<-- not using default parameters, because @DelegatesTo is failing
 
     /**
      * Creates new ListWithTotalAndType for given criteria specified by the build closure.
+     *
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              type to be used as wrapper's itemType
      * @param buildClosure      DetachedCriteria build closure
@@ -95,6 +101,9 @@ class Lists {
 
     /**
      * Creates new ListWrapper for existing criteria.
+     *
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param type              type to be used as wrapper's itemType
      * @param base              base url of the list returned
@@ -103,13 +112,16 @@ class Lists {
      *
      * @see DetachedCriteria
      */
-    static <T> ListWrapper<T> fromCriteria(Map params, String base, String name = null, DetachedCriteria<T> criteria){
-        wrap(params, base, name, DetachedListWithTotalAndType.create(params, criteria))
+    static <T> ListWrapper<T> fromCriteria(Map params, String base, DetachedCriteria<T> criteria){
+        wrap(params, base, DetachedListWithTotalAndType.create(params, criteria))
     }
 
 
     /**
      * Creates new ListWithTotalAndType for existing criteria.
+     *
+     * This list supports classification.
+     *
      * @param params            url parameters used to determine pagination and sort settings
      * @param criteria          existing criteria
      * @return new ListWithTotalAndType for existing criteria
@@ -144,8 +156,8 @@ class Lists {
      *
      * @see DetachedCriteria
      */
-    static <T> ListWrapper<T> lazy(Map params, Class<T> type, String base, String name = null, Closure<List<T>> itemsClosure, Closure<Long> totalClosure = null){
-        wrap(params, base, name, LazyListWithTotalAndType.create(params, type, itemsClosure, totalClosure))
+    static <T> ListWrapper<T> lazy(Map params, Class<T> type, String base, Closure<List<T>> itemsClosure, Closure<Long> totalClosure = null){
+        wrap(params, base, LazyListWithTotalAndType.create(params, type, itemsClosure, totalClosure))
     }
 
 
@@ -187,7 +199,7 @@ class Lists {
         new EmptyListWithTotalAndType<T>(itemType: type)
     }
 
-    static Map<String, String> nextAndPreviousLinks(Map params, String baseLink, Long total) {
+    static Map<String, String> nextAndPreviousLinks(Map<String, Object> params, String baseLink, Long total) {
         def link = baseLink.contains('?') ? "${baseLink}&" : "${baseLink}?"
         if (params.max) {
             link += "max=${params.max ?: 10}"

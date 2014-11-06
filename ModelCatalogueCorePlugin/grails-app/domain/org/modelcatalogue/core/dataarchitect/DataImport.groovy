@@ -2,9 +2,8 @@ package org.modelcatalogue.core.dataarchitect
 
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ConceptualDomain
-import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.Model
 
 class DataImport {
 
@@ -13,7 +12,6 @@ class DataImport {
     Collection<Model> models = []
     Collection<DataElement> updatedDataElements = []
     Collection<String> messages = []
-    Collection<ConceptualDomain> conceptualDomains = []
     Collection<Classification> classifications = []
     Asset asset
 

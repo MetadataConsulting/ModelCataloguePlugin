@@ -3,7 +3,7 @@ package org.modelcatalogue.core.actions
 
 class IntegrationTestActionRunner extends AbstractActionRunner {
 
-    def publishedElementService
+    def elementService
 
     @Override
     String getMessage() {
@@ -12,7 +12,7 @@ class IntegrationTestActionRunner extends AbstractActionRunner {
 
     @Override
     void run() {
-        out << "PublishedElementService is $publishedElementService"
+        out << "ElementService is $elementService"
     }
 }
 

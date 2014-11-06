@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.dataarchitect.ImportRow
 

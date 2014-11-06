@@ -10,11 +10,13 @@ import org.modelcatalogue.core.util.RelationshipDirection
  */
 class ModelCatalogueSearchService implements SearchCatalogue {
 
+    def classificationService
+
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
-        // TODO: enable classification in search
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, null)
+
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, classificationService.classificationsInUse)
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
@@ -64,7 +66,18 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         String query = "%$params.search%"
 
-        if (PublishedElement.isAssignableFrom(resource)) {
+        if (Classification.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
+            DetachedCriteria criteria = new DetachedCriteria(resource)
+            criteria.or {
+                ilike('name', query)
+                ilike('description', query)
+                ilike('modelCatalogueId', query)
+            }
+            searchResults.searchResults = criteria.list(params)
+            searchResults.total = criteria.count()
+        } else if (CatalogueElement.isAssignableFrom(resource)) {
+            List<Classification> classifications = classificationService.classificationsInUse
+
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """
                 from ${resource.simpleName} ${alias}
@@ -78,64 +91,33 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                     )
             """
 
-            def results = Lists.fromQuery(params, resource, listQuery, [
+            Map<String, Object> arguments = [
                     query: query,
-                    statuses: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED]
-            ])
+                    statuses: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED]
+            ]
 
-
-            searchResults.searchResults = results.items
-            searchResults.total = results.total
-        } else if (ExtendibleElement.isAssignableFrom(resource)) {
-            String alias = resource.simpleName[0].toLowerCase()
-            String listQuery = """
-                from ${resource.simpleName} ${alias}
+            if (classifications) {
+                listQuery = """
+                from ${resource.simpleName} ${alias} join ${alias}.incomingRelationships as rel
                 where
-                    lower(${alias}.name) like lower(:query)
-                    or lower(${alias}.description) like lower(:query)
-                    or lower(${alias}.modelCatalogueId) like lower(:query)
-                    or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
-            """
-
-            def results = Lists.fromQuery(params, resource, listQuery, [
-                    query: query
-            ])
-
-            searchResults.searchResults = results.items
-            searchResults.total = results.total
-        } else if (ConceptualDomain.isAssignableFrom(resource) || Classification.isAssignableFrom(resource) || DataType.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource) ) {
-            DetachedCriteria criteria = new DetachedCriteria(resource)
-            criteria.or {
-                ilike('name', query)
-                ilike('description', query)
-                ilike('modelCatalogueId', query)
+                    ${alias}.status in :statuses
+                    and (
+                        lower(${alias}.name) like lower(:query)
+                        or lower(${alias}.description) like lower(:query)
+                        or lower(${alias}.modelCatalogueId) like lower(:query)
+                        or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
+                    )
+                    and rel.source in (:classifications)
+                    and rel.relationshipType = :classificationType
+                """
+                arguments.classifications = classifications
+                arguments.classificationType = RelationshipType.classificationType
             }
-            searchResults.searchResults = criteria.list(params)
-            searchResults.total = criteria.count()
-        } else if (CatalogueElement.isAssignableFrom(resource)) {
-            String alias = CatalogueElement.simpleName[0].toLowerCase()
-            String listQuery = """
-                from ${resource.simpleName} ${alias}
-                where
-                    ${alias}.status is null
-                    and (
-                        lower(${alias}.name) like lower(:query)
-                        or lower(${alias}.description) like lower(:query)
-                        or lower(${alias}.modelCatalogueId) like lower(:query)
-                        or ${alias} in (select c.element from ExtensionValue c where lower(c.extensionValue) like lower(:query))
-                    )
-                    or ${alias}.status in :statuses
-                    and (
-                        lower(${alias}.name) like lower(:query)
-                        or lower(${alias}.description) like lower(:query)
-                        or lower(${alias}.modelCatalogueId) like lower(:query)
-                        or ${alias} in (select c.element from ExtensionValue c where lower(c.extensionValue) like lower(:query))
-                    )
-            """
-            def results = Lists.fromQuery(params, resource, listQuery, [
-                    query: query,
-                    statuses: [PublishedElementStatus.DRAFT, PublishedElementStatus.PENDING, PublishedElementStatus.UPDATED, PublishedElementStatus.FINALIZED]
-            ])
+
+
+
+            def results = Lists.fromQuery(params, resource, listQuery, arguments)
+
 
             searchResults.searchResults = results.items
             searchResults.total = results.total

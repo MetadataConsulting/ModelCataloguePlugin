@@ -1,9 +1,8 @@
 package org.modelcatalogue.core.security
 
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ExtendibleElement
+import org.modelcatalogue.core.CatalogueElement
 
-class User extends ExtendibleElement {
+class User extends CatalogueElement {
 
     transient modelCatalogueSecurityService
 
@@ -15,13 +14,10 @@ class User extends ExtendibleElement {
     boolean accountLocked
     boolean passwordExpired
 
-    Classification defaultClassification
-
     static constraints = {
         username blank: false, unique: true, maxSize: 255
         password blank: false, maxSize: 255
         email    nullable: true, email: true, maxSize: 255
-        defaultClassification nullable: true
     }
 
     static mapping = {
@@ -44,5 +40,20 @@ class User extends ExtendibleElement {
 
     protected void encodePassword() {
         password = modelCatalogueSecurityService.encodePassword(password)
+    }
+
+    @Override
+    protected void beforeArchive() {
+        super.beforeArchive()
+        String randomUsername = username
+        while (User.countByUsername(randomUsername)) {
+            randomUsername = "$username (${UUID.randomUUID().toString()})"
+        }
+        username = randomUsername
+        // made the user account unable to sign in
+        enabled = false
+        accountExpired = true
+        accountLocked = true
+        passwordExpired = true
     }
 }

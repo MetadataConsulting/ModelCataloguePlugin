@@ -1,28 +1,9 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.Lists
-import org.modelcatalogue.core.util.PublishedElements
-
 class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
 
     ClassificationController() {
-        super(Classification)
-    }
-
-    def classifies(Integer max){
-        handleParams(max)
-        Classification classification = queryForResource(params.id)
-        if (!classification) {
-            notFound()
-            return
-        }
-
-        reportCapableRespond new PublishedElements(list: Lists.fromCriteria(params, PublishedElement, "/${resourceName}/${params.id}/classifies", "classifies"){
-            classifications{
-                eq 'id', classification.id
-            }
-        })
-
+        super(Classification, false)
     }
 
     protected bindRelations(Classification instance, Object objectToBind) {
@@ -32,9 +13,9 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
                 domain.removeFromClassifications(instance)
             }
             for (domain in objectToBind.classifies) {
-                PublishedElement publishedElement = PublishedElement.get(domain.id as Long)
-                instance.addToClassifies publishedElement
-                publishedElement.addToClassifications instance
+                CatalogueElement catalogueElement = CatalogueElement.get(domain.id as Long)
+                instance.addToClassifies catalogueElement
+                catalogueElement.addToClassifications instance
             }
         }
     }

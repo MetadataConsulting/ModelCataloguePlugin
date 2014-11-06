@@ -61,18 +61,17 @@ class ImportService {
             '/CAN_CUH.csv':
                     { tokens ->
                         def categories = ["NHIC Datasets", "Ovarian Cancer", "CUH", "Round 1", tokens[1], tokens[2]]
-                        def cd = findOrCreateConceptualDomain("NHIC", "NHIC conceptual domain i.e. value domains used the NHIC project")
-                        def models = importModels(categories, cd)
+                        def classification = findOrCreateClassification("NHIC", "NHIC conceptual domain i.e. value domains used the NHIC project")
+                        def models = importModels(categories, classification)
                         def dataTypes = [tokens[5]]
                         def dataType = importDataTypes(tokens[3], dataTypes)
                         def ext = new HashMap()
 
                         def vd = new ValueDomain(name: tokens[3].replaceAll("\\s", "_"),
-                                //conceptualDomain: cd,
                                 dataType: dataType,
                                 description: tokens[5]).save(failOnError: true);
 
-                        vd.addToConceptualDomains(cd)
+                        vd.addToClassifications(classification)
 
                         def de = new DataElement(name: tokens[3],
                                 description: tokens[4], code: tokens[0])
@@ -97,7 +96,6 @@ class ImportService {
                         de.ext.put("E2", tokens[17].take(255))
 
 
-                        vd.addToDataElements(de)
                         de.addToContainedIn(models)
 
                         //de.addToDataElementValueDomains(vd);
@@ -107,7 +105,7 @@ class ImportService {
     ]
 
 
-    private static importModels(categories, ConceptualDomain conceptualDomain) {
+    private static importModels(categories, Classification classification) {
         //categories look something like ["Animals", "Mammals", "Dogs"]
         //where animal is a parent of mammals which is a parent of dogs......
 
@@ -143,7 +141,7 @@ class ImportService {
 
                 //create the child model
                 child = new Model('name': childName).save()
-                child.addToHasContextOf(conceptualDomain)
+                child.addToClassifications(classification)
 
                 modelToReturn = child
 
@@ -157,7 +155,7 @@ class ImportService {
 
                 if (!parent) {
                     parent = new Model('name': parentName).save()
-                    parent.addToHasContextOf(conceptualDomain)
+                    parent.addToClassifications(classification)
                 }
 
                 child.addToChildOf(parent)
@@ -234,10 +232,10 @@ class ImportService {
         return dataTypeReturn
     }
 
-    private static findOrCreateConceptualDomain(String name, String description) {
-        def cd = ConceptualDomain.findByName(name)
+    private static findOrCreateClassification(String name, String description) {
+        def cd = Classification.findByName(name)
         if (!cd) {
-            cd = new ConceptualDomain(name: name, description: description, namespace: "www.nhic.co.uk").save()
+            cd = new Classification(name: name, description: description, namespace: "www.nhic.co.uk").save()
         }
         return cd
     }

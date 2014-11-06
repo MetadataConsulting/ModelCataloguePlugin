@@ -14,7 +14,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('school subject (cdtest1)')
+    expect(element.val()).toBe('school subject')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -51,7 +51,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('school subject (cdtest1)')
+    expect(element.val()).toBe('school subject')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -75,7 +75,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $scope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('school subject (cdtest1)')
+    expect(element.val()).toBe('school subject')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 

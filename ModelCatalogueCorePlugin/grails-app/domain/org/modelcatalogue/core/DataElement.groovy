@@ -1,16 +1,11 @@
 package org.modelcatalogue.core
-
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
-
 /*
 * A data element is an atomic unit of data
 * i.e. xml  <xs:element name="title" />
 *
 * */
 
-class DataElement extends PublishedElement {
+class DataElement extends CatalogueElement {
 
     ValueDomain valueDomain
 

@@ -1,11 +1,9 @@
 package org.modelcatalogue.core
 
-import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.dataarchitect.SchemaValidatorService
 import org.springframework.web.multipart.MultipartFile
 
-
-class AssetController extends AbstractPublishedElementController<Asset> {
+class AssetController extends AbstractCatalogueElementController<Asset> {
 
     StorageService modelCatalogueStorageService
     SchemaValidatorService schemaValidatorService
@@ -31,11 +29,11 @@ class AssetController extends AbstractPublishedElementController<Asset> {
         }
 
         if (asset.hasErrors()) {
-            reportCapableRespond asset.errors, view: 'create' // STATUS CODE 422
+            respond asset.errors, view: 'create' // STATUS CODE 422
             return
         }
 
-        reportCapableRespond asset
+        respond asset
     }
 
     def validateXml() {
@@ -110,17 +108,14 @@ class AssetController extends AbstractPublishedElementController<Asset> {
             return null
         }
 
-        if (!currentAsset.latestVersion) {
+        if (!currentAsset.latestVersionId) {
             return null
         }
 
-        List<Asset> assets = new DetachedCriteria<Asset>(Asset).build {
-            eq 'latestVersion', currentAsset.latestVersion
-            lt 'versionNumber'
+        List<Asset> assets = Asset.where {
+            latestVersionId == currentAsset.latestVersionId && versionNumber < currentAsset.versionNumber
         }.list()
-                Asset.where {
-            latestVersion == currentAsset.latestVersion && versionNumber < currentAsset.versionNumber
-        }.list()
+
         for (Asset asset in assets) {
             if (modelCatalogueStorageService.exists('assets', "${asset.id}")) {
                 return asset

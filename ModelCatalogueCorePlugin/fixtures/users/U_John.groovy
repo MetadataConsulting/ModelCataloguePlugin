@@ -1,6 +1,7 @@
+import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.security.User
 
 fixture {
-    U_John(User, name: "John", username: "John", password: "password")
+    U_John(User, name: "John", username: "John", password: "password", status: ElementStatus.FINALIZED)
 }
 

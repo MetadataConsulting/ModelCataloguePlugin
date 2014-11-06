@@ -1,13 +1,10 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.converters.XML
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionService
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
-import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.springframework.beans.factory.annotation.Autowired
 
 class BatchMarshaller extends AbstractMarshallers {
@@ -41,21 +38,6 @@ class BatchMarshaller extends AbstractMarshallers {
         ret['actions'] = [count: actionService.list(el as Batch).total, itemType: Action.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/actions/"]
 
         ret
-    }
-
-    protected void buildXml(el, XML xml) {
-        xml.build {
-            name el.name
-            description el.description
-        }
-    }
-
-    protected void addXmlAttributes(el, XML xml) {
-        addXmlAttribute(el.id, "id", xml)
-        addXmlAttribute(el.version, "version", xml)
-        addXmlAttribute("/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id", "link", xml)
-        addXmlAttribute(el.class.name, "elementType", xml)
-        addXmlAttribute(el.archived, "archived", xml)
     }
 
 }

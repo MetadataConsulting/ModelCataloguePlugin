@@ -50,42 +50,6 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
         [no, size, max, offset, total, next, previous] << getPaginationValueDomainsParameters("/${resourceName}/${loadItem.id}/valueDomain")
     }
 
-
-    @Unroll
-    def "get value domains: #no where max: #max offset: #offset"() {
-        DataType first = loadItem
-        createValueDomainsUsingDataType(first, 12)
-
-        when:
-        controller.params.id = first.id
-        controller.params.offset = offset
-        controller.params.max = max
-        controller.response.format = "xml"
-        controller.valueDomains(max)
-        def xml = controller.response.xml
-        recordResult "valueDomains$no", xml
-
-        then:
-        checkXmlCorrectListValues(xml, total, size, offset, max, next, previous)
-        xml.valueDomain.size() == size
-
-        when:
-        def item  = xml.valueDomain[0]
-        def valueDomain = first.relatedValueDomains.find {it.id == item.@id.text() as Long}
-
-        then:
-        item.@id == valueDomain.id
-        item.dataType.@id == valueDomain.dataType.id
-        resource.count() == totalCount
-
-        cleanup:
-        deleteValueDomains(first, 12)
-
-
-        where:
-        [no, size, max, offset, total, next, previous] << getPaginationValueDomainsParameters("/${resourceName}/${loadItem.id}/valueDomain")
-    }
-
     @Override
     Map getPropertiesToEdit(){
         [name: "changedName", description: "edited description "]
@@ -99,13 +63,6 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
     @Override
     Map getBadInstance(){
         [name: "t"*300, description: "asdf"]
-    }
-
-    @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.DataType] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
     }
 
     @Override
@@ -158,28 +115,15 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
             ]
     }
 
-//    def getMappingPaginationParameters(baseLink){
-//        [
-//                // no,size, max , off. tot. next                           , previous
-//                [1, 2, 10, 0, 2, "", ""],
-//                [2, 2, 5, 0, 2, "", ""],
-//        ]
-//
-//    }
 
-
-    private createValueDomainsUsingDataType(DataType DataType, Integer max){
+    private static createValueDomainsUsingDataType(DataType DataType, Integer max) {
         max.times {new ValueDomain(name: "dataTypeValueDomain${it}", description: "the ground speed of the moving vehicle", dataType: DataType).save()}
     }
 
-    private deleteValueDomains(DataType DataType, Integer max){
+    private static deleteValueDomains(DataType DataType, Integer max) {
         max.times {
             DataType.removeFromRelatedValueDomains(ValueDomain.findByName("dataTypeValueDomain${it}"))
         }
     }
-
-
-
-
 
 }

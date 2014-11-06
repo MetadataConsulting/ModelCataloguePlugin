@@ -4,7 +4,7 @@ import grails.test.mixin.Mock
 import spock.lang.Specification
 import spock.lang.Unroll
 
-@Mock([DataElement, ExtensionValue, ExtendibleElement, Relationship, Model,  RelationshipType, RelationshipMetadata])
+@Mock([DataElement, ExtensionValue, Relationship, Model,  RelationshipType, RelationshipMetadata])
 class ExtendibleElementExtensionsWrapperSpec extends Specification {
 
 

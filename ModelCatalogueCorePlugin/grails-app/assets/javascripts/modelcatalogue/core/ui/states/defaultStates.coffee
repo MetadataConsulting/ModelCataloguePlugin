@@ -1,6 +1,6 @@
 angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
-.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', '$log', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', ($rootScope, $scope, $stateParams, $state, $log, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics) ->
+.controller('mc.core.ui.states.DashboardCtrl', ['$rootScope', '$scope', '$stateParams', '$state', 'security', 'catalogue', 'modelCatalogueApiRoot', 'user', 'messages', 'applicationTitle', 'names', 'statistics', ($rootScope, $scope, $stateParams, $state, security, catalogue, modelCatalogueApiRoot, user, messages, applicationTitle, names, statistics) ->
     applicationTitle "Model Catalogue"
 
     angular.extend $scope, statistics
@@ -51,7 +51,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       $scope.dataTypeCount = ''
       $scope.valueDomainCount = ''
       $scope.incompleteValueDomainsCount = ''
-      $scope.conceptualDomainCount = ''
       $scope.totalAssetCount = ''
       $scope.draftAssetCount = ''
       $scope.finalizedAssetCount = ''
@@ -59,21 +58,21 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   ])
 
-.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', '$rootScope', ($scope, $stateParams, $state, $log, element, $rootScope) ->
+.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', ($scope, $stateParams, $state, element, $rootScope) ->
     $scope.element = element
     $rootScope.elementToShow = element
 ])
 
-.controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+.controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', 'element', ($scope, $stateParams, $state, element) ->
     $scope.element  = element
 ])
 
-.controller('mc.core.ui.states.BatchCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', 'applicationTitle', ($scope, $stateParams, $state, $log, element, applicationTitle) ->
+.controller('mc.core.ui.states.BatchCtrl', ['$scope', '$stateParams', '$state', 'element', 'applicationTitle', ($scope, $stateParams, $state, element, applicationTitle) ->
     $scope.element  = element
     applicationTitle "Actions in batch #{element.name}"
 ])
 
-.controller('mc.core.ui.states.CsvTransformationCtrl', ['$scope', '$stateParams', '$state', '$log', 'element', ($scope, $stateParams, $state, $log, element) ->
+.controller('mc.core.ui.states.CsvTransformationCtrl', ['$scope', '$stateParams', '$state', 'element', ($scope, $stateParams, $state, element) ->
     $scope.element  = element
 ])
 
@@ -90,12 +89,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       $scope.list = list
 ])
 
-.controller('mc.core.ui.states.DiffCtrl', ['$scope', '$stateParams', '$state', '$log', 'elements', 'applicationTitle', ($scope, $stateParams, $state, $log, elements, applicationTitle) ->
+.controller('mc.core.ui.states.DiffCtrl', ['$scope', '$stateParams', '$state', 'elements', 'applicationTitle', ($scope, $stateParams, $state, elements, applicationTitle) ->
     $scope.elements = elements
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
 ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', '$log', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, $log, list, names, enhance, applicationTitle, $rootScope) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope) ->
     listEnhancer    = enhance.getEnhancer('list')
 
     if $stateParams.resource
@@ -483,8 +482,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   }
 ])
 
-.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$log', '$q', '$state', 'names', 'messages', 'actions'
-    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $log, $q, $state, names, messages, actions)->
+.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions'
+    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions)->
       actions = []
 
       $scope.search = (item, model, label) ->
@@ -864,28 +863,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'conceptualDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cogs fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="conceptualDomainLink" ui-sref="mc.resource.list({resource: 'conceptualDomain'})" ui-sref-opts="{inherit: false}"> Conceptual Domains</a> {{conceptualDomainCount}} </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <a show-for-role="CURATOR" ng-click="create('conceptualDomain')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Conceptual Domain</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
                     <div class="col-lg-4 col-sm-6 col-md-4">
                         <div class="panel panel-default">
                             <div class="panel-heading">
@@ -895,7 +873,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} <span ng-show="incompleteValueDomainsCount"> / <a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}">Incomplete </a> {{incompleteValueDomainsCount}}</span></div>
-                                        <div><a id="unusedValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'unused'})" ui-sref-opts="{inherit: false}">Unused Value Domains</a> {{unusedValueDomainsCount}}<!-- / <a id="duplicateValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'duplicate'})" ui-sref-opts="{inherit: false}"> Duplicate</a> {{duplicateValueDomainsCount}}--></div>
                                         <div><a ng-click="validate()">Validate</a> / <a ng-click="convert()">Convert</a></div>
                                     </div>
                                 </div>

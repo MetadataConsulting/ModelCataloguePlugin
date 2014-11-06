@@ -14,7 +14,7 @@ class DetachedListWrapperSpec extends Specification {
         new DataElement(name: 'test 2').save(failOnError: true)
         new DataElement(name: 'tset 0').save(failOnError: true)
 
-        ListWrapper<DataElement> wrapper = Lists.fromCriteria(DataElement, '/dataElements/', 'elements', max: max, sort: 'name', order: 'asc') {
+        ListWrapper<DataElement> wrapper = Lists.fromCriteria(DataElement, '/dataElements/', max: max, sort: 'name', order: 'asc') {
             ilike 'name', 'test%'
         }
 
@@ -24,7 +24,6 @@ class DetachedListWrapperSpec extends Specification {
         wrapper.total        == 2
         wrapper.offset       == 0
         wrapper.page         == max
-        wrapper.elementName  == 'elements'
         wrapper.sort         == 'name'
         wrapper.order        == 'asc'
         wrapper.itemType     == DataElement

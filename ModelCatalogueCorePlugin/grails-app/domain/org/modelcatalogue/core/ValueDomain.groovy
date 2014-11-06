@@ -35,7 +35,7 @@ import org.modelcatalogue.core.util.ValueDomainRuleScript
  *
 */
 
-class ValueDomain extends ExtendibleElement  {
+class ValueDomain extends CatalogueElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
@@ -45,7 +45,7 @@ class ValueDomain extends ExtendibleElement  {
         unitOfMeasure component:true
         extensions component:true
 
-        except = ['incomingRelationships', 'outgoingRelationships', 'dataElements', 'conceptualDomains']
+        except = ['incomingRelationships', 'outgoingRelationships', 'dataElements']
     }
 
     DataType dataType
@@ -54,15 +54,11 @@ class ValueDomain extends ExtendibleElement  {
 	String rule
     Boolean multiple = Boolean.FALSE
 
-    static belongsTo = ConceptualDomain
-
-    static hasMany = [dataElements: DataElement, conceptualDomains: ConceptualDomain]
-
-    static transients = ['regexDef']
+    static transients = ['regexDef', 'dataElements']
 
     static constraints = {
-		description     nullable:true, maxSize: 2000
-		unitOfMeasure   nullable:true
+        description nullable: true, maxSize: 2000
+        unitOfMeasure nullable: true
         dataType        nullable: true
 
 		rule nullable:true, maxSize: 10000, validator: { val,obj ->
@@ -76,13 +72,6 @@ class ValueDomain extends ExtendibleElement  {
         incoming: [base: 'basedOn'],
         outgoing: [base: 'isBaseFor']
     ]
-
-    String getClassifiedName() {
-        if (!conceptualDomains) {
-            return name
-        }
-        "$name (${conceptualDomains*.name.sort().join(', ')})"
-    }
 
     void setRegexDef(String regex) {
         if (!regex) {
@@ -138,6 +127,26 @@ class ValueDomain extends ExtendibleElement  {
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    }
+
+    List<DataElement> getDataElements() {
+        if (!readyForQueries) {
+            return []
+        }
+        if (archived) {
+            return DataElement.findAllByValueDomain(this)
+        }
+        return DataElement.findAllByValueDomainAndStatus(this, ElementStatus.FINALIZED)
+    }
+
+    Long countDataElements() {
+        if (!readyForQueries) {
+            return 0
+        }
+        if (archived) {
+            return DataElement.countByValueDomain(this)
+        }
+        return DataElement.countByValueDomainAndStatus(this, ElementStatus.FINALIZED)
     }
 
 

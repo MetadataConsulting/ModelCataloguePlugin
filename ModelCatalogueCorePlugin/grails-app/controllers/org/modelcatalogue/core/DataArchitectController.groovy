@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.dataarchitect.CSVService
 import org.modelcatalogue.core.util.Elements
-import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
@@ -10,20 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 
-class DataArchitectController<T> extends AbstractRestfulController<T>{
+class DataArchitectController extends AbstractRestfulController<CatalogueElement> {
 
-    static responseFormats = ['json', 'xml', 'xlsx']
+    static responseFormats = ['json', 'xlsx']
 
     def dataArchitectService
     def modelService
     @Autowired CSVService csvService
 
-    DataArchitectController(Class<T> resource, boolean readOnly) {
-        super(resource, readOnly)
-    }
-
-    DataArchitectController(Class<T> resource) {
-        super(resource, false)
+    DataArchitectController() {
+        super(CatalogueElement, false)
     }
 
     def index(){}
@@ -77,7 +72,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
 
     def getSubModelElements(){
         Long id = params.long('modelId') ?: params.long('id')
-        reportCapableRespond Lists.lazy(params, DataElement, "/dataArchitect/getSubModelElements", "elements")  {
+        respond Lists.lazy(params, DataElement, "/dataArchitect/getSubModelElements") {
             if (id){
                 Model model = Model.get(id)
                 ListWithTotalAndType<Model> subModels = modelService.getSubModels(model)
@@ -118,7 +113,7 @@ class DataArchitectController<T> extends AbstractRestfulController<T>{
             respondWithLinks elements
 
         }else{
-            reportCapableRespond "please enter keys"
+            respond "please enter keys"
         }
 
     }

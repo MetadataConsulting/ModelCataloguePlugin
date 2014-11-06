@@ -1,27 +1,25 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
-import org.modelcatalogue.core.util.Lists
-import org.modelcatalogue.core.util.Mappings
-import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.Relationships
-import org.modelcatalogue.core.util.SimpleListWrapper
+import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
-import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
 
-abstract class AbstractCatalogueElementController<T> extends AbstractRestfulController<T> {
+import static org.springframework.http.HttpStatus.OK
 
-    static responseFormats = ['json', 'xml', 'xlsx']
+abstract class AbstractCatalogueElementController<T extends CatalogueElement> extends AbstractRestfulController<T> {
+
+    static responseFormats = ['json', 'xlsx']
     static allowedMethods = [outgoing: "GET", incoming: "GET", addIncoming: "POST", addOutgoing: "POST", removeIncoming: "DELETE", removeOutgoing: "DELETE", mappings: "GET", removeMapping: "DELETE", addMapping: "POST"]
 
     def relationshipService
     def mappingService
+    def elementService
 
 	def uuid(String uuid){
-		reportCapableRespond resource.findByModelCatalogueId(uuid)
+        respond resource.findByModelCatalogueId(uuid)
 	}
 
     AbstractCatalogueElementController(Class<T> resource, boolean readOnly) {
@@ -102,13 +100,12 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             }
 
             if (old.hasErrors()) {
-                reportCapableRespond old.errors
+                respond old.errors
                 return
             }
 
             response.status = HttpServletResponse.SC_NO_CONTENT
             render "DELETED"
-            return
         }
     }
 
@@ -158,7 +155,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType, classification) :  relationshipService.link(destination, source, relationshipType, classification)
 
             if (rel.hasErrors()) {
-                reportCapableRespond rel.errors
+                respond rel.errors
                 return
             }
 
@@ -171,32 +168,12 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             response.status = HttpServletResponse.SC_CREATED
             RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
 
-            withFormat {
-                json {
-                    reportCapableRespond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)),  relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
-                }
-                xml {
-                    reportCapableRespond rel
-                }
-            }
-            return
+            respond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
         }
     }
 
     protected parseOtherSide() {
-        def otherSide = [:]
-
-        withFormat {
-            json {
-                otherSide = request.getJSON()
-            }
-            xml {
-                def xml = request.getXML()
-                otherSide.id = xml.@id.text() as Long
-                otherSide.elementType = xml.@elementType.text() as String
-            }
-        }
-        otherSide
+        request.getJSON()
     }
 
     private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
@@ -214,16 +191,10 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        Classification classification = params.classification ? Classification.get(params.classification as Long) : null
-        if (params.classification && !classification) {
-            notFound()
-            return
-        }
-
-        reportCapableRespond new Relationships(
+        respond new Relationships(
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), "relationships", direction.composeWhere(element, type, classification))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, modelCatalogueSecurityService.currentUser?.classifications ?: []))
         )
     }
 
@@ -254,7 +225,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
         def results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)
 
         if(results.errors){
-            reportCapableRespond results
+            respond results
             return
         }
 
@@ -265,7 +236,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
                 total: total,
                 items: results.searchResults,
         )
-        reportCapableRespond new Relationships(owner: element, direction: direction, list: withLinks(elements))
+        respond new Relationships(owner: element, direction: direction, list: withLinks(elements))
     }
 
 
@@ -277,7 +248,7 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             return
         }
 
-        reportCapableRespond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping", "mappings") {
+        respond new Mappings(list: Lists.fromCriteria(params, Mapping, "/${resourceName}/${params.id}/mapping") {
             eq 'source', element
         })
     }
@@ -314,21 +285,14 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             }
             if (add) {
                 String mappingString = null
-                withFormat {
-                    json {
-                        mappingString = request.getJSON().mapping
-                    }
-                    xml {
-                        mappingString = request.getXML().text()
-                    }
-                }
+                mappingString = request.getJSON().mapping
                 Mapping mapping = mappingService.map(element, destination, mappingString)
                 if (mapping.hasErrors()) {
-                    reportCapableRespond mapping.errors
+                    respond mapping.errors
                     return
                 }
                 response.status = HttpServletResponse.SC_CREATED
-                reportCapableRespond mapping
+                respond mapping
                 return
             }
             Mapping old = mappingService.unmap(element, destination)
@@ -338,12 +302,203 @@ abstract class AbstractCatalogueElementController<T> extends AbstractRestfulCont
             } else {
                 notFound()
             }
-            return
         }
     }
 
     protected getDefaultSort()  { actionName == 'index' ? 'name'  : null }
     protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
+    def relationshipTypeService
+    def classificationService
+
+    @Override
+    def index(Integer max) {
+        handleParams(max)
+
+        respond classificationService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+            eq 'status', ElementService.getStatusFromParams(params)
+        })
+    }
+
+    /**
+     * Updates a resource for the given id
+     * @param id
+     */
+    @Transactional
+    def update() {
+
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+        if(handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        def newVersion = Boolean.valueOf(params?.newVersion)
+        def ext = params?.ext
+        def oldProps = new HashMap(instance.properties)
+        oldProps.remove('modelCatalogueId')
+
+        T helper = createResource(oldProps)
+
+        def includeParams = includeFields
+
+        if (!newVersion) newVersion = (request.JSON?.newVersion) ? request.JSON?.newVersion?.toBoolean() : false
+        if (!ext) ext = request.JSON?.ext
+
+
+        if (newVersion) includeParams.remove('status')
+
+        bindData(helper, getObjectToBind(), [include: includeParams])
+
+
+        if (helper.hasErrors()) {
+            respond helper.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+
+        if (newVersion) {
+            elementService.archiveAndIncreaseVersion(instance)
+        }
+
+        if (ext) {
+            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
+        }
+
+        bindData(instance, getObjectToBind(), [include: includeParams])
+        instance.save flush:true
+
+        bindRelations(instance)
+
+        respond instance, [status: OK]
+    }
+
+    @Transactional
+    def merge() {
+
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (handleReadOnly()) {
+            return
+        }
+
+        T source = queryForResource(params.source)
+        if (source == null) {
+            notFound()
+            return
+        }
+
+        T destination = queryForResource(params.destination)
+        if (destination == null) {
+            notFound()
+            return
+        }
+
+        T merged = elementService.merge(source, destination)
+
+        if (merged.hasErrors()) {
+            respond merged.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+
+        respond merged, [status: OK]
+    }
+
+    /**
+     * Archive element
+     * @param id
+     */
+    @Transactional
+    def archive() {
+
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        instance = elementService.archive(instance)
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+
+        respond instance, [status: OK]
+    }
+
+    def history(Integer max) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+        handleParams(max)
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        Long id = element.id
+
+        if (!element.latestVersionId) {
+            respond Lists.wrap(params, "/${resourceName}/${params.id}/history", Lists.lazy(params, resource, {
+                [resource.get(id)]
+            }, { 1 }))
+            return
+        }
+
+        Long latestVersionId = element.latestVersionId
+
+        def customParams = [:]
+        customParams.putAll params
+
+        customParams.sort = 'versionNumber'
+        customParams.order = 'desc'
+
+        respond Lists.fromCriteria(customParams, resource, "/${resourceName}/${params.id}/history") {
+            eq 'latestVersionId', latestVersionId
+        }
+    }
+
+    // classifications are marshalled with the published element so no need for special method to fetch them
+    protected bindRelations(T instance, Object objectToBind) {
+        def classifications = objectToBind.classifications ?: []
+        for (classification in instance.classifications.findAll { !(it.id in classifications*.id) }) {
+            instance.removeFromClassifications classification
+            classification.removeFromClassifies instance
+        }
+        for (domain in classifications) {
+            Classification classification = Classification.get(domain.id as Long)
+            instance.addToClassifications classification
+            classification.addToClassifies instance
+        }
+    }
+
+    @Override
+    protected getIncludeFields(){
+        def fields = super.includeFields
+        fields.removeAll(['extensions', 'versionCreated', 'versionNumber', 'classifications'])
+        fields
+    }
 
 }

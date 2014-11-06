@@ -1,9 +1,6 @@
 package org.modelcatalogue.core
 
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
-class Model extends PublishedElement  {
+class Model extends CatalogueElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
@@ -15,7 +12,7 @@ class Model extends PublishedElement  {
     }
 
     static relationships = [
-            incoming: [context: 'hasContextOf', hierarchy: 'childOf'],
+            incoming: [hierarchy: 'childOf'],
             outgoing: [containment: 'contains', hierarchy: 'parentOf']
     ]
 

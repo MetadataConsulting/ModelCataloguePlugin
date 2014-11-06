@@ -2,28 +2,28 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
 
   localNameAndIdent = -> [
-    {header: 'Name',            value: "ext.name || ext.Name || relation.name ",                                 classes: 'col-md-5', show: "relation.show()", href: 'relation.href()', href: 'relation.href()'}
+    {header: 'Name', value: "ext.name || ext.Name || relation.name ", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()', href: 'relation.href()'}
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
   ]
 
   localNameAndIdAndMetadata = -> [
-    {header: 'Name',            value: "ext.name || ext.Name || relation.classifiedName",                                 classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
+    {header: 'Name', value: "ext.name || ext.Name || relation.classifiedName", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
   nameAndIdent = -> [
-    {header: 'Name',            value: "relation.classifiedName ",                                     classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
+    {header: 'Name', value: "relation.classifiedName ", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
   ]
 
   nameAndIdAndMetadata = -> [
-    {header: 'Name',            value: "relation.classifiedName",             classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
+    {header: 'Name', value: "relation.classifiedName", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
-  publishedElement = ->  [
+  classifiedElement = ->  [
     { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'href()' }
     { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'} }
     { header: "Description", value: "description" , classes: "col-md-4"}
@@ -59,20 +59,19 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
 
   # global settings
-  catalogueElementPropertiesProvider.configureProperty 'ext',             label: 'Metadata'
-  catalogueElementPropertiesProvider.configureProperty 'parentOf',        label: 'Children',            columns: localNameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'childOf',         label: 'Parents',             columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'isContextFor',    label: 'Models',              columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'includes',        label: 'Value Domains',       columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy',  label: 'Value Domains',       columns: nameAndIdAndMetadata()
-  catalogueElementPropertiesProvider.configureProperty 'contains',        label: 'Data Elements',       columns: localNameAndIdAndMetadata()
-  catalogueElementPropertiesProvider.configureProperty 'containedIn',     label: 'Models',              columns: nameAndIdAndMetadata()
-  catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments',         columns: attachmentColumns()
-  catalogueElementPropertiesProvider.configureProperty 'hasContextOf',    label: 'Conceptual Domains',  columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'classifies',    label: 'Classifies',  columns: publishedElement()
+  catalogueElementPropertiesProvider.configureProperty 'ext', label: 'Metadata'
+  catalogueElementPropertiesProvider.configureProperty 'parentOf', label: 'Children', columns: localNameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'childOf', label: 'Parents', columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'isContextFor', label: 'Models', columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'includes', label: 'Value Domains', columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'instantiatedBy', label: 'Value Domains', columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'contains', label: 'Data Elements', columns: localNameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Models', columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments', columns: attachmentColumns()
+  catalogueElementPropertiesProvider.configureProperty 'hasContextOf', label: 'Conceptual Domains', columns: nameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'classifies', label: 'Classifies', columns: classifiedElement()
 
-  catalogueElementPropertiesProvider.configureProperty 'conceptualDomains',      label: 'Conceptual Domains',  columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'instantiates',    label: 'Data Elements'     ,  columns: nameAndIdAndMetadata()
+  catalogueElementPropertiesProvider.configureProperty 'instantiates', label: 'Data Elements', columns: nameAndIdAndMetadata()
 
   catalogueElementPropertiesProvider.configureProperty 'history', {
     hidden: (security) ->

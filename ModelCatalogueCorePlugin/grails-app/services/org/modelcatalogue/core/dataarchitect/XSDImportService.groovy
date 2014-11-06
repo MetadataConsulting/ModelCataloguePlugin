@@ -1,15 +1,15 @@
 package org.modelcatalogue.core.dataarchitect
 
 import groovy.xml.QName
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.dataarchitect.xsd.*
-
 
 class XSDImportService {
 
     static transactional = false
     
     def relationshipService
+    def classificationService
 
     def getClassifications(XsdSchema schema, String classificationName, Collection<QName> namespaces, String description) {
         Collection<Classification> classifications = []
@@ -35,36 +35,11 @@ class XSDImportService {
         return classification
     }
 
-    def matchOrCreateConceptualDomain(String conceptualDomainName, String namespaceURI, String description) {
-        ConceptualDomain conceptualDomain = ConceptualDomain.findByNamespace(namespaceURI)
-        if (!conceptualDomain) conceptualDomain = new ConceptualDomain(name: conceptualDomainName, namespace: namespaceURI, description: description).save()
-        return conceptualDomain
-    }
-
-    def getConceptualDomains(XsdSchema schema, String conceptualDomainName, Collection<QName> namespaces, String description) {
-        Collection<ConceptualDomain> conceptualDomains = []
-
-        //match the conceptual domain
-        conceptualDomains.add(matchOrCreateConceptualDomain(conceptualDomainName, schema.targetNamespace, description))
-        for (namespace in namespaces) {
-            def conceptualDomain = ConceptualDomain.findByNamespace(namespace.namespaceURI)
-            if (!conceptualDomain) {
-                conceptualDomains = []
-                break
-            } else if (!conceptualDomains.find {
-                it.namespace == namespace.namespaceURI
-            }) conceptualDomains.add(conceptualDomain)
-        }
-
-        return conceptualDomains
-    }
-
-    def createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationName, String conceptualDomainName, XsdSchema schema, Collection<QName> namespaces, Boolean createModelsForElements = false) {
+    Collection<Classification> createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationName, String conceptualDomainName, XsdSchema schema, Collection<QName> namespaces, Boolean createModelsForElements = false) {
 
         try {
             Collection<Classification> classifications = []
-            Collection<ConceptualDomain> conceptualDomains = []
-            def description
+            def description = null
             if (schema.targetNamespace) {
                 description = "Generated from Schema........ \r\n Info: \r\n targetNamespace: " + schema.targetNamespace + "\r\n"
                 if (schema.attributeFormDefault) description += "attributeFormDefault: " + schema.attributeFormDefault + "\r\n"
@@ -75,29 +50,24 @@ class XSDImportService {
                 if (schema.version) description += "attributeFormDefault: " + schema.version + "\r\n"
             }
 
-            conceptualDomains = getConceptualDomains(schema, conceptualDomainName, namespaces, description)
             classifications = getClassifications(schema, classificationName, namespaces, description)
 
             //if the getConceptualDomains returns empty array i.e. some namespaces don't exist
-            if (conceptualDomains.size() > 0 && classifications.size() > 0) {
-
-                //make sure the new classifications from the new namespace are related to one another
-                classifications.first().addToRelatedTo(conceptualDomains.first())
+            if (classifications.size() > 0) {
 
                 new XSDImporter(
                         simpleDataTypes:            simpleDataTypes,
                         complexDataTypes:           complexDataTypes,
                         topLevelElements:           topLevelElements,
                         classifications:            classifications,
-                        conceptualDomains:          conceptualDomains,
                         createModelsForElements:    createModelsForElements,
 
-                        relationshipService:        relationshipService
+                        relationshipService: relationshipService,
+                        classificationService: classificationService
                 ).createAll()
             }
 
-            return [classifications.first(), conceptualDomains.first()]
-
+            classifications
         } catch (e) {
             log.error "Exception during import", e
             throw e

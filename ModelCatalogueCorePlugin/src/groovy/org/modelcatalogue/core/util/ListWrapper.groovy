@@ -9,6 +9,5 @@ interface ListWrapper<T> extends ListWithTotalAndType<T> {
     String getOrder()
     int getPage() // max
     int getOffset()
-    String getElementName()
 
 }

@@ -20,7 +20,8 @@
                 currentUser: {
                     roles: ${grails.plugin.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
                     username: '${sec.username()}',
-                    id: ${sec.loggedInUserInfo(field:"id")}
+                    id: ${sec.loggedInUserInfo(field:"id")},
+                    classifications: ${org.modelcatalogue.core.security.User.get(sec.loggedInUserInfo(field:"id")).classifications?.collect{ org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers.minimalCatalogueElementJSON(it) }.encodeAsJSON() }
                 }
                 </sec:ifLoggedIn>
             })
@@ -72,8 +73,15 @@
             </div>
         </div>
     </div>
+
+    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+        <div class="container">
+            <contextual-menu role="navigation-bottom-left"></contextual-menu>
+            <contextual-menu role="navigation-bottom-right" right="true"></contextual-menu>
+        </div>
+    </nav>
+
     <messages-panel max="3" growl="true"></messages-panel>
-    %{--<shopping-cart></shopping-cart>--}%
 </div>
 </body>
 </html>

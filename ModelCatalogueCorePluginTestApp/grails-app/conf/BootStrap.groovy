@@ -1,19 +1,13 @@
-import grails.rest.render.RenderContext
-import org.modelcatalogue.core.actions.Action
-import org.modelcatalogue.core.actions.Batch
-import org.modelcatalogue.core.actions.CreateCatalogueElement
-import org.modelcatalogue.core.actions.CreateRelationship
+import org.modelcatalogue.core.*
+import org.modelcatalogue.core.actions.*
+import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
+import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.reports.ReportsRegistry
-import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.dataarchitect.CsvTransformation
-import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
-import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.security.UserRole
+import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
-import org.modelcatalogue.core.*
-import org.modelcatalogue.core.actions.TestAction
 import org.springframework.http.HttpMethod
 
 class BootStrap {
@@ -21,7 +15,7 @@ class BootStrap {
     def importService
     def domainModellerService
     def initCatalogueService
-    def publishedElementService
+    def elementService
     def executorService
     def actionService
     def mappingService
@@ -32,17 +26,6 @@ class BootStrap {
     def init = { servletContext ->
 
         initCatalogueService.initCatalogue()
-
-//        xlsxListRenderer.registerRowWriter('reversed') {
-//            title "Reversed DEMO Export"
-//            append metadata
-//            headers 'Description', 'Name', 'ID'
-//            when { ListWrapper container, RenderContext context ->
-//                context.actionName in ['index', 'search'] && container.itemType && CatalogueElement.isAssignableFrom(container.itemType)
-//            } then { CatalogueElement element ->
-//                [[element.description, element.name, element.id]]
-//            }
-//        }
 
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
@@ -89,6 +72,7 @@ class BootStrap {
         }
 
         createRequestmapIfMissing('/asset/download/*',             'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/user/current',                 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/catalogue/*/**',               'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.POST)
@@ -109,7 +93,6 @@ class BootStrap {
 
 
         environments {
-
             development {
                 setupStuff()
 
@@ -130,11 +113,11 @@ class BootStrap {
             importService.importData()
 
             println 'Finalizing all published elements'
-            PublishedElement.findAllByStatusNotEqual(PublishedElementStatus.FINALIZED).each {
+            CatalogueElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
                 if (it instanceof Model) {
-                    publishedElementService.finalizeTree(it)
+                    elementService.finalizeTree(it)
                 } else {
-                    it.status = PublishedElementStatus.FINALIZED
+                    it.status = ElementStatus.FINALIZED
                     it.save failOnError: true
                 }
             }
@@ -157,7 +140,7 @@ class BootStrap {
                 }
             }
 
-            def parent = new Model(name:"parent1", status: PublishedElementStatus.FINALIZED).save(flush:true)
+            def parent = new Model(name:"parent1", status: ElementStatus.FINALIZED).save(flush:true)
             parent.addToChildOf(parent)
 
             assert !actionService.create(batch, TestAction, fail: true).hasErrors()
@@ -179,7 +162,6 @@ class BootStrap {
         } catch (e) {
             e.printStackTrace()
         }
-        //domainModellerService.modelDomains()
     }
 
     def setupSimpleCsvTransformation() {

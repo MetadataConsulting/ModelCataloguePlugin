@@ -46,9 +46,9 @@ class XSDImporter {
 
     Collection<XsdElement> topLevelElements
     Collection<Classification> classifications
-    Collection<ConceptualDomain> conceptualDomains
 
     RelationshipService relationshipService
+    ClassificationService classificationService
 
     XsdSchema schema
     Collection<QName> namespaces
@@ -68,23 +68,23 @@ class XSDImporter {
 
         log.info("Publishing elements as DRAFT")
         for (DataElement element in elementsCreated) {
-            element.status = PublishedElementStatus.DRAFT
+            element.status = ElementStatus.DRAFT
             element.save(failOnError: true)
         }
 
         log.info("Publishing models as DRAFT")
         for (Model model in modelsCreated) {
-            model.status = PublishedElementStatus.DRAFT
+            model.status = ElementStatus.DRAFT
             model.save(failOnError: true)
         }
 
         if (publicTypesContainer) {
-            publicTypesContainer.status = PublishedElementStatus.DRAFT
+            publicTypesContainer.status = ElementStatus.DRAFT
             publicTypesContainer.save(failOnError: true)
         }
 
         if (rootElementsContainer) {
-            rootElementsContainer.status = PublishedElementStatus.DRAFT
+            rootElementsContainer.status = ElementStatus.DRAFT
             rootElementsContainer.save(failOnError: true)
         }
 
@@ -108,12 +108,12 @@ class XSDImporter {
         classifications.add(typeClassification)
 
         publicTypesContainer = findModel(containerModelName)
-        if (!publicTypesContainer) publicTypesContainer = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save(failOnError: true)
+        if (!publicTypesContainer) publicTypesContainer = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: ElementStatus.PENDING).save(failOnError: true)
 
         if (!createModelsForElements) {
             if (!rootElementsModelName) rootElementsModelName = classifications.first()?.name + " Root Elements"
             rootElementsContainer = findModel(rootElementsModelName)
-            if (!rootElementsContainer) rootElementsContainer = new Model(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: PublishedElementStatus.PENDING).save(failOnError: true)
+            if (!rootElementsContainer) rootElementsContainer = new Model(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: ElementStatus.PENDING).save(failOnError: true)
         }
 
 
@@ -166,7 +166,7 @@ class XSDImporter {
         }
     }
 
-    protected <E extends PublishedElement> E  addClassifications(E element) {
+    protected <E extends CatalogueElement> E addClassifications(E element) {
         element.addToClassifications(classifications.first())
         element
     }
@@ -179,7 +179,7 @@ class XSDImporter {
         def model = findModel(modelName)
         if (!model) {
 
-            model = new Model(name: modelName, description: complexType?.description, status: PublishedElementStatus.UPDATED).save(flush: true, failOnError: true)
+            model = new Model(name: modelName, description: complexType?.description, status: ElementStatus.UPDATED).save(flush: true, failOnError: true)
             model = addClassifications(model)
             modelsCreated.add(model)
 
@@ -215,7 +215,7 @@ class XSDImporter {
                 }
             }
 
-            model.status = PublishedElementStatus.PENDING
+            model.status = ElementStatus.PENDING
 
         }
         return model
@@ -250,13 +250,8 @@ class XSDImporter {
     }
 
 
-
-    List<Model> findModels(String name) {
-        Model.executeQuery("""
-            select m from Model m left join m.classifications c
-            where m.name = :name and c in :classifications
-            group by m
-        """, [name: name, classifications: classifications])
+    List<Model> findModels(String modelName) {
+        classificationService.classified(Model.where { name == modelName }, classifications).list()
     }
 
     Model findModel(String name) {
@@ -271,11 +266,11 @@ class XSDImporter {
 
         for (ValueDomain domain in valueDomains) {
             if (dataType && domain.dataType == dataType) {
-                if (conceptualDomains.intersect(domain.conceptualDomains) && domain.rule == rule) {
+                if (classifications.intersect(domain.classifications) && domain.rule == rule) {
                         return domain
                 }
             } else if (!dataType) {
-                if (conceptualDomains.intersect(domain.conceptualDomains) && domain.rule == rule) {
+                if (classifications.intersect(domain.classifications) && domain.rule == rule) {
                         return domain
                 }
             }
@@ -568,7 +563,7 @@ class XSDImporter {
         DataElement dataElement = findDataElement(name, domain)
 
         if (!dataElement) {
-            dataElement = new DataElement(name: name, description: description, valueDomain: domain, status: PublishedElementStatus.PENDING)
+            dataElement = new DataElement(name: name, description: description, valueDomain: domain, status: ElementStatus.PENDING)
             dataElement = addClassifications(dataElement)
             elementsCreated << dataElement.save(failOnError: true)
         }
@@ -576,25 +571,21 @@ class XSDImporter {
         dataElement
     }
 
-    protected DataElement findDataElement(String name, ValueDomain domain) {
-        if (!name) {
+    protected DataElement findDataElement(String theName, ValueDomain domain) {
+        if (!theName) {
             return null
         }
 
-        def elements
+        List<DataElement> elements
 
         if (domain) {
-            elements = DataElement.executeQuery("""
-                select de from DataElement de left join de.classifications c
-                where de.name = :name and de.valueDomain = :domain and c in :classifications
-                group by de
-            """, [name: name, domain: domain, classifications: classifications])
+            elements = classificationService.classified(DataElement.where {
+                name == theName && valueDomain == domain
+            }, classifications).list()
         } else {
-            elements = DataElement.executeQuery("""
-                select de from DataElement de left join de.classifications c
-                where de.name = :name and de.valueDomain is null and c in :classifications
-                group by de
-            """, [name: name, classifications: classifications])
+            elements = classificationService.classified(DataElement.where {
+                name == theName && valueDomain == null
+            }, classifications).list()
         }
 
         if (elements) {
@@ -674,7 +665,9 @@ class XSDImporter {
         def valueDomain = findValueDomain(simpleDataType.name, dataType, rule)
         if (!valueDomain) {
             valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: rule).save(flush: true, failOnError: true)
-            valueDomain.addToConceptualDomains(conceptualDomains.first())
+            for (Classification classification in classifications) {
+                valueDomain.addToClassifications(classification)
+            }
 
             if (baseValueDomain) valueDomain.addToIsBasedOn(baseValueDomain)
             if (simpleDataType.union) valueDomain = addUnions(valueDomain, simpleDataType.union)

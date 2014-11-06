@@ -3,8 +3,10 @@ package org.modelcatalogue.core.actions
 import grails.test.mixin.Mock
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElementService
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipService
+import org.modelcatalogue.core.RelationshipType
 import spock.lang.Ignore
 import spock.lang.Specification
 
@@ -24,8 +26,11 @@ class MergePublishedElementsSpec extends Specification {
         two = new Model(name: 'two').save(failOnError: true)
 
         merge.autowireCapableBeanFactory = Mock(org.springframework.beans.factory.config.AutowireCapableBeanFactory)
+        merge.relationshipService = Mock(RelationshipService)
+        merge.elementService = Mock(ElementService)
 
-        merge.publishedElementService = Mock(PublishedElementService)
+        _ * merge.relationshipService.getClassifiedName(one) >> 'one'
+        _ * merge.relationshipService.getClassifiedName(two) >> 'two'
     }
 
     def "uses default action natural name"() {
@@ -75,7 +80,7 @@ class MergePublishedElementsSpec extends Specification {
         merge.merge()
 
         then:
-        1 * merge.publishedElementService.merge(one, two) >> one
+        1 * merge.elementService.merge(one, two) >> one
     }
 
     def "published element service is called with the proper parameters"() {
@@ -89,7 +94,7 @@ class MergePublishedElementsSpec extends Specification {
         merge.run()
 
         then:
-        1 * merge.publishedElementService.merge(one, two) >> one
+        1 * merge.elementService.merge(one, two) >> one
         !merge.failed
         sw.toString() == """Merged Model <a target="_blank" href="#/catalogue/model/${one.id}">${one.name}</a> into Model <a target="_blank" href="#/catalogue/model/${two.id}">${two.name}</a>"""
         merge.result == encodeEntity(one)

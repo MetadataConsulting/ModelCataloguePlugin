@@ -19,11 +19,11 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     }
 
     def loadFixtures(){
-        if(CatalogueElement.count()==0){
-            fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "conceptualDomains/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "valueDomains/*", "users/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
-        }
         if(RelationshipType.count()<7) {
             initCatalogueService.initDefaultRelationshipTypes()
+        }
+        if(CatalogueElement.count()==0){
+            fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "valueDomains/*", "users/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
         }
     }
 

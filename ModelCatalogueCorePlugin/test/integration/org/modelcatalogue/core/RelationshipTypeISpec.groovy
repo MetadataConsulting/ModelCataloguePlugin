@@ -8,14 +8,13 @@ import spock.lang.Shared
 class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
     @Shared
-    def md1, de1, cd1, md2, vd
+    def md1, de1, md2, vd
 
     def setupSpec(){
         loadFixtures()
         md1 = Model.findByName("book")
         md2 = Model.findByName("chapter1")
         de1 = DataElement.findByName("DE_author1")
-        cd1 = ConceptualDomain.findByName("public libraries")
         vd = ValueDomain.findByName("value domain uni subjects 2")
 
     }
@@ -64,47 +63,6 @@ class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
         cleanup:
         model.delete()
-
-    }
-
-    def "conceptual domains can provide context for model, models have context of conceptual domains"(){
-
-        def model = Model.get(md1.id)
-        def conceptualDomain =  ConceptualDomain.get(cd1.id)
-
-
-        when:
-        model.addToHasContextOf(conceptualDomain)
-
-        then:
-        model.hasContextOf
-        model.hasContextOf.contains(conceptualDomain)
-        conceptualDomain.isContextFor
-        conceptualDomain.isContextFor.contains(model)
-
-        when:
-        model.removeFromHasContextOf(conceptualDomain)
-
-        then:
-        !model.hasContextOf.contains(conceptualDomain)
-        !conceptualDomain.isContextFor.contains(model)
-
-        when:
-        conceptualDomain.addToIsContextFor(model)
-
-        then:
-        model.hasContextOf
-        model.hasContextOf.contains(conceptualDomain)
-        conceptualDomain.isContextFor
-        conceptualDomain.isContextFor.contains(model)
-
-        when:
-
-        conceptualDomain.removeFromIsContextFor(model)
-
-        then:
-        !model.hasContextOf.contains(conceptualDomain)
-        !conceptualDomain.isContextFor.contains(model)
 
     }
 

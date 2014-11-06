@@ -15,9 +15,9 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
-                <label for="conceptualDomain"> Conceptual Domains</label>
-                <elements-as-tags elements="copy.conceptualDomains"></elements-as-tags>
-                <input id="conceptualDomain" placeholder="Conceptual Domain" ng-model="pending.conceptualDomain" catalogue-element-picker="conceptualDomain" label="el.name" typeahead-on-select="copy.conceptualDomains.push(pending.conceptualDomain);pending.conceptualDomain = null">
+                <label for="classification"> Classifications</label>
+                <elements-as-tags elements="copy.classifications"></elements-as-tags>
+                <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(pending.classification);pending.classification = null">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -58,7 +58,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
         </div>
         '''
         controller: ['$scope', 'messages', '$controller', '$modalInstance', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, catalogueElementResource) ->
-          $scope.newEntity      = -> {conceptualDomains: $scope.copy?.conceptualDomains ? []}
+          $scope.newEntity      = -> {classifications: $scope.copy?.classifications ? []}
           $scope.copy           = angular.copy(args.element ? $scope.newEntity())
           $scope.original       = args.element ? $scope.newEntity()
           $scope.messages       = messages.createNewMessages()
@@ -90,10 +90,10 @@ x in ['apple', 'banana', 'cherry']
           $scope.beforeSave = ->
             promise = $q.when {}
 
-            if $scope.pending.conceptualDomain and angular.isString($scope.pending.conceptualDomain)
-              promise = promise.then -> catalogueElementResource('conceptualDomain').save({name: $scope.pending.conceptualDomain}).then (newDomain) ->
-                $scope.copy.conceptualDomains.push newDomain
-                $scope.pending.conceptualDomain = null
+            if $scope.pending.classification and angular.isString($scope.pending.classification)
+              promise = promise.then -> catalogueElementResource('classification').save({name: $scope.pending.classification}).then (newDomain) ->
+                $scope.copy.classifications.push newDomain
+                $scope.pending.classification = null
 
             if $scope.copy.dataType and angular.isString($scope.copy.dataType)
               promise = promise.then -> catalogueElementResource('dataType').save({name: $scope.copy.dataType}).then (newType) ->
@@ -113,7 +113,7 @@ x in ['apple', 'banana', 'cherry']
             return true if $scope.copy.multiple != $scope.original.multiple
             return true if $scope.copy.unitOfMeasure?.id != $scope.original.unitOfMeasure?.id
             return true if $scope.copy.dataType?.id != $scope.original.dataType?.id
-            return true if not angular.equals($scope.copy.conceptualDomains, $scope.original.conceptualDomains)
+            return true if not angular.equals($scope.copy.classifications, $scope.original.classifications)
             return false
         ]
 

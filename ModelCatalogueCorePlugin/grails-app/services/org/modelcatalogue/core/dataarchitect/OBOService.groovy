@@ -5,7 +5,7 @@ import groovy.text.Template
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.obolibrary.oboformat.model.Clause
@@ -180,12 +180,12 @@ class OBOService {
     private void publishModelsAsDraft(Collection<Model> models) {
         log.info "Publishing models as draft"
         models.eachWithIndex { Model model, Integer i ->
-            if (model.status != PublishedElementStatus.PENDING) {
+            if (model.status != ElementStatus.PENDING) {
                 // obsolete models
                 return
             }
             log.info "[${(i + 1).toString().padLeft(6, '0')}/${models.size().toString().padLeft(6, '0')}] Publishing model ${model.ext[OBO_ID]}: ${model.name} as DRAFT"
-            model.status = PublishedElementStatus.DRAFT
+            model.status = ElementStatus.DRAFT
             model.save(failOnError: true)
             if (i % 1000 == 0) {
                 cleanUpGorm()
@@ -386,7 +386,7 @@ class OBOService {
 
     private void handleStatusForObsoleteAndReplacedBy(Model model, Frame frame) {
         if (frame.getClause('is_obsolete') || frame.getClause('replaced_by')) {
-            model.status = PublishedElementStatus.DEPRECATED
+            model.status = ElementStatus.DEPRECATED
         }
     }
 
@@ -433,7 +433,7 @@ class OBOService {
             throw new IllegalArgumentException("Frame ${frame.id} is missing the 'name' property")
         }
 
-        Model model = new Model(name: name.value.toString(), status: PublishedElementStatus.PENDING, modelCatalogueId: mcid).save(failOnError: true)
+        Model model = new Model(name: name.value.toString(), status: ElementStatus.PENDING, modelCatalogueId: mcid).save(failOnError: true)
         model.ext[OBO_ID] = frame.id
         model
     }

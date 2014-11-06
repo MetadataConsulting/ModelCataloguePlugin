@@ -4,12 +4,14 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
   actionsChildrenByParentId = {}
   availableActionsById      = {}
   actionsProvider           =
-    ROLE_NAVIGATION:          'navigation'
-    ROLE_LIST_ACTION:         'list'
-    ROLE_ITEM_ACTION:         'item'
-    ROLE_MODAL_ACTION:        'modal'
-    ROLE_LIST_HEADER_ACTION:  'header'
-    ROLE_LIST_FOOTER_ACTION:  'footer'
+    ROLE_NAVIGATION:              'navigation'
+    ROLE_NAVIGATION_BOTTOM_LEFT:  'navigation-bottom-left'
+    ROLE_NAVIGATION_BOTTOM_RIGHT: 'navigation-bottom-right'
+    ROLE_LIST_ACTION:             'list'
+    ROLE_ITEM_ACTION:             'item'
+    ROLE_MODAL_ACTION:            'modal'
+    ROLE_LIST_HEADER_ACTION:      'header'
+    ROLE_LIST_FOOTER_ACTION:      'footer'
 
   getRoleAwareId = (role, id) -> "role_#{role}_#{id}"
 
@@ -132,12 +134,14 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
 
 
     actions =
-      ROLE_NAVIGATION:            actionsProvider.ROLE_NAVIGATION
-      ROLE_LIST_ACTION:           actionsProvider.ROLE_LIST_ACTION
-      ROLE_ITEM_ACTION:           actionsProvider.ROLE_ITEM_ACTION
-      ROLE_MODAL_ACTION:          actionsProvider.ROLE_MODAL_ACTION
-      ROLE_LIST_HEADER_ACTION:    actionsProvider.ROLE_LIST_HEADER_ACTION
-      ROLE_LIST_FOOTER_ACTION:    actionsProvider.ROLE_LIST_FOOTER_ACTION
+      ROLE_NAVIGATION:              actionsProvider.ROLE_NAVIGATION
+      ROLE_NAVIGATION_BOTTOM_LEFT:  actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT
+      ROLE_NAVIGATION_BOTTOM_RIGHT: actionsProvider.ROLE_NAVIGATION_BOTTOM_RIGHT
+      ROLE_LIST_ACTION:             actionsProvider.ROLE_LIST_ACTION
+      ROLE_ITEM_ACTION:             actionsProvider.ROLE_ITEM_ACTION
+      ROLE_MODAL_ACTION:            actionsProvider.ROLE_MODAL_ACTION
+      ROLE_LIST_HEADER_ACTION:      actionsProvider.ROLE_LIST_HEADER_ACTION
+      ROLE_LIST_FOOTER_ACTION:      actionsProvider.ROLE_LIST_FOOTER_ACTION
 
     actions.getActions = ($scope, role = undefined) ->
       currentActions = []
