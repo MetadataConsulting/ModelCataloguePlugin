@@ -38,6 +38,11 @@ class UserController extends AbstractCatalogueElementController<User> {
     }
 
     def current() {
+        if (!modelCatalogueSecurityService.currentUser) {
+            render(success: true, username: null, roles: [], id: null, classifications: [])
+            return
+        }
+
         render([
                 success: true,
                 username: modelCatalogueSecurityService.currentUser.username,

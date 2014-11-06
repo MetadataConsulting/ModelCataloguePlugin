@@ -20,10 +20,11 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
 
       windowEl = angular.element($window)
-      handler = -> $scope.scroll = windowEl.scrollTop()
-      windowEl.on('scroll', $scope.$apply.bind($scope, handler))
+      handler = (scope) -> $scope.scroll = windowEl.scrollTop()
+      windowEl.on 'scroll', ->
+        $scope.$apply (scope) -> handler(scope)
 
-      handler()
+      handler($scope)
 
       initialOffset = undefined
 
