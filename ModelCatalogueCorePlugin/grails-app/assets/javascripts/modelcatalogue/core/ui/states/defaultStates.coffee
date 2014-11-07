@@ -677,7 +677,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <div class="row">
         <div class="col-md-4">
           <h2>
-            <small ng-class="catalogue.getIcon('model')"></small>&nbsp; Models
+            <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
             <span class="contextual-actions-right">
             <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
             </span>
