@@ -93,6 +93,7 @@ environments {
     }
     test {
         grails.plugin.console.enabled = true
+        grails.serverURL = "https://metadata.cfapps.io"
     }
     production {
         grails.logging.jul.usebridge = false
