@@ -11,7 +11,7 @@ class CatalogueController  {
 
        CatalogueElement element
 
-       if (version) {
+       if (version && version != 1) {
            Long lastVersion = id
            element = CatalogueElement.where {
                versionNumber == version && latestVersionId == lastVersion
