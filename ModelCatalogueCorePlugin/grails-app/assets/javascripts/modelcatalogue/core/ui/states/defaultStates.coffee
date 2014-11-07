@@ -676,19 +676,19 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">
       <div class="row">
         <div class="col-md-4">
+            <span class="contextual-actions-right">
+              <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
+            </span>
           <h2>
             <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
-            <span class="contextual-actions-right">
-            <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
-            </span>
           </h2>
         </div>
         <div class="col-md-8">
-          <h3 ng-show="element">{{element.metadata.name || element.metadata.Name || element.name}}
-            <small class="text-muted" ng-show="element.metadata.name || element.metadata.Name  &amp;&amp; ((element.metadata.name || element.metadata.Name ) != element.name)">{{element.name}}</small>
             <span class="contextual-actions-right">
               <contextual-actions size="sm" no-colors="true" icon-only="true" role="item"></contextual-actions>
             </span>
+          <h3 ng-show="element">{{element.metadata.name || element.metadata.Name || element.name}}
+            <small class="text-muted" ng-show="element.metadata.name || element.metadata.Name  &amp;&amp; ((element.metadata.name || element.metadata.Name ) != element.name)">{{element.name}}</small>
           </h3>
           <h3 ng-hide="element">No Selection</h3>
         </div>

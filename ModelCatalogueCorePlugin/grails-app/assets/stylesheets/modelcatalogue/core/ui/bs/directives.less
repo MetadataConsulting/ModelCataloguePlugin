@@ -116,21 +116,14 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
 }
 
 .contextual-actions-right {
-  z-index: 1000;
-  float: right;
-  position: absolute;
-  right: 15px;
-  top: 20px;
+  display: block;
+  width: 100%;
+  padding: 7px 7px 3px;
+  background-color: whitesmoke;
+  border-top: solid #dddddd 1px;
+  border-bottom: solid #dddddd 1px;
+  text-align: right;
 
-  opacity: 0.6;
-
-  .btn.disabled, .btn[disabled] {
-    color: #c12e2a;
-  }
-
-  &:hover {
-    opacity: 1;
-  }
 }
 
 .contextual-actions {
