@@ -52,7 +52,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
 
         MultipartFile file = request.getFile('xml')
 
-        String result = schemaValidatorService.validateSchema(modelCatalogueStorageService.fetch('assets', asset.modelCatalogueId), file.inputStream)
+        String result = schemaValidatorService.validateSchema(modelCatalogueStorageService.fetch('assets', "${asset.id}"), file.inputStream)
 
         if (result && !result.contains('INVALID')) {
             respond(success: true)
