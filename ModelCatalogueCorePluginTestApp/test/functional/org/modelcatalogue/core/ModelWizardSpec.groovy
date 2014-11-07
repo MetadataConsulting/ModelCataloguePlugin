@@ -14,7 +14,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
         then:
         at ModalTreeViewPage
-        waitFor(60) {
+        waitFor(120) {
             viewTitle.displayed
         }
         viewTitle.text().trim()     == 'Models'

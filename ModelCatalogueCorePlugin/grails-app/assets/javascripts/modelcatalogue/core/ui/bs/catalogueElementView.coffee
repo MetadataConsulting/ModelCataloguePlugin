@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
         <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge">{{tab.value.total}}</span></span></a></li>
       </ul>
 
-      <div ng-repeat="tab in tabs">
+      <div ng-repeat="tab in tabs" class="tab-pane">
             <div ng-switch="tab.type" id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
               <div ng-switch-when="simple-object-editor">
                 <simple-object-editor ng-if="tab.name != 'enumerations'" object="tab.value" title="Key"   value-title="Value"></simple-object-editor>

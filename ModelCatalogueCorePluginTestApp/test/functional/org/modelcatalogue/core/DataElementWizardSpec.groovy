@@ -19,7 +19,7 @@ class DataElementWizardSpec extends GebReportingSpec  {
 
         then:
         at DataViewPage
-        waitFor(60) {
+        waitFor(120) {
             viewTitle.displayed
         }
         viewTitle.text().trim()     == 'Data Element List'
