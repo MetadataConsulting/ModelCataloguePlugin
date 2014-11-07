@@ -9,6 +9,7 @@ class Classification extends CatalogueElement {
     String namespace
 
     static constraints = {
+        name unique: 'versionNumber'
         namespace nullable: true, unique: true
     }
 
