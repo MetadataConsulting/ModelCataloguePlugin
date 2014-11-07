@@ -100,8 +100,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
               $scope.messages.error 'Missing Direction', 'Please select the direction'
               return
 
-            if not $scope.relation
-              $scope.messages.error 'Missing Relation', 'Please select the relation'
+            if not $scope.relation or angular.isString($scope.relation)
+              $scope.messages.error 'Missing Relation', 'Please select the relation from the existing elements'
               return
 
             # this is ignored by binding and handled separately

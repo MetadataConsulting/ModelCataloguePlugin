@@ -262,7 +262,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedOut', refreshElement
-      $rootScope.$on 'actionPerformed', refreshElement
       $rootScope.$on 'catalogueElementCreated', refreshElement
       $rootScope.$on 'catalogueElementDeleted', refreshElement
 
