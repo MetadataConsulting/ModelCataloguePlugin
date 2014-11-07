@@ -5,8 +5,8 @@ dataSource {
     password = ""
 }
 hibernate {
-    cache.use_second_level_cache = true
-    cache.use_query_cache = false
+    cache.use_second_level_cache    = true
+    cache.use_query_cache           = false
     cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // Hibernate 3
 //    cache.region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory' // Hibernate 4
 }
@@ -49,7 +49,7 @@ environments {
     production {
         dataSource {
             // will be reconfigured by cloud foundry
-            dbCreate = ""
+            dbCreate = "update"
             url = "jdbc:mysql://ec2-176-34-253-124.eu-west-1.compute.amazonaws.com:3306/modelcatalogue-core-testapp?autoReconnect=true&useUnicode=yes"
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')

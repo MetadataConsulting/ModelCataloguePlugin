@@ -483,7 +483,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerActionInRoles 'create-new-relationship', [actionsProvider.ROLE_ITEM_ACTION], ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('org.modelcatalogue.core.CatalogueElement')
+    return undefined if not $scope.element.isInstanceOf('catalogueElement')
     return undefined if $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
 

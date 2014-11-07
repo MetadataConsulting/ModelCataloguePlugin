@@ -20,14 +20,15 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setInstanceOf 'publishedElement',   'catalogueElement'
   catalogueProvider.setInstanceOf 'user',               'catalogueElement'
   catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'
+  catalogueProvider.setInstanceOf 'dataType',           'catalogueElement'
+  catalogueProvider.setInstanceOf 'classification',     'catalogueElement'
+  catalogueProvider.setInstanceOf 'asset',              'catalogueElement'
+  catalogueProvider.setInstanceOf 'measurementUnit',    'catalogueElement'
+  catalogueProvider.setInstanceOf 'model',              'catalogueElement'
+  catalogueProvider.setInstanceOf 'dataElement',        'catalogueElement'
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
 
-  catalogueProvider.setInstanceOf 'dataType', 'catalogueElement'
-  catalogueProvider.setInstanceOf 'classification', 'catalogueElement'
-  catalogueProvider.setInstanceOf 'asset', 'catalogueElement'
-  catalogueProvider.setInstanceOf 'measurementUnit', 'catalogueElement'
-  catalogueProvider.setInstanceOf 'model', 'catalogueElement'
-  catalogueProvider.setInstanceOf 'dataElement', 'catalogueElement'
+
 
 ]

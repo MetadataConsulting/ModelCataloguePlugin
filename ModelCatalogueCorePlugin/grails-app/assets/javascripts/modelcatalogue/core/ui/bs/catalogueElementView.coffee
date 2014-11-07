@@ -6,12 +6,15 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
       </span>
       <h3 class="ce-name"><small ng-class="element.getIcon()" title="{{element.getElementTypeName()}}"></small> {{element.name}} <small><span class="label" ng-show="element.status" ng-class="{'label-warning': element.status == 'DRAFT', 'label-info': element.status == 'PENDING', 'label-primary': element.status == 'FINALIZED', 'label-danger': element.status == 'DEPRECATED'}">{{element.status}}</span></small></h3>
       <blockquote class="ce-description" ng-show="element.description" ng-bind-html="'' + element.description | linky:'_blank'"></blockquote>
-      <tabset ng-show="showTabs">
-        <tab ng-repeat="tab in tabs" active="tab.active" select="select(tab)">
-            <tab-heading><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge">{{tab.value.total}}</span></span></tab-heading>
-            <div ng-switch="tab.type" id="{{tab.name}}-tab" class="cev-tab-content">
+
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge">{{tab.value.total}}</span></span></a></li>
+      </ul>
+
+      <div ng-repeat="tab in tabs">
+            <div ng-switch="tab.type" id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
               <div ng-switch-when="simple-object-editor">
-                <simple-object-editor ng-if="tab.name != 'enumerations'" object="tab.value" title="Key" value-title="Value"></simple-object-editor>
+                <simple-object-editor ng-if="tab.name != 'enumerations'" object="tab.value" title="Key"   value-title="Value"></simple-object-editor>
                 <simple-object-editor ng-if="tab.name == 'enumerations'" object="tab.value" title="Value" value-title="Description" key-placeholder="Value" value-placeholder="Description"></simple-object-editor>
                 <div class="row">
                   <div class="col-md-12">
@@ -24,13 +27,12 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
                   </div>
                 </div>
               </div>
-              <properties-pane id="{{tab.name}}-enums"    item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'enumerations'" title="Value" value-title="Description"></properties-pane>
-              <properties-pane id="{{tab.name}}-objects"  item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name != 'properties' &amp;&amp; tab.name != 'enumerations' " title="Key" value-title="Value"></properties-pane>
+              <properties-pane id="{{tab.name}}-enums"    item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'enumerations'"                                      title="Value" value-title="Description"></properties-pane>
+              <properties-pane id="{{tab.name}}-objects"  item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name != 'properties' &amp;&amp; tab.name != 'enumerations' " title="Key"   value-title="Value"></properties-pane>
               <properties-pane id="{{tab.name}}-props"    item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'properties'"></properties-pane>
-              <infinite-table  id="{{tab.name}}-table"    list="tab.value" columns="tab.columns" actions="tab.actions"  container="'#' + tab.name + '-tab'" ng-switch-when="decorated-list"></infinite-table>
+              <infinite-table  id="{{tab.name}}-table"    list="tab.value" columns="tab.columns" actions="tab.actions" ng-switch-when="decorated-list"></infinite-table>
             </div>
-        </tab>
-      </tabset>
+      </div>
     </div>
     '''
   ]

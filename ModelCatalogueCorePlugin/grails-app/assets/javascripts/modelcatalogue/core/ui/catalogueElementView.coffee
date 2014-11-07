@@ -156,9 +156,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             original:   angular.copy(obj ? {})
             properties: []
             type:       if security.hasRole('CURATOR') then 'simple-object-editor' else 'properties-pane'
-            isDirty:    () -> angular.equals(@original, @value)
-            reset:      () -> @value = angular.copy @original
-            update:     () ->
+            isDirty:    -> angular.equals(@original, @value)
+            reset:      -> @value = angular.copy @original
+            update:     ->
               if not resource
                 messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
                 return
@@ -262,18 +262,20 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedOut', refreshElement
+      $rootScope.$on 'actionPerformed', refreshElement
+      $rootScope.$on 'catalogueElementCreated', refreshElement
+      $rootScope.$on 'catalogueElementDeleted', refreshElement
 
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
         $scope.property = params.property
-        $scope.$broadcast 'infiniteTableRedraw'
 
       # init
       onElementUpdate($scope.element)
 
       # watches
-      $scope.$watch 'element', onElementUpdate, true
+      $scope.$watch 'element', onElementUpdate
       $scope.$watch 'property', onPropertyUpdate
     ]
   }
