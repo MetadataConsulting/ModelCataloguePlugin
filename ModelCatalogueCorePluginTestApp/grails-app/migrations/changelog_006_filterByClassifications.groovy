@@ -146,6 +146,11 @@ databaseChangeLog = {
                     def classification = sql.firstRow classificationSelector
 
                     if (!classification) {
+                        // try namespace as well
+                        classification = sql.firstRow "select cs.id, cs.namespace, ce.name from classification cs join catalogue_element ce on ce.id = cs.id where cs.namespace = $cdns"
+                    }
+
+                    if (!classification) {
                         def newids = sql.executeInsert """
                             insert into catalogue_element (
                                 version, date_created, description, last_updated,
@@ -159,9 +164,9 @@ databaseChangeLog = {
                         """
                         Number newId = newids[0][0]
                         sql.executeInsert "insert into classification (id, namespace) value ($newId, $cdns)"
+                        classification = sql.firstRow classificationSelector
                     }
 
-                    classification = sql.firstRow classificationSelector
 
                     if (!classification) {
                         throw new IllegalArgumentException("Failed to convert conceptual domain $name to classification!")

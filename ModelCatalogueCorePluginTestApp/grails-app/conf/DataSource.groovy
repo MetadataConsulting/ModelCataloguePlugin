@@ -47,15 +47,13 @@ environments {
         }
     }
     production {
-//        dataSource {
-//            dialect = 'org.hibernate.dialect.MySQL5InnoDBDialect'
-//            pooled = false
-//            dbCreate = 'update' // use 'update', 'validate', 'create' or 'create-drop'
-//            jndiName = 'java:comp/env/jdbc/mcc-testapp'
-//        }
         dataSource {
-            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            // will be reconfigured by cloud foundry
+            dbCreate = ""
+            url = "jdbc:mysql://ec2-176-34-253-124.eu-west-1.compute.amazonaws.com:3306/modelcatalogue-core-testapp?autoReconnect=true&useUnicode=yes"
+            username = System.getenv('METADATA_DB_USERNAME')
+            password = System.getenv('METADATA_DB_PASSWORD')
+            driverClassName = "com.mysql.jdbc.Driver"
         }
     }
 }
