@@ -235,18 +235,10 @@ grails.assets.excludes = [
         "angular-animate/**/*.js",
         "angular-bootstrap/**/*.js",
         "angular-cookies/**/*.js",
-        "angular-dif-match-patch-musketyr/**/*.js",
-        "angular-http-auth/**/*.js",
         "angular-i18n/**/*.js",
-        "angular-loading-bar/**/*.js",
         "angular-mocks/**/*.js",
         "angular-sanitize/**/*.js",
-        "angular-ui-router/**/*.js",
-        "google-diff-match-patch/**/*.js",
         "jasmine/**/*.js",
-        "ng-file-upload/**/*.js",
-        "ng-file-upload-shim/**/*.js",
-        "ngInfiniteScroll/**/*.js",
 ]
 
 grails.assets.plugin."model-catalogue-core-plugin".excludes = [
@@ -258,18 +250,10 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "angular-animate/**/*.js",
         "angular-bootstrap/**/*.js",
         "angular-cookies/**/*.js",
-        "angular-dif-match-patch-musketyr/**/*.js",
-        "angular-http-auth/**/*.js",
         "angular-i18n/**/*.js",
-        "angular-loading-bar/**/*.js",
         "angular-mocks/**/*.js",
         "angular-sanitize/**/*.js",
-        "angular-ui-router/**/*.js",
-        "google-diff-match-patch/**/*.js",
         "jasmine/**/*.js",
-        "ng-file-upload/**/*.js",
-        "ng-file-upload-shim/**/*.js",
-        "ngInfiniteScroll/**/*.js",
 ]
 
 grails.assets.minifyOptions = [

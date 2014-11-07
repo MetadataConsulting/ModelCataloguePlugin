@@ -36,6 +36,16 @@ environments {
             logSql = true
         }
     }
+    cloudbees {
+        dataSource {
+            dbCreate = ""
+            url = "jdbc:mysql://ec2-176-34-253-124.eu-west-1.compute.amazonaws.com:3306/modelcatalogue-core-testapp?autoReconnect=true&useUnicode=yes"
+            username = System.getenv('METADATA_DB_USERNAME')
+            password = System.getenv('METADATA_DB_PASSWORD')
+            driverClassName = "com.mysql.jdbc.Driver"
+            logSql = true
+        }
+    }
     production {
 //        dataSource {
 //            dialect = 'org.hibernate.dialect.MySQL5InnoDBDialect'
