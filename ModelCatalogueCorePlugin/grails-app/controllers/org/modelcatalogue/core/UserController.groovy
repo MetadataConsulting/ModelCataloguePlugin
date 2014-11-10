@@ -39,7 +39,7 @@ class UserController extends AbstractCatalogueElementController<User> {
 
     def current() {
         if (!modelCatalogueSecurityService.currentUser) {
-            render([success: true, username: null, roles: [], id: null, classifications: []] as JSON)
+            render([success: false, username: null, roles: [], id: null, classifications: []] as JSON)
             return
         }
 
