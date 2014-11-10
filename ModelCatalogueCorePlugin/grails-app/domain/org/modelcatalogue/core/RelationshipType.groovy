@@ -38,6 +38,9 @@ class RelationshipType {
     // if the direction of the relationship doesn't matter
     Boolean bidirectional = Boolean.FALSE
 
+    /** if relationships of this type shall not be carried over when new draft version is created */
+    Boolean versionSpecific = Boolean.FALSE
+
     /**
      * This is a script which will be evaluated with following binding:
      * source

@@ -43,11 +43,11 @@ class User extends CatalogueElement {
     }
 
     @Override
-    protected void beforeArchive() {
-        super.beforeArchive()
+    protected void beforeDraftPersisted() {
+        super.beforeDraftPersisted()
         String randomUsername = username
         while (User.countByUsername(randomUsername)) {
-            randomUsername = "$username (${UUID.randomUUID().toString()})"
+            randomUsername = "${username[0..(username.indexOf('(') - 1)]} (${UUID.randomUUID().toString()})"
         }
         username = randomUsername
         // made the user account unable to sign in

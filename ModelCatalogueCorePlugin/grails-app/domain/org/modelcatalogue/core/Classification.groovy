@@ -26,4 +26,8 @@ class Classification extends CatalogueElement {
         "${getClass().simpleName}[id: ${id}, name: ${name}]"
     }
 
+    @Override
+    protected void beforeDraftPersisted() {
+        namespace = null
+    }
 }

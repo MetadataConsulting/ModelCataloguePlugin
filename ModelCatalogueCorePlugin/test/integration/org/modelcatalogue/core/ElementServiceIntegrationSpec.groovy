@@ -56,37 +56,52 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.valueDomain = domain
 
         int originalVersion     = author.versionNumber
-        DataElement archived    = elementService.archiveAndIncreaseVersion(author)
-        int archivedVersion     = archived.versionNumber
+        DataElement draft       = elementService.createDraftVersion(author)
+        int draftVersion        = draft.versionNumber
         int newVersion          = author.versionNumber
         author.refresh()
 
         expect:
-        author != archived
-        author.id != archived.id
+        author != draft
+        author.id != draft.id
         author.versionCreated != author.dateCreated
-        originalVersion != newVersion
-        originalVersion == newVersion - 1
-        archivedVersion == originalVersion
+        originalVersion == newVersion
+        draftVersion    == originalVersion + 1
 
-        archived.ext.something == 'anything'
+        draft.ext.something == 'anything'
 
-        author.supersedes.contains(archived)
+        draft.supersedes.contains(author)
 
         author.valueDomain
-        archived.valueDomain
+        draft.valueDomain
+
+        author.status == ElementStatus.FINALIZED
+        draft.status == ElementStatus.DRAFT
 
         when:
-        def anotherArchived = elementService.archiveAndIncreaseVersion(author)
+        def anotherDraft = elementService.createDraftVersion(draft)
+
+        println "Author Supersedes: $author.supersedes"
+        println "Draft Supersedes: $draft.supersedes"
+        println "Another Draft Supersedes:  $anotherDraft.supersedes"
 
         then:
-        archived.countSupersedes()        == 0
-        anotherArchived.countSupersedes() == 1
-        author.countSupersedes()          == 1
+        draft.countSupersedes()             == 1
+        author.countSupersedes()            == 0
+        anotherDraft.countSupersedes()      == 1
+        draft.countSupersededBy()           == 1
+        author.countSupersededBy()          == 1
+        anotherDraft.countSupersededBy()    == 0
 
-        author.supersedes.contains(anotherArchived)
-        anotherArchived.supersedes.contains(archived)
-        author.status == ElementStatus.DRAFT
+        anotherDraft.supersedes.contains(draft)
+        anotherDraft.status == ElementStatus.DRAFT
+        draft.status        == ElementStatus.DEPRECATED
+        author.status       == ElementStatus.FINALIZED
+
+        author.latestVersionId          == author.id
+        draft.latestVersionId           == author.id
+        anotherDraft.latestVersionId    == author.id
+
     }
 
     def "archive"() {
@@ -193,29 +208,26 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md2.addToParentOf(md3)
 
         int originalVersion     = md2.versionNumber
-        Model archived    = elementService.archiveAndIncreaseVersion(md2)
-        int archivedVersion     = archived.versionNumber
+        Model draft             = elementService.createDraftVersion(md2)
+        int draftVersion        = draft.versionNumber
         int newVersion          = md2.versionNumber
 
-        def archivedrel = relationshipService.getRelationships([:], RelationshipDirection.BOTH, archived, RelationshipType.hierarchyType).items
+        List<Relationship> draftRelationships = relationshipService.getRelationships([:], RelationshipDirection.BOTH, draft, RelationshipType.hierarchyType).items
 
         expect:
-        md2 != archived
-        md2.id != archived.id
-        originalVersion != newVersion
-        originalVersion == newVersion - 1
-        archivedVersion == originalVersion
+        md2 != draft
+        md2.id != draft.id
+        originalVersion == newVersion
+        draftVersion == originalVersion + 1
 
-        md2.supersedes.contains(archived)
+        draft.supersedes.contains(md2)
 
         md2.parentOf.contains(md3)
-        !md2.childOf.contains(md1)
+        md2.childOf.contains(md1)
         md2.parentOf.contains(md3)
-        md1.parentOf.contains(archived)
-        archived.parentOf.contains(md3)
-        archivedrel.size() == 2
-        !archivedrel.get(0).archived
-        !archivedrel.get(1).archived
+        !md1.parentOf.contains(draft)
+        !draft.parentOf.contains(md3)
+        draftRelationships.size() == 0
 
         cleanup:
         md1.delete()
@@ -223,6 +235,22 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md3.delete()
 
 
+    }
+
+    def "finalize element"(){
+        when:
+        DataElement author = DataElement.findByName('auth5')
+        DataElement draft = elementService.createDraftVersion(author)
+
+        then:
+        draft.status    == ElementStatus.DRAFT
+        author.status   == ElementStatus.FINALIZED
+
+        elementService.finalizeElement(draft)
+
+        then:
+        draft.status    == ElementStatus.FINALIZED
+        author.status   == ElementStatus.DEPRECATED
     }
 
     def "finalize tree"(){
