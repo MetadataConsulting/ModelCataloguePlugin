@@ -4,19 +4,23 @@ import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
+import org.springframework.mock.web.MockMultipartFile
+import org.springframework.mock.web.MockMultipartHttpServletRequest
 import spock.lang.Shared
 
 /**
  * Created by sus_avi on 01/05/2014.
  */
 
-class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder{
+class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder {
     @Shared
-    def fileName, recorder, filenameXsd, filenameXsd2
-    def setupSpec(){
+    def fileName, recorder, filenameXsd, filenameXsd2, fileNameStarUML
+
+    def setupSpec() {
         fileName = "test/integration/resources/example.xls"
         filenameXsd = "test/unit/resources/SACT/XMLDataTypes.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
         filenameXsd2 = "test/unit/resources/SACT/Breast_XMLSchema.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
+        fileNameStarUML = "test/integration/resources/gel_cancer_combined2.umlj"
         loadMarshallers()
         loadFixtures()
         recorder = DefaultResultRecorder.create(
@@ -27,11 +31,31 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     }
 
     //so we don't load a file
-    def "placeholder"(){
+    def "placeholder"() {
 
     }
 
-//uncomment locally
+    def "Test the dataImportService in the ImporterController"()
+    {
+        def controller = new DataImportController()
+        when: "The dataImportService is called"
+        def numElements = DataElement.count()
+        controller.response.format = 'json'
+        controller.metaClass.request = new MockMultipartHttpServletRequest()
+        controller.params.name = 'Core Cancer Model'
+        InputStream inputStream = new FileInputStream(fileNameStarUML)
+        controller.request.addFile(new MockMultipartFile('file', fileNameStarUML,"application/octet-stream" , inputStream))
+        controller.upload()
+
+        then:
+
+        true
+
+
+    }
+
+
+
 
 //    def "Test the dataImportService in the ImporterController"()
 //    {
