@@ -60,7 +60,12 @@ class AssetService {
                 return null
             }
 
-            elementService.archiveAndIncreaseVersion(existing)
+            existing = elementService.createDraftVersion(existing)
+
+            if (existing.hasErrors()) {
+                return existing
+            }
+
 
             existing.name              = asset.name
             existing.description       = asset.description

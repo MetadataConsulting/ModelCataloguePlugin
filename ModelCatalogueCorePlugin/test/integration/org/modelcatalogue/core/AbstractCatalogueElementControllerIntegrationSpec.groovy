@@ -53,7 +53,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     @Unroll
     def "get json history: #no where max: #max offset: #offset\""() {
         CatalogueElement first = CatalogueElement.get(loadItem.id)
-        createArchiveVersions(first)
+        createDraftVersions(first)
 
         when:
         controller.params.id = first.id
@@ -88,9 +88,12 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         ]
     }
 
-    void createArchiveVersions(CatalogueElement el) {
+    void createDraftVersions(CatalogueElement el) {
         while (el.versionNumber != 12) {
-            elementService.archiveAndIncreaseVersion(el)
+            el = elementService.createDraftVersion(el)
+            if (el.hasErrors()) {
+                throw new IllegalStateException("Creating draft version faileds with ${el.errors}")
+            }
         }
     }
 

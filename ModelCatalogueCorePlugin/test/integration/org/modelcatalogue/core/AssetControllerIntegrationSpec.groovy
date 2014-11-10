@@ -78,9 +78,9 @@ class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerI
 
         then:
         json
-        json.id                 == existing.id
+        json.id                 != existing.id
         asset
-        asset.id                == existing.id
+        asset.id                != existing.id
         asset.originalFileName  == 'readme.txt'
         asset.md5
 

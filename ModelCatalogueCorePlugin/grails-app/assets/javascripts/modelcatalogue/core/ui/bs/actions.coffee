@@ -222,7 +222,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action
   ]
 
-  actionsProvider.registerActionInRole 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', ($rootScope, $scope, messages, names, security, catalogueElementResource) ->
+  actionsProvider.registerActionInRole 'finalize', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'catalogueElementResource', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, catalogueElementResource, enhance, rest, modelCatalogueApiRoot) ->
     return undefined if not $scope.element
     return undefined if not $scope.element.status
     return undefined if not security.hasRole('CURATOR')
@@ -234,16 +234,13 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:       'primary'
       action:     ->
         messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be finalized").then ->
-          $scope.element.status = 'FINALIZED'
-          catalogueElementResource($scope.element.elementType).update($scope.element).then (updated) ->
-            updateFrom $scope.element, updated
-            messages.success("#{$scope.element.name} finalized")
-            $rootScope.$broadcast 'newVersionCreated', $scope.element
+          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalize", method: 'POST')).then (finalized) ->
+            updateFrom $scope.element, finalized
           , showErrorsUsingMessages(messages)
     }
 
     updateAction = ->
-      action.disabled = $scope.element.archived or $scope.element?.status == 'FINALIZED'
+      action.disabled = $scope.element?.status != 'DRAFT'
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
@@ -376,7 +373,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           $scope.element.delete()
           .then ->
             messages.success "#{$scope.element.getElementTypeName()} #{$scope.element.name} deleted."
-            #$state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
+            if $state.current.name.indexOf('mc.resource.show') >= 0
+              $state.go('mc.resource.list', {resource: names.getPropertyNameFromType($scope.element.elementType)}, {reload: true})
           .catch showErrorsUsingMessages(messages)
     }
 
@@ -787,8 +785,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
   ]
 
-  actionsProvider.registerActionInRole 'switch-status', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope', '$stateParams', ($state, $scope, $stateParams) ->
-    return undefined unless $state.current.name == 'mc.resource.list' and $scope.list and not $scope.noStatusSwitch and $stateParams.resource in ['model', 'dataElement', 'asset']
+  actionsProvider.registerActionInRole 'switch-status', actionsProvider.ROLE_LIST_ACTION, ['$state', '$scope', '$stateParams', 'catalogue', ($state, $scope, $stateParams, catalogue) ->
+    return undefined unless $state.current.name == 'mc.resource.list'
+    return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
 
     {
     abstract: true

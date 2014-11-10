@@ -365,7 +365,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         if (newVersion) {
-            elementService.archiveAndIncreaseVersion(instance)
+            instance = elementService.createDraftVersion(instance)
+            if (instance.hasErrors()) {
+                respond instance.errors, view: 'edit' // STATUS CODE 422
+                return
+            }
         }
 
         if (ext) {
@@ -412,6 +416,38 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         respond merged, [status: OK]
+    }
+
+    /**
+     * Archive element
+     * @param id
+     */
+    @Transactional
+    def finalizeElement() {
+
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        instance = elementService.finalizeElement(instance)
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+
+        respond instance, [status: OK]
     }
 
     /**

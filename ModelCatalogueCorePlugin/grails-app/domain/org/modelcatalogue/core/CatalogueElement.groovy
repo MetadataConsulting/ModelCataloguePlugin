@@ -57,7 +57,7 @@ abstract class CatalogueElement implements Extendible {
     static constraints = {
         name size: 1..255
         description nullable: true, maxSize: 2000
-		modelCatalogueId nullable: true, unique: true, maxSize: 255, url: true
+		modelCatalogueId nullable: true, unique: 'versionNumber', maxSize: 255, url: true
         dateCreated bindable: false
         lastUpdated bindable: false
         archived bindable: false
@@ -284,7 +284,7 @@ abstract class CatalogueElement implements Extendible {
     /**
      * Called before the archived element is persisted to the data store.
      */
-    protected void beforeArchive() {}
+    protected void beforeDraftPersisted() {}
 
     static String fixResourceName(String resourceName) {
         if (resourceName.contains('_')) {

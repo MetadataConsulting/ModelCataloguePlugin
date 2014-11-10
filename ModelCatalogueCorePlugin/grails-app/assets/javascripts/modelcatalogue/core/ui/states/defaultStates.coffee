@@ -588,6 +588,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 icon:       if searchResult.getIcon  then searchResult.getIcon()  else 'glyphicon glyphicon-file'
                 term:       term
                 highlight:  true
+                element:    searchResult
               }
 
             deferred.resolve results
@@ -646,8 +647,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
     <a>
         <span class="omnisearch-icon" ng-class="match.model.icon"></span>
-        <span ng-if="!match.model.highlight" bind-html-unsafe="match.label"></span>
-        <span ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+        <span class="omnisearch-text" ng-if="!match.model.highlight" bind-html-unsafe="match.label" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-info': match.model.element.status == 'PENDING'}"></span>
+        <span class="omnisearch-text" ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-info': match.model.element.status == 'PENDING'}"></span>
     </a>
   '''
 
@@ -697,8 +698,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <div class="col-md-4">
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
-        <div class="col-md-8" ng-show="element">
-          <blockquote class="ce-description" ng-show="element.description">{{element.description}}</blockquote>
+        <div class="col-md-8" ng-if="element">
+          <blockquote class="ce-description" ng-if="element.description">{{element.description}}</blockquote>
           <h4>Data Elements</h4>
           <infinite-table list="dataElements" columns="dataElementsColumns" stateless="true"></infinite-table>
         </div>

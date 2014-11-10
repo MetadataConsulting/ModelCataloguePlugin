@@ -1,7 +1,7 @@
 catalogueElementPicker = angular.module('mc.core.ui.catalogueElementPicker', ['mc.core.modelCatalogueSearch', 'mc.core.catalogueElementResource', 'ui.bootstrap'])
 catalogueElementPicker.run ['$templateCache', ($templateCache) ->
   $templateCache.put "modelcatalogue/core/ui/catalogueElementPickerTypeahead.html", """
-        <a><span class="text-muted" ng-class="match.model.getIcon()"/><span> {{match.model.classifiedName}}</span></a>
+        <a><span class="omnisearch-text" ng-class="{'text-warning': match.model.status == 'DRAFT', 'text-info': match.model.status == 'PENDING'}"><span class="text-muted" ng-class="match.model.getIcon()"/><span> {{match.model.classifiedName}}</span></a>
   """
 ]
 catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelCatalogueSearch', 'catalogueElementResource', ($compile, modelCatalogueSearch, catalogueElementResource)-> {
