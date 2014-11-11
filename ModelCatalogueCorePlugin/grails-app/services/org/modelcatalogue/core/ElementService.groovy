@@ -2,8 +2,9 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.springframework.transaction.TransactionStatus
 
-class ElementService {
+class ElementService implements Archiver<CatalogueElement> {
 
     static transactional = true
 
@@ -86,7 +87,7 @@ class ElementService {
 
 
 
-    public <E extends CatalogueElement> E archive(E archived) {
+    CatalogueElement archive(CatalogueElement archived) {
         if (archived.archived) {
             return archived
         }
@@ -115,50 +116,13 @@ class ElementService {
 
 
     public <E extends CatalogueElement> E finalizeElement(E draft) {
-        if (draft.status != ElementStatus.DRAFT) {
-            draft.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.must.be.draft', 'Element is not draft!')
-            return draft
-        }
-        draft.status = ElementStatus.FINALIZED
-        if (draft.latestVersionId) {
-            List<E> previousFinalized = draft.getClass().findAllByLatestVersionId(draft.latestVersionId)
-            for (E e in previousFinalized) {
-                if (e != draft) {
-                    archive(e)
-                }
+        CatalogueElement.withTransaction { TransactionStatus status ->
+            CatalogueElement finalized = draft.publish(this)
+            if (finalized.hasErrors()) {
+                status.setRollbackOnly()
             }
+            finalized
         }
-        draft.save()
-    }
-
-    public <E extends Model> E finalizeTree(E model, Collection<E> tree = []) {
-
-        //check that it isn't already finalized
-        if(model.status==ElementStatus.FINALIZED || model.status==ElementStatus.DEPRECATED) return model
-
-        //to avoid infinite loop
-        if(!tree.contains(model)) tree.add(model)
-
-        //finalize data elements
-        model.contains.each{ DataElement dataElement ->
-            finalizeElement(dataElement)
-            if (dataElement.valueDomain) {
-                finalizeElement(dataElement.valueDomain)
-            }
-        }
-
-        //finalize child models
-        model.parentOf.each { E child ->
-            if(!tree.contains(child)) {
-                finalizeTree(child, tree)
-            }
-        }
-
-        model.status = ElementStatus.FINALIZED
-        model.save(flush:true)
-
-        return model
-
     }
 
     static ElementStatus getStatusFromParams(params) {

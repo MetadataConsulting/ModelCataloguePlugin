@@ -149,5 +149,12 @@ class ValueDomain extends CatalogueElement {
         return DataElement.countByValueDomainAndStatus(this, ElementStatus.FINALIZED)
     }
 
-
+    @Override
+    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
+        PublishingChain
+                .create(this)
+                .require(unitOfMeasure)
+                .publish(dataType)
+                .publish(archiver)
+    }
 }

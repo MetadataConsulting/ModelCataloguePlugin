@@ -52,7 +52,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->
       return undefined if not security.hasRole('CURATOR')
-#      return undefined if $state.current.name != 'mc.dataArchitect.imports'
+      return undefined if $state.current.name != 'mc.dataArchitect.imports.list'
 
       {
         position: 100
@@ -73,12 +73,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     label:  "Import OBO"
     action: ->
       messages.prompt('Import OBO File', '', type: 'new-obo-import')
-  }]
-
-  actionsProvider.registerChildAction 'new-import', 'import-umlj', ['$scope', 'messages', ($scope, messages) -> {
-  label:  "Import Star Uml"
-  action: ->
-    messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
   }]
 
   actionsProvider.registerChildAction 'new-import', 'import-xsd', ['$scope', 'messages', ($scope, messages) -> {
@@ -239,9 +233,10 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       icon:       'glyphicon glyphicon-check'
       type:       'primary'
       action:     ->
-        messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be finalized").then ->
+        messages.confirm("Do you want to finalize #{$scope.element.getElementTypeName()} #{$scope.element.name} ?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} and all it's dependencies will be finalized recursively. This means all elements classfied by classifications, all child models and data elements of models, all value domains of data elements and all data types of value domains. If any value domain is using measurement unit which is not finalized yet the whole finalization process will fail.").then ->
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalize", method: 'POST')).then (finalized) ->
             updateFrom $scope.element, finalized
+            $rootScope.$broadcast 'catalogueElementUpdated', finalized
           , showErrorsUsingMessages(messages)
     }
 
@@ -308,34 +303,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     action
   ]
-
-  actionsProvider.registerChildActionInRole 'finalize', 'finalize-tree', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('model')
-    return undefined if not $scope.element.status
-    return undefined if not security.hasRole('CURATOR')
-
-    action = {
-      label:      'Finalize Tree'
-      type:       'primary'
-      action:     ->
-        messages.confirm("Finalize Model Tree", "Do you really want to finalize Model #{$scope.element.name} and and all its child models and elements?" ).then ->
-          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalizeTree", method: 'POST')).then (finalized) ->
-            updateFrom $scope.element, finalized
-          , showErrorsUsingMessages(messages)
-    }
-
-    updateAction = ->
-      action.disabled = $scope.element.archived or $scope.element?.status == 'FINALIZED'
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-    $rootScope.$on 'newVersionCreated', updateAction
-
-    action
-  ]
-
 
   actionsProvider.registerActionInRole 'archive-batch', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', 'enhance', 'rest', 'modelCatalogueApiRoot', ($rootScope, $scope, messages, names, security, enhance, rest, modelCatalogueApiRoot) ->
     return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch

@@ -288,7 +288,7 @@ class DataImportService {
         }
 
         importer.models.each{ Model model->
-            elementService.finalizeTree(model)
+            elementService.finalizeElement(model)
         }
     }
 

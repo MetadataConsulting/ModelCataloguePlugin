@@ -1,4 +1,4 @@
-angular.module('mc.util.rest', ['mc.util.enhance']).factory 'rest',  [ '$q', '$http', ($q, $http) ->
+angular.module('mc.util.rest', ['mc.util.messages']).factory 'rest',  [ '$q', '$http', '$rootScope', ($q, $http, $rootScope) ->
 
   (config) ->
     deferred = $q.defer()
@@ -12,6 +12,10 @@ angular.module('mc.util.rest', ['mc.util.enhance']).factory 'rest',  [ '$q', '$h
         else
           deferred.reject response
     , (response) ->
+      if response.status is 0
+        $rootScope.$broadcast 'applicationOffline', response
+      if response.status is 404
+        $rootScope.$broadcast 'resourceNotFound', response
       deferred.reject response
     , (update) ->
       deferred.update update

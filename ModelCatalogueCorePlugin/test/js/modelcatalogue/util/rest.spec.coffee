@@ -1,6 +1,7 @@
 describe "mc.util.rest", ->
 
   beforeEach module "mc.util.rest"
+  beforeEach module "mc.util.enhance"
   beforeEach module( (enhanceProvider) ->
     condition = (input) ->
       input.world?
