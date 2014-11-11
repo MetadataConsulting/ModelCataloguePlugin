@@ -104,7 +104,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.title                    = names.getNaturalName($stateParams.resource) + ' List'
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
+    $scope.elementSelectedInTree    = false
     $scope.element                  = if list.size > 0 then list.list[0]
+
     if $scope.element
       $scope.dataElements           = angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$scope.element.link}/outgoing/containment"})
     else
@@ -144,6 +146,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       if $rootScope.$$lastModels? and angular.equals($stateParams,$rootScope.$$lastModels.params)
         $scope.list = $rootScope.$$lastModels.list
         $scope.element = $rootScope.$$lastModels.element
+        # let's say it's more convenient if you get back to expanded tree that the parent is selected but
+        # if this behaviour will be unintuitive as well just remove the line bellow
+        $scope.elementSelectedInTree = $rootScope.$$lastModels.elementSelectedInTree
         if $scope.element
           $scope.dataElements = $rootScope.$$lastModels.element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$rootScope.$$lastModels.element?.link}/outgoing/containment"})
         else
@@ -164,7 +169,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             element._containedElements_ = contained
             $scope.dataElements         = contained
         $scope.element                  = element
+        $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels.element = element
+        $rootScope.$$lastModels.elementSelectedInTree = true
         $scope.dataElements             = element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{element.link}/outgoing/containment"})
 
     else if $scope.resource == 'newRelationships'
