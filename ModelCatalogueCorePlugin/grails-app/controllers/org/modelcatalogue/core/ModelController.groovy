@@ -20,23 +20,4 @@ class ModelController extends AbstractCatalogueElementController<Model> {
         respond Lists.wrap(params, "/${resourceName}/", modelService.getTopLevelModels(params))
     }
 
-
-    def finalizeTree() {
-        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
-            notAuthorized()
-            return
-        }
-        if (handleReadOnly()) {
-            return
-        }
-
-        Model instance = queryForResource(params.id)
-        if (instance == null) {
-            notFound()
-            return
-        }
-
-        respond elementService.finalizeTree(instance)
-    }
-
 }

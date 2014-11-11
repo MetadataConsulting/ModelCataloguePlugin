@@ -13,15 +13,15 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "return only finalized elements by default"() {
         expect:
-        elementService.list().size() == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.list(max: 10).size()        == 10
-        elementService.list(DataElement).size()    == DataElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.list(Model).size()          == Model.countByStatus(ElementStatus.FINALIZED)
-        elementService.list(Asset).size()          == Asset.countByStatus(ElementStatus.FINALIZED)
-        elementService.count() == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.count(DataElement)          == DataElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.count(Model)                == Model.countByStatus(ElementStatus.FINALIZED)
-        elementService.count(Asset)                == Asset.countByStatus(ElementStatus.FINALIZED)
+        elementService.list().size()                == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
+        elementService.list(max: 10).size()         == 10
+        elementService.list(DataElement).size()     == DataElement.countByStatus(ElementStatus.FINALIZED)
+        elementService.list(Model).size()           == Model.countByStatus(ElementStatus.FINALIZED)
+        elementService.list(Asset).size()           == Asset.countByStatus(ElementStatus.FINALIZED)
+        elementService.count()                      == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
+        elementService.count(DataElement)           == DataElement.countByStatus(ElementStatus.FINALIZED)
+        elementService.count(Model)                 == Model.countByStatus(ElementStatus.FINALIZED)
+        elementService.count(Asset)                 == Asset.countByStatus(ElementStatus.FINALIZED)
     }
 
     def "can supply status as parameter"() {
@@ -282,7 +282,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         when:
 
-        elementService.finalizeTree(md1)
+        elementService.finalizeElement(md1)
 
         then:
         md1.status == ElementStatus.FINALIZED
@@ -321,9 +321,13 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md3.status == ElementStatus.DRAFT
 
         when:
-        elementService.finalizeTree(md1)
+        md1 = elementService.finalizeElement(md1)
 
         then:
+        md1.errors.errorCount == 0
+        md2.errors.errorCount == 0
+        md3.errors.errorCount == 0
+
         md1.status == ElementStatus.FINALIZED
         md2.status == ElementStatus.FINALIZED
         md3.status == ElementStatus.FINALIZED

@@ -66,10 +66,6 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/$id/finalize"(controller: controllerName, action: 'finalizeElement', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
 
-                if (controllerName == 'model') {
-                    "/api/modelCatalogue/core/$controllerName/$id/finalizeTree"(controller: controllerName, action: 'finalizeTree', method: HttpMethod.POST)
-                }
-
                 if (controllerName == 'dataType' || controllerName == 'enumeratedType' ) {
                     "/api/modelCatalogue/core/$controllerName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                 }

@@ -11,6 +11,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   ]
 
   getEnumerations = (enumeratedType) ->
+    return '' if not enumeratedType
     return enumeratedType.description if not enumeratedType.enumerations
     enumerations = []
     enumerations.push "#{key}: #{value}" for key, value of enumeratedType.enumerations

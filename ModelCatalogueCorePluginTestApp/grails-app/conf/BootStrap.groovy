@@ -115,7 +115,7 @@ class BootStrap {
             println 'Finalizing all published elements'
             CatalogueElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
                 if (it instanceof Model) {
-                    elementService.finalizeTree(it)
+                    elementService.finalizeElement(it)
                 } else {
                     it.status = ElementStatus.FINALIZED
                     it.save failOnError: true

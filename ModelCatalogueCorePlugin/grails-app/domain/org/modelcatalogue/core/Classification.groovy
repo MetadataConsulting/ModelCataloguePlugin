@@ -30,4 +30,12 @@ class Classification extends CatalogueElement {
     protected void beforeDraftPersisted() {
         namespace = null
     }
+
+    @Override
+    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
+        PublishingChain
+                .create(this)
+                .publish(this.classifies)
+                .publish(archiver)
+    }
 }
