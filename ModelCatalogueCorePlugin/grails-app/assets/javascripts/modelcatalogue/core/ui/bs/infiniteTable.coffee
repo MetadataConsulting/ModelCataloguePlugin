@@ -1,4 +1,5 @@
 angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
+    # language=HTML
     $templateCache.put 'modelcatalogue/core/ui/infiniteTable.html', '''
     <div>
       <div class="inf-table-header">
@@ -52,6 +53,9 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
              <tr class="actions-row active" ng-repeat-end="" ng-if="row.$$expanded && isNotFiltered(row)">
                 <td class="actions-cell col-md-12" colspan="{{columns.length}}">
                   <blockquote ng-if="row.element.description" class="preserve-new-lines" ng-bind-html="row.element.description"></blockquote>
+                  <div class="infinite-row-additional-info">
+                    <properties-pane item="row.element" properties="row.properties" ng-if="row.properties.length"></properties-pane>
+                  </div>
                   <div class="text-right" ng-init="element = row.element">
                     <span class="pull-left text-muted"><em>Actions for {{row.element.getElementTypeName()}}</em></span>
                     <contextual-actions size="sm" no-colors="true" role="item" no-actions="true"></contextual-actions>
