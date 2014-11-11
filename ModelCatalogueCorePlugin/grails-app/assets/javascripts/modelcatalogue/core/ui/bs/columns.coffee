@@ -93,12 +93,19 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
       result += "#{key}: #{value ? ''}\n"
     result
 
+  relationTypeName = (relationship) ->
+    return '' unless relationship
+    return '' unless relationship.relation
+    return '' unless angular.isFunction(relationship.relation.getElementTypeName)
+    relationship.relation.getElementTypeName()
+
+
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Relationship', [
     {header: 'Relation',        value: 'type[direction]',  classes: 'col-md-3'}
     {header: 'Destination',     value: "relation.classifiedName",    classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
-    {header: 'Type',        value:  "relation.getElementTypeName()",     classes: 'col-md-2'}
-    {header: 'Metadata',        value:  printMetadata,     classes: 'col-md-3'}
+    {header: 'Type',            value: relationTypeName,     classes: 'col-md-2'}
+    {header: 'Metadata',        value: printMetadata,     classes: 'col-md-3'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.RelationshipType', [
