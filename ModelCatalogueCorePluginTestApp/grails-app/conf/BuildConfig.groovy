@@ -92,7 +92,7 @@ grails.project.dependency.resolution = {
         // plugins for the compile step
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.7'
-        compile ":asset-pipeline:1.9.6"
+        compile ":asset-pipeline:1.9.9"
 
         compile ":console:1.5.0"
 
