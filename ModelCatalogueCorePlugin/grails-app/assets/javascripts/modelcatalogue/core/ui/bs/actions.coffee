@@ -35,7 +35,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       args      = {create: ($scope.resource)}
       args.type = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
 
-      if $scope.resource == 'model' and $scope.element
+      if $scope.resource == 'model' and $scope.element and $scope.elementSelectedInTree
         args.parent = $scope.element
 
       security.requireRole('CURATOR')
