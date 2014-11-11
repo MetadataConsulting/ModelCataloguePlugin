@@ -618,13 +618,19 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     security.requireLogin()
 ])
 
-.run(['$rootScope', '$state', '$stateParams', ($rootScope, $state, $stateParams) ->
+.run(['$rootScope', '$state', '$stateParams', 'messages', ($rootScope, $state, $stateParams, messages) ->
     # It's very handy to add references to $state and $stateParams to the $rootScope
     # so that you can access them from any scope within your applications.For example,
     # <li ui-sref-active="active }"> will set the <li> // to active whenever
     # 'contacts.list' or one of its decendents is active.
     $rootScope.$state = $state
     $rootScope.$stateParams = $stateParams
+
+    $rootScope.$on 'applicationOffline', ->
+      messages.error 'Application is not available at the moment, please, retry later'
+
+    $rootScope.$on 'resourceNotFound', ->
+      messages.error 'Selected resource cannot be found in the catalogue.'
 ])
 
 .run(['$templateCache', ($templateCache) ->
