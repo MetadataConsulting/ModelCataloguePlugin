@@ -52,7 +52,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->
       return undefined if not security.hasRole('CURATOR')
-      return undefined if $state.current.name != 'mc.dataArchitect.imports'
+      return undefined if $state.current.name != 'mc.dataArchitect.imports.list'
 
       {
         position: 100
