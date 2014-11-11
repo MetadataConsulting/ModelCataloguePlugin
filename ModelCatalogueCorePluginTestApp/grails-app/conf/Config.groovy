@@ -122,11 +122,11 @@ log4j = {
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
-    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
-        trace 'org.hibernate.type'
-        trace 'org.hibernate.stat'
-        debug 'org.hibernate.SQL'
-    }
+//    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
+//        trace 'org.hibernate.type'
+//        trace 'org.hibernate.stat'
+//        debug 'org.hibernate.SQL'
+//    }
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP

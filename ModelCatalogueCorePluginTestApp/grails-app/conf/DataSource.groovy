@@ -17,7 +17,7 @@ environments {
         dataSource {
             dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
             url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
-            logSql = true
+//            logSql = true
         }
     }
     test {
@@ -33,7 +33,7 @@ environments {
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
             driverClassName = "com.mysql.jdbc.Driver"
-            logSql = true
+//            logSql = true
         }
     }
     cloudbees {
@@ -43,7 +43,7 @@ environments {
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
             driverClassName = "com.mysql.jdbc.Driver"
-            logSql = true
+//            logSql = true
         }
     }
     production {
