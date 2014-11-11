@@ -52,7 +52,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->
       return undefined if not security.hasRole('CURATOR')
-      return undefined if $state.current.name != 'mc.dataArchitect.imports'
+#      return undefined if $state.current.name != 'mc.dataArchitect.imports'
 
       {
         position: 100
@@ -73,6 +73,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     label:  "Import OBO"
     action: ->
       messages.prompt('Import OBO File', '', type: 'new-obo-import')
+  }]
+
+  actionsProvider.registerChildAction 'new-import', 'import-umlj', ['$scope', 'messages', ($scope, messages) -> {
+  label:  "Import Star Uml"
+  action: ->
+    messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
   }]
 
   actionsProvider.registerChildAction 'new-import', 'import-xsd', ['$scope', 'messages', ($scope, messages) -> {
