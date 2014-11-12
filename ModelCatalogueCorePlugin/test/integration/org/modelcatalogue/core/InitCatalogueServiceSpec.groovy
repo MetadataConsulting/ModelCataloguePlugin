@@ -113,19 +113,4 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
     }
 
-    def "check initDataTypes works"(){
-        initCatalogueService.initDefaultDataTypes()
-
-        expect:
-        DataType.findByName("String")
-        DataType.findByName("Integer")
-        DataType.findByName("Double")
-        DataType.findByName("Boolean")
-        DataType.findByName("Date")
-        DataType.findByName("Time")
-        DataType.findByName("Currency")
-    }
-
-
-
 }

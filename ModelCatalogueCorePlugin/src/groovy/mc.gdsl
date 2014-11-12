@@ -1,0 +1,6 @@
+
+def ctx = context filetypes: ['mc'], scope: scriptScope()
+
+contributor (ctx) {
+    delegatesTo(findClass('org.modelcatalogue.core.util.CatalogueBuilder'))
+}

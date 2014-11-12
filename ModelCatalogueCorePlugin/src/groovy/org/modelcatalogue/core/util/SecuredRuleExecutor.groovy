@@ -13,6 +13,8 @@ import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.syntax.Types
 import org.grails.datastore.gorm.GormStaticApi
 
+import javax.xml.bind.DatatypeConverter
+
 class SecuredRuleExecutor<S extends Script> {
 
     static class ValidationResult {
@@ -78,7 +80,7 @@ class SecuredRuleExecutor<S extends Script> {
             importsWhitelist = withBaseScript()
             starImportsWhitelist = withBaseScript()
             staticImportsWhitelist = withBaseScript()
-            staticStarImportsWhitelist = withBaseScript(Math)
+            staticStarImportsWhitelist = withBaseScript(Math, DatatypeConverter)
 
             receiversClassesBlackList = [System, GormStaticApi]
         }

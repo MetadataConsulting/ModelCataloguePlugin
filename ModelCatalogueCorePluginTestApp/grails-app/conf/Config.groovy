@@ -146,18 +146,6 @@ elasticSearch.client.mode = 'local'
 elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
 elasticSearch.datastoreImpl = 'hibernateDatastore'
 
-
-modelcatalogue.defaults.datatypes = [
-        [name: "String", description: "java.lang.String"],
-        [name: "Integer", description: "java.lang.Integer"],
-        [name: "Double", description: "java.lang.Double"],
-        [name: "Boolean", description: "java.lang.Boolean"],
-        [name: "Date", description: "java.util.Date"],
-        [name: "Time", description: "java.sql.Time"],
-        [name: "Currency", description: "java.util.Currency"]
-]
-
-
 modelcatalogue.defaults.measurementunits = [
         [name: "celsius", description: "degrees celsius", symbol: "°C"],
         [name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"],

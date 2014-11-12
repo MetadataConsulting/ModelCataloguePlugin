@@ -2,6 +2,10 @@ package org.modelcatalogue.core.util
 
 import org.modelcatalogue.core.ValueDomain
 
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
+
 abstract class ValueDomainRuleScript  extends Script {
 
     static final Class<BigDecimal> decimal  = BigDecimal
@@ -42,7 +46,7 @@ abstract class ValueDomainRuleScript  extends Script {
      * @param o object to be converted
      * @return string representation of given object
      */
-    String string(Object o) {
+    static String string(Object o) {
         if (o == null) return ""
         if (o instanceof String) return o
         return o.toString()
@@ -139,6 +143,20 @@ abstract class ValueDomainRuleScript  extends Script {
      */
     boolean maxExclusive(Number limit) {
         is(number) && number(x) < limit
+    }
+
+    Date date(String pattern) {
+        DateFormat format = new SimpleDateFormat(pattern)
+        try {
+            Date result = format.parse(string(x))
+            if (format.format(result) != string(x)) {
+                // very likely overflown
+                return null
+            }
+            return x = result
+        } catch (ParseException ignored) {
+            return null
+        }
     }
 
     Object getX() {
