@@ -44,7 +44,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         Classification.findByNamespace('http://www.w3.org/2001/TestSchema')
     }
 
-    def "reuse existing classification with by name"() {
+    def "reuse existing classification by name"() {
         Classification c = new Classification(name: 'ExistingSchema', status: ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
@@ -69,6 +69,49 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         AssertionError e = thrown(AssertionError)
         e.message.startsWith "You must provide the name of the classification"
     }
+    
+    def "creates new measurement unit with given name"() {
+        build {
+            measurementUnit(name: 'TestUnit', symbol: 'TU') {
+                description '''
+                    This is a test unit which is just for test purposes!
+                '''
+            }
+        }
+
+        expect:
+        MeasurementUnit.findByName('TestUnit')
+        MeasurementUnit.findByName('TestUnit').description == 'This is a test unit which is just for test purposes!'
+    }
+
+    def "reuse existing measurement unit by name"() {
+        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit', status: ElementStatus.DEPRECATED).save(failOnError: true)
+
+        build {
+            measurementUnit(name: 'ExistingUnit', symbol: 'EU') {
+                description '''
+                    This is a test unit which is just for test purposes!
+                '''
+            }
+        }
+
+        expect:
+        created.first() == unit
+    }
+
+    def "complain if measurement unit name is missing"() {
+        when:
+        build {
+            measurementUnit symbol: 'TU'
+        }
+
+        then:
+        AssertionError e = thrown(AssertionError)
+        e.message.startsWith "You must provide the name of the measurement unit"
+    }
+
+
+
 
     def "creates new value domain with given name"() {
         build {

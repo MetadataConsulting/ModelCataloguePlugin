@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import groovy.transform.stc.*
 import org.modelcatalogue.core.*
 
+// TODO: late binding of properties to minimize writes
 class CatalogueBuilder {
 
     private Set<CatalogueElement> created = []
@@ -46,8 +47,6 @@ class CatalogueBuilder {
         unclassifiedQueriesFor.clear()
 
         saveIfDirty classification
-
-        classification
     }
 
     ValueDomain valueDomain(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
@@ -111,10 +110,39 @@ class CatalogueBuilder {
         }
 
         saveIfDirty dataType
-
-        dataType
     }
 
+    MeasurementUnit measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        assert parameters.name : "You must provide the name of the data type"
+
+        MeasurementUnit unit = tryFind MeasurementUnit, parameters.name
+
+
+
+        if (!unit) {
+            unit = new MeasurementUnit(parameters).save(failOnError: true)
+        } else {
+            unit.properties = parameters
+            saveIfDirty unit
+        }
+
+        created << unit
+        executeWithContext MeasurementUnit, unit, c
+        classifyIfNeeded unit
+
+        withContextElement(ValueDomain, true) {
+            it.unitOfMeasure = unit
+        }
+
+        saveIfDirty unit
+    }
+
+    void basedOn(String classification, String name) {
+        withContextElement(CatalogueElement) {
+            saveIfDirty it
+            it.addToBasedOn tryFind(it.class, classification, name)
+        }
+    }
     void basedOn(String name) {
         withContextElement(CatalogueElement) {
             saveIfDirty it
@@ -218,21 +246,33 @@ class CatalogueBuilder {
         }
     }
 
-    private static void saveIfDirty(CatalogueElement element) {
+    private static <T extends CatalogueElement> T saveIfDirty(T element) {
         if (element.dirty) {
-            element.save(failOnError: true)
+            return element.save(failOnError: true) as T
         }
+        return element
+    }
+
+
+
+    private <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name) {
+        Classification classification = tryFindWithClassification(Classification, null, classificationName)
+        if (!classification) {
+            throw new IllegalArgumentException("Requested classification ${classificationName} is not present in the catalogue!")
+        }
+        tryFindWithClassification(type, classification, name)
     }
 
     private <T extends CatalogueElement> T tryFind(Class<T> type, Object name) {
+        tryFindWithClassification(type, getContextElement(Classification), name)
+    }
+
+    private <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, Classification classification, Object name) {
         if (!name) {
-            // should not happen
             return null
         }
 
         T result
-
-        Classification classification = getContextElement(Classification)
 
         DetachedCriteria<T> criteria = new DetachedCriteria<T>(type).build {
             eq 'name', name.toString()

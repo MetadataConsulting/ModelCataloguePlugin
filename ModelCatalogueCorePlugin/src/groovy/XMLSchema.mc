@@ -1,5 +1,6 @@
 classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema') {
     id 'http://www.w3.org/2001/XMLSchema'
+    description 'XML Schema provides standard types for describing your own XML formats'
 
     // data types are missing the link to the XMLSchema, but the all have xs prefix so no name clash should happen
     globalSearchFor dataType
@@ -10,11 +11,6 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
     valueDomain name: 'xs:boolean', {
         id 'http://www.w3.org/2001/XMLSchema#boolean'
         description 'Binary-valued logic legal literals'
-        rule '''
-            import static javax.xml.bind.DatatypeConverter.*
-
-            (x = parseBoolean(string(x)))
-        '''
         dataType enumerations: [
                 '0':    'False',
                 '1':    'True',
@@ -47,7 +43,7 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            (x = parseString(string(x)))
+            true && (x = parseString(string(x)))
         '''
     }
 
@@ -55,21 +51,21 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         id 'http://www.w3.org/2001/XMLSchema#normalizedString'
         description 'White space normalized strings'
         basedOn 'xs:string'
-        rule 'string(x)?.replace(/\\s/, " ")'
+        rule '!(x =~ /[\\r\\n\\t]/)'
     }
 
     valueDomain name: 'xs:token', {
         id 'http://www.w3.org/2001/XMLSchema#token'
         description 'Tokenized strings.'
         basedOn 'xs:normalizedString'
-        rule 'string(x)?.replaceAll(/\\s+/, " ")'
+        rule '!(x =~ /\\s+/)'
     }
 
     valueDomain name: 'xs:language', {
         id 'http://www.w3.org/2001/XMLSchema#language'
         description 'Tokenized strings.'
         basedOn 'xs:token'
-        rule 'string(x)?.size() <=2 && new Locale(x)'
+        rule 'maxLength(2) && new Locale(x)'
     }
 
     valueDomain name: 'xs:decimal', {
@@ -78,7 +74,7 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            (x = parseDecimal(string(x)))
+            parseDecimal(string(x)) in BigDecimal
         '''
     }
 
@@ -88,7 +84,7 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            (x = parseDouble(string(x)))
+            parseDouble(string(x)) in Double
         '''
     }
 
@@ -98,8 +94,119 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            (x = parseFloat(string(x)))
+            parseFloat(string(x)) in Float
         '''
+    }
+
+    valueDomain name: 'xs:integer', {
+        id 'http://www.w3.org/2001/XMLSchema#integer'
+        description 'Integer or whole numbers - Sign omitted, “+” is assumed. Example: -1, 0, 12678967543233, +100000'
+        basedOn 'xs:decimal'
+        rule '''
+            import static javax.xml.bind.DatatypeConverter.*
+
+            parseInteger(string(x)) in BigInteger
+        '''
+    }
+
+    valueDomain name: 'xs:byte', {
+        id 'http://www.w3.org/2001/XMLSchema#byte'
+        description '127 to-128. Sign is omitted, “+” assumed. Example: -1, 0, 126, +100.'
+        basedOn 'xs:short'
+        rule '''
+            import static javax.xml.bind.DatatypeConverter.*
+
+            parseByte(string(x)) in Byte
+        '''
+    }
+
+    valueDomain name: 'xs:int', {
+        id 'http://www.w3.org/2001/XMLSchema#int'
+        description '2147483647 to -2147483648. Sign omitted, “+” is assumed. Example: -1, 0, 126789675, +100000.'
+        basedOn 'xs:long'
+        rule '''
+            import static javax.xml.bind.DatatypeConverter.*
+
+            parseInt(string(x)) in Integer
+        '''
+    }
+
+    valueDomain name: 'xs:long', {
+        id 'http://www.w3.org/2001/XMLSchema#long'
+        description '9223372036854775807 to -9223372036854775808. Sign omitted, “+” assumed. Example: -1, 0, 12678967543233, +100000.'
+        basedOn 'xs:integer'
+        rule '''
+            import static javax.xml.bind.DatatypeConverter.*
+
+            parseLong(string(x)) in Long
+        '''
+    }
+
+    valueDomain name: 'xs:negativeInteger', {
+        id 'http://www.w3.org/2001/XMLSchema#negativeInteger'
+        description 'Infinite set {...,-2,-1}. Example: -1, -12678967543233, -100000'
+        basedOn 'xs:nonPositiveInteger'
+        rule 'maxExclusive(0)'
+    }
+
+    valueDomain name: 'xs:nonNegativeInteger', {
+        id 'http://www.w3.org/2001/XMLSchema#nonNegativeInteger'
+        description 'Infinite set {0, 1, 2,...}. Sign omitted, “+” assumed. Example: 1, 0, 12678967543233, +100000.'
+        basedOn 'xs:integer'
+        rule 'minInclusive(0)'
+    }
+
+    valueDomain name: 'xs:nonPositiveInteger', {
+        id 'http://www.w3.org/2001/XMLSchema#nonPositiveInteger'
+        description 'Infinite set {...,-2,-1,0}. Example: -1, 0, -126733, -100000.'
+        basedOn 'xs:integer'
+        rule 'maxInclusive(0)'
+    }
+
+    valueDomain name: 'xs:positiveInteger', {
+        id 'http://www.w3.org/2001/XMLSchema#positiveInteger'
+        description 'Infinite set {1, 2,...}. Optional “+” sign,. Example: 1, 12678967543233, +100000.'
+        basedOn 'xs:nonNegativeInteger'
+        rule 'minExclusive(0)'
+    }
+
+    valueDomain name: 'xs:short', {
+        id 'http://www.w3.org/2001/XMLSchema#short'
+        description '32767 to -32768. Sign omitted, “+” assumed. Example: -1, 0, 12678, +10000.'
+        basedOn 'xs:int'
+        rule '''
+            import static javax.xml.bind.DatatypeConverter.*
+
+            parseShort(string(x)) in Short
+        '''
+    }
+
+    valueDomain name: 'xs:unsignedByte', {
+        id 'http://www.w3.org/2001/XMLSchema#unsignedByte'
+        description '0 to 255. a finite-length Example: 0, 126, 100.'
+        basedOn 'xs:unsignedShort'
+        rule 'minInclusive(0) && maxInclusive(255)'
+    }
+
+    valueDomain name: 'xs:unsignedInt', {
+        id 'http://www.w3.org/2001/XMLSchema#unsignedInt'
+        description '0 to 4294967295'
+        basedOn 'xs:unsignedLong'
+        rule 'minInclusive(0) && maxInclusive(4294967295)'
+    }
+
+    valueDomain name: 'xs:unsignedLong', {
+        id 'http://www.w3.org/2001/XMLSchema#unsignedLong'
+        description '0 to 18446744073709551615. Example: 0, 12678967543233, 100000.'
+        basedOn 'xs:nonNegative'
+        rule 'minInclusive(0) && maxInclusive(18446744073709551615)'
+    }
+
+    valueDomain name: 'xs:unsignedShort', {
+        id 'http://www.w3.org/2001/XMLSchema#unsignedShort'
+        description '0 to 65535. Example: 0, 12678, 10000.'
+        basedOn 'xs:unsignedInt'
+        rule 'minInclusive(0) && maxInclusive(65535)'
     }
 
     valueDomain name: 'xs:date', {
@@ -108,7 +215,7 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            (x = parseDateTime(string(x))?.time)
+            parseDateTime(string(x)) in Calendar
         '''
     }
 
@@ -118,7 +225,7 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            (x = parseDateTime(string(x))?.time)
+            parseDateTime(string(x)) in Calendar
         '''
     }
 
@@ -128,7 +235,7 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            (x = parseTime(string(x))?.time)
+            parseTime(string(x)) in Calendar
         '''
     }
 
@@ -141,31 +248,31 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
     valueDomain name: 'xs:gDay', {
         id 'http://www.w3.org/2001/XMLSchema#gDay'
         description 'Gregorian day. Example a day such as the 5th of the month is 05.'
-        rule 'date("dd")'
+        rule 'date("dd") in Date'
     }
 
     valueDomain name: 'xs:gMonth', {
         id 'http://www.w3.org/2001/XMLSchema#gMonth'
         description 'Gregorian month. Example: May is 05.'
-        rule 'date("MM")'
+        rule 'date("MM") in Date'
     }
 
     valueDomain name: 'xs:gMonthDay', {
         id 'http://www.w3.org/2001/XMLSchema#gMonthDay'
         description 'Gregorian specific day in a month. Example: Feb 5 is 02-05.'
-        rule 'date("MM-dd")'
+        rule 'date("MM-dd") in Date'
     }
 
     valueDomain name: 'xs:gYear', {
         id 'http://www.w3.org/2001/XMLSchema#gYear'
         description 'Gregorian calendar year. Example, year 1999, write: 1999.'
-        rule 'date("yyyy")'
+        rule 'date("yyyy") in Date'
     }
 
     valueDomain name: 'xs:gYearMonth', {
         id 'http://www.w3.org/2001/XMLSchema#gYearMonth'
         description 'Specific gregorian month and year. Example, May 1999, write: 1999-05.'
-        rule 'date("yyyy-MM")'
+        rule 'date("yyyy-MM") in Date'
     }
 
     valueDomain name: "xs:QName", {
