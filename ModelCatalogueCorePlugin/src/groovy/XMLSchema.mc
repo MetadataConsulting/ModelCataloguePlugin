@@ -1,12 +1,15 @@
+/**
+ * XMLSchema classification provides default XML data types and their value domains
+ */
 classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema') {
     id 'http://www.w3.org/2001/XMLSchema'
     description 'XML Schema provides standard types for describing your own XML formats'
 
-    // data types are missing the link to the XMLSchema, but the all have xs prefix so no name clash should happen
-    globalSearchFor dataType
-
     // if not set explicitly, the data type with the same name and description is created for value domains
     automatic dataType
+
+    // data types are missing the link to the XMLSchema, but the all have xs prefix so no name clash should happen
+    globalSearchFor dataType
 
     valueDomain name: 'xs:boolean', {
         id 'http://www.w3.org/2001/XMLSchema#boolean'

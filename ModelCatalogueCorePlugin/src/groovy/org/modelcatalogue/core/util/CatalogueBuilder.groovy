@@ -238,12 +238,13 @@ class CatalogueBuilder {
     }
 
 
-    static Class<Classification> getClassification() { Classification }
-    static Class<Model> getModel() { Model }
-    static Class<DataElement> getDataElement() { DataElement }
-    static Class<ValueDomain> getValueDomain() { ValueDomain }
-    static Class<DataType> getDataType() { DataType }
-    static Class<MeasurementUnit> getMeasurementUnit() { MeasurementUnit }
+    // following cannot be static as it would no longer be available for the scripts
+    Class<Classification> getClassification() { Classification }
+    Class<Model> getModel() { Model }
+    Class<DataElement> getDataElement() { DataElement }
+    Class<ValueDomain> getValueDomain() { ValueDomain }
+    Class<DataType> getDataType() { DataType }
+    Class<MeasurementUnit> getMeasurementUnit() { MeasurementUnit }
 
     public <T extends CatalogueElement> void globalSearchFor(Class<T> type){
         unclassifiedQueriesFor << type

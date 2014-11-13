@@ -5,7 +5,7 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.security.User
 
-class ModelCatalogueSecurityService implements SecurityService {
+class SpringSecurity2SecurityService implements SecurityService {
 
     static transactional = false
 

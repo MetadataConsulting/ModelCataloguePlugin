@@ -42,7 +42,7 @@ Spring Security 2.x implementation of Model Catalogue Core Plugin abstract secur
     }
 
     def doWithSpring = {
-        springConfig.addAlias('modelCatalogueSecurityService','modelCatalogueSpringSecurity2xPluginModelCatalogueSecurityService')
+        springConfig.addAlias('modelCatalogueSecurityService','springSecurity2SecurityService')
         // TODO Implement runtime spring config (optional)
     }
 

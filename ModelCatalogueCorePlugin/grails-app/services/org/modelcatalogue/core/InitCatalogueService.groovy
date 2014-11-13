@@ -12,19 +12,6 @@ import org.modelcatalogue.core.util.CatalogueBuilderScript
 @Transactional
 class InitCatalogueService {
 
-//    modelcatalogue.defaults.datatypes = [
-//
-//    [name: "String", description: "java.lang.String"],
-//    [name: "Integer", description: "java.lang.Integer"],
-//    [name: "Double", description: "java.lang.Double"],
-//    [name: "Boolean", description: "java.lang.Boolean"],
-//    [name: "Date", description: "java.util.Date"],
-//    [name: "Time", description: "java.sql.Time"],
-//    [name: "Currency", description: "java.util.Currency"],
-//    [name: "Text", description: "a text field"],
-//
-//    ]
-
     def grailsApplication
     def classificationService
     def elementService
@@ -32,7 +19,6 @@ class InitCatalogueService {
     def initCatalogue(){
         initDefaultRelationshipTypes()
         initDefaultDataTypes()
-        initDefaultMeasurementUnits()
     }
 
     def initDefaultDataTypes() {
@@ -66,24 +52,6 @@ class InitCatalogueService {
                 }
             } catch (e) {
                 log.error("Exception parsing model catalogue file", e)
-            }
-        }
-    }
-
-
-    def initDefaultMeasurementUnits() {
-
-        def defaultDataTypes = grailsApplication.config.modelcatalogue.defaults.measurementunits
-
-        for (Map definition in defaultDataTypes) {
-            MeasurementUnit existing = MeasurementUnit.findByName(definition.name)
-            if (!existing) {
-                MeasurementUnit unit = new MeasurementUnit(definition)
-                unit.save()
-
-                if (unit.hasErrors()) {
-                    log.error("Cannot create measurement unit $definition.name. $unit.errors")
-                }
             }
         }
     }

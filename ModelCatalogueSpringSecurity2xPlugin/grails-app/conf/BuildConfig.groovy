@@ -67,6 +67,8 @@ grails.project.dependency.resolution = {
         }
 
         compile ':spring-security-core:2.0-RC4'
-        compile ':model-catalogue-core:0.9.1'
+        // compile ':model-catalogue-core:0.9.1'
     }
 }
+
+grails.plugin.location.'model-catalogue-core' = "../ModelCatalogueCorePlugin"
