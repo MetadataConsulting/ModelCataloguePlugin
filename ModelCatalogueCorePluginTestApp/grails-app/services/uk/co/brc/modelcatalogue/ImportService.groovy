@@ -16,9 +16,8 @@ class ImportService {
     ]
 
     def importData() {
-        initCatalogueService.initDefaultRelationshipTypes()
-        initCatalogueService.initDefaultDataTypes()
-        initCatalogueService.initDefaultMeasurementUnits()
+        initCatalogueService.initCatalogue()
+
         getNhicFiles().each { filename -> singleImport(filename) }
     }
 //

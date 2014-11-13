@@ -22,10 +22,8 @@ grails.project.fork = [
 ]
 
 
-grails.plugin.location.'ModelCatalogueCorePlugin' = "../ModelCatalogueCorePlugin"
-grails.plugin.location.'ModelCatalogueSpringSecurity2xPlugin' = "../ModelCatalogueSpringSecurity2xPlugin"
-//grails.plugin.location.'ModelCatalogueElasticSearchPlugin' = "../ModelCatalogueElasticSearchPlugin"
-//grails.plugin.location.'ModelCatalogueDataArchitectPlugin' = "../ModelCatalogueDataArchitectPlugin"
+grails.plugin.location.'model-catalogue-core' = "../ModelCatalogueCorePlugin"
+grails.plugin.location.'model-catalogue-security-ss2' = "../ModelCatalogueSpringSecurity2xPlugin"
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {

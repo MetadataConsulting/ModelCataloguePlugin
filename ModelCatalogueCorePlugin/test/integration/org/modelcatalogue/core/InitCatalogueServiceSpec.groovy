@@ -1,10 +1,12 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
+import spock.lang.Stepwise
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
+@Stepwise
 class InitCatalogueServiceSpec extends IntegrationSpec {
 
     def initCatalogueService
@@ -17,9 +19,10 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
 
     def "init default measurement units"() {
+        // just call once in the spec
+        initCatalogueService.initCatalogue()
 
         when:
-        initCatalogueService.initDefaultMeasurementUnits()
         MeasurementUnit dt1 = MeasurementUnit.findByName("celsius")
         MeasurementUnit dt2 = MeasurementUnit.findByName("fahrenheit")
         MeasurementUnit dt3 = MeasurementUnit.findByName("newtons")
@@ -35,7 +38,6 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
     def "init default relationship types"() {
 
         when:
-        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType dt1 = RelationshipType.findByName("containment")
         RelationshipType dt2 = RelationshipType.findByName("classification")
         RelationshipType dt3 = RelationshipType.findByName("supersession")
@@ -48,26 +50,8 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         dt4
     }
 
-
-    def "you can init default types without duplicates"() {
-
-        when: "the init method is run for the first type"
-        initCatalogueService.initDefaultRelationshipTypes()
-        int defaultTypesCount = RelationshipType.count()
-
-        then: "there are some default types"
-        defaultTypesCount
-
-        when: "the init method again"
-        initCatalogueService.initDefaultRelationshipTypes()
-
-        then: "no types are added again"
-        defaultTypesCount == RelationshipType.count()
-    }
-
     def "The containment is present withing default relations types"(){
         when:
-        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.containmentType
 
         then:
@@ -82,7 +66,6 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
     def "The hierarchy is present withing default relations types"(){
         when:
-        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.hierarchyType
 
         then:
@@ -97,7 +80,6 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
     def "The supersession is present withing default relations types"(){
         when:
-        initCatalogueService.initDefaultRelationshipTypes()
         RelationshipType loaded = RelationshipType.supersessionType
 
         then:
@@ -112,20 +94,5 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         loaded.validateRule(new DataElement(), new DataElement(), [:])
 
     }
-
-    def "check initDataTypes works"(){
-        initCatalogueService.initDefaultDataTypes()
-
-        expect:
-        DataType.findByName("String")
-        DataType.findByName("Integer")
-        DataType.findByName("Double")
-        DataType.findByName("Boolean")
-        DataType.findByName("Date")
-        DataType.findByName("Time")
-        DataType.findByName("Currency")
-    }
-
-
 
 }

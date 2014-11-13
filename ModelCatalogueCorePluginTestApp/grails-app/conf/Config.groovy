@@ -146,44 +146,6 @@ elasticSearch.client.mode = 'local'
 elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
 elasticSearch.datastoreImpl = 'hibernateDatastore'
 
-
-modelcatalogue.defaults.datatypes = [
-        [name: "String", description: "java.lang.String"],
-        [name: "Integer", description: "java.lang.Integer"],
-        [name: "Double", description: "java.lang.Double"],
-        [name: "Boolean", description: "java.lang.Boolean"],
-        [name: "Date", description: "java.util.Date"],
-        [name: "Time", description: "java.sql.Time"],
-        [name: "Currency", description: "java.util.Currency"]
-]
-
-
-modelcatalogue.defaults.measurementunits = [
-        [name: "celsius", description: "degrees celsius", symbol: "°C"],
-        [name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"],
-        [name: "newtons", description: "measurement of force", symbol: "N"],
-        [name: 'meter', description: 'length', symbol: 'm'],
-        [name: 'kilogram', description: 'mass', symbol: 'kg'],
-        [name: 'second', description: 'time', symbol: 's'],
-        [name: 'ampere', description: 'electric current', symbol: 'A'],
-        [name: 'kelvin', description: 'thermodynamic temperature', symbol: 'K'],
-        [name: 'mole', description: 'amount of substance', symbol: 'mol'],
-        [name: 'candela', description: 'luminous intensity', symbol: 'cd'],
-        [name: 'area', description: 'square meter', symbol: 'm2'],
-        [name: 'volume', description: 'cubic meter', symbol: 'm3'],
-        [name: 'speed, velocity', description: 'meter per second', symbol: 'm/s'],
-        [name: 'acceleration', description: 'meter per second squared  ', symbol: 'm/s2'],
-        [name: 'wave number', description: 'reciprocal meter', symbol: 'm-1'],
-        [name: 'mass density', description: 'kilogram per cubic meter', symbol: 'kg/m3'],
-        [name: 'specific volume', description: 'cubic meter per kilogram', symbol: 'm3/kg'],
-        [name: 'current density', description: 'ampere per square meter', symbol: 'A/m2'],
-        [name: 'magnetic field strength  ', description: 'ampere per meter', symbol: 'A/m'],
-        [name: 'amount-of-substance concentration', description: 'mole per cubic meter', symbol: 'mol/m3'],
-        [name: 'luminance', description: 'candela per square meter', symbol: 'cd/m2'],
-        [name: 'mass fraction', description: 'kilogram per kilogram', symbol: 'kg/kg = 1']
-]
-
-
 modelcatalogue.defaults.relationshiptypes =  [
         [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
 
@@ -227,12 +189,12 @@ grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.tes
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
 
-grails.assets.excludes = [
+grails.assets.excludes =  [
         "bootstrap/**/*.*",
         "bootstrap/**/*.*",
         "font-awesome/**/*.*",
-        "jquery/**/*.js",
-        "angular/**/*.js",
+        "jquery/**/*.*",
+        "angular/**/*.*",
         "angular-animate/**/*.*",
         "angular-bootstrap/**/*.*",
         "angular-cookies/**/*.*",
@@ -241,17 +203,33 @@ grails.assets.excludes = [
         "angular-sanitize/**/*.*",
         "jasmine/**/*.*",
         "**/*/GruntFile",
+        "**/*/Gruntfile",
+        "**/*/Gruntfile.coffee",
+        "**/*/LICENSE",
+        "**/*/COPYING",
+        "**/*/README",
         "**/*/*.md",
         "**/*/*.json",
         "**/src/*.*",
+        "**/test/*.*",
+        "**/cpp/*.*",
+        "**/csharp/*.*",
+        "**/dart/*.*",
+        "**/demos/*.*",
+        "**/java/*.*",
+        "**/lua/*.*",
+        "**/maven/*.*",
+        "**/objectivec/*.*",
+        "**/python2/*.*",
+        "**/python3/*.*",
 ]
 
 grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "bootstrap/**/*.*",
         "bootstrap/**/*.*",
         "font-awesome/**/*.*",
-        "jquery/**/*.js",
-        "angular/**/*.js",
+        "jquery/**/*.*",
+        "angular/**/*.*",
         "angular-animate/**/*.*",
         "angular-bootstrap/**/*.*",
         "angular-cookies/**/*.*",
@@ -260,9 +238,25 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "angular-sanitize/**/*.*",
         "jasmine/**/*.*",
         "**/*/GruntFile",
+        "**/*/Gruntfile",
+        "**/*/Gruntfile.coffee",
+        "**/*/LICENSE",
+        "**/*/COPYING",
+        "**/*/README",
         "**/*/*.md",
         "**/*/*.json",
         "**/src/*.*",
+        "**/test/*.*",
+        "**/cpp/*.*",
+        "**/csharp/*.*",
+        "**/dart/*.*",
+        "**/demos/*.*",
+        "**/java/*.*",
+        "**/lua/*.*",
+        "**/maven/*.*",
+        "**/objectivec/*.*",
+        "**/python2/*.*",
+        "**/python3/*.*",
 ]
 
 grails.assets.minifyOptions = [

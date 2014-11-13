@@ -103,6 +103,14 @@ class ValueDomain extends CatalogueElement {
         return true
     }
 
+    /**
+     * Validates given value. Only boolean value true is considered as valid.
+     *
+     * As falsy method you can for example return boolean null, false, any String or any Exception.
+     *
+     * @param x
+     * @return
+     */
     def validateRule(Object x) {
         if (!isEnumKey(x)) {
             return false
