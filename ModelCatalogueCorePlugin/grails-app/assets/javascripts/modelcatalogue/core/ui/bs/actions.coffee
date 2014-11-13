@@ -81,6 +81,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       messages.prompt('Import XSD File', '', type: 'new-xsd-import')
   }]
 
+  actionsProvider.registerChildAction 'new-import', 'import-umlj', ['$scope', 'messages', ($scope, messages) -> {
+  label:  "Import Star Uml"
+  action: ->
+    messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
+  }]
+
 
 
   actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
