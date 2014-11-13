@@ -1,25 +1,27 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
+import org.springframework.transaction.TransactionStatus
+import org.springframework.transaction.support.DefaultTransactionDefinition
 import spock.lang.Shared
+import spock.lang.Stepwise
 import spock.lang.Unroll
 import spock.util.mop.Use
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@Unroll
+@Unroll @Stepwise
 class InitXMLSchemaDataTypesSpec extends IntegrationSpec {
 
-    @Shared
     def initCatalogueService
 
-    def setupSpec() {
+    def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
-        initCatalogueService.initDefaultDataTypes()
     }
 
     def "check XMLSchema classification present"() {
+        initCatalogueService.initDefaultDataTypes()
         expect:
         Classification.countByName('XMLSchema') == 1
     }

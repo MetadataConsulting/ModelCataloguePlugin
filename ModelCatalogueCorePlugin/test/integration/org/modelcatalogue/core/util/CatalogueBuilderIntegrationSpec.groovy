@@ -110,8 +110,85 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         e.message.startsWith "You must provide the name of the measurement unit"
     }
 
+    def "creates new data element with given name"() {
+        build {
+            dataElement(name: 'TestElement') {
+                description '''
+                    This is a test element which is just for test purposes!
+                '''
+            }
+        }
 
+        expect:
+        DataElement.findByName('TestElement')
+        DataElement.findByName('TestElement').description == 'This is a test element which is just for test purposes!'
+    }
 
+    def "reuse existing data element unit by name"() {
+        DataElement unit = new DataElement(name: 'ExistingElement', status: ElementStatus.DEPRECATED).save(failOnError: true)
+
+        build {
+            dataElement(name: 'ExistingElement') {
+                description '''
+                    This is a test element which is just for test purposes!
+                '''
+            }
+        }
+
+        expect:
+        created.first() == unit
+    }
+
+    def "complain if data element name is missing"() {
+        when:
+        build {
+            dataElement([:])
+        }
+
+        then:
+        AssertionError e = thrown(AssertionError)
+        e.message.startsWith "You must provide the name of the data element"
+    }
+
+    def "creates new model with given name"() {
+        build {
+            model(name: 'TestModel') {
+                description '''
+                    This is a test model which is just for test purposes!
+                '''
+            }
+        }
+
+        expect:
+        Model.findByName('TestModel')
+        Model.findByName('TestModel').description == 'This is a test model which is just for test purposes!'
+    }
+
+    def "reuse existing model by name"() {
+        Model unit = new Model(name: 'ExistingModel', status: ElementStatus.DEPRECATED).save(failOnError: true)
+
+        build {
+            model(name: 'ExistingModel') {
+                description '''
+                    This is a test model which is just for test purposes!
+                '''
+            }
+        }
+
+        expect:
+        created.first() == unit
+    }
+
+    def "complain if model name is missing"() {
+        when:
+        build {
+            model([:])
+        }
+
+        then:
+        AssertionError e = thrown(AssertionError)
+        e.message.startsWith "You must provide the name of the model"
+    }
 
     def "creates new value domain with given name"() {
         build {
@@ -137,7 +214,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        ValueDomain.countByName('SomeDomain') == 3
+        ValueDomain.countByName('SomeDomain') == 2
 
         cleanup:
         [domain2].each {
@@ -201,7 +278,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        DataType.countByName('SomeType') == 3
+        DataType.countByName('SomeType') == 2
 
         cleanup:
         [dt2].each {
@@ -267,6 +344,46 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         tokenDomain.isBasedOn
         tokenDomain.isBasedOn.contains stringDomain
 
+    }
+
+    def "complex model"() {
+        build {
+            automatic valueDomain
+            automatic dataType
+
+            classification name: 'Complex', {
+                id 'http://www.example.com/complex-model'
+
+                model name: "Complex Grand Parent", {
+                    model name: "Complex Parent", {
+                        model name: "Complex Child", {
+                            dataElement name: "Complex Element 1"
+                            dataElement name: "Complex Element 2", {
+                                valueDomain name: "Complex Domain 2", {
+                                    dataType enumerations: [yes: 'Yes', no: 'No']
+                                    measurementUnit name: 'Unit'
+                                }
+                            }
+                        }
+                    }
+
+                    model name: "Complex Sibling", {
+                        dataElement name: "Sibling Element"
+                    }
+                }
+            }
+        }
+
+        expect:
+        Model.findByName('Complex Grand Parent')
+        Model.findByName('Complex Grand Parent').parentOf
+        Model.findByName('Complex Grand Parent').parentOf.size() == 2
+
+        Model.findByName('Complex Child')
+        Model.findByName('Complex Child').contains
+        Model.findByName('Complex Child').contains.size() == 2
+
+        ValueDomain.findByName('Complex Element 1')
     }
 
 
