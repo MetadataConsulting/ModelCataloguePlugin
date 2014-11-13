@@ -18,7 +18,6 @@ class ModelCatalogueCoreGrailsPlugin {
             "grails-app/views/index.gsp",
     ]
 
-    // TODO Fill in these fields
     def title = "Model Catalogue Core Plugin " // Headline display name of the plugin
     def author = "Adam Milward, Vladimír Oraný"
     def authorEmail = "adam.milward@outlook.com, vladimir@orany.cz"

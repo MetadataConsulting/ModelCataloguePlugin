@@ -1,6 +1,6 @@
-class ModelCatalogueSpringSecurity2xPluginGrailsPlugin {
+class ModelCatalogueSecuritySs2GrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.9.1"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging
@@ -8,21 +8,23 @@ class ModelCatalogueSpringSecurity2xPluginGrailsPlugin {
         "grails-app/views/error.gsp"
     ]
 
-    // TODO Fill in these fields
-    def title = "Model Catalogue Spring Security 1.x Plugin" // Headline display name of the plugin
-    def author = "Vladimir Orany"
-    def authorEmail = "vladimir@orany.cz"
+    def title = "Model Catalogue Spring Security 2.x Plugin" // Headline display name of the plugin
+    def author = "Adam Milward, Vladimír Oraný"
+    def authorEmail = "adam.milward@outlook.com, vladimir@orany.cz"
     def description = '''\
 Spring Security 2.x implementation of Model Catalogue Core Plugin abstract security service.
 '''
 
+
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/model-catalogue-spring-security2x-plugin"
+    def documentation = "https://metadata.ci.cloudbees.com/job/ModelCatalogueCorePluginDevelop/javadoc/guide/"
+
+    //def packaging = "binary"
 
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-//    def license = "APACHE"
+    def license = "MIT"
 
     // Details of company behind the plugin (if there is one)
 //    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]
@@ -30,11 +32,10 @@ Spring Security 2.x implementation of Model Catalogue Core Plugin abstract secur
     // Any additional developers beyond the author specified above.
 //    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
 
-    // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
+    def issueManagement = [ system: "GitHub", url: "https://github.com/MetadataRegistry/ModelCataloguePlugin/issues" ]
 
-    // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
+    def scm = [ url: "https://github.com/MetadataRegistry/ModelCataloguePlugin" ]
+
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
