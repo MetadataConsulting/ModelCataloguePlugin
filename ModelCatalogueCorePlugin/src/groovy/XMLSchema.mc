@@ -2,6 +2,9 @@
  * XMLSchema classification provides default XML data types and their value domains
  */
 classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema') {
+    // save some time finalizing the elements as they all are finalized by default
+    status finalized
+
     id 'http://www.w3.org/2001/XMLSchema'
     description 'XML Schema provides standard types for describing your own XML formats'
 

@@ -321,9 +321,15 @@ class CatalogueBuilder {
         if (!element) {
             return element
         }
-        if (!element.attached || element.dirty) {
+
+        if (element.dirty) {
+            log.info "Persisting changes ${element.dirtyPropertyNames} of $element"
+            return element.save(failOnError: true) as T
+        } else if (!element.attached) {
+            log.info "Persisting $element"
             return element.save(failOnError: true) as T
         }
+
         return element
     }
 
@@ -430,8 +436,10 @@ class CatalogueBuilder {
         T element = unclassified ? tryFindUnclassified(type, parameters.name) : tryFind(type, parameters.name)
 
         if (!element) {
+            log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} does not exist yet, creating new one"
             element = type.newInstance(parameters)
         } else {
+            log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} found"
             element.properties = parameters
         }
 

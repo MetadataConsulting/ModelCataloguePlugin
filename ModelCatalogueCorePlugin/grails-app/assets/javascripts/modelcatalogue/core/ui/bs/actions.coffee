@@ -81,6 +81,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       messages.prompt('Import XSD File', '', type: 'new-xsd-import')
   }]
 
+  actionsProvider.registerChildAction 'new-import', 'import-mc', ['$scope', 'messages', ($scope, messages) -> {
+    label:  "Import MC"
+    action: ->
+      messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
+  }]
+
 
 
   actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->

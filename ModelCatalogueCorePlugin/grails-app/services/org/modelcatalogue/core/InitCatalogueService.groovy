@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
@@ -24,34 +23,19 @@ class InitCatalogueService {
 
     def initDefaultDataTypes() {
         CatalogueBuilder builder = new CatalogueBuilder(classificationService)
-
-        CompilerConfiguration configuration = new CompilerConfiguration()
-        configuration.scriptBaseClass = CatalogueBuilderScript.name
-
-        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
-        secureASTCustomizer.with {
-            packageAllowed = false
-            indirectImportCheckEnabled = true
-
-            importsWhitelist = [Object.name, CatalogueBuilder.name]
-            starImportsWhitelist = [Object.name, CatalogueBuilder.name]
-            staticImportsWhitelist = [Object.name, CatalogueBuilder.name]
-            staticStarImportsWhitelist = [Object.name, CatalogueBuilder.name]
-
-            receiversClassesBlackList = [System, GormStaticApi]
-        }
-        configuration.addCompilationCustomizers secureASTCustomizer
-
-
-        GroovyShell shell = new GroovyShell(grailsApplication.classLoader, new Binding(builder: builder), configuration)
+        GroovyShell shell = prepareGroovyShell(builder)
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
 
         for (Resource resource in resolver.getResources('classpath*:**/*.mc')) {
             try {
-                shell.evaluate(resource.URI)
+                log.info "Importing MC file ${resource.URI}"
+                shell.evaluate(resource.inputStream.newReader())
                 for (CatalogueElement element in builder.lastCreated) {
-                    elementService.finalizeElement(element)
+                    if (element.status == ElementStatus.DRAFT) {
+                        elementService.finalizeElement(element)
+                    }
                 }
+                log.info "File ${resource.URI} imported"
             } catch (e) {
                 log.error("Exception parsing model catalogue file", e)
             }
@@ -73,6 +57,35 @@ class InitCatalogueService {
                 }
             }
         }
+    }
+
+    Set<CatalogueElement> importMCFile(InputStream inputStream) {
+        CatalogueBuilder builder = new CatalogueBuilder(classificationService)
+        GroovyShell shell = prepareGroovyShell(builder)
+        shell.evaluate(inputStream.newReader())
+        builder.lastCreated
+    }
+
+    private GroovyShell prepareGroovyShell(CatalogueBuilder builder) {
+        CompilerConfiguration configuration = new CompilerConfiguration()
+        configuration.scriptBaseClass = CatalogueBuilderScript.name
+
+        SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
+        secureASTCustomizer.with {
+            packageAllowed = false
+            indirectImportCheckEnabled = true
+
+            importsWhitelist = [Object.name, CatalogueBuilder.name]
+            starImportsWhitelist = [Object.name, CatalogueBuilder.name]
+            staticImportsWhitelist = [Object.name, CatalogueBuilder.name]
+            staticStarImportsWhitelist = [Object.name, CatalogueBuilder.name]
+
+            receiversClassesBlackList = [System, GormStaticApi]
+        }
+        configuration.addCompilationCustomizers secureASTCustomizer
+
+
+        new GroovyShell(grailsApplication.classLoader, new Binding(builder: builder), configuration)
     }
 
 
