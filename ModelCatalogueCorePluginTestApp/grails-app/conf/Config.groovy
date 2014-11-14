@@ -90,6 +90,11 @@ grails.hibernate.cache.queries = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+        grails.serverURL = " http://localhost:8080/ModelCatalogueCorePluginTestApp"
+    }
+    local {
+        grails.logging.jul.usebridge = true
+        grails.serverURL = " http://localhost:8080/ModelCatalogueCorePluginTestApp"
     }
     test {
         grails.plugin.console.enabled = true
@@ -97,7 +102,7 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://mcc-testapp.metadata.eu.cloudbees.net"
+        grails.serverURL = "https://metadata.cfapps.io"
     }
 }
 
@@ -117,7 +122,9 @@ log4j = {
 
     debug 'grails.app.services.org.modelcatalogue.core.ElementService'
     debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
+    debug 'grails.app.services.org.modelcatalogue.core.InitCatalogueService'
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
+    debug 'org.modelcatalogue.core.util.CatalogueBuilder'
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'

@@ -2,10 +2,12 @@ package org.modelcatalogue.core.util
 
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
-import groovy.transform.stc.*
-import org.modelcatalogue.core.*
+import groovy.util.logging.Log4j
 
-// TODO: late binding of properties to minimize writes
+import org.modelcatalogue.core.*
+import groovy.transform.stc.*
+
+@Log4j
 class CatalogueBuilder {
 
     private static Set<Class> SUPPORTED_AS_CONTEXT  = [CatalogueElement, Classification, ValueDomain, DataType, Model, MeasurementUnit, DataElement]
@@ -33,191 +35,160 @@ class CatalogueBuilder {
     }
 
     Classification classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        assert parameters.name : "You must provide the name of the classification"
-        Classification classification = tryFindUnclassified(Classification, parameters.name)
+        Classification classification = findOrPrepareInstance Classification, checkAndPrepareParameters(Classification, parameters)
 
-        if (!classification) {
-            classification = new Classification(parameters).save(failOnError: true)
-        } else {
-            classification.properties = parameters
-            saveIfDirty classification
-        }
-
-        created << classification
-
-
-        executeWithContext classification, c
+        withNewContext classification, c
         unclassifiedQueriesFor.clear()
 
-        saveIfDirty classification
+        saveIfNeeded classification
     }
 
     Model model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        assert parameters.name : "You must provide the name of the model"
+        Model model = findOrPrepareInstance Model, checkAndPrepareParameters(Model, parameters, Classification)
 
-        Model model = tryFind Model, parameters.name
+        withNewContext model, c
 
-        if (!model) {
-            model = new Model(parameters).save(failOnError: true)
-        } else {
-            model.properties = parameters
-            saveIfDirty model
-        }
+        saveIfNeeded model
 
-        created << model
-        executeWithContext model, c
-
-        saveIfDirty model
         classifyIfNeeded model
 
         withContextElement(Model) {
-            saveIfDirty model
+            saveIfNeeded model
             it.addToParentOf model
         }
 
-        model
+        saveIfNeeded model
     }
 
     DataElement dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        assert parameters.name : "You must provide the name of the data element"
+        DataElement element = findOrPrepareInstance DataElement, checkAndPrepareParameters(DataElement, parameters, Model)
 
-        DataElement element = tryFind DataElement, parameters.name
+        withNewContext element, c
 
-        if (!element) {
-            element = new DataElement(parameters).save(failOnError: true)
-        } else {
-            element.properties = parameters
-            saveIfDirty element
-        }
-
-        created << element
-        executeWithContext element, c
-
-        saveIfDirty element
+        saveIfNeeded element
         classifyIfNeeded element
 
         if (element.valueDomain == null && ValueDomain in createAutomatically) {
-            executeWithContext element, {
+            withNewContext element, {
                 valueDomain()
             }
-            saveIfDirty element
         }
 
         withContextElement(Model) {
-            saveIfDirty element
+            saveIfNeeded element
             it.addToContains element
         }
 
-        element
+        saveIfNeeded element
     }
 
     ValueDomain valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        withContextElement(DataElement) {
-            if (!parameters.name) {
-                parameters.name = it.name
-            }
-            if (!parameters.description) {
-                parameters.description = it.description
-            }
-        }
+        ValueDomain valueDomain = findOrPrepareInstance ValueDomain, checkAndPrepareParameters(ValueDomain, parameters, DataElement)
 
-        assert parameters.name : "You must provide the name of the value domain"
+        withNewContext valueDomain, c
 
-        ValueDomain valueDomain = tryFind ValueDomain, parameters.name
-
-        if (!valueDomain) {
-            valueDomain = new ValueDomain(parameters).save(failOnError: true)
-        } else {
-            valueDomain.properties = parameters
-            saveIfDirty valueDomain
-        }
-
-        created << valueDomain
-        executeWithContext valueDomain, c
-
-        saveIfDirty valueDomain
+        saveIfNeeded valueDomain
         classifyIfNeeded valueDomain
 
         if (valueDomain.dataType == null && DataType in createAutomatically) {
-            executeWithContext valueDomain, {
+            withNewContext valueDomain, {
                 dataType()
             }
-            saveIfDirty valueDomain
+            saveIfNeeded valueDomain
         }
 
-        valueDomain
+        saveIfNeeded valueDomain
     }
 
     DataType dataType(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        withContextElement(ValueDomain) {
-            if (!parameters.name) {
-                parameters.name = it.name
-            }
-            if (!parameters.description) {
-                parameters.description = it.description
-            }
-        }
-        assert parameters.name : "You must provide the name of the data type"
+        checkAndPrepareParameters DataType, parameters, ValueDomain
 
-        DataType dataType = tryFind DataType, parameters.name
+        DataType dataType = findOrPrepareInstance((parameters.enumerations ? EnumeratedType : DataType), parameters)
 
-
-
-        if (!dataType) {
-            dataType = parameters.enumerations ?
-                    new EnumeratedType(parameters).save(failOnError: true) :
-                    new DataType(parameters).save(failOnError: true)
-        } else {
-            dataType.properties = parameters
-            saveIfDirty dataType
-        }
-
-        created << dataType
-        executeWithContext dataType, c
+        withNewContext dataType, c
         classifyIfNeeded dataType
 
-        withContextElement(ValueDomain, true) {
+        withContextElement(ValueDomain) {
             it.dataType = dataType
         }
 
-        saveIfDirty dataType
+        saveIfNeeded dataType
     }
 
     MeasurementUnit measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        assert parameters.name : "You must provide the name of the measurement unit type"
+        MeasurementUnit unit = findOrPrepareInstance MeasurementUnit, checkAndPrepareParameters(MeasurementUnit, parameters)
 
-        MeasurementUnit unit = tryFind MeasurementUnit, parameters.name
-
-
-
-        if (!unit) {
-            unit = new MeasurementUnit(parameters).save(failOnError: true)
-        } else {
-            unit.properties = parameters
-            saveIfDirty unit
-        }
-
-        created << unit
-        executeWithContext unit, c
+        withNewContext unit, c
         classifyIfNeeded unit
 
         withContextElement(ValueDomain, true) {
             it.unitOfMeasure = unit
         }
 
-        saveIfDirty unit
+        saveIfNeeded unit
+    }
+
+
+    void child(String classification, String name) {
+        withContextElement(Model) {
+            saveIfNeeded it
+            it.addToParentOf tryFind(Model, classification, name)
+        }
+    }
+
+    void child(String name) {
+        withContextElement(Model) {
+            saveIfNeeded it
+            it.addToParentOf tryFind(Model, name)
+        }
+    }
+
+    void child(Model element) {
+        withContextElement(Model) {
+            saveIfNeeded it
+            it.addToParentOf element
+        }
+    }
+
+    void contains(String classification, String name) {
+        withContextElement(Model) {
+            saveIfNeeded it
+            it.addToContains tryFind(DataElement, classification, name)
+        }
+    }
+
+    void contains(String name) {
+        withContextElement(Model) {
+            saveIfNeeded it
+            it.addToContains tryFind(DataElement, name)
+        }
+    }
+
+    void contains(DataElement element) {
+        withContextElement(Model) {
+            saveIfNeeded it
+            it.addToContains element
+        }
     }
 
     void basedOn(String classification, String name) {
         withContextElement(CatalogueElement) {
-            saveIfDirty it
+            saveIfNeeded it
             it.addToBasedOn tryFind(it.class, classification, name)
         }
     }
+
     void basedOn(String name) {
         withContextElement(CatalogueElement) {
-            saveIfDirty it
+            saveIfNeeded it
             it.addToBasedOn tryFind(it.class, name)
+        }
+    }
+
+    void basedOn(CatalogueElement element) {
+        withContextElement(CatalogueElement) {
+            saveIfNeeded it
+            it.addToBasedOn element
         }
     }
 
@@ -225,26 +196,37 @@ class CatalogueBuilder {
     void rule(String rule) { setStringValue('rule', rule) }
     void id(String rule) { setStringValue('modelCatalogueId', rule) }
 
+    void status(ElementStatus status) {
+        withContextElement(CatalogueElement) {
+            it.status = status
+        }
+    }
+
     void ext(String key, String value) {
         withContextElement(CatalogueElement) {
+            saveIfNeeded it
             it.ext.put(key, value)
         }
     }
 
     void ext(Map<String, String> values) {
         withContextElement(CatalogueElement) {
+            saveIfNeeded it
             it.ext.putAll(values)
         }
     }
 
 
-    // following cannot be static as it would no longer be available for the scripts
-    Class<Classification> getClassification() { Classification }
-    Class<Model> getModel() { Model }
-    Class<DataElement> getDataElement() { DataElement }
-    Class<ValueDomain> getValueDomain() { ValueDomain }
-    Class<DataType> getDataType() { DataType }
-    Class<MeasurementUnit> getMeasurementUnit() { MeasurementUnit }
+    static Class<Classification> getClassification() { Classification }
+    static Class<Model> getModel() { Model }
+    static Class<DataElement> getDataElement() { DataElement }
+    static Class<ValueDomain> getValueDomain() { ValueDomain }
+    static Class<DataType> getDataType() { DataType }
+    static Class<MeasurementUnit> getMeasurementUnit() { MeasurementUnit }
+
+    static ElementStatus getDraft() { ElementStatus.DRAFT }
+    static ElementStatus getDeprecated() { ElementStatus.DEPRECATED }
+    static ElementStatus getFinalized() { ElementStatus.FINALIZED }
 
     public <T extends CatalogueElement> void globalSearchFor(Class<T> type){
         unclassifiedQueriesFor << type
@@ -262,7 +244,14 @@ class CatalogueBuilder {
       new HashSet<CatalogueElement>(created)
     }
 
-    private <T extends CatalogueElement>  void executeWithContext(T contextElement, Closure c) {
+    // helper methods
+
+    private <T extends CatalogueElement>  void withNewContext(T contextElement, Closure c) {
+        // save current element if dirty
+        withContextElement(CatalogueElement) {
+            saveIfNeeded it
+        }
+
         pushContext()
         setContextElement(contextElement)
         with c
@@ -289,8 +278,6 @@ class CatalogueBuilder {
         contextElement
     }
 
-
-
     private <T extends CatalogueElement> T getContextElement(Class<T> contextElementType = CatalogueElement) {
         for (Map<Class, CatalogueElement> context in contexts.reverse()) {
             T result = context[contextElementType] as T
@@ -303,7 +290,7 @@ class CatalogueBuilder {
 
     private void classifyIfNeeded(CatalogueElement element) {
         withContextElement(Classification) {
-            saveIfDirty element
+            saveIfNeeded element
             it.addToClassifies element
         }
     }
@@ -317,9 +304,6 @@ class CatalogueBuilder {
         T contextElement = getContextElement(contextElementType)
         if (contextElement) {
             closure(contextElement)
-            if (update) {
-                contextElement.save(failOnError: true)
-            }
         }
     }
 
@@ -332,10 +316,19 @@ class CatalogueBuilder {
         }
     }
 
-    private static <T extends CatalogueElement> T saveIfDirty(T element) {
+    private static <T extends CatalogueElement> T saveIfNeeded(T element) {
+        if (!element) {
+            return element
+        }
+
         if (element.dirty) {
+            log.info "Persisting changes ${element.dirtyPropertyNames} of $element"
+            return element.save(failOnError: true) as T
+        } else if (!element.attached) {
+            log.info "Persisting $element"
             return element.save(failOnError: true) as T
         }
+
         return element
     }
 
@@ -350,7 +343,7 @@ class CatalogueBuilder {
     }
 
     private <T extends CatalogueElement> T tryFind(Class<T> type, Object name) {
-        tryFindWithClassification(type, getContextElement(Classification), name)
+        tryFindWithClassification(type, saveIfNeeded(getContextElement(Classification)), name)
     }
 
     private <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name) {
@@ -416,6 +409,41 @@ class CatalogueBuilder {
         created = []
         unclassifiedQueriesFor = []
         createAutomatically = []
+    }
+
+    private <T extends CatalogueElement, E extends CatalogueElement> Map<String, Object> checkAndPrepareParameters(Class<T> type, Map<String, Object> parameters, Class<E> inheritFrom = null) {
+        if (type in SUPPORTED_FOR_AUTO) {
+            withContextElement(inheritFrom) {
+                if (!parameters.name) {
+                    parameters.name = it.name
+                }
+                if (!parameters.description) {
+                    parameters.description = it.description
+                }
+            }
+        }
+        if (!parameters.status) {
+            withContextElement(CatalogueElement) {
+                parameters.status = it.status
+            }
+        }
+        assert parameters.name : "You must provide the name of the ${GrailsNameUtils.getNaturalName(type.simpleName)}"
+        parameters
+    }
+
+    private <T extends CatalogueElement> T findOrPrepareInstance(Class<T> type, Map<String, Object> parameters, boolean unclassified = false) {
+        T element = unclassified ? tryFindUnclassified(type, parameters.name) : tryFind(type, parameters.name)
+
+        if (!element) {
+            log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} does not exist yet, creating new one"
+            element = type.newInstance(parameters)
+        } else {
+            log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} found"
+            element.properties = parameters
+        }
+
+        created << element
+        element
     }
 
 }

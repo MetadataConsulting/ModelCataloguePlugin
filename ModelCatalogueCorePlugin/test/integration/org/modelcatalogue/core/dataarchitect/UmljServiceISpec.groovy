@@ -11,7 +11,7 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
 
     def umljService, initCatalogueService
 
-
+    @Ignore
     def "test import"() {
         initCatalogueService.initCatalogue()
         def filenameXsd = "test/integration/resources/rare_diseases_combined.umlj"

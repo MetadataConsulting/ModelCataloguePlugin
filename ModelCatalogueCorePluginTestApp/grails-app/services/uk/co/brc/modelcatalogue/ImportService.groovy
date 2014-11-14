@@ -45,8 +45,6 @@ class ImportService {
 //     * @param filename The filename. Must exist in the collection returned by <code>getNhicFiles</code>
 //     */
     def singleImport(String filename) {
-
-        DataType.initDefaultDataTypes()
         initCatalogueService.initDefaultRelationshipTypes()
         def applicationContext = grailsApplication.mainContext
         String basePath = applicationContext.getResource("/").getFile().toString()

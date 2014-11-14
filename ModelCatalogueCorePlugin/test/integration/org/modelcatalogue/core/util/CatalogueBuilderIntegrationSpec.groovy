@@ -67,7 +67,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the classification"
+        e.message.startsWith "You must provide the name of the Classification"
     }
     
     def "creates new measurement unit with given name"() {
@@ -107,7 +107,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the measurement unit"
+        e.message.startsWith "You must provide the name of the Measurement Unit"
     }
 
     def "creates new data element with given name"() {
@@ -147,7 +147,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the data element"
+        e.message.startsWith "You must provide the name of the Data Element"
     }
 
     def "creates new model with given name"() {
@@ -187,7 +187,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the model"
+        e.message.startsWith "You must provide the name of the Model"
     }
 
     def "creates new value domain with given name"() {
@@ -231,7 +231,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the value domain"
+        e.message.startsWith "You must provide the name of the Value Domain"
     }
 
     def "add extensions"() {
@@ -295,7 +295,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the data type"
+        e.message.startsWith "You must provide the name of the Data Type"
     }
 
     def "do not complain if data type name is missing but inside value domain"() {

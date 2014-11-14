@@ -10,6 +10,7 @@
 #= require modalPromptNewOboImport
 #= require modalPromptNewUmljImport
 #= require modalPromptNewXsdImport
+#= require modalPromptNewMCImport
 #= require batchView
 #= require catalogueElementTreeview
 #= require catalogueElementTreeviewItem
@@ -75,6 +76,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewOboImport'
   'mc.core.ui.bs.modalPromptNewUmljImport'
   'mc.core.ui.bs.modalPromptNewXsdImport'
+  'mc.core.ui.bs.modalPromptNewMCImport'
   'mc.core.ui.bs.batchView'
   'mc.core.ui.bs.catalogueElementTreeview'
   'mc.core.ui.bs.catalogueElementTreeviewItem'

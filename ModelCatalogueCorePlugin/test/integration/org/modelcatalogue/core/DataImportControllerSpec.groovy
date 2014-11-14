@@ -6,6 +6,7 @@ import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.mock.web.MockMultipartHttpServletRequest
+import spock.lang.Ignore
 import spock.lang.Shared
 
 /**
@@ -34,7 +35,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     def "placeholder"() {
 
     }
-
+    @Ignore
     def "Test the dataImportService in the ImporterController"()
     {
         def controller = new DataImportController()
