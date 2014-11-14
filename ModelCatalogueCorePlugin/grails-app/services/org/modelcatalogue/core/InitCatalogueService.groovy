@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
@@ -26,19 +27,20 @@ class InitCatalogueService {
 
         CompilerConfiguration configuration = new CompilerConfiguration()
         configuration.scriptBaseClass = CatalogueBuilderScript.name
+
         SecureASTCustomizer secureASTCustomizer = new SecureASTCustomizer()
         secureASTCustomizer.with {
             packageAllowed = false
             indirectImportCheckEnabled = true
 
-            importsWhitelist = [Object.name]
-            starImportsWhitelist = [Object.name]
-            staticImportsWhitelist = [Object.name]
-            staticStarImportsWhitelist = [Object.name]
+            importsWhitelist = [Object.name, CatalogueBuilder.name]
+            starImportsWhitelist = [Object.name, CatalogueBuilder.name]
+            staticImportsWhitelist = [Object.name, CatalogueBuilder.name]
+            staticStarImportsWhitelist = [Object.name, CatalogueBuilder.name]
 
             receiversClassesBlackList = [System, GormStaticApi]
         }
-        configuration.addCompilationCustomizers(secureASTCustomizer)
+        configuration.addCompilationCustomizers secureASTCustomizer
 
 
         GroovyShell shell = new GroovyShell(grailsApplication.classLoader, new Binding(builder: builder), configuration)
