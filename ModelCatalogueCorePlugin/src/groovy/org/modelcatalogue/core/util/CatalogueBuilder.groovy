@@ -7,7 +7,6 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import groovy.transform.stc.*
 
-// TODO: late binding of properties to minimize writes
 @Log4j
 class CatalogueBuilder {
 
