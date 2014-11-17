@@ -6,7 +6,6 @@
 **/atlassian-ide-plugin.xml
 ModelCatalogueCorePlugin/test/unit/resources/SACT/Breast_XMLSchema.xsd
 ModelCatalogueCorePlugin/test/unit/resources/SACT/XMLDataTypes.xsd
-ModelCatalogueCorePlugin/src/groovy/org/modelcatalogue/core/dataarchitect/StarUMLFile.groovy
 ModelCatalogueCorePlugin/test/integration/resources/rare_diseases_combined.umlj
 ModelCatalogueCorePluginTestApp/test/integration/resources/DataTemplate.xls
 ModelCatalogueCorePluginTestApp/test/integration/resources/DataTemplateChangeDataItemName.xls
