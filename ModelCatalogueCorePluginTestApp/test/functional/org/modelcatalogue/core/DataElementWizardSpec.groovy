@@ -74,9 +74,17 @@ class DataElementWizardSpec extends GebReportingSpec  {
         }
         then: 'Click the element'
 
-        waitFor {
-            $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)').click()
+        $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3) a').click()
+
+        //waitFor {
+        //    newDataElementTitle.test() == "NewDE1"
+        //}
+
+        waitFor(60) {
+            viewTitle.displayed
         }
+
+        viewTitle.text().trim()     == 'NewDE1'
 
     }
 
