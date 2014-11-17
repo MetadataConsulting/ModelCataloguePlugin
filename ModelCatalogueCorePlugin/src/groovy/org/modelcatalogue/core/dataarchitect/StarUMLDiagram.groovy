@@ -17,7 +17,7 @@ import groovy.json.JsonSlurper
 import groovy.xml.MarkupBuilder
 import groovy.xml.StreamingMarkupBuilder
 
-class StarUMLFile {
+class StarUMLDiagram {
 
     //test
 
@@ -26,7 +26,7 @@ class StarUMLFile {
 
     HashMap<String, Object> allClasses, topLevelClasses, allDataTypes, allEnumerations;
 
-    StarUMLFile(json) {
+    StarUMLDiagram(json) {
 
         // We'll also add each class to a list of classes
         json = json
