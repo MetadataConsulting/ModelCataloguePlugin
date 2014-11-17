@@ -14,8 +14,8 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
     @Ignore
     def "test import"() {
         initCatalogueService.initCatalogue()
-        def filenameXsd = "test/integration/resources/rare_diseases_combined.umlj"
-        Classification classification = new Classification(name: "rare_diseases_combined").save()
+        def filenameXsd = "test/integration/resources/CancerCoreDataModel1.0.umlj"
+        Classification classification = new Classification(name: "GeL Cancer Core").save()
 
         when:
         InputStream inputStream = new FileInputStream(filenameXsd)
