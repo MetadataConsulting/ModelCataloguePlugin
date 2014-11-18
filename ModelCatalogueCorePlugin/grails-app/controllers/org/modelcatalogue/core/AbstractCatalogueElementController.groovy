@@ -60,7 +60,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         removeRelation(id, type, false)
     }
 
-    private removeRelation(Long id, String type, boolean outgoing) {
+    private void removeRelation(Long id, String type, boolean outgoing) {
         withRetryingTransaction {
             if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
                 notAuthorized()
@@ -106,6 +106,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             response.status = HttpServletResponse.SC_NO_CONTENT
             render "DELETED"
+            return
         }
     }
 
@@ -284,8 +285,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 return
             }
             if (add) {
-                String mappingString = null
-                mappingString = request.getJSON().mapping
+                String mappingString = request.getJSON().mapping
                 Mapping mapping = mappingService.map(element, destination, mappingString)
                 if (mapping.hasErrors()) {
                     respond mapping.errors
@@ -302,6 +302,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             } else {
                 notFound()
             }
+            return
         }
     }
 
@@ -341,7 +342,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        def newVersion = Boolean.valueOf(params?.newVersion)
+        def newVersion = params.boolean('newVersion',false)
         def ext = params?.ext
         def oldProps = new HashMap(instance.properties)
         oldProps.remove('modelCatalogueId')

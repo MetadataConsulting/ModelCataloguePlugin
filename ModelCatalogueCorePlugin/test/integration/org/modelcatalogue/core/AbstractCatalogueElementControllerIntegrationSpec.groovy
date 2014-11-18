@@ -106,8 +106,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller."add${direction.capitalize()}"(anotherLoadItem.id, relationshipType.name)
         def json = controller.response.json
         recordResult "add${direction.capitalize()}", json
-        def expectedSource =        direction == "outgoing" ? anotherLoadItem : loadItem
-        def expectedDestination =   direction == "outgoing" ? loadItem : anotherLoadItem
 
         expect:
         controller.response.status == HttpServletResponse.SC_CREATED
@@ -593,7 +591,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     @Unroll
     def "get json mapping: #no where max: #max offset: #offset\""() {
-        CatalogueElement first = loadItem
+        CatalogueElement first = loadItem as CatalogueElement
         mapToDummyEntities(first)
 
         when:

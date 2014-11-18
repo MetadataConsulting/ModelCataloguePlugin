@@ -11,7 +11,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
   priority: 10000
 
 
-  controller: ['$scope', '$q', '$attrs', ($scope, $q, $attrs) ->
+  controller: ['$scope', '$q',  ($scope, $q ) ->
     $scope.searchForElement = (query, pickerValue, resourceAttr) ->
 
       searchFun     = null

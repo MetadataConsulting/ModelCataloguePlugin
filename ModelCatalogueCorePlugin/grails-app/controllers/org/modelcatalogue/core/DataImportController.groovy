@@ -250,13 +250,13 @@ class DataImportController extends AbstractRestfulController<DataImport> {
     def pendingAction(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        long total = (importer?.pendingAction) ? importer?.pendingAction?.size() : 0
-        long offset = 0
+        int total = (importer?.pendingAction) ? importer?.pendingAction?.size() : 0
+        int offset = 0
         List<ImportRow> items = []
         if (importer.pendingAction) items.addAll(importer?.pendingAction)
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/pendingAction",
-                items: items.subList(offset, Math.min(offset + params.long('max'), total)),
+                items: items.subList(offset, Math.min(offset + params.int('max'), total)),
                 total: total
         )
     }
@@ -264,14 +264,14 @@ class DataImportController extends AbstractRestfulController<DataImport> {
     def imported(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        long total = (importer?.imported) ? importer?.imported?.size() : 0
-        long offset = 0
+        int total = (importer?.imported) ? importer?.imported?.size() : 0
+        int offset = 0
         List<ImportRow> items = []
         if (importer.imported) items.addAll(importer?.imported)
 
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/imported",
-                items: items.subList(offset, Math.min(offset + params.long('max'), total)),
+                items: items.subList(offset, Math.min(offset + params.int('max'), total)),
                 total: total
         )
     }
@@ -279,14 +279,14 @@ class DataImportController extends AbstractRestfulController<DataImport> {
     def importQueue(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        long total = (importer?.importQueue) ? importer?.importQueue?.size() : 0
-        long offset = 0
+        int total = (importer?.importQueue) ? importer?.importQueue?.size() : 0
+        int offset = 0
         List<ImportRow> items = []
         if (importer.importQueue) items.addAll(importer?.importQueue)
 
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/importQueue",
-                items: items.subList(offset, Math.min(params.long('max'), total)),
+                items: items.subList(offset, Math.min(params.int('max'), total)),
                 total: total
         )
     }

@@ -81,10 +81,10 @@ class DataElementWizardSpec extends GebReportingSpec  {
         //}
 
         waitFor(60) {
-            viewTitle.displayed
+            pageTitle.displayed
         }
 
-        viewTitle.text().trim()     == 'NewDE1'
+        pageTitle.text().trim()     == 'NewDE1 DRAFT'
 
     }
 

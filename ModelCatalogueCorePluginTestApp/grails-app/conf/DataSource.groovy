@@ -58,6 +58,7 @@ environments {
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
             driverClassName = "com.mysql.jdbc.Driver"
+
         }
     }
 }
