@@ -104,7 +104,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.title                    = names.getNaturalName($stateParams.resource) + ' List'
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
+    $scope.elementSelectedInTree    = false
     $scope.element                  = if list.size > 0 then list.list[0]
+
     if $scope.element
       $scope.dataElements           = angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$scope.element.link}/outgoing/containment"})
     else
@@ -144,6 +146,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       if $rootScope.$$lastModels? and angular.equals($stateParams,$rootScope.$$lastModels.params)
         $scope.list = $rootScope.$$lastModels.list
         $scope.element = $rootScope.$$lastModels.element
+        # let's say it's more convenient if you get back to expanded tree that the parent is selected but
+        # if this behaviour will be unintuitive as well just remove the line bellow
+        $scope.elementSelectedInTree = $rootScope.$$lastModels.elementSelectedInTree
         if $scope.element
           $scope.dataElements = $rootScope.$$lastModels.element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$rootScope.$$lastModels.element?.link}/outgoing/containment"})
         else
@@ -164,7 +169,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             element._containedElements_ = contained
             $scope.dataElements         = contained
         $scope.element                  = element
+        $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels.element = element
+        $rootScope.$$lastModels.elementSelectedInTree = true
         $scope.dataElements             = element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{element.link}/outgoing/containment"})
 
     else if $scope.resource == 'newRelationships'
@@ -588,6 +595,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 icon:       if searchResult.getIcon  then searchResult.getIcon()  else 'glyphicon glyphicon-file'
                 term:       term
                 highlight:  true
+                element:    searchResult
               }
 
             deferred.resolve results
@@ -610,13 +618,19 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     security.requireLogin()
 ])
 
-.run(['$rootScope', '$state', '$stateParams', ($rootScope, $state, $stateParams) ->
+.run(['$rootScope', '$state', '$stateParams', 'messages', ($rootScope, $state, $stateParams, messages) ->
     # It's very handy to add references to $state and $stateParams to the $rootScope
     # so that you can access them from any scope within your applications.For example,
     # <li ui-sref-active="active }"> will set the <li> // to active whenever
     # 'contacts.list' or one of its decendents is active.
     $rootScope.$state = $state
     $rootScope.$stateParams = $stateParams
+
+    $rootScope.$on 'applicationOffline', ->
+      messages.error 'Application is not available at the moment, please, retry later'
+
+    $rootScope.$on 'resourceNotFound', ->
+      messages.error 'Selected resource cannot be found in the catalogue.'
 ])
 
 .run(['$templateCache', ($templateCache) ->
@@ -646,8 +660,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
     <a>
         <span class="omnisearch-icon" ng-class="match.model.icon"></span>
-        <span ng-if="!match.model.highlight" bind-html-unsafe="match.label"></span>
-        <span ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query"></span>
+        <span class="omnisearch-text" ng-if="!match.model.highlight" bind-html-unsafe="match.label" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-info': match.model.element.status == 'PENDING'}"></span>
+        <span class="omnisearch-text" ng-if=" match.model.highlight" bind-html-unsafe="match.label | typeaheadHighlight:query" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-info': match.model.element.status == 'PENDING'}"></span>
     </a>
   '''
 
@@ -697,8 +711,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         <div class="col-md-4">
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
-        <div class="col-md-8" ng-show="element">
-          <blockquote class="ce-description" ng-show="element.description">{{element.description}}</blockquote>
+        <div class="col-md-8" ng-if="element">
+          <blockquote class="ce-description" ng-if="element.description">{{element.description}}</blockquote>
           <h4>Data Elements</h4>
           <infinite-table list="dataElements" columns="dataElementsColumns" stateless="true"></infinite-table>
         </div>

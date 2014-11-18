@@ -41,6 +41,11 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
               </div>
               <div class="checkbox">
                 <label>
+                  <input type="checkbox" ng-model="copy.versionSpecific"> Version Specific
+                </label>
+              </div>
+              <div class="checkbox">
+                <label>
                   <input type="checkbox" ng-model="copy.bidirectional"> Bidirectional
                 </label>
               </div>

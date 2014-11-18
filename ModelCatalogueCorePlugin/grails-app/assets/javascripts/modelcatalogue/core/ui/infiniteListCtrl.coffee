@@ -1,7 +1,17 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names) ->
   angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
 
   columnsDefined = $scope.columns?
+
+  getEnumerations = (enumeratedType) ->
+    return '' if not enumeratedType
+    return enumeratedType.description if not enumeratedType.enumerations
+    enumerations = []
+    enumerations.push "#{key}: #{value}" for key, value of enumeratedType.enumerations
+    enumerations.join('\n')
+
+  getPropertyVal  = (propertyName) ->
+    (element) -> element[propertyName]
 
   getCellForColumn = (element, column) ->
     cell =
@@ -15,12 +25,33 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     cell
 
   getRowForElement = (element) ->
-    row = {element: element, classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll}
+    row = {element: element, properties: [], classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll}
+
     if $scope.columns
       row.head = getCellForColumn(element, $scope.columns[0])
       if $scope.columns.length > 1
         for column in $scope.columns.slice(1)
           row.tail.push getCellForColumn(element, column)
+
+    if angular.isFunction(element.isInstanceOf)
+      if element.isInstanceOf('catalogueElement') and not element.isInstanceOf('classification')
+        row.properties.push label: 'Classifications', value: -> element.classifications
+      if element.isInstanceOf('dataElement')
+        row.properties.push label: 'Value Domain', value: -> element.valueDomain
+      if element.isInstanceOf('valueDomain')
+        row.properties.push label: 'Data Type', value: -> element.dataType
+        row.properties.push label: 'Unit of Measure', value: -> element.unitOfMeasure
+        row.properties.push label: 'Rule', value: -> element.rule
+      if element.isInstanceOf('enumeratedType')
+        row.properties.push label: 'Enumerations', value: getEnumerations
+
+    if element.ext
+      row.properties.push label: ''
+      row.properties.push label: 'Metadata'
+
+      angular.forEach element.ext, (value, key) ->
+        row.properties.push label: names.getNaturalName(key), value: -> value
+
     row
 
   addElements = (elements) ->

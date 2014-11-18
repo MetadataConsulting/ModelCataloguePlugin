@@ -11,7 +11,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class CatalogueElement implements Extendible {
+abstract class CatalogueElement implements Extendible, Published<CatalogueElement> {
 
     def grailsLinkGenerator
     def relationshipService
@@ -57,25 +57,10 @@ abstract class CatalogueElement implements Extendible {
     static constraints = {
         name size: 1..255
         description nullable: true, maxSize: 2000
-		modelCatalogueId nullable: true, unique: true, maxSize: 255, url: true
+		modelCatalogueId nullable: true, unique: 'versionNumber', maxSize: 255, url: true
         dateCreated bindable: false
         lastUpdated bindable: false
         archived bindable: false
-        status validator: { val, obj ->
-            if (!val) {
-                return true
-            }
-            def oldStatus = null
-            if (obj.version != null) {
-                oldStatus = obj.getPersistentValue('status')
-            }
-            if (obj.instanceOf(Model) && oldStatus != ElementStatus.FINALIZED && val == ElementStatus.FINALIZED) {
-                if (!checkChildItemsFinalized(obj)) {
-                    return ['org.modelcatalogue.core.PublishedElement.status.validator.children']
-                }
-            }
-            return true
-        }
         versionNumber bindable: false
         latestVersionId bindable: false, nullable: true
     }
@@ -249,26 +234,6 @@ abstract class CatalogueElement implements Extendible {
         getClass().countByLatestVersionId(latestVersionId)
     }
 
-    static protected Boolean checkChildItemsFinalized(Model model, Collection<Model> tree = []) {
-
-        if (model.contains.any {
-            it.status != ElementStatus.FINALIZED && it.status != ElementStatus.DEPRECATED
-        }) return false
-
-        if (!tree.contains(model)) tree.add(model)
-
-        def parentOf = model.parentOf
-        if (parentOf) {
-            return model.parentOf.any { Model md ->
-                if (md.status != ElementStatus.FINALIZED && md.status != ElementStatus.DEPRECATED) return false
-                if (!tree.contains(md)) {
-                    if (!checkChildItemsFinalized(md, tree)) return false
-                }
-                return true
-            }
-        }
-        return true
-    }
 
     String getDefaultModelCatalogueId(boolean withoutVersion = false) {
         if (!grailsLinkGenerator) {
@@ -284,7 +249,7 @@ abstract class CatalogueElement implements Extendible {
     /**
      * Called before the archived element is persisted to the data store.
      */
-    protected void beforeArchive() {}
+    protected void beforeDraftPersisted() {}
 
     static String fixResourceName(String resourceName) {
         if (resourceName.contains('_')) {
@@ -334,6 +299,16 @@ abstract class CatalogueElement implements Extendible {
 
     boolean isReadyForQueries() {
         isAttached() && !hasErrors()
+    }
+
+    @Override
+    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
+        PublishingChain.create(this).publish(archiver)
+    }
+
+    @Override
+    boolean isPublished() {
+        return status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]
     }
 
 }

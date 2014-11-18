@@ -18,4 +18,6 @@ plugins{
 }
 ```
 
+[Plugin Documentation](https://metadata.ci.cloudbees.com/job/ModelCatalogueCorePluginDevelop/javadoc/)
+
 

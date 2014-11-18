@@ -8,18 +8,16 @@ import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 
-class ModelCatalogueCorePluginGrailsPlugin {
+class ModelCatalogueCoreGrailsPlugin {
     // the plugin version
-    def version = "0.5.0"
+    def version = "0.9.2-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4.3 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/index.gsp",
-            "grails-app/assets/javascripts/demo.coffee"
     ]
 
-    // TODO Fill in these fields
     def title = "Model Catalogue Core Plugin " // Headline display name of the plugin
     def author = "Adam Milward, Vladimír Oraný"
     def authorEmail = "adam.milward@outlook.com, vladimir@orany.cz"
@@ -28,7 +26,7 @@ Model catalogue core plugin (metadata registry)
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/model-catalogue-core-plugin"
+    def documentation = "https://metadata.ci.cloudbees.com/job/ModelCatalogueCorePluginDevelop/javadoc/guide/"
 
     //def packaging = "binary"
 
@@ -43,11 +41,9 @@ Model catalogue core plugin (metadata registry)
     // Any additional developers beyond the author specified above.
 //    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
 
-    // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
+    def issueManagement = [ system: "GitHub", url: "https://github.com/MetadataRegistry/ModelCataloguePlugin/issues" ]
 
-    // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
+    def scm = [ url: "https://github.com/MetadataRegistry/ModelCataloguePlugin" ]
 
     private static String stringSeparator = "\r\n"
 

@@ -270,8 +270,7 @@ class DataImportService {
             def pendingDataElements = importer.updatedDataElements.findAll { it[1] == model }
 
             if(model.status == ElementStatus.UPDATED) {
-                def archivedModel = elementService.archiveAndIncreaseVersion(model)
-                model.refresh()
+                model = elementService.createDraftVersion(model)
             }
 
             if (pendingDataElements) {
@@ -289,7 +288,7 @@ class DataImportService {
         }
 
         importer.models.each{ Model model->
-            elementService.finalizeTree(model)
+            elementService.finalizeElement(model)
         }
     }
 
@@ -437,8 +436,7 @@ class DataImportService {
                 model.save()
             }
             addModelToImport(importer, model)
-            elementService.archiveAndIncreaseVersion(dataElement)
-            dataElement.refresh()
+            dataElement = elementService.createDraftVersion(dataElement)
             dataElement.name = params.name
             dataElement.description = params.description
             dataElement.status = ElementStatus.UPDATED
@@ -466,8 +464,7 @@ class DataImportService {
 
             addModelToImport(importer, model)
 
-            elementService.archiveAndIncreaseVersion(dataElement)
-            dataElement.refresh()
+            dataElement = elementService.createDraftVersion(dataElement)
 
             if(dataElementChanged) {
                 dataElement.name = params.name
@@ -515,8 +512,7 @@ class DataImportService {
 
             addModelToImport(importer, model)
 
-            elementService.archiveAndIncreaseVersion(dataElement)
-            dataElement.refresh()
+            dataElement = elementService.createDraftVersion(dataElement)
 
             if(dataElementChanged) {
                 dataElement.name = element.name

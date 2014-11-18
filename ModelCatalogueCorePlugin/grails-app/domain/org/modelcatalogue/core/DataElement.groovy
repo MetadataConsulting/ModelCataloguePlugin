@@ -30,4 +30,12 @@ class DataElement extends CatalogueElement {
         "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
     }
 
+    @Override
+    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
+        PublishingChain
+                .create(this)
+                .publish(this.valueDomain)
+                .publish(archiver)
+    }
+
 }

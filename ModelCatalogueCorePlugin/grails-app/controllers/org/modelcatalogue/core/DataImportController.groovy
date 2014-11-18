@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 class DataImportController extends AbstractRestfulController<DataImport> {
 
     def dataImportService
+    def initCatalogueService
     def XSDImportService
     def OBOService
 
@@ -33,7 +34,7 @@ class DataImportController extends AbstractRestfulController<DataImport> {
         def errors = []
         if (!file) {
             if (!params?.conceptualDomain) errors.add("no conceptual domain!")
-        } else if (!file.originalFilename.endsWith('.obo')) {
+        } else if (!file.originalFilename.endsWith('.obo') && !file.originalFilename.endsWith('.mc') ) {
             if (!params?.conceptualDomain) errors.add("no conceptual domain!")
         }
         if (!params?.name) errors.add("no import name")
@@ -70,6 +71,7 @@ class DataImportController extends AbstractRestfulController<DataImport> {
         if (errors) {
             response = ["errors": errors]
             respond response
+            return
         }
 
         conceptualDomainName = trimString(params.conceptualDomain)
@@ -130,6 +132,41 @@ class DataImportController extends AbstractRestfulController<DataImport> {
             return
         }
 
+        if (file.size > 0 && file.originalFilename.endsWith(".mc")) {
+            def asset = storeAsset(params, file, 'application/model-catalogue')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+
+//            executorService.submit {
+                try {
+                    Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
+
+                    Asset updated = Asset.get(id)
+                    updated.status = ElementStatus.FINALIZED
+                    updated.description = "Your import has finished."
+                    updated.save(flush: true, failOnError: true)
+
+                    Classification classification = created.find { it instanceof Classification } as Classification
+
+                    if (classification) {
+                        updated.addToClassifications(classification)
+                        classification.addToClassifies(updated)
+                        updated.addToRelatedTo(classification)
+                    }
+                } catch (Exception e) {
+                    Asset updated = Asset.get(id)
+                    updated.refresh()
+                    updated.status = ElementStatus.FINALIZED
+                    updated.name = updated.name + " - Error during upload"
+                    updated.description = "Error importing obo file: ${e}"
+                    updated.save(flush: true, failOnError: true)
+                }
+//            }
+
+            redirect url: "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
+            return
+        }
+
         if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
 
             Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
@@ -162,7 +199,7 @@ class DataImportController extends AbstractRestfulController<DataImport> {
                 originalFileName: theName,
                 description: "Your import will be available in this asset soon. Use Refresh action to reload.",
                 status: ElementStatus.PENDING,
-                contentType: 'application/xslt',
+                contentType: contentType,
                 size: 0
         )
         assetService.storeAssetFromFile(file, asset)

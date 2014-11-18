@@ -2,8 +2,9 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.springframework.transaction.TransactionStatus
 
-class ElementService {
+class ElementService implements Archiver<CatalogueElement> {
 
     static transactional = true
 
@@ -28,54 +29,81 @@ class ElementService {
         resource.countByStatus(getStatusFromParams(params))
     }
 
-    public <E extends CatalogueElement> E archiveAndIncreaseVersion(E element) {
-        if (element.archived) throw new IllegalArgumentException("You cannot archive already archived element $element")
+    /**
+     * Returns fresh draft version of the element.
+     *
+     * If the element is already draft the current element is set as deprecated. If the element is finalized it
+     * remains untouched.
+     *
+     * @param element the element from which new draft version should be created.
+     * @return fresh draft version of the elements supplied
+     */
+    public <E extends CatalogueElement> E createDraftVersion(E element) {
+        if (!element.latestVersionId) {
+            element.latestVersionId = element.id
+            element.save(failOnError: true)
+        }
+
+        if (element.archived) {
+            element.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.cannot.be.archived', 'Cannot create draft version from deprecated element!')
+            return element
+        }
 
         GrailsDomainClass domainClass = grailsApplication.getDomainClass(element.class.name) as GrailsDomainClass
 
-        E archived = element.class.newInstance() as E
+        E draft = element.class.newInstance() as E
 
         for (prop in domainClass.persistentProperties) {
             if (!prop.association) {
-                archived.setProperty(prop.name, element[prop.name])
+                draft.setProperty(prop.name, element[prop.name])
             }
         }
 
-        element = createNewVersion(element)
-        archived = populateArchivedProperties(archived, element)
+        draft.versionNumber++
+        draft.versionCreated = new Date()
 
-        element.status = ElementStatus.DRAFT
-        element.save()
+        draft.latestVersionId = element.latestVersionId ?: element.id
+        draft.status = ElementStatus.UPDATED
+        draft.dateCreated = element.dateCreated
+        draft.beforeDraftPersisted()
 
-        def supersedes = element.supersedes
-        def previousSupersedes = supersedes ? supersedes[0] : null
-        if (previousSupersedes) {
-            element.removeFromSupersedes previousSupersedes
-            archived.addToSupersedes previousSupersedes
+        if (!draft.save()) {
+            return draft
         }
 
-        element.addToSupersedes(archived)
 
-        archived = addRelationshipsToArchived(archived, element)
-        archived = elementSpecificActions(archived, element)
+        draft.addToSupersedes(element)
 
-        modelCatalogueSearchService.unindex(archived)
+        draft = addRelationshipsToDraft(draft, element)
+        draft = elementSpecificActions(draft, element)
 
-        //set archived status from updated to archived
-        archived.status = ElementStatus.DEPRECATED
-        archived.latestVersionId = element.latestVersionId ?: element.id
-        archived.save()
+        if (element.status == ElementStatus.DRAFT) {
+            archive(element)
+        }
+
+        draft.status = ElementStatus.DRAFT
+        draft.save()
     }
 
-    public <E extends CatalogueElement> E archive(CatalogueElement archived) {
-        if (archived.archived) throw new IllegalArgumentException("You cannot archive already archived element $element")
+
+
+    CatalogueElement archive(CatalogueElement archived) {
+        if (archived.archived) {
+            return archived
+        }
 
         archived.incomingRelationships.each {
+            if (it.relationshipType == RelationshipType.supersessionType) {
+                return
+            }
             it.archived = true
             it.save(failOnError: true)
         }
 
         archived.outgoingRelationships.each {
+            if (it.relationshipType == RelationshipType.supersessionType) {
+                return
+            }
             it.archived = true
             it.save(failOnError: true)
         }
@@ -86,34 +114,15 @@ class ElementService {
         archived.save()
     }
 
-    public <E extends Model> E finalizeTree(E model, Collection<E> tree = []) {
 
-        //check that it isn't already finalized
-        if(model.status==ElementStatus.FINALIZED || model.status==ElementStatus.DEPRECATED) return model
-
-        //to avoid infinite loop
-        if(!tree.contains(model)) tree.add(model)
-
-        //finalize data elements
-        model.contains.each{ DataElement dataElement ->
-            if(dataElement.status!=ElementStatus.FINALIZED && dataElement.status!=ElementStatus.DEPRECATED){
-                dataElement.status = ElementStatus.FINALIZED
-                dataElement.save(flush:true)
+    public <E extends CatalogueElement> E finalizeElement(E draft) {
+        CatalogueElement.withTransaction { TransactionStatus status ->
+            CatalogueElement finalized = draft.publish(this)
+            if (finalized.hasErrors()) {
+                status.setRollbackOnly()
             }
+            finalized
         }
-
-        //finalize child models
-        model.parentOf.each { E child ->
-            if(!tree.contains(child)) {
-                finalizeTree(child, tree)
-            }
-        }
-
-        model.status = ElementStatus.FINALIZED
-        model.save(flush:true)
-
-        return model
-
     }
 
     static ElementStatus getStatusFromParams(params) {
@@ -126,87 +135,34 @@ class ElementService {
         return ElementStatus.valueOf(params.status.toString().toUpperCase())
     }
 
-    private <E extends CatalogueElement> E createNewVersion(E element) {
-        element.versionNumber++
-        element.versionCreated = new Date()
 
-        if (!element.latestVersionId) {
-            element.latestVersionId = element.id
-        }
-
-        if (!element.save(flush: true)) {
-            log.error(element.errors)
-            throw new IllegalArgumentException("Cannot update version of $element. See application log for errors.")
-        }
-
-        element
-    }
-
-    private <E extends CatalogueElement> E elementSpecificActions(E archived, E element) {
-
-        //don't add parent relationships to new version of model - this should be manually done
-        //children on the other hand should be added
-        if(element instanceof Model) {
-            if(element.childOf.size() > 0){
-                element.childOf.each{ Model model ->
-                    relationshipService.unlink(model, element, RelationshipType.hierarchyType, true)
-                }
-            }
-        }
-
-        //don't add a data element to the model if it's updated (the old model should still reference the archived one)
-        if(element instanceof DataElement) {
-            if(element.containedIn.size() > 0){
-                element.containedIn.each{ Model model ->
-                    relationshipService.unlink(model, element, RelationshipType.containmentType, true)
-                }
-            }
+    private static <E extends CatalogueElement> E elementSpecificActions(E draft, E element) {
+        if(draft instanceof DataElement) {
             if (element.valueDomain) {
-                archived.valueDomain = element.valueDomain
+                draft.valueDomain = element.valueDomain
             }
         }
 
-        //add all the extensions to the archived element as well
-        // TODO: this should be more generic
-        archived.ext.putAll element.ext
+        //add all the extensions to the new draft element as well
+        draft.ext.putAll element.ext
 
-        archived
+        draft
     }
 
-    private <E extends CatalogueElement> E addRelationshipsToArchived(E archived, E element) {
+    private <E extends CatalogueElement> E addRelationshipsToDraft(E draft, E element) {
         for (Relationship r in element.incomingRelationships) {
-            if (r.archived || r.relationshipType.name == 'supersession') continue
-            if (r.archived || r.relationshipType.name == 'hierarchy' || r.relationshipType.name == 'containment') {
-                relationshipService.link(r.source, archived, r.relationshipType, false, true)
-                continue
-            }
-            relationshipService.link(r.source, archived, r.relationshipType, true)
+            if (r.archived || r.relationshipType.versionSpecific) continue
+            relationshipService.link(r.source, draft, r.relationshipType, false)
         }
 
         for (Relationship r in element.outgoingRelationships) {
-            if (r.archived || r.relationshipType.name == 'supersession') continue
-            if (r.archived || r.relationshipType.name == 'hierarchy') {
-                relationshipService.link(archived, r.destination, r.relationshipType, false, true)
-                continue
-            }
-            relationshipService.link(archived, r.destination, r.relationshipType, true)
+            if (r.archived || r.relationshipType.versionSpecific) continue
+            relationshipService.link(draft, r.destination, r.relationshipType, false)
         }
 
-        archived
+        draft
     }
 
-    private <E extends CatalogueElement> E populateArchivedProperties(E archived, E element) {
-        //set archived as updated whilst updates are going on (so it doesn't interfere with regular validation rules)
-        archived.status = ElementStatus.UPDATED
-        archived.dateCreated = element.dateCreated // keep the original creation date
-        archived.beforeArchive()
-
-        if (!archived.save()) {
-            log.error(archived.errors)
-            throw new IllegalArgumentException("Cannot create archived version of $element. See application log for errors.")
-        }
-        archived
-    }
 
     public <E extends CatalogueElement> E merge(E source, E destination, Set<Classification> classifications = new HashSet(source.classifications)) {
         log.info "Merging $source into $destination"

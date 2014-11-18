@@ -22,10 +22,8 @@ grails.project.fork = [
 ]
 
 
-grails.plugin.location.'ModelCatalogueCorePlugin' = "../ModelCatalogueCorePlugin"
-grails.plugin.location.'ModelCatalogueSpringSecurity2xPlugin' = "../ModelCatalogueSpringSecurity2xPlugin"
-//grails.plugin.location.'ModelCatalogueElasticSearchPlugin' = "../ModelCatalogueElasticSearchPlugin"
-//grails.plugin.location.'ModelCatalogueDataArchitectPlugin' = "../ModelCatalogueDataArchitectPlugin"
+grails.plugin.location.'model-catalogue-core' = "../ModelCatalogueCorePlugin"
+grails.plugin.location.'model-catalogue-security-ss2' = "../ModelCatalogueSpringSecurity2xPlugin"
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
@@ -92,7 +90,7 @@ grails.project.dependency.resolution = {
         // plugins for the compile step
         compile ":scaffolding:2.1.2"
         compile ':cache:1.1.7'
-        compile ":asset-pipeline:1.9.6"
+        compile ":asset-pipeline:1.9.9"
 
         compile ":console:1.5.0"
 
