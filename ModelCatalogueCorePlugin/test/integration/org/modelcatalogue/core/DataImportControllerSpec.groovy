@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
+import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Shared
@@ -25,6 +26,63 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
                 "Importer"
         )
     }
+
+    def testHeaderSetup(){
+        HeadersMap headersMap = DataImportController.populateHeaders([])
+        expect:
+        headersMap.dataElementCode == "Data Item Unique Code"
+        headersMap.dataElementName == "Data Item Name"
+        headersMap.dataElementDescription == "Data Item Description"
+        headersMap.dataType == "Data type"
+        headersMap.parentModelName == "Parent Model"
+        headersMap.parentModelCode == "Parent Model Unique Code"
+        headersMap.containingModelName == "Model"
+        headersMap.containingModelCode == "Model Unique Code"
+        headersMap.measurementUnitName == "Measurement Unit"
+        headersMap.measurementSymbol == "Measurement Unit Symbol"
+        headersMap.classification == "Classification"
+        headersMap.metadata == "Metadata"
+
+    }
+
+    def testCustomHeaderSetup(){
+
+        Map<String,String> params = [:]
+
+        params.dataElementCode = "Data Item UC"
+        params.dataElementName = "DataI Name"
+        params.dataElementDescription = "Description"
+        params.dataType = "DataType"
+        params.parentModelName = "parentModel"
+        params.parentModelCode = "Parent Model UC"
+        params.containingModelName = "ModelName"
+        params.containingModelCode = "ModelUC"
+        params.measurementUnitName = "measurement"
+        params.measurementSymbol = "MeasurementSymbol"
+        params.classification = "Classification"
+        params.metadata = "metadata"
+
+
+
+        HeadersMap headersMap = DataImportController.populateHeaders(params)
+        expect:
+        headersMap.dataElementCode == "Data Item UC"
+        headersMap.dataElementName == "DataI Name"
+        headersMap.dataElementDescription == "Description"
+        headersMap.dataType == "DataType"
+        headersMap.parentModelName == "parentModel"
+        headersMap.parentModelCode == "Parent Model UC"
+        headersMap.containingModelName == "ModelName"
+        headersMap.containingModelCode == "ModelUC"
+        headersMap.measurementUnitName == "measurement"
+        headersMap.measurementSymbol == "MeasurementSymbol"
+        headersMap.classification == "Classification"
+        headersMap.metadata == "metadata"
+
+    }
+
+
+
 
     //so we don't load a file
     def "placeholder"(){
