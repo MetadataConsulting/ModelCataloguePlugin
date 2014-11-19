@@ -108,7 +108,7 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
 
-//            executorService.submit {
+            executorService.submit {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
 
@@ -118,7 +118,7 @@ class DataImportController  {
                 } catch (Exception e) {
                     logError(id, e)
                 }
-//            }
+            }
 
             redirectToAsset(id)
             return
