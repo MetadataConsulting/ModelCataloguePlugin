@@ -43,7 +43,6 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'angularFileUplo
         if result.errors
           for err in result.errors
             $scope.messages.error err.message
-          $modalInstance.close()
         else
           messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
           $modalInstance.close(result)

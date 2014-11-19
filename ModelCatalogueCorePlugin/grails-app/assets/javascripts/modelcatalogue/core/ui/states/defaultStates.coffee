@@ -454,42 +454,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     controller: 'mc.core.ui.states.ListCtrl'
   }
-
-  $stateProvider.state 'mc.dataArchitect.imports', {
-    abstract: true
-    url: '/imports'
-    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-  }
-
-  $stateProvider.state 'mc.dataArchitect.imports.list', {
-    url: '/all?page&order&sort&status'
-    templateUrl: 'modelcatalogue/core/ui/state/list.html'
-    resolve:
-      list: ['$stateParams','modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        $stateParams.resource = "import"
-        page = parseInt($stateParams.page ? 1, 10)
-        page = 1 if isNaN(page)
-        # it's safe to call top level for each controller, only model controller will respond on it
-        params        = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true
-        params.order  = $stateParams.order ? 'asc'
-        params.sort   = $stateParams.sort ? 'name'
-        return modelCatalogueDataArchitect.imports(params)
-      ]
-
-    controller: 'mc.core.ui.states.ListCtrl'
-  }
-
-  $stateProvider.state 'mc.dataArchitect.imports.show', {
-    url: '/{id:\\d+}'
-    templateUrl: 'modelcatalogue/core/ui/state/dataImport.html'
-    resolve:
-      element: ['$stateParams','modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        $stateParams.resource = "Import"
-        return modelCatalogueDataArchitect.getImport($stateParams.id)
-      ]
-
-    controller: 'mc.core.ui.states.DataImportCtrl'
-  }
 ])
 
 .controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions'
@@ -1037,28 +1001,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
-                    <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.dataArchitect.imports.list" ui-sref-opts="{inherit: false}"><i class="fa fa-cloud-upload fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="batchesLink" ui-sref="mc.dataArchitect.imports.list" ui-sref-opts="{inherit: false}">Imports</a> {{importCount}}</div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <a ng-click="create('import')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Import</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
       </div>
     </div>
   '''

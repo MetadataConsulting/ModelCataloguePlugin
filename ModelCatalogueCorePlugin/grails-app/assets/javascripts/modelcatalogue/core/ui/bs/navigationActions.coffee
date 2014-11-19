@@ -59,21 +59,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     }
   ]
 
-  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-imports', ['$scope', '$state', ($scope, $state) ->
-    action = {
-      position:    100
-      label:      'Imports'
-      icon:       'fa fa-fw fa-cloud-upload'
-      action: ->
-        $state.go 'mc.dataArchitect.imports.list'
-    }
-
-    $scope.$on '$stateChangeSuccess', (ignored, state) ->
-      action.active = state.name == 'mc.dataArchitect.imports.list'
-
-    action
-  ]
-
   actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-uninstantiated-elements', ['$scope', '$state', ($scope, $state) ->
     action = {
       position:    200

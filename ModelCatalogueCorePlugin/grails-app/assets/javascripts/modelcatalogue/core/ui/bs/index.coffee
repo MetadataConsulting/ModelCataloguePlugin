@@ -4,7 +4,6 @@
 #= require modelcatalogue/util/ui/bs/index
 #= require catalogueElementView
 #= require csvTransformationView
-#= require importView
 #= require importCtrl
 #= require modalPromptNewExcelImport
 #= require modalPromptNewOboImport
@@ -19,7 +18,6 @@
 #= require infiniteList
 #= require propertiesPane
 #= require actions
-#= require importActions
 #= require navigationActions
 #= require columns
 #= require catalogue
@@ -69,7 +67,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.infiniteList'
   'mc.core.ui.bs.catalogueElementView'
   'mc.core.ui.bs.csvTransformationView'
-  'mc.core.ui.bs.importView'
   'mc.core.ui.bs.importCtrl'
   'mc.core.ui.bs.modalPromptNewExcelImport'
   'mc.core.ui.bs.modalPromptNewOboImport'
@@ -81,7 +78,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.catalogueElementProperties'
   'mc.core.ui.bs.propertiesPane'
   'mc.core.ui.bs.actions'
-  'mc.core.ui.bs.importActions'
   'mc.core.ui.bs.navigationActions'
   'mc.core.ui.bs.columns'
   'mc.core.ui.bs.catalogue'

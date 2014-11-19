@@ -8,7 +8,6 @@
 #= require catalogueElementView
 #= require csvTransformationView
 #= require batchView
-#= require importView
 #= require catalogueElementTreeviewItem
 #= require catalogueElementTreeview
 #= require catalogueElementPicker
@@ -34,7 +33,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.columnsSupportCtrl'
   'mc.core.ui.catalogueElementView'
   'mc.core.ui.csvTransformationView'
-  'mc.core.ui.importView'
   'mc.core.ui.batchView'
   'mc.core.ui.catalogueElementTreeviewItem'
   'mc.core.ui.catalogueElementTreeview'

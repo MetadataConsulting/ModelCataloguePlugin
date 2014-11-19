@@ -265,9 +265,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $rootScope.$on 'catalogueElementCreated', refreshElement
       $rootScope.$on 'catalogueElementDeleted', refreshElement
       $rootScope.$on 'catalogueElementUpdated', refreshElement
-      $rootScope.$on 'newVersionCreated',  ->
-        if $scope.element
-          $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: 'history'}
+      $rootScope.$on 'newVersionCreated', (ignored, element) ->
+        if element
+          $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history'}
 
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->

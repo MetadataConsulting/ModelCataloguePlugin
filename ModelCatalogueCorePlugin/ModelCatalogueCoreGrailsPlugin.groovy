@@ -74,15 +74,16 @@ Model catalogue core plugin (metadata registry)
                     new ValueDomainMarshaller(),
                     new MappingMarshallers(),
                     new MappingsMarshaller(),
-                    new ImportRowMarshaller(),
-                    new ImportRowsMarshaller(),
-                    new DataImportMarshaller(),
                     new ListWithTotalAndTypeWrapperMarshaller(),
                     new BatchMarshaller(),
                     new ActionMarshaller(),
                     new CsvTransformationMarshaller(),
                     new UserMarshaller()
             ]
+        }
+
+        if (Environment.current == Environment.DEVELOPMENT) {
+            springConfig.addAlias('modelCatalogueStorageService','localFilesStorageService')
         }
 
     }
