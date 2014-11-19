@@ -82,12 +82,12 @@ class ElementService implements Archiver<CatalogueElement> {
         }
 
         draft.status = ElementStatus.DRAFT
-        draft.save()
+        (E)draft.save()
     }
 
 
 
-    CatalogueElement archive(CatalogueElement archived) {
+     CatalogueElement  archive(CatalogueElement archived) {
         if (archived.archived) {
             return archived
         }
@@ -112,12 +112,13 @@ class ElementService implements Archiver<CatalogueElement> {
 
         archived.status = ElementStatus.DEPRECATED
         archived.save()
+        return archived
     }
 
 
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         CatalogueElement.withTransaction { TransactionStatus status ->
-            CatalogueElement finalized = draft.publish(this)
+            E finalized = draft.publish(this)
             if (finalized.hasErrors()) {
                 status.setRollbackOnly()
             }

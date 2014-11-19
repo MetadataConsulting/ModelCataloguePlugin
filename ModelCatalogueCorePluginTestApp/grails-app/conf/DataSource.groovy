@@ -16,13 +16,7 @@ environments {
     development {
         dataSource {
             dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:mysql://localhost:3306/test?autoReconnect=true&useUnicode=yes"
-            username = "root"
-            password = ""
-            driverClassName = "com.mysql.jdbc.Driver"
-//            logSql = true
-//            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-//            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     test {
@@ -38,7 +32,6 @@ environments {
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
             driverClassName = "com.mysql.jdbc.Driver"
-//            logSql = true
         }
     }
     cloudbees {
@@ -48,10 +41,16 @@ environments {
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
             driverClassName = "com.mysql.jdbc.Driver"
-//            logSql = true
+            logSql = true
         }
     }
     production {
+//        dataSource {
+//            dialect = 'org.hibernate.dialect.MySQL5InnoDBDialect'
+//            pooled = false
+//            dbCreate = 'update' // use 'update', 'validate', 'create' or 'create-drop'
+//            jndiName = 'java:comp/env/jdbc/mcc-testapp'
+//        }
         dataSource {
             // will be reconfigured by cloud foundry
             dbCreate = "update"
@@ -59,6 +58,7 @@ environments {
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
             driverClassName = "com.mysql.jdbc.Driver"
+
         }
     }
 }

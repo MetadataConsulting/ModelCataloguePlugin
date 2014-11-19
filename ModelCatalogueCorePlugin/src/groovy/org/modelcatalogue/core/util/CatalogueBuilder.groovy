@@ -90,6 +90,10 @@ class CatalogueBuilder {
         saveIfNeeded valueDomain
         classifyIfNeeded valueDomain
 
+        withContextElement(DataElement) {
+            it.valueDomain = valueDomain
+        }
+
         if (valueDomain.dataType == null && DataType in createAutomatically) {
             withNewContext valueDomain, {
                 dataType()

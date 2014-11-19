@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.pages
 
+import org.openqa.selenium.By
+
 /**
  * Created by david on 02/11/14.
  */
@@ -28,10 +30,17 @@ class DataViewPage extends ModelCataloguePage {
         saveButton          { dataWizard.find("button.btn-success") }
         exitButton          { $("#exit-wizard") }
 
+        newDataElement       {$('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)')}
+
+        newDataElementTitle      { $('#ce-name ng-binding')}
+        pageTitle             { $("h3") }
 
 
 
+    }
 
+    def getCell(int row, int col) {
+        $('div.inf-table-body tbody tr:nth-child(' + row + ') td:nth-child(' + col + ')')
     }
 
 

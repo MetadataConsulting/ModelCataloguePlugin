@@ -55,7 +55,7 @@
                     roles: ${grails.plugin.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
                     username: '${sec.username()}',
                     id: ${sec.loggedInUserInfo(field:"id")},
-                    classifications: ${org.modelcatalogue.core.security.User.get(sec.loggedInUserInfo(field:"id")).classifications?.collect{ org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers.minimalCatalogueElementJSON(it) }.encodeAsJSON() }
+                    classifications: ${(org.modelcatalogue.core.security.User.get(sec.loggedInUserInfo(field:"id"))?.classifications?.collect({ org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers.minimalCatalogueElementJSON(it) }) ?: []).encodeAsJSON() }
                 }
                 </sec:ifLoggedIn>
             })

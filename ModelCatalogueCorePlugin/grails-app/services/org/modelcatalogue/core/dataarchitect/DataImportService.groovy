@@ -3,6 +3,7 @@ package org.modelcatalogue.core.dataarchitect
 import grails.transaction.Transactional
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.dataarchitect.xsd.*
+import org.modelcatalogue.core.util.CatalogueBuilder
 
 /**
  * @deprecated it is not guaranteed that this import is still working, needs more attention when needed

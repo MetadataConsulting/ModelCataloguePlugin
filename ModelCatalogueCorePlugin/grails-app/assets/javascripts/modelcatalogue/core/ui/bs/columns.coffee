@@ -1,8 +1,5 @@
 angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsProvider)->
-  nameAndDescription = -> [
-    {header: "Name", value: 'classifiedName', classes: 'col-md-4', show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'}}
-    {header: "Description", value: 'description', classes: 'col-md-6'}
-  ]
+
 
   idNameAndDescription = -> [
     { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'modelCatalogueId'}

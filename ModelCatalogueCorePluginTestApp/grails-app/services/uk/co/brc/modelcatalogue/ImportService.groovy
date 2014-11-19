@@ -1,12 +1,14 @@
 package uk.co.brc.modelcatalogue
 
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.CatalogueBuilder
 
 class ImportService {
 
     static transactional = true
     def grailsApplication
     def initCatalogueService
+    def classificationService
 
     private static final QUOTED_CHARS = [
             "\\": "&#92;",
@@ -54,187 +56,110 @@ class ImportService {
         }
     }
 
+
     private fileFunctions = [
             '/CAN_CUH.csv':
                     { tokens ->
-                        def categories = ["NHIC Datasets", "Ovarian Cancer", "CUH", "Round 1", tokens[1], tokens[2]]
-                        def classification = findOrCreateClassification("NHIC", "NHIC conceptual domain i.e. value domains used the NHIC project")
-                        def models = importModels(categories, classification)
-                        def dataTypes = [tokens[5]]
-                        def dataType = importDataTypes(tokens[3], dataTypes)
-                        def ext = new HashMap()
+                        CatalogueBuilder builder = new CatalogueBuilder(classificationService)
+                        builder.build {
+                            classification(name:"NHIC"){
+                                globalSearchFor dataType
 
-                        def vd = new ValueDomain(name: tokens[3].replaceAll("\\s", "_"),
-                                dataType: dataType,
-                                description: tokens[5]).save(failOnError: true);
+                                description("NHIC conceptual domain i.e. value domains used the NHIC project")
+                                model(name:"NHIC Datasets"){
+                                    model(name:"Ovarian Cancer"){
+                                        model(name:"CUH") {
+                                            model(name:"Round 1"){
+                                                model(name:tokens[1]){
+                                                    model(name:tokens[2]){
+                                                        dataElement(name:tokens[3], description:tokens[4]){
+                                                            valueDomain(name:tokens[3].replaceAll("\\s", "_")){
+                                                                importDataTypes(builder, tokens[3], [tokens[5]])
+                                                            }
+                                                            ext "NHIC_Identifier:", tokens[0].take(2000)
+                                                            ext "Link_to_existing definition:", tokens[6].take(2000)
+                                                            ext "Notes_from_GD_JCIS", tokens[7].take(2000)
+                                                            ext "[Optional]_Local_Identifier", tokens[8].take(2000)
+                                                            ext "A", tokens[9].take(2000)
+                                                            ext "B", tokens[10].take(2000)
+                                                            ext "C", tokens[11].take(2000)
+                                                            ext "D", tokens[12].take(2000)
+                                                            ext "E", tokens[13].take(2000)
+                                                            ext "F", tokens[14].take(2000)
+                                                            ext "G", tokens[15].take(2000)
+                                                            ext "H", tokens[16].take(2000)
+                                                            ext "E2", tokens[17].take(2000)
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
-                        vd.addToClassifications(classification)
-
-                        def de = new DataElement(name: tokens[3],
-                                description: tokens[4], code: tokens[0])
-                        //dataElementConcept: models,
-                        //extension: ext).save(failOnError: true)
-
-                        de.valueDomain = vd
-                        de.save()
-
-                        de.ext.put("NHIC_Identifier:", tokens[0].take(255));
-                        de.ext.put("Link_to_existing definition:", tokens[6].take(255));
-                        de.ext.put("Notes_from_GD_JCIS", tokens[7].take(255));
-                        de.ext.put("[Optional]_Local_Identifier", tokens[8].take(255));
-                        de.ext.put("A", tokens[9].take(255));
-                        de.ext.put("B", tokens[10].take(255));
-                        de.ext.put("C", tokens[11].take(255));
-                        de.ext.put("D", tokens[12].take(255));
-                        de.ext.put("E", tokens[13].take(255));
-                        de.ext.put("F", tokens[14].take(255));
-                        de.ext.put("G", tokens[15].take(255));
-                        de.ext.put("H", tokens[16]);
-                        de.ext.put("E2", tokens[17].take(255))
-
-
-                        de.addToContainedIn(models)
-
-                        //de.addToDataElementValueDomains(vd);
-                        //de.save();
                         println "importing: " + tokens[0] + "_Round1_CAN"
                     }
     ]
 
+    static Map<String,String> parseEnumeration(String[] lines){
+        Map enumerations = new HashMap()
 
-    private static importModels(categories, Classification classification) {
-        //categories look something like ["Animals", "Mammals", "Dogs"]
-        //where animal is a parent of mammals which is a parent of dogs......
+        lines.each { enumeratedValues ->
 
-        def modelToReturn
+            def EV = enumeratedValues.split(":")
 
-        categories.inject { parentName, childName ->
+            if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
+                def key = EV[0]
+                def value = EV[1]
 
-            //if there isn't a name for the child return the parentName
-            if (childName.equals("")) {
-                return parentName;
-            }
-
-            //def matches = Model.findAllWhere("name" : name, "parentName" : models)
-
-            //see if there are any models with this name
-            Model match
-            def namedChildren = Model.findAllWhere("name": childName)
-
-            //see if there are any models with this name that have the same parentName
-            if (namedChildren.size()>0) {
-                namedChildren.each{ Model childModel ->
-                    if(childModel.childOf.collect{it.name}.contains(parentName)){
-                        match = childModel
-                    }
-                }
-            }
-
-            //if there isn't a matching model with the same name and parentName
-            if (!match) {
-                //new Model('name': name, 'parentName': parentName).save()
-                Model child
-                Model parent
-
-                //create the child model
-                child = new Model('name': childName).save()
-                child.addToClassifications(classification)
-
-                modelToReturn = child
-
-                //see if the parent model exists
-                parent = Model.findWhere("name": parentName)
-
-                //FIXME we should probably have unique names for models (or codes)
-                // or at least within conceptual domains
-                // or we need to have a way of choosing the model parent to use
-                // at the moment it just uses the first one Model that is returned
-
-                if (!parent) {
-                    parent = new Model('name': parentName).save()
-                    parent.addToClassifications(classification)
+                if (value.size() > 244) {
+                    value = value[0..244]
                 }
 
-                child.addToChildOf(parent)
+                key = key.trim()
+                value = value.trim()
 
-                child.name
 
-                //add the parent child relationship between models
-
-            } else {
-                modelToReturn = match
-                match.name
+                enumerations.put(key, value)
             }
         }
-
-        modelToReturn
+        return enumerations
     }
 
-    private static importDataTypes(name, dataType) {
+    /**
+     *
+     * @param name data element/item name
+     * @param dataType - Column F - content of - either blank or an enumeration or a named datatype.
+     * @return
+     */
+    private static importDataTypes(CatalogueBuilder catalogueBuilder, name, dataType) {
 
         //default data type to return is the string data type
-        def dataTypeReturn
-
-        dataType.each { line ->
-
+        for (line in dataType) {
             String[] lines = line.split("\\r?\\n");
-
-            def enumerated = false
-
-            if (lines.size() > 0 && lines[] != null) {
-
-                Map enumerations = new HashMap()
-
-                lines.each { enumeratedValues ->
-
-                    def EV = enumeratedValues.split(":")
-
-                    if (EV != null && EV.size() > 1 && EV[0] != null && EV[1] != null) {
-                        def key = EV[0]
-                        def value = EV[1]
-
-                        if (value.size() > 244) {
-                            value = value[0..244]
-                        }
-
-                        key = key.trim()
-                        value = value.trim()
-
-                        enumerated = true
-                        enumerations.put(key, value)
-                    }
-                }
-
-                if (enumerated) {
-
-
-                    String enumString = enumerations.sort() collect { key, val ->
-                        "${this.quote(key)}:${this.quote(val)}"
-                    }.join('|')
-
-                    dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
-
-                    if (!dataTypeReturn) {
-                        dataTypeReturn = new EnumeratedType(name: name.replaceAll("\\s", "_"), enumerations: enumerations).save()
-                    }
-                } else {
-
-                    dataTypeReturn = (DataType.findByName(name)) ?: DataType.findByName("String")
-
-                }
-            } else {
-                dataTypeReturn = DataType.findByName("String")
+            if (!(lines.size() > 0 && lines != null)) {
+                return catalogueBuilder.dataType(name: "String")
             }
-        }
-        return dataTypeReturn
-    }
 
-    private static findOrCreateClassification(String name, String description) {
-        def cd = Classification.findByName(name)
-        if (!cd) {
-            cd = new Classification(name: name, description: description, namespace: "www.nhic.co.uk").save()
+            def enumerations = parseEnumeration(lines)
+
+            if(!enumerations){
+                return catalogueBuilder.dataType(name: name) ?: catalogueBuilder.dataType(name: "String")
+            }
+            String enumString = enumerations.sort() collect { key, val ->
+                    "${quote(key)}:${quote(val)}"
+                }.join('|')
+
+            def dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
+
+            if (dataTypeReturn) {
+                return catalogueBuilder.dataType(name: dataTypeReturn.name)
+            }
+            return catalogueBuilder.dataType(name: name.replaceAll("\\s", "_"), enumerations: enumerations)
         }
-        return cd
+        catalogueBuilder.dataType(name: "String")
     }
 
     private static String quote(String s) {

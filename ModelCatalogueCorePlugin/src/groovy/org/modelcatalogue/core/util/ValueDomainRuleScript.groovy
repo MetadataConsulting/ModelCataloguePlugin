@@ -65,7 +65,7 @@ abstract class ValueDomainRuleScript  extends Script {
         if (o instanceof Number) return o
         try {
             return new BigDecimal(o.toString())
-        } catch(e) {
+        } catch(Exception e) {
             exception = e
             return 0
         }
@@ -185,7 +185,7 @@ abstract class ValueDomainRuleScript  extends Script {
         if (!binding.hasVariable('domain')) {
             return null
         }
-        binding.getVariable('domain')
+        (ValueDomain)binding.getVariable('domain')
     }
 
     void setDomain(ValueDomain domain) {

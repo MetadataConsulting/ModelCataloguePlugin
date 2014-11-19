@@ -114,7 +114,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.save(failOnError: true)
 
         int originalVersion     = author.versionNumber
-        DataElement archived    = elementService.archive(author)
+        DataElement archived    = elementService.archive(author) as DataElement
         int archivedVersion     = archived.versionNumber
         author.refresh()
 

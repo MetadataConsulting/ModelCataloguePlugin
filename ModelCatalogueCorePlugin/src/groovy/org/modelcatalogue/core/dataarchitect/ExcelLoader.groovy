@@ -19,7 +19,7 @@ class ExcelLoader {
     }
 
 
-	def parse(path) {
+	def parse() {
 		Workbook wb = WorkbookFactory.create(stream);
         if(!wb) return [[],[]]
 		Sheet sheet = wb.getSheetAt(0);
@@ -52,42 +52,37 @@ class ExcelLoader {
 		data
 	}
 
-	def getRowReference(Row row, Cell cell) {
+	static getRowReference(Row row, Cell cell) {
 		def rowIndex = row.getRowNum()
 		def colIndex = cell.getColumnIndex()
 		CellReference ref = new CellReference(rowIndex, colIndex)
 		ref.getRichStringCellValue().getString()
 	}
 
-	def getValue(Row row, Cell cell, List data) {
-		def rowIndex = row.getRowNum()
+	static getValue(Row row, Cell cell, List data) {
 		def colIndex = cell.getColumnIndex()
-		def value = ""
-		switch (cell.getCellType()) {
-			case Cell.CELL_TYPE_STRING:
-				value = cell.getRichStringCellValue().getString().trim();
-				break;
-			case Cell.CELL_TYPE_NUMERIC:
-				if (DateUtil.isCellDateFormatted(cell)) {
-					value = cell.getDateCellValue();
-				} else {
-					value = cell.getNumericCellValue();
-				}
-				break;
-			case Cell.CELL_TYPE_BOOLEAN:
-				value = cell.getBooleanCellValue();
-				break;
-			case Cell.CELL_TYPE_FORMULA:
-				value = cell.getCellFormula();
-				break;
-			default:
-				value = ""
-		}
-		data[colIndex] = value
+		data[colIndex] = valueHelper(cell)
 		data
 	}
 
-	def toXml(header, row) {
+    static valueHelper(Cell cell){
+        switch (cell.getCellType()) {
+            case Cell.CELL_TYPE_STRING:
+                return cell.getRichStringCellValue().getString().trim();
+            case Cell.CELL_TYPE_NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue();
+                }
+                return cell.getNumericCellValue();
+            case Cell.CELL_TYPE_BOOLEAN:
+                return cell.getBooleanCellValue();
+            case Cell.CELL_TYPE_FORMULA:
+                return cell.getCellFormula();
+        }
+        return ""
+    }
+
+	static toXml(header, row) {
 		def obj = "<object>\n"
 		row.eachWithIndex { datum, i ->
 			def headerName = header[i]

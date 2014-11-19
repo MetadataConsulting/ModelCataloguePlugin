@@ -34,6 +34,6 @@ class SpringSecurity2SecurityService implements SecurityService {
     }
 
     User getCurrentUser() {
-        return springSecurityService.currentUser
+        return springSecurityService.currentUser as User
     }
 }

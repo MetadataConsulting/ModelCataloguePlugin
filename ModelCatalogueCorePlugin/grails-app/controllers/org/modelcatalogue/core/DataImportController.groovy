@@ -87,7 +87,7 @@ class DataImportController extends AbstractRestfulController<DataImport> {
             def asset = storeAsset(params, file)
             ExcelLoader parser = new ExcelLoader(inputStream)
             def (headers, rows) = parser.parse()
-            HeadersMap headersMap = populateHeaders()
+            HeadersMap headersMap = populateHeaders(objectToBind.headersMap ?: [:])
             DataImport importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap, asset)
             response = importer
             respond response
@@ -293,13 +293,13 @@ class DataImportController extends AbstractRestfulController<DataImport> {
     def pendingAction(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        long total = (importer?.pendingAction) ? importer?.pendingAction?.size() : 0
-        long offset = 0
+        int total = (importer?.pendingAction) ? importer?.pendingAction?.size() : 0
+        int offset = 0
         List<ImportRow> items = []
         if (importer.pendingAction) items.addAll(importer?.pendingAction)
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/pendingAction",
-                items: items.subList(offset, Math.min(offset + params.long('max'), total)),
+                items: items.subList(offset, Math.min(offset + params.int('max'), total)),
                 total: total
         )
     }
@@ -307,14 +307,14 @@ class DataImportController extends AbstractRestfulController<DataImport> {
     def imported(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        long total = (importer?.imported) ? importer?.imported?.size() : 0
-        long offset = 0
+        int total = (importer?.imported) ? importer?.imported?.size() : 0
+        int offset = 0
         List<ImportRow> items = []
         if (importer.imported) items.addAll(importer?.imported)
 
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/imported",
-                items: items.subList(offset, Math.min(offset + params.long('max'), total)),
+                items: items.subList(offset, Math.min(offset + params.int('max'), total)),
                 total: total
         )
     }
@@ -322,14 +322,14 @@ class DataImportController extends AbstractRestfulController<DataImport> {
     def importQueue(Integer max){
         handleParams(max)
         DataImport importer = queryForResource(params.id)
-        long total = (importer?.importQueue) ? importer?.importQueue?.size() : 0
-        long offset = 0
+        int total = (importer?.importQueue) ? importer?.importQueue?.size() : 0
+        int offset = 0
         List<ImportRow> items = []
         if (importer.importQueue) items.addAll(importer?.importQueue)
 
         respondWithLinks ImportRow, new ImportRows(
                 base: "/dataArchitect/imports/${params.id}/importQueue",
-                items: items.subList(offset, Math.min(params.long('max'), total)),
+                items: items.subList(offset, Math.min(params.int('max'), total)),
                 total: total
         )
     }
@@ -387,21 +387,24 @@ class DataImportController extends AbstractRestfulController<DataImport> {
 
 
 
-    protected static HeadersMap populateHeaders(){
+    protected static HeadersMap populateHeaders(params){
+
         HeadersMap headersMap = new HeadersMap()
-        headersMap.dataElementCode = "Data Item Unique Code"
-        headersMap.dataElementName = "Data Item Name"
-        headersMap.dataElementDescription = "Data Item Description"
-        headersMap.dataType = "Data type"
-        headersMap.parentModelName = "Parent Model"
-        headersMap.parentModelCode = "Parent Model Unique Code"
-        headersMap.containingModelName = "Model"
-        headersMap.containingModelCode = "Model Unique Code"
-        headersMap.measurementUnitName = "Measurement Unit"
-        headersMap.measurementSymbol = "Measurement Unit Symbol"
-        headersMap.classification = "Classification"
-        headersMap.conceptualDomainName = "Conceptual Domain"
-        headersMap.metadata = "Metadata"
+
+
+
+        headersMap.dataElementCode = params.dataElementCode ?: "Data Item Unique Code"
+        headersMap.dataElementName = params.dataElementName ?: "Data Item Name"
+        headersMap.dataElementDescription = params.dataElementDescription ?: "Data Item Description"
+        headersMap.dataType = params.dataType ?: "Data type"
+        headersMap.parentModelName = params.parentModelName ?: "Parent Model"
+        headersMap.parentModelCode = params.parentModelCode ?: "Parent Model Unique Code"
+        headersMap.containingModelName = params.containingModelName ?: "Model"
+        headersMap.containingModelCode = params.containingModelCode ?: "Model Unique Code"
+        headersMap.measurementUnitName = params.measurementUnitName ?: "Measurement Unit"
+        headersMap.measurementSymbol = params.measurementSymbol ?: "Measurement Unit Symbol"
+        headersMap.classification = params.classification ?: "Classification"
+        headersMap.metadata = params.metadata ?: "Metadata"
         return headersMap
     }
 }

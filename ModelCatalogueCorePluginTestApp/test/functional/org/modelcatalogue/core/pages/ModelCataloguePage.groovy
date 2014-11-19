@@ -22,9 +22,9 @@ abstract class ModelCataloguePage extends Page {
     }
 
 
-    def loginAdmin() { loginUser("admin", "admin") }
-    def loginViewer() { loginUser("viewer", "viewer") }
-    def loginCurator() { loginUser("curator", "curator") }
+    def loginAdmin() { loginUser("admin", "A!6m1n2014") }
+    def loginViewer() { loginUser("viewer", "v13w3r") }
+    def loginCurator() { loginUser("curator", "c2r4t0r") }
 
     def loginUser(String user, String pwd) {
         if (!showLoginButton.displayed) {

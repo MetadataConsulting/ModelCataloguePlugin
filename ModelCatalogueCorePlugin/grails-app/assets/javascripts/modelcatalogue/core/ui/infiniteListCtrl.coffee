@@ -10,8 +10,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     enumerations.push "#{key}: #{value}" for key, value of enumeratedType.enumerations
     enumerations.join('\n')
 
-  getPropertyVal  = (propertyName) ->
-    (element) -> element[propertyName]
+
 
   getCellForColumn = (element, column) ->
     cell =
