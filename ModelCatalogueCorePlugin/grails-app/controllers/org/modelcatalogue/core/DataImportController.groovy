@@ -137,9 +137,10 @@ class DataImportController extends AbstractRestfulController<DataImport> {
             def id = asset.id
             InputStream inputStream = file.inputStream
 
-//            executorService.submit {
+            executorService.submit {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
+
 
                     Asset updated = Asset.get(id)
                     updated.status = ElementStatus.FINALIZED
@@ -153,6 +154,11 @@ class DataImportController extends AbstractRestfulController<DataImport> {
                         classification.addToClassifies(updated)
                         updated.addToRelatedTo(classification)
                     }
+
+                    for (CatalogueElement element in created) {
+                        updated.addToRelatedTo(element)
+                    }
+
                 } catch (Exception e) {
                     Asset updated = Asset.get(id)
                     updated.refresh()
@@ -161,7 +167,7 @@ class DataImportController extends AbstractRestfulController<DataImport> {
                     updated.description = "Error importing obo file: ${e}"
                     updated.save(flush: true, failOnError: true)
                 }
-//            }
+            }
 
             redirect url: "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
             return
