@@ -7,6 +7,7 @@ import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.core.util.CatalogueBuilder
 
 class ModelCatalogueCoreGrailsPlugin {
     // the plugin version
@@ -83,6 +84,10 @@ Model catalogue core plugin (metadata registry)
                     new CsvTransformationMarshaller(),
                     new UserMarshaller()
             ]
+        }
+
+        catalogueBuilder(CatalogueBuilder, ref('classificationService')) { bean ->
+            bean.scope = 'prototype'
         }
 
     }

@@ -8,7 +8,7 @@ class ImportService {
     static transactional = true
     def grailsApplication
     def initCatalogueService
-    def classificationService
+    CatalogueBuilder catalogueBuilder
 
     private static final QUOTED_CHARS = [
             "\\": "&#92;",
@@ -60,8 +60,7 @@ class ImportService {
     private fileFunctions = [
             '/CAN_CUH.csv':
                     { tokens ->
-                        CatalogueBuilder builder = new CatalogueBuilder(classificationService)
-                        builder.build {
+                        catalogueBuilder.build {
                             classification(name:"NHIC"){
                                 globalSearchFor dataType
 
@@ -74,7 +73,7 @@ class ImportService {
                                                     model(name:tokens[2]){
                                                         dataElement(name:tokens[3], description:tokens[4]){
                                                             valueDomain(name:tokens[3].replaceAll("\\s", "_")){
-                                                                importDataTypes(builder, tokens[3], [tokens[5]])
+                                                                importDataTypes(catalogueBuilder, tokens[3], [tokens[5]])
                                                             }
                                                             ext "NHIC_Identifier:", tokens[0].take(2000)
                                                             ext "Link_to_existing definition:", tokens[6].take(2000)
