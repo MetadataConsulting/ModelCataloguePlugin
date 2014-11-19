@@ -11,10 +11,10 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
 
     def umljService, initCatalogueService
 
-    @Ignore
+//    @Ignore
     def "test import"() {
         initCatalogueService.initCatalogue()
-        def filenameXsd = "test/integration/resources/CancerCoreDataModel1.0.umlj"
+        def filenameXsd = "test/integration/resources/CLLDataModel0.1.umlj"
         Classification classification = new Classification(name: "GeL Cancer Core").save()
 
         when:

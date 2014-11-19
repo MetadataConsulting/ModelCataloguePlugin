@@ -24,7 +24,7 @@ class UmljService {
         log.info "Parsing Umlj file for ${name}"
         def slurper = new JsonSlurper()
         def result  = slurper.parse(new BufferedReader(new InputStreamReader(is)))
-        def umlFile = new StarUMLFile(result)
+        def umlFile = new StarUMLDiagram(result)
         generateCatalogueElements(umlFile, classification)
     }
 
@@ -126,7 +126,7 @@ class UmljService {
             valueDomain.addToClassifications(classification)
             return valueDomain
         } else if(att.type instanceof String){
-
+            if(att.type=="") att.type="string"
             def dataType = DataType.findByNameIlike(att.type)
             if(!dataType) dataType = new DataType(name: att.type).save()
             def valueDomain = ValueDomain.findByDataType(dataType)
@@ -158,6 +158,9 @@ class UmljService {
             model.addToClassifications(classification)
             model.addToChildOf(topLevelModel)
             println("Outputting model: " + cls.name)
+            if(cls.name=="Patient"){
+                println("test")
+            }
 
             // first output the attributes for this class
             cfa.each {
