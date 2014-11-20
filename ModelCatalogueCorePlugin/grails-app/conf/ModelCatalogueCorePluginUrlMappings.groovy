@@ -72,6 +72,8 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName == 'classification') {
                     "/api/modelCatalogue/core/$controllerName/$id/classifies"(controller: controllerName, action: 'classifies', method: HttpMethod.GET)
+                    // /ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/classification/24/report
+                    "/api/modelCatalogue/core/$controllerName/$id/report"(controller: controllerName, action: 'report', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'measurementUnit') {

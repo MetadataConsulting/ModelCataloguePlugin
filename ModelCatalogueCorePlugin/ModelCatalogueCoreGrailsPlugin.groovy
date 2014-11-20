@@ -256,6 +256,14 @@ Model catalogue core plugin (metadata registry)
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
 
+        reportsRegistry.register {
+            creates link
+            title { "Inventory Report" }
+            type Classification
+            link controller: 'classification', action: 'report', id: true
+        }
+
+
 
     }
 
