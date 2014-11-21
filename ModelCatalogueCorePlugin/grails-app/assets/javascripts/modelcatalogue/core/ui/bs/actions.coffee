@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           for err in response.data.errors
             messages.error err.message
 
-  actionsProvider.registerActionInRole 'create-catalogue-element', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'names', 'security', 'messages', '$state', ($scope, names, security, messages, $state) ->
+  actionsProvider.registerActionInRole 'create-catalogue-element', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.resource
     return undefined if $scope.resource == 'batch'
@@ -43,7 +43,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then ->
           if $scope.resource == 'model' and $state.current.name == 'mc.resource.list'
             $state.go '.', {status: 'draft'}, {reload: true}
-      , ->
+      , (errors)->
+        $log.error errors
         messages.error('You don\'t have rights to create new elements')
     }
   ]
@@ -52,7 +53,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     '$scope', 'names','security', '$state',
     ($scope ,  names , security ,  $state ) ->
       return undefined if not security.hasRole('CURATOR')
-      return undefined if $state.current.name != 'mc.dataArchitect.imports.list'
+      return undefined if $state.current.name != 'mc.resource.list'
+      return undefined if $scope.resource != 'asset'
 
       {
         position: 100

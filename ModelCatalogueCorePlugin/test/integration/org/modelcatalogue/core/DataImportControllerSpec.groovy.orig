@@ -84,6 +84,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     }
 
 
+<<<<<<< HEAD
 
 
     //so we don't load a file
@@ -227,6 +228,8 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
 //        json
 //    }
 
+=======
+>>>>>>> 19e5b8aede5198532858f4e5a6272ff130df956b
     @Override
     File recordResult(String fixtureName, JSONElement json) {
         recorder.recordResult(fixtureName, json)

@@ -15,10 +15,6 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
-                <label for="name" class="">Conceptual Domain</label>
-                <input type="text" class="form-control" id="conceptualDomain" ng-model="copy.conceptualDomain">
-              </div>
-              <div class="form-group">
                 <label for="name" class="">Name</label>
                 <input type="text" class="form-control" id="name" placeholder="Name (leave blank to use filename)" ng-model="copy.name">
               </div>
@@ -28,55 +24,58 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                 <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
               </div>
               <div class="form-group">
-                <label for="dataElementCode">Data Element Code</label>
-                <input type="text" class="form-control" id="dataElementCode" placeholder="Data Item Unique Code" ng-model="headersMap.dataElementCode">
+                      <label ng-click="headersCollapsed = !headersCollapsed" ng-init="headersCollapsed = true">Customize Columns Headers</label>
               </div>
-              <div class="form-group">
-                <label for="dataElementName">Data Element Name</label>
-                <input type="text" class="form-control" id="dataElementName" placeholder="Data Item Name" ng-model="headersMap.dataElementName">
+              <div collapse="headersCollapsed">
+                    <div class="form-group">
+                      <label for="dataElementCode">Data Element Code</label>
+                      <input type="text" class="form-control" id="dataElementCode" placeholder="Data Item Unique Code" ng-model="headersMap.dataElementCode">
+                    </div>
+                    <div class="form-group">
+                      <label for="dataElementName">Data Element Name</label>
+                      <input type="text" class="form-control" id="dataElementName" placeholder="Data Item Name" ng-model="headersMap.dataElementName">
+                    </div>
+                    <div class="form-group">
+                      <label for="dataElementDescription">Data Item Description</label>
+                      <input type="text" class="form-control" id="dataElementDescription" placeholder="Data Item Description" ng-model="headersMap.dataElementDescription">
+                    </div>
+                    <div class="form-group">
+                      <label for="dataType">Data type</label>
+                      <input type="text" class="form-control" id="dataType" placeholder="Data type" ng-model="headersMap.dataType">
+                    </div>
+                    <div class="form-group">
+                      <label for="parentModelName">Parent Model</label>
+                      <input type="text" class="form-control" id="parentModelName" placeholder="Parent Model" ng-model="headersMap.parentModelName">
+                    </div>
+                    <div class="form-group">
+                      <label for="parentModelCode">Parent Model Unique Code</label>
+                      <input type="text" class="form-control" id="parentModelCode" placeholder="Parent Model Unique Code" ng-model="headersMap.parentModelCode">
+                    </div>
+                    <div class="form-group">
+                      <label for="containingModelName">Model</label>
+                      <input type="text" class="form-control" id="containingModelName" placeholder="Model" ng-model="headersMap.containingModelName">
+                    </div>
+                    <div class="form-group">
+                      <label for="containingModelCode">Model Unique Code</label>
+                      <input type="text" class="form-control" id="containingModelCode" placeholder="Model Unique Code" ng-model="headersMap.containingModelCode">
+                    </div>
+                    <div class="form-group">
+                      <label for="measurementUnitName">Measurement Unit</label>
+                      <input type="text" class="form-control" id="measurementUnitName" placeholder="Measurement Unit" ng-model="headersMap.measurementUnitName">
+                    </div>
+                    <div class="form-group">
+                      <label for="measurementSymbol">Measurement Unit Symbol</label>
+                      <input type="text" class="form-control" id="measurementSymbol" placeholder="Measurement Unit Symbol" ng-model="headersMap.measurementSymbol">
+                    </div>
+                    <div class="form-group">
+                      <label for="classification">Classification</label>
+                      <input type="text" class="form-control" id="classificatio  n" placeholder="Classification" ng-model="headersMap.classification">
+                    </div>
+                    <div class="form-group">
+                      <label for="metadata">Metadata</label>
+                      <input type="text" class="form-control" id="metadata" placeholder="Metadata" ng-model="headersMap.metadata">
+                    </div>
               </div>
-              <div class="form-group">
-                <label for="dataElementDescription">Data Item Description</label>
-                <input type="text" class="form-control" id="dataElementDescription" placeholder="Data Item Description" ng-model="headersMap.dataElementDescription">
-              </div>
-              <div class="form-group">
-                <label for="dataType">Data type</label>
-                <input type="text" class="form-control" id="dataType" placeholder="Data type" ng-model="headersMap.dataType">
-              </div>
-              <div class="form-group">
-                <label for="parentModelName">Parent Model</label>
-                <input type="text" class="form-control" id="parentModelName" placeholder="Parent Model" ng-model="headersMap.parentModelName">
-              </div>
-              <div class="form-group">
-                <label for="parentModelCode">Parent Model Unique Code</label>
-                <input type="text" class="form-control" id="parentModelCode" placeholder="Parent Model Unique Code" ng-model="headersMap.parentModelCode">
-              </div>
-              <div class="form-group">
-                <label for="containingModelName">Model</label>
-                <input type="text" class="form-control" id="containingModelName" placeholder="Model" ng-model="headersMap.containingModelName">
-              </div>
-              <div class="form-group">
-                <label for="containingModelCode">Model Unique Code</label>
-                <input type="text" class="form-control" id="containingModelCode" placeholder="Model Unique Code" ng-model="headersMap.containingModelCode">
-              </div>
-              <div class="form-group">
-                <label for="measurementUnitName">Measurement Unit</label>
-                <input type="text" class="form-control" id="measurementUnitName" placeholder="Measurement Unit" ng-model="headersMap.measurementUnitName">
-              </div>
-              <div class="form-group">
-                <label for="measurementSymbol">Measurement Unit Symbol</label>
-                <input type="text" class="form-control" id="measurementSymbol" placeholder="Measurement Unit Symbol" ng-model="headersMap.measurementSymbol">
-              </div>
-              <div class="form-group">
-                <label for="classification">Classification</label>
-                <input type="text" class="form-control" id="classificatio  n" placeholder="Classification" ng-model="headersMap.classification">
-              </div>
-              <div class="form-group">
-                <label for="metadata">Metadata</label>
-                <input type="text" class="form-control" id="metadata" placeholder="Metadata" ng-model="headersMap.metadata">
-              </div>
-
-
             </form>
         </div>
         <div class="modal-footer">

@@ -90,11 +90,11 @@ grails.hibernate.cache.queries = false
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = " http://localhost:8080/ModelCatalogueCorePluginTestApp"
+        grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     local {
         grails.logging.jul.usebridge = true
-        grails.serverURL = " http://localhost:8080/ModelCatalogueCorePluginTestApp"
+        grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     test {
         grails.plugin.console.enabled = true

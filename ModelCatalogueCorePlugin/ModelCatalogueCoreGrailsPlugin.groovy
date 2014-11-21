@@ -7,6 +7,7 @@ import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.core.util.CatalogueBuilder
 
 class ModelCatalogueCoreGrailsPlugin {
     // the plugin version
@@ -74,15 +75,20 @@ Model catalogue core plugin (metadata registry)
                     new ValueDomainMarshaller(),
                     new MappingMarshallers(),
                     new MappingsMarshaller(),
-                    new ImportRowMarshaller(),
-                    new ImportRowsMarshaller(),
-                    new DataImportMarshaller(),
                     new ListWithTotalAndTypeWrapperMarshaller(),
                     new BatchMarshaller(),
                     new ActionMarshaller(),
                     new CsvTransformationMarshaller(),
                     new UserMarshaller()
             ]
+        }
+
+        if (Environment.current == Environment.DEVELOPMENT) {
+            springConfig.addAlias('modelCatalogueStorageService','localFilesStorageService')
+        }
+
+        catalogueBuilder(CatalogueBuilder, ref('classificationService')) { bean ->
+            bean.scope = 'prototype'
         }
 
     }
@@ -249,6 +255,14 @@ Model catalogue core plugin (metadata registry)
             type Model
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
+
+        reportsRegistry.register {
+            creates link
+            title { "Inventory Report" }
+            type Classification
+            link controller: 'classification', action: 'report', id: true
+        }
+
 
 
     }

@@ -131,4 +131,8 @@ class EnumeratedType extends DataType {
         ret
     }
 
+    String prettyPrint() {
+        enumerations.collect { key, value -> "$key: $value" }.join('\n')
+    }
+
 }

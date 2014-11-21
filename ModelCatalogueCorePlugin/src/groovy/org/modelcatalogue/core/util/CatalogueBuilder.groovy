@@ -120,7 +120,7 @@ class CatalogueBuilder {
     }
 
     MeasurementUnit measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        MeasurementUnit unit = findOrPrepareInstance MeasurementUnit, checkAndPrepareParameters(MeasurementUnit, parameters)
+        MeasurementUnit unit = findOrPrepareInstance MeasurementUnit, checkAndPrepareParameters(MeasurementUnit, parameters), true
 
         withNewContext unit, c
         classifyIfNeeded unit
@@ -136,14 +136,14 @@ class CatalogueBuilder {
     void child(String classification, String name) {
         withContextElement(Model) {
             saveIfNeeded it
-            it.addToParentOf tryFind(Model, classification, name)
+            it.addToParentOf tryFind(Model, classification, name, null)
         }
     }
 
     void child(String name) {
         withContextElement(Model) {
             saveIfNeeded it
-            it.addToParentOf tryFind(Model, name)
+            it.addToParentOf tryFind(Model, name, null)
         }
     }
 
@@ -157,14 +157,14 @@ class CatalogueBuilder {
     void contains(String classification, String name) {
         withContextElement(Model) {
             saveIfNeeded it
-            it.addToContains tryFind(DataElement, classification, name)
+            it.addToContains tryFind(DataElement, classification, name, null)
         }
     }
 
     void contains(String name) {
         withContextElement(Model) {
             saveIfNeeded it
-            it.addToContains tryFind(DataElement, name)
+            it.addToContains tryFind(DataElement, name, null)
         }
     }
 
@@ -178,14 +178,14 @@ class CatalogueBuilder {
     void basedOn(String classification, String name) {
         withContextElement(CatalogueElement) {
             saveIfNeeded it
-            it.addToBasedOn tryFind(it.class, classification, name)
+            it.addToBasedOn tryFind(it.class, classification, name, null)
         }
     }
 
     void basedOn(String name) {
         withContextElement(CatalogueElement) {
             saveIfNeeded it
-            it.addToBasedOn tryFind(it.class, name)
+            it.addToBasedOn tryFind(it.class, name, null)
         }
     }
 
@@ -198,7 +198,15 @@ class CatalogueBuilder {
 
     void description(String description) { setStringValue('description', description) }
     void rule(String rule) { setStringValue('rule', rule) }
-    void id(String rule) { setStringValue('modelCatalogueId', rule) }
+
+    /**
+     * Sets the id of the current element.
+     *
+     * This id is not used for queries. If you want to query by model catalogue id, send it as parameter in
+     * the domain call such as model(id: 'http://www.example.com/foo').
+     * @param id
+     */
+    void id(String id) { setStringValue('modelCatalogueId', id) }
 
     void status(ElementStatus status) {
         withContextElement(CatalogueElement) {
@@ -327,10 +335,10 @@ class CatalogueBuilder {
 
         if (element.dirty) {
             log.info "Persisting changes ${element.dirtyPropertyNames} of $element"
-            return element.save(failOnError: true) as T
+            return element.save(failOnError: true, flush: true) as T
         } else if (!element.attached) {
             log.info "Persisting $element"
-            return element.save(failOnError: true) as T
+            return element.save(failOnError: true, flush: true) as T
         }
 
         return element
@@ -338,23 +346,29 @@ class CatalogueBuilder {
 
 
 
-    private <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name) {
-        Classification classification = tryFindUnclassified(Classification, classificationName)
+    private <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
+        Classification classification = tryFindUnclassified(Classification, classificationName, id)
         if (!classification) {
             throw new IllegalArgumentException("Requested classification ${classificationName} is not present in the catalogue!")
         }
-        tryFindWithClassification(type, classification, name)
+        tryFindWithClassification(type, classification, name, id)
     }
 
-    private <T extends CatalogueElement> T tryFind(Class<T> type, Object name) {
-        tryFindWithClassification(type, saveIfNeeded(getContextElement(Classification)), name)
+    private <T extends CatalogueElement> T tryFind(Class<T> type, Object name, Object id) {
+        tryFindWithClassification(type, saveIfNeeded(getContextElement(Classification)), name, id)
     }
 
-    private <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name) {
-        tryFindWithClassification(type, null, name)
+    private <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name, Object id) {
+        tryFindWithClassification(type, null, name, id)
     }
 
-    private <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, Classification classification, Object name) {
+    private <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, Classification classification, Object name, Object id) {
+        if (id) {
+            DetachedCriteria<T> criteria = new DetachedCriteria<T>(type).build {
+                eq 'modelCatalogueId', id.toString()
+            }
+            return getLatestFromCriteria(criteria)
+        }
         if (!name) {
             return null
         }
@@ -432,11 +446,14 @@ class CatalogueBuilder {
             }
         }
         assert parameters.name : "You must provide the name of the ${GrailsNameUtils.getNaturalName(type.simpleName)}"
+
+        parameters.modelCatalogueId = parameters.id
+
         parameters
     }
 
     private <T extends CatalogueElement> T findOrPrepareInstance(Class<T> type, Map<String, Object> parameters, boolean unclassified = false) {
-        T element = unclassified ? tryFindUnclassified(type, parameters.name) : tryFind(type, parameters.name)
+        T element = unclassified ? tryFindUnclassified(type, parameters.name, parameters.id) : tryFind(type, parameters.name, parameters.id)
 
         if (!element) {
             log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} does not exist yet, creating new one"
@@ -451,3 +468,5 @@ class CatalogueBuilder {
     }
 
 }
+
+

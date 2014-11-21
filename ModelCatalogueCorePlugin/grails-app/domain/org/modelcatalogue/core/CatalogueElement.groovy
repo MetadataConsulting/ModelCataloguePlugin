@@ -241,9 +241,9 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         }
         String resourceName = fixResourceName GrailsNameUtils.getPropertyName(getClass())
         if (withoutVersion) {
-            return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${latestVersionId ?: id}")
+            return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}")
         }
-        return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${latestVersionId ?: id}.${versionNumber}")
+        return grailsLinkGenerator.link(absolute: true, uri: "/catalogue/${resourceName}/${getLatestVersionId() ?: getId()}.${getVersionNumber()}")
     }
 
     /**

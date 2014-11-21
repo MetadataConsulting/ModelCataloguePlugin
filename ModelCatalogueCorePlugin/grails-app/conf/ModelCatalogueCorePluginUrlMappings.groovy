@@ -72,6 +72,8 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName == 'classification') {
                     "/api/modelCatalogue/core/$controllerName/$id/classifies"(controller: controllerName, action: 'classifies', method: HttpMethod.GET)
+                    // /ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/classification/24/report
+                    "/api/modelCatalogue/core/$controllerName/$id/report"(controller: controllerName, action: 'report', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'measurementUnit') {
@@ -115,17 +117,7 @@ class ModelCatalogueCorePluginUrlMappings {
             "/findRelationsByMetadataKeys/$key?" (controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)
             "/elementsFromCSV" (controller: "dataArchitect", action: "elementsFromCSV", method: HttpMethod.POST)
             "/generateSuggestions" (controller: "dataArchitect", action: "generateSuggestions", method: HttpMethod.POST)
-
             "/imports/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
-            "/imports" (controller: "dataImport", action: 'index', method: HttpMethod.GET)
-            "/imports/$id" (controller: "dataImport", action: 'show', method: HttpMethod.GET)
-            "/imports/$id/pendingAction" (controller: "dataImport", action: 'pendingAction', method: HttpMethod.GET)
-            "/imports/$id/pendingAction/$rowId/resolveAllRowActions" (controller: "dataImport", action: 'resolveAllRowActions', method: HttpMethod.POST)
-            "/imports/$id/importQueue/$rowId/ingestRow" (controller: "dataImport", action: 'ingestRow', method: HttpMethod.POST)
-            "/imports/$id/importQueue" (controller: "dataImport", action: 'importQueue', method: HttpMethod.GET)
-            "/imports/$id/imported" (controller: "dataImport", action: 'imported', method: HttpMethod.GET)
-            "/imports/$id/resolveAll" (controller: "dataImport", action: 'resolveAll', method: HttpMethod.POST)
-            "/imports/$id/ingestQueue" (controller: "dataImport", action: 'ingestQueue', method: HttpMethod.POST)
         }
 
         "/"(view:"index")

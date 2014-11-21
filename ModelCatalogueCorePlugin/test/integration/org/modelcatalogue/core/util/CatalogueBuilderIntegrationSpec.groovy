@@ -59,6 +59,22 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         created.first() == c
     }
 
+    def "reuse existing classification by id"() {
+        Classification c = new Classification(name: 'SchemaWithId', modelCatalogueId: 'http://www.example.com/SWI').save(failOnError: true)
+
+        build {
+            classification(name: 'NotUniqueName', id: 'http://www.example.com/SWI') {
+                description '''
+                    This is a test schema which is just for test purposes!
+                '''
+            }
+        }
+
+        expect:
+        created.first() == c
+        created.first().name == 'NotUniqueName'
+    }
+
     def "complain if classification name is missing"() {
         when:
         build {

@@ -4,7 +4,6 @@ import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
-import org.modelcatalogue.core.dataarchitect.DataImport
 import org.modelcatalogue.core.util.Lists
 
 class DashboardController {
@@ -38,8 +37,7 @@ class DashboardController {
                 dataTypeCount: countWithClassificationAndStatus(DataType, ElementStatus.FINALIZED),
                 valueDomainCount:countWithClassification(ValueDomain),
                 incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
-                transformationsCount:CsvTransformation.count(),
-                importCount:DataImport.count(),
+                transformationsCount:CsvTransformation.count()
                 ]
         respond model
     }
