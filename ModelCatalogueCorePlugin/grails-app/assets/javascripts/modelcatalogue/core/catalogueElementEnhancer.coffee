@@ -41,7 +41,10 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
           self.refresh        = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{self.link}"
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
-          self.update         = () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload()
+          self.update         = () ->
+            enhance(rest(method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload())).then (result)->
+            $rootScope.$broadcast 'catalogueElementUpdated', result
+            result
           self.show           = () ->
             if self.isInstanceOf "batch"
               $state.go('mc.actions.show', {id: self.id}); self

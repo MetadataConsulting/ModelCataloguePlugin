@@ -70,15 +70,10 @@ class DataElementWizardSpec extends GebReportingSpec  {
 
         waitFor {
             $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)', text: "NewDE1").displayed
-            //newDataElement.text()== "NewDE1"
         }
         then: 'Click the element'
 
         $('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3) a').click()
-
-        //waitFor {
-        //    newDataElementTitle.test() == "NewDE1"
-        //}
 
         waitFor(60) {
             pageTitle.displayed
@@ -86,6 +81,29 @@ class DataElementWizardSpec extends GebReportingSpec  {
 
         pageTitle.text().trim()     == 'NewDE1 DRAFT'
 
+    }
+
+    def "Edit the value domain"() {
+        at DataViewPage
+
+        when: "edit action is clicked"
+        $('#role_item_edit-catalogue-elementBtn').click()
+
+        then: "edit dialog is shown"
+        waitFor {
+            dataWizard.displayed
+        }
+
+        when: "new value domain is changed"
+        valueDomain = "VD4Dent2"
+
+        and: 'save button clicked'
+        saveButton.click()
+
+        then: 'the data element is saved and and different value domain is shown'
+        waitFor {
+            $('td', 'data-value-for': "Value Domain").text().contains('VD4Dent2')
+        }
     }
 
 
