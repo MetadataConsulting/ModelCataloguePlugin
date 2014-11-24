@@ -13,21 +13,6 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
     }
-
-    def cleanup() {
-        created.each {
-            if (!it.readyForQueries) {
-                it.attach()
-                return
-            }
-            [it.outgoingRelations, it.incomingRelations, it.outgoingMappings, it.incomingMappings].each { col ->
-                col?.each { rel ->
-                    rel.delete()
-                }
-            }
-            it.delete()
-        }
-    }
     
     def "creates new classification with given name, namespace and description"() {
         build {
@@ -113,6 +98,34 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         expect:
         created.first() == unit
+    }
+
+    def "creates only one measurement unit as measurement unit name is unique"() {
+        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit2', status: ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
+
+        build {
+            classification(name: "TestClassificationA") {
+                measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
+                    description '''
+                        This is a test unit which is just for test purposes!
+                    '''
+                }
+            }
+            classification(name: "TestClassificationB") {
+                measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
+                    description '''
+                        This is a test unit which is just for test purposes!
+                    '''
+                }
+            }
+        }
+
+        expect:
+        created.find { it instanceof  MeasurementUnit} == unit
+        created.size() == 3
+        created.any { it.name == 'TestClassificationA'}
+        created.any { it.name == 'TestClassificationB'}
+        created.any { it.name == 'ExistingUnit2'}
     }
 
     def "complain if measurement unit name is missing"() {
