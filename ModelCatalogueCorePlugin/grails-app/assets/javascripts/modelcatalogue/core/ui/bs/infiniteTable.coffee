@@ -7,7 +7,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
           <thead>
             <tr class="inf-table-header-row">
               <th class="inf-table-header-cell" ng-repeat="column in columns" ng-class="evaluateClasses(column.classes)">
-                <a title="Show row actions" ng-if="$first" ng-click="triggerHeaderExpanded()" class="btn btn-default inf-cell-expand"><span class="fa fa-fw" ng-class="{'fa-minus-square-o': $$headerExpanded, 'fa-plus-square-o': !$$headerExpanded}"></span></a>
+                <a title="Show row actions" ng-if="$first" ng-click="triggerHeaderExpanded()" class="inf-cell-expand"><span class="fa fa-fw" ng-class="{'fa-minus-square-o': $$headerExpanded, 'fa-plus-square-o': !$$headerExpanded}"></span></a>
                 <span ng-if="!column.sort">{{column.header}}<span ng-if="!$$headerExpanded &amp;&amp; filters[column.header]" class="text-info" ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span></span>
                 <span ng-if=" column.sort"><a class="inf-table-header-sortable" ng-click="sortBy(column)" >
                   <span class="glyphicon" ng-class="getSortClass(column)"></span>
@@ -39,7 +39,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
           <tbody ng-if="rows">
              <tr class="inf-table-item-row" ng-repeat-start="row in rows"  ng-class="row.classesForStatus" ng-if="isNotFiltered(row)">
                 <td class="inf-table-item-cell" ng-class="row.head.classes" ng-switch="row.head.type">
-                  <a title="Show row actions" ng-click="row.$$expanded = !row.$$expanded" class="btn btn-default inf-cell-expand"><span class="fa fa-fw" ng-class="{'fa-minus-square-o ': row.$$expanded, 'fa-plus-square-o ': !row.$$expanded}"></span></a>
+                  <a title="Show row actions" ng-click="row.$$expanded = !row.$$expanded" class="inf-cell-expand"><span class="fa fa-fw" ng-class="{'fa-minus-square-o ': row.$$expanded, 'fa-plus-square-o ': !row.$$expanded}"></span></a>
                   <a     ng-switch-when="link" ng-href="{{row.head.href}}" class="preserve-new-lines">{{row.head.value}}</a>
                   <span ng-switch-when="html" ><span ng-bind-html="row.head.value" class="preserve-new-lines"></span></span>
                   <span ng-switch-when="plain"><span class="preserve-new-lines">{{row.head.value}}</span></span>
