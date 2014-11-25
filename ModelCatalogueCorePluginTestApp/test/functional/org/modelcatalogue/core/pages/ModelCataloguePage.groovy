@@ -27,9 +27,11 @@ abstract class ModelCataloguePage extends Page {
     }
 
 
-    def loginAdmin() { loginUser("admin", "A6m1n2014") }
-    def loginViewer() { loginUser("viewer", "v13w3r") }
-    def loginCurator() { loginUser("curator", "c2r4t0r") }
+    // keep the passwords simply stupid, they are only for dev/test or very first setup
+    // sauce labs connector for some reason fails with the six in the input
+    def loginAdmin() { loginUser("admin", "admin") }
+    def loginViewer() { loginUser("viewer", "viewer") }
+    def loginCurator() { loginUser("curator", "creator") }
 
     def loginUser(String user, String pwd) {
         if (!showLoginButton.displayed) {
