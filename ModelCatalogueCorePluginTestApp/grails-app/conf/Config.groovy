@@ -195,8 +195,7 @@ grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.secu
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
-
-grails.assets.excludes =  [
+grails.assets.excludes = [
         "bootstrap/**/*.*",
         "bootstrap/**/*.*",
         "font-awesome/**/*.*",
@@ -234,7 +233,8 @@ grails.assets.excludes =  [
 grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "bootstrap/**/*.*",
         "bootstrap/**/*.*",
-        "font-awesome/**/*.*",
+        "font-awesome/less/*.*",
+        "font-awesome/scss/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
         "angular-animate/**/*.*",
@@ -265,6 +265,39 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "**/python2/*.*",
         "**/python3/*.*",
 ]
+
+environments {
+    test {
+        grails.assets.plugin."model-catalogue-core-plugin".includes = [
+                "bootstrap/dist/css/bootstrap.css",
+                "modelcatalogue.css",
+                "jquery/dist/jquery.js",
+                "bootstrap/dist/js/bootstrap.js",
+                "angular/angular.js",
+                "angular-animate/angular-animate.js",
+                "angular-bootstrap/ui-bootstrap-tpls.js",
+                "angular-cookies/angular-cookies.js",
+                "angular-sanitize/angular-sanitize.js",
+                "angular-animate/angular-animate.js",
+                "modelcatalogue.js",
+        ]
+
+
+        grails.assets.includes = [
+                "bootstrap/dist/css/bootstrap.css",
+                "modelcatalogue.css",
+                "jquery/dist/jquery.js",
+                "bootstrap/dist/js/bootstrap.js",
+                "angular/angular.js",
+                "angular-animate/angular-animate.js",
+                "angular-bootstrap/ui-bootstrap-tpls.js",
+                "angular-cookies/angular-cookies.js",
+                "angular-sanitize/angular-sanitize.js",
+                "angular-animate/angular-animate.js",
+                "modelcatalogue.js",
+        ]
+    }
+}
 
 grails.assets.minifyOptions = [
         strictSemicolons: false,
