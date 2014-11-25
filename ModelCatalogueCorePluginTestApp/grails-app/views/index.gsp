@@ -4,6 +4,26 @@
 <head>
 
     <title>Model Catalogue Demo App</title>
+    <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
+        <script type="text/javascript">
+            window.pendingErrorsPres = [];
+            window.onerror = function(errorMsg, url, lineNumber) {
+                var message = document.createElement('div');
+                message.innerHTML = errorMsg + ' at ' + url + ' at ' + lineNumber;
+                message.className = 'pre-js-error well';
+                if (document.body) {
+                    document.getElementById('jserrors').appendChild(message);
+                } else {
+                    window.pendingErrorsPres.push(message);
+                    window.onload = function() {
+                        for(var i = 0; i < window.pendingErrorsPres.length ; i++) {
+                            document.getElementById('jserrors').appendChild(window.pendingErrorsPres[i]);
+                        }
+                    }
+                }
+            }
+        </script>
+    </g:if>
     <g:if test="${Environment.current in [Environment.PRODUCTION, Environment.TEST, Environment.CUSTOM]}">
         <!-- CDNs -->
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
@@ -11,7 +31,7 @@
 
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
-        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular.min.js"></script>
+        %{--<script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular.min.js"></script>--}%
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap-tpls.min.js"></script>
 
         <!-- i18n 1.3.0 not present but hopefuly it's the same -->
@@ -32,7 +52,7 @@
 
         <asset:javascript src="jquery/dist/jquery.js"/>
         <asset:javascript src="bootstrap/dist/js/bootstrap.js"/>
-        <asset:javascript src="angular/angular.js"/>
+        %{--<asset:javascript src="angular/angular.js"/>--}%
         <asset:javascript src="angular-animate/angular-animate.js"/>
         <asset:javascript src="angular-bootstrap/ui-bootstrap-tpls.js"/>
         <asset:javascript src="angular-cookies/angular-cookies.js"/>
@@ -103,6 +123,9 @@
     <div class="container container-main">
         <div class="row">
             <div class="col-md-12">
+                <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
+                    <div id="jserrors"></div>
+                </g:if>
                 <ui-view></ui-view>
             </div>
         </div>
