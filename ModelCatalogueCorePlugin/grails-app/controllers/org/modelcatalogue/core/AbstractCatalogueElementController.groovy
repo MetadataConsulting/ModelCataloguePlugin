@@ -106,7 +106,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             response.status = HttpServletResponse.SC_NO_CONTENT
             render "DELETED"
-            return
         }
     }
 
@@ -538,4 +537,19 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         fields
     }
 
+    @Override
+    protected clearAssociationsBeforeDelete(T instance) {
+        // it is safe to remove all classifications
+        for (Classification c in instance.classifications) {
+            instance.removeFromClassifications(c)
+        }
+
+        // it is safe to remove all versioning informations
+        for (CatalogueElement e in instance.supersededBy) {
+            instance.removeFromSupersededBy(e)
+        }
+        for (CatalogueElement e in instance.supersedes) {
+            instance.removeFromSupersedes(e)
+        }
+    }
 }

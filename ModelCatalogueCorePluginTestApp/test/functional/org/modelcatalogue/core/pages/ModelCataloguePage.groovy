@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.pages
 
 import geb.Page
+import geb.navigator.Navigator
 
 abstract class ModelCataloguePage extends Page {
 
@@ -8,6 +9,7 @@ abstract class ModelCataloguePage extends Page {
 
         viewTitle           { $("h2") }
         subviewTitle        { $("h3:not(.ng-hide)") }
+        subviewStatus       { $("h3 small span.label") }
 
         showLoginButton     { $(".navbar-form i.glyphicon.glyphicon-log-in") }
         showLogoutButton    { $(".navbar-form i.glyphicon.glyphicon-log-out") }
@@ -18,6 +20,9 @@ abstract class ModelCataloguePage extends Page {
         username            { loginDialog.find("#username") }
         password            { loginDialog.find("#password") }
         loginButton         { loginDialog.find("button.btn-success") }
+
+        confirmDialog       { $('.modal.messages-modal-confirm') }
+        confirmOk           { $('.modal.messages-modal-confirm .btn-primary') }
 
     }
 
@@ -42,6 +47,25 @@ abstract class ModelCataloguePage extends Page {
         loginButton.click()
     }
 
+    /**
+     * Selects the first item from catalogue element picker if any element is found.
+     * returns true if the element was selected, false otherwise
+     */
+    boolean selectCepItemIfExists() {
+        try {
+            waitFor(3) {
+                $('.cep-item').displayed
+            }
+            $('.cep-item').click()
+            return true
+        } catch (ignored) {
+            return false
+        }
 
+    }
+
+    Navigator actionButton(String id, String role = "item") {
+        $('#role_' + role + '_' + id + 'Btn')
+    }
 
 }

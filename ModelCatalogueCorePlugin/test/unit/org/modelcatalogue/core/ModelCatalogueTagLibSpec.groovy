@@ -9,7 +9,8 @@ import org.modelcatalogue.core.util.RelationshipDirection
 import spock.lang.Specification
 import spock.util.mop.ConfineMetaClassChanges
 
-@TestFor(ModelCatalogueTagLib)
+// TODO: commit the tag library to the git
+//@TestFor(ModelCatalogueTagLib)
 @Mock([RelationshipType, Relationship, Model])
 @ConfineMetaClassChanges(Model)
 class ModelCatalogueTagLibSpec extends Specification {

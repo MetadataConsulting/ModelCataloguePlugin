@@ -32,7 +32,7 @@ class DataViewPage extends ModelCataloguePage {
 
         newDataElement       {$('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)')}
 
-        newDataElementTitle      { $('#ce-name ng-binding')}
+        newDataElementTitle      { $('#ce-name')}
         pageTitle             { $("h3") }
 
 

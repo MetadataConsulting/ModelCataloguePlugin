@@ -359,13 +359,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           .catch showErrorsUsingMessages(messages)
     }
 
-    updateAction = ->
-      action.disabled = $scope.element.archived
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-    $rootScope.$on 'newVersionCreated', updateAction
-
     action
   ]
 
