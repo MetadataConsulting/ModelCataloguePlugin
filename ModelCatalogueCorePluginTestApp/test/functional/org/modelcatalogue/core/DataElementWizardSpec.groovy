@@ -106,5 +106,29 @@ class DataElementWizardSpec extends GebReportingSpec  {
         }
     }
 
+    def "Remove the value domain"() {
+        at DataViewPage
+
+        when: "edit action is clicked"
+        $('#role_item_edit-catalogue-elementBtn').click()
+
+        then: "edit dialog is shown"
+        waitFor {
+            dataWizard.displayed
+        }
+
+        when: "new value domain is changed"
+        valueDomain = ""
+
+        and: 'save button clicked'
+        saveButton.click()
+
+        then: 'the data element is saved and and different value domain is shown'
+        waitFor {
+            $('td', 'data-value-for': "Value Domain").text().trim() == ''
+        }
+    }
+
+
 
 }
