@@ -27,7 +27,7 @@ abstract class ModelCataloguePage extends Page {
     }
 
 
-    def loginAdmin() { loginUser("admin", "A!6m1n2014") }
+    def loginAdmin() { loginUser("admin", "A6m1n2014") }
     def loginViewer() { loginUser("viewer", "v13w3r") }
     def loginCurator() { loginUser("curator", "c2r4t0r") }
 
