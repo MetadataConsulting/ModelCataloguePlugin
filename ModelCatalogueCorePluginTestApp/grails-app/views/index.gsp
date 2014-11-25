@@ -100,7 +100,7 @@
         </div>
     </div>
 
-    <div class="container">
+    <div class="container container-main">
         <div class="row">
             <div class="col-md-12">
                 <ui-view></ui-view>
