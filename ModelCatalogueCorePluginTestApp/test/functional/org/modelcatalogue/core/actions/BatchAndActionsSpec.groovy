@@ -1,11 +1,13 @@
 package org.modelcatalogue.core.actions
 
+import geb.spock.GebReportingSpec
 import geb.spock.GebSpec
+import geb.waiting.WaitTimeoutException
 import org.modelcatalogue.core.pages.BatchActionsPage
 import org.modelcatalogue.core.pages.BatchListPage
 import org.modelcatalogue.core.pages.ModalTreeViewPage
 
-class BatchAndActionsSpec extends GebSpec {
+class BatchAndActionsSpec extends GebReportingSpec {
 
 
     def "execute few actions"() {
@@ -74,8 +76,21 @@ class BatchAndActionsSpec extends GebSpec {
         pendingActions[0].find('.glyphicon-play').click()
 
         then:
-        waitFor {
-            performedActions.size() == 1
+        actionsPerformed
+    }
+
+    protected boolean isActionsPerformed() {
+        try {
+            waitFor (5) {
+                performedActions.size() == 1
+            }
+            return true
+        } catch (WaitTimeoutException ignored) {
+            actionButton('reload-actions').click()
+            waitFor (5) {
+                performedActions.size() == 1
+            }
+            return true
         }
     }
 

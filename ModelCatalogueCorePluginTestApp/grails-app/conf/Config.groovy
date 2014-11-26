@@ -196,9 +196,12 @@ grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.tes
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
 grails.assets.excludes = [
-        "bootstrap/**/*.*",
-        "bootstrap/**/*.*",
-        "font-awesome/**/*.*",
+        "bootstrap/fonts/*.*",
+        "bootstrap/grunt/*.*",
+        "bootstrap/js/*.*",
+        "bootstrap/less/*.*",
+        "font-awesome/less/*.*",
+        "font-awesome/scss/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
         "angular-animate/**/*.*",
@@ -231,8 +234,10 @@ grails.assets.excludes = [
 ]
 
 grails.assets.plugin."model-catalogue-core-plugin".excludes = [
-        "bootstrap/**/*.*",
-        "bootstrap/**/*.*",
+        "bootstrap/fonts/*.*",
+        "bootstrap/grunt/*.*",
+        "bootstrap/js/*.*",
+        "bootstrap/less/*.*",
         "font-awesome/less/*.*",
         "font-awesome/scss/*.*",
         "jquery/**/*.*",
@@ -269,7 +274,6 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = [
 environments {
     test {
         grails.assets.plugin."model-catalogue-core-plugin".includes = [
-                "bootstrap/dist/css/bootstrap.css",
                 "modelcatalogue.css",
                 "jquery/dist/jquery.js",
                 "bootstrap/dist/js/bootstrap.js",
@@ -284,7 +288,6 @@ environments {
 
 
         grails.assets.includes = [
-                "bootstrap/dist/css/bootstrap.css",
                 "modelcatalogue.css",
                 "jquery/dist/jquery.js",
                 "bootstrap/dist/js/bootstrap.js",
