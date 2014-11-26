@@ -12,7 +12,7 @@ angular.module('mc.util.ui.bs.actionButtonDropdown', ['mc.util.ui.actionButtonDr
 
           <ul id="{{action.id}}BtnItems" class="dropdown-menu" role="menu">
             <li ng-repeat="childAction in action.children track by $index" ng-class="{'dropdown-header': childAction.heading, 'active': childAction.active}">
-              <a ng-hide="childAction.heading" ng-click="childAction.run()" ng-class="{'disabled': childAction.disabled}"><span ng-show="childAction.icon" ng-class="childAction.icon"></span></span> {{childAction.label}}</a>
+              <a ng-hide="childAction.heading" ng-click="childAction.run()" ng-class="{'disabled': childAction.disabled}"><span ng-show="childAction.icon" ng-class="childAction.icon"></span></span><span> {{childAction.label}}</span></a>
               <span ng-show="childAction.heading">{{childAction.label}}</span>
             </li>
           </ul>
