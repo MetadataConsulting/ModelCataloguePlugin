@@ -33,15 +33,17 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   z-index: 1001;
   background-color: rgba(255, 255, 255, 0.7);
 
-  &:hover {
-    position: absolute;
-    min-width: 120%;
+  @media (min-width:768px) {
+    &:hover {
+      position: absolute;
+      min-width: 120%;
 
-    .catalogue-element-treeview-labels {
-      overflow-x: visible;
-      text-overflow:clip;
-      padding-right: 35px;
-     }
+      .catalogue-element-treeview-labels {
+        overflow-x: visible;
+        text-overflow:clip;
+        padding-right: 35px;
+      }
+    }
   }
   
 }
@@ -224,12 +226,6 @@ blockquote, .dl-table-item-cell, .pp-table-property-value {
   padding-bottom: 10px;
 }
 
-.create-model-wizard {
-  .modal-dialog {
-    width: 800px;
-  }
-}
-
 .tutorial-steps {
   float: left;
   width: 100%;
@@ -346,8 +342,10 @@ a div.panel-footer, .with-pointer {
   input {
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
-    &:hover, &:active, &:focus, &.expanded {
-      width: 400px;
+    @media (min-width:768px) {
+      &:hover, &:active, &:focus, &.expanded {
+        width: 400px;
+      }
     }
   }
 
@@ -425,44 +423,6 @@ a div.panel-footer, .with-pointer {
 
 .pp-table {
   background-color: transparent!important;
-}
-
-
-.shopping-cart {
-
-  z-index: 1000;
-
-  position: fixed;
-  width: 3.5em;
-  height: 3.5em;
-  background-color: #f5f5f5;
-  right: 0px;
-  top: 100px;
-
-  -webkit-border-top-left-radius: 1em;
-  -moz-border-top-left-radius: 1em;
-  border-top-left-radius: 1em;
-
-  -webkit-border-bottom-left-radius: 1em;
-  -moz-border-bottom-left-radius: 1em;
-  border-bottom-left-radius: 1em;
-
-  border: 1px solid #dddddd;
-
-  .fa-shopping-cart {
-    font-size: 2em;
-    padding: 0.35em;
-  }
-
-  &:hover, &.drop  {
-    width: 10em;
-    height: 10em;
-
-    .fa-shopping-cart {
-      font-size: 8em;
-      padding: 0.1em;
-    }
-  }
 }
 
 .ins, ins {

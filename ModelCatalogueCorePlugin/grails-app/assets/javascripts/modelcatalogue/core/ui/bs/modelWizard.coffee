@@ -8,6 +8,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
         windowClass: 'create-model-wizard'
         backdrop: 'static'
         keyboard: false
+        size: 'lg'
         resolve:
           args: -> args
           classificationInUse: ['$stateParams', 'catalogueElementResource',  ($stateParams, catalogueElementResource)->
