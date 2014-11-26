@@ -70,4 +70,13 @@ abstract class ModelCataloguePage extends Page {
         $('#role_' + role + '_' + id + 'Btn')
     }
 
+    /**
+     * @param row number of row starting 1
+     * @param column number of column starting 1
+     * @return given cell
+     */
+    Navigator infTableCell(Map attrs = [:], int row, int column) {
+        $(attrs, 'div.inf-table-body tbody tr:nth-child(' + row +') td:nth-child(' + column + ')')
+    }
+
 }

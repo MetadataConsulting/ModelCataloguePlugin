@@ -5,10 +5,10 @@ package org.modelcatalogue.core.pages
  */
 class ValueDomainPage extends ModelCataloguePage {
 
-    static url = "#/catalogue/batch/all"
+    static url = "#/catalogue/valueDomain/all"
 
     static at = {
-        url == "#/catalogue/batch/all"
+        url == "#/catalogue/valueDomain/all"
     }
     static content = {
 
@@ -16,12 +16,21 @@ class ValueDomainPage extends ModelCataloguePage {
 
         basicEditDialog     { $('div.basic-edit-modal-prompt') }
 
-        name                { basicEditDialog.find('input[id=name]') }
-        description         { basicEditDialog.find('textarea[id=description]') }
+        classification      { basicEditDialog.find('#classification') }
+        name                { basicEditDialog.find('#name') }
+        modelCatalogueId    { basicEditDialog.find('#modelCatalogueId') }
+        description         { basicEditDialog.find('#description') }
+        dataType            { basicEditDialog.find('#dataType') }
+        unitOfMeasure       { basicEditDialog.find('#unitOfMeasure') }
+        rule                { basicEditDialog.find('#rule') }
+
+        expandRuleButton    { basicEditDialog.find('.glyphicon-collapse-down') }
+
+
+
         saveButton          { basicEditDialog.find("button.btn-success") }
 
-        batchList           { $('table.dl-table') }
-        linkToTestBatch     { $('td.inf-table-item-cell a', text: 'Test Batch') }
+        newValueDomain      {$('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)')}
 
     }
 }
