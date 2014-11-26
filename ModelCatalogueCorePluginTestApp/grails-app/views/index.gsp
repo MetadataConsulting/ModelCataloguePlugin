@@ -11,6 +11,8 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+    <asset:javascript src="ng-file-upload-shim/angular-file-upload-shim.min.js"/>
+
     <title>Model Catalogue Demo App</title>
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
         <script type="text/javascript">
