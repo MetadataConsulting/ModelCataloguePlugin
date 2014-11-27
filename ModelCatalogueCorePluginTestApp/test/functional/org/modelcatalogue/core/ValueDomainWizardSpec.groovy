@@ -55,7 +55,7 @@
 
             expandRuleButton.click()
 
-            rule                = "x ==~ /\\d+(\\.\\d+)?/"
+            rule                = "is number"
 
             and: 'save button clicked'
             actionButton('modal-save-element', 'modal').click()
