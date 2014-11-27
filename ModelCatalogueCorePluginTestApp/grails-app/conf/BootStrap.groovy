@@ -66,20 +66,25 @@ class BootStrap {
                 '/**/img/**',
                 '/login', '/login.*', '/login/*',
                 '/logout', '/logout.*', '/logout/*',
-                '/register/*', '/errors', '/errors/*'
+                '/register/*', '/errors', '/errors/*',
+                '/index.gsp'
         ]) {
             createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        createRequestmapIfMissing('/asset/download/*',             'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/asset/download/*',             'ROLE_ADMIN', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/user/current',                 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/catalogue/*/**',               'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/catalogue/*/**',               'ROLE_ADMIN', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_ADMIN', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.POST)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.PUT)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.DELETE)
 
-
+        createRequestmapIfMissing('/role/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/userAdmin/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/requestMap/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/registrationCode/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/securityInfo/**',                   'ROLE_ADMIN')
         createRequestmapIfMissing('/console/**',                   'ROLE_ADMIN')
         createRequestmapIfMissing('/dbconsole/**',                 'ROLE_ADMIN')
         createRequestmapIfMissing('/plugins/console-1.5.0/**',     'ROLE_ADMIN')
