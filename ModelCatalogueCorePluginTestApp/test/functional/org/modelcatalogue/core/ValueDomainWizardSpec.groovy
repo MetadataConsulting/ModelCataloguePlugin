@@ -43,9 +43,9 @@
             classification      = "Java"
             selectCepItemIfExists()
 
-            name                = "NewV5"
+            name                = "New"
             modelCatalogueId    = "http://www.example.com/" + UUID.randomUUID().toString()
-            description         = "NewV5 Description"
+            description         = "New Description"
 
             dataType            = "xs:double"
             selectCepItemIfExists()
@@ -62,7 +62,7 @@
 
             then: 'the value domain  is saved and displayed at the top of the table'
             waitFor {
-                infTableCell(1, 2, text: "NewV5").displayed
+                infTableCell(1, 2, text: "New").displayed
             }
 
         }
@@ -72,7 +72,7 @@
             when: 'Value domain is located'
 
             waitFor {
-                infTableCell(1, 2, text: "NewV5").displayed
+                infTableCell(1, 2, text: "New").displayed
             }
 
             then: 'Click the domain'
@@ -83,7 +83,7 @@
                 subviewTitle.displayed
             }
 
-            subviewTitle.text().trim() == 'NewV5 DRAFT'
+            subviewTitle.text().trim() == 'New DRAFT'
 
         }
 
@@ -95,7 +95,7 @@
             then: "validate value dialog opens"
             waitFor {
                 modalDialog.displayed
-                modalHeader.text() == 'Validate Value by NewV5 domain'
+                modalHeader.text() == 'Validate Value by New domain'
                 modalDialog.find('.alert.alert-warning').displayed
             }
 
@@ -134,7 +134,7 @@
             then: "crate new mapping dialog opens"
             waitFor {
                 modalDialog.displayed
-                modalHeader.text() == 'Create new mapping for NewV5'
+                modalHeader.text() == 'Create new mapping for New'
             }
 
             when: "value domain is selected"
@@ -160,7 +160,7 @@
             then: "modal is shown"
             waitFor {
                 modalDialog.displayed
-                modalHeader.text() == 'Convert Value from NewV5'
+                modalHeader.text() == 'Convert Value from New'
             }
 
             when: "truthy value is entered"
@@ -393,7 +393,7 @@
             then:
             waitFor {
                 modalDialog.displayed
-                modalHeader.text() == 'Merge Value Domain NewV5 to another Value Domain'
+                modalHeader.text() == 'Merge Value Domain New to another Value Domain'
             }
 
             when: "langauge is select and confirmed"
