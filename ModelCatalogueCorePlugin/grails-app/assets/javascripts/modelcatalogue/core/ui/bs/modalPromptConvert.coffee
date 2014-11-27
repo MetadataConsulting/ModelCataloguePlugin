@@ -65,7 +65,7 @@ angular.module('mc.core.ui.bs.modalPromptConvert', ['mc.util.messages']).config 
           $scope.convert = ->
             if $scope.definition.source and not angular.isString($scope.definition.source) and $scope.definition.destination and not angular.isString($scope.definition.destination) and $scope.definition.value
               rest(method: 'GET', url: "#{modelCatalogueApiRoot}#{$scope.definition.source.link}/convert/#{$scope.definition.destination.id}", params: {value: $scope.definition.value}).then (result) ->
-                $scope.result = result.result
+                $scope.result = "#{result.result}"
               , (response) ->
                 $scope.result = $scope.defaultResult
                 if response.status == 404

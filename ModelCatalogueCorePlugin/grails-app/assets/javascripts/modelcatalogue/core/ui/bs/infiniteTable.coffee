@@ -73,7 +73,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
                 </div>
               </td>
             </tr>
-            <tr class="active" ng-if="!loading" ng-click="footerAction.run()" >
+            <tr class="active inf-table-footer-action" ng-if="!loading" ng-click="footerAction.run()" >
               <td colspan="{{columns.length}}" class="col-md-3">
                 <div class="text-center">
                   <span class="fa" ng-class="getFooterCentralIconClass()"></span>

@@ -5,26 +5,34 @@ import geb.navigator.Navigator
 
 abstract class ModelCataloguePage extends Page {
 
+    private static final Map<String, Object> OPT = [required: false]
+
     static content = {
 
-        viewTitle           { $("h2") }
-        subviewTitle        { $("h3:not(.ng-hide)") }
-        subviewStatus       { $("h3 small span.label") }
+        viewTitle               { $("h2") }
+        subviewTitle            { $("h3:not(.ng-hide)") }
+        subviewStatus           { $("h3 small span.label") }
 
-        showLoginButton     { $(".navbar-form i.glyphicon.glyphicon-log-in") }
-        showLogoutButton    { $(".navbar-form i.glyphicon.glyphicon-log-out") }
+        showLoginButton(OPT)    { $(".navbar-form i.glyphicon.glyphicon-log-in") }
+        showLogoutButton(OPT)   { $(".navbar-form i.glyphicon.glyphicon-log-out") }
 
 
-        loginDialog         { $("div.login-modal-prompt") }
-        modalDialog         { $("div.modal") }
-        modalHeader         { $("div.modal-header h4") }
+        loginDialog(OPT)        { $("div.login-modal-prompt") }
+        modalDialog(OPT)        { $("div.modal") }
+        modalHeader(OPT)        { $("div.modal-header h4") }
+        modalPrimaryButton(OPT) { modalDialog.find('button.btn-primary') }
+        modalCloseButton(OPT)   { modalDialog.find('button.close') }
 
-        username            { loginDialog.find("#username") }
-        password            { loginDialog.find("#password") }
-        loginButton         { loginDialog.find("button.btn-success") }
+        username                { loginDialog.find("#username") }
+        password                { loginDialog.find("#password") }
+        loginButton             { loginDialog.find("button.btn-success") }
 
-        confirmDialog       { $('.modal.messages-modal-confirm') }
-        confirmOk           { $('.modal.messages-modal-confirm .btn-primary') }
+        confirmDialog(OPT)      { $('.modal.messages-modal-confirm') }
+        confirmOk(OPT)          { $('.modal.messages-modal-confirm .btn-primary') }
+
+        tableFooterAction(OPT)  { $('tr.inf-table-footer-action')}
+
+
 
     }
 
@@ -81,12 +89,29 @@ abstract class ModelCataloguePage extends Page {
         $(attrs, 'div.inf-table-body tbody tr:nth-child(' + row +') td:nth-child(' + column + ')')
     }
 
+
+    void toggleInfTableRow(int row) {
+        $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand').click()
+    }
+
     int totalOf(String name) {
-        Navigator totalSpan = $('span.badge', 'data-total-of': name)
+        Navigator totalSpan = tab(name).find('span.badge.tab-value-total')
         if (!totalSpan.displayed) {
             return 0
         }
         return totalSpan.text() as Integer
+    }
+
+    Navigator tab(String name) {
+        $('li', 'data-tab-name': name)
+    }
+
+    void selectTab(String name) {
+        tab(name).find('a').click()
+    }
+
+    boolean tabActive(String name) {
+        tab(name).hasClass('active')
     }
 
 }

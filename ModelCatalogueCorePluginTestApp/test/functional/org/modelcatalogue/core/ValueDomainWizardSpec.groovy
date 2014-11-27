@@ -28,7 +28,7 @@
         }
 
 
-        def "Add new data element"(){
+        def "Add new value domain"(){
             when: 'I click the add value domain button'
             actionButton('create-catalogue-element', 'list').click()
 
@@ -43,9 +43,9 @@
             classification      = "Java"
             selectCepItemIfExists()
 
-            name                = "NewVD5"
+            name                = "NewV5"
             modelCatalogueId    = "http://www.example.com/" + UUID.randomUUID().toString()
-            description         = "NewVD5 Description"
+            description         = "NewV5 Description"
 
             dataType            = "xs:double"
             selectCepItemIfExists()
@@ -62,7 +62,7 @@
 
             then: 'the value domain  is saved and displayed at the top of the table'
             waitFor {
-                infTableCell(1, 2, text: "NewVD5").displayed
+                infTableCell(1, 2, text: "NewV5").displayed
             }
 
         }
@@ -72,7 +72,7 @@
             when: 'Value domain is located'
 
             waitFor {
-                infTableCell(1, 2, text: "NewVD5").displayed
+                infTableCell(1, 2, text: "NewV5").displayed
             }
 
             then: 'Click the domain'
@@ -83,19 +83,58 @@
                 subviewTitle.displayed
             }
 
-            subviewTitle.text().trim() == 'NewVD5 DRAFT'
+            subviewTitle.text().trim() == 'NewV5 DRAFT'
 
         }
 
+        def "validate value"() {
+            when: "validate action is clicked"
+            actionButton('validate-value').click()
+
+
+            then: "validate value dialog opens"
+            waitFor {
+                modalDialog.displayed
+                modalHeader.text() == 'Validate Value by NewV5 domain'
+                modalDialog.find('.alert.alert-warning').displayed
+            }
+
+            when: "valid value is entered"
+            value = '10'
+
+            then: "success is shown"
+            waitFor {
+                modalDialog.find('.alert.alert-success').displayed
+            }
+
+            when: "invalid value is entered"
+            value = 'foo'
+
+            then: "error is shown"
+            waitFor {
+                modalDialog.find('.alert.alert-danger').displayed
+            }
+
+            when:
+            modalCloseButton.click()
+
+            then:
+            waitFor {
+                !modalDialog
+            }
+        }
+
+
+
         def "create new mapping"() {
-            when: "edit action is clicked"
+            when: "create new mapping action is clicked"
             actionButton('create-new-mapping').click()
 
 
             then: "crate new mapping dialog opens"
             waitFor {
                 modalDialog.displayed
-                modalHeader.text() == 'Create new mapping for NewVD5'
+                modalHeader.text() == 'Create new mapping for NewV5'
             }
 
             when: "value domain is selected"
@@ -103,16 +142,187 @@
             selectCepItemIfExists()
 
             and: "new mapping rule is created"
-            mapping = "x as Boolean"
+            mapping = "number(x) as Boolean"
 
             and: "the create mapping button is clicked"
-            createMapping.click()
+            modalPrimaryButton.click()
 
             then: "there is exactly one mapping"
-            totalOf('mappings') == 1
+            waitFor {
+                totalOf('mappings') == 1
+            }
+        }
+
+        def "convert value"() {
+            when: "convert action is clicked"
+            actionButton('convert').click()
+
+            then: "modal is shown"
+            waitFor {
+                modalDialog.displayed
+                modalHeader.text() == 'Convert Value from NewV5'
+            }
+
+            when: "truthy value is entered"
+            value = '10'
+
+            then: "true is shown"
+            waitFor {
+                modalDialog.find('pre').text().trim() == 'true'
+            }
+
+            when: "falsy value is entered"
+            value = '0'
+
+            then: "false is shown"
+            waitFor {
+                modalDialog.find('pre').text().trim() == 'false'
+            }
+
+            when: "invalid value is entered"
+            value = 'foo'
+
+            then: "INVALID is shown"
+            waitFor {
+                modalDialog.find('pre').text().trim().contains('INVALID')
+            }
+
+            when:
+            modalCloseButton.click()
+
+            then:
+            waitFor {
+                !modalDialog
+            }
+        }
+
+        def "edit mapping"() {
+            when: "mappings tab selected"
+            selectTab('mappings')
+
+
+            then: "mappings tab is active"
+            waitFor {
+                tabActive('mappings')
+            }
+
+            when:
+            toggleInfTableRow(1)
+            actionButton('edit-mapping').click()
+
+            then:
+            waitFor {
+                modalDialog.displayed
+            }
+
+            when:
+            mapping = 'x'
+            modalPrimaryButton.click()
+
+            then:
+            waitFor {
+                infTableCell(1, 2).text().trim() == 'x'
+            }
+        }
+
+
+        def "create relationship"() {
+            when: "create relationship action is clicked"
+            actionButton('create-new-relationship').click()
+
+            then: "modal is shown"
+            waitFor {
+                modalDialog.displayed
+                modalHeader.text() == 'Create Relationship'
+            }
+
+            when:
+            type    = 'related to'
+            element = 'xs:boolean'
+            selectCepItemIfExists()
+
+            modalPrimaryButton.click()
+
+            then:
+            waitFor {
+                totalOf('relatedTo') == 1
+            }
+
+        }
+
+        def "create relationship from footer action"() {
+            when: "related to tab selected"
+            selectTab('relatedTo')
+
+
+            then: "related to tab is active"
+            waitFor {
+                tabActive('relatedTo')
+            }
+
+            when: "click the footer action"
+            tableFooterAction.click()
+
+            then: "modal is shown"
+            waitFor {
+                modalDialog.displayed
+                modalHeader.text() == 'Create Relationship'
+            }
+
+            when:
+            element = 'xs:string'
+            selectCepItemIfExists()
+
+            modalPrimaryButton.click()
+
+            then:
+            waitFor {
+                totalOf('relatedTo') == 2
+            }
+        }
+
+        def "remove relationship"() {
+            when:
+            toggleInfTableRow(1)
+            actionButton('remove-relationship').click()
+
+            then:
+            waitFor {
+                confirmDialog.displayed
+            }
+
+            when:
+            confirmOk.click()
+
+            then:
+            waitFor {
+                totalOf('relatedTo') == 1
+            }
+        }
+
+        def "remove mapping"() {
+            when:
+            selectTab('mappings')
+            toggleInfTableRow(1)
+            actionButton('remove-mapping').click()
+
+            then:
+            waitFor {
+                confirmDialog.displayed
+            }
+
+            when:
+            confirmOk.click()
+
+            then:
+            waitFor {
+                totalOf('mappings') == 0
+            }
         }
 
         def "Edit the value domain"() {
+            selectTab('properties')
+
             when: "edit action is clicked"
             actionButton('edit-catalogue-element').click()
 
@@ -132,7 +342,7 @@
 
             then: 'the value domain is saved and and different measurement unit is shown'
             waitFor {
-                $('td', 'data-value-for': "Unit Of Measure").text().contains('celsius')
+                $('td', 'data-value-for': "Unit Of Measure")?.text()?.contains('celsius')
             }
         }
 
@@ -176,40 +386,30 @@
 
         }
 
-        def "deprecate the domain"() {
-            when: "depracete action is clicked"
-            actionButton('archive').click()
+        def "merge domain"() {
+            when:
+            actionButton('merge').click()
 
-            then: "modal prompt is displayed"
+            then:
             waitFor {
-                confirmDialog.displayed
+                modalDialog.displayed
+                modalHeader.text() == 'Merge Value Domain NewV5 to another Value Domain'
             }
 
-            when: "ok is clicked"
-            confirmOk.click()
+            when: "langauge is select and confirmed"
+            value = 'xs:language'
+            selectCepItemIfExists()
 
-            then: "the element is now deprecated"
+            modalPrimaryButton().click()
+
+            then: "the item is merged and we are redirected to destination domain"
             waitFor {
-                subviewStatus.text() == 'DEPRECATED'
+                subviewTitle.text().trim() == 'xs:language FINALIZED'
             }
 
-        }
-
-        def "hard delete the domain"() {
-            when: "delete action is clicked"
-            actionButton('delete').click()
-
-            then: "modal prompt is displayed"
+            and: "the relationships are copied to the destination domain"
             waitFor {
-                confirmDialog.displayed
-            }
-
-            when: "ok is clicked"
-            confirmOk.click()
-
-            then: "you are redirected to the list page"
-            waitFor {
-                at ValueDomainPage
+                totalOf('relatedTo') == 1
             }
 
         }

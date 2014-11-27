@@ -32,7 +32,11 @@ class ValueDomainPage extends ModelCataloguePage {
 
         valueDomain         { modalDialog.find('#valueDomain') }
         mapping             { modalDialog.find('#mapping') }
+        value               { modalDialog.find('#value') }
 
-        createMapping       { modalDialog.find('button.btn-primary') }
+        type                { modalDialog.find('#type') }
+        element             { modalDialog.find('#element') }
+
+
     }
 }

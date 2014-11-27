@@ -8,7 +8,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
       <blockquote class="ce-description" ng-show="element.description" ng-bind-html="'' + element.description | linky:'_blank'"></blockquote>
 
       <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge" data-total-of="{{tab.name}}">{{tab.value.total}}</span></span></a></li>
+        <li role="presentation" ng-repeat="tab in tabs" ng-class="{active: tab.active}" data-tab-name="{{tab.name}}"><a ng-click="select(tab)"><span  ng-class="{'text-muted': tab.type == 'decorated-list' &amp;&amp; tab.value.total == 0}">{{tab.heading}}</span><span ng-show="tab.value.total"> <span class="badge tab-value-total">{{tab.value.total}}</span></span></a></li>
       </ul>
 
       <div ng-repeat="tab in tabs" class="tab-pane">
