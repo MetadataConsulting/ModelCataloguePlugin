@@ -49,7 +49,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
-            incoming: [base: 'isBasedOn', classification: 'classifications', supersession: 'supersedes'],
+            incoming: [base: 'isBasedOn', classification: 'classifications', supersession: 'supersedes', favourite: 'isFavouriteOf'],
             outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy'],
             bidirectional: [relatedTo: 'relatedTo']
     ]

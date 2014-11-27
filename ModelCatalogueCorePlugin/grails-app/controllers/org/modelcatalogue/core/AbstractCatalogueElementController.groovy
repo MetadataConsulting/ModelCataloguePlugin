@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
@@ -550,6 +551,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         for (CatalogueElement e in instance.supersedes) {
             instance.removeFromSupersedes(e)
+        }
+        for (User u in instance.isFavouriteOf) {
+            instance.removeFromIsFavouriteOf(u)
         }
     }
 }
