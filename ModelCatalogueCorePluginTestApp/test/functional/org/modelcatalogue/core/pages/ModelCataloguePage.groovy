@@ -32,6 +32,7 @@ abstract class ModelCataloguePage extends Page {
 
         tableFooterAction(OPT)  { $('tr.inf-table-footer-action')}
 
+        simpleObjectEditor(OPT) { $('table.soe-table')}
 
 
     }
@@ -112,6 +113,26 @@ abstract class ModelCataloguePage extends Page {
 
     boolean tabActive(String name) {
         tab(name).hasClass('active')
+    }
+
+    /**
+     * Fills the metadata with the new values
+     * @param newMetadata
+     */
+    void fillMetadata(Map newMetadata, Navigator parent = null) {
+        if (!parent) {
+            parent = simpleObjectEditor
+        }
+
+        while (parent.find('.soe-table-property-row').size() > 1) {
+            parent.find('.soe-table-property-row:first-child .soe-table-property-actions .soe-remove-row').click()
+        }
+
+        newMetadata.each { key, value ->
+            parent.find('.soe-table-property-row:last-child .soe-table-property-key input').value(key?.toString() ?: '')
+            parent.find('.soe-table-property-row:last-child .soe-table-property-value input').value(value?.toString() ?: '')
+            parent.find('.soe-table-property-row:last-child .soe-table-property-actions .soe-add-row').click()
+        }
     }
 
 }

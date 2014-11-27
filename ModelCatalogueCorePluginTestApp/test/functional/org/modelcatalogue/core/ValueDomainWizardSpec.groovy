@@ -67,7 +67,6 @@
 
         }
 
-
         def "Check the value domain shows up with own details"(){
             when: 'Value domain is located'
 
@@ -84,6 +83,33 @@
             }
 
             subviewTitle.text().trim() == 'New DRAFT'
+
+        }
+
+        def "update metadata"() {
+            when:
+            selectTab('ext')
+
+            then:
+            waitFor {
+                $('button.btn-primary.update-object').disabled
+            }
+
+            when:
+            fillMetadata(foo: 'bar', one: 'two', free: 'for')
+
+            then:
+            waitFor {
+                !$('button.btn-primary.update-object').disabled
+            }
+
+            when:
+            $('button.btn-primary.update-object').click()
+
+            then:
+            waitFor {
+                $('button.btn-primary.update-object').disabled
+            }
 
         }
 
@@ -240,6 +266,8 @@
             type    = 'related to'
             element = 'xs:boolean'
             selectCepItemIfExists()
+
+            fillMetadata(modalDialog, foo: 'bar', one: 'two')
 
             modalPrimaryButton.click()
 
