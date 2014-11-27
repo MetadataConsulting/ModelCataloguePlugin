@@ -15,6 +15,15 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
         render view: 'report', model: [classification: classification]
     }
 
+    def gereport() {
+        Classification classification = queryForResource(params.id)
+        if (!classification) {
+            notFound()
+            return
+        }
+        render view: 'gereport', model: [classification: classification]
+    }
+
     protected bindRelations(Classification instance, Object objectToBind) {
         if (objectToBind.classifies != null) {
             for (domain in instance.classifies.findAll { !(it.id in objectToBind.classifies*.id) }) {

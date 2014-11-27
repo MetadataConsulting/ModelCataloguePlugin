@@ -263,6 +263,13 @@ Model catalogue core plugin (metadata registry)
             link controller: 'classification', action: 'report', id: true
         }
 
+        reportsRegistry.register {
+            creates link
+            title { "GE Inventory Report" }
+            type Classification
+            link controller: 'classification', action: 'gereport', id: true
+        }
+
 
 
     }
