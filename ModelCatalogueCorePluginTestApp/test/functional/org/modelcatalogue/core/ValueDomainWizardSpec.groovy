@@ -168,7 +168,7 @@
             selectCepItemIfExists()
 
             and: "new mapping rule is created"
-            mapping = "number(x) as Boolean"
+            mapping = "number(x).asType(Boolean)"
 
             and: "the create mapping button is clicked"
             modalPrimaryButton.click()
