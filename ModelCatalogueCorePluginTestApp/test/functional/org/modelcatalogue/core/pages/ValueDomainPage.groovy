@@ -26,11 +26,13 @@ class ValueDomainPage extends ModelCataloguePage {
 
         expandRuleButton    { basicEditDialog.find('.glyphicon-collapse-down') }
 
-
-
         saveButton          { basicEditDialog.find("button.btn-success") }
 
         newValueDomain      {$('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)')}
 
+        valueDomain         { modalDialog.find('#valueDomain') }
+        mapping             { modalDialog.find('#mapping') }
+
+        createMapping       { modalDialog.find('button.btn-primary') }
     }
 }

@@ -16,6 +16,8 @@ abstract class ModelCataloguePage extends Page {
 
 
         loginDialog         { $("div.login-modal-prompt") }
+        modalDialog         { $("div.modal") }
+        modalHeader         { $("div.modal-header h4") }
 
         username            { loginDialog.find("#username") }
         password            { loginDialog.find("#password") }
@@ -77,6 +79,14 @@ abstract class ModelCataloguePage extends Page {
      */
     Navigator infTableCell(Map attrs = [:], int row, int column) {
         $(attrs, 'div.inf-table-body tbody tr:nth-child(' + row +') td:nth-child(' + column + ')')
+    }
+
+    int totalOf(String name) {
+        Navigator totalSpan = $('span.badge', 'data-total-of': name)
+        if (!totalSpan.displayed) {
+            return 0
+        }
+        return totalSpan.text() as Integer
     }
 
 }

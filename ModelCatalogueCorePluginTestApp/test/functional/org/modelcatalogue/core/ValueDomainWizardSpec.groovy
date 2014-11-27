@@ -55,7 +55,7 @@
 
             expandRuleButton.click()
 
-            rule                = "is number"
+            rule                = "is(number)"
 
             and: 'save button clicked'
             actionButton('modal-save-element', 'modal').click()
@@ -85,6 +85,31 @@
 
             subviewTitle.text().trim() == 'NewVD5 DRAFT'
 
+        }
+
+        def "create new mapping"() {
+            when: "edit action is clicked"
+            actionButton('create-new-mapping').click()
+
+
+            then: "crate new mapping dialog opens"
+            waitFor {
+                modalDialog.displayed
+                modalHeader.text() == 'Create new mapping for NewVD5'
+            }
+
+            when: "value domain is selected"
+            valueDomain = 'xs:boolean'
+            selectCepItemIfExists()
+
+            and: "new mapping rule is created"
+            mapping = "x as Boolean"
+
+            and: "the create mapping button is clicked"
+            createMapping.click()
+
+            then: "there is exactly one mapping"
+            totalOf('mappings') == 1
         }
 
         def "Edit the value domain"() {
@@ -146,6 +171,7 @@
             then: "the element new draft version is created"
             waitFor {
                 subviewStatus.text() == 'DRAFT'
+                totalOf('history') == 2
             }
 
         }
