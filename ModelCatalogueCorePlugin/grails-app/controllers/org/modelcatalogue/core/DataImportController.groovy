@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.dataarchitect.DataImport
 
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
