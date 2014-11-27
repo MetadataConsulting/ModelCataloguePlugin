@@ -39,21 +39,14 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     def search(Integer max){
         handleParams(max)
-        def results =  modelCatalogueSearchService.search(resource, params)
+        def results = modelCatalogueSearchService.search(resource, params)
 
         if(results.errors){
             respond results
             return
         }
 
-        def total = (results.total)?results.total.intValue():0
-
-        Elements elements = new Elements(
-                base: "/${resourceName}/search",
-                total: total,
-                items: results.searchResults
-            )
-        respondWithLinks elements
+        respond Lists.lazy(params, resource, "/${resourceName}/search", { results.searchResults })
     }
 
     protected handleParams(Integer max) {
@@ -117,6 +110,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+        clearAssociationsBeforeDelete(instance)
         checkAssociationsBeforeDelete(instance)
 
         if (instance.hasErrors()) {
@@ -139,6 +133,15 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         }
 
         render status: NO_CONTENT // NO CONTENT STATUS CODE
+    }
+
+    /**
+     * Removes all the associations which can be removed before checking for their presence in
+     * checkAssociationsBeforeDelete method.
+     * @param instance
+     */
+    protected clearAssociationsBeforeDelete(T instance){
+        // do nothing by default
     }
 
     protected checkAssociationsBeforeDelete(T instance) {

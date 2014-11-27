@@ -31,9 +31,11 @@ class BootStrap {
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 
-        def admin   = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'A!6m1n2014').save(failOnError: true)
-        def viewer  = User.findByName('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'v13w3r').save(failOnError: true)
-        def curator = User.findByName('curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'c2r4t0r').save(failOnError: true)
+        // keep the passwords lame, they are only for dev/test or very first setup
+        // sauce labs connector for some reason fails with the six in the input
+        def admin   = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+        def viewer  = User.findByName('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
+        def curator = User.findByName('curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'creator').save(failOnError: true)
 
 
         if (!admin.authorities.contains(roleAdmin)) {

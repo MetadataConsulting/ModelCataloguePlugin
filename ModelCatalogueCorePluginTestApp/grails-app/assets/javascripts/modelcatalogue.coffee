@@ -1,4 +1,3 @@
-#= require ng-file-upload-shim/angular-file-upload-shim
 #= require ng-file-upload/angular-file-upload
 #= require angular-i18n/angular-locale_en-gb
 #= require angular-http-auth/src/http-auth-interceptor

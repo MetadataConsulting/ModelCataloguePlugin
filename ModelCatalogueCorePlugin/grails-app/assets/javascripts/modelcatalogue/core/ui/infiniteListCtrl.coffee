@@ -32,7 +32,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         for column in $scope.columns.slice(1)
           row.tail.push getCellForColumn(element, column)
 
-    if angular.isFunction(element.isInstanceOf)
+    if element and angular.isFunction(element.isInstanceOf)
       if element.isInstanceOf('catalogueElement') and not element.isInstanceOf('classification')
         row.properties.push label: 'Classifications', value: -> element.classifications
       if element.isInstanceOf('dataElement')
@@ -44,7 +44,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       if element.isInstanceOf('enumeratedType')
         row.properties.push label: 'Enumerations', value: getEnumerations
 
-    if element.ext
+    if element and element.ext
       row.properties.push label: ''
       row.properties.push label: 'Metadata'
 

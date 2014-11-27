@@ -1,0 +1,12 @@
+<plugin name='model-catalogue-spring-security2x-plugin' version='0.1' grailsVersion='2.3.7 &gt; *'>
+  <author>Vladimir Orany</author>
+  <authorEmail>vladimir@orany.cz</authorEmail>
+  <title>Model Catalogue Spring Security 1.x Plugin</title>
+  <description>Spring Security 2.x implementation of Model Catalogue Core Plugin abstract security service.
+</description>
+  <documentation>http://grails.org/plugin/model-catalogue-spring-security2x-plugin</documentation>
+  <type>ModelCatalogueSpringSecurity2xPluginGrailsPlugin</type>
+  <resources>
+    <resource>org.modelcatalogue.core.security.ss2x.ModelCatalogueSecurityService</resource>
+  </resources>
+</plugin>

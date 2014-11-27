@@ -17,7 +17,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 
         expect:
         clazz.transients
-        clazz.transients == transients
+        clazz.transients as Set == transients as Set
 
         where:
         clazz                   | transients
@@ -97,9 +97,9 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 class TestCatalogueElement1 extends CatalogueElement {
 
     static relationships = [
-            incoming: [hierarchy: 'parentOf'],
-        outgoing:           [hierarchy: 'childOf'],
-        bidirectional:      [synonym: 'synonyms']
+        incoming:       [hierarchy: 'parentOf'],
+        outgoing:       [hierarchy: 'childOf'],
+        bidirectional:  [synonym: 'synonyms']
     ]
 
 }

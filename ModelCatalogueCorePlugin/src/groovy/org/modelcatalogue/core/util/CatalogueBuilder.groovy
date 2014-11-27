@@ -18,7 +18,8 @@ class CatalogueBuilder {
     private Set<CatalogueElement> created = []
     private List<Map<Class, CatalogueElement>> contexts = []
 
-    private Set<Class> unclassifiedQueriesFor = []
+    private Set<Class> unclassifiedQueriesFor = [MeasurementUnit]
+    private Set<Class> hasUniqueNames = [MeasurementUnit, Classification]
     private Set<Class> createAutomatically = []
 
     private static final Map LATEST = [sort: 'versionNumber', order: 'asc', max: 1]
@@ -38,7 +39,8 @@ class CatalogueBuilder {
         Classification classification = findOrPrepareInstance Classification, checkAndPrepareParameters(Classification, parameters)
 
         withNewContext classification, c
-        unclassifiedQueriesFor.clear()
+
+        unclassifiedQueriesFor = [MeasurementUnit]
 
         saveIfNeeded classification
     }
@@ -398,7 +400,7 @@ class CatalogueBuilder {
         }
 
         // only return unclassified results
-        if (result.classifications) {
+        if (result.classifications && !(type in hasUniqueNames)) {
             return null
         }
 
@@ -406,11 +408,11 @@ class CatalogueBuilder {
         return result
     }
 
-    private static <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
+    private <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
         Map<String, Object> params = unclassifiedOnly ? LATEST - [max: 1] : LATEST
         List<T> elements = criteria.list(params)
         if (elements) {
-            if (!unclassifiedOnly) {
+            if (!unclassifiedOnly || criteria.persistentEntity.javaClass in hasUniqueNames) {
                 return elements.first()
             }
             for (T element in elements) {

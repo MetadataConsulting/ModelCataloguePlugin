@@ -25,49 +25,13 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     def uninstantiatedDataElements(Integer max){
         handleParams(max)
-        ListWithTotal results
-
-        try{
-            results = dataArchitectService.uninstantiatedDataElements(params)
-        }catch(Exception e){
-            println(e)
-            return
-        }
-
-        def baseLink = "/dataArchitect/uninstantiatedDataElements"
-        def total = (results.total)?results.total.intValue():0
-
-        Elements elements =  new Elements(
-                base: baseLink,
-                total: total,
-                items: results.items
-        )
-
-        respondWithLinks elements
+        respond Lists.wrap(params, DataElement, "/dataArchitect/uninstantiatedDataElements", dataArchitectService.uninstantiatedDataElements(params))
     }
 
 
     def metadataKeyCheck(Integer max){
         handleParams(max)
-        ListWithTotal results
-
-        try{
-            results = dataArchitectService.metadataKeyCheck(params)
-        }catch(Exception e){
-            println(e)
-            return
-        }
-
-
-        def baseLink = "/dataArchitect/metadataKeyCheck"
-
-        Elements elements =  new Elements(
-                base: baseLink,
-                total: results.total,
-                items: results.items
-        )
-
-        respondWithLinks elements
+        respond Lists.wrap(params, DataElement, "/dataArchitect/metadataKeyCheck", dataArchitectService.metadataKeyCheck(params))
     }
 
     def getSubModelElements(){
@@ -97,20 +61,13 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
             //FIXME we need new method to do this and integrate it with the ui
             try {
-                dataArchitectService.actionRelationshipList(results.list)
+                dataArchitectService.actionRelationshipList(results.items)
             } catch (Exception e) {
                 println(e)
                 return
             }
 
-            def baseLink = "/dataArchitect/findRelationsByMetadataKeys"
-            Elements elements =  new Elements(
-                    base: baseLink,
-                    total: results.total,
-                    items: results.list,
-            )
-
-            respondWithLinks elements
+            respond Lists.wrap(params, Relationship, "/dataArchitect/findRelationsByMetadataKeys", results)
 
         }else{
             respond "please enter keys"

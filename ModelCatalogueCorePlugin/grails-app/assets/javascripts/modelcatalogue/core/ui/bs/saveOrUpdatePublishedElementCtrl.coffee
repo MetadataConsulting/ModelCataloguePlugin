@@ -19,12 +19,12 @@ angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', []).controller 
   $scope.beforeSave = ->
     promise = $q.when {}
 
-    if angular.isString($scope.pending.classification)
+    if $scope.pending.classification and angular.isString($scope.pending.classification)
       promise = promise.then -> catalogueElementResource('classification').save({name: $scope.pending.classification}).then (newClassification) ->
         $scope.copy.classifications.push newClassification
         $scope.pending.classification = null
 
-    if angular.isString($scope.copy.valueDomain)
+    if $scope.copy.valueDomain and angular.isString($scope.copy.valueDomain)
       promise = promise.then -> catalogueElementResource('valueDomain').save({name: $scope.copy.valueDomain}).then (newDomain) ->
         $scope.copy.valueDomain = newDomain
 

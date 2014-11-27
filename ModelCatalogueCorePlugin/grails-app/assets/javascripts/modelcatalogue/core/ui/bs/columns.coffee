@@ -15,7 +15,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     enumerations.join('\n')
 
   getClassificationsForDataElement = (dataElement) ->
-    return '' if not dataElement.classifications
+    return '' if not dataElement?.classifications
     classificationNames = for classification in dataElement.classifications
       "<a href='#/catalogue/classification/#{classification.id}'>#{classification.name}</a>"
     classificationNames.join(', ')

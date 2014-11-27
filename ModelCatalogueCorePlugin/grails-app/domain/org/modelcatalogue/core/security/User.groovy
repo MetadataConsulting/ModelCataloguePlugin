@@ -20,6 +20,10 @@ class User extends CatalogueElement {
         email    nullable: true, email: true, maxSize: 255
     }
 
+    static relationships = [
+            outgoing: [favourite: 'favourites']
+    ]
+
     static mapping = {
         password column: '`password`'
     }

@@ -29,7 +29,7 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
           if $scope.editableProperties.length == 0
             $scope.editableProperties.push key: ''
 
-      $scope.addProperty = (index, property = {key: 'Key', value: 'Value'}) ->
+      $scope.addProperty = (index, property = {key: '', value: ''}) ->
         newProperty = angular.copy(property)
         delete newProperty.originalKey
         newIndex = index + 1

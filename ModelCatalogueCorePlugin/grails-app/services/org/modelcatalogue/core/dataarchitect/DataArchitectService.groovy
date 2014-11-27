@@ -53,11 +53,11 @@ class DataArchitectService {
                 "WHERE e2.name = :key)", [key: searchParams.key])
     }
 
-    ListWithTotal<DataElement> findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
+    ListWithTotal<Relationship> findRelationsByMetadataKeys(String keyOne, String keyTwo, Map params){
 
-        ListAndCount results = new ListAndCount()
+        ListAndCount<Relationship> results = new ListAndCount<Relationship>()
         def searchParams = getParams(params)
-        def synonymDataElements = []
+        List<Relationship> synonymDataElements = []
         //FIXME the relationship type should be configurable
         def relType = RelationshipType.findByName("relatedTo")
 
@@ -86,7 +86,7 @@ class DataArchitectService {
         return results
     }
 
-    def actionRelationshipList(ArrayList<Relationship> list){
+    def actionRelationshipList(Collection<Relationship> list){
         list.each { relationship ->
             relationship.save()
         }

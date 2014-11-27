@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.MappingScript
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.springframework.validation.Errors
 
@@ -52,15 +53,15 @@ class Mapping {
     }
 
     static SecuredRuleExecutor.ValidationResult validateMapping(String mappingText) {
-        new SecuredRuleExecutor(x: 0).validate(mappingText)
+        new SecuredRuleExecutor(MappingScript, x: 0).validate(mappingText)
     }
 
     static Object mapValue(String mapping, Object value) {
-        new SecuredRuleExecutor(x: value).execute(mapping)
+        new SecuredRuleExecutor(MappingScript, x: value).execute(mapping)
     }
 
     static SecuredRuleExecutor.ReusableScript reusableMapping(String mappingText) {
-        new SecuredRuleExecutor(x: 0).reuse(mappingText)
+        new SecuredRuleExecutor(MappingScript, x: 0).reuse(mappingText)
     }
 
     String toString() {

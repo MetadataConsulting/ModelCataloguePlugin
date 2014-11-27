@@ -63,6 +63,12 @@ class SecuredRuleExecutor<S extends Script> {
         this.shell              = createShell(binding)
     }
 
+    SecuredRuleExecutor(Map binding, Class<S> baseScriptClass) {
+        this.binding            = new Binding(binding)
+        this.baseScriptClass    = baseScriptClass
+        this.shell              = createShell(this.binding)
+    }
+
     SecuredRuleExecutor(Class<S> baseScriptClass, Binding binding) {
         this.binding            = binding
         this.baseScriptClass    = baseScriptClass
