@@ -13,7 +13,7 @@ class DashboardController {
     def classificationService
 
     def index() {
-
+        response.addHeader('Expires', '-1')
         def uninstantiatedDataElements = dataArchitectService.uninstantiatedDataElements(params)
 
         def model = [
