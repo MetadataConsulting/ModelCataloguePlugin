@@ -45,11 +45,13 @@ abstract class ModelCataloguePage extends Page {
     def loginCurator() { loginUser("curator", "creator") }
 
     def loginUser(String user, String pwd) {
-        if (!showLoginButton.displayed) {
-            showLogoutButton.click()
-        }
+        if (!$('.login-modal-prompt').displayed) {
+            if (!showLoginButton.displayed) {
+                showLogoutButton.click()
+            }
 
-        showLoginButton.click()
+            showLoginButton.click()
+        }
 
         waitFor {
             loginDialog.displayed
