@@ -226,26 +226,63 @@ class DataArchitectService {
     }
 
     Map<Long, String> dataTypesNamesSuggestions() {
-        def results = DataType.executeQuery """
-            select d.id, re.source.name
+        // find all data types with duplicite name
+        List<DataType> dataTypes = DataType.executeQuery("""
             from DataType d
-                left join d.relatedValueDomains vd
-                left join vd.dataElements de
-                left join de.incomingRelationships re
-
-            where
-                d.name in (select d.name from DataType d group by d.name having count(d.name) > 1 and name not like '%(in %)')
-            and
-                re.relationshipType = :containment
-
-            order by d.name, de.id
-        """, [containment: RelationshipType.findByName('containment')]
+            where d.name in (
+                select d.name
+                from DataType d
+                where
+                    d.name not like '%(in %)'
+                and
+                    d.latestVersionId = d.id or d.latestVersionId is null
+                group by
+                    d.name
+                having
+                    count(d.name) > 1
+            )
+            order by d.name
+        """)
 
         Map<Long, Set<String>> suggestions = new LinkedHashMap<Long, Set<String>>().withDefault { new TreeSet<String>() }
 
-        for (row in results) {
-            suggestions[row[0]] << row[1]
+        for (DataType dataType in dataTypes) {
+            List<ValueDomain> domains = ValueDomain.findAllByDataTypeAndName(dataType, dataType.name)
+            if (!domains) {
+                // value domains have different names
+                for (ValueDomain domain in ValueDomain.findAllByDataType(dataType)) {
+                    suggestions[dataType.id] << domain.name
+                }
+            } else {
+                // we have to try names of data element
+                for (ValueDomain valueDomain in domains) {
+                    List<DataElement> elements = DataElement.findAllByValueDomainAndName(valueDomain, dataType.name)
+                    if (!elements) {
+                        // elements have different names
+                        for (DataElement element in DataElement.findAllByValueDomain(valueDomain)) {
+                            suggestions[dataType.id] << element.name
+                        }
+                    } else {
+                        // we have to rely on names of the model
+                        def results = DataElement.executeQuery """
+                            select re.source.name
+                            from DataElement de
+                                left join de.incomingRelationships re
+                            where
+                                de.valueDomain = :valueDomain
+                            and
+                                re.relationshipType = :containment
+                            order by de.id
+                        """, [containment: RelationshipType.containmentType, valueDomain: valueDomain]
+
+                        for (row in results) {
+                            suggestions[dataType.id] << row[0]
+                        }
+                    }
+                }
+            }
         }
+
 
         Map<Long, String> ret = [:]
 

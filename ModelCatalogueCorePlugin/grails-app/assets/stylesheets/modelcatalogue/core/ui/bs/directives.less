@@ -324,7 +324,7 @@ a div.panel-footer, .with-pointer {
 .infinite-scroll-item:hover .panel-actions {
   display: block;
   position: absolute;
-  padding: 0px 10px;
+  padding: 0 10px;
   top: 50px;
   float: right;
   right: 15px;
@@ -337,12 +337,12 @@ a div.panel-footer, .with-pointer {
 
 
 .navbar-input-group {
-  font-size: 0px; /*removes whitespace between button and input*/
+  font-size: 0; /*removes whitespace between button and input*/
 
   input {
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    @media (min-width:768px) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    @media (min-width: 1200px) {
       &:hover, &:active, &:focus, &.expanded {
         width: 400px;
       }
@@ -350,9 +350,9 @@ a div.panel-footer, .with-pointer {
   }
 
   .btn {
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-left: 0px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
     width: 45px;
   }
 
@@ -408,7 +408,7 @@ a div.panel-footer, .with-pointer {
   opacity: 0.9;
 
   .table {
-    margin-bottom: 0px;
+    margin-bottom: 0;
   }
 }
 

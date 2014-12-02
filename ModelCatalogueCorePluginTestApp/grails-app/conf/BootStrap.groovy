@@ -7,6 +7,7 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.testapp.Requestmap
+import org.modelcatalogue.core.util.CatalogueBuilder
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.http.HttpMethod
 
@@ -19,6 +20,7 @@ class BootStrap {
     def executorService
     def actionService
     def mappingService
+    CatalogueBuilder catalogueBuilder
 
     XLSXListRenderer xlsxListRenderer
     ReportsRegistry reportsRegistry
@@ -159,6 +161,24 @@ class BootStrap {
 
 
             setupSimpleCsvTransformation()
+
+            // for generate suggestion test
+            catalogueBuilder.build {
+                automatic dataType
+
+                classification(name: 'Test 1') {
+                    dataElement (name: 'Test Element 1') {
+                        valueDomain(name: 'Same Name')
+                    }
+                }
+
+                classification(name: 'Test 2') {
+                    dataElement (name: 'Test Element 2') {
+                        valueDomain(name: 'Same Name')
+                    }
+                }
+
+            }
 
             println "Init finished in ${new Date()}"
         } catch (e) {
