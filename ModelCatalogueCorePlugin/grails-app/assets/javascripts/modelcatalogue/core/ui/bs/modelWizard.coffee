@@ -41,13 +41,13 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements', 'btn-info': step != 'elements' &amp;&amp; dataElements.length > 0}">5. Elements</button>
               </li>
               <li>
-                <button id="step-elements" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications', 'btn-info': step != 'classifications' &amp;&amp; classifications.length > 0}">6. Classifications</button>
+                <button id="step-classifications" ng-disabled="!model.name || step == 'summary'" ng-click="select('classifications')" class="btn btn-default" ng-class="{'btn-primary': step == 'classifications', 'btn-info': step != 'classifications' &amp;&amp; classifications.length > 0}">6. Classifications</button>
               </li>
               <li>
                 <button id="step-next" ng-disabled="!model.name || step == 'classifications' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
               </li>
               <li>
-                <button id="step-finish" ng-disabled="!model.name" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+                <button id="step-finish" ng-disabled="!model.name || !isModelCatalogueIdValid()" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
               </li>
             </ul>
         </div>
@@ -63,7 +63,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     </span>
                   </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" ng-class="{ 'has-error': !isModelCatalogueIdValid() }">
                   <label for="modelCatalogueId" class="">Catalogue ID (URL)</label>
                   <input type="text" class="form-control" id="modelCatalogueId" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="model.modelCatalogueId">
                 </div>
@@ -165,8 +165,8 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', 'delayedQueueExecutor', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args, delayedQueueExecutor) ->
-          execAfter50 = delayedQueueExecutor(50)
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', 'delayedQueueExecutor', '$q', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args, delayedQueueExecutor, $q) ->
+          execAfter50 = delayedQueueExecutor(500)
 
           $scope.reset = ->
             $scope.args = args
@@ -226,6 +226,10 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           $scope.finish = () ->
             return if $scope.finishInProgress
             $scope.finishInProgress = true
+
+            $scope.parents.push($scope.parent)            if angular.isString($scope.parent?.element)
+            $scope.children.push($scope.child)            if angular.isString($scope.child?.element)
+            $scope.dataElements.push($scope.dataElement)  if angular.isString($scope.dataElement?.element)
 
             unless $scope.isEmpty($scope.metadata)
               $scope.pendingActions.push (model)->
@@ -289,7 +293,18 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             promise = catalogueElementResource('model').save($scope.model).then decreasePendingActionsCount
 
             for action in $scope.pendingActions
-             promise = promise.then(action).then decreasePendingActionsCount
+             promise = promise.then(action).then decreasePendingActionsCount, (errorResponse) ->
+
+               if errorResponse.errors
+                for error in errorResponse.errors
+                  messages.error(error.message)
+               else if errorResponse.error
+                 messages.error(errorResponse.error)
+               else
+                 messages.error('Unknown expection happened while creating new model. See application logs for details.')
+
+               $scope.finishInProgress = false
+               $q.reject errorResponse
 
             promise.then (model) ->
               messages.success "Model #{model.name} created"
@@ -376,6 +391,10 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               return true
             return false
 
+
+          $scope.isModelCatalogueIdValid = ->
+            return true if not $scope.model.modelCatalogueId
+            return new RegExp(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/).test($scope.model.modelCatalogueId)
         ]
 
       }

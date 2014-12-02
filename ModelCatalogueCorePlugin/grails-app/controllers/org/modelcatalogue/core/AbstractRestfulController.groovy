@@ -4,6 +4,7 @@ import grails.rest.RestfulController
 import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.hibernate.StaleStateException
 import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Lists
@@ -328,11 +329,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             attempt++
             try {
                 return resource.withTransaction(body)
-            } catch (ConcurrencyFailureException e) {
+            } catch (ConcurrencyFailureException | StaleStateException e) {
                 if (attempt >= MAX_ATTEMPTS) {
-                    throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${MAX_ATTEMPTS} attempts", e)
+                    throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${MAX_ATTEMPTS} attempts", e as Throwable)
                 }
-                log.warn "Exception executing action ${actionName} on ${resource} controller with parameters ${params} (#${attempt} attempt).", e
+                log.warn "Exception executing action ${actionName} on ${resource} controller with parameters ${params} (#${attempt} attempt).", e as Throwable
                 Thread.sleep(backOff)
                 backOff = 2 * backOff
             }

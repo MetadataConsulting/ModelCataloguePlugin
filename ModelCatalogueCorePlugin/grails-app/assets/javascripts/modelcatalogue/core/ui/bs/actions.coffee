@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           for err in response.data.errors
             messages.error err.message
 
-  actionsProvider.registerActionInRole 'create-catalogue-element', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
+  actionsProvider.registerActionInRole 'create-catalogue-element', actionsProvider.ROLE_LIST_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', '$rootScope', ($scope, names, security, messages, $state, $log, $rootScope) ->
     return undefined if not security.hasRole('CURATOR')
     return undefined if not $scope.resource
     return undefined if $scope.resource == 'batch'
@@ -42,6 +42,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       .then ->
         messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then ->
           if $scope.resource == 'model' and $state.current.name == 'mc.resource.list'
+            # remove cached tree
+            $rootScope.$$lastModels = undefined
+            # reload in draft mode
             $state.go '.', {status: 'draft'}, {reload: true}
       , (errors)->
         $log.error errors

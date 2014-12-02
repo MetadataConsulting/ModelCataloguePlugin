@@ -48,9 +48,9 @@ class RelationshipService {
             return relationshipInstance
         }
 
+        relationshipInstance.save(flush: true)
         source?.addToOutgoingRelationships(relationshipInstance)
         destination?.addToIncomingRelationships(relationshipInstance)
-        relationshipInstance.save(flush: true)
         relationshipInstance
     }
 
