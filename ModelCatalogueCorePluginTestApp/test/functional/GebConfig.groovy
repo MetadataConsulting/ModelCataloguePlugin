@@ -54,9 +54,7 @@ environments {
     // See: http://code.google.com/p/selenium/wiki/FirefoxDriver
     firefox {
         driver = {
-            FirefoxProfile profile = new FirefoxProfile()
-            profile.setPreference(FirefoxProfile.ALLOWED_HOSTS_PREFERENCE, InetAddress.localHost.hostName.toString())
-            new FirefoxDriver(profile)
+            new FirefoxDriver()
         }
     }
 
