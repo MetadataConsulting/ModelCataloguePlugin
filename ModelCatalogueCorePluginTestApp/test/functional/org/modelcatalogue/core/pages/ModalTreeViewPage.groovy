@@ -13,10 +13,27 @@ class ModalTreeViewPage extends ModelCataloguePage {
 
         modelWizard         { $('div.create-model-wizard') }
 
-        name                { modelWizard.find('input[id=name]') }
-        description         { modelWizard.find('textarea[id=description]') }
+        name                { modelWizard.find('#name') }
+        description         { modelWizard.find('#description') }
+        modelCatalogueId    { modelWizard.find('#modelCatalogueId') }
+
+        stepTitle           { modelWizard.find('h4')}
+
+        stepPrevious        { $("#step-previous") }
+        stepModel           { $("#step-model") }
+        stepMetadata        { $("#step-metadata") }
+        stepParents         { $("#step-parents") }
+        stepChildren        { $("#step-children") }
+        stepElements        { $("#step-elements") }
+        stepClassifications { $("#step-classifications") }
+        stepNext            { $("#step-next") }
+        stepFinish          { $("#step-finish") }
+
+
         saveButton          { modelWizard.find("button.btn-success") }
         exitButton          { $("#exit-wizard") }
 
+        type                { modalDialog.find('#type') }
+        element             { modalDialog.find('#element') }
     }
 }

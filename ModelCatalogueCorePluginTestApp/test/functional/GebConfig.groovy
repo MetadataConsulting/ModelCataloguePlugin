@@ -7,6 +7,7 @@
 import org.openqa.selenium.Platform
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.firefox.FirefoxProfile
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
 
@@ -52,7 +53,11 @@ environments {
     // run as "grails -Dgeb.env=firefox test-app"
     // See: http://code.google.com/p/selenium/wiki/FirefoxDriver
     firefox {
-        driver = { new FirefoxDriver() }
+        driver = {
+            FirefoxProfile profile = new FirefoxProfile()
+            profile.setPreference(FirefoxProfile.ALLOWED_HOSTS_PREFERENCE, InetAddress.localHost.hostName.toString())
+            new FirefoxDriver(profile)
+        }
     }
 
     sauce {
@@ -66,7 +71,7 @@ environments {
         if(username == null || apiKey == null){
             System.err.println("Sauce OnDemand credentials not set.");
         }
-        DesiredCapabilities capabillities = DesiredCapabilities.chrome();
+        DesiredCapabilities capabillities = DesiredCapabilities.firefox();
         capabillities.setCapability("name", "ModelCatalogueCoreTestApp");
         capabillities.setCapability("platform", Platform.LINUX);
         capabillities.setCapability("selenium-version", "2.40.0");

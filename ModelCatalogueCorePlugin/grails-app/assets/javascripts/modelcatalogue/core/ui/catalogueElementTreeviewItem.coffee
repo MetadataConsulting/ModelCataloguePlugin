@@ -99,15 +99,15 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
 
       $rootScope.$on 'catalogueElementCreated', (_, result) ->
-        if result and result.destination and result.source and result.type
+        if result and result.relation and result.element and result.type
           currentDescend = $scope.element[$scope.currentDescend]
-          if result.destination.link == $scope.element.link and endsWith(currentDescend.link, "/incoming/#{result.type.name}")
+          if result.relation.link == $scope.element.link and endsWith(currentDescend.link, "/incoming/#{result.type.name}")
             $scope.element.$$numberOfChildren++
-            result.source.refresh().then (newOne) ->
+            result.element.refresh().then (newOne) ->
               $scope.element.$$children = [newOne].concat $scope.element.$$children
-          if result.source.link == $scope.element.link and endsWith(currentDescend.link, "/outgoing/#{result.type.name}")
+          if result.element.link == $scope.element.link and endsWith(currentDescend.link, "/outgoing/#{result.type.name}")
             $scope.element.$$numberOfChildren++
-            result.destination.refresh().then (newOne) ->
+            result.relation.refresh().then (newOne) ->
               $scope.element.$$children = [newOne].concat $scope.element.$$children
 
 

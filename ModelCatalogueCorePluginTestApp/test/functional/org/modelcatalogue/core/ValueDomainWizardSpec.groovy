@@ -28,6 +28,47 @@
         }
 
 
+        def "filter by name in header and expand enumerations"() {
+            when: "the header is expanded"
+            $('.inf-table thead .inf-cell-expand').click()
+
+            then: "the name filter is displayed"
+            waitFor {
+                $('input.form-control', placeholder: 'Filter Name').displayed
+            }
+
+            when: "we filter by anatomical side"
+            $('input.form-control', placeholder: 'Filter Name').value('anatomical_side')
+
+            then: "only one row will be shown"
+            waitFor {
+                $('.inf-table tbody .inf-table-item-row').size() == 1
+            }
+
+            when: "we expand the row"
+            toggleInfTableRow(1)
+
+            and: "we expand the data type"
+            def dataTypeCell = $('td', 'data-value-for': 'Data Type')
+            dataTypeCell.find('span.fa-plus-square-o').click()
+
+            then: "we see enumerated values"
+            waitFor {
+                dataTypeCell.find('div.preserve-new-lines')?.text()?.contains('Midline')
+            }
+
+            when: "the filter is reset"
+            $('input.form-control', placeholder: 'Filter Name').value('')
+
+            then: "we see many rows again"
+            waitFor {
+                $('.inf-table tbody .inf-table-item-row').size() > 1
+            }
+
+        }
+
+
+
         def "Add new value domain"(){
             when: 'I click the add value domain button'
             actionButton('create-catalogue-element', 'list').click()

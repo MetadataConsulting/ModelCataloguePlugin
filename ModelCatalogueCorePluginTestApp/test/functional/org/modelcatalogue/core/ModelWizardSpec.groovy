@@ -30,7 +30,8 @@ class ModelWizardSpec extends GebReportingSpec {
         }
 
     }
-        def "Add new model"(){
+
+    def "Add new model"(){
 
         when: 'I click the add model button'
         addModelButton.click()
@@ -42,12 +43,74 @@ class ModelWizardSpec extends GebReportingSpec {
         }
 
         when: 'the model details are filled in'
-        name        = "New"
-        description = "Description"
+        name                = "New"
+        modelCatalogueId    = "http://www.example.com/${UUID.randomUUID().toString()}"
+        description         = "Description"
 
-        and: 'save button clicked'
-        saveButton.click()
+        then: 'metadata step is not disabled'
+        waitFor {
+            !stepMetadata.disabled
+        }
 
+        when: 'metadata step is clicked'
+        stepMetadata.click()
+
+        then:
+        waitFor {
+            stepMetadata.hasClass('btn-primary')
+        }
+
+        when: 'metadata are filled in'
+        fillMetadata foo: 'bar', one: 'two'
+
+
+        and: 'children step is clicked'
+        stepChildren.click()
+
+        then:
+        waitFor {
+            stepChildren.hasClass('btn-primary')
+        }
+
+        when: 'child metadata are filled in'
+        fillMetadata 'Min Occurs': '1', 'Max Occurs': '10'
+
+        and: 'the child is selected'
+        name = 'patient'
+        selectCepItemIfExists()
+
+        and: 'create child from scratch and leave it filled in'
+        name = 'This should create new child model'
+
+        and: 'elements step is clicked'
+        stepElements.click()
+
+        then:
+        waitFor {
+            stepElements.hasClass('btn-primary')
+        }
+
+        when: 'element metadata are filled in'
+        fillMetadata 'Min Occurs': '2', 'Max Occurs': '25'
+
+        and: 'the element is selected'
+        name = 'nhs'
+        selectCepItemIfExists()
+
+        and: 'the classifications step is clicked'
+        stepClassifications.click()
+
+        then:
+        waitFor {
+            stepClassifications.hasClass('btn-primary')
+        }
+
+        when: 'the classification is selected'
+        name = 'nhic'
+        selectCepItemIfExists()
+
+        and: 'finish is clicked'
+        stepFinish.click()
 
         then: 'the model is saved'
         waitFor {
@@ -61,10 +124,77 @@ class ModelWizardSpec extends GebReportingSpec {
             $('span.catalogue-element-treeview-name', text: "New").displayed
         }
 
+        when: 'the item is double-clicked'
+        $('a.catalogue-element-treeview-link', title: "New").click()
+
+        then:
+        subviewTitle.text().trim() == 'New DRAFT'
+
+        totalOf('parentOf') == 2
+        totalOf('contains') == 1
 
 
+    }
 
 
+    def "Add another model"(){
+        when:
+        go "#/catalogue/model/all"
+
+        then:
+        at ModalTreeViewPage
+        waitFor(120) {
+            viewTitle.displayed
+        }
+
+        when: 'I click the add model button'
+        addModelButton.click()
+
+
+        then: 'the model dialog opens'
+        waitFor {
+            modelWizard.displayed
+        }
+
+        when: 'the model details are filled in'
+        name = "Another New"
+
+        and: 'finish is clicked'
+        stepFinish.click()
+
+        then: 'the model is saved'
+        waitFor {
+            $('div.messages-panel span', text: "Model Another New created").displayed
+        }
+        when:
+        exitButton.click()
+
+        then:
+        waitFor {
+            $('span.catalogue-element-treeview-name', text: "Another New").displayed
+        }
+
+        when: "click the footer action"
+        $('span.catalogue-element-treeview-name', text: "Another New").click()
+        tableFooterAction.click()
+
+        then: "modal is shown"
+        waitFor {
+            modalDialog.displayed
+            modalHeader.text() == 'Create Relationship'
+        }
+
+        when:
+        type    = 'parent of'
+        element = 'demographics'
+        selectCepItemIfExists()
+
+        modalPrimaryButton.click()
+
+        then: 'the number of children of Another New must be 1'
+        waitFor {
+            $('span.catalogue-element-treeview-name', text: "Another New").parent().parent().find('.badge').text() == '1'
+        }
 
     }
 
