@@ -74,7 +74,7 @@ environments {
         DesiredCapabilities capabillities = DesiredCapabilities.firefox();
         capabillities.setCapability("name", "ModelCatalogueCoreTestApp");
         capabillities.setCapability("platform", Platform.LINUX);
-        capabillities.setCapability("selenium-version", "2.40.0");
+        capabillities.setCapability("selenium-version", "2.44.0");
         driver = {
             new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), capabillities)
         }
