@@ -69,12 +69,14 @@ environments {
         if(username == null || apiKey == null){
             System.err.println("Sauce OnDemand credentials not set.");
         }
-        DesiredCapabilities capabillities = DesiredCapabilities.firefox();
-        capabillities.setCapability("name", "ModelCatalogueCoreTestApp");
-        capabillities.setCapability("platform", Platform.LINUX);
-        capabillities.setCapability("selenium-version", "2.44.0");
+
+        DesiredCapabilities caps = DesiredCapabilities.internetExplorer();
+        caps.setCapability("name", "ModelCatalogueCoreTestApp");
+        caps.setCapability("platform", "Windows 8.1");
+        caps.setCapability("version", "11");
+        caps.setCapability("browserName", "")
         driver = {
-            new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), capabillities)
+            new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), caps)
         }
     }
 }
