@@ -70,20 +70,25 @@ class BootStrap {
                 '/**/img/**',
                 '/login', '/login.*', '/login/*',
                 '/logout', '/logout.*', '/logout/*',
-                '/register/*', '/errors', '/errors/*'
+                '/register/*', '/errors', '/errors/*',
+                '/index.gsp'
         ]) {
             createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        createRequestmapIfMissing('/asset/download/*',             'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/asset/download/*',             'ROLE_ADMIN', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/user/current',                 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/catalogue/*/**',               'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/catalogue/*/**',               'ROLE_ADMIN', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_ADMIN', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.POST)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.PUT)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.DELETE)
 
-
+        createRequestmapIfMissing('/role/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/userAdmin/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/requestMap/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/registrationCode/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/securityInfo/**',                   'ROLE_ADMIN')
         createRequestmapIfMissing('/console/**',                   'ROLE_ADMIN')
         createRequestmapIfMissing('/dbconsole/**',                 'ROLE_ADMIN')
         createRequestmapIfMissing('/plugins/console-1.5.0/**',     'ROLE_ADMIN')
@@ -114,53 +119,53 @@ class BootStrap {
         try {
             println 'Running post init job'
             println 'Importing data'
-            importService.importData()
+//            importService.importData()
 
-            println 'Finalizing all published elements'
-            CatalogueElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
-                if (it instanceof Model) {
-                    elementService.finalizeElement(it)
-                } else {
-                    it.status = ElementStatus.FINALIZED
-                    it.save failOnError: true
-                }
-            }
-
-            println "Creating some actions"
-
-            Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
-
-            15.times {
-                Action action
-                if (it == 7) {
-                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: Model.name)
-                } else if (it == 4) {
-                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: Model.name)
-                } else {
-                    action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
-                }
-                if (it % 3 == 0) {
-                    actionService.dismiss(action)
-                }
-            }
-
-            def parent = new Model(name:"parent1", status: ElementStatus.FINALIZED).save(flush:true)
-            parent.addToChildOf(parent)
-
-            assert !actionService.create(batch, TestAction, fail: true).hasErrors()
-            assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
-            assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
-            assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
-
-
-            Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
-            if (createRelationshipAction.hasErrors()) {
-                println createRelationshipAction.errors
-                throw new AssertionError("Failed to create relationship actions!")
-            }
-
-
-            setupSimpleCsvTransformation()
+//            println 'Finalizing all published elements'
+//            CatalogueElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
+//                if (it instanceof Model) {
+//                    elementService.finalizeElement(it)
+//                } else {
+//                    it.status = ElementStatus.FINALIZED
+//                    it.save failOnError: true
+//                }
+//            }
+//
+//            println "Creating some actions"
+//
+//            Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
+//
+//            15.times {
+//                Action action
+//                if (it == 7) {
+//                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: Model.name)
+//                } else if (it == 4) {
+//                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: Model.name)
+//                } else {
+//                    action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
+//                }
+//                if (it % 3 == 0) {
+//                    actionService.dismiss(action)
+//                }
+//            }
+//
+//            def parent = new Model(name:"parent1", status: ElementStatus.FINALIZED).save(flush:true)
+//            parent.addToChildOf(parent)
+//
+//            assert !actionService.create(batch, TestAction, fail: true).hasErrors()
+//            assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
+//            assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
+//            assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
+//
+//
+//            Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
+//            if (createRelationshipAction.hasErrors()) {
+//                println createRelationshipAction.errors
+//                throw new AssertionError("Failed to create relationship actions!")
+//            }
+//
+//
+//            setupSimpleCsvTransformation()
 
             // for generate suggestion test
             catalogueBuilder.build {

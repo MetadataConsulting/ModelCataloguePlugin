@@ -15,11 +15,14 @@ class DataImportController  {
     def initCatalogueService
     def XSDImportService
     def OBOService
+<<<<<<< HEAD
     def umljService
+=======
     def modelCatalogueSecurityService
     def executorService
     def assetService
 
+>>>>>>> 19e5b8aede5198532858f4e5a6272ff130df956b
 
     private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml']
     static responseFormats = ['json']
@@ -27,6 +30,14 @@ class DataImportController  {
 
     protected static getErrors(Map params, MultipartFile file) {
         def errors = []
+<<<<<<< HEAD
+        if (!file) {
+            if (!params?.conceptualDomain) errors.add("no conceptual domain!")
+        } else if (!file.originalFilename.endsWith('.obo') && !file.originalFilename.endsWith('.mc') && !file.originalFilename.endsWith('.umlj')) {
+            if (!params?.conceptualDomain) errors.add("no conceptual domain!")
+        }
+=======
+>>>>>>> 19e5b8aede5198532858f4e5a6272ff130df956b
         if (!params?.name) errors.add("no import name")
         if (!file) errors.add("no file")
         return errors

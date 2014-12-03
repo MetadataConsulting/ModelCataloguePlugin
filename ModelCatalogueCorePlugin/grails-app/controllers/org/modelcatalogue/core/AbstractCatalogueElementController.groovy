@@ -534,7 +534,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     @Override
     protected getIncludeFields(){
         def fields = super.includeFields
-        fields.removeAll(['extensions', 'versionCreated', 'versionNumber', 'classifications'])
+        fields.removeAll(['extensions', 'versionCreated', 'versionNumber', 'classifications', 'modelCatalogueId'])
         fields
     }
 
