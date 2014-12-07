@@ -49,7 +49,7 @@ class UmljService {
         def components = umlFile.allClasses.findAll{
             id, component -> component.ownedElements.findAll{
                 ct ->
-                    ct._type.equals("UMLAssociation") && ct.end2.aggregation.equals("composite") && ct.end2.reference.$ref.equals(cls._id)
+                    ct._type.equals("UMLAssociation") && ct.end2.aggregation.equals("composite") && ct.end2.reference?.$ref.equals(cls._id)
             }.size() > 0
 
         }
@@ -92,7 +92,7 @@ class UmljService {
     }
 
     protected ValueDomain findOrCreateValueDomain(att, umlFile, classification){
-        if(!(att.type instanceof String) && att.type?.$ref && umlFile.allDataTypes.get(att.type.$ref)){
+        if(!(att.type instanceof String) && att.type?.$ref && umlFile.allDataTypes.get(att?.type.$ref)){
             // Find highest supertype
             def currType = umlFile.allDataTypes.get(att.type.$ref)
             while(currType.ownedElements?.findAll({oe -> oe._type.equals("UMLGeneralization")})!= null)
@@ -100,7 +100,6 @@ class UmljService {
                 currType = umlFile.allDataTypes.get(currType.ownedElements.findAll({oe -> oe._type.equals("UMLGeneralization")}).get(0).target.$ref)
             }
             def dataType = DataType.findByNameIlike(currType.name.toString())
-
             if(!dataType) dataType = new DataType(name: currType.name.toString()).save()
             dataType.addToClassifications(classification)
             def valueDomain = ValueDomain.findByDataType(dataType)
@@ -117,12 +116,12 @@ class UmljService {
                 enumMap.put(ev.name, ev.documentation)
             }
             def enumString = mapToString(enumMap)
-            def dataType = EnumeratedType.findByEnumAsStringAndName(enumString, att.type)
-            if(!dataType) dataType = new EnumeratedType(name: att.type, enumerations: enumMap).save()
+            def dataType = EnumeratedType.findByEnumAsStringAndName(enumString, enumeration.name)
+            if(!dataType) dataType = new EnumeratedType(name: enumeration.name, enumerations: enumMap).save()
             dataType.addToClassifications(classification)
 
             def valueDomain = ValueDomain.findByDataType(dataType)
-            if(!valueDomain) valueDomain = new ValueDomain(name: att.type, dataType: dataType).save()
+            if(!valueDomain) valueDomain = new ValueDomain(name: enumeration.name, dataType: dataType).save()
             valueDomain.addToClassifications(classification)
             return valueDomain
         } else if(att.type instanceof String){
@@ -145,7 +144,10 @@ class UmljService {
         if(!dataElement) dataElement = new DataElement(name: att.name.replaceAll("_", " "), description: att.documentation, valueDomain: valueDomain).save()
         dataElement.addToClassifications(classification)
         if(att.tags?.value) dataElement.ext.put("cosd id", att.tags?.value[0])
-        model.addToContains(dataElement)
+        def rel = model.addToContains(dataElement)
+        if(multiplicity["minRepeat"]) rel.ext.put("Min Occurs", multiplicity["minRepeat"])
+        if(multiplicity["maxRepeat"]) rel.ext.put("Max Occurs", multiplicity["maxRepeat"])
+
     }
 
     protected createModels(cls, umlFile, classification, topLevelModel, ArrayList<Object> carried_forward_atts = new ArrayList<Object>(), ArrayList<Object> carried_forward_comps = new ArrayList<Object>()) {

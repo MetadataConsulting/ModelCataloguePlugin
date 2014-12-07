@@ -133,7 +133,8 @@ class DataImportController  {
 
             executorService.submit {
                 try {
-                    Classification classification = new Classification(name: name).save(flush:true)
+                    Classification classification = Classification.findByName(name)
+                    if(!classification) classification =  new Classification(name: name).save(flush:true, failOnError:true)
                     umljService.importUmlDiagram(inputStream, name, classification)
                     Asset updated = Asset.get(id)
                     updated.status = ElementStatus.FINALIZED
