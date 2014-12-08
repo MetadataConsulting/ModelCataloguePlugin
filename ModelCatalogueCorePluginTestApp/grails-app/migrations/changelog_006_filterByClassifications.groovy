@@ -15,6 +15,9 @@ databaseChangeLog = {
             tableExists tableName: "extendible_element"
         }
 
+        dropAllForeignKeyConstraints baseTableName: 'user'
+        addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "user", constraintName: "FKEA5792AFB738USER", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
+
         dropAllForeignKeyConstraints baseTableName: 'extension_value'
         addForeignKeyConstraint(baseColumnNames: "element_id", baseTableName: "extension_value", constraintName: "CAT_EL_EXTENSIONS", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
 
