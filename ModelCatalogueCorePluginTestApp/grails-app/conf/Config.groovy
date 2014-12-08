@@ -102,7 +102,7 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "https://metadata.cfapps.io"
+        grails.serverURL = System.getenv('METADATA_SERVER_URL')
     }
 }
 

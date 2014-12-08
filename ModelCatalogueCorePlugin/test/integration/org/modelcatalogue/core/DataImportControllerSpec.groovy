@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
@@ -11,13 +10,15 @@ import spock.lang.Shared
  * Created by sus_avi on 01/05/2014.
  */
 
-class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder{
+class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder {
     @Shared
-    def fileName, recorder, filenameXsd, filenameXsd2
-    def setupSpec(){
+    def fileName, recorder, filenameXsd, filenameXsd2, fileNameStarUML
+
+    def setupSpec() {
         fileName = "test/integration/resources/example.xls"
         filenameXsd = "test/unit/resources/SACT/XMLDataTypes.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
         filenameXsd2 = "test/unit/resources/SACT/Breast_XMLSchema.xsd"//"test/unit/resources/SACT/XSD_Example.xsd"
+        fileNameStarUML = "test/integration/resources/gel_cancer_combined2.umlj"
         loadMarshallers()
         loadFixtures()
         recorder = DefaultResultRecorder.create(

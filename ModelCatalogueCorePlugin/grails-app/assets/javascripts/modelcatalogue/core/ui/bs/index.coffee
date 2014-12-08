@@ -7,6 +7,7 @@
 #= require importCtrl
 #= require modalPromptNewExcelImport
 #= require modalPromptNewOboImport
+#= require modalPromptNewUmljImport
 #= require modalPromptNewXsdImport
 #= require modalPromptNewMCImport
 #= require batchView
@@ -70,6 +71,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.importCtrl'
   'mc.core.ui.bs.modalPromptNewExcelImport'
   'mc.core.ui.bs.modalPromptNewOboImport'
+  'mc.core.ui.bs.modalPromptNewUmljImport'
   'mc.core.ui.bs.modalPromptNewXsdImport'
   'mc.core.ui.bs.modalPromptNewMCImport'
   'mc.core.ui.bs.batchView'

@@ -37,23 +37,26 @@ class DataImportService {
 
                     model(name:getRowValue(row,parentModelIndex), id:getRowValue(row,parentModelCodeIndex)){
                         model(name:getRowValue(row,modelIndex),id: getRowValue(row,modelCodeIndex) ){
-                            dataElement(name:getRowValue(row,dataItemNameIndex), description:getRowValue(row,dataItemDescriptionIndex),id:getRowValue(row,dataItemCodeIndex) ){
-                                if(getRowValue(row,unitsIndex)||getRowValue(row,dataTypeIndex)){
-                                    valueDomain(name:getRowValue(row,dataItemNameIndex)){
-                                        if(getRowValue(row,dataTypeIndex))
-                                            importDataTypes(builder,getRowValue(row,dataItemNameIndex),getRowValue(row,dataTypeIndex))
-                                        if(getRowValue(row,unitsIndex))
-                                            measurementUnit(name:getRowValue(row,unitsIndex) , symbol:getRowValue(row,symbolsIndex))
+                            if(getRowValue(row,dataItemNameIndex)) {
+                                dataElement(name: getRowValue(row, dataItemNameIndex), description: getRowValue(row, dataItemDescriptionIndex), id: getRowValue(row, dataItemCodeIndex)) {
+                                    if (getRowValue(row, unitsIndex) || getRowValue(row, dataTypeIndex)) {
+                                        valueDomain(name: getRowValue(row, dataItemNameIndex)) {
+                                            if (getRowValue(row, dataTypeIndex))
+                                                importDataTypes(builder, getRowValue(row, dataItemNameIndex), getRowValue(row, dataTypeIndex))
+                                            if (getRowValue(row, unitsIndex))
+                                                measurementUnit(name: getRowValue(row, unitsIndex), symbol: getRowValue(row, symbolsIndex))
+                                        }
                                     }
-                                }
-                                int counter = metadataStartIndex
-                                while (counter <= metadataEndIndex) {
-                                    String key = headers[counter].toString()
-                                    String value = (row[counter]!=null) ? row[counter].toString() : ""
-                                    if (key!="" && key!="null") {
-                                        ext(key, value?.take(2000)?.toString() ?: '')
+
+                                    int counter = metadataStartIndex
+                                    while (counter <= metadataEndIndex) {
+                                        String key = headers[counter].toString()
+                                        String value = (row[counter] != null) ? row[counter].toString() : ""
+                                        if (key != "" && key != "null") {
+                                            ext(key, value?.take(2000)?.toString() ?: '')
+                                        }
+                                        counter++
                                     }
-                                    counter++
                                 }
                             }
                         }
