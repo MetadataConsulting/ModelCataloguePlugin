@@ -1,6 +1,7 @@
 package uk.co.brc.modelcatalogue
 
 import org.modelcatalogue.core.*
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
@@ -11,7 +12,7 @@ class ImportServiceSpec extends Specification {
     def importService
     def initCatalogueService
 
-
+    @Ignore
     def
     "import nhic spreadsheet"() {
 

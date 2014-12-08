@@ -74,7 +74,6 @@ environments {
         caps.setCapability("name", "ModelCatalogueCoreTestApp");
         caps.setCapability("platform", "Windows 8.1");
         caps.setCapability("version", "11");
-        caps.setCapability("browserName", "")
         driver = {
             new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), caps)
         }
