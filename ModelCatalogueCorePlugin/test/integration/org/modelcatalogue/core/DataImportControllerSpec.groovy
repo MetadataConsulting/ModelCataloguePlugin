@@ -1,13 +1,9 @@
 package org.modelcatalogue.core
 
-import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
-import org.springframework.mock.web.MockMultipartFile
-import org.springframework.mock.web.MockMultipartHttpServletRequest
-import spock.lang.Ignore
 import spock.lang.Shared
 
 /**
@@ -83,149 +79,6 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
 
     }
 
-
-
-
-    //so we don't load a file
-    def "placeholder"() {
-
-    }
-    @Ignore
-    def "Test the dataImportService in the ImporterController"()
-    {
-        def controller = new DataImportController()
-        when: "The dataImportService is called"
-        def numElements = DataElement.count()
-        controller.response.format = 'json'
-        controller.metaClass.request = new MockMultipartHttpServletRequest()
-        controller.params.name = 'Core Cancer Model'
-        InputStream inputStream = new FileInputStream(fileNameStarUML)
-        controller.request.addFile(new MockMultipartFile('file', fileNameStarUML,"application/octet-stream" , inputStream))
-        controller.upload()
-
-        then:
-
-        true
-
-
-    }
-
-
-
-
-//    def "Test the dataImportService in the ImporterController"()
-//    {
-//        def controller = new DataImportController()
-//        when: "The dataImportService is called"
-//        def numElements = DataElement.count()
-//        controller.response.format = 'json'
-//        controller.metaClass.request = new MockMultipartHttpServletRequest()
-//        controller.params.conceptualDomain = 'COSD'
-//        controller.params.name = 'testImport123'
-//        InputStream inputStream = new FileInputStream(fileName)
-//        controller.request.addFile(new MockMultipartFile('file', fileName,"application/octet-stream" , inputStream))
-//        controller.upload()
-//        JSONElement json = controller.response.json
-//        String list = "list1"
-//        recordResult list, json
-//
-//        then: "The an importer is created and there are items in the importQueue and actions"
-//        json
-//        json.pendingAction
-//        DataImport.list().size()>0
-//
-//        when:
-//        controller.resolveAll(json.id)
-//
-//        then:
-//        json
-//
-//        when:
-//        controller.ingestQueue(json.id)
-//
-//        then:
-//        json
-//
-//
-//
-//
-//    }
-
-//    def "Test the dataImportService in the ImporterController"() {
-//        def controller = new DataImportController()
-//        when: "The dataImportService is called"
-//        def numElements = DataElement.count()
-//        controller.response.format = 'json'
-//        controller.metaClass.request = new MockMultipartHttpServletRequest()
-//        controller.params.conceptualDomain = 'COSD'
-//        controller.params.name = 'testImport123'
-//        InputStream inputStream = new FileInputStream(filenameXsd2)
-//        controller.request.addFile(new MockMultipartFile('file', filenameXsd2, "application/octet-stream", inputStream))
-//        controller.upload()
-//        def asset = Asset.findByName("Import for testImport123")
-//
-//        then:
-//        asset
-
-//        when:
-//        controller = new DataImportController()
-//        numElements = DataElement.count()
-//        controller.response.format = 'json'
-//        controller.metaClass.request = new MockMultipartHttpServletRequest()
-//        controller.params.conceptualDomain = 'COSD'
-//        controller.params.name = 'testImport1234'
-//        InputStream inputStream2 = new FileInputStream(filenameXsd2)
-//        controller.request.addFile(new MockMultipartFile('file', filenameXsd2,"application/octet-stream" , inputStream2))
-//        controller.upload()
-//        def asset2 = Asset.findByName("Import for testImport1234")
-//
-//        then:
-//        asset2
-
-//    }
-
-//        JSONElement json = controller.response.json
-//        String list = "list1"
-//        recordResult list, json
-//        def model = Model.findByName("qualifier")
-//        def group = Model.findByName("group")
-//        def cd = Model.findByName("CR")
-//        def nhsDate = Model.findByName("TS.GB-en-NHS.Date")
-//        def parents = model.parentOf
-//        def children = model.childOf
-//
-//        then: "The an importer is created and there are items in the importQueue and actions"
-//        ValueDomain.findByName("ts")
-//        parents.contains(cd)
-//        children.contains(group)
-//        nhsDate.contains.collect{it.name=="value"}
-//        json
-//
-//        when: "The dataImportService is called"
-//        controller = new DataImportController()
-//        numElements = DataElement.count()
-//        controller.response.format = 'json'
-//        controller.metaClass.request = new MockMultipartHttpServletRequest()
-//        controller.params.conceptualDomain = 'test2'
-//        controller.params.name = 'testImport1234'
-//        InputStream inputStream2 = new FileInputStream(filenameXsd2)
-//        controller.request.addFile(new MockMultipartFile('file', filenameXsd2,"application/octet-stream" , inputStream2))
-//        controller.upload()
-//        json = controller.response.json
-//        def model = Model.findByName("qualifier")
-//        def group = Model.findByName("group")
-//        def cd = Model.findByName("CR")
-//        def nhsDate = Model.findByName("TS.GB-en-NHS.Date")
-//        def parents = model.parentOf
-//        def children = model.childOf
-
-//        then: "The an importer is created and there are items in the importQueue and actions"
-//        ValueDomain.findByName("ts")
-//        parents.contains(cd)
-//        children.contains(group)
-//        nhsDate.contains.collect{it.name=="value"}
-//        json
-//    }
 
     @Override
     File recordResult(String fixtureName, JSONElement json) {
