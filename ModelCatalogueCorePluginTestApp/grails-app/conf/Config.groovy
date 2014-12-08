@@ -98,7 +98,7 @@ environments {
     }
     test {
         grails.plugin.console.enabled = true
-        grails.serverURL = "https://metadata.cfapps.io"
+        grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     production {
         grails.logging.jul.usebridge = false

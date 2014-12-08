@@ -83,6 +83,10 @@ abstract class ModelCataloguePage extends Page {
         $('#role_' + role + '_' + id + 'Btn')
     }
 
+    Navigator menuItem(String id, String role = "navigation") {
+        $('#role_' + role + '_' + id + '-menu-item-link')
+    }
+
     /**
      * @param row number of row starting 1
      * @param column number of column starting 1

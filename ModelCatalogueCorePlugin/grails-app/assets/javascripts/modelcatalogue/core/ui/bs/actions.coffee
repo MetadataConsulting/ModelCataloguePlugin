@@ -4,7 +4,8 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
   updateFrom = (original, update) ->
     for originalKey of original
-      delete original[originalKey]
+      if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
+        delete original[originalKey]
 
     for newKey of update
       original[newKey] = update[newKey]

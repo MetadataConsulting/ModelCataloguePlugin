@@ -31,7 +31,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
     }
 
-    def "Add new model"(){
+    def "Add new model"() {
 
         when: 'I click the add model button'
         addModelButton.click()
@@ -43,9 +43,9 @@ class ModelWizardSpec extends GebReportingSpec {
         }
 
         when: 'the model details are filled in'
-        name                = "New"
-        modelCatalogueId    = "http://www.example.com/${UUID.randomUUID().toString()}"
-        description         = "Description"
+        name = "New"
+        modelCatalogueId = "http://www.example.com/${UUID.randomUUID().toString()}"
+        description = "Description"
 
         then: 'metadata step is not disabled'
         waitFor {
@@ -124,6 +124,57 @@ class ModelWizardSpec extends GebReportingSpec {
             $('span.catalogue-element-treeview-name', text: "New").displayed
         }
 
+    }
+    def "filter by classification"() {
+        expect:
+        menuItem('classifications', 'navigation-bottom-left').displayed
+
+        when:
+        menuItem('classifications', 'navigation-bottom-left').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+
+        when:
+        $('#elements').value('xmlschema')
+        selectCepItemIfExists()
+        modalPrimaryButton.click()
+
+        then:
+        waitFor {
+            !$('span.catalogue-element-treeview-name', text: "New").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
+        }
+
+        when:
+        menuItem('classifications', 'navigation-bottom-left').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+        waitFor {
+            modalDialog.find("#remove-tag-0").displayed
+        }
+
+        when:
+        modalDialog.find("#remove-tag-0").click()
+        modalPrimaryButton.click()
+
+        then:
+        waitFor {
+            !modalDialog.find("#remove-tag-0").displayed
+        }
+        waitFor {
+            $('span.catalogue-element-treeview-name', text: "New").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('All Classifications')
+        }
+
+    }
+
+    def "open the detail view"() {
+
         when: 'the item is double-clicked'
         $('a.catalogue-element-treeview-link', title: "New").click()
 
@@ -180,8 +231,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
         then: "modal is shown"
         waitFor {
-            modalDialog.displayed
-            modalHeader.text() == 'Create Relationship'
+            modalDialog.displayed && modalHeader.text() == 'Create Relationship'
         }
 
         when:
@@ -196,6 +246,28 @@ class ModelWizardSpec extends GebReportingSpec {
             $('span.catalogue-element-treeview-name', text: "Another New").parent().parent().find('.badge').text() == '1'
         }
 
+    }
+
+    def "edit child model"() {
+        expect:
+        actionButton('edit-catalogue-element').displayed
+
+        when:
+        actionButton('edit-catalogue-element').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        modalDialog.find('#name').value('Changed Name')
+        modalDialog.find("button.btn-success").click()
+
+        then: "same number of children are still shown"
+        waitFor {
+            $('span.catalogue-element-treeview-name', text: "Changed Name").parent().parent().find('.badge').text() == '1'
+        }
     }
 
 }
