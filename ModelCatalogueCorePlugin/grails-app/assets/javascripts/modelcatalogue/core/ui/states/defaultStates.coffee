@@ -12,7 +12,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       )
 
     $rootScope.$on('userLoggedIn', (ignored, user) ->
-      if !user.data.error then updateDashboard(user?.data?.displayName)
+      if user?.data?.error
+        updateDashboard undefined
+      else
+        updateDashboard user?.data?.displayName
     )
 
     $scope.convert = ->
