@@ -322,6 +322,9 @@ class CatalogueBuilder {
     }
 
     private void setStringValue(String name, String value) {
+        if (!value) {
+            return
+        }
         withContextElement(CatalogueElement) {
             if (!it.hasProperty(name)) {
                 throw new IllegalArgumentException("There is no property '$name' in $it")
