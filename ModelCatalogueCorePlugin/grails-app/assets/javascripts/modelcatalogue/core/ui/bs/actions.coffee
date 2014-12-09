@@ -680,6 +680,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         catalogueElementResource($scope.element.elementType).get($scope.element.id).then (refreshed) ->
           updateFrom $scope.element, refreshed
           $rootScope.$broadcast 'redrawContextualActions'
+          $rootScope.$broadcast 'catalogueElementUpdated', refreshed
 
     }
   ]
