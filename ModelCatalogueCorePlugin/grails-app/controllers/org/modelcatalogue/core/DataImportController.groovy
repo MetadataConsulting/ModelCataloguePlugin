@@ -116,6 +116,9 @@ class DataImportController  {
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
                     classifyAsset(updated, classification)
+                    for (CatalogueElement element in created) {
+                        asset.addToRelatedTo(element)
+                    }
                 } catch (Exception e) {
                     logError(id, e)
                 }
