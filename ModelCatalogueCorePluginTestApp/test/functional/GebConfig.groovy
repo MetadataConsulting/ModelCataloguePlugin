@@ -70,10 +70,9 @@ environments {
             System.err.println("Sauce OnDemand credentials not set.");
         }
 
-        DesiredCapabilities caps = DesiredCapabilities.internetExplorer();
+        DesiredCapabilities caps = DesiredCapabilities.chrome();
         caps.setCapability("name", "ModelCatalogueCoreTestApp");
-        caps.setCapability("platform", "Windows 8.1");
-        caps.setCapability("version", "11");
+        caps.setCapability("platform", "Linux");
         driver = {
             new RemoteWebDriver(new URL("http://${username}:${apiKey}@ondemand.saucelabs.com:80/wd/hub"), caps)
         }
