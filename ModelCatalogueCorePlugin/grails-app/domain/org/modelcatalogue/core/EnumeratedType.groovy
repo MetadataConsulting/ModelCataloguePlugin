@@ -107,8 +107,12 @@ class EnumeratedType extends DataType {
         s.split(/\|/).each { String part ->
             if (!part) return
             String[] pair = part.split("(?<!\\\\):")
-            if (pair.length != 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
-            ret[unquote(pair[0])] = unquote(pair[1])
+            if (pair.length > 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
+            if (pair.length == 1) {
+                ret[unquote(pair[0])] = ''
+            } else {
+                ret[unquote(pair[0])] = unquote(pair[1])
+            }
         }
         return ret
     }

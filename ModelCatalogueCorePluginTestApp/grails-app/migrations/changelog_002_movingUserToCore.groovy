@@ -18,10 +18,6 @@ databaseChangeLog = {
                 constraints(nullable: "false", primaryKey: "true")
             }
 
-            column(name: "version", type: "BIGINT") {
-                constraints(nullable: "false")
-            }
-
             column(name: "account_expired", type: "BIT") {
                 constraints(nullable: "false")
             }
@@ -67,7 +63,6 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "id", baseTableName: "user", constraintName: "FKEA5792AFB738USER", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "extendible_element", referencesUniqueColumn: "false")
         addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "user_role", constraintName: "FK143BF46A40A240E4", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
         addForeignKeyConstraint(baseColumnNames: "default_classification_id", baseTableName: "user", constraintName: "FK74B46B67136D25CE", deferrable: "false", initiallyDeferred: "false", onDelete: "NO ACTION", onUpdate: "NO ACTION", referencedColumnNames: "id", referencedTableName: "catalogue_element", referencesUniqueColumn: "false")
-
 
     }
 
