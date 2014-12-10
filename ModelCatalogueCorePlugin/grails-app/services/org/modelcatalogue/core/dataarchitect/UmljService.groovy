@@ -92,12 +92,12 @@ class UmljService {
     }
 
     protected ValueDomain findOrCreateValueDomain(att, umlFile, classification){
-        if(!(att.type instanceof String) && att.type?.$ref && umlFile.allDataTypes.get(att?.type.$ref)){
+        if(!(att.type instanceof String) && att.type?.$ref && umlFile.allDataTypes.get(att?.type?.$ref)){
             // Find highest supertype
-            def currType = umlFile.allDataTypes.get(att.type.$ref)
+            def currType = umlFile.allDataTypes.get(att.type?.$ref)
             while(currType.ownedElements?.findAll({oe -> oe._type.equals("UMLGeneralization")})!= null)
             {
-                currType = umlFile.allDataTypes.get(currType.ownedElements.findAll({oe -> oe._type.equals("UMLGeneralization")}).get(0).target.$ref)
+                currType = umlFile.allDataTypes.get(currType.ownedElements.findAll({oe -> oe._type.equals("UMLGeneralization")}).get(0).target?.$ref)
             }
             def dataType = DataType.findByNameIlike(currType.name.toString())
             if(!dataType) dataType = new DataType(name: currType.name.toString()).save()
@@ -109,8 +109,8 @@ class UmljService {
         }
 
 
-        if(!(att.type instanceof String) && att.type?.$ref && umlFile.allEnumerations.get(att.type.$ref)){
-            def enumeration = umlFile.allEnumerations.get(att.type.$ref)
+        if(!(att.type instanceof String) && att.type?.$ref && umlFile.allEnumerations.get(att.type?.$ref)){
+            def enumeration = umlFile.allEnumerations.get(att.type?.$ref)
             def enumMap = [:]
             enumeration.literals.each{ ev ->
                 enumMap.put(ev.name, ev.documentation)
@@ -192,7 +192,7 @@ class UmljService {
         return umlFile.allClasses.findAll{
             id, subtype -> subtype.ownedElements.findAll{
                 oe ->
-                    oe._type.equals("UMLGeneralization") && oe.target.$ref.equals(cls._id)
+                    oe._type?.equals("UMLGeneralization") && oe?.target?.$ref.equals(cls._id)
             }.size() > 0
         }
     }
