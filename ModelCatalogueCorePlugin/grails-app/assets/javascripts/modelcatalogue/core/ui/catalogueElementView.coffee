@@ -26,7 +26,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.reports  = []
 
 
+
       loadTab = (property) ->
+        
         tab = tabsByName[property]
 
         applicationTitle "#{if tab and tab.heading then tab.heading else names.getNaturalName(property)} of #{$scope.element.getLabel()}"
@@ -37,7 +39,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         if !tab.disabled and (tab.value.empty or tab.search != $state.params.q)
           promise = null
-
+          
           if tab.value.empty or tab.search != $state.params.q
             if $state.params.q
               promise = tab.loader 'search', {search: $state.params.q}
@@ -51,7 +53,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             promise = $q.when tab.value
 
           tab.search = $state.params.q
-
+          
           promise.then (result) ->
             tab.value       = result
             $scope.reports  = result.availableReports
@@ -60,6 +62,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
       onPropertyUpdate = (newProperty, oldProperty) ->
+
         return if oldProperty is newProperty
         loadTab(newProperty)
 
@@ -95,9 +98,10 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         page = undefined if page == 1 or isNaN(page)
         options.location = "replace" if newProperty and not oldProperty
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
+        if(!$state.$current.name=="mc.resource.list") then $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
 
       onElementUpdate = (element, oldEl) ->
+        
         return if angular.equals element, oldEl
 
         applicationTitle "#{element.getLabel()}"
@@ -266,7 +270,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $rootScope.$on 'catalogueElementDeleted', refreshElement
       $rootScope.$on 'catalogueElementUpdated', refreshElement
       $rootScope.$on 'newVersionCreated', (ignored, element) ->
-        if element
+        if element and !$state.$current.name=="mc.resource.list"
           $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history'}
 
 
