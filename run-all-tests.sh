@@ -1,3 +1,8 @@
+#!/bin/bash
+
+# fail if any line fails
+set -e
+
 cd ModelCatalogueCorePlugin
 npm install
 bower install
