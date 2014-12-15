@@ -8,7 +8,7 @@
 
 <body>
 
-<h3><g:message code="default.create.label" args="[entityName]"/></h3>
+<h3>TEST3<g:message code="default.create.label" args="[entityName]"/>TEST</h3>
 
 <g:form action="save" name='userCreateForm'>
 
@@ -29,6 +29,8 @@ tabData << [name: 'roles',    icon: 'icon_role', messageCode: 'spring.security.u
 
 			<s2ui:passwordFieldRow name='password' labelCode='user.password.label' bean="${user}"
                                 labelCodeDefault='Password' value="${user?.password}"/>
+
+            <input type='hidden' name="name" bean="${user}" value="${user?.username}"/>
 
 			<s2ui:checkboxRow name='enabled' labelCode='user.enabled.label' bean="${user}"
                            labelCodeDefault='Enabled' value="${user?.enabled}"/>
