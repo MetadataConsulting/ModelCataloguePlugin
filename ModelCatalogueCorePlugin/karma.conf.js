@@ -5,8 +5,8 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
 
         browsers: [
-            'Chrome'
-            // 'Firefox', // Firefox is slow!
+            // 'Chrome'
+            'Firefox'
             // 'Safari',  // Safari keeps old tabs open causing testing multiple times
         ],
         reporters: ['progress', 'junit', 'coverage', 'osx'],
@@ -54,6 +54,7 @@ module.exports = function(config) {
             'karma-coverage',
             'karma-jasmine',
             'karma-chrome-launcher',
+            'karma-firefox-launcher',
             'karma-safari-launcher',
             'karma-junit-reporter',
             'karma-osx-reporter',
