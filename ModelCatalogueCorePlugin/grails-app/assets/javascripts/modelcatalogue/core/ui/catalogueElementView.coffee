@@ -9,6 +9,15 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
     controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, $injector, applicationTitle) ->
+      updateFrom = (original, update) ->
+        for originalKey of original
+          if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
+            delete original[originalKey]
+
+        for newKey of update
+          original[newKey] = update[newKey]
+        original
+
       propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'downloadUrl', 'archived', 'status', '__enhancedBy']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
@@ -28,7 +37,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
       loadTab = (property) ->
-        
+
         tab = tabsByName[property]
 
         applicationTitle "#{if tab and tab.heading then tab.heading else names.getNaturalName(property)} of #{$scope.element.getLabel()}"
@@ -39,7 +48,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         if !tab.disabled and (tab.value.empty or tab.search != $state.params.q)
           promise = null
-          
+
           if tab.value.empty or tab.search != $state.params.q
             if $state.params.q
               promise = tab.loader 'search', {search: $state.params.q}
@@ -53,7 +62,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             promise = $q.when tab.value
 
           tab.search = $state.params.q
-          
+
           promise.then (result) ->
             tab.value       = result
             $scope.reports  = result.availableReports
@@ -101,7 +110,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         if(!$state.$current.name=="mc.resource.list") then $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
 
       onElementUpdate = (element, oldEl) ->
-        
+
         return if angular.equals element, oldEl
 
         applicationTitle "#{element.getLabel()}"
@@ -261,7 +270,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       refreshElement = () ->
         if $scope.element
           $scope.element.refresh().then (refreshed)->
-            $scope.element = refreshed
+            updateFrom($scope.element, refreshed)
+            onElementUpdate($scope.element)
 
       $rootScope.$on 'userLoggedIn', refreshElement
       $rootScope.$on 'userLoggedIn', refreshElement

@@ -110,12 +110,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.elementSelectedInTree    = false
     $scope.element                  = if list.size > 0 then list.list[0]
 
-    if $scope.element
-      $scope.dataElements           = angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$scope.element.link}/outgoing/containment"})
-    else
-      $scope.dataElements           = listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
-
-
     printMetadata = (relationship) ->
       result  = ''
       ext     = relationship.ext ? {}
@@ -137,14 +131,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         result = result.substring(0,result.lastIndexOf(","))
       result
 
-    $scope.dataElementsColumns = [
-      {header: 'Name',          value: "ext.name || ext.Name || relation.name",        classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
-      {header: 'Description',   value: "relation.description", classes: 'col-md-4'}
-      {header: 'Local Identifier', value:  printLocalIdentifiers,     classes: 'col-md-2'}
-      {header: 'Metadata', value:  printMetadata,     classes: 'col-md-3'}
-    ]
-
-
     if $scope.resource == 'model'
       if $rootScope.$$lastModels? and angular.equals($stateParams,$rootScope.$$lastModels.params)
         $scope.list = $rootScope.$$lastModels.list
@@ -152,10 +138,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         # let's say it's more convenient if you get back to expanded tree that the parent is selected but
         # if this behaviour will be unintuitive as well just remove the line bellow
         $scope.elementSelectedInTree = $rootScope.$$lastModels.elementSelectedInTree
-        if $scope.element
-          $scope.dataElements = $rootScope.$$lastModels.element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{$rootScope.$$lastModels.element?.link}/outgoing/containment"})
-        else
-          $scope.dataElements = listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
       else
         $rootScope.$$lastModels =
           list:   $scope.list
@@ -164,25 +146,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           item._containedElements_ ?= listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
 
       $scope.$on 'treeviewElementSelected', (event, element) ->
-        unless element._containedElements_?.size?
-          params = {}
-          params.classification = $stateParams.classification if $stateParams.classification
-
-          element.contains(null, params).then (contained)->
-            element._containedElements_ = contained
-            $scope.dataElements         = contained
         $scope.element                  = element
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels.element = element
         $rootScope.$$lastModels.elementSelectedInTree = true
-        $scope.dataElements             = element._containedElements_ ? angular.extend(listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship'), {base: "#{element.link}/outgoing/containment"})
-
-    else if $scope.resource == 'newRelationships'
-      $scope.columns = [
-        {header: "source",          value: 'source.name',           class: 'col-md-6' }
-        {header: "destination",     value: 'destination.name',      class: 'col-md-6' }
-      ]
-
   ])
 .config(['$stateProvider', ($stateProvider) ->
 
