@@ -325,8 +325,10 @@ class DataArchitectService {
         }
 
         Batch.findAllByNameIlike("Create Synonyms for Model '%'").each reset
-        Batch.findAllByNameIlike("Inline Model '%'").each reset
         Batch.findAllByNameIlike("Create Synonyms for Data Element '%'").each reset
+        Batch.findAllByNameIlike("Inline Model '%'").each reset
+        Batch.findAllByNameIlike("Merge Model '%'").each reset
+        Batch.findAllByNameIlike("Merge Data Element '%'").each reset
 
         Batch.findAllByName("Rename Data Types and Value Domains").each reset
 
@@ -361,12 +363,38 @@ class DataArchitectService {
             batch.save()
         }
 
+        elementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
+            DataElement dataElement = DataElement.get(destId)
+            Batch batch = Batch.findOrSaveByName("Merge Data Element '$dataElement.name'")
+            sources.each { srcId ->
+                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId"
+                if (action.hasErrors()) {
+                    log.error "Error generating create synonym action: $action.errors"
+                }
+            }
+            batch.archived = false
+            batch.save()
+        }
+
         elementService.findDuplicateModelsSuggestions().each { destId, sources ->
             Model model = Model.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Model '$model.name'")
             RelationshipType type = RelationshipType.findByName("synonym")
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                if (action.hasErrors()) {
+                    log.error "Error generating create synonym action: $action.errors"
+                }
+            }
+            batch.archived = false
+            batch.save()
+        }
+
+        elementService.findDuplicateModelsSuggestions().each { destId, sources ->
+            Model model = Model.get(destId)
+            Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
+            sources.each { srcId ->
+                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
                 if (action.hasErrors()) {
                     log.error "Error generating create synonym action: $action.errors"
                 }
