@@ -449,7 +449,7 @@
 
             then: "the element new draft version is created"
             waitFor {
-                subviewStatus.text() == 'FINALIZED'
+                subviewStatus.text() == 'DRAFT'
                 totalOf('history') == 2
             }
 

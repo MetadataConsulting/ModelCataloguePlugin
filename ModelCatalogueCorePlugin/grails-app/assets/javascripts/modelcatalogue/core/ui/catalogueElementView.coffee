@@ -270,8 +270,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $rootScope.$on 'catalogueElementDeleted', refreshElement
       $rootScope.$on 'catalogueElementUpdated', refreshElement
       $rootScope.$on 'newVersionCreated', (ignored, element) ->
-        if element and !$state.$current.name=="mc.resource.list"
-          $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history'}
+        if element
+          $state.go '.', {resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history'}
 
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->

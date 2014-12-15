@@ -19,7 +19,7 @@ class ModelWizardSpec extends GebReportingSpec {
         }
 
         viewTitle.text().trim()     == 'Models'
-        subviewTitle.text().trim()  == 'NHIC Datasets FINALIZED'
+        subviewTitle.text().trim()  == 'NHIC Datasets'
 
         when:
         loginAdmin()
