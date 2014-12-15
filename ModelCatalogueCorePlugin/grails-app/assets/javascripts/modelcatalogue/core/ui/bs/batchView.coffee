@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView', 'mc.core.ui.decoratedList',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'mc.util.ui.bs.contextualActions' , 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
+angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'mc.util.ui.bs.contextualActions' , 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/batchView.html', '''
     <div>
       <span class="contextual-actions-right">

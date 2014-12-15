@@ -14,7 +14,6 @@
 #= require catalogueElementTreeview
 #= require catalogueElementTreeviewItem
 #= require catalogueElementProperties
-#= require decoratedListTable
 #= require infiniteTable
 #= require infiniteList
 #= require propertiesPane
@@ -63,7 +62,6 @@ angular.module('mc.core.ui.bs', [
   'ngCookies'
   'infinite-scroll'
   # list of modules
-  'mc.core.ui.bs.decoratedListTable'
   'mc.core.ui.bs.infiniteTable'
   'mc.core.ui.bs.infiniteList'
   'mc.core.ui.bs.catalogueElementView'
