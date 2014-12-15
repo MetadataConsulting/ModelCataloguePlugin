@@ -1,6 +1,5 @@
 #= require_self
 #= require modelcatalogue/core/index
-#= require decoratedList
 #= require infiniteList
 #= require infiniteTable
 #= require infiniteListCtrl
@@ -26,7 +25,6 @@ angular.module('mc.core.ui', [
   'ui.router',
   'mc.core'
   # list of modules
-  'mc.core.ui.decoratedList'
   'mc.core.ui.infiniteList'
   'mc.core.ui.infiniteTable'
   'mc.core.ui.infiniteListCtrl'

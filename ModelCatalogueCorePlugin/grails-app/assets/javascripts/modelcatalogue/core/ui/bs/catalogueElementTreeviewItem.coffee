@@ -1,4 +1,4 @@
-cetiModule = angular.module('mc.core.ui.bs.catalogueElementTreeviewItem', ['mc.core.ui.catalogueElementTreeviewItem', 'mc.core.ui.decoratedList', 'ui.bootstrap'])
+cetiModule = angular.module('mc.core.ui.bs.catalogueElementTreeviewItem', ['mc.core.ui.catalogueElementTreeviewItem', 'ui.bootstrap'])
 cetiModule.config ['$tooltipProvider', ($tooltipProvider) ->
   $tooltipProvider.setTriggers mouseover: 'mouseout'
 ]
