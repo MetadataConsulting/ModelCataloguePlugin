@@ -458,7 +458,14 @@ class CatalogueBuilder {
     }
 
     private <T extends CatalogueElement> T findOrPrepareInstance(Class<T> type, Map<String, Object> parameters, boolean unclassified = false) {
-        T element = unclassified ? tryFindUnclassified(type, parameters.name, parameters.id) : tryFind(type, parameters.name, parameters.id)
+        T element
+        if (unclassified) {
+            element = tryFindUnclassified(type, parameters.name, parameters.id)
+        } else if (parameters.classification) {
+            element = tryFind(type, parameters.classification, parameters.name, parameters.id)
+        } else {
+            element = tryFind(type, parameters.name, parameters.id)
+        }
 
         if (!element) {
             log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} does not exist yet, creating new one"

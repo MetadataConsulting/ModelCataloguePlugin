@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.springframework.transaction.TransactionStatus
@@ -330,6 +331,11 @@ class ElementService implements Archiver<CatalogueElement> {
 
 
     Map<Long, Long> findModelsToBeInlined() {
+        if (Environment.current == Environment.DEVELOPMENT) {
+            // does not work with H2 database
+            log.warn "Trying to find inlined models in development mode. This feature does not work with H2 database"
+            return [:]
+        }
         List<Model> models = Model.executeQuery("""
             select m
             from Model m left join m.incomingRelationships inc
@@ -349,6 +355,12 @@ class ElementService implements Archiver<CatalogueElement> {
         ret
     }
 
+    /**
+     * Return models which are very likely to be duplicates.
+     * For models having same name as at least one other Model check if they contains same child models and data
+     * elements. If so return their id and the set of ids of similar models.
+     * @return map with the model id as key and set of ids of duplicate models as value
+     */
     Map<Long, Set<Long>> findDuplicateModelsSuggestions() {
         // TODO: create test
         Object[][] results = Model.executeQuery """
@@ -405,6 +417,14 @@ class ElementService implements Archiver<CatalogueElement> {
         suggestions
     }
 
+    /**
+     * Returns data elements which are very likely to be duplicates.
+     *
+     * Data elements are considered duplicates if they share the exactly same value domain and they are having the same
+     * name.
+     *
+     * @return map with the data element id as key and set of ids of duplicate data elements as value
+     */
     Map<Long, Set<Long>> findDuplicateDataElementsSuggestions() {
         // TODO: create test
         Object[][] results = DataElement.executeQuery """

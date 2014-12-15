@@ -26,7 +26,6 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
       deferred = $q.defer()
       searchFun(query).then (result) ->
         deferred.resolve(result.list)
-        debugger
       deferred.promise
 
     $scope.label = (el, customLabel) ->
