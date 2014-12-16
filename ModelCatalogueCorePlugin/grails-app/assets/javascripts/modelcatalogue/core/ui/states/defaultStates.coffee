@@ -61,9 +61,13 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   ])
 
-.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', ($scope, $stateParams, $state, element, $rootScope) ->
+.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', 'names' , ($scope, $stateParams, $state, element, $rootScope, names) ->
     $scope.element = element
     $rootScope.elementToShow = element
+
+    $scope.$on 'newVersionCreated', (ignored, element) ->
+      if element
+        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history'}
 ])
 
 .controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', 'element', ($scope, $stateParams, $state, element) ->
@@ -109,27 +113,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.resource                 = $stateParams.resource
     $scope.elementSelectedInTree    = false
     $scope.element                  = if list.size > 0 then list.list[0]
-
-    printMetadata = (relationship) ->
-      result  = ''
-      ext     = relationship.ext ? {}
-      for key, value of ext
-        result += "#{key}: #{value ? ''}\n"
-      result
-
-    printLocalIdentifiers = (relationship) ->
-      result = ''
-      ext     = relationship?.relation?.ext ? {}
-      #local identifiers will be added as extensions (metadata) and may look like these:
-      #"identifier","local identifier","local_identifier","local identifier","optional_local_identifier","optional local identifier"
-      for key, value of ext
-        if key.toLowerCase().indexOf("identifier") != -1
-          if value?.length   #if value is not empty or null
-            result += "#{value ? ''}, "
-
-      if(result.indexOf(",") != -1)
-        result = result.substring(0,result.lastIndexOf(","))
-      result
+    $scope.property                 = 'contains'
 
     if $scope.resource == 'model'
       if $rootScope.$$lastModels? and angular.equals($stateParams,$rootScope.$$lastModels.params)
@@ -150,6 +134,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels.element = element
         $rootScope.$$lastModels.elementSelectedInTree = true
+
+      $scope.$on 'newVersionCreated', (ignored, element) ->
+        if element
+          $scope.property = 'history'
   ])
 .config(['$stateProvider', ($stateProvider) ->
 
@@ -635,7 +623,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
         </div>
         <div class="col-md-8" ng-if="element">
-          <catalogue-element-view element="element" property="'contains'"></catalogue-element-view>
+          <catalogue-element-view element="element" property="property"></catalogue-element-view>
         </div>
         <hr/>
       </div>
