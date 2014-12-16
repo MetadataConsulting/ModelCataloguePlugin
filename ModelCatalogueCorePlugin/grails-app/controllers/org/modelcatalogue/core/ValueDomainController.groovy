@@ -101,7 +101,7 @@ class ValueDomainController extends AbstractCatalogueElementController<ValueDoma
             return
         }
 
-        if (!valueDomain.rule && !(valueDomain.dataType?.instanceOf(EnumeratedType))) {
+        if (!valueDomain.rule && !(valueDomain.dataType?.instanceOf(EnumeratedType)) && valueDomain.countBasedOn() == 0) {
             respond result: "Don't know how to validate value."
             return
         }

@@ -656,7 +656,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
 
     updateDisabled =  ->
-      action.disabled = not $scope.element.rule and not ($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType'))
+      action.disabled = not $scope.element.rule and not ($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType')) and $scope.element.basedOn?.length == 0
 
 
     $scope.$watch 'element.rule',     updateDisabled

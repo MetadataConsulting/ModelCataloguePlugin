@@ -387,6 +387,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         tokenDomain.isBasedOn
         tokenDomain.isBasedOn.contains stringDomain
+        tokenDomain.dataType == stringType
 
     }
 
