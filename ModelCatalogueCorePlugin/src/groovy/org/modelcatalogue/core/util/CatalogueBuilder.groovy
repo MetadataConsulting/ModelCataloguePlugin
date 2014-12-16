@@ -200,6 +200,7 @@ class CatalogueBuilder {
 
     void description(String description) { setStringValue('description', description) }
     void rule(String rule) { setStringValue('rule', rule) }
+    void regex(String regex) { setStringValue('regexDef', regex) }
 
     /**
      * Sets the id of the current element.

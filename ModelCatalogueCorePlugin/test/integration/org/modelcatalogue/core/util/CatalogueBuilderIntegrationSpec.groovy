@@ -263,6 +263,21 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         e.message.startsWith "You must provide the name of the Value Domain"
     }
 
+    def "specify rule as regex"() {
+        when:
+        build {
+            valueDomain name: 'with regex', {
+                regex(/\w+/)
+            }
+        }
+
+        ValueDomain domain = ValueDomain.findByName('with regex')
+
+        then:
+        domain
+        domain.rule == """x ==~ /\\w+/"""
+    }
+
     def "add extensions"() {
         build {
             dataType name: 'test:blah', {
