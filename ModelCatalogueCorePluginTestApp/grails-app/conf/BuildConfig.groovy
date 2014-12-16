@@ -62,7 +62,7 @@ grails.project.dependency.resolution = {
         runtime 'mysql:mysql-connector-java:5.1.24'
 
         // Selenium WebDriver, for use in Geb
-        def webDriverVersion = "2.44.0ebdrive"
+        def webDriverVersion = "2.44.0"
 
         // Testing modules
         test "org.gebish:geb-spock:0.9.3"
