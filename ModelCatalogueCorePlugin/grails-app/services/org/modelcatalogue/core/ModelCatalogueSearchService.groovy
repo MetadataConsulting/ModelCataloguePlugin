@@ -123,10 +123,10 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.total = results.total
         } else if (RelationshipType.isAssignableFrom(resource)) {
             searchResults.searchResults = resource.findAllByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query, params)
-            searchResults.total = resource.countByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query, params)
+            searchResults.total = resource.countByNameIlikeOrSourceToDestinationIlikeOrDestinationToSourceIlike(query, query, query)
         } else {
             searchResults.searchResults = resource.findAllByNameIlike(query, params)
-            searchResults.total         = resource.countByNameIlike(query, params)
+            searchResults.total         = resource.countByNameIlike(query)
         }
 
         searchResults

@@ -47,7 +47,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        respond Lists.lazy(params, resource, "/${resourceName}/search", { results.searchResults })
+        respond Lists.lazy(params, resource, "/${resourceName}/search", { results.searchResults }, { results.total })
     }
 
     protected handleParams(Integer max) {
@@ -283,7 +283,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     }
 
     protected void notAuthorized() {
-        render status: HttpStatus.UNAUTHORIZED
+        render status: UNAUTHORIZED
     }
 
     protected getIncludeFields(){
