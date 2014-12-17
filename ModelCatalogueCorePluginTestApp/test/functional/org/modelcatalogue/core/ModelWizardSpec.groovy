@@ -76,8 +76,12 @@ class ModelWizardSpec extends GebReportingSpec {
         fillMetadata 'Min Occurs': '1', 'Max Occurs': '10'
 
         and: 'the child is selected'
-        name = 'patient'
-        selectCepItemIfExists()
+        $('.search-for-more-icon').click()
+        $('.modal-body .input-group-lg input').value('patient')
+        waitFor {
+            $('.list-group-item.item-found').displayed
+        }
+        $('.list-group-item.item-found').click()
 
         and: 'create child from scratch and leave it filled in'
         name = 'This should create new child model'
