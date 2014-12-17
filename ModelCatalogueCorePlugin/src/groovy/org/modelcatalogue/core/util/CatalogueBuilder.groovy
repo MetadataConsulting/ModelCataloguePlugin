@@ -209,6 +209,10 @@ class CatalogueBuilder {
         }
     }
 
+    RelationshipBuilder rel(String relationshipTypeName) {
+        return new RelationshipBuilder(this,relationshipTypeName)
+    }
+
     void description(String description) { setStringValue('description', description) }
     void rule(String rule) { setStringValue('rule', rule) }
     void regex(String regex) { setStringValue('regexDef', regex) }
@@ -326,11 +330,13 @@ class CatalogueBuilder {
      * @param contextElementType
      * @param closure
      */
-    private <T extends CatalogueElement> void withContextElement(Class<T> contextElementType, boolean update = false, @ClosureParams(value=FirstParam.FirstGenericType) Closure closure) {
+    private <T extends CatalogueElement> WithOptionalOrClause withContextElement(Class<T> contextElementType, boolean update = false, @ClosureParams(value=FirstParam.FirstGenericType) Closure closure) {
         T contextElement = getContextElement(contextElementType)
         if (contextElement) {
             closure(contextElement)
+            return WithOptionalOrClause.NOOP
         }
+        DefaultWithOptionalOrClause.INSTANCE
     }
 
     private void setStringValue(String name, String value) {
@@ -345,7 +351,7 @@ class CatalogueBuilder {
         }
     }
 
-    private static <T extends CatalogueElement> T saveIfNeeded(T element) {
+    protected static <T extends CatalogueElement> T saveIfNeeded(T element) {
         if (!element) {
             return element
         }
@@ -363,7 +369,7 @@ class CatalogueBuilder {
 
 
 
-    private <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
+    protected <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
         Classification classification = tryFindUnclassified(Classification, classificationName, id)
         if (!classification) {
             throw new IllegalArgumentException("Requested classification ${classificationName} is not present in the catalogue!")
@@ -371,7 +377,7 @@ class CatalogueBuilder {
         tryFindWithClassification(type, classification, name, id)
     }
 
-    private <T extends CatalogueElement> T tryFind(Class<T> type, Object name, Object id) {
+    protected <T extends CatalogueElement> T tryFind(Class<T> type, Object name, Object id) {
         tryFindWithClassification(type, saveIfNeeded(getContextElement(Classification)), name, id)
     }
 
@@ -493,4 +499,91 @@ class CatalogueBuilder {
 
 }
 
+
+class RelationshipBuilder {
+
+    CatalogueBuilder catalogueBuilder
+    RelationshipType type
+
+    RelationshipBuilder(CatalogueBuilder catalogueBuilder, String type) {
+        if (catalogueBuilder == null) {
+            throw new IllegalArgumentException("CatalogueBuilder cannot be null!")
+        }
+        RelationshipType relationshipType = RelationshipType.findByName(type)
+        if (relationshipType == null) {
+            throw new IllegalArgumentException("Relationship type $type does not exist!")
+        }
+        this.catalogueBuilder = catalogueBuilder
+        this.type = relationshipType
+    }
+
+    void to(String classification, String name) {
+        catalogueBuilder.withContextElement(type.sourceClass) {
+            CatalogueBuilder.saveIfNeeded it
+            assert it.createLinkTo(catalogueBuilder.tryFind(type.destinationClass, classification, name, null), type).errors.errorCount == 0
+        } or {
+            throw new IllegalStateException("There is no contextual element available of type $type.sourceClass")
+        }
+    }
+
+    void to(String name) {
+        catalogueBuilder.withContextElement(type.sourceClass) {
+            CatalogueBuilder.saveIfNeeded it
+            assert it.createLinkTo(catalogueBuilder.tryFind(type.destinationClass, name, null), type).errors.errorCount == 0
+        } or {
+            throw new IllegalStateException("There is no contextual element available of type $type.sourceClass")
+        }
+    }
+
+    void to(CatalogueElement element) {
+        catalogueBuilder.withContextElement(type.sourceClass) {
+            CatalogueBuilder.saveIfNeeded it
+            assert it.createLinkFrom(element, type).errors.errorCount == 0
+        } or {
+            throw new IllegalStateException("There is no contextual element available of type $type.sourceClass")
+        }
+    }
+
+    void from(String classification, String name) {
+        catalogueBuilder.withContextElement(type.destinationClass) {
+            CatalogueBuilder.saveIfNeeded it
+            assert it.createLinkFrom(catalogueBuilder.tryFind(type.sourceClass, classification, name, null), type).errors.errorCount == 0
+        } or {
+            throw new IllegalStateException("There is no contextual element available of type $type.destinationClass")
+        }
+    }
+
+    void from(String name) {
+        catalogueBuilder.withContextElement(type.destinationClass) {
+            CatalogueBuilder.saveIfNeeded it
+            assert it.createLinkFrom(catalogueBuilder.tryFind(type.sourceClass, name, null), type).errors.errorCount == 0
+        } or {
+            throw new IllegalStateException("There is no contextual element available of type $type.destinationClass")
+        }
+    }
+
+    void from(CatalogueElement element) {
+        catalogueBuilder.withContextElement(type.destinationClass) {
+            CatalogueBuilder.saveIfNeeded it
+            assert it.createLinkFrom(element, type).errors.errorCount == 0
+        } or {
+            throw new IllegalStateException("There is no contextual element available of type $type.destinationClass")
+        }
+    }
+
+}
+
+interface WithOptionalOrClause {
+    static WithOptionalOrClause NOOP = {}
+    void or(Closure orClosure)
+}
+
+enum DefaultWithOptionalOrClause implements WithOptionalOrClause {
+
+    INSTANCE
+
+    void or(Closure c) {
+        c()
+    }
+}
 

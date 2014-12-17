@@ -431,6 +431,30 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         ValueDomain.findByName('Complex Element 1')
     }
 
+    def "create generic relationship"() {
+        build {
+            classification name: "Other123", {
+                valueDomain name: 'WD40'
+            }
+            classification name: "Other234", {
+                valueDomain name: 'VDRel1'
+                def vd2 = valueDomain name: 'VDRel2'
+                valueDomain name: 'VDRel3'
+                valueDomain name: 'VDRel4', {
+                    rel 'synonym'   to      vd2
+                    rel 'synonym'   from    'VDRel1'
+                    rel 'relatedTo' to      'Other123', 'WD40'
+                    rel 'base'      to      'Other123', 'WD40'
+                }
+            }
+        }
+
+        expect:
+        ValueDomain.findByName('VDRel4')
+        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.findByName('synonym'))   == 2
+        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.findByName('base'))      == 1
+        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.findByName('relatedTo')) == 1
+    }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
         created = new CatalogueBuilder(classificationService).build cl
