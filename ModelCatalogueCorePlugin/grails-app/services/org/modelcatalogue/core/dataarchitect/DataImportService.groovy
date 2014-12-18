@@ -2,12 +2,14 @@ package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.dataarchitect.xsd.*
 import org.modelcatalogue.core.util.CatalogueBuilder
 
 class DataImportService {
     static transactional = false
-    def elementService, relationshipService, classificationService
+    def elementService
+    def relationshipService
+    def classificationService
+
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
 
     @Transactional
@@ -29,7 +31,7 @@ class DataImportService {
 
         if (dataItemNameIndex == -1) throw new Exception("Can not find 'Data Item Name' column")
         //iterate through the rows and import each line
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService)
+        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
         builder.build {
             rows.eachWithIndex { def row, int i ->
                 classification(name: getRowValue(row,classificationsIndex)) {

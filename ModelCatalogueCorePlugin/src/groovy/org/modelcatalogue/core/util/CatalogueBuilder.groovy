@@ -14,6 +14,7 @@ class CatalogueBuilder {
     private static Set<Class> SUPPORTED_FOR_AUTO    = [DataType, ValueDomain]
 
     private ClassificationService classificationService
+    private ElementService elementService
 
     private Set<CatalogueElement> created = []
     private List<Map<Class, CatalogueElement>> contexts = []
@@ -24,8 +25,9 @@ class CatalogueBuilder {
 
     private static final Map LATEST = [sort: 'versionNumber', order: 'asc', max: 1]
 
-    CatalogueBuilder(ClassificationService classificationService) {
+    CatalogueBuilder(ClassificationService classificationService, ElementService elementService) {
         this.classificationService = classificationService
+        this.elementService = elementService
     }
 
     Set<CatalogueElement> build(@DelegatesTo(CatalogueBuilder) Closure c) {
@@ -50,13 +52,12 @@ class CatalogueBuilder {
 
         withNewContext model, c
 
-        saveIfNeeded model
+        model = saveIfNeeded model
 
         classifyIfNeeded model
 
         withContextElement(Model) {
-            saveIfNeeded model
-            it.addToParentOf model
+            child model
         }
 
         saveIfNeeded model
@@ -67,7 +68,8 @@ class CatalogueBuilder {
 
         withNewContext element, c
 
-        saveIfNeeded element
+        element = saveIfNeeded element
+
         classifyIfNeeded element
 
         if (element.valueDomain == null && ValueDomain in createAutomatically) {
@@ -77,33 +79,33 @@ class CatalogueBuilder {
         }
 
         withContextElement(Model) {
-            saveIfNeeded element
-            it.addToContains element
+            contains element
         }
 
         saveIfNeeded element
     }
 
     ValueDomain valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        ValueDomain valueDomain = findOrPrepareInstance ValueDomain, checkAndPrepareParameters(ValueDomain, parameters, DataElement)
+        ValueDomain domain = findOrPrepareInstance ValueDomain, checkAndPrepareParameters(ValueDomain, parameters, DataElement)
 
-        withNewContext valueDomain, c
+        withNewContext domain, c
 
-        saveIfNeeded valueDomain
-        classifyIfNeeded valueDomain
+        domain = saveIfNeeded domain
+
+        classifyIfNeeded domain
 
         withContextElement(DataElement) {
-            it.valueDomain = valueDomain
+            it.valueDomain = domain
         }
 
-        if (valueDomain.dataType == null && DataType in createAutomatically) {
-            withNewContext valueDomain, {
+        if (domain.dataType == null && DataType in createAutomatically) {
+            withNewContext domain, {
                 dataType()
             }
-            saveIfNeeded valueDomain
+            domain = saveIfNeeded domain
         }
 
-        saveIfNeeded valueDomain
+        saveIfNeeded domain
     }
 
     DataType dataType(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
@@ -112,6 +114,9 @@ class CatalogueBuilder {
         DataType dataType = findOrPrepareInstance((parameters.enumerations ? EnumeratedType : DataType), parameters)
 
         withNewContext dataType, c
+
+        dataType = saveIfNeeded dataType
+
         classifyIfNeeded dataType
 
         withContextElement(ValueDomain) {
@@ -125,6 +130,9 @@ class CatalogueBuilder {
         MeasurementUnit unit = findOrPrepareInstance MeasurementUnit, checkAndPrepareParameters(MeasurementUnit, parameters), true
 
         withNewContext unit, c
+
+        unit = saveIfNeeded unit
+
         classifyIfNeeded unit
 
         withContextElement(ValueDomain, true) {
@@ -136,79 +144,51 @@ class CatalogueBuilder {
 
 
     void child(String classification, String name) {
-        withContextElement(Model) {
-            saveIfNeeded it
-            it.addToParentOf tryFind(Model, classification, name, null)
-        }
+        child(assertFound(tryFind(Model, classification, name, null), "Cannot add child as Model $name in $classification does not exist") as Model)
     }
 
     void child(String name) {
-        withContextElement(Model) {
-            saveIfNeeded it
-            it.addToParentOf tryFind(Model, name, null)
-        }
+        child(assertFound(tryFind(Model, name, null), "Cannot add child as Model $name does not exist") as Model)
     }
 
-    void child(Model element) {
-        withContextElement(Model) {
-            saveIfNeeded it
-            it.addToParentOf element
-        }
+    void child(Model model) {
+        rel "hierarchy" to model
     }
+
 
     void contains(String classification, String name) {
-        withContextElement(Model) {
-            saveIfNeeded it
-            it.addToContains tryFind(DataElement, classification, name, null)
-        }
+        contains(assertFound(tryFind(DataElement, classification, name, null), "Cannot add element as Data Element $name in $classification does not exist") as DataElement)
     }
 
     void contains(String name) {
-        withContextElement(Model) {
-            saveIfNeeded it
-            it.addToContains tryFind(DataElement, name, null)
-        }
+        contains(assertFound(tryFind(DataElement, name, null), "Cannot add element as Data Element $name does not exist") as DataElement)
     }
 
     void contains(DataElement element) {
-        withContextElement(Model) {
-            saveIfNeeded it
-            it.addToContains element
-        }
+        rel "containment" to element
     }
 
     void basedOn(String classification, String name) {
         withContextElement(CatalogueElement) {
-            saveIfNeeded it
-            CatalogueElement other = tryFind(it.class, classification, name, null)
-            it.addToBasedOn other
-            if (it instanceof ValueDomain && other instanceof ValueDomain && !it.dataType) {
-                it.dataType = other.dataType
-            }
+            basedOn(assertFound(tryFind(it.class, classification, name, null), "Cannot add base as element $name in $classification does not exist") as CatalogueElement)
         }
     }
 
     void basedOn(String name) {
         withContextElement(CatalogueElement) {
-            saveIfNeeded it
-            CatalogueElement other = tryFind(it.class, name, null)
-            it.addToBasedOn other
-            if (it instanceof ValueDomain && other instanceof ValueDomain && !it.dataType) {
-                it.dataType = other.dataType
-            }
+            basedOn(assertFound(tryFind(it.class, name, null), "Cannot add base as element $name does not exist") as CatalogueElement)
         }
     }
 
     void basedOn(CatalogueElement element) {
-        withContextElement(CatalogueElement) {
-            saveIfNeeded it
-            it.addToBasedOn element
-            if (it instanceof ValueDomain && element instanceof ValueDomain && !it.dataType) {
+        rel "base" from element
+
+        withContextElement(ValueDomain) {
+            if (element instanceof ValueDomain && !it.dataType && !(DataType in createAutomatically)) {
                 it.dataType = element.dataType
             }
         }
     }
-
     RelationshipBuilder rel(String relationshipTypeName) {
         return new RelationshipBuilder(this,relationshipTypeName)
     }
@@ -234,14 +214,14 @@ class CatalogueBuilder {
 
     void ext(String key, String value) {
         withContextElement(CatalogueElement) {
-            saveIfNeeded it
+            it = saveIfNeeded it
             it.ext.put(key, value)
         }
     }
 
     void ext(Map<String, String> values) {
         withContextElement(CatalogueElement) {
-            saveIfNeeded it
+            it = saveIfNeeded it
             it.ext.putAll(values)
         }
     }
@@ -296,7 +276,7 @@ class CatalogueBuilder {
         contexts.pop()
     }
 
-    private <T extends CatalogueElement> T setContextElement(T contextElement) {
+    protected <T extends CatalogueElement> T setContextElement(T contextElement) {
         if (!contextElement) {
             return contextElement
         }
@@ -305,6 +285,27 @@ class CatalogueBuilder {
                 contexts.last()[type] = contextElement
             }
         }
+        contextElement
+    }
+
+    protected <T extends CatalogueElement> T replaceContextElement(T contextElement, T old) {
+        if (contextElement == old) {
+            return contextElement
+        }
+        if (!old) {
+            return old
+        }
+
+        contexts.each {
+            Map<Class, CatalogueElement> replacements = [:]
+            it.each { key, value ->
+                if (value == old) {
+                    replacements[key] = contextElement
+                }
+            }
+            it.putAll replacements
+        }
+
         contextElement
     }
 
@@ -319,9 +320,13 @@ class CatalogueBuilder {
     }
 
     private void classifyIfNeeded(CatalogueElement element) {
-        withContextElement(Classification) {
-            saveIfNeeded element
-            it.addToClassifies element
+        if (element instanceof Classification) {
+            return
+        }
+        try {
+            rel "classification" to element
+        } catch (IllegalStateException ignored) {
+            // no classificaiton found in context
         }
     }
 
@@ -351,9 +356,13 @@ class CatalogueBuilder {
         }
     }
 
-    protected static <T extends CatalogueElement> T saveIfNeeded(T element) {
+    protected <T extends CatalogueElement> T saveIfNeeded(T element) {
         if (!element) {
             return element
+        }
+
+        if (element.dirty && !('status' in element.dirtyPropertyNames) && (element.status == ElementStatus.FINALIZED || element.status == ElementStatus.DEPRECATED)) {
+            return createNewVersion(element, element.dirtyPropertyNames as Set<String>)
         }
 
         if (element.dirty) {
@@ -367,6 +376,16 @@ class CatalogueBuilder {
         return element
     }
 
+    protected <T extends CatalogueElement> T createNewVersion(T element, Set<String> changes) {
+        T newVersion = elementService.createDraftVersion(element)
+        replaceContextElement(newVersion, element)
+        for (String propertyName in element.dirtyPropertyNames) {
+            newVersion.setProperty(propertyName, element.getProperty(propertyName))
+        }
+        log.info "Created new version for ${GrailsNameUtils.getNaturalName(element.class.simpleName)} with name ${newVersion.name}. New version differs in ${changes}."
+        element.refresh()
+        return newVersion.save(failOnError: true, flush: true) as T
+    }
 
 
     protected <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
@@ -463,11 +482,6 @@ class CatalogueBuilder {
                 }
             }
         }
-        if (!parameters.status) {
-            withContextElement(CatalogueElement) {
-                parameters.status = it.status
-            }
-        }
         assert parameters.name : "You must provide the name of the ${GrailsNameUtils.getNaturalName(type.simpleName)}"
 
         parameters.modelCatalogueId = parameters.id
@@ -485,15 +499,46 @@ class CatalogueBuilder {
             element = tryFind(type, parameters.name, parameters.id)
         }
 
+        parameters.remove 'id'
+        parameters.remove 'classification'
+
         if (!element) {
             log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} does not exist yet, creating new one"
             element = type.newInstance(parameters)
         } else {
             log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} found"
-            element.properties = parameters
+            Closure propChanged = { String key, Object value ->
+                // if something has changed
+                if (element.hasProperty(key) && element.getProperty(key) != value) {
+                    if (key == 'modelCatalogueKey' && value == null && element.defaultModelCatalogueId == element.modelCatalogueId) {
+                        return false
+                    }
+                    if (key == 'status' && value == null && element.status == ElementStatus.DRAFT) {
+                        return false
+                    }
+                    log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} has changed. At least $key is different (new value is $value)"
+                    return true
+                }
+                return false
+            }
+            if (parameters.any(propChanged)) {
+                if (element.status == ElementStatus.FINALIZED || element.status == ElementStatus.DEPRECATED) {
+                    Set<String> changed = properties.findAll(propChanged).keySet()
+                    element = createNewVersion(element, changed)
+                }
+                element.properties = parameters
+            }
+
         }
 
         created << element
+        element
+    }
+
+    protected static <T extends CatalogueElement> T assertFound(T element, String notFoundMessage = "Element supposed to be found but it does not exist") {
+        if (!element) {
+            throw new IllegalStateException(notFoundMessage)
+        }
         element
     }
 
@@ -518,54 +563,32 @@ class RelationshipBuilder {
     }
 
     void to(String classification, String name) {
-        catalogueBuilder.withContextElement(type.sourceClass) {
-            CatalogueBuilder.saveIfNeeded it
-            assert it.createLinkTo(catalogueBuilder.tryFind(type.destinationClass, classification, name, null), type).errors.errorCount == 0
-        } or {
-            throw new IllegalStateException("There is no contextual element available of type $type.sourceClass")
-        }
+        to CatalogueBuilder.assertFound(catalogueBuilder.tryFind(type.destinationClass, classification, name, null), "Cannot create relationship ${type.name} as ${GrailsNameUtils.getNaturalName(GrailsNameUtils.getPropertyName(type.destinationClass))} $name in $classification does not exist")
     }
 
     void to(String name) {
-        catalogueBuilder.withContextElement(type.sourceClass) {
-            CatalogueBuilder.saveIfNeeded it
-            assert it.createLinkTo(catalogueBuilder.tryFind(type.destinationClass, name, null), type).errors.errorCount == 0
-        } or {
-            throw new IllegalStateException("There is no contextual element available of type $type.sourceClass")
-        }
+        to CatalogueBuilder.assertFound(catalogueBuilder.tryFind(type.destinationClass, name, null), "Cannot create relationship ${type.name} as ${GrailsNameUtils.getNaturalName(GrailsNameUtils.getPropertyName(type.destinationClass))} $name does not exist")
     }
 
     void to(CatalogueElement element) {
         catalogueBuilder.withContextElement(type.sourceClass) {
-            CatalogueBuilder.saveIfNeeded it
-            assert it.createLinkFrom(element, type).errors.errorCount == 0
+            assert catalogueBuilder.saveIfNeeded(it).createLinkTo(catalogueBuilder.saveIfNeeded(element), type).errors.errorCount == 0
         } or {
             throw new IllegalStateException("There is no contextual element available of type $type.sourceClass")
         }
     }
 
     void from(String classification, String name) {
-        catalogueBuilder.withContextElement(type.destinationClass) {
-            CatalogueBuilder.saveIfNeeded it
-            assert it.createLinkFrom(catalogueBuilder.tryFind(type.sourceClass, classification, name, null), type).errors.errorCount == 0
-        } or {
-            throw new IllegalStateException("There is no contextual element available of type $type.destinationClass")
-        }
+        from CatalogueBuilder.assertFound(catalogueBuilder.tryFind(type.sourceClass, classification, name, null), "Cannot create relationship ${type.name} as ${GrailsNameUtils.getNaturalName(GrailsNameUtils.getPropertyName(type.destinationClass))} $name in $classification does not exist")
     }
 
     void from(String name) {
-        catalogueBuilder.withContextElement(type.destinationClass) {
-            CatalogueBuilder.saveIfNeeded it
-            assert it.createLinkFrom(catalogueBuilder.tryFind(type.sourceClass, name, null), type).errors.errorCount == 0
-        } or {
-            throw new IllegalStateException("There is no contextual element available of type $type.destinationClass")
-        }
+        from CatalogueBuilder.assertFound(catalogueBuilder.tryFind(type.sourceClass, name, null), "Cannot create relationship ${type.name} as ${GrailsNameUtils.getNaturalName(GrailsNameUtils.getPropertyName(type.destinationClass))} $name does not exist")
     }
 
     void from(CatalogueElement element) {
         catalogueBuilder.withContextElement(type.destinationClass) {
-            CatalogueBuilder.saveIfNeeded it
-            assert it.createLinkFrom(element, type).errors.errorCount == 0
+            assert catalogueBuilder.saveIfNeeded(it).createLinkFrom(catalogueBuilder.saveIfNeeded(element), type).errors.errorCount == 0
         } or {
             throw new IllegalStateException("There is no contextual element available of type $type.destinationClass")
         }

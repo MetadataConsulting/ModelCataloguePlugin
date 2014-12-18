@@ -13,7 +13,7 @@ import org.openqa.selenium.remote.RemoteWebDriver
 
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
-baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp'
+baseUrl = 'http://localhost:8080/ModelCatalogueCorePluginTestApp/'
 
 driver = {
     new FirefoxDriver()

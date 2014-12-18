@@ -1,9 +1,7 @@
 /**
  * XMLSchema classification provides default XML data types and their value domains
  */
-classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema') {
-    // save some time finalizing the elements as they all are finalized by default
-    status finalized
+classification(name: 'XMLSchema') {
 
     id 'http://www.w3.org/2001/XMLSchema'
     description 'XML Schema provides standard types for describing your own XML formats'
@@ -115,14 +113,14 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         '''
     }
 
-    valueDomain name: 'xs:byte', {
-        id 'http://www.w3.org/2001/XMLSchema#byte'
-        description '127 to-128. Sign is omitted, “+” assumed. Example: -1, 0, 126, +100.'
-        basedOn 'xs:short'
+    valueDomain name: 'xs:long', {
+        id 'http://www.w3.org/2001/XMLSchema#long'
+        description '9223372036854775807 to -9223372036854775808. Sign omitted, “+” assumed. Example: -1, 0, 12678967543233, +100000.'
+        basedOn 'xs:integer'
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            parseByte(string(x)) in Byte
+            parseLong(string(x)) in Long
         '''
     }
 
@@ -137,22 +135,26 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         '''
     }
 
-    valueDomain name: 'xs:long', {
-        id 'http://www.w3.org/2001/XMLSchema#long'
-        description '9223372036854775807 to -9223372036854775808. Sign omitted, “+” assumed. Example: -1, 0, 12678967543233, +100000.'
-        basedOn 'xs:integer'
+    valueDomain name: 'xs:short', {
+        id 'http://www.w3.org/2001/XMLSchema#short'
+        description '32767 to -32768. Sign omitted, “+” assumed. Example: -1, 0, 12678, +10000.'
+        basedOn 'xs:int'
         rule '''
             import static javax.xml.bind.DatatypeConverter.*
 
-            parseLong(string(x)) in Long
+            parseShort(string(x)) in Short
         '''
     }
 
-    valueDomain name: 'xs:negativeInteger', {
-        id 'http://www.w3.org/2001/XMLSchema#negativeInteger'
-        description 'Infinite set {...,-2,-1}. Example: -1, -12678967543233, -100000'
-        basedOn 'xs:nonPositiveInteger'
-        rule 'maxExclusive(0)'
+    valueDomain name: 'xs:byte', {
+        id 'http://www.w3.org/2001/XMLSchema#byte'
+        description '127 to-128. Sign is omitted, “+” assumed. Example: -1, 0, 126, +100.'
+        basedOn 'xs:short'
+        rule '''
+            import static javax.xml.bind.DatatypeConverter.*
+
+            parseByte(string(x)) in Byte
+        '''
     }
 
     valueDomain name: 'xs:nonNegativeInteger', {
@@ -169,6 +171,13 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule 'maxInclusive(0)'
     }
 
+    valueDomain name: 'xs:negativeInteger', {
+        id 'http://www.w3.org/2001/XMLSchema#negativeInteger'
+        description 'Infinite set {...,-2,-1}. Example: -1, -12678967543233, -100000'
+        basedOn 'xs:nonPositiveInteger'
+        rule 'maxExclusive(0)'
+    }
+
     valueDomain name: 'xs:positiveInteger', {
         id 'http://www.w3.org/2001/XMLSchema#positiveInteger'
         description 'Infinite set {1, 2,...}. Optional “+” sign,. Example: 1, 12678967543233, +100000.'
@@ -176,22 +185,11 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule 'minExclusive(0)'
     }
 
-    valueDomain name: 'xs:short', {
-        id 'http://www.w3.org/2001/XMLSchema#short'
-        description '32767 to -32768. Sign omitted, “+” assumed. Example: -1, 0, 12678, +10000.'
-        basedOn 'xs:int'
-        rule '''
-            import static javax.xml.bind.DatatypeConverter.*
-
-            parseShort(string(x)) in Short
-        '''
-    }
-
-    valueDomain name: 'xs:unsignedByte', {
-        id 'http://www.w3.org/2001/XMLSchema#unsignedByte'
-        description '0 to 255. a finite-length Example: 0, 126, 100.'
-        basedOn 'xs:unsignedShort'
-        rule 'minInclusive(0) && maxInclusive(255)'
+    valueDomain name: 'xs:unsignedLong', {
+        id 'http://www.w3.org/2001/XMLSchema#unsignedLong'
+        description '0 to 18446744073709551615. Example: 0, 12678967543233, 100000.'
+        basedOn 'xs:nonNegativeInteger'
+        rule 'minInclusive(0) && maxInclusive(18446744073709551615)'
     }
 
     valueDomain name: 'xs:unsignedInt', {
@@ -201,18 +199,18 @@ classification(name: 'XMLSchema', namespace: 'http://www.w3.org/2001/XMLSchema')
         rule 'minInclusive(0) && maxInclusive(4294967295)'
     }
 
-    valueDomain name: 'xs:unsignedLong', {
-        id 'http://www.w3.org/2001/XMLSchema#unsignedLong'
-        description '0 to 18446744073709551615. Example: 0, 12678967543233, 100000.'
-        basedOn 'xs:nonNegative'
-        rule 'minInclusive(0) && maxInclusive(18446744073709551615)'
-    }
-
     valueDomain name: 'xs:unsignedShort', {
         id 'http://www.w3.org/2001/XMLSchema#unsignedShort'
         description '0 to 65535. Example: 0, 12678, 10000.'
         basedOn 'xs:unsignedInt'
         rule 'minInclusive(0) && maxInclusive(65535)'
+    }
+
+    valueDomain name: 'xs:unsignedByte', {
+        id 'http://www.w3.org/2001/XMLSchema#unsignedByte'
+        description '0 to 255. a finite-length Example: 0, 126, 100.'
+        basedOn 'xs:unsignedShort'
+        rule 'minInclusive(0) && maxInclusive(255)'
     }
 
     valueDomain name: 'xs:date', {

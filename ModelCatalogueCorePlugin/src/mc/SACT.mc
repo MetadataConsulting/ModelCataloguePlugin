@@ -351,7 +351,7 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
         dataElement(name: 'Date decision to treat') {
             description 'To allow analysis of wait before treatment start'
             valueDomain(name: ' DECISION TO TREAT DATE (ANTI-CANCER DRUG REGIMEN)') {
-                basedOn 'an10 ccyy-mm-dd '
+                basedOn 'an10 ccyy-mm-dd'
             }
             ext 'Usage', 'Required'
             ext 'Min Occurs', '0'

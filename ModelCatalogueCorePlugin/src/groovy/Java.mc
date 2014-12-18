@@ -1,6 +1,4 @@
 classification name: 'Java', {
-    // save some time finalizing the elements as they all are finalized by default
-    status finalized
 
     // if not set explicitly, the data type with the same name and description is created for value domains
     automatic dataType

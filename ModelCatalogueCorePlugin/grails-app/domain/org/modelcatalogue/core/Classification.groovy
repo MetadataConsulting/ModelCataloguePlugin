@@ -6,17 +6,27 @@ class Classification extends CatalogueElement {
     /**
      * @deprecated use model catalogue id instead
      */
-    String namespace
+    String getNamespace() {
+        modelCatalogueId
+    }
+
+    /**
+     * @deprecated use model catalogue id instead
+     */
+    void setNamespace(String namespace) {
+        modelCatalogueId = namespace
+    }
 
     static constraints = {
         name unique: 'versionNumber'
-        namespace nullable: true, unique: true
     }
 
     static searchable = {
         name boost:5
         except = ['incomingRelationships', 'outgoingRelationships']
     }
+
+    static transients = ['namespace']
 
     static relationships = [
             outgoing: [classification: 'classifies']

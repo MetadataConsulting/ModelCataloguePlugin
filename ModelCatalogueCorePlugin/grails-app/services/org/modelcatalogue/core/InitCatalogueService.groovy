@@ -22,7 +22,7 @@ class InitCatalogueService {
     }
 
     def initDefaultDataTypes() {
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService)
+        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
         GroovyShell shell = prepareGroovyShell(builder)
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
 
@@ -37,7 +37,7 @@ class InitCatalogueService {
                 }
                 log.info "File ${resource.URI} imported"
             } catch (e) {
-                log.error("Exception parsing model catalogue file", e)
+                log.error("Exception parsing model catalogue file ${resource.URI}", e)
             }
         }
     }
@@ -60,7 +60,7 @@ class InitCatalogueService {
     }
 
     Set<CatalogueElement> importMCFile(InputStream inputStream) {
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService)
+        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
         GroovyShell shell = prepareGroovyShell(builder)
         shell.evaluate(inputStream.newReader())
         builder.lastCreated

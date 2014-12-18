@@ -7,6 +7,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def initCatalogueService
     def classificationService
+    def elementService
 
     Set<CatalogueElement> created = []
 
@@ -456,8 +457,42 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.findByName('relatedTo')) == 1
     }
 
+    def "creates new version of the element"() {
+        build {
+            classification(name: "NewVersion1") {
+                // creates finalized model
+                model name: "ModelNV1", id: "http://www.example.com/models/ModelNV1", {
+                    status finalized
+                }
+            }
+        }
+
+        expect:
+        Model.findByName("ModelNV1")?.status == ElementStatus.FINALIZED
+
+        when:
+        build {
+            classification(name: "NewVersion1") {
+                // this should create new version with different name
+                model name: "ModelNV2", id: "http://www.example.com/models/ModelNV1"
+            }
+        }
+
+
+        then: "new model is draft"
+        Model.findByName("ModelNV2")?.status            == ElementStatus.DRAFT
+        Model.findByName("ModelNV2")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
+        Model.findByName("ModelNV2")?.latestVersionId   == Model.findByName("ModelNV1")?.id
+
+        and: "the old model is still finalized"
+        Model.findByName("ModelNV1")?.status            == ElementStatus.FINALIZED
+        Model.findByName("ModelNV1")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
+
+
+    }
+
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        created = new CatalogueBuilder(classificationService).build cl
+        created = new CatalogueBuilder(classificationService, elementService).build cl
     }
 
 

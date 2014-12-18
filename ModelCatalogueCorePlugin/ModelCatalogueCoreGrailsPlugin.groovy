@@ -87,7 +87,7 @@ Model catalogue core plugin (metadata registry)
             springConfig.addAlias('modelCatalogueStorageService','localFilesStorageService')
         }
 
-        catalogueBuilder(CatalogueBuilder, ref('classificationService')) { bean ->
+        catalogueBuilder(CatalogueBuilder, ref('classificationService'), ref('elementService')) { bean ->
             bean.scope = 'prototype'
         }
 

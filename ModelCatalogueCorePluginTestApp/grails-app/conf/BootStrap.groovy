@@ -122,7 +122,7 @@ class BootStrap {
             importService.importData()
 
             println 'Finalizing all published elements'
-            CatalogueElement.findAllByStatusNotEqual(ElementStatus.FINALIZED).each {
+            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
                 if (it instanceof Model) {
                     elementService.finalizeElement(it)
                 } else {
