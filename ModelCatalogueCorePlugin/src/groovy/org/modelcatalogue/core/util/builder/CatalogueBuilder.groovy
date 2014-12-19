@@ -187,7 +187,10 @@ class CatalogueBuilder {
      * @deprecated use id as input parameter
      */
     @Deprecated
-    void id(String id) { setStringValue('modelCatalogueId', id) }
+    void id(String id) {
+        log.warn("using id in element body is deprecated, supply id as input parameter e.g. model(id: 'http://www.example.com/model'){...}")
+        setStringValue('modelCatalogueId', id)
+    }
 
     void status(ElementStatus status) {
         context.withContextElement(CatalogueElement) {

@@ -494,7 +494,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     }
 
-    private void build(@DelegatesTo(org.modelcatalogue.core.util.builder.CatalogueBuilder) Closure cl) {
+    private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
         created = new CatalogueBuilder(classificationService, elementService).build cl
     }
 
