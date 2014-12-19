@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.util
+package org.modelcatalogue.core.util.builder
 
 abstract class CatalogueBuilderScript extends Script {
 

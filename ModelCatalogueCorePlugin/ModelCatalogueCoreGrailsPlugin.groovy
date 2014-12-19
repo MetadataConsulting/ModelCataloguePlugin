@@ -7,7 +7,7 @@ import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
-import org.modelcatalogue.core.util.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
 
 class ModelCatalogueCoreGrailsPlugin {
     // the plugin version

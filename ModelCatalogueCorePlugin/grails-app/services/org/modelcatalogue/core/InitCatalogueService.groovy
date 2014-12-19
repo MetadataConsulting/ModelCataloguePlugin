@@ -6,8 +6,8 @@ import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
 import org.grails.datastore.gorm.GormStaticApi
-import org.modelcatalogue.core.util.CatalogueBuilder
-import org.modelcatalogue.core.util.CatalogueBuilderScript
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
 
 @Transactional
 class InitCatalogueService {

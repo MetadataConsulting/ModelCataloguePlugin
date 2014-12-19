@@ -7,7 +7,7 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.core.util.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.http.HttpMethod
 

@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
 
 class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
@@ -27,7 +28,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         expect:
         Classification.findByName('TestSchema')
         Classification.findByName('TestSchema').description == 'This is a test schema which is just for test purposes!'
-        Classification.findByNamespace('http://www.w3.org/2001/TestSchema')
+        Classification.findByModelCatalogueId('http://www.w3.org/2001/TestSchema')
     }
 
     def "reuse existing classification by name"() {
@@ -68,8 +69,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the Classification"
+        IllegalArgumentException e = thrown(IllegalArgumentException)
+        e.message.startsWith "Cannot create element abstraction from"
     }
     
     def "creates new measurement unit with given name"() {
@@ -136,8 +137,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the Measurement Unit"
+        IllegalArgumentException e = thrown(IllegalArgumentException)
+        e.message.startsWith "Cannot create element abstraction from"
     }
 
     def "creates new data element with given name"() {
@@ -176,8 +177,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the Data Element"
+        IllegalArgumentException e = thrown(IllegalArgumentException)
+        e.message.startsWith "Cannot create element abstraction from"
     }
 
     def "creates new model with given name"() {
@@ -216,8 +217,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the Model"
+        IllegalArgumentException e = thrown(IllegalArgumentException)
+        e.message.startsWith "Cannot create element abstraction from"
     }
 
     def "creates new value domain with given name"() {
@@ -260,8 +261,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the Value Domain"
+        IllegalArgumentException e = thrown(IllegalArgumentException)
+        e.message.startsWith "Cannot create element abstraction from"
     }
 
     def "specify rule as regex"() {
@@ -339,8 +340,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        AssertionError e = thrown(AssertionError)
-        e.message.startsWith "You must provide the name of the Data Type"
+        IllegalArgumentException e = thrown(IllegalArgumentException)
+        e.message.startsWith "Cannot create element abstraction from"
     }
 
     def "do not complain if data type name is missing but inside value domain"() {
@@ -352,6 +353,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         expect:
         DataType.findByName('test:number')
+        ValueDomain.findByName('test:number')
+        ValueDomain.findByName('test:number').dataType
+        ValueDomain.findByName('test:number').dataType == DataType.findByName('test:number')
     }
 
 
@@ -388,7 +392,6 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         tokenDomain.isBasedOn
         tokenDomain.isBasedOn.contains stringDomain
-        tokenDomain.dataType == stringType
 
     }
 
@@ -491,7 +494,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     }
 
-    private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
+    private void build(@DelegatesTo(org.modelcatalogue.core.util.builder.CatalogueBuilder) Closure cl) {
         created = new CatalogueBuilder(classificationService, elementService).build cl
     }
 
