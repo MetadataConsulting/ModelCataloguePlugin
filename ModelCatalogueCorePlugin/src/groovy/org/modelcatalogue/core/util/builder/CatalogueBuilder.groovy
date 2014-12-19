@@ -27,17 +27,7 @@ class CatalogueBuilder {
         CatalogueBuilder self = this
         self.with c
 
-        // resolve elements
-        for (CatalogueElementProxy element in repository.pendingProxies) {
-           created << element.resolve()
-        }
-
-        // resolve pending relationships
-        for (CatalogueElementProxy element in repository.pendingProxies) {
-            element.resolveRelationships()
-        }
-
-        created
+        created = repository.resolveAllProxies()
     }
 
     CatalogueElementProxy<Classification> classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
@@ -146,11 +136,15 @@ class CatalogueBuilder {
     }
 
     void basedOn(String classification, String name) {
-        rel "base" from classification, name
+        context.withContextElement(CatalogueElement) {
+            rel "base" from it.domain called classification, name
+        }
     }
 
     void basedOn(String name) {
-        rel "base" from name
+        context.withContextElement(CatalogueElement) {
+            rel "base" from it.domain called name
+        }
     }
 
     void basedOn(CatalogueElementProxy<CatalogueElement> element) {
@@ -164,17 +158,7 @@ class CatalogueBuilder {
     void rule(String rule)               { setStringValue('rule', rule) }
     void regex(String regex)             { setStringValue('regexDef', regex) }
 
-    /**
-     * Sets the id of the current element.
-     *
-     * This id is not used for queries. If you want to query by model catalogue id, send it as parameter in
-     * the domain call such as model(id: 'http://www.example.com/foo').
-     * @param id
-     * @deprecated use id as input parameter
-     */
-    @Deprecated
     void id(String id) {
-        log.warn("using id in element body is deprecated, supply id as input parameter e.g. model(id: 'http://www.example.com/model'){...}")
         setStringValue('modelCatalogueId', id)
     }
 
@@ -233,10 +217,8 @@ class CatalogueBuilder {
         if (Classification.isAssignableFrom(element.domain)) {
             return
         }
-        try {
-            rel "classification" to element
-        } catch (IllegalStateException ignored) {
-            // no classification found in context
+        context.withContextElement(Classification) {
+            element.addToPendingRelationships(new RelationshipProxy('classification', it, element))
         }
     }
 

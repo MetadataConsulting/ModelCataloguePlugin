@@ -20,7 +20,7 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
     def "init default measurement units"() {
         // just call once in the spec
-        initCatalogueService.initCatalogue()
+        initCatalogueService.initCatalogue(true)
 
         when:
         MeasurementUnit dt1 = MeasurementUnit.findByName("celsius")

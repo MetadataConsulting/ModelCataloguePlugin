@@ -13,7 +13,7 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
 
 //    @Ignore
     def "test import"() {
-        initCatalogueService.initCatalogue()
+        initCatalogueService.initCatalogue(true)
         def filenameXsd = "test/integration/resources/CLLDataModel0.1.umlj"
         Classification classification = new Classification(name: "GeL Cancer Core").save()
 

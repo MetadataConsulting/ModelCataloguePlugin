@@ -17,7 +17,7 @@ class ImportServiceSpec extends Specification {
 
         when:
         initCatalogueService.initDefaultRelationshipTypes()
-        importService.importData()
+        importService.importData(true)
 
         then:
         def models = Model.list()

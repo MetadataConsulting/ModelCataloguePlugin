@@ -13,6 +13,7 @@ log4j = {
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
     debug 'org.modelcatalogue.core.util.builder.CatalogueBuilder'
     debug 'org.modelcatalogue.core.util.builder.AbstractCatalogueElementProxy'
+    debug 'org.modelcatalogue.core.util.builder.CatalogueElementProxy'
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP

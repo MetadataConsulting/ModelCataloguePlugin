@@ -1,15 +1,28 @@
 package org.modelcatalogue.core.util.builder
 
 import groovy.util.logging.Log4j
+import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.MeasurementUnit
+import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.ValueDomain
 
 @Log4j
-abstract class AbstractCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T> {
+class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T> {
 
-    final Class<T> domain
-    final String name
+    static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, Classification, DataElement, DataType, EnumeratedType, MeasurementUnit, Model, ValueDomain]
+
+    Class<T> domain
+
+    String id
+    String name
+    String classification
 
     protected final CatalogueElementProxyRepository repository
 
@@ -17,16 +30,27 @@ abstract class AbstractCatalogueElementProxy<T extends CatalogueElement> impleme
     private final Map<String, String> extensions = [:]
     private final Set<RelationshipProxy> relationships = []
 
+    private CatalogueElementProxy<T> replacedBy
     private T resolved
 
-    AbstractCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String name) {
+    DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name) {
+        if (!(domain in KNOWN_DOMAIN_CLASSES)) {
+            throw new IllegalArgumentException("Only domain classes of $KNOWN_DOMAIN_CLASSES are supported as proxies")
+        }
         this.repository = repository
         this.domain = domain
+
+        this.id = id
         this.name = name
+        this.classification = classification
     }
 
     @Override
     final T resolve() {
+        if (replacedBy) {
+            return replacedBy.resolve()
+        }
+
         if(resolved) {
             return resolved
         }
@@ -55,6 +79,14 @@ abstract class AbstractCatalogueElementProxy<T extends CatalogueElement> impleme
             throw new IllegalStateException("This catalogue element is already resolved!")
         }
 
+        if (key == 'modelCatalogueId') {
+            id = value?.toString()
+        }
+
+        if (key == 'name') {
+            name = value?.toString()
+        }
+
         parameters.put(key, value)
     }
 
@@ -66,7 +98,18 @@ abstract class AbstractCatalogueElementProxy<T extends CatalogueElement> impleme
         extensions.put(key, value)
     }
 
-    abstract T findExisting()
+    T findExisting() {
+        if (id) {
+            return repository.findById(domain, id)
+        }
+        if (name) {
+            if (classification) {
+                return repository.tryFind(domain, classification, name, id)
+            }
+            return repository.tryFindUnclassified(domain, name, id)
+        }
+        throw new IllegalStateException("Missing id, classification and name so there is no way how to find existing element")
+    }
 
     private T fill(T element) {
         if (!element) {
@@ -132,6 +175,9 @@ abstract class AbstractCatalogueElementProxy<T extends CatalogueElement> impleme
 
     @Override
     void addToPendingRelationships(RelationshipProxy relationshipProxy) {
+        if (!classification && relationshipProxy.relationshipTypeName == 'classification' && repository.equals(this, relationshipProxy.destination)) {
+            classification = relationshipProxy.source.name
+        }
         relationships << relationshipProxy
     }
 
@@ -140,5 +186,38 @@ abstract class AbstractCatalogueElementProxy<T extends CatalogueElement> impleme
         relationships.collect {
             it.resolve()
         }
+    }
+
+    String toString() {
+        "Proxy of $domain[id: $id, classification: $classification, name: $name]"
+    }
+
+    @Override
+    CatalogueElementProxy<T> merge(CatalogueElementProxy<T> other) {
+        if (!(other instanceof DefaultCatalogueElementProxy) ) {
+            throw new IllegalArgumentException("Can only merge with other default catalogue element proxies")
+        }
+
+        other.extensions.each { String key, String value ->
+            setExtension(key, value)
+        }
+
+        other.parameters.each { String key, Object value ->
+            setParameter(key, value)
+        }
+
+        other.relationships.each { RelationshipProxy relationship ->
+            if (repository.equals(this, relationship.source)) {
+                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination))
+            }
+
+            if (repository.equals(this, relationship.destination)) {
+                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, relationship.source, this))
+            }
+        }
+
+        other.replacedBy = this
+
+        this
     }
 }

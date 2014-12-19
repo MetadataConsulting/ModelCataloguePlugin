@@ -17,7 +17,8 @@ class CatalogueElementProxyRepository {
     private final ElementService elementService
 
     Set<Class> unclassifiedQueriesFor = []
-    Set<CatalogueElementProxy> pendingProxies = []
+
+    private Set<CatalogueElementProxy> pendingProxies = []
 
     CatalogueElementProxyRepository(ClassificationService classificationService, ElementService elementService) {
         this.classificationService = classificationService
@@ -27,6 +28,75 @@ class CatalogueElementProxyRepository {
     public void clear() {
         unclassifiedQueriesFor.clear()
         pendingProxies.clear()
+    }
+
+    public boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
+        if (a == b) {
+            return true
+        }
+        if (a && !b || b && !a) {
+            return false
+        }
+        if (a.id && a.id == b.id) {
+            return true
+        }
+        if (a.domain != b.domain) {
+            return false
+        }
+        if (a.domain in HAS_UNIQUE_NAMES) {
+            return a.name == b.name
+        }
+
+        if (!a.classification || !b.classification) {
+            return false
+        }
+
+        return a.classification == b.classification && a.name == b.name
+    }
+
+    public Set<CatalogueElement> resolveAllProxies() {
+        Set<CatalogueElement> created = []
+
+        Set<CatalogueElementProxy> toBeResolved     = []
+        Map<String, CatalogueElementProxy> byID     = [:]
+        Map<String, CatalogueElementProxy> byName   = [:]
+
+        for (CatalogueElementProxy proxy in pendingProxies) {
+            if (proxy.id) {
+                CatalogueElementProxy existing = byID[proxy.id]
+
+                if (!existing) {
+                    byID[proxy.id] = proxy
+                    toBeResolved << proxy
+                } else {
+                    existing.merge(proxy)
+                }
+            }
+
+            String fullName = "${proxy.domain}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+            CatalogueElementProxy existing = byName[fullName]
+
+            if (!existing) {
+                byName[fullName] = proxy
+                // it is a set, so if we add it twice it does not matter
+                toBeResolved << proxy
+            } else {
+                // must survive double addition
+                existing.merge(proxy)
+            }
+        }
+
+        // resolve elements
+        for (CatalogueElementProxy element in toBeResolved) {
+            created << element.resolve()
+        }
+
+        // resolve pending relationships
+        for (CatalogueElementProxy element in toBeResolved) {
+            element.resolveRelationships()
+        }
+
+        created
     }
 
     public <T extends CatalogueElement> CatalogueElementProxy<T> createProxy(Class<T> domain, Map<String, Object> parameters) {
@@ -47,24 +117,21 @@ class CatalogueElementProxyRepository {
     }
 
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, Object id) {
-        return new CatalogueElementById<T>(this, domain, name, id)
+    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name)
     }
 
     public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name) {
-        return new CatalogueElementByNameAndClassification<T>(this, domain, classificationName, name)
+        return new DefaultCatalogueElementProxy<T>(this, domain, null, classificationName, name)
     }
 
     public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name) {
-        return new CatalogueElementByName<T>(this, domain, name)
+        return new DefaultCatalogueElementProxy<T>(this, domain, null, null, name)
     }
 
 
     public static <T extends CatalogueElement> T save(T element) {
-        if (!element.validate()) {
-            throw new IllegalStateException("Cannot save element $element, errors: $element.errors")
-        }
-        element.save(flush: true)
+        element.save(flush: true, failOnError: true)
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
@@ -72,6 +139,9 @@ class CatalogueElementProxyRepository {
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
+        if (type in HAS_UNIQUE_NAMES) {
+            return tryFindWithClassification(type, null, name, id)
+        }
         Classification classification = tryFindUnclassified(Classification, classificationName, id)
         if (!classification) {
             throw new IllegalArgumentException("Requested classification ${classificationName} is not present in the catalogue!")

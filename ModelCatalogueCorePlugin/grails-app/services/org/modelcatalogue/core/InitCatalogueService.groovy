@@ -16,12 +16,12 @@ class InitCatalogueService {
     def classificationService
     def elementService
 
-    def initCatalogue(){
+    def initCatalogue(boolean failOnError = false){
         initDefaultRelationshipTypes()
-        initDefaultDataTypes()
+        initDefaultDataTypes(failOnError)
     }
 
-    def initDefaultDataTypes() {
+    def initDefaultDataTypes(boolean failOnError = false) {
         CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
         GroovyShell shell = prepareGroovyShell(builder)
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
@@ -37,6 +37,9 @@ class InitCatalogueService {
                 }
                 log.info "File ${resource.URI} imported"
             } catch (e) {
+                if (failOnError) {
+                    throw e
+                }
                 log.error("Exception parsing model catalogue file ${resource.URI}", e)
             }
         }

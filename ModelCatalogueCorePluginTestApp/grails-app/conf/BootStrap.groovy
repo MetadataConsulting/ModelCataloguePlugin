@@ -1,3 +1,4 @@
+import grails.util.Environment
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
@@ -27,7 +28,7 @@ class BootStrap {
 
     def init = { servletContext ->
 
-        initCatalogueService.initCatalogue()
+        initCatalogueService.initCatalogue(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
 
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
@@ -119,7 +120,7 @@ class BootStrap {
         try {
             println 'Running post init job'
             println 'Importing data'
-            importService.importData()
+            importService.importData(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
 
             println 'Finalizing all published elements'
             CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {

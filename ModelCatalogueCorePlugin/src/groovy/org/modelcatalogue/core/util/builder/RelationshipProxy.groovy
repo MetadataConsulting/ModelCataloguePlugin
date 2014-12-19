@@ -31,4 +31,9 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
         }
         relationship
     }
+
+    @Override
+    String toString() {
+        "Proxy for Relationship[type: $relationshipTypeName, source: $source, destination: $destination]"
+    }
 }

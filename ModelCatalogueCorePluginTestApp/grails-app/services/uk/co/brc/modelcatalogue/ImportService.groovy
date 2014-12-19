@@ -18,8 +18,8 @@ class ImportService {
             "%": "&#37;",
     ]
 
-    def importData() {
-        initCatalogueService.initCatalogue()
+    def importData(boolean failOnError = false) {
+        initCatalogueService.initCatalogue(failOnError)
 
         getNhicFiles().each { filename -> singleImport(filename) }
     }

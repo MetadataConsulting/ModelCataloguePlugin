@@ -10,9 +10,14 @@ interface CatalogueElementProxy<T extends CatalogueElement> {
 
     T resolve()
     Set<Relationship> resolveRelationships()
+    CatalogueElementProxy<T> merge(CatalogueElementProxy<T> other)
 
-    String getName()
     Class<T> getDomain()
+
+    String getId()
+    String getName()
+    String getClassification()
+
 
     Object getParameter(String key)
     void setParameter(String key, Object value)

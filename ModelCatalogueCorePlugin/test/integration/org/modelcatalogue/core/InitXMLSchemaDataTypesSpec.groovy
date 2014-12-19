@@ -17,7 +17,9 @@ class InitXMLSchemaDataTypesSpec extends IntegrationSpec {
     }
 
     def "check XMLSchema classification present"() {
-        initCatalogueService.initDefaultDataTypes()
+        // it should be able to run twice
+        initCatalogueService.initDefaultDataTypes(true)
+        initCatalogueService.initDefaultDataTypes(true)
         expect:
         Classification.countByName('XMLSchema') == 1
     }
