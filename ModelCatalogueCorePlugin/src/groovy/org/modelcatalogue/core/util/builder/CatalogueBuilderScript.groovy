@@ -2,13 +2,15 @@ package org.modelcatalogue.core.util.builder
 
 abstract class CatalogueBuilderScript extends Script {
 
-    @Delegate CatalogueBuilder delegate
+    @Delegate(deprecated = true) CatalogueBuilder delegate
 
     abstract configure()
 
     @Override Object run() {
         delegate = binding.builder
-        configure()
+        delegate.build {
+            configure()
+        }
     }
 
 }

@@ -1,12 +1,8 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
-import org.springframework.transaction.TransactionStatus
-import org.springframework.transaction.support.DefaultTransactionDefinition
-import spock.lang.Shared
 import spock.lang.Stepwise
 import spock.lang.Unroll
-import spock.util.mop.Use
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions

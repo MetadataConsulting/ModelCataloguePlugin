@@ -11,14 +11,15 @@ class CatalogueBuilder {
     private static Set<Class> SUPPORTED_FOR_AUTO    = [DataType, EnumeratedType, ValueDomain]
 
     private CatalogueElementProxyRepository repository
+    private CatalogueBuilderContext context
 
-    private CatalogueBuilderContext context = new CatalogueBuilderContext()
     private Set<CatalogueElement> created = []
     private Set<Class> createAutomatically = []
 
 
     CatalogueBuilder(ClassificationService classificationService, ElementService elementService) {
         this.repository = new CatalogueElementProxyRepository(classificationService, elementService)
+        this.context = new CatalogueBuilderContext(this)
     }
 
     Set<CatalogueElement> build(@DelegatesTo(CatalogueBuilder) Closure c) {

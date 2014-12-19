@@ -100,11 +100,12 @@ abstract class AbstractCatalogueElementProxy<T extends CatalogueElement> impleme
         parameters.each { String key, Object value ->
             def realValue = value instanceof CatalogueElementProxy ? value.resolve() : value
             if (element.getProperty(key) != realValue) {
-                log.debug "$this has changed - $key is $realValue"
+                log.debug "$this has changed - property $key is now $realValue"
                 element.setProperty(key, realValue)
             }
         }
 
+        log.debug "Saving $this"
         repository.save(element)
 
         updateExtensions(element)
@@ -115,6 +116,7 @@ abstract class AbstractCatalogueElementProxy<T extends CatalogueElement> impleme
     private <T extends CatalogueElement> void updateExtensions(T element) {
         extensions.each { String key, String value ->
             if (element.ext.get(key) != value) {
+                log.debug "$this has changed - extension $key is now $value"
                 element.ext.put(key, value)
             }
         }

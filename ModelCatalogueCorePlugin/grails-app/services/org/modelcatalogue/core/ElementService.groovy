@@ -331,7 +331,7 @@ class ElementService implements Archiver<CatalogueElement> {
 
 
     Map<Long, Long> findModelsToBeInlined() {
-        if (Environment.current == Environment.DEVELOPMENT) {
+        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
             // does not work with H2 database
             log.warn "Trying to find inlined models in development mode. This feature does not work with H2 database"
             return [:]

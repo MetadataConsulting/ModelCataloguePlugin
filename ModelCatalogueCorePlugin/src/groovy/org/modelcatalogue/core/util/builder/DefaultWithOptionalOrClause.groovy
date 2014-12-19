@@ -1,11 +1,15 @@
 package org.modelcatalogue.core.util.builder
 
-enum DefaultWithOptionalOrClause implements WithOptionalOrClause {
+class DefaultWithOptionalOrClause implements WithOptionalOrClause {
 
-    INSTANCE
+    final CatalogueBuilder builder
+
+    DefaultWithOptionalOrClause(CatalogueBuilder builder) {
+        this.builder = builder
+    }
 
     void or(Closure c) {
-        c()
+        builder.with c
     }
 
 }

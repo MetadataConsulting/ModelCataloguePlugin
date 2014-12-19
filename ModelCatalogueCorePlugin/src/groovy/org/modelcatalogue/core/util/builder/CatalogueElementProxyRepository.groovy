@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.util.builder
 
 import grails.gorm.DetachedCriteria
+import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ClassificationService
@@ -60,7 +61,10 @@ class CatalogueElementProxyRepository {
 
 
     public static <T extends CatalogueElement> T save(T element) {
-        element.save(failOnError: true, flush: true)
+        if (!element.validate()) {
+            throw new IllegalStateException("Cannot save element $element, errors: $element.errors")
+        }
+        element.save(flush: true)
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {

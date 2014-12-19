@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
+import com.google.common.escape.CharEscaperBuilder
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.CatalogueElement
@@ -19,15 +20,20 @@ class CatalogueBuilderContext {
 
     private List<Map<Class, CatalogueElementProxy>> contexts = []
 
+    private final CatalogueBuilder builder
+
+    CatalogueBuilderContext(CatalogueBuilder builder) {
+        this.builder = builder
+    }
 
     public void clear() {
         contexts.clear()
     }
 
-    public <T extends CatalogueElement, A extends CatalogueElementProxy<T>>  void withNewContext(A contextElement, Closure c) {
+    public <T extends CatalogueElement, A extends CatalogueElementProxy<T>>  void withNewContext(A contextElement, @DelegatesTo(CatalogueBuilder) Closure c) {
         pushContext()
         setContextElement(contextElement)
-        with c
+        builder.with c
         popContext()
     }
 
@@ -36,13 +42,15 @@ class CatalogueBuilderContext {
      * @param contextElementType
      * @param closure
      */
-    public <T extends CatalogueElement, A extends CatalogueElementProxy<T>> WithOptionalOrClause withContextElement(Class<T> contextElementType, @ClosureParams(value=FromString, options = ['A']) Closure closure) {
+    public <T extends CatalogueElement, A extends CatalogueElementProxy<T>> WithOptionalOrClause withContextElement(Class<T> contextElementType, @DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options = ['A']) Closure closure) {
         A contextElement = getContextElement(contextElementType) as A
         if (contextElement) {
+            closure.resolveStrategy = Closure.DELEGATE_FIRST
+            closure.delegate = builder
             closure(contextElement)
             return WithOptionalOrClause.NOOP
         }
-        DefaultWithOptionalOrClause.INSTANCE
+        new DefaultWithOptionalOrClause(builder)
     }
 
     private void pushContext() {
