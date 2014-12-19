@@ -44,7 +44,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
       ext     = dataType?.enumerations ? {}
       for key of ext
         result += "#{key} \n"
-    else result = dataType.name
+    else result = dataType?.name
     result
 
 
