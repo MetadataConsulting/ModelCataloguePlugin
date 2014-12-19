@@ -10,8 +10,6 @@ class CatalogueBuilder {
 
     private static Set<Class> SUPPORTED_FOR_AUTO    = [DataType, EnumeratedType, ValueDomain]
 
-    private ClassificationService classificationService
-    private ElementService elementService
     private CatalogueElementProxyRepository repository
 
     private CatalogueBuilderContext context = new CatalogueBuilderContext()
@@ -20,9 +18,7 @@ class CatalogueBuilder {
 
 
     CatalogueBuilder(ClassificationService classificationService, ElementService elementService) {
-        this.classificationService = classificationService
-        this.elementService = elementService
-        this.repository = new CatalogueElementProxyRepository(classificationService)
+        this.repository = new CatalogueElementProxyRepository(classificationService, elementService)
     }
 
     Set<CatalogueElement> build(@DelegatesTo(CatalogueBuilder) Closure c) {
@@ -57,9 +53,6 @@ class CatalogueBuilder {
         CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification)
 
         context.withNewContext model, c
-
-        classifyIfNeeded model
-
         context.withContextElement(Model) {
             child model
         }
@@ -71,8 +64,6 @@ class CatalogueBuilder {
         CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model)
 
         context.withNewContext element, c
-
-        classifyIfNeeded element
 
         if (element.getParameter('valueDomain') == null && ValueDomain in createAutomatically) {
             context.withNewContext element, {
@@ -92,8 +83,6 @@ class CatalogueBuilder {
 
         context.withNewContext domain, c
 
-        classifyIfNeeded domain
-
         context.withContextElement(DataElement) {
             it.setParameter('valueDomain', domain)
         }
@@ -111,8 +100,6 @@ class CatalogueBuilder {
 
         context.withNewContext dataType, c
 
-        classifyIfNeeded dataType
-
         context.withContextElement(ValueDomain) {
             it.setParameter('dataType', dataType)
         }
@@ -124,8 +111,6 @@ class CatalogueBuilder {
         CatalogueElementProxy<MeasurementUnit> unit = createProxy(MeasurementUnit, parameters)
 
         context.withNewContext unit, c
-
-        classifyIfNeeded unit
 
         context.withContextElement(ValueDomain) {
             it.setParameter('unitOfMeasure', unit)
@@ -242,10 +227,6 @@ class CatalogueBuilder {
       new HashSet<CatalogueElement>(created)
     }
 
-    // helper methods
-
-
-
 
     private <T extends CatalogueElement, A extends CatalogueElementProxy<T>> void classifyIfNeeded(A element) {
         if (Classification.isAssignableFrom(element.domain)) {
@@ -271,12 +252,12 @@ class CatalogueBuilder {
     }
 
     private void reset() {
-        context = new CatalogueBuilderContext()
-        created = []
+        context.clear()
+        created.clear()
 
-        repository = new CatalogueElementProxyRepository(classificationService)
+        repository.clear()
 
-        createAutomatically = []
+        createAutomatically.clear()
     }
 
     protected <T extends CatalogueElement, A extends CatalogueElementProxy<T>> A createProxy(Class<T> domain, Map<String, Object> parameters, Class inheritFrom = null) {
@@ -307,89 +288,10 @@ class CatalogueBuilder {
             element.setParameter(key, value)
         }
 
+        classifyIfNeeded element
+
         element
     }
-
-
-    // -- not migrated bellow this line
-
-
-//    protected <T extends CatalogueElement> T saveIfNeeded(T element) {
-//        if (!element) {
-//            return element
-//        }
-//
-//        if (element.dirty && !('status' in element.dirtyPropertyNames) && (element.status == ElementStatus.FINALIZED || element.status == ElementStatus.DEPRECATED)) {
-//            return createNewVersion(element, element.dirtyPropertyNames as Set<String>)
-//        }
-//
-//        if (element.dirty) {
-//            log.info "Persisting changes ${element.dirtyPropertyNames} of $element"
-//            return element.save(failOnError: true, flush: true) as T
-//        } else if (!element.attached) {
-//            log.info "Persisting $element"
-//            return element.save(failOnError: true, flush: true) as T
-//        }
-//
-//        return element
-//    }
-
-//    protected <T extends CatalogueElement> T createNewVersion(T element, Set<String> changes) {
-//        T newVersion = elementService.createDraftVersion(element)
-//        for (String propertyName in element.dirtyPropertyNames) {
-//            newVersion.setProperty(propertyName, element.getProperty(propertyName))
-//        }
-//        log.info "Created new version for ${GrailsNameUtils.getNaturalName(element.class.simpleName)} with name ${newVersion.name}. New version differs in ${changes}."
-//        element.refresh()
-//        return newVersion.save(failOnError: true, flush: true) as T
-//    }
-//
-//
-//    private <T extends CatalogueElement> T findOrPrepareInstance(Class<T> type, Map<String, Object> parameters, boolean unclassified = false) {
-//        T element
-//        if (unclassified) {
-//            element = tryFindUnclassified(type, parameters.name, parameters.id)
-//        } else if (parameters.classification) {
-//            element = tryFind(type, parameters.classification, parameters.name, parameters.id)
-//        } else {
-//            element = tryFind(type, parameters.name, parameters.id)
-//        }
-//
-//        parameters.remove 'id'
-//        parameters.remove 'classification'
-//
-//        if (!element) {
-//            log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} does not exist yet, creating new one"
-//            element = type.newInstance(parameters)
-//        } else {
-//            log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} found"
-//            Closure propChanged = { String key, Object value ->
-//                // if something has changed
-//                if (element.hasProperty(key) && element.getProperty(key) != value) {
-//                    if (key == 'modelCatalogueKey' && value == null && element.defaultModelCatalogueId == element.modelCatalogueId) {
-//                        return false
-//                    }
-//                    if (key == 'status' && value == null && element.status == ElementStatus.DRAFT) {
-//                        return false
-//                    }
-//                    log.info "${GrailsNameUtils.getNaturalName(type.simpleName)} with name ${parameters.name} has changed. At least $key is different (new value is $value)"
-//                    return true
-//                }
-//                return false
-//            }
-//            if (parameters.any(propChanged)) {
-//                if (element.status == ElementStatus.FINALIZED || element.status == ElementStatus.DEPRECATED) {
-//                    Set<String> changed = properties.findAll(propChanged).keySet()
-//                    element = createNewVersion(element, changed)
-//                }
-//                element.properties = parameters
-//            }
-//
-//        }
-//
-//        created << element
-//        element
-//    }
 
 }
 

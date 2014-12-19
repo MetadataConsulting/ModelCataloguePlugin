@@ -20,6 +20,10 @@ class CatalogueBuilderContext {
     private List<Map<Class, CatalogueElementProxy>> contexts = []
 
 
+    public void clear() {
+        contexts.clear()
+    }
+
     public <T extends CatalogueElement, A extends CatalogueElementProxy<T>>  void withNewContext(A contextElement, Closure c) {
         pushContext()
         setContextElement(contextElement)

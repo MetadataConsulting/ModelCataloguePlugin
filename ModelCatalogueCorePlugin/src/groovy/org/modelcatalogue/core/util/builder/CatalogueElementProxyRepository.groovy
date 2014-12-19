@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ClassificationService
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.MeasurementUnit
 
 class CatalogueElementProxyRepository {
@@ -12,14 +13,20 @@ class CatalogueElementProxyRepository {
     private static final Map LATEST = [sort: 'versionNumber', order: 'asc', max: 1]
 
     private final ClassificationService classificationService
+    private final ElementService elementService
 
     Set<Class> unclassifiedQueriesFor = []
     Set<CatalogueElementProxy> pendingProxies = []
 
-    CatalogueElementProxyRepository(ClassificationService classificationService) {
+    CatalogueElementProxyRepository(ClassificationService classificationService, ElementService elementService) {
         this.classificationService = classificationService
+        this.elementService = elementService
     }
 
+    public void clear() {
+        unclassifiedQueriesFor.clear()
+        pendingProxies.clear()
+    }
 
     public <T extends CatalogueElement> CatalogueElementProxy<T> createProxy(Class<T> domain, Map<String, Object> parameters) {
         CatalogueElementProxy<T> proxy = createAbstractionInternal(domain, parameters)
@@ -54,6 +61,10 @@ class CatalogueElementProxyRepository {
 
     public static <T extends CatalogueElement> T save(T element) {
         element.save(failOnError: true, flush: true)
+    }
+
+    public <T extends CatalogueElement> T createDraftVersion(T element) {
+        elementService.createDraftVersion(element)
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
