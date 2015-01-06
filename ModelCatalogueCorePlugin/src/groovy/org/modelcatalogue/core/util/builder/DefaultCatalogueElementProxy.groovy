@@ -24,7 +24,7 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
     String name
     String classification
 
-    protected final CatalogueElementProxyRepository repository
+    protected CatalogueElementProxyRepository repository
 
     private final Map<String, Object> parameters = [:]
     private final Map<String, String> extensions = [:]
@@ -37,6 +37,7 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
         if (!(domain in KNOWN_DOMAIN_CLASSES)) {
             throw new IllegalArgumentException("Only domain classes of $KNOWN_DOMAIN_CLASSES are supported as proxies")
         }
+
         this.repository = repository
         this.domain = domain
 
@@ -98,6 +99,53 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
         extensions.put(key, value)
     }
 
+    boolean isNew() {
+        !findExisting()
+    }
+
+    boolean isChanged() {
+        T existing = findExisting()
+        if (!existing) {
+            return false
+        }
+
+        if (isParametersChanged(existing)) {
+            return true
+        }
+
+        if (isExtensionsChanged(existing)) {
+            return true
+        }
+
+        return false
+    }
+
+    T requestDraft() {
+        T existing = findExisting()
+
+        if (!existing) {
+            return null
+        }
+
+        if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]) {
+            return repository.createDraftVersion(existing)
+        }
+        return existing
+    }
+
+    private boolean isParametersChanged(T element) {
+        parameters.any { String key, Object value ->
+            def realValue = value instanceof CatalogueElementProxy ? value.resolve() : value
+            element.getProperty(key) != realValue
+        }
+    }
+
+    private boolean isExtensionsChanged(T element) {
+        extensions.any { String key, String value ->
+            element.ext.get(key) != value
+        }
+    }
+
     T findExisting() {
         if (id) {
             return repository.findById(domain, id)
@@ -115,15 +163,11 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
         if (!element) {
             return element
         }
-        boolean changed = parameters.any { String key, Object value ->
-            def realValue = value instanceof CatalogueElementProxy ? value.resolve() : value
-            element.getProperty(key) != realValue
-        }
+        boolean changed =  isParametersChanged(element)
 
         if (!changed) {
-            boolean extChanged = extensions.any { String key, String value ->
-                element.ext.get(key) != value
-            }
+            boolean extChanged = isExtensionsChanged(element)
+
             if (!extChanged) {
                 log.debug "$this has no changes"
                 return element

@@ -11,7 +11,7 @@ import org.modelcatalogue.core.MeasurementUnit
 class CatalogueElementProxyRepository {
 
     private Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, Classification]
-    private static final Map LATEST = [sort: 'versionNumber', order: 'asc', max: 1]
+    private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
 
     private final ClassificationService classificationService
     private final ElementService elementService
@@ -86,6 +86,25 @@ class CatalogueElementProxyRepository {
             }
         }
 
+        Set<String> changedClassification = []
+
+        for (CatalogueElementProxy element in toBeResolved) {
+            if (element.changed) {
+                element.requestDraft()
+                if (element.classification) {
+                    changedClassification << element.classification
+                }
+            }
+        }
+
+        if (changedClassification) {
+            for (CatalogueElementProxy element in toBeResolved) {
+                if (element.classification in changedClassification) {
+                    element.requestDraft()
+                }
+            }
+        }
+
         // resolve elements
         for (CatalogueElementProxy element in toBeResolved) {
             created << element.resolve()
@@ -142,11 +161,7 @@ class CatalogueElementProxyRepository {
         if (type in HAS_UNIQUE_NAMES) {
             return tryFindWithClassification(type, null, name, id)
         }
-        Classification classification = tryFindUnclassified(Classification, classificationName, id)
-        if (!classification) {
-            throw new IllegalArgumentException("Requested classification ${classificationName} is not present in the catalogue!")
-        }
-        tryFindWithClassification(type, classification, name, id)
+        tryFindWithClassification(type, tryFindUnclassified(Classification, classificationName, id), name, id)
     }
 
     protected <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name, Object id) {

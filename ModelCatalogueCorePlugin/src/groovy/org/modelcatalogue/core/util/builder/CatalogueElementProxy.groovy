@@ -8,15 +8,22 @@ import org.modelcatalogue.core.Relationship
  */
 interface CatalogueElementProxy<T extends CatalogueElement> {
 
+
+    boolean isNew()
+    boolean isChanged()
+
     T resolve()
     Set<Relationship> resolveRelationships()
     CatalogueElementProxy<T> merge(CatalogueElementProxy<T> other)
+    T requestDraft()
 
     Class<T> getDomain()
 
     String getId()
     String getName()
     String getClassification()
+
+
 
 
     Object getParameter(String key)

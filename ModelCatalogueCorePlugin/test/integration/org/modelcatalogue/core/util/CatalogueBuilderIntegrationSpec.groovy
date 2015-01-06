@@ -468,6 +468,11 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
                     status finalized
                 }
             }
+            classification(name: "NewVersion2") {
+                model name: "ModelNVX1", id: "http://www.example.com/models/ModelNVX1", {
+                    status finalized
+                }
+            }
         }
 
         expect:
