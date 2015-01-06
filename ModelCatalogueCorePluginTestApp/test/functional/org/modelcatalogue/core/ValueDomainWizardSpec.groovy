@@ -48,13 +48,17 @@
             when: "we expand the row"
             toggleInfTableRow(1)
 
-            and: "we expand the data type"
-            def dataTypeCell = $('td', 'data-value-for': 'Data Type')
-            dataTypeCell.find('span.fa-plus-square-o').click()
+            then: "we expand the data type"
+            waitFor {
+                $('td', 'data-value-for': 'Data Type').displayed
+            }
+
+            when:
+            $('td', 'data-value-for': 'Data Type').find('span.fa-plus-square-o').click()
 
             then: "we see enumerated values"
             waitFor {
-                dataTypeCell.find('div.preserve-new-lines')?.text()?.contains('Midline')
+                $('td', 'data-value-for': 'Data Type').find('div.preserve-new-lines')?.text()?.contains('Midline')
             }
 
             when: "the filter is reset"

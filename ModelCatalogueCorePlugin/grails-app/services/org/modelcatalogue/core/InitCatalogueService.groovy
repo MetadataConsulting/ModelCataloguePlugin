@@ -26,20 +26,39 @@ class InitCatalogueService {
         GroovyShell shell = prepareGroovyShell(builder)
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
 
+        List<Resource> forSecondPass = []
+
+        // first pass
         for (Resource resource in resolver.getResources('classpath*:**/*.mc')) {
             try {
-                log.info "Importing MC file ${resource.URI}"
-                shell.evaluate(resource.inputStream.newReader())
-                for (CatalogueElement element in builder.lastCreated) {
-                    if (element.status == ElementStatus.DRAFT) {
-                        elementService.finalizeElement(element)
-                    }
+                readMCFile(resource, shell, builder, true)
+            } catch (Exception e) {
+                log.info("Resource $resource couldn't be processed at the moment, will try again later", e)
+                forSecondPass << resource
+            }
+        }
+
+
+        // second pass
+        for (Resource resource in forSecondPass) {
+            readMCFile(resource, shell, builder, failOnError)
+        }
+    }
+
+    private void readMCFile(Resource resource, GroovyShell shell, CatalogueBuilder builder, boolean failOnError) {
+        try {
+            log.info "Importing MC file ${resource.URI}"
+            shell.evaluate(resource.inputStream.newReader())
+            for (CatalogueElement element in builder.lastCreated) {
+                if (element.status == ElementStatus.DRAFT) {
+                    elementService.finalizeElement(element)
                 }
-                log.info "File ${resource.URI} imported"
-            } catch (e) {
-                if (failOnError) {
-                    throw e
-                }
+            }
+            log.info "File ${resource.URI} imported"
+        } catch (e) {
+            if (failOnError) {
+                throw new IllegalArgumentException("Exception parsing model catalogue file ${resource.URI}", e)
+            } else {
                 log.error("Exception parsing model catalogue file ${resource.URI}", e)
             }
         }

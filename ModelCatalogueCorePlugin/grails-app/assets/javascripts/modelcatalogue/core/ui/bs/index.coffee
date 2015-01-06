@@ -35,6 +35,7 @@
 #= require modalPromptCsvTransform
 #= require modalPromptLogin
 #= require modalPromptForCatalogueElement
+#= require modalSearchForCatalogueElement
 #= require modalPromptForCatalogueElements
 #= require modalPromptMeasurementUnitEdit
 #= require modalPromptActionParametersEdit
@@ -91,7 +92,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptNewMapping'
   'mc.core.ui.bs.modalPromptXmlValidate'
   'mc.core.ui.bs.modalPromptForCatalogueElement'
-  'mc.core.ui.bs.modalPromptForCatalogueElements'
+  'mc.core.ui.bs.modalSearchForCatalogueElement'
   'mc.core.ui.bs.modalPromptForCatalogueElements'
   'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'

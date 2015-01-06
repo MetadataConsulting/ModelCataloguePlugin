@@ -98,6 +98,9 @@ abstract class ModelCataloguePage extends Page {
 
 
     void toggleInfTableRow(int row) {
+        waitFor {
+            $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand')
+        }
         $('div.inf-table-body tbody tr:nth-child(' + row +') a.inf-cell-expand').click()
     }
 

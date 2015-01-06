@@ -44,7 +44,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
       resource      = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
       value         = if pickerValue then pickerValue else resource
 
-      messages.prompt(null, null, {type: 'catalogue-element', resource: value}).then (element) ->
+      messages.prompt(null, null, {type: 'search-catalogue-element', resource: value}).then (element) ->
         $parse(ngModel).assign($scope, element)
         $scope.$eval onSelect, {$item: element, $model: element, $label: element.classifiedName} if onSelect
 
