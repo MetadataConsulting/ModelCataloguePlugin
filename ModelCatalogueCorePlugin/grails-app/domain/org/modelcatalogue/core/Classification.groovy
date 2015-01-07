@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
 
 class Classification extends CatalogueElement {
 
@@ -42,10 +44,9 @@ class Classification extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
-        PublishingChain
-                .create(this)
-                .publish(this.classifies)
-                .publish(archiver)
+    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
+        PublishingChain.finalize(this)
+        .add(this.classifies)
+        .run(publisher)
     }
 }

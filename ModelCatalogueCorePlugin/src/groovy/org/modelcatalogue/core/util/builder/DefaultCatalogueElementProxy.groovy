@@ -99,27 +99,6 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
         extensions.put(key, value)
     }
 
-    boolean isNew() {
-        !findExisting()
-    }
-
-    boolean isChanged() {
-        T existing = findExisting()
-        if (!existing) {
-            return false
-        }
-
-        if (isParametersChanged(existing)) {
-            return true
-        }
-
-        if (isExtensionsChanged(existing)) {
-            return true
-        }
-
-        return false
-    }
-
     T requestDraft() {
         T existing = findExisting()
 

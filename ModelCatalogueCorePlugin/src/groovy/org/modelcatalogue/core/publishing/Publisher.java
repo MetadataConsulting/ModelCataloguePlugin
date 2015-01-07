@@ -1,10 +1,9 @@
-package org.modelcatalogue.core;
+package org.modelcatalogue.core.publishing;
 
 /**
  * Simple interface to decouple element service and domain classes
  */
-public interface Archiver<T extends Published>  {
+public interface Publisher<T extends Published>  {
 
     T archive(T published);
-
 }

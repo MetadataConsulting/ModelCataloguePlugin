@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
 
 /*
 * A Data Type is like a primitive type
@@ -90,5 +92,12 @@ class DataType extends CatalogueElement {
         domain.dataType = null
         domain.save(failOnError: true)
         this
+    }
+
+    @Override
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher) {
+        PublishingChain.createDraft(this)
+        .add(this.relatedValueDomains)
+        .run(publisher)
     }
 }

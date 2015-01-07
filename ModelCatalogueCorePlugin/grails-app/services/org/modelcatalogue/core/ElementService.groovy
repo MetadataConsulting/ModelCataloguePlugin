@@ -3,9 +3,10 @@ package org.modelcatalogue.core
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.modelcatalogue.core.publishing.Publisher
 import org.springframework.transaction.TransactionStatus
 
-class ElementService implements Archiver<CatalogueElement> {
+class ElementService implements Publisher<CatalogueElement> {
 
     static transactional = true
 
@@ -88,7 +89,7 @@ class ElementService implements Archiver<CatalogueElement> {
 
 
 
-     CatalogueElement  archive(CatalogueElement archived) {
+    CatalogueElement archive(CatalogueElement archived) {
         if (archived.archived) {
             return archived
         }

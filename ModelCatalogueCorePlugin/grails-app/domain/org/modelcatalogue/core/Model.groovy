@@ -1,5 +1,8 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
+
 class Model extends CatalogueElement {
 
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
@@ -21,12 +24,18 @@ class Model extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
-        PublishingChain
-                .create(this)
-                .publish(this.contains)
-                .publish(this.parentOf)
-                .publish(archiver)
+    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
+        PublishingChain.finalize(this)
+        .add(this.contains)
+        .add(this.parentOf)
+        .run(publisher)
     }
 
+    @Override
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher) {
+        PublishingChain.createDraft(this)
+        .add(this.childOf)
+        .add(this.classifications)
+        .run(publisher)
+    }
 }

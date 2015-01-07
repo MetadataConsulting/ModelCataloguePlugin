@@ -1,4 +1,8 @@
 package org.modelcatalogue.core
+
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
+
 /*
 * A data element is an atomic unit of data
 * i.e. xml  <xs:element name="title" />
@@ -31,11 +35,16 @@ class DataElement extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
-        PublishingChain
-                .create(this)
-                .publish(this.valueDomain)
-                .publish(archiver)
+    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
+        PublishingChain.finalize(this)
+        .add(this.valueDomain)
+        .run(publisher)
     }
 
+    @Override
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher) {
+        PublishingChain.createDraft(this)
+        .add(this.containedIn)
+        .run(publisher)
+    }
 }

@@ -1,6 +1,9 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.publishing.Published
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -302,8 +305,13 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
     @Override
-    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
-        PublishingChain.create(this).publish(archiver)
+    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
+        PublishingChain.finalize(this).run(publisher)
+    }
+
+    @Override
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher) {
+        PublishingChain.createDraft(this).run(publisher)
     }
 
     @Override

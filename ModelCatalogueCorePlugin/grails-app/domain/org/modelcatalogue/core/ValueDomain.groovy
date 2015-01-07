@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.modelcatalogue.core.util.ValueDomainRuleScript
 
@@ -96,7 +98,7 @@ class ValueDomain extends CatalogueElement {
         if (!x) {
             return true
         }
-        Set<String> enums = new HashSet<String>(dataType.enumerations.keySet())
+        Set<String> enums = new HashSet<String>((dataType as EnumeratedType).enumerations.keySet())
         if (!enums.contains(x.toString())) {
             return false
         }
@@ -157,11 +159,18 @@ class ValueDomain extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement publish(Archiver<CatalogueElement> archiver) {
+    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain
-                .create(this)
+                .finalize(this)
                 .require(unitOfMeasure)
-                .publish(dataType)
-                .publish(archiver)
+                .add(dataType)
+                .run(publisher)
+    }
+
+    @Override
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher) {
+        PublishingChain.createDraft(this)
+        .add(this.dataElements)
+        .run(publisher)
     }
 }

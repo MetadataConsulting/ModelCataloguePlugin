@@ -9,9 +9,6 @@ import org.modelcatalogue.core.Relationship
 interface CatalogueElementProxy<T extends CatalogueElement> {
 
 
-    boolean isNew()
-    boolean isChanged()
-
     T resolve()
     Set<Relationship> resolveRelationships()
     CatalogueElementProxy<T> merge(CatalogueElementProxy<T> other)

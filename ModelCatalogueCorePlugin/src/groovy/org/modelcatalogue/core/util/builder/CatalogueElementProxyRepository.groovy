@@ -86,25 +86,6 @@ class CatalogueElementProxyRepository {
             }
         }
 
-        Set<String> changedClassification = []
-
-        for (CatalogueElementProxy element in toBeResolved) {
-            if (element.changed) {
-                element.requestDraft()
-                if (element.classification) {
-                    changedClassification << element.classification
-                }
-            }
-        }
-
-        if (changedClassification) {
-            for (CatalogueElementProxy element in toBeResolved) {
-                if (element.classification in changedClassification) {
-                    element.requestDraft()
-                }
-            }
-        }
-
         // resolve elements
         for (CatalogueElementProxy element in toBeResolved) {
             created << element.resolve()
