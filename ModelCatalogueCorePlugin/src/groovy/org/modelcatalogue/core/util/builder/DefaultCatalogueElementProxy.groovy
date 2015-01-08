@@ -33,7 +33,7 @@ import org.modelcatalogue.core.ValueDomain
     private CatalogueElementProxy<T> replacedBy
     private T resolved
     private String draftRequest
-    private Boolean changed
+    private String changed
 
     DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name) {
         if (!(domain in KNOWN_DOMAIN_CLASSES)) {
@@ -101,8 +101,8 @@ import org.modelcatalogue.core.ValueDomain
         extensions.put(key, value)
     }
 
-    void requestDraft(String reason) {
-        draftRequest = reason ?: "New version needed"
+    void requestDraft() {
+        draftRequest = changed == null ? (changed = getChanged()) : changed
     }
 
     T createDraftIfRequested() {
@@ -117,7 +117,7 @@ import org.modelcatalogue.core.ValueDomain
         }
 
         if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]) {
-            log.info("New draft version created. Reason: $draftRequest")
+            log.info("New draft version created for $this. Reason: $draftRequest")
             return repository.createDraftVersion(existing)
         }
         return existing
@@ -125,12 +125,24 @@ import org.modelcatalogue.core.ValueDomain
 
     private boolean isParametersChanged(T element) {
         parameters.any { String key, Object value ->
-            def realValue = value instanceof CatalogueElementProxy ? value.resolve() : value
-            boolean result = element.getProperty(key) != realValue
-            if (result) {
-                log.debug "$this has changed at least one property - property $key is now $realValue"
+            def currentValue = element.getProperty(key)
+            if (value instanceof CatalogueElementProxy) {
+                def realValue = value.findExisting()
+                if (realValue?.latestVersionId && realValue?.latestVersionId != currentValue?.latestVersionId) {
+                    log.debug "$this has changed at least one property - property $key is now $realValue instead of ${currentValue}"
+                    return true
+                }
+                if (realValue?.id != currentValue?.id) {
+                    log.debug "$this has changed at least one property - property $key is now $realValue instead of ${currentValue}"
+                    return true
+                }
+                return false
             }
-            result
+            if (currentValue != value) {
+                log.debug "$this has changed at least one property - property $key is now $value instead of ${currentValue}"
+                return true
+            }
+            return false
         }
     }
 
@@ -138,27 +150,31 @@ import org.modelcatalogue.core.ValueDomain
         extensions.any { String key, String value ->
             boolean result = element.ext.get(key) != value
             if (result) {
-                log.debug "$this has changed at least one extension - extension $key is now $value"
+                log.debug "$this has changed at least one extension - extension $key is now $value instead of ${element.ext.get(key)}"
             }
             result
         }
     }
 
-    boolean isChanged() {
+    String getChanged() {
         T existing = findExisting()
         if (!existing) {
-            return changed = false
+            return changed = "Does Not Exist Yet"
         }
 
         if (isParametersChanged(existing)) {
-            return changed = true
+            return changed = "Parameters Changed"
         }
 
         if (isExtensionsChanged(existing)) {
-            return changed = true
+            return changed = "Extensions Changed"
         }
 
-        return changed = isRelationshipsChanged()
+        if (isRelationshipsChanged()) {
+            return changed = "Relationship Changed"
+        }
+
+        return ""
     }
 
     boolean isRelationshipsChanged() {
@@ -202,11 +218,11 @@ import org.modelcatalogue.core.ValueDomain
         }
 
         if (changed == null) {
-            changed = isChanged()
+            changed = getChanged()
         }
 
         if (!changed) {
-            log.debug "$this has no changes or does not exist yet"
+            return element
         }
 
         updateProperties(element)
@@ -221,9 +237,28 @@ import org.modelcatalogue.core.ValueDomain
 
     private Map<String, Object> updateProperties(element) {
         parameters.each { String key, Object value ->
-            def realValue = value instanceof CatalogueElementProxy ? value.resolve() : value
+            def currentValue = element.getProperty(key)
+            if (value instanceof CatalogueElementProxy) {
+                def realValue = value.resolve()
+                if (realValue?.latestVersionId && realValue?.latestVersionId != currentValue?.latestVersionId) {
+                    log.debug "$this has changed at least one property - property $key is now $realValue instead of ${currentValue}"
+                    element.setProperty(key, realValue)
+                    return
+                }
+                if (realValue?.id != currentValue?.id) {
+                    log.debug "$this has changed at least one property - property $key is now $realValue instead of ${currentValue}"
+                    element.setProperty(key, realValue)
+                    return
+                }
+            }
+            if (currentValue != value) {
+                log.debug "$this has changed at least one property - property $key is now $value instead of ${currentValue}"
+                element.setProperty(key, value)
+                return
+            }
+            def realValue = value instanceof CatalogueElementProxy ? value.findExisting() : value
             if (element.getProperty(key) != realValue) {
-                log.debug "$this has changed - property $key is now $realValue"
+                log.debug "$this has changed - property $key is now $realValue instead of ${element.getProperty(key)}"
                 element.setProperty(key, realValue)
             }
         }
@@ -232,7 +267,7 @@ import org.modelcatalogue.core.ValueDomain
     private <T extends CatalogueElement> void updateExtensions(T element) {
         extensions.each { String key, String value ->
             if (element.ext.get(key) != value) {
-                log.debug "$this has changed - extension $key is now $value"
+                log.debug "$this has changed - extension $key is now $value instead of ${element.ext.get(key)}"
                 element.ext.put(key, value)
             }
         }

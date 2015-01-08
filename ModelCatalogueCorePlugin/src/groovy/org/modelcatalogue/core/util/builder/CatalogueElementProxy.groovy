@@ -10,13 +10,13 @@ interface CatalogueElementProxy<T extends CatalogueElement> {
     Set<Relationship> resolveRelationships()
     CatalogueElementProxy<T> merge(CatalogueElementProxy<T> other)
 
-    void requestDraft(String reason)
+    void requestDraft()
     T createDraftIfRequested()
 
 
     T findExisting()
 
-    boolean isChanged()
+    String getChanged()
 
     Class<T> getDomain()
 

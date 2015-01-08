@@ -88,7 +88,7 @@ class CatalogueElementProxyRepository {
         // Step 1:check something changed this must run before any other resolution happens
         for (CatalogueElementProxy element in toBeResolved) {
             if (element.changed) {
-                element.requestDraft("element was changed")
+                element.requestDraft()
             }
         }
 

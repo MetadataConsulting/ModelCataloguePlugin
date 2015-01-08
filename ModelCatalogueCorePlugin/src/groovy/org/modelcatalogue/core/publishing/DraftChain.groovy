@@ -69,7 +69,7 @@ class DraftChain extends PublishingChain {
             }
         }
 
-        draft.versionNumber++
+        draft.versionNumber = (published.class.findByLatestVersionId(published.latestVersionId, [sort: 'versionNumber', order: 'desc'])?.versionNumber ?: 1) + 1
         draft.versionCreated = new Date()
 
         draft.latestVersionId = published.latestVersionId ?: published.id
