@@ -21,8 +21,20 @@ class DraftChain extends PublishingChain {
     }
 
     CatalogueElement run(Publisher<CatalogueElement> publisher) {
-        if (!force && isDraft(published)) {
-            return published
+        if (!force) {
+            if (isDraft(published) || isUpdatingInProgress(published)) {
+                return published
+            }
+        }
+
+
+        if (published.latestVersionId) {
+            def existingDrafts = published.class.findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
+            for (existing in existingDrafts) {
+                if (existing.id != published.id) {
+                    return existing
+                }
+            }
         }
 
         startUpdating()
