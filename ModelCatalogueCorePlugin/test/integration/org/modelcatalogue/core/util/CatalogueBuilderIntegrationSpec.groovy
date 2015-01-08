@@ -43,7 +43,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        created.first() == c
+        created.first().latestVersionId == c.refresh().latestVersionId
     }
 
     def "reuse existing classification by id"() {
@@ -99,7 +99,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        created.first() == unit
+        created.first().latestVersionId == unit.refresh().latestVersionId
     }
 
     def "creates only one measurement unit as measurement unit name is unique"() {
@@ -123,7 +123,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        created.find { it instanceof  MeasurementUnit} == unit
+        created.find { it instanceof  MeasurementUnit}.latestVersionId == unit.refresh().latestVersionId
         created.size() == 3
         created.any { it.name == 'TestClassificationA'}
         created.any { it.name == 'TestClassificationB'}
@@ -167,7 +167,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        created.first() == unit
+        created.first().latestVersionId == unit.refresh().latestVersionId
     }
 
     def "complain if data element name is missing"() {
@@ -207,7 +207,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        created.first() == unit
+        created.first().latestVersionId == unit.refresh().latestVersionId
     }
 
     def "complain if model name is missing"() {
@@ -488,9 +488,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
 
         then: "new model is draft"
-        Model.findByName("ModelNV2")?.status            == ElementStatus.DRAFT
         Model.findByName("ModelNV2")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
         Model.findByName("ModelNV2")?.latestVersionId   == Model.findByName("ModelNV1")?.id
+        Model.findByName("ModelNV2")?.status            == ElementStatus.DRAFT
 
         and: "the old model is still finalized"
         Model.findByName("ModelNV1")?.status            == ElementStatus.FINALIZED

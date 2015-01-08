@@ -90,7 +90,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     void createDraftVersions(CatalogueElement el) {
         while (el.versionNumber != 12) {
-            el = elementService.createDraftVersion(el)
+            el = elementService.createNewDraftVersion(el)
             if (el.hasErrors()) {
                 throw new IllegalStateException("Creating draft version faileds with ${el.errors}")
             }

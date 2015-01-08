@@ -11,10 +11,10 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
 
-@Log4j
-class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T> {
+@Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T> {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, Classification, DataElement, DataType, EnumeratedType, MeasurementUnit, Model, ValueDomain]
 
@@ -32,6 +32,8 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
 
     private CatalogueElementProxy<T> replacedBy
     private T resolved
+    private String draftRequest
+    private Boolean changed
 
     DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name) {
         if (!(domain in KNOWN_DOMAIN_CLASSES)) {
@@ -99,7 +101,15 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
         extensions.put(key, value)
     }
 
-    T requestDraft() {
+    void requestDraft(String reason) {
+        draftRequest = reason ?: "New version needed"
+    }
+
+    T createDraftIfRequested() {
+        if (!draftRequest) {
+            return null
+        }
+
         T existing = findExisting()
 
         if (!existing) {
@@ -107,6 +117,7 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
         }
 
         if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]) {
+            log.info("New draft version created. Reason: $draftRequest")
             return repository.createDraftVersion(existing)
         }
         return existing
@@ -115,14 +126,61 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
     private boolean isParametersChanged(T element) {
         parameters.any { String key, Object value ->
             def realValue = value instanceof CatalogueElementProxy ? value.resolve() : value
-            element.getProperty(key) != realValue
+            boolean result = element.getProperty(key) != realValue
+            if (result) {
+                log.debug "$this has changed at least one property - property $key is now $realValue"
+            }
+            result
         }
     }
 
     private boolean isExtensionsChanged(T element) {
         extensions.any { String key, String value ->
-            element.ext.get(key) != value
+            boolean result = element.ext.get(key) != value
+            if (result) {
+                log.debug "$this has changed at least one extension - extension $key is now $value"
+            }
+            result
         }
+    }
+
+    boolean isChanged() {
+        T existing = findExisting()
+        if (!existing) {
+            return changed = false
+        }
+
+        if (isParametersChanged(existing)) {
+            return changed = true
+        }
+
+        if (isExtensionsChanged(existing)) {
+            return changed = true
+        }
+
+        return changed = isRelationshipsChanged()
+    }
+
+    boolean isRelationshipsChanged() {
+        boolean result = relationships.any {
+            CatalogueElement source = it.source.findExisting()
+
+            if (!source) return true
+
+            CatalogueElement destination = it.destination.findExisting()
+
+            if (!destination) return true
+
+            RelationshipType type = RelationshipType.readByName(it.relationshipTypeName)
+
+            if (!type) return true
+
+            !Relationship.countBySourceAndDestinationAndRelationshipType(source, destination, type)
+        }
+        if (result) {
+            log.debug "$this has changed at least one relationship"
+        }
+        result
     }
 
     T findExisting() {
@@ -142,27 +200,26 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
         if (!element) {
             return element
         }
-        boolean changed =  isParametersChanged(element)
 
-        if (!changed) {
-            boolean extChanged = isExtensionsChanged(element)
-
-            if (!extChanged) {
-                log.debug "$this has no changes"
-                return element
-            }
-
-            log.debug "$this has different in metadata"
-
-            element = createNewVersionIfNeeded(element)
-
-            updateExtensions(element)
-
-            return element
+        if (changed == null) {
+            changed = isChanged()
         }
 
-        element = createNewVersionIfNeeded(element)
+        if (!changed) {
+            log.debug "$this has no changes or does not exist yet"
+        }
 
+        updateProperties(element)
+
+        log.debug "Saving properties of $this"
+        repository.save(element)
+
+        updateExtensions(element)
+
+        element
+    }
+
+    private Map<String, Object> updateProperties(element) {
         parameters.each { String key, Object value ->
             def realValue = value instanceof CatalogueElementProxy ? value.resolve() : value
             if (element.getProperty(key) != realValue) {
@@ -170,13 +227,6 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
                 element.setProperty(key, realValue)
             }
         }
-
-        log.debug "Saving $this"
-        repository.save(element)
-
-        updateExtensions(element)
-
-        element
     }
 
     private <T extends CatalogueElement> void updateExtensions(T element) {
@@ -186,14 +236,6 @@ class DefaultCatalogueElementProxy<T extends CatalogueElement> implements Catalo
                 element.ext.put(key, value)
             }
         }
-    }
-
-    private <T extends CatalogueElement> T createNewVersionIfNeeded(T element) {
-        if (element.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]) {
-            log.debug "$this is finalized, creating new draft version"
-            return repository.createDraftVersion(element)
-        }
-        element
     }
 
     @Override

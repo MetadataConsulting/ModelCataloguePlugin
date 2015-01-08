@@ -31,12 +31,6 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
             throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
         }
         Relationship relationship = sourceElement.createLinkTo(destinationElement, type)
-        if (relationship.hasErrors() && relationship.errors.getFieldErrorCount('relationshipType') > 0 && relationship.errors.getFieldError('relationshipType').code == 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add') {
-            // this is nasty
-            // type refused, retry with draft version
-            sourceElement = source.requestDraft()
-            relationship = sourceElement.createLinkTo(destinationElement, type)
-        }
         if (relationship.hasErrors()) {
             log.error(relationship.errors)
             throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement.")

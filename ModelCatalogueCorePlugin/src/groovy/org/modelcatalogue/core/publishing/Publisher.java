@@ -6,4 +6,5 @@ package org.modelcatalogue.core.publishing;
 public interface Publisher<T extends Published>  {
 
     T archive(T published);
+    T createNewDraftVersion(T published, boolean noCopy);
 }

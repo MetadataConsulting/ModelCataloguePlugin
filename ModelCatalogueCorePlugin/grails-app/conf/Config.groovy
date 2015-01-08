@@ -11,9 +11,8 @@ log4j = {
     debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
     debug 'grails.app.services.org.modelcatalogue.core.InitCatalogueService'
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
-    debug 'org.modelcatalogue.core.util.builder.CatalogueBuilder'
-    debug 'org.modelcatalogue.core.util.builder.AbstractCatalogueElementProxy'
-    debug 'org.modelcatalogue.core.util.builder.CatalogueElementProxy'
+    debug 'org.modelcatalogue.core.util.builder'
+    debug 'org.modelcatalogue.core.publishing'
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP

@@ -126,6 +126,8 @@ log4j = {
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 
     debug 'org.modelcatalogue.core.util.builder'
+    debug 'org.modelcatalogue.core.publishing'
+
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'

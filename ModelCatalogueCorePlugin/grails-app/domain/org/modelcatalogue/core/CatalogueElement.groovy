@@ -252,7 +252,11 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     /**
      * Called before the archived element is persisted to the data store.
      */
-    protected void beforeDraftPersisted() {}
+    void beforeDraftPersisted() {}
+
+    void afterDraftPersisted(CatalogueElement draft) {
+        draft.ext.putAll this.ext
+    }
 
     static String fixResourceName(String resourceName) {
         if (resourceName.contains('_')) {

@@ -39,7 +39,7 @@ class Classification extends CatalogueElement {
     }
 
     @Override
-    protected void beforeDraftPersisted() {
+    void beforeDraftPersisted() {
         namespace = null
     }
 

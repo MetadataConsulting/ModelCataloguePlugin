@@ -42,6 +42,14 @@ class DataElement extends CatalogueElement {
     }
 
     @Override
+    void afterDraftPersisted(CatalogueElement draft) {
+        super.afterDraftPersisted(draft)
+        if (valueDomain) {
+            (draft as DataElement).valueDomain = valueDomain
+        }
+    }
+
+    @Override
     CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher) {
         PublishingChain.createDraft(this)
         .add(this.containedIn)

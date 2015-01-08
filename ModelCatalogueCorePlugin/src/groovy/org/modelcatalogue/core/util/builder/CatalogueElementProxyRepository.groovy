@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
 import grails.gorm.DetachedCriteria
-import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ClassificationService
@@ -86,12 +85,25 @@ class CatalogueElementProxyRepository {
             }
         }
 
-        // resolve elements
+        // Step 1:check something changed this must run before any other resolution happens
+        for (CatalogueElementProxy element in toBeResolved) {
+            if (element.changed) {
+                element.requestDraft("element was changed")
+            }
+        }
+
+        // Step 2: if something changed, create new versions. if run in one step, it generates false changes
+        for (CatalogueElementProxy element in toBeResolved) {
+            element.createDraftIfRequested()
+        }
+
+
+        // Step 3: resolve elements (set properties, update metadata)
         for (CatalogueElementProxy element in toBeResolved) {
             created << element.resolve()
         }
 
-        // resolve pending relationships
+        // Step 4: resolve pending relationships
         for (CatalogueElementProxy element in toBeResolved) {
             element.resolveRelationships()
         }
@@ -135,7 +147,11 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
-        elementService.createDraftVersion(element)
+        T draft = element.createDraftVersion(elementService) as T
+        if (draft.hasErrors()) {
+            throw new IllegalStateException("Failed to create draft version of $element. Errors: $draft.errors")
+        }
+        draft
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {

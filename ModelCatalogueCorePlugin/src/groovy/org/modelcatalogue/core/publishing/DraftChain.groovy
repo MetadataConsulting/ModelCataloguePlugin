@@ -1,10 +1,13 @@
 package org.modelcatalogue.core.publishing
 
+import grails.util.Holders
+import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.Relationship
 
 class DraftChain extends PublishingChain {
-
 
     private DraftChain(CatalogueElement published) {
         super(published)
@@ -39,23 +42,72 @@ class DraftChain extends PublishingChain {
                 }
             }
         }
-        return doPublish(publisher)
+        return createDraft(publisher)
     }
 
-    private CatalogueElement doPublish(Publisher<CatalogueElement> archiver) {
-        published.status = ElementStatus.DRAFT
+    private CatalogueElement createDraft(Publisher<CatalogueElement> archiver) {
+        if (!published.latestVersionId) {
+            published.latestVersionId = published.id
+            published.save(failOnError: true)
+        }
 
-        if (published.latestVersionId) {
-            List<CatalogueElement> previousDraft = published.getClass().findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT)
-            for (CatalogueElement e in previousDraft) {
-                if (e != published) {
-                    archiver.archive(e)
-                }
+        if (published.archived) {
+            published.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.cannot.be.archived', 'Cannot create draft version from deprecated element!')
+            return published
+        }
+
+        GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(published.class.name) as GrailsDomainClass
+
+        CatalogueElement draft = published.class.newInstance()
+
+        for (prop in domainClass.persistentProperties) {
+            if (!prop.association) {
+                draft.setProperty(prop.name, published[prop.name])
             }
         }
 
-        published.save()
-        published
+        draft.versionNumber++
+        draft.versionCreated = new Date()
+
+        draft.latestVersionId = published.latestVersionId ?: published.id
+        draft.status = ElementStatus.UPDATED
+        draft.dateCreated = published.dateCreated
+
+        draft.beforeDraftPersisted()
+
+        if (!draft.save()) {
+            return draft
+        }
+
+        restoreStatus()
+
+
+        draft.addToSupersedes(published)
+
+        draft = addRelationshipsToDraft(draft, published)
+
+        published.afterDraftPersisted(draft)
+
+        if (published.status == ElementStatus.DRAFT) {
+            archiver.archive(published)
+        }
+
+        draft.status = ElementStatus.DRAFT
+        draft.save()
+    }
+
+    private static <E extends CatalogueElement> E addRelationshipsToDraft(E draft, E element) {
+        for (Relationship r in element.incomingRelationships) {
+            if (r.archived || r.relationshipType.versionSpecific) continue
+            draft.createLinkFrom(r.source, r.relationshipType)
+        }
+
+        for (Relationship r in element.outgoingRelationships) {
+            if (r.archived || r.relationshipType.versionSpecific) continue
+            draft.createLinkTo(r.destination, r.relationshipType)
+        }
+
+        draft
     }
 
 

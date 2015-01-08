@@ -47,7 +47,7 @@ class User extends CatalogueElement {
     }
 
     @Override
-    protected void beforeDraftPersisted() {
+    void beforeDraftPersisted() {
         super.beforeDraftPersisted()
         String randomUsername = username
         while (User.countByUsername(randomUsername)) {
