@@ -56,7 +56,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.valueDomain = domain
 
         int originalVersion     = author.versionNumber
-        DataElement draft       = elementService.createNewDraftVersion(author, false) as DataElement
+        DataElement draft       = elementService.createDraftVersion(author, true) as DataElement
         int draftVersion        = draft.versionNumber
         int newVersion          = author.versionNumber
         author.refresh()
@@ -79,7 +79,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         draft.status == ElementStatus.DRAFT
 
         when:
-        def anotherDraft = elementService.createNewDraftVersion(draft, false)
+        def anotherDraft = elementService.createDraftVersion(draft, true)
 
         println "Author Supersedes: $author.supersedes"
         println "Draft Supersedes: $draft.supersedes"
@@ -208,7 +208,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md2.addToParentOf(md3)
 
         int originalVersion     = md2.versionNumber
-        Model draft             = elementService.createNewDraftVersion(md2) as Model
+        Model draft             = elementService.createDraftVersion(md2, true) as Model
         int draftVersion        = draft.versionNumber
         int newVersion          = md2.versionNumber
 
@@ -240,7 +240,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "finalize element"(){
         when:
         DataElement author = DataElement.findByName('auth5')
-        DataElement draft = elementService.createNewDraftVersion(author) as DataElement
+        DataElement draft = elementService.createDraftVersion(author, true) as DataElement
 
         then:
         draft.status    == ElementStatus.DRAFT

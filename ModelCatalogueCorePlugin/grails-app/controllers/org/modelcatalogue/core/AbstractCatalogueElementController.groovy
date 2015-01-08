@@ -368,7 +368,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (newVersion) {
 
             // when draft version is created from the UI still just create plain draft ignoring dependencies
-            instance = elementService.createNewDraftVersion(instance) as T
+            instance = elementService.createDraftVersion(instance, true) as T
             if (instance.hasErrors()) {
                 respond instance.errors, view: 'edit' // STATUS CODE 422
                 return

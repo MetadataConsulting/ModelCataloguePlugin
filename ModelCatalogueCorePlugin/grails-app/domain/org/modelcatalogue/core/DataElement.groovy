@@ -50,8 +50,8 @@ class DataElement extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher) {
-        PublishingChain.createDraft(this)
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, boolean force) {
+        PublishingChain.createDraft(this, force)
         .add(this.containedIn)
         .run(publisher)
     }

@@ -9,16 +9,19 @@ import org.modelcatalogue.core.Relationship
 
 class DraftChain extends PublishingChain {
 
-    private DraftChain(CatalogueElement published) {
+    private final boolean force
+
+    private DraftChain(CatalogueElement published, boolean force) {
         super(published)
+        this.force = force
     }
 
-    static DraftChain create(CatalogueElement published) {
-        return new DraftChain(published)
+    static DraftChain create(CatalogueElement published, boolean force) {
+        return new DraftChain(published, force)
     }
 
     CatalogueElement run(Publisher<CatalogueElement> publisher) {
-        if (isDraft(published)) {
+        if (!force && isDraft(published)) {
             return published
         }
 
@@ -36,7 +39,7 @@ class DraftChain extends PublishingChain {
                     continue
                 }
                 processed << element.id
-                CatalogueElement draft = element.createDraftVersion(publisher)
+                CatalogueElement draft = element.createDraftVersion(publisher, force)
                 if (draft.hasErrors()) {
                     return rejectDraftDependency(draft)
                 }

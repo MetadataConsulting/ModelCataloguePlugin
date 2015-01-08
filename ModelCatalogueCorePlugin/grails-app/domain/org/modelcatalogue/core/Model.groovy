@@ -32,8 +32,8 @@ class Model extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher) {
-        PublishingChain.createDraft(this)
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, boolean force) {
+        PublishingChain.createDraft(this, force)
         .add(this.childOf)
         .add(this.classifications)
         .run(publisher)

@@ -60,7 +60,7 @@ class AssetService {
                 return null
             }
 
-            existing = elementService.createNewDraftVersion(existing) as Asset
+            existing = elementService.createDraftVersion(existing, true) as Asset
 
             if (existing.hasErrors()) {
                 return existing

@@ -147,7 +147,7 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
-        T draft = element.createDraftVersion(elementService) as T
+        T draft = element.createDraftVersion(elementService, false) as T
         if (draft.hasErrors()) {
             throw new IllegalStateException("Failed to create draft version of $element. Errors: $draft.errors")
         }

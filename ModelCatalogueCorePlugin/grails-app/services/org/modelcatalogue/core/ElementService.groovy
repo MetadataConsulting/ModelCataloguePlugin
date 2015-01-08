@@ -31,92 +31,17 @@ class ElementService implements Publisher<CatalogueElement> {
         resource.countByStatus(getStatusFromParams(params))
     }
 
-    /**
-     * Always created new draft version of the without forcing to make any dependencies to be draft as well.
-     * @param element
-     * @param noCopy do not copy properties, extensions and relationships
-     * @return
-     */
-    CatalogueElement createNewDraftVersion(CatalogueElement element, boolean noCopy = false) {
-        if (!element.latestVersionId) {
-            element.latestVersionId = element.id
-            element.save(failOnError: true)
-        }
 
-        if (element.archived) {
-            element.errors.rejectValue('status', 'org.modelcatalogue.core.CatalogueElement.element.cannot.be.archived', 'Cannot create draft version from deprecated element!')
-            return element
-        }
-
-        GrailsDomainClass domainClass = grailsApplication.getDomainClass(element.class.name) as GrailsDomainClass
-
-        CatalogueElement draft = element.class.newInstance()
-
-        if (!noCopy) {
-            for (prop in domainClass.persistentProperties) {
-                if (!prop.association) {
-                    draft.setProperty(prop.name, element[prop.name])
-                }
+    public <E extends CatalogueElement> E createDraftVersion(E element, boolean force = false) {
+        CatalogueElement.withTransaction { TransactionStatus status ->
+            E draft = element.createDraftVersion(this, force) as E
+            if (draft.hasErrors()) {
+                status.setRollbackOnly()
             }
+            draft
         }
-
-        draft.versionNumber++
-        draft.versionCreated = new Date()
-
-        draft.latestVersionId = element.latestVersionId ?: element.id
-        draft.status = ElementStatus.UPDATED
-        draft.dateCreated = element.dateCreated
-
-        if (!noCopy) {
-            draft.beforeDraftPersisted()
-        }
-
-        if (!draft.save()) {
-            return draft
-        }
-
-
-        draft.addToSupersedes(element)
-
-        if (!noCopy) {
-            draft = addRelationshipsToDraft(draft, element)
-            draft = elementSpecificActions(draft, element)
-        }
-
-        if (element.status == ElementStatus.DRAFT) {
-            archive(element)
-        }
-
-        draft.status = ElementStatus.DRAFT
-        draft.save()
     }
 
-    private static <E extends CatalogueElement> E elementSpecificActions(E draft, E element) {
-        if(draft instanceof DataElement) {
-            if (element.valueDomain) {
-                draft.valueDomain = element.valueDomain
-            }
-        }
-
-        //add all the extensions to the new draft element as well
-        draft.ext.putAll element.ext
-
-        draft
-    }
-
-    private <E extends CatalogueElement> E addRelationshipsToDraft(E draft, E element) {
-        for (Relationship r in element.incomingRelationships) {
-            if (r.archived || r.relationshipType.versionSpecific) continue
-            relationshipService.link(r.source, draft, r.relationshipType, false)
-        }
-
-        for (Relationship r in element.outgoingRelationships) {
-            if (r.archived || r.relationshipType.versionSpecific) continue
-            relationshipService.link(draft, r.destination, r.relationshipType, false)
-        }
-
-        draft
-    }
 
 
     CatalogueElement archive(CatalogueElement archived) {
@@ -150,7 +75,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         CatalogueElement.withTransaction { TransactionStatus status ->
-            E finalized = draft.publish(this)
+            E finalized = draft.publish(this) as E
             if (finalized.hasErrors()) {
                 status.setRollbackOnly()
             }

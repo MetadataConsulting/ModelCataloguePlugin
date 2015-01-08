@@ -6,7 +6,7 @@ package org.modelcatalogue.core.publishing;
 public interface Published<T extends Published<T>> {
 
     T publish(Publisher<T> publisher);
-    T createDraftVersion(Publisher<T> publisher);
+    T createDraftVersion(Publisher<T> publisher, boolean force);
 
     boolean isPublished();
 
