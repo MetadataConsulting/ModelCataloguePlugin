@@ -75,6 +75,23 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     }
 
+    def modelsFromCSV(){
+        MultipartFile file = request.getFile('csv')
+
+        if (!file) {
+            respond status: HttpStatus.BAD_REQUEST
+            return
+        }
+
+        List<Object> elements = []
+
+        file.inputStream.withReader {
+            elements = dataArchitectService.matchModelsWithCSVHeaders(csvService.readHeaders(it, params.separator ?: ';'))
+        }
+
+        respond elements
+    }
+
     def elementsFromCSV(){
         MultipartFile file = request.getFile('csv')
 

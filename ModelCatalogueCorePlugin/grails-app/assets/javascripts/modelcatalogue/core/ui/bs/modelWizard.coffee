@@ -112,6 +112,11 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   </div>
                   <p class="help-block">Child model is destination for the hierarchy relationship</p>
                 </div>
+                <div ng-click="importChildModelsFromCSV()">
+                  <alert type="info">
+                    <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child models from CSV file headers</a>.
+                  </alert>
+                </div>
                 <simple-object-editor object="child.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
               </form>
           </div>
@@ -352,6 +357,18 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   value.elementType = value.element.elementType
                   value.id = value.element.id
                 $scope.dataElements.push value
+
+          $scope.importChildModelsFromCSV = ->
+            messages.prompt("Import Child Models", null, {type: 'child-model-suggestions-from-csv'}).then (result) ->
+              angular.forEach result, (element) ->
+                value = {element : element}
+                if angular.isString(value.element)
+                  value = {name: value.element, create: true, element: value.element}
+                else
+                  value.name = value.element.name
+                  value.elementType = value.element.elementType
+                  value.id = value.element.id
+                $scope.children.push value
 
           $scope.dismiss = (reason) ->
             return $modalInstance.dismiss(reason) if $scope.finished
