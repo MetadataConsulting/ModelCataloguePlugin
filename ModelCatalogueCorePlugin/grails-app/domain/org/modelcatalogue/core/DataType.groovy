@@ -31,10 +31,6 @@ class DataType extends CatalogueElement {
 
     static transients = ['relatedValueDomains']
 
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
-    }
-
     private final static defaultRelationshipTypesDefinitions = [
             [name: "String", description: "java.lang.String"],
             [name: "Integer", description: "java.lang.Integer"],

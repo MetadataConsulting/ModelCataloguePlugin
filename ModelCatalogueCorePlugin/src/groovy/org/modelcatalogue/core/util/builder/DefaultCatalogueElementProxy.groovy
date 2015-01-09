@@ -237,30 +237,11 @@ import org.modelcatalogue.core.ValueDomain
 
     private Map<String, Object> updateProperties(element) {
         parameters.each { String key, Object value ->
-            def currentValue = element.getProperty(key)
             if (value instanceof CatalogueElementProxy) {
-                def realValue = value.resolve()
-                if (realValue?.latestVersionId && realValue?.latestVersionId != currentValue?.latestVersionId) {
-                    log.debug "$this has changed at least one property - property $key is now $realValue instead of ${currentValue}"
-                    element.setProperty(key, realValue)
-                    return
-                }
-                if (realValue?.id != currentValue?.id) {
-                    log.debug "$this has changed at least one property - property $key is now $realValue instead of ${currentValue}"
-                    element.setProperty(key, realValue)
-                    return
-                }
-            }
-            if (currentValue != value) {
-                log.debug "$this has changed at least one property - property $key is now $value instead of ${currentValue}"
-                element.setProperty(key, value)
+                element.setProperty(key, value.resolve())
                 return
             }
-            def realValue = value instanceof CatalogueElementProxy ? value.findExisting() : value
-            if (element.getProperty(key) != realValue) {
-                log.debug "$this has changed - property $key is now $realValue instead of ${element.getProperty(key)}"
-                element.setProperty(key, realValue)
-            }
+            element.setProperty(key, value)
         }
     }
 

@@ -134,10 +134,6 @@ class ValueDomain extends CatalogueElement {
     }
 
 
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
-    }
-
     List<DataElement> getDataElements() {
         if (!readyForQueries) {
             return []

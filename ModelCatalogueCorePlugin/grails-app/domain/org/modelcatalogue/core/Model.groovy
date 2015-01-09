@@ -19,10 +19,6 @@ class Model extends CatalogueElement {
             outgoing: [containment: 'contains', hierarchy: 'parentOf']
     ]
 
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
-    }
-
     @Override
     CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain.finalize(this)

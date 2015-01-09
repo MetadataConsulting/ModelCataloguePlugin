@@ -30,10 +30,6 @@ class DataElement extends CatalogueElement {
             incoming: [containment: 'containedIn'],
     ]
 
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
-    }
-
     @Override
     CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain.finalize(this)

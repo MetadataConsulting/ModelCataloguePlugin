@@ -1,25 +1,26 @@
 package uk.co.brc.modelcatalogue
 
+import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
-import spock.lang.Specification
 
 /**
  * Created by adammilward on 11/02/2014.
  */
-class ImportServiceSpec extends Specification {
+class ImportServiceSpec extends IntegrationSpec {
 
-    def importService
-    def initCatalogueService
+//    def importService
+//    def initCatalogueService
 
 
     def
     "import nhic spreadsheet"() {
 
         when:
-        initCatalogueService.initDefaultRelationshipTypes()
-        importService.importData(true)
+        // this is done in bootstrap already
+//        initCatalogueService.initDefaultRelationshipTypes()
+//        importService.importData(true)
 
-        then:
+        expect:
         def models = Model.list()
         !models.isEmpty()
         def dataTypes = DataType.list()
@@ -61,9 +62,9 @@ class ImportServiceSpec extends Specification {
         def icodeEnumerations = new HashMap<String, String>(indicatorCode.enumerations)
         assert icodehash.entrySet().containsAll(icodeEnumerations.entrySet())
 
-        valueDomain.classifications as Set == [NHICConceptualDomain] as Set
         dataElement.valueDomain
         valueDomain.dataElements as Set == [dataElement] as Set
+        valueDomain.classifications as Set == [NHICConceptualDomain] as Set
 
     }
 

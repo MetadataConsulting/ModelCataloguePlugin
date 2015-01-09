@@ -273,7 +273,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
     }
 
     @Override

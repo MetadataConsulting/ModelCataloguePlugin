@@ -34,10 +34,6 @@ class Classification extends CatalogueElement {
             outgoing: [classification: 'classifies']
     ]
 
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
-    }
-
     @Override
     void beforeDraftPersisted() {
         namespace = null

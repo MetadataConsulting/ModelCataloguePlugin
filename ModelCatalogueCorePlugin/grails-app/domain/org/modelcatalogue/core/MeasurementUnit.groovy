@@ -24,7 +24,7 @@ class MeasurementUnit extends CatalogueElement {
     static transients = ['valueDomains']
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, symbol: ${symbol}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
     }
 
     List<ValueDomain> getValueDomains() {

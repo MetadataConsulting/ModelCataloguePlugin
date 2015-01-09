@@ -26,8 +26,4 @@ class Asset extends CatalogueElement {
             incoming: [attachment: 'isAttachedTo']
     ]
 
-
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
-    }
 }
