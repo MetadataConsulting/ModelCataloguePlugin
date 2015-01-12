@@ -6,6 +6,7 @@
 #= require csvTransformationView
 #= require importCtrl
 #= require modalPromptNewExcelImport
+#= require modalPromptNewLoincImport
 #= require modalPromptNewOboImport
 #= require modalPromptNewUmljImport
 #= require modalPromptNewXsdImport
@@ -68,6 +69,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.csvTransformationView'
   'mc.core.ui.bs.importCtrl'
   'mc.core.ui.bs.modalPromptNewExcelImport'
+  'mc.core.ui.bs.modalPromptNewLoincImport'
   'mc.core.ui.bs.modalPromptNewOboImport'
   'mc.core.ui.bs.modalPromptNewUmljImport'
   'mc.core.ui.bs.modalPromptNewXsdImport'

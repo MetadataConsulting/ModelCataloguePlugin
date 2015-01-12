@@ -68,6 +68,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       }
   ]
 
+  actionsProvider.registerChildAction 'new-import', 'import-loinc', ['$scope', 'messages', ($scope, messages) -> {
+  label:  "Import Loinc"
+  action: ->
+    messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
+  }]
 
   actionsProvider.registerChildAction 'new-import', 'import-excel', ['$scope', 'messages', ($scope, messages) -> {
     label:  "Import Excel"
