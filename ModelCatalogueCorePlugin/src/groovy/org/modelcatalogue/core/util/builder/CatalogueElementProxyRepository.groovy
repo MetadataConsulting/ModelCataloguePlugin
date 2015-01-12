@@ -6,7 +6,7 @@ import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ClassificationService
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.publishing.DraftStrategy
+import org.modelcatalogue.core.publishing.DraftContext
 
 class CatalogueElementProxyRepository {
 
@@ -148,7 +148,7 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
-        T draft = element.createDraftVersion(elementService, DraftStrategy.importFriendly()) as T
+        T draft = element.createDraftVersion(elementService, DraftContext.importFriendly()) as T
         if (draft.hasErrors()) {
             throw new IllegalStateException("Failed to create draft version of $element. Errors: $draft.errors")
         }

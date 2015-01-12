@@ -1,8 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
-import org.modelcatalogue.core.publishing.DraftStrategy
-import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
@@ -369,7 +368,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (newVersion) {
 
             // when draft version is created from the UI still just create plain draft ignoring dependencies
-            instance = elementService.createDraftVersion(instance, DraftStrategy.userFriendly()) as T
+            instance = elementService.createDraftVersion(instance, DraftContext.userFriendly()) as T
             if (instance.hasErrors()) {
                 respond instance.errors, view: 'edit' // STATUS CODE 422
                 return

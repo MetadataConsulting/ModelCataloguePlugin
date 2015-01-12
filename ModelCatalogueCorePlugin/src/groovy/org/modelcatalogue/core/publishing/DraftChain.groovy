@@ -9,14 +9,14 @@ import org.modelcatalogue.core.Relationship
 
 class DraftChain extends PublishingChain {
 
-    private final DraftStrategy strategy
+    private final DraftContext strategy
 
-    private DraftChain(CatalogueElement published, DraftStrategy strategy) {
+    private DraftChain(CatalogueElement published, DraftContext strategy) {
         super(published)
         this.strategy = strategy
     }
 
-    static DraftChain create(CatalogueElement published, DraftStrategy strategy) {
+    static DraftChain create(CatalogueElement published, DraftContext strategy) {
         return new DraftChain(published, strategy)
     }
 
@@ -101,7 +101,7 @@ class DraftChain extends PublishingChain {
 
         draft.addToSupersedes(published)
 
-        draft = addRelationshipsToDraft(draft, published)
+        strategy.delayRelationshipCopying(draft, published)
 
         published.afterDraftPersisted(draft)
 
@@ -111,20 +111,6 @@ class DraftChain extends PublishingChain {
 
         draft.status = ElementStatus.DRAFT
         draft.save()
-    }
-
-    private static <E extends CatalogueElement> E addRelationshipsToDraft(E draft, E element) {
-        for (Relationship r in element.incomingRelationships) {
-            if (r.archived || r.relationshipType.versionSpecific) continue
-            draft.createLinkFrom(r.source, r.relationshipType)
-        }
-
-        for (Relationship r in element.outgoingRelationships) {
-            if (r.archived || r.relationshipType.versionSpecific) continue
-            draft.createLinkTo(r.destination, r.relationshipType)
-        }
-
-        draft
     }
 
 

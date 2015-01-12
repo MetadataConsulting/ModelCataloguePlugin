@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.DraftStrategy
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
 
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
@@ -57,7 +57,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.valueDomain = domain
 
         int originalVersion     = author.versionNumber
-        DataElement draft       = elementService.createDraftVersion(author, DraftStrategy.userFriendly()) as DataElement
+        DataElement draft       = elementService.createDraftVersion(author, DraftContext.userFriendly()) as DataElement
         int draftVersion        = draft.versionNumber
         int newVersion          = author.versionNumber
         author.refresh()
@@ -80,7 +80,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         draft.status == ElementStatus.DRAFT
 
         when:
-        def anotherDraft = elementService.createDraftVersion(draft, DraftStrategy.userFriendly())
+        def anotherDraft = elementService.createDraftVersion(draft, DraftContext.userFriendly())
 
         println "Author Supersedes: $author.supersedes"
         println "Draft Supersedes: $draft.supersedes"
@@ -214,7 +214,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
         int originalVersion     = md2.versionNumber
-        Model draft             = elementService.createDraftVersion(md2, DraftStrategy.userFriendly()) as Model
+        Model draft             = elementService.createDraftVersion(md2, DraftContext.userFriendly()) as Model
         int draftVersion        = draft.versionNumber
         int newVersion          = md2.versionNumber
 
@@ -246,7 +246,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "finalize element"(){
         when:
         DataElement author = DataElement.findByName('auth5')
-        DataElement draft = elementService.createDraftVersion(author, DraftStrategy.userFriendly()) as DataElement
+        DataElement draft = elementService.createDraftVersion(author, DraftContext.userFriendly()) as DataElement
 
         then:
         draft.status    == ElementStatus.DRAFT

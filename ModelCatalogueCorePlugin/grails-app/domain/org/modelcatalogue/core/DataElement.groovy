@@ -1,6 +1,6 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.DraftStrategy
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 
@@ -47,7 +47,7 @@ class DataElement extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftStrategy strategy) {
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
         PublishingChain.createDraft(this, strategy)
         .add(this.containedIn)
         .run(publisher)

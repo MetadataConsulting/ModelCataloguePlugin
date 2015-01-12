@@ -18,7 +18,7 @@ abstract class PublishingChain {
         FinalizationChain.create(published)
     }
 
-    public static PublishingChain createDraft(CatalogueElement published, DraftStrategy strategy) {
+    public static PublishingChain createDraft(CatalogueElement published, DraftContext strategy) {
         DraftChain.create(published, strategy)
     }
 

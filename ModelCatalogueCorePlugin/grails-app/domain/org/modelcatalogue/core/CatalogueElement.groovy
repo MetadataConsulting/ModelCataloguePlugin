@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.publishing.DraftStrategy
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
@@ -315,7 +315,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftStrategy strategy) {
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
         PublishingChain.createDraft(this, strategy).run(publisher)
     }
 
