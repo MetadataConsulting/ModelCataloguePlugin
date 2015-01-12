@@ -28,6 +28,13 @@ class CatalogueBuilder {
         self.with c
 
         created = repository.resolveAllProxies()
+
+        // we don't want to keep any references in this point
+        context.clear()
+        repository.clear()
+        createAutomatically.clear()
+
+        created
     }
 
     CatalogueElementProxy<Classification> classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
@@ -236,11 +243,11 @@ class CatalogueBuilder {
 
     private void reset() {
         context.clear()
+        repository.clear()
+        createAutomatically.clear()
+
         created.clear()
 
-        repository.clear()
-
-        createAutomatically.clear()
     }
 
     protected <T extends CatalogueElement, A extends CatalogueElementProxy<T>> A createProxy(Class<T> domain, Map<String, Object> parameters, Class inheritFrom = null) {

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.publishing.DraftStrategy
 import org.modelcatalogue.core.util.RelationshipDirection
 
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
@@ -56,7 +57,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         author.valueDomain = domain
 
         int originalVersion     = author.versionNumber
-        DataElement draft       = elementService.createDraftVersion(author, true) as DataElement
+        DataElement draft       = elementService.createDraftVersion(author, DraftStrategy.userFriendly()) as DataElement
         int draftVersion        = draft.versionNumber
         int newVersion          = author.versionNumber
         author.refresh()
@@ -79,7 +80,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         draft.status == ElementStatus.DRAFT
 
         when:
-        def anotherDraft = elementService.createDraftVersion(draft, true)
+        def anotherDraft = elementService.createDraftVersion(draft, DraftStrategy.userFriendly())
 
         println "Author Supersedes: $author.supersedes"
         println "Draft Supersedes: $draft.supersedes"
@@ -207,8 +208,13 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md1.addToParentOf(md2)
         md2.addToParentOf(md3)
 
+        elementService.finalizeElement(md1)
+        elementService.finalizeElement(md2)
+        elementService.finalizeElement(md3)
+
+
         int originalVersion     = md2.versionNumber
-        Model draft             = elementService.createDraftVersion(md2, true) as Model
+        Model draft             = elementService.createDraftVersion(md2, DraftStrategy.userFriendly()) as Model
         int draftVersion        = draft.versionNumber
         int newVersion          = md2.versionNumber
 
@@ -226,8 +232,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         md2.childOf.contains(md1)
         md2.parentOf.contains(md3)
         !md1.parentOf.contains(draft)
-        !draft.parentOf.contains(md3)
-        draftRelationships.size() == 0
+        draft.parentOf.contains(md3)
+        draftRelationships.size() == 2
 
         cleanup:
         md1.delete()
@@ -240,7 +246,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "finalize element"(){
         when:
         DataElement author = DataElement.findByName('auth5')
-        DataElement draft = elementService.createDraftVersion(author, true) as DataElement
+        DataElement draft = elementService.createDraftVersion(author, DraftStrategy.userFriendly()) as DataElement
 
         then:
         draft.status    == ElementStatus.DRAFT

@@ -9,19 +9,19 @@ import org.modelcatalogue.core.Relationship
 
 class DraftChain extends PublishingChain {
 
-    private final boolean force
+    private final DraftStrategy strategy
 
-    private DraftChain(CatalogueElement published, boolean force) {
+    private DraftChain(CatalogueElement published, DraftStrategy strategy) {
         super(published)
-        this.force = force
+        this.strategy = strategy
     }
 
-    static DraftChain create(CatalogueElement published, boolean force) {
-        return new DraftChain(published, force)
+    static DraftChain create(CatalogueElement published, DraftStrategy strategy) {
+        return new DraftChain(published, strategy)
     }
 
     CatalogueElement run(Publisher<CatalogueElement> publisher) {
-        if (!force) {
+        if (!strategy.forceNew) {
             if (isDraft(published) || isUpdatingInProgress(published)) {
                 return published
             }
@@ -51,12 +51,14 @@ class DraftChain extends PublishingChain {
                     continue
                 }
                 processed << element.id
-                CatalogueElement draft = element.createDraftVersion(publisher, force)
+                CatalogueElement draft = element.createDraftVersion(publisher, strategy)
                 if (draft.hasErrors()) {
                     return rejectDraftDependency(draft)
                 }
             }
         }
+        // TODO: the creating relationships must happen in two phase, first everything we need is turned into draft
+        // than the new relationships will link these existing drafts
         return createDraft(publisher)
     }
 

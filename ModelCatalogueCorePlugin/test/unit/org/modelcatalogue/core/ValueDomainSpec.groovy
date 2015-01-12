@@ -102,7 +102,7 @@ class ValueDomainSpec extends Specification {
         def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: [male: 'male', female: 'female', unknown:'unknown'])).save()
 
         then:
-        a.toString() == "ValueDomain[id: 1, name: ground_speed]"
+        a.toString() == "ValueDomain[id: 1, name: ground_speed, status: DRAFT, modelCatalogueId: null]"
 
     }
 

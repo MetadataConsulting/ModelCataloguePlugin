@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import groovy.transform.CompileStatic
 import org.apache.commons.io.input.CountingInputStream
 import org.apache.commons.io.output.CountingOutputStream
+import org.modelcatalogue.core.publishing.DraftStrategy
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
 
@@ -60,7 +61,7 @@ class AssetService {
                 return null
             }
 
-            existing = elementService.createDraftVersion(existing, true) as Asset
+            existing = elementService.createDraftVersion(existing, DraftStrategy.userFriendly()) as Asset
 
             if (existing.hasErrors()) {
                 return existing

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.publishing.DraftStrategy
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 
@@ -91,8 +92,8 @@ class DataType extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, boolean force) {
-        PublishingChain.createDraft(this, force)
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftStrategy strategy) {
+        PublishingChain.createDraft(this, strategy)
         .add(this.relatedValueDomains)
         .run(publisher)
     }

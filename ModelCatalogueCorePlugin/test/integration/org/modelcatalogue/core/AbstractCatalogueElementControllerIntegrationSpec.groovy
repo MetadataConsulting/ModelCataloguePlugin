@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.core.publishing.DraftStrategy
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Unroll
 
@@ -91,7 +92,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     void createDraftVersions(CatalogueElement el) {
         int counter = 0
         while ((el.versionNumber != 12) && (counter++ < 12)) {
-            el = elementService.createDraftVersion(el, true)
+            el = elementService.createDraftVersion(el, DraftStrategy.userFriendly())
             if (el.hasErrors()) {
                 throw new IllegalStateException("Creating draft version fails with ${el.errors}")
             }

@@ -18,8 +18,8 @@ abstract class PublishingChain {
         FinalizationChain.create(published)
     }
 
-    public static PublishingChain createDraft(CatalogueElement published, boolean force) {
-        DraftChain.create(published, force)
+    public static PublishingChain createDraft(CatalogueElement published, DraftStrategy strategy) {
+        DraftChain.create(published, strategy)
     }
 
     protected PublishingChain(CatalogueElement published) {

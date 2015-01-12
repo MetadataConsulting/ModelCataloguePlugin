@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.util.Environment
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.modelcatalogue.core.publishing.DraftStrategy
 import org.modelcatalogue.core.publishing.Publisher
 import org.springframework.transaction.TransactionStatus
 
@@ -32,9 +33,9 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    public <E extends CatalogueElement> E createDraftVersion(E element, boolean force = false) {
+    public <E extends CatalogueElement> E createDraftVersion(E element, DraftStrategy strategy) {
         CatalogueElement.withTransaction { TransactionStatus status ->
-            E draft = element.createDraftVersion(this, force) as E
+            E draft = element.createDraftVersion(this, strategy) as E
             if (draft.hasErrors()) {
                 status.setRollbackOnly()
             }
