@@ -32,12 +32,6 @@ class DraftContext {
         }
     }
 
-    void delayAssociationCopying(CatalogueElement draft, CatalogueElement oldVersion) {
-        if (copyRelationships) {
-            pendingRelationshipsTasks << new CopyAssociationsAndRelationships(draft, oldVersion)
-        }
-    }
-
     void resolvePendingRelationships() {
         pendingRelationshipsTasks.each {
             it.run()
