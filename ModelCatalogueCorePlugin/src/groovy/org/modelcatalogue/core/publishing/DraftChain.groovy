@@ -21,12 +21,9 @@ class DraftChain extends PublishingChain {
     }
 
     CatalogueElement run(Publisher<CatalogueElement> publisher) {
-        if (!strategy.forceNew) {
-            if (isDraft(published) || isUpdatingInProgress(published)) {
-                return published
-            }
+        if (isDraft(published) || isUpdatingInProgress(published)) {
+            return published
         }
-
 
         if (published.latestVersionId) {
             def existingDrafts = published.class.findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
@@ -79,7 +76,7 @@ class DraftChain extends PublishingChain {
 
         for (prop in domainClass.persistentProperties) {
             if (!prop.association) {
-                draft.setProperty(prop.name, published[prop.name])
+                draft.setProperty(prop.name, published.getProperty(prop.name))
             }
         }
 

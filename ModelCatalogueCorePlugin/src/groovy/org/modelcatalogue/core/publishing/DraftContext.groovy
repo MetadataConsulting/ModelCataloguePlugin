@@ -9,21 +9,19 @@ import org.modelcatalogue.core.ElementStatus
  */
 class DraftContext {
 
-    @PackageScope final boolean forceNew
-    @PackageScope final boolean copyRelationships
+    private boolean copyRelationships
 
     private Set<Runnable> pendingRelationshipsTasks = new LinkedHashSet<Runnable>()
 
-    private DraftContext(boolean forceNew, boolean copyRelationships) {
-        this.forceNew = forceNew
+    private DraftContext(boolean copyRelationships) {
         this.copyRelationships = copyRelationships
     }
     static DraftContext userFriendly() {
-        new DraftContext(true, true)
+        new DraftContext(true)
     }
 
     static DraftContext importFriendly() {
-        new DraftContext(false, false)
+        new DraftContext(false)
     }
 
     void delayRelationshipCopying(CatalogueElement draft, CatalogueElement oldVersion) {
