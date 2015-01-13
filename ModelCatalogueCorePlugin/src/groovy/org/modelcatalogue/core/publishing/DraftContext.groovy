@@ -9,6 +9,7 @@ import org.modelcatalogue.core.ElementStatus
 class DraftContext {
 
     private boolean copyRelationships
+    private boolean forceNew
 
     private Set<CopyAssociationsAndRelationships> pendingRelationshipsTasks = new LinkedHashSet<CopyAssociationsAndRelationships>()
 
@@ -21,6 +22,20 @@ class DraftContext {
 
     static DraftContext importFriendly() {
         new DraftContext(false)
+    }
+
+    static DraftContext forceNew() {
+        DraftContext context = new DraftContext(true)
+        context.forceNew = true
+        context
+    }
+
+    boolean isForceNew() {
+        return forceNew
+    }
+
+    void stopForcingNew() {
+        forceNew = false
     }
 
     void delayRelationshipCopying(CatalogueElement draft, CatalogueElement oldVersion) {

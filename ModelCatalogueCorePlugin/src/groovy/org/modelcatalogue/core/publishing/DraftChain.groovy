@@ -5,7 +5,6 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementStatus
-import org.modelcatalogue.core.Relationship
 
 class DraftChain extends PublishingChain {
 
@@ -21,18 +20,23 @@ class DraftChain extends PublishingChain {
     }
 
     CatalogueElement run(Publisher<CatalogueElement> publisher) {
-        if (isDraft(published) || isUpdatingInProgress(published)) {
-            return published
-        }
+        if (!strategy.forceNew) {
+            if (isDraft(published) || isUpdatingInProgress(published)) {
+                return published
+            }
 
-        if (published.latestVersionId) {
-            def existingDrafts = published.class.findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
-            for (existing in existingDrafts) {
-                if (existing.id != published.id) {
-                    return existing
+            if (published.latestVersionId) {
+                def existingDrafts = published.class.findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
+                for (existing in existingDrafts) {
+                    if (existing.id != published.id) {
+                        return existing
+                    }
                 }
             }
         }
+
+        // only the first element in the chain can be forced
+        strategy.stopForcingNew()
 
         startUpdating()
 

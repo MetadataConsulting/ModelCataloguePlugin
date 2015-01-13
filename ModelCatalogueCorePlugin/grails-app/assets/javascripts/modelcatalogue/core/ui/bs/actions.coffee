@@ -230,7 +230,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     }
 
     updateAction = ->
-      action.disabled = $scope.element.archived
+      action.disabled = $scope.element.archived || $scope.element.status == 'DRAFT'
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction

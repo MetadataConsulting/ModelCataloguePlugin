@@ -23,6 +23,11 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         String newName = "UPDATED NAME WITH NEW VERSION"
         CatalogueElement another = CatalogueElement.get(anotherLoadItem.id)
+
+        if (another.status == ElementStatus.DRAFT) {
+            another = elementService.finalizeElement(another)
+        }
+
         String currentName = another.name
         Integer currentVersionNumber = another.versionNumber
         Integer numberOfCurrentVersions = another.countVersions()
@@ -92,7 +97,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     void createDraftVersions(CatalogueElement el) {
         int counter = 0
         while ((el.versionNumber != 12) && (counter++ < 12)) {
-            el = elementService.createDraftVersion(el, DraftContext.userFriendly())
+            el = elementService.createDraftVersion(elementService.finalizeElement(el), DraftContext.userFriendly())
             if (el.hasErrors()) {
                 throw new IllegalStateException("Creating draft version fails with ${el.errors}")
             }
