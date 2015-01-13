@@ -6,12 +6,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
   ]
 
-  localNameAndIdAndMetadata = -> [
-    {header: 'Name', value: "ext.name || ext.Name || relation.classifiedName", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
-    {header: 'Identification',  value: "relation.modelCatalogueId", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
-    {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
-  ]
-
   nameAndIdent = -> [
     {header: 'Name', value: "relation.classifiedName ", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
@@ -181,6 +175,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
 
   catalogueElementPropertiesProvider.configureProperty 'relationships',   {
+    hidden: true
+  }
+
+  catalogueElementPropertiesProvider.configureProperty '$$metadata',   {
     hidden: true
   }
 
