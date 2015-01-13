@@ -96,7 +96,7 @@ class ValueDomain extends CatalogueElement {
         if (!x) {
             return true
         }
-        Set<String> enums = new HashSet<String>(dataType.enumerations.keySet())
+        Set<String> enums = new HashSet<String>((dataType as EnumeratedType).enumerations.keySet())
         if (!enums.contains(x.toString())) {
             return false
         }
@@ -143,7 +143,7 @@ class ValueDomain extends CatalogueElement {
         if (archived) {
             return DataElement.findAllByValueDomain(this)
         }
-        return DataElement.findAllByValueDomainAndStatus(this, ElementStatus.FINALIZED)
+        return DataElement.findAllByValueDomainAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     Long countDataElements() {
@@ -153,7 +153,7 @@ class ValueDomain extends CatalogueElement {
         if (archived) {
             return DataElement.countByValueDomain(this)
         }
-        return DataElement.countByValueDomainAndStatus(this, ElementStatus.FINALIZED)
+        return DataElement.countByValueDomainAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     @Override
