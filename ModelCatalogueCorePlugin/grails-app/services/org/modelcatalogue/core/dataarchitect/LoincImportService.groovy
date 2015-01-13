@@ -28,24 +28,24 @@ class LoincImportService {
                     globalSearchFor dataType
                     description("LOINC conceptual domain")
                     model(name: "LOINC Datasets") {
-                        model(name: tokens[5]) {
-                            model(name: tokens[8]) {
-                                dataElement(name: tokens[2], description: tokens[4]) {
-                                    valueDomain(name: tokens[29].replaceAll("\\s", "_")) {
+                        model(name: tokens[4]) {
+                            model(name: tokens[7]) {
+                                dataElement(name: tokens[1], description: tokens[4]) {
+                                    valueDomain(name: tokens[28].replaceAll("\\s", "_")) {
                                         //DataImportService.importDataTypes(catalogueBuilder, tokens[3], [tokens[5]])
                                     }
-                                    ext "Loinc Ref:", tokens[1]
-                                    ext "Source:", tokens[9]
-                                    ext "Date Last Changed", tokens[10]
-                                    ext "Property", tokens[3]
-                                    ext "Scale Type", tokens[6]
-                                    ext "Method Type", tokens[7]
-                                    ext "Related Names", tokens[28]
-                                    ext "Under Observation", tokens[30]
-                                    ext "Example Units", tokens[34]
-                                    ext "HL7 v2 Datatype", tokens[36]
-                                    ext "HL7 v3 Datatype", tokens[37]
-                                    ext "Example UCUM Units", tokens[40]
+                                    ext "Loinc Ref:", tokens[0]
+                                    ext "Source:", tokens[8]
+                                    ext "Date Last Changed", tokens[9]
+                                    ext "Property", tokens[2]
+                                    ext "Scale Type", tokens[5]
+                                    ext "Method Type", tokens[6]
+                                    ext "Related Names", tokens[27]
+                                    ext "Under Observation", tokens[29]
+                                    ext "Example Units", tokens[33]
+                                    ext "HL7 v2 Datatype", tokens[35]
+                                    ext "HL7 v3 Datatype", tokens[36]
+                                    ext "Example UCUM Units", tokens[39]
                                 }
                             }
 
