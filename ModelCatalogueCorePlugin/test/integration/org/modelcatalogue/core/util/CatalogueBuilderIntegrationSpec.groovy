@@ -496,6 +496,11 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         Model.findByName("ModelNV1")?.status            == ElementStatus.FINALIZED
         Model.findByName("ModelNV1")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
 
+        and: "there are two NewVersion1 classifications at the moment"
+        Classification.countByName('NewVersion1')                                   == 2
+        Classification.countByNameAndStatus('NewVersion1', ElementStatus.DRAFT)     == 1
+        Classification.countByNameAndStatus('NewVersion1', ElementStatus.FINALIZED) == 1
+
 
     }
 

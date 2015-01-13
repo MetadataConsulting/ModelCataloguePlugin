@@ -107,7 +107,7 @@ class CopyRelationshipChain extends PublishingChain {
         if (!element) {
             return element
         }
-        if (isDraft(element)) {
+        if (isDraft(element) || isUpdatingInProgress(element)) {
             return element
         }
         if (!element.latestVersionId) {

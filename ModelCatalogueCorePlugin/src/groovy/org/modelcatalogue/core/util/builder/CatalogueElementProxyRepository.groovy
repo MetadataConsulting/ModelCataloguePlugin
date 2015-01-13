@@ -148,10 +148,12 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
-        T draft = element.createDraftVersion(elementService, DraftContext.importFriendly()) as T
+        DraftContext context = DraftContext.importFriendly()
+        T draft = element.createDraftVersion(elementService, context) as T
         if (draft.hasErrors()) {
             throw new IllegalStateException("Failed to create draft version of $element. Errors: $draft.errors")
         }
+        context.classifyDrafts()
         draft
     }
 
@@ -159,14 +161,14 @@ class CatalogueElementProxyRepository {
         if (type in HAS_UNIQUE_NAMES) {
             return tryFindWithClassification(type, null, name, id)
         }
-        tryFindWithClassification(type, tryFindUnclassified(Classification, classificationName, id), name, id)
+        tryFindWithClassification(type, Classification.findAllByName(classificationName?.toString()), name, id)
     }
 
     protected <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name, Object id) {
         tryFindWithClassification(type, null, name, id)
     }
 
-    protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, Classification classification, Object name, Object id) {
+    protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<Classification> classifications, Object name, Object id) {
         if (id) {
             return findById(type, id)
         }
@@ -178,8 +180,8 @@ class CatalogueElementProxyRepository {
             eq 'name', name.toString()
         }
 
-        if (classification) {
-            T result = getLatestFromCriteria(classificationService.classified(criteria, [classification]))
+        if (classifications) {
+            T result = getLatestFromCriteria(classificationService.classified(criteria, classifications))
 
             if (result) {
                 return result

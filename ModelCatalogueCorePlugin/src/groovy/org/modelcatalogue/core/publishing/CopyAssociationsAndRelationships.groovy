@@ -5,30 +5,44 @@ import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 
-class CopyAssociationsAndRelationships implements Runnable {
+class CopyAssociationsAndRelationships {
 
     private final CatalogueElement draft
     private final CatalogueElement element
+    private final boolean classificationOnly
 
-    CopyAssociationsAndRelationships(CatalogueElement draft, CatalogueElement element) {
+    CopyAssociationsAndRelationships(CatalogueElement draft, CatalogueElement element, boolean classificationOnly) {
         this.draft = draft
         this.element = element
+        this.classificationOnly = classificationOnly
     }
 
 
-    @Override
-    void run() {
+    void copyClassifications() {
+        for (Classification classification in element.classifications) {
+            draft.addToClassifications(classification)
+        }
+    }
+
+    void copyRelationships() {
+        if (classificationOnly) {
+            return
+        }
+
         RelationshipType supersession =  RelationshipType.readByName('supersession')
+        RelationshipType classification = RelationshipType.readByName('classification')
+
         for (Relationship r in element.incomingRelationships) {
-            if (r.archived || r.relationshipType == supersession) continue
+            if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
             draft.createLinkFrom(DraftContext.preferDraft(r.source), r.relationshipType)
         }
 
         for (Relationship r in element.outgoingRelationships) {
-            if (r.archived || r.relationshipType == supersession) continue
+            if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
             draft.createLinkTo(DraftContext.preferDraft(r.destination), r.relationshipType)
         }
 

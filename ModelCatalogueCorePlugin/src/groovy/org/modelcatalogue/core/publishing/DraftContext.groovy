@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.publishing
 
-import groovy.transform.PackageScope
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementStatus
 
@@ -11,7 +10,7 @@ class DraftContext {
 
     private boolean copyRelationships
 
-    private Set<Runnable> pendingRelationshipsTasks = new LinkedHashSet<Runnable>()
+    private Set<CopyAssociationsAndRelationships> pendingRelationshipsTasks = new LinkedHashSet<CopyAssociationsAndRelationships>()
 
     private DraftContext(boolean copyRelationships) {
         this.copyRelationships = copyRelationships
@@ -25,19 +24,23 @@ class DraftContext {
     }
 
     void delayRelationshipCopying(CatalogueElement draft, CatalogueElement oldVersion) {
-        if (copyRelationships) {
-            pendingRelationshipsTasks << new CopyAssociationsAndRelationships(draft, oldVersion)
+        pendingRelationshipsTasks << new CopyAssociationsAndRelationships(draft, oldVersion, !copyRelationships)
+    }
+
+    void classifyDrafts() {
+        pendingRelationshipsTasks.each {
+            it.copyClassifications()
         }
     }
 
     void resolvePendingRelationships() {
         pendingRelationshipsTasks.each {
-            it.run()
+            it.copyRelationships()
         }
     }
 
     static CatalogueElement preferDraft(CatalogueElement element) {
-        if (element.status == ElementStatus.DRAFT) {
+        if (element.status == ElementStatus.DRAFT || element.status == ElementStatus.UPDATED) {
             return element
         }
 
@@ -45,7 +48,7 @@ class DraftContext {
             return element
         }
 
-        CatalogueElement existingDraft =  element.class.findByLatestVersionIdAndStatus(element.latestVersionId, ElementStatus.DRAFT, [sort: 'versionNumber', order: 'desc'])
+        CatalogueElement existingDraft =  element.class.findByLatestVersionIdAndStatusInList(element.latestVersionId, [ElementStatus.DRAFT, ElementStatus.UPDATED], [sort: 'versionNumber', order: 'desc'])
 
         if (existingDraft) {
             return existingDraft

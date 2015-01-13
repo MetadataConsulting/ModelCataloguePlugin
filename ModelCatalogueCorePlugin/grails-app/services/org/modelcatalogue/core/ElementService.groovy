@@ -40,6 +40,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 status.setRollbackOnly()
                 return element
             }
+            strategy.classifyDrafts()
             strategy.resolvePendingRelationships()
             draft
         }
