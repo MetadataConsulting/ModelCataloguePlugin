@@ -19,6 +19,6 @@ cd ModelCatalogueCorePluginTestApp
 #./grailsw clean-all
 #./grailsw refresh-dependencies
 #./grailsw test-app integration:
-./grailsw test-app functional: -war -Dgeb.env=chrome
+./grailsw test-app functional: -war
 
 cd ..
