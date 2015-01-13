@@ -145,6 +145,47 @@ class DataArchitectService {
         elements
     }
 
+    List<Object> matchModelsWithCSVHeaders(String[] headers) {
+        List<Object> elements = []
+
+        for (String header in headers) {
+            def element = Model.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
+            if (!element) {
+                element = Model.findByModelCatalogueId(header)
+            }
+            if (!element) {
+                if (header.contains('_')) {
+                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
+                } else {
+                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
+                }
+            }
+            if (!element) {
+                element = Model.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
+            }
+            if (!element) {
+                if (header.contains('_')) {
+                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
+                } else {
+                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
+                }
+            }
+            if (element) {
+                elements << element
+            } else {
+                def searchResult = modelCatalogueSearchService.search(Model, [search: header])
+                // only if we have single hit
+                if (searchResult.total == 1) {
+                    elements << searchResult.searchResults[0]
+                } else {
+                    elements << header
+                }
+            }
+        }
+
+        elements
+    }
+
     void transformData(Map<String, String> options = [separator: ';'],CsvTransformation transformation, Reader input, Writer output) {
         if (!transformation) throw new IllegalArgumentException("Transformation missing!")
         if (!transformation.columnDefinitions) throw new IllegalArgumentException("Nothing to transform. Column definitions missing!")
