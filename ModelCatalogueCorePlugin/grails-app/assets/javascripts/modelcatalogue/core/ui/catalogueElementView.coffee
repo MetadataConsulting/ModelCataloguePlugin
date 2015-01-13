@@ -182,7 +182,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               payload[@name] = angular.copy(@value)
               self = @
               resource.update(payload).then (updated) ->
-                $scope.element = updated
+                updateFrom($scope.element, updated)
                 messages.success("Property #{names.getNaturalName(self.name)} of #{element.name} successfully updated")
                 updated
               ,  (response) ->
