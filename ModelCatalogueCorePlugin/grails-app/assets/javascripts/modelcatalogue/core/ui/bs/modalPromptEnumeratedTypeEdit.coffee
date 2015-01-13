@@ -34,7 +34,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             </form>
             <div class="checkbox">
               <label>
-                <input type="checkbox" ng-model="settings.enumerated" ng-disabled="!create"> Enumerated
+                <input type="checkbox" ng-model="settings.enumerated" ng-disabled="!create" id="enumerated"> Enumerated
               </label>
             </div>
             <div collapse="!settings.enumerated"><simple-object-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></simple-object-editor></div>

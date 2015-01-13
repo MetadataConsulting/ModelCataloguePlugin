@@ -147,11 +147,22 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
   $scope.$watch 'list', onListUpdate
 
   $scope.$on 'catalogueElementCreated', (ignored, newElement, url) ->
-    if $scope.list and $scope.list.itemType and newElement and newElement.isInstanceOf and newElement.isInstanceOf($scope.list.itemType) and url and $scope.list.base and (url.indexOf("#{modelCatalogueApiRoot}#{$scope.list.base}") >= 0 or "#{modelCatalogueApiRoot}#{$scope.list.base}".indexOf(url) >= 0 or url.indexOf("#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}") >= 0 or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0)
-      $scope.total++
-      $scope.elements.unshift newElement
-      $scope.rows.unshift getRowForElement($scope.transform(newElement))
-      $scope.list.total = $scope.total if $scope.list
+    return unless $scope.list
+    return unless $scope.list.itemType
+    return unless newElement
+    return unless newElement.isInstanceOf and newElement.isInstanceOf($scope.list.itemType)
+    return unless url
+    return unless $scope.list.base
+    return unless url.indexOf("#{modelCatalogueApiRoot}#{$scope.list.base}") >= 0 \
+      or "#{modelCatalogueApiRoot}#{$scope.list.base}".indexOf(url) >= 0 \
+      or url.indexOf("#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}") >= 0 \
+      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0 \
+      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0
+
+    $scope.total++
+    $scope.elements.unshift newElement
+    $scope.rows.unshift getRowForElement($scope.transform(newElement))
+    $scope.list.total = $scope.total if $scope.list
 
 
   $scope.$on 'catalogueElementDeleted', (ignored, deleted) ->
