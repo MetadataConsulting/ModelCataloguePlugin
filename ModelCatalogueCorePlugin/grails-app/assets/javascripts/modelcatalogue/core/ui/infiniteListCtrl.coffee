@@ -161,7 +161,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
     $scope.total++
     $scope.elements.unshift newElement
-    $scope.rows.unshift getRowForElement($scope.transform(newElement))
+    $scope.rows.unshift getRowForElement($scope.transform $element: newElement)
     $scope.list.total = $scope.total if $scope.list
 
 
