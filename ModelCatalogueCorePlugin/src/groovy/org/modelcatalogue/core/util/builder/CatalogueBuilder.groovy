@@ -94,7 +94,11 @@ class CatalogueBuilder {
     }
 
     CatalogueElementProxy<? extends DataType> dataType(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<? extends DataType> dataType = createProxy((parameters.containsKey('enumerations') ? EnumeratedType : DataType), parameters, ValueDomain)
+        Class type = (parameters.enumerations ? EnumeratedType : DataType)
+        if (parameters.containsKey('enumerations') && !parameters.enumerations) {
+            parameters.remove('enumerations')
+        }
+        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain)
 
         context.withNewContext dataType, c
 
