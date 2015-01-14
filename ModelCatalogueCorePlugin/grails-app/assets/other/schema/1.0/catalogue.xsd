@@ -5,8 +5,6 @@
         targetNamespace="http://www.metadataregistry.org.uk/assets/schema/1.0/catalogue.xsd"
         elementFormDefault="qualified" version="1.0" xml:lang="EN">
 
-    <xs:element name="catalogue" type="mc:Catalogue"/>
-
     <xs:simpleType name="Name">
         <xs:restriction base="xs:string">
             <xs:minLength value="1"/>
@@ -268,5 +266,7 @@
             </xs:choice>
         </xs:sequence>
     </xs:complexType>
+
+    <xs:element name="catalogue" type="mc:Catalogue"/>
 
 </xs:schema>
