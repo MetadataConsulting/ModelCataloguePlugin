@@ -50,25 +50,30 @@ import org.modelcatalogue.core.ValueDomain
 
     @Override
     final T resolve() {
-        if (replacedBy) {
-            return replacedBy.resolve()
-        }
+        try {
+            if (replacedBy) {
+                return replacedBy.resolve()
+            }
 
-        if(resolved) {
+            if(resolved) {
+                return resolved
+            }
+
+            resolved = fill(findExisting())
+
+            if (resolved) {
+                return resolved
+            }
+
+            log.debug "$this not found, creating new one"
+
+            resolved = fill(domain.newInstance())
+
             return resolved
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to resolve $this:\n\n$e", e)
         }
 
-        resolved = fill(findExisting())
-
-        if (resolved) {
-            return resolved
-        }
-
-        log.debug "$this not found, creating new one"
-
-        resolved = fill(domain.newInstance())
-
-        resolved
     }
 
     @Override
