@@ -27,10 +27,22 @@
             <xs:enumeration value="DEPRECATED"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:simpleType name="Description">
+
+    <xs:simpleType name="PreservedString">
         <xs:restriction base="xs:string">
             <xs:whiteSpace value="preserve"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Description">
+        <xs:restriction base="mc:PreservedString">
             <xs:maxLength value="2000"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Rule">
+        <xs:restriction base="mc:PreservedString">
+            <xs:maxLength value="10000"/>
         </xs:restriction>
     </xs:simpleType>
 
@@ -82,15 +94,67 @@
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="Relationship">
-        <xs:attribute name="name" type="mc:Name" use="required" />
-        <xs:attribute name="class" type="mc:Name" />
-    </xs:complexType>
+    <xs:simpleType name="KnownCatalogueElementType">
+        <xs:restriction base="mc:Name">
+            <xs:enumeration value="classification"/>
+            <xs:enumeration value="model"/>
+            <xs:enumeration value="dataElement"/>
+            <xs:enumeration value="valueDomain"/>
+            <xs:enumeration value="dataType"/>
+            <xs:enumeration value="measurementUnit"/>
+        </xs:restriction>
+    </xs:simpleType>
+    
+    <xs:simpleType name="JavaClass">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([\p{L}_$][\p{L}\p{N}_$]*\.)*[\p{L}_$][\p{L}\p{N}_$]*"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CatalogueElementType">
+        <xs:union memberTypes="mc:JavaClass mc:KnownCatalogueElementType"/>
+    </xs:simpleType>
 
     <xs:complexType name="Reference">
-        <xs:attribute name="name"   type="mc:Name" use="required" />
-        <xs:attribute name="class"  type="mc:Name" />
-        <xs:attribute name="ref"    type="mc:ID" />
+        <xs:annotation>
+            <xs:documentation>
+                The Reference can must always contain at least "ref" attribute or "name". If the "classification" is
+                provided the name will be searched only within this classification. Also if element of this type
+                is used inside element of type "Classification" it is assumed that the element should be searched by name
+                within the surrounding classification. This does not apply on elements having the "ref" attribute
+                provided. In that case the element is resolved by the ID. The type of the catalogue element can
+                be provided to distinguish between elements having same name and classification but different types
+                (this is quite common for value domains and it's data types)
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="name"           type="mc:Name" />
+        <xs:attribute name="classification" type="mc:Name" />
+        <xs:attribute name="ref"            type="mc:ID" />
+        <xs:attribute name="type"           type="mc:CatalogueElementType" />
+    </xs:complexType>
+
+    <xs:simpleType name="KnownRelationshipTypes">
+        <xs:restriction base="mc:Name">
+            <xs:enumeration value="containment"/>
+            <xs:enumeration value="base"/>
+            <xs:enumeration value="hierarchy"/>
+            <xs:enumeration value="relatedTo"/>
+            <xs:enumeration value="synonym"/>
+            <xs:enumeration value="favourite"/>
+            <xs:enumeration value="classification"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RelationshipType">
+        <xs:union memberTypes="mc:Name mc:KnownRelationshipTypes"/>
+    </xs:simpleType>
+
+    <xs:complexType name="Relationship">
+        <xs:complexContent>
+            <xs:extension base="mc:Reference">
+                <xs:attribute name="relationshipType" type="mc:RelationshipType" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="Relationships">
@@ -101,14 +165,22 @@
     </xs:complexType>
 
     <xs:complexType name="CatalogueElement" abstract="true">
-        <xs:sequence>
-            <xs:element name="description"  type="mc:Description"   minOccurs="0"/>
-            <xs:element name="extensions"   type="mc:Extensions"    minOccurs="0"/>
-        </xs:sequence>
-        <xs:attribute name="name"           type="mc:Name"  use="required" />
-        <xs:attribute name="id"             type="mc:ID"/>
-        <xs:attribute name="status"         type="mc:Status" default="FINALIZED"/>
-        <xs:attribute name="classification" type="mc:Name" />
+        <xs:annotation>
+            <xs:documentation>
+                CatalogueElement is either a in-lined definition of the element or a reference to the existing element.
+                If "ref" attribute is set, any other attributes or nested elements are ignored.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="mc:Reference">
+                <xs:sequence>
+                    <xs:element name="description"      type="mc:Description"   minOccurs="0"/>
+                    <xs:element name="extensions"       type="mc:Extensions"    minOccurs="0"/>
+                    <xs:element name="relationships"    type="mc:Relationships" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute name="id" type="mc:ID"/>
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="MeasurementUnit">
@@ -128,19 +200,65 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
-    <xs:complexType name="ValueDomain"/>
-    <xs:complexType name="DataElement"/>
-    <xs:complexType name="Model"/>
-    <xs:complexType name="Classification"/>
+
+    <xs:complexType name="ValueDomain">
+        <xs:complexContent>
+            <xs:extension base="mc:CatalogueElement">
+                <xs:sequence>
+                    <xs:choice minOccurs="0">
+                        <xs:element name="rule"     type="mc:Rule" />
+                        <xs:element name="regex"    type="xs:string" />
+                    </xs:choice>
+                    <xs:element name="unitOfMeasure"    type="mc:MeasurementUnit"   minOccurs="0" />
+                    <xs:element name="dataType"         type="mc:DataType"          minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="DataElement">
+        <xs:complexContent>
+            <xs:extension base="mc:CatalogueElement">
+                <xs:sequence>
+                    <xs:element name="valueDomain" type="mc:ValueDomain"   minOccurs="0" />
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="Model">
+        <xs:complexContent>
+            <xs:extension base="mc:CatalogueElement">
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="model"        type="mc:Model" />
+                    <xs:element name="dataElement"  type="mc:DataElement" />
+                </xs:choice>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="Classification">
+        <xs:complexContent>
+            <xs:extension base="mc:CatalogueElement">
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="model"            type="mc:Model"           />
+                    <xs:element name="dataElement"      type="mc:DataElement"     />
+                    <xs:element name="valueDomain"      type="mc:ValueDomain"     />
+                    <xs:element name="dataType"         type="mc:DataType"        />
+                    <xs:element name="measurementUnit"  type="mc:MeasurementUnit" />
+                </xs:choice>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
 
     <xs:complexType name="Catalogue">
         <xs:choice maxOccurs="unbounded">
-            <xs:element name="classification"   type="mc:Classification"  minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="model"            type="mc:Model"           minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="dataElement"      type="mc:DataElement"     minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="valueDomain"      type="mc:ValueDomain"     minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="dataType"         type="mc:DataType"        minOccurs="0" maxOccurs="unbounded"/>
-            <xs:element name="measurementUnit"  type="mc:MeasurementUnit" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="classification"   type="mc:Classification"  />
+            <xs:element name="model"            type="mc:Model"           />
+            <xs:element name="dataElement"      type="mc:DataElement"     />
+            <xs:element name="valueDomain"      type="mc:ValueDomain"     />
+            <xs:element name="dataType"         type="mc:DataType"        />
+            <xs:element name="measurementUnit"  type="mc:MeasurementUnit" />
         </xs:choice>
     </xs:complexType>
 
