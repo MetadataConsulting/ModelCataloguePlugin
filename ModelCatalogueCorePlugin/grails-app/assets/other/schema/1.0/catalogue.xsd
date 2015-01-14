@@ -241,20 +241,23 @@
     <xs:complexType name="Classification">
         <xs:complexContent>
             <xs:extension base="mc:CatalogueElement">
-                <xs:choice minOccurs="0" maxOccurs="unbounded">
-                    <xs:element name="model"            type="mc:Model"           />
-                    <xs:element name="dataElement"      type="mc:DataElement"     />
-                    <xs:element name="valueDomain"      type="mc:ValueDomain"     />
-                    <xs:element name="dataType"         type="mc:DataType"        />
-                    <xs:element name="measurementUnit"  type="mc:MeasurementUnit" />
-                </xs:choice>
+                <xs:sequence>
+                    <xs:element name="globalSearchFor" type="mc:CatalogueElementType" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="model"            type="mc:Model"           />
+                        <xs:element name="dataElement"      type="mc:DataElement"     />
+                        <xs:element name="valueDomain"      type="mc:ValueDomain"     />
+                        <xs:element name="dataType"         type="mc:DataType"        />
+                        <xs:element name="measurementUnit"  type="mc:MeasurementUnit" />
+                    </xs:choice>
+                </xs:sequence>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="Catalogue">
         <xs:sequence>
-            <xs:element name="globalSearchFor" type="mc:CatalogueElementType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="createAutomatically" type="mc:CatalogueElementType" minOccurs="0" maxOccurs="unbounded" />
             <xs:choice maxOccurs="unbounded">
                 <xs:element name="classification"   type="mc:Classification"  />
                 <xs:element name="model"            type="mc:Model"           />
