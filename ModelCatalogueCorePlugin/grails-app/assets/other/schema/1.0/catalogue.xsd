@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+        xmlns:mc="http://www.metadataregistry.org.uk/assets/schema/1.0/catalogue.xsd"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/1.0/catalogue.xsd"
+        elementFormDefault="qualified" version="1.0" xml:lang="EN">
+
+    <xs:element name="catalogue" type="mc:Catalogue"/>
+
+    <xs:simpleType name="Name">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="255"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ID">
+        <xs:restriction base="xs:anyURI">
+            <xs:pattern value="https?://.*"/>
+            <xs:minLength value="1"/>
+            <xs:maxLength value="255"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Status">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DRAFT"/>
+            <xs:enumeration value="FINALIZED"/>
+            <xs:enumeration value="DEPRECATED"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Description">
+        <xs:restriction base="xs:string">
+            <xs:whiteSpace value="preserve"/>
+            <xs:maxLength value="2000"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ExtensionKey">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="255"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ExtensionValue">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="2000"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Symbol">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="100"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="Extension">
+        <xs:simpleContent>
+            <xs:extension base="mc:ExtensionValue">
+                <xs:attribute name="key" type="mc:ExtensionKey" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="Extensions">
+        <xs:sequence>
+            <xs:element name="extension" type="mc:Extension" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Enumeration">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="value" use="required" type="xs:string"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="Enumerations">
+        <xs:sequence>
+            <xs:element name="enumeration" type="mc:Enumeration" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Relationship">
+        <xs:attribute name="name" type="mc:Name" use="required" />
+        <xs:attribute name="class" type="mc:Name" />
+    </xs:complexType>
+
+    <xs:complexType name="Reference">
+        <xs:attribute name="name"   type="mc:Name" use="required" />
+        <xs:attribute name="class"  type="mc:Name" />
+        <xs:attribute name="ref"    type="mc:ID" />
+    </xs:complexType>
+
+    <xs:complexType name="Relationships">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="from" type="mc:Relationship"/>
+            <xs:element name="to"   type="mc:Relationship"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="CatalogueElement" abstract="true">
+        <xs:sequence>
+            <xs:element name="description"  type="mc:Description"   minOccurs="0"/>
+            <xs:element name="extensions"   type="mc:Extensions"    minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="name"           type="mc:Name"  use="required" />
+        <xs:attribute name="id"             type="mc:ID"/>
+        <xs:attribute name="status"         type="mc:Status" default="FINALIZED"/>
+        <xs:attribute name="classification" type="mc:Name" />
+    </xs:complexType>
+
+    <xs:complexType name="MeasurementUnit">
+        <xs:complexContent>
+            <xs:extension base="mc:CatalogueElement">
+                    <xs:attribute name="symbol" type="mc:Symbol"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="DataType">
+        <xs:complexContent>
+            <xs:extension base="mc:CatalogueElement">
+                <xs:sequence>
+                    <xs:element name="enumerations" type="mc:Enumerations" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ValueDomain"/>
+    <xs:complexType name="DataElement"/>
+    <xs:complexType name="Model"/>
+    <xs:complexType name="Classification"/>
+
+    <xs:complexType name="Catalogue">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="classification"   type="mc:Classification"  minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="model"            type="mc:Model"           minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="dataElement"      type="mc:DataElement"     minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="valueDomain"      type="mc:ValueDomain"     minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="dataType"         type="mc:DataType"        minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="measurementUnit"  type="mc:MeasurementUnit" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:choice>
+    </xs:complexType>
+
+</xs:schema>
