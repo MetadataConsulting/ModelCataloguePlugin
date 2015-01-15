@@ -2,12 +2,15 @@ package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.dataarchitect.xsd.*
 import org.modelcatalogue.core.util.CatalogueBuilder
 
 class DataImportService {
     static transactional = false
-    def elementService, relationshipService, classificationService
+
+    def elementService
+    def relationshipService
+    def classificationService
+
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
 
     @Transactional
