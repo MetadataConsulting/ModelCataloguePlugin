@@ -190,6 +190,7 @@
         <xs:complexContent>
             <xs:extension base="mc:CatalogueElement">
                     <xs:attribute name="symbol" type="mc:Symbol"/>
+                    <xs:attribute name="type"   use="prohibited"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -200,6 +201,7 @@
                 <xs:sequence>
                     <xs:element name="enumerations" type="mc:Enumerations" minOccurs="0"/>
                 </xs:sequence>
+                <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -215,6 +217,7 @@
                     <xs:element name="unitOfMeasure"    type="mc:MeasurementUnit"   minOccurs="0" />
                     <xs:element name="dataType"         type="mc:DataType"          minOccurs="0" />
                 </xs:sequence>
+                <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -225,6 +228,7 @@
                 <xs:sequence>
                     <xs:element name="valueDomain" type="mc:ValueDomain"   minOccurs="0" />
                 </xs:sequence>
+                <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -236,6 +240,7 @@
                     <xs:element name="model"        type="mc:Model" />
                     <xs:element name="dataElement"  type="mc:DataElement" />
                 </xs:choice>
+                <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -253,6 +258,7 @@
                         <xs:element name="measurementUnit"  type="mc:MeasurementUnit" />
                     </xs:choice>
                 </xs:sequence>
+                <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
