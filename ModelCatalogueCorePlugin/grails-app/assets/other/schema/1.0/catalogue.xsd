@@ -172,8 +172,12 @@
         <xs:complexContent>
             <xs:extension base="mc:Reference">
                 <xs:sequence>
-                    <xs:element name="basedOn"          type="mc:Reference"     minOccurs="0" maxOccurs="unbounded" />
                     <xs:element name="description"      type="mc:Description"   minOccurs="0"/>
+                    <xs:choice minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="basedOn"      type="mc:Reference"/>
+                        <xs:element name="relatedTo"    type="mc:Reference"/>
+                        <xs:element name="synonym"      type="mc:Reference"/>
+                    </xs:choice>
                     <xs:element name="extensions"       type="mc:Extensions"    minOccurs="0"/>
                     <xs:element name="relationships"    type="mc:Relationships" minOccurs="0"/>
                 </xs:sequence>
