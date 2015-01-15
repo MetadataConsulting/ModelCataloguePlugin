@@ -52,7 +52,7 @@
     </xs:simpleType>
 
     <xs:simpleType name="ExtensionValue">
-        <xs:restriction base="xs:string">
+        <xs:restriction base="mc:PreservedString">
             <xs:maxLength value="2000"/>
         </xs:restriction>
     </xs:simpleType>
@@ -181,7 +181,8 @@
                     <xs:element name="extensions"       type="mc:Extensions"    minOccurs="0"/>
                     <xs:element name="relationships"    type="mc:Relationships" minOccurs="0"/>
                 </xs:sequence>
-                <xs:attribute name="id" type="mc:ID"/>
+                <xs:attribute name="id"     type="mc:ID"/>
+                <xs:attribute name="status" type="mc:Status"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
