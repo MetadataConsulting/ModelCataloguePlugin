@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
         #language=HTML
         template: '''
         <div class="modal-header">
-            <button type="button" class="close" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
+            <button type="button" class="close" id="exit-wizard" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
             <h4>Classification Wizard</h4>
             <ul class="tutorial-steps">
               <li>
@@ -41,7 +41,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                 </div>
                 <div class="form-group">
                   <label for="name" class="">Catalogue ID (URL)</label>
-                  <input type="text" class="form-control" id="name" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="classification.modelCatalogueId">
+                  <input type="text" class="form-control" id="modelCatalogueId" placeholder="e.g. external ID, namespace (leave blank for generated)" ng-model="classification.modelCatalogueId">
                 </div>
                 <div class="form-group">
                   <label for="description" class="">Description</label>

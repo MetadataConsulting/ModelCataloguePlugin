@@ -16,6 +16,7 @@ class DataImportController  {
     def XSDImportService
     def OBOService
     def umljService
+    def LoincImportService
     def modelCatalogueSecurityService
     def executorService
     def assetService
@@ -101,6 +102,29 @@ class DataImportController  {
             }
             redirectToAsset(id)
 
+            return
+        }
+
+        if (file.size > 0 && file.originalFilename.endsWith("c.csv")) {
+            def asset = storeAsset(params, file, 'application/model-catalogue')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+
+            executorService.submit {
+                try {
+                    Set<CatalogueElement> created = LoincImportService.serviceMethod(inputStream)
+                    for (CatalogueElement element in created) {
+                        asset.addToRelatedTo(element)
+                    }
+                    Asset updated = finalizeAsset(id)
+                    Classification classification = created.find { it instanceof Classification } as Classification
+                    classifyAsset(updated, classification)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
+            }
+
+            redirectToAsset(id)
             return
         }
 

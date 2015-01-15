@@ -25,7 +25,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
               </div>
               <div class="form-group">
                 <label for="symbol" class="">Symbol</label>
-                <input type="symbol" class="form-control" id="name" placeholder="Symbol" ng-model="copy.symbol">
+                <input type="symbol" class="form-control" id="symbol" placeholder="Symbol" ng-model="copy.symbol">
               </div>
               <div class="form-group">
                 <label for="modelCatalogueId" class="">Catalogue ID (URL)</label>

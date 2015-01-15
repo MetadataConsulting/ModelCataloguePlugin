@@ -47,7 +47,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', 'classificationInUse', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance, classificationInUse) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', 'classificationInUse', '$rootScope', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance, classificationInUse, $rootScope) ->
           $scope.pending        = {classification: null}
           $scope.newEntity      = -> {classifications: $scope.copy?.classifications ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
@@ -101,6 +101,9 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
                 $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
               ).success((result) ->
                 result = enhance result
+
+                $rootScope.$broadcast 'catalogueElementCreated', result, "#{modelCatalogueApiRoot}/asset/upload"
+
                 $scope.uploading = false
                 if result.errors
                   for err in result.errors

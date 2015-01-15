@@ -142,7 +142,7 @@ class ValueDomain extends CatalogueElement {
         if (archived) {
             return DataElement.findAllByValueDomain(this)
         }
-        return DataElement.findAllByValueDomainAndStatus(this, ElementStatus.FINALIZED)
+        return DataElement.findAllByValueDomainAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     Long countDataElements() {
@@ -152,7 +152,7 @@ class ValueDomain extends CatalogueElement {
         if (archived) {
             return DataElement.countByValueDomain(this)
         }
-        return DataElement.countByValueDomainAndStatus(this, ElementStatus.FINALIZED)
+        return DataElement.countByValueDomainAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
     @Override
