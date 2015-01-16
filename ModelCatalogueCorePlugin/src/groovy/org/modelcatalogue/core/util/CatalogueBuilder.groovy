@@ -181,7 +181,7 @@ class CatalogueBuilder {
         withContextElement(CatalogueElement) {
             saveIfNeeded it
             CatalogueElement other = tryFind(it.class, classification, name, null)
-            it.addToBasedOn other
+            it.addToIsBasedOn other
             if (it instanceof ValueDomain && other instanceof ValueDomain && !it.dataType) {
                 it.dataType = other.dataType
             }
@@ -192,7 +192,7 @@ class CatalogueBuilder {
         withContextElement(CatalogueElement) {
             saveIfNeeded it
             CatalogueElement other = tryFind(it.class, name, null)
-            it.addToBasedOn other
+            it.addToIsBasedOn other
             if (it instanceof ValueDomain && other instanceof ValueDomain && !it.dataType) {
                 it.dataType = other.dataType
             }
@@ -202,7 +202,7 @@ class CatalogueBuilder {
     void basedOn(CatalogueElement element) {
         withContextElement(CatalogueElement) {
             saveIfNeeded it
-            it.addToBasedOn element
+            it.addToIsBasedOn element
             if (it instanceof ValueDomain && element instanceof ValueDomain && !it.dataType) {
                 it.dataType = element.dataType
             }

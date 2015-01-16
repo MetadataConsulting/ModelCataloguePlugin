@@ -78,7 +78,6 @@ grails.project.dependency.resolution = {
         }
 
         test "org.grails:grails-datastore-test-support:1.0-grails-2.4"
-
     }
 
     plugins {

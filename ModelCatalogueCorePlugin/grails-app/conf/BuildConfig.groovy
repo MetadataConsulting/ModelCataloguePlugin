@@ -46,10 +46,8 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        //test "org.modelcatalogue:simple-fixtures:0.1.3"
-        //compile "jlibs:jlibs-xml:1.0"
-//        compile 'org.biojava:biojava3-ontology:3.1.0'
         compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
+        test 'xmlunit:xmlunit:1.6'
     }
 
     plugins {

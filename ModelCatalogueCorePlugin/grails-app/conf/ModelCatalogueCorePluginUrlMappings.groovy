@@ -6,6 +6,7 @@ class ModelCatalogueCorePluginUrlMappings {
 	static mappings = {
 
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
+        "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
 
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
         def catalogueElements = ['asset', 'dataElement', 'model', 'catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
@@ -28,7 +29,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
 
             if (controllerName == 'batch') {
-                "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action:  'archive', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/run"(controller: controllerName, action: 'runAll', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$state?"(controller: controllerName, action: 'listActions', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/actions/$actionId/dismiss"(controller: controllerName, action: 'dismiss', method: HttpMethod.POST)

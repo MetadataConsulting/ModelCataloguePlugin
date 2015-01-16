@@ -68,11 +68,6 @@ class ValueDomain extends CatalogueElement {
         }
     }
 
-    static relationships = [
-        incoming: [base: 'basedOn'],
-        outgoing: [base: 'isBaseFor']
-    ]
-
     void setRegexDef(String regex) {
         if (!regex) {
             rule = null

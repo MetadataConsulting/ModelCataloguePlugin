@@ -51,7 +51,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     static relationships = [
             incoming: [base: 'isBasedOn', classification: 'classifications', supersession: 'supersedes', favourite: 'isFavouriteOf'],
             outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy'],
-            bidirectional: [relatedTo: 'relatedTo']
+            bidirectional: [relatedTo: 'relatedTo', synonym: 'isSynonymFor']
     ]
 
     static constraints = {
@@ -225,6 +225,10 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         if (mcID != defaultModelCatalogueId) {
             modelCatalogueId = mcID
         }
+    }
+
+    boolean hasModelCatalogueId() {
+        this.@modelCatalogueId != null
     }
 
     Integer countVersions() {

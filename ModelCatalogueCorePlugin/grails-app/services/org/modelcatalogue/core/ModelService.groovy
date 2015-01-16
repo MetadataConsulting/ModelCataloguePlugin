@@ -11,10 +11,12 @@ class ModelService {
     SecurityService modelCatalogueSecurityService
 
     ListWithTotalAndType<Model> getTopLevelModels(Map params) {
-        RelationshipType hierarchy      = RelationshipType.hierarchyType
-        ElementStatus status   = ElementService.getStatusFromParams(params)
+        getTopLevelModels(modelCatalogueSecurityService.currentUser?.classifications, params)
+    }
 
-        List<Classification> classifications = modelCatalogueSecurityService.currentUser?.classifications
+    ListWithTotalAndType<Model> getTopLevelModels(List<Classification> classifications, Map params) {
+        RelationshipType hierarchy      = RelationshipType.hierarchyType
+        ElementStatus status            = ElementService.getStatusFromParams(params)
         RelationshipType classification = RelationshipType.classificationType
 
 

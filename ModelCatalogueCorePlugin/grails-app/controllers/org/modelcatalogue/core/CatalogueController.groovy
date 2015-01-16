@@ -1,30 +1,42 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
-class CatalogueController  {
+class CatalogueController {
 
-   def xref() {
-       String resource  = params.resource
-       Long id          = params.long('id')
-       Integer version  = params.int('version')
+    def classificationService
+    def modelService
 
-       CatalogueElement element
+    def xref() {
+        String resource = params.resource
+        Long id = params.long('id')
+        Integer version = params.int('version')
 
-       if (version && version != 1) {
-           Long lastVersion = id
-           element = CatalogueElement.where {
-               versionNumber == version && latestVersionId == lastVersion
-           }.get()
-       } else {
-           element = CatalogueElement.get(id)
-       }
-       if (!element) {
-           render status: HttpStatus.NOT_FOUND
-           return
-       }
+        CatalogueElement element
 
-       redirect controller: resource, action: 'show', id: element.id
-   }
+        if (version && version != 1) {
+            Long lastVersion = id
+            element = CatalogueElement.where {
+                versionNumber == version && latestVersionId == lastVersion
+            }.get()
+        } else {
+            element = CatalogueElement.get(id)
+        }
+        if (!element) {
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+
+        if (params.format == 'xml') {
+            response.contentType = 'application/xml'
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(classificationService, modelService)
+            printer.bind(element).writeTo(response.writer)
+            return
+        }
+
+
+        redirect controller: resource, action: 'show', id: element.id
+    }
 
 }
