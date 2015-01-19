@@ -13,7 +13,7 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
-import org.modelcatalogue.core.util.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
@@ -24,6 +24,7 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
     CatalogueXmlPrinter printer
 
     @Shared def classificationService
+    @Shared def elementService
     @Shared def modelService
     @Shared def initCatalogueService
 
@@ -91,40 +92,39 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
 
 
     boolean similar(CatalogueElement input, String sampleFile) {
-        String xml = XmlUtil.serialize(printer.bind(input))
+        String xml = XmlUtil.serialize(printer.bind(input){
+            noHref = true
+        })
         println xml
-        DetailedDiff diff = new DetailedDiff(new Diff(xml, getClass().classLoader.getResourceAsStream("resources/xml/$sampleFile").text))
-        assert diff.similar(), diff.toString()
+
+        Diff diff = new Diff(xml, getClass().classLoader.getResourceAsStream("resources/xml/$sampleFile").text)
+        DetailedDiff detailedDiff = new DetailedDiff(diff)
+
+        assert detailedDiff.similar(), detailedDiff.toString()
         return true
     }
 
     private <E extends CatalogueElement> E build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        new CatalogueBuilder(classificationService).build(cl).first() as E
+        new CatalogueBuilder(classificationService, elementService).build(cl).first() as E
     }
 
     private ValueDomain getPressure() {
         build {
-            valueDomain(name: 'Pressure', id: "http://www.example.com/domains/Pressure") {
-                status finalized
-            }
+            valueDomain(name: 'Pressure', id: "http://www.example.com/domains/Pressure")
         }
     }
 
     private Classification getTransportation() {
         build {
-            classification (name: "Transportation") {
+            classification (name: "Transportation", id: "http://www.example.com/datasets/Transportation") {
                 dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
-                    status finalized
                     valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
-                        status finalized
                         description "A force is a push or pull upon an object resulting from the object's interaction with another object."
                         regex "\\d+"
                         dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {
                             description "A number that uses a decimal point followed by digits that show a value smaller than one."
-                            status finalized
                         }
                         measurementUnit(name: "Newton", symbol: "N", id: "http://www.example.com/units/Newton") {
-                            status finalized
                             description "The newton (symbol: N) is the International System of Units (SI) derived unit of force."
                             ext "From", "SI"
                         }
@@ -145,17 +145,13 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
         build {
             model(name: "Locomotive", id: "http://www.example.com/models/Locomotive") {
                 dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
-                    status finalized
                     valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
-                        status finalized
                         description "A force is a push or pull upon an object resulting from the object's interaction with another object."
                         regex "\\d+"
                         dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {
                             description "A number that uses a decimal point followed by digits that show a value smaller than one."
-                            status finalized
                         }
                         measurementUnit(name: "Newton", symbol: "N", id: "http://www.example.com/units/Newton") {
-                            status finalized
                             description "The newton (symbol: N) is the International System of Units (SI) derived unit of force."
                             ext "From", "SI"
                         }
@@ -171,17 +167,13 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
     private DataElement getAdhesion() {
         build {
             dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
-                status finalized
                 valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
-                    status finalized
                     description "A force is a push or pull upon an object resulting from the object's interaction with another object."
                     regex "\\d+"
                     dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {
                         description "A number that uses a decimal point followed by digits that show a value smaller than one."
-                        status finalized
                     }
                     measurementUnit(name: "Newton", symbol: "N", id: "http://www.example.com/units/Newton") {
-                        status finalized
                         description "The newton (symbol: N) is the International System of Units (SI) derived unit of force."
                         ext "From", "SI"
                     }
@@ -191,21 +183,20 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
     }
 
     private ValueDomain getForce() {
+        pressure
+
         build {
             valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
-                status finalized
                 description "A force is a push or pull upon an object resulting from the object's interaction with another object."
                 regex "\\d+"
                 dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {
                     description "A number that uses a decimal point followed by digits that show a value smaller than one."
-                    status finalized
                 }
                 measurementUnit(name: "Newton", symbol: "N", id: "http://www.example.com/units/Newton") {
-                    status finalized
                     description "The newton (symbol: N) is the International System of Units (SI) derived unit of force."
                     ext "From", "SI"
                 }
-                rel "relatedTo" to pressure
+                rel "relatedTo" to 'Pressure'
             }
         }
 
@@ -214,7 +205,6 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
     private MeasurementUnit getNewton() {
         build {
             measurementUnit(name: "Newton", symbol: "N", id: "http://www.example.com/units/Newton") {
-                status finalized
                 description "The newton (symbol: N) is the International System of Units (SI) derived unit of force."
                 ext "From", "SI"
                 rel 'relatedTo' to 'SI', 'kilogram'
@@ -224,10 +214,11 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
     }
 
     private DataType getInteger() {
+        decimal
+
         build {
             dataType(name: "Integer", id: "http://www.example.com/types/Integer") {
-                status finalized
-                basedOn decimal
+                basedOn 'Decimal'
                 description "A number with no fractional part."
             }
         }
@@ -236,7 +227,6 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
     private DataType getGender() {
         build {
             dataType(name: "Gender", id: "http://www.example.com/types/Gender", enumerations: [M: 'Male', F: 'Female']) {
-                status finalized
                 description "The state of being male or female (typically used with reference to social and cultural differences rather than biological ones)"
             }
         }
@@ -244,9 +234,7 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
 
     private DataType getDecimal() {
         build {
-            dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {
-                status finalized
-            }
+            dataType(name: "Decimal", id: "http://www.example.com/types/Decimal")
         }
     }
 

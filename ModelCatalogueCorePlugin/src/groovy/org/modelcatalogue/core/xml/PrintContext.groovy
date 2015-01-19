@@ -15,6 +15,7 @@ class PrintContext {
 
 
     boolean idWithoutVersion
+    boolean noHref
 
     Classification currentClassification
     Set<Long> idsOfPrinted = []

@@ -195,7 +195,6 @@ class CatalogueBuilder {
         }
     }
 
-
     static Class<Classification> getClassification() { Classification }
     static Class<Model> getModel() { Model }
     static Class<DataElement> getDataElement() { DataElement }

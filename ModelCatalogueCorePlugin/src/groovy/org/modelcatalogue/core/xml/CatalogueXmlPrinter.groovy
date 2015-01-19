@@ -15,8 +15,9 @@ class CatalogueXmlPrinter {
         this.modelService = modelService
     }
 
-    Writable bind(CatalogueElement element) {
+    Writable bind(CatalogueElement element, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
         PrintContext context = new PrintContext(classificationService, modelService)
+        context.with contextConfigurer
         StreamingMarkupBuilder builder = new StreamingMarkupBuilder()
         builder.bind {
             catalogue ('xmlns' : 'http://www.metadataregistry.org.uk/assets/schema/1.0/metadataregistry.xsd') {

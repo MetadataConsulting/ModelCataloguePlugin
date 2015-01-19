@@ -129,6 +129,7 @@
         <xs:attribute name="classification" type="mdr:Name" />
         <xs:attribute name="ref"            type="mdr:ID" />
         <xs:attribute name="type"           type="mdr:CatalogueElementType" />
+        <xs:attribute name="href"           type="mdr:ID"/>
     </xs:complexType>
 
     <xs:simpleType name="KnownRelationshipTypes">

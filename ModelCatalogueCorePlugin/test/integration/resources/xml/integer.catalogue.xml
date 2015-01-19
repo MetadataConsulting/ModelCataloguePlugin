@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.0/metadataregistry.xsd">
-    <dataType name="Integer" id="http://www.example.com/types/Integer">
+    <dataType name="Integer" id="http://www.example.com/types/Integer" status="DRAFT">
         <description>A number with no fractional part.</description>
-        <basedOn ref="http://www.example.com/types/Decimal"/>
+        <basedOn ref="http://www.example.com/types/Decimal" />
     </dataType>
 </catalogue>
