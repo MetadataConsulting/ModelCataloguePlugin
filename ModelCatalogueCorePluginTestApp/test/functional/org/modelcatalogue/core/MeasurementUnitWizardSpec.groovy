@@ -16,8 +16,9 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
         waitFor(120) {
             viewTitle.displayed
         }
-
-        viewTitle.text().trim()     == 'Measurement Unit List'
+        waitFor {
+            viewTitle.text().trim() == 'Measurement Unit List'
+        }
 
         when:
         loginAdmin()

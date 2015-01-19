@@ -25,8 +25,9 @@ class AssetWizardSpec extends GebReportingSpec {
         waitFor(120) {
             viewTitle.displayed
         }
-
-        viewTitle.text().trim()     == 'Asset List'
+        waitFor {
+            viewTitle.text().trim() == 'Asset List'
+        }
 
         when:
         loginAdmin()

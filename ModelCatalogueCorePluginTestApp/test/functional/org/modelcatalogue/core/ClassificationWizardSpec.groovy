@@ -16,8 +16,10 @@ class ClassificationWizardSpec extends GebReportingSpec {
         waitFor(120) {
             viewTitle.displayed
         }
+        waitFor(120) {
+            viewTitle.text().trim() == 'Classification List'
+        }
 
-        viewTitle.text().trim() == 'Classification List'
 
         when:
         loginAdmin()

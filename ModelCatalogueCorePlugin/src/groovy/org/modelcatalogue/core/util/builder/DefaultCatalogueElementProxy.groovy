@@ -241,6 +241,10 @@ import org.modelcatalogue.core.ValueDomain
     }
 
     private Map<String, Object> updateProperties(T element) {
+        element.name = name
+        if (id) {
+            element.modelCatalogueId = id
+        }
         parameters.each { String key, Object value ->
             if (value instanceof CatalogueElementProxy) {
                 element.setProperty(key, value.resolve())

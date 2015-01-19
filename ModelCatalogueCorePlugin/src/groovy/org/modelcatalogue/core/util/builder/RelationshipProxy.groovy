@@ -21,21 +21,26 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
     }
 
     Relationship resolve() {
-        RelationshipType type = RelationshipType.readByName(relationshipTypeName)
-        T sourceElement = source.resolve()
-        U destinationElement = destination.resolve()
-        if (!sourceElement.readyForQueries) {
-            throw new IllegalStateException("Source element $sourceElement is not ready to be part of the relationship ${toString()}")
+        try {
+            RelationshipType type = RelationshipType.readByName(relationshipTypeName)
+            T sourceElement = source.resolve()
+            U destinationElement = destination.resolve()
+            if (!sourceElement.readyForQueries) {
+                throw new IllegalStateException("Source element $sourceElement is not ready to be part of the relationship ${toString()}")
+            }
+            if (!destinationElement.readyForQueries) {
+                throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
+            }
+            Relationship relationship = sourceElement.createLinkTo(destinationElement, type)
+            if (relationship.hasErrors()) {
+                log.error(relationship.errors)
+                throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement.")
+            }
+            return relationship
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to resolve $this:\n\n$e", e)
         }
-        if (!destinationElement.readyForQueries) {
-            throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
-        }
-        Relationship relationship = sourceElement.createLinkTo(destinationElement, type)
-        if (relationship.hasErrors()) {
-            log.error(relationship.errors)
-            throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement.")
-        }
-        relationship
+
     }
 
     @Override

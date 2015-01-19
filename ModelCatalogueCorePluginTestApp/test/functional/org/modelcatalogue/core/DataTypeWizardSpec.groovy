@@ -17,8 +17,9 @@ class DataTypeWizardSpec extends GebReportingSpec {
         waitFor(120) {
             viewTitle.displayed
         }
-
-        viewTitle.text().trim() == 'Data Type List'
+        waitFor {
+            viewTitle.text().trim() == 'Data Type List'
+        }
 
         when:
         loginAdmin()

@@ -23,8 +23,9 @@
             waitFor(120) {
                 viewTitle.displayed
             }
-            viewTitle.text().trim()     == 'Data Element List'
-            //subviewTitle.text().trim()  == 'NHIC Datasets'
+            waitFor(120) {
+                viewTitle.text().trim() == 'Data Element List'
+            }
 
             when:
             loginAdmin()
@@ -102,7 +103,7 @@
             saveButton.click()
 
             then: 'the data element is saved and and different value domain is shown'
-            waitFor {
+            waitFor(120) {
                 $('td', 'data-value-for': "Value Domain").text().contains('VD4Dent2')
             }
         }
@@ -122,8 +123,8 @@
             and: 'save button clicked'
             saveButton.click()
 
-            then: 'the data element is saved and and different value domain is shown'
-            waitFor {
+            then: 'the data element is saved and and no value domain is shown'
+            waitFor(120) {
                 $('td', 'data-value-for': "Value Domain").text().trim() == ''
             }
         }

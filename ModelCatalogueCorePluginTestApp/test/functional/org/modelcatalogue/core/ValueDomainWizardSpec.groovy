@@ -16,7 +16,9 @@
             waitFor(120) {
                 viewTitle.displayed
             }
-            viewTitle.text().trim() == 'Value Domain List'
+            waitFor {
+                viewTitle.text().trim() == 'Value Domain List'
+            }
 
             when:
             loginAdmin()
