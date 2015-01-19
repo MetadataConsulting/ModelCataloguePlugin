@@ -21,8 +21,8 @@ class ReportDescriptorBuilder {
     }
 
 
-    ReportDescriptorBuilder type(Class type) {
-        descriptor.conditions << { type.isAssignableFrom(it.class)} ; this
+    ReportDescriptorBuilder type(Class... types) {
+        descriptor.conditions << { types.any { type -> type.isAssignableFrom(it.class) }} ; this
     }
 
     ReportDescriptorBuilder item(Class item) {

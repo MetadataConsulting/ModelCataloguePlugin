@@ -270,6 +270,15 @@ Model catalogue core plugin (metadata registry)
             link controller: 'classification', action: 'gereport', id: true
         }
 
+        reportsRegistry.register {
+            creates link
+            type Classification, Model, DataElement, ValueDomain, DataType, MeasurementUnit
+            title { "Export to Catalogue XML" }
+            link { CatalogueElement element ->
+                [url: element.getDefaultModelCatalogueId(false) + '?format=xml']
+            }
+        }
+
 
 
     }
