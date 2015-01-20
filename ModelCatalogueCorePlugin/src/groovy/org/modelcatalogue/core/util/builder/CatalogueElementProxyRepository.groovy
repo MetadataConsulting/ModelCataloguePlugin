@@ -71,18 +71,20 @@ class CatalogueElementProxyRepository {
                 } else {
                     existing.merge(proxy)
                 }
-            }
+            } else if (proxy.name) {
+                String fullName = "${proxy.domain}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+                CatalogueElementProxy existing = byName[fullName]
 
-            String fullName = "${proxy.domain}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
-            CatalogueElementProxy existing = byName[fullName]
-
-            if (!existing) {
-                byName[fullName] = proxy
-                // it is a set, so if we add it twice it does not matter
-                toBeResolved << proxy
+                if (!existing) {
+                    byName[fullName] = proxy
+                    // it is a set, so if we add it twice it does not matter
+                    toBeResolved << proxy
+                } else {
+                    // must survive double addition
+                    existing.merge(proxy)
+                }
             } else {
-                // must survive double addition
-                existing.merge(proxy)
+                throw new IllegalStateException("Proxy $proxy does not provide ID nor name")
             }
         }
 

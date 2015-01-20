@@ -387,5 +387,4 @@ class ElementService implements Publisher<CatalogueElement> {
         elements
     }
 
-
 }

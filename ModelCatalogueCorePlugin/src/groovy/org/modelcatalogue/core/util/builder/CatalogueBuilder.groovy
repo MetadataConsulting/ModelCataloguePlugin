@@ -161,6 +161,11 @@ class CatalogueBuilder {
     void basedOn(CatalogueElementProxy<CatalogueElement> element) {
         rel "base" from element
     }
+
+    CatalogueElementProxy<? extends CatalogueElement> ref(String id) {
+        repository.createAbstractionById(CatalogueElement, null, id)
+    }
+
     RelationshipBuilder rel(String relationshipTypeName) {
         return new RelationshipBuilder(context, repository, relationshipTypeName)
     }

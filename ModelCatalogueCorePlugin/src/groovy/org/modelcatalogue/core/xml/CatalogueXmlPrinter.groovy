@@ -7,6 +7,8 @@ import org.modelcatalogue.core.ModelService
 
 class CatalogueXmlPrinter {
 
+    static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/1.0/metadataregistry.xsd'
+
     ClassificationService classificationService
     ModelService modelService
 
@@ -20,7 +22,7 @@ class CatalogueXmlPrinter {
         context.with contextConfigurer
         StreamingMarkupBuilder builder = new StreamingMarkupBuilder()
         builder.bind {
-            catalogue ('xmlns' : 'http://www.metadataregistry.org.uk/assets/schema/1.0/metadataregistry.xsd') {
+            catalogue ('xmlns' : NAMESPACE_URL) {
                 CatalogueElementPrintHelper.printElement(mkp, element, context)
             }
         }

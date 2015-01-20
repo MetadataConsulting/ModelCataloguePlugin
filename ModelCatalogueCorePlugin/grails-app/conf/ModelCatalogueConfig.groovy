@@ -16,6 +16,8 @@ log4j = {
 //    debug 'org.modelcatalogue.core.util.builder'
 //    debug 'org.modelcatalogue.core.publishing'
 
+    warn 'org.modelcatalogue.core.xml'
+
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP
            'org.codehaus.groovy.grails.web.sitemesh', //  layouts

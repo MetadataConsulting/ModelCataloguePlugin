@@ -289,11 +289,15 @@ import org.modelcatalogue.core.ValueDomain
         }
 
         other.extensions.each { String key, String value ->
-            setExtension(key, value)
+            if (value != null) {
+                setExtension(key, value)
+            }
         }
 
         other.parameters.each { String key, Object value ->
-            setParameter(key, value)
+            if (value != null) {
+                setParameter(key, value)
+            }
         }
 
         other.relationships.each { RelationshipProxy relationship ->
