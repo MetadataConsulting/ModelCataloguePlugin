@@ -14,7 +14,7 @@ class PrintContext {
     ModelService modelService
 
 
-    boolean idWithoutVersion
+    boolean idIncludeVersion
     boolean noHref
 
     Classification currentClassification

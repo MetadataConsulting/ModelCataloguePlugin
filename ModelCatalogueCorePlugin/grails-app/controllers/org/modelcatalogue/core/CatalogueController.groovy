@@ -30,6 +30,7 @@ class CatalogueController {
 
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
+            response.setHeader("Content-disposition", "attachment; filename=${element.name.replaceAll(/\s+/, '_')}.xml")
             CatalogueXmlPrinter printer = new CatalogueXmlPrinter(classificationService, modelService)
             printer.bind(element).writeTo(response.writer)
             return

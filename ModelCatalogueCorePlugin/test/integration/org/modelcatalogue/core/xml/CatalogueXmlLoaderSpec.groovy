@@ -26,13 +26,15 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
     def setupSpec() {
         initCatalogueService.initCatalogue(true)
 
-        new RelationshipType(
-                name: 'derivedFrom',
-                sourceClass: MeasurementUnit,
-                sourceToDestination: 'is derived from',
-                destinationClass: MeasurementUnit,
-                destinationToSource: 'derives'
-        ).save(failOnError: true)
+        if (!RelationshipType.findByName('derivedFrom')) {
+            new RelationshipType(
+                    name: 'derivedFrom',
+                    sourceClass: MeasurementUnit,
+                    sourceToDestination: 'is derived from',
+                    destinationClass: MeasurementUnit,
+                    destinationToSource: 'derives'
+            ).save(failOnError: true)
+        }
     }
 
     def setup() {

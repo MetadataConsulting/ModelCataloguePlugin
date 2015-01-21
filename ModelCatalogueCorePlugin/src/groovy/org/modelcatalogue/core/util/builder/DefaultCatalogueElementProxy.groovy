@@ -134,17 +134,20 @@ import org.modelcatalogue.core.ValueDomain
             if (value instanceof CatalogueElementProxy) {
                 def realValue = value.findExisting()
                 if (realValue?.latestVersionId && realValue?.latestVersionId != currentValue?.latestVersionId) {
-                    log.debug "$this has changed at least one property - property $key is now $realValue instead of ${currentValue}"
+                    log.debug "$this has changed at least one property - property $key\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
                     return true
                 }
                 if (realValue?.id != currentValue?.id) {
-                    log.debug "$this has changed at least one property - property $key is now $realValue instead of ${currentValue}"
+                    log.debug "$this has changed at least one property - property $key\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
                     return true
                 }
                 return false
             }
-            if (currentValue != value) {
-                log.debug "$this has changed at least one property - property $key is now $value instead of ${currentValue}"
+            if (normalizeWhitespace(currentValue) != normalizeWhitespace(value)) {
+                if (key == 'modelCatalogueId' && value?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
+                    return false
+                }
+                log.debug "$this has changed at least one property - property $key\n\n===NEW===\n${normalizeWhitespace(value)}\n===OLD===\n${normalizeWhitespace(currentValue)}\n========="
                 return true
             }
             return false
@@ -153,9 +156,9 @@ import org.modelcatalogue.core.ValueDomain
 
     private boolean isExtensionsChanged(T element) {
         extensions.any { String key, String value ->
-            boolean result = element.ext.get(key) != value
+            boolean result = normalizeWhitespace(element.ext.get(key)) != normalizeWhitespace(value)
             if (result) {
-                log.debug "$this has changed at least one extension - extension $key is now $value instead of ${element.ext.get(key)}"
+                log.debug "$this has changed at least one extension - extension $key\n\n===NEW===\n${normalizeWhitespace(value)}\n===OLD===\n${normalizeWhitespace(element.ext.get(key))}\n========="
             }
             result
         }
@@ -183,7 +186,7 @@ import org.modelcatalogue.core.ValueDomain
     }
 
     boolean isRelationshipsChanged() {
-        boolean result = relationships.any {
+        relationships.any {
             CatalogueElement source = it.source.findExisting()
 
             if (!source) return true
@@ -196,12 +199,12 @@ import org.modelcatalogue.core.ValueDomain
 
             if (!type) return true
 
-            !Relationship.countBySourceAndDestinationAndRelationshipType(source, destination, type)
+            boolean changed = !Relationship.countBySourceAndDestinationAndRelationshipType(source, destination, type)
+            if (changed) {
+                log.debug "$this has changed at least one relationship $it"
+            }
+            changed
         }
-        if (result) {
-            log.debug "$this has changed at least one relationship"
-        }
-        result
     }
 
     T findExisting() {
@@ -242,7 +245,7 @@ import org.modelcatalogue.core.ValueDomain
 
     private Map<String, Object> updateProperties(T element) {
         element.name = name
-        if (id) {
+        if (id && !id.startsWith(element.getDefaultModelCatalogueId(true))) {
             element.modelCatalogueId = id
         }
         parameters.each { String key, Object value ->
@@ -257,7 +260,6 @@ import org.modelcatalogue.core.ValueDomain
     private <T extends CatalogueElement> void updateExtensions(T element) {
         extensions.each { String key, String value ->
             if (element.ext.get(key) != value) {
-                log.debug "$this has changed - extension $key is now $value instead of ${element.ext.get(key)}"
                 element.ext.put(key, value)
             }
         }
@@ -313,5 +315,15 @@ import org.modelcatalogue.core.ValueDomain
         other.replacedBy = this
 
         this
+    }
+
+    static normalizeWhitespace(Object o) {
+        if (o instanceof CharSequence) {
+            return o.toString().replaceAll(/(?m)\s+/, ' ').trim()
+        }
+        if (!o) {
+            return ''
+        }
+        return o
     }
 }

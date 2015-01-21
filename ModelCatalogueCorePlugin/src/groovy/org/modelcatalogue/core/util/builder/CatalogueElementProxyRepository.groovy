@@ -215,7 +215,40 @@ class CatalogueElementProxyRepository {
         DetachedCriteria<T> criteria = new DetachedCriteria<T>(type).build {
             eq 'modelCatalogueId', id.toString()
         }
-        return getLatestFromCriteria(criteria)
+        T result = getLatestFromCriteria(criteria)
+
+        if (result) {
+            return result
+        }
+
+        // try to find it as it is a default id
+
+        def match = id.toString() =~ /\/(.\w+)\/(\d+)(\.(\d+))?$/
+
+        if (match) {
+            Long theId      = match[0][2] as Long
+            Integer version = match[0][4] as Integer
+
+            if (version) {
+                result = CatalogueElement.findByLatestVersionIdAndVersionNumber(theId, version) as T
+                if (result && result.getDefaultModelCatalogueId(false) == id.toString()) {
+                    return result
+                }
+                return null
+            }
+
+            result = CatalogueElement.findByLatestVersionId(theId, [sort: 'versionNumber', order: 'desc']) as T
+
+            if (result && id.toString().startsWith(result.getDefaultModelCatalogueId(true))) {
+                return result
+            }
+
+            result = CatalogueElement.get(theId) as T
+            if (result && result.getDefaultModelCatalogueId(true) == id.toString()) {
+                return result
+            }
+        }
+        return null
     }
 
     private <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {

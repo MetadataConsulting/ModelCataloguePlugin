@@ -6,7 +6,7 @@
 #= require ngInfiniteScroll/build/ng-infinite-scroll
 #= require angular-ui-router/release/angular-ui-router
 #= require google-diff-match-patch/javascript/diff_match_patch
-#= require angular-diff-match-patch-musketyr/angular-diff-match-patch.js
+#= require angular-diff-match-patch.js
 
 #= require modelcatalogue/util/index
 #= require modelcatalogue/util/ui/index

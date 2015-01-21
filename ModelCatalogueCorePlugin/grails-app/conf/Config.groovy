@@ -11,8 +11,8 @@ log4j = {
     debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
     debug 'grails.app.services.org.modelcatalogue.core.InitCatalogueService'
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
-//    debug 'org.modelcatalogue.core.util.builder'
-//    debug 'org.modelcatalogue.core.publishing'
+    debug 'org.modelcatalogue.core.util.builder'
+    debug 'org.modelcatalogue.core.publishing'
 
     warn 'org.modelcatalogue.core.xml'
 

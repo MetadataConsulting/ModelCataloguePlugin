@@ -102,6 +102,11 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     action: ->
       messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', ['$scope', 'messages', ($scope, messages) -> {
+    label:  "Import Catalogue XML"
+    action: ->
+      messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
+  }]
 
 
 

@@ -78,10 +78,10 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (element.hasModelCatalogueId()) {
             attrs.id   = element.modelCatalogueId
             if (!context.noHref) {
-                attrs.href = element.getDefaultModelCatalogueId(context.idWithoutVersion)
+                attrs.href = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
             }
         } else {
-            attrs.id = element.getDefaultModelCatalogueId(context.idWithoutVersion)
+            attrs.id = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
         }
 
         if (element.status != ElementStatus.FINALIZED) {
@@ -149,7 +149,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             if (context.noHref) {
                 return [ref: element.modelCatalogueId]
             }
-            return [ref: element.modelCatalogueId, href: element.getDefaultModelCatalogueId(context.idWithoutVersion)]
+            return [ref: element.modelCatalogueId, href: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
         }
 
         if (element.classifications) {
@@ -161,7 +161,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         }
 
 
-        return [ref: element.getDefaultModelCatalogueId(context.idWithoutVersion)]
+        return [ref: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
     }
 
     static Map<String, Object> relationship(Relationship relationship, boolean outgoing, PrintContext context) {

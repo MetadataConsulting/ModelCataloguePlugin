@@ -33,13 +33,15 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
 
         initCatalogueService.initCatalogue()
 
-        new RelationshipType(
-                name: 'derivedFrom',
-                sourceClass: MeasurementUnit,
-                sourceToDestination: 'is derived from',
-                destinationClass: MeasurementUnit,
-                destinationToSource: 'derives'
-        ).save(failOnError: true)
+        if (!RelationshipType.findByName('derivedFrom')) {
+            new RelationshipType(
+                    name: 'derivedFrom',
+                    sourceClass: MeasurementUnit,
+                    sourceToDestination: 'is derived from',
+                    destinationClass: MeasurementUnit,
+                    destinationToSource: 'derives'
+            ).save(failOnError: true)
+        }
     }
 
     def setup() {

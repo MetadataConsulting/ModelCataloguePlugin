@@ -5,6 +5,8 @@ import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
@@ -19,6 +21,8 @@ class DataImportController  {
     def LoincImportService
     def modelCatalogueSecurityService
     def executorService
+    def elementService
+    def classificationService
     def assetService
 
 
@@ -76,6 +80,24 @@ class DataImportController  {
                     ExcelLoader parser = new ExcelLoader(inputStream)
                     def (headers, rows) = parser.parse()
                     Collection<CatalogueElement> catElements =  dataImportService.importData(headers, rows, headersMap)
+                    makeRelationships(catElements, finalizeAsset(id))
+                } catch (Exception e) {
+                    logError(id, e)
+                }
+            }
+            redirectToAsset(id)
+            return
+        }
+
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xml")) {
+            def asset = storeAsset(params, file, 'application/xml')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+            HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
+            executorService.submit {
+                try {
+                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
+                    Collection<CatalogueElement> catElements = loader.load(inputStream)
                     makeRelationships(catElements, finalizeAsset(id))
                 } catch (Exception e) {
                     logError(id, e)

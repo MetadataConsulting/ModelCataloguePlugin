@@ -5,7 +5,7 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
 
         browsers: [
-            // 'Chrome'
+            'Chrome',
             'Firefox'
             // 'Safari',  // Safari keeps old tabs open causing testing multiple times
         ],

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptNewCatalogueXmlImport', ['mc.util.messages', 'angularFileUpload']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptNewMCImport', ['mc.util.messages', 'angularFileUpload']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', ($modal) ->
     (title, body, args) ->
       dialog = $modal.open {
@@ -20,7 +20,7 @@ angular.module('mc.core.ui.bs.modalPromptNewCatalogueXmlImport', ['mc.util.messa
               </div>
               <div class="form-group">
                 <label for="asset" class="">File</label>
-                <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".mc" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
+                <input ng-hide="uploading &amp;&amp; progress" type="file" accept=".xml" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
                 <progressbar value="progress" ng-show="uploading &amp;&amp; progress">{{progress}} %</progressbar>
               </div>
             </form>
@@ -36,5 +36,5 @@ angular.module('mc.core.ui.bs.modalPromptNewCatalogueXmlImport', ['mc.util.messa
 
       dialog.result
   ]
-  messagesProvider.setPromptFactory 'new-mc-import', factory
+  messagesProvider.setPromptFactory 'new-catalogue-xml-import', factory
 ]

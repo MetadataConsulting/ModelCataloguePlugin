@@ -79,7 +79,7 @@ class CatalogueXmlLoader {
 
 
     private void handleExtension(NodeChild element) {
-        builder.ext(element.@key.text(), element.text())
+        builder.ext(element.@key.text() ?: '', element.text() ?: '')
     }
 
     private void handleRelationship(NodeChild element, boolean outgoing, String relType = element.attributes()['relationshipType']) {
