@@ -32,6 +32,9 @@ class DataImportController  {
 
     protected static getErrors(Map params, MultipartFile file) {
         def errors = []
+        if (file && !params.name) {
+            params.name = file.originalFilename
+        }
         if (!params?.name) errors.add("no import name")
         if (!file) errors.add("no file")
         return errors

@@ -280,3 +280,11 @@ grails.assets.minifyOptions = [
 //grails.assets.bundle=false
 
 grails.assets.minifyJs = true
+
+
+grails.plugin.springsecurity.useBasicAuth = true
+grails.plugin.springsecurity.basic.realmName = "Model Catalogue"
+grails.plugin.springsecurity.filterChain.chainMap = [
+        '/catalogue/upload': 'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
+]

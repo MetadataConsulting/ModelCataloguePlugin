@@ -5,6 +5,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
 	static mappings = {
 
+        "/catalogue/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
         "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
 
