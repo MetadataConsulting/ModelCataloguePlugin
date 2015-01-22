@@ -6,18 +6,27 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 
 @Log4j
-class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> {
+class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> implements ExtensionAwareBuilder {
 
     final String relationshipTypeName
     final CatalogueElementProxy<T> source
     final CatalogueElementProxy<U> destination
+    final Map<String, String> extensions = [:]
 
-    // TODO: extend to be able to assign metadata as well
-
-    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination) {
+    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination, @DelegatesTo(ExtensionAwareBuilder) Closure extensions) {
         this.relationshipTypeName = relationshipTypeName
         this.source = source
         this.destination = destination
+        this.with extensions
+    }
+
+    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination, Map<String, String> extensions) {
+        this.relationshipTypeName = relationshipTypeName
+        this.source = source
+        this.destination = destination
+        if (extensions) {
+            this.extensions.putAll(extensions)
+        }
     }
 
     Relationship resolve() {
@@ -36,12 +45,24 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
                 log.error(relationship.errors)
                 throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement.")
             }
+            if (extensions) {
+                relationship.ext.putAll(extensions)
+            }
             return relationship
         } catch (Exception e) {
             throw new RuntimeException("Failed to resolve $this:\n\n$e", e)
         }
 
     }
+
+    void ext(String key, String value) {
+        extensions[key] = value
+    }
+
+    void ext(Map<String, String> values) {
+        extensions.putAll(values)
+    }
+
 
     @Override
     String toString() {

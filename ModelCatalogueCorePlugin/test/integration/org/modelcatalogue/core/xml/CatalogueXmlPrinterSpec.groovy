@@ -160,7 +160,11 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
                     }
                 }
                 model(name: 'Engine', id: "http://www.example.com/models/Engine") {
-                    dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion")
+                    dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
+                        relationship {
+                            ext 'Min. Occurs', '0'
+                        }
+                    }
                 }
             }
         }

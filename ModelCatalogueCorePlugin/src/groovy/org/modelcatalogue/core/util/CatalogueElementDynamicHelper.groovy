@@ -43,6 +43,18 @@ class CatalogueElementDynamicHelper {
                     }
                     delegate."get${direction.capitalize()}RelationsByType"(relType)
                 }
+                type.metaClass."get${name.capitalize()}Relationships" = {->
+                    RelationshipType relType = RelationshipType.findByName(relName)
+                    if (!relType) {
+                        log.warning "querying for $name for $delegate.name but the relationship type $relName does not exist"
+                        return []
+                    }
+                    if (!delegate.id) {
+                        log.info "trying to get relations on transient object, returning empty list"
+                        return []
+                    }
+                    delegate."get${direction.capitalize()}RelationshipsByType"(relType)
+                }
             }
             String countMethodName = "count${name.capitalize()}"
             if (!type.metaClass.metaMethods.any {it.name == countMethodName}) {

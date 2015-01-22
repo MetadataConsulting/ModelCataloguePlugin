@@ -22,7 +22,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         where:
         clazz                   | transients
         TestCatalogueElement1 | [*new ArrayList<String>(CatalogueElement.transients), 'parentOf', 'childOf', 'synonyms']
-        TestCatalogueElement2 | [*new ArrayList<String>(CatalogueElement.transients), 'parentOf', 'childOf', 'synonyms', 'b', 'd']
+        TestCatalogueElement2 | [*new ArrayList<String>(CatalogueElement.transients), 'parentOf', 'childOf', 'synonyms', 'br', 'dr']
 
     }
 
@@ -38,6 +38,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         expect:
         instance.hasProperty(prop)
         instance[prop]                          == []
+        instance[prop + 'Relationships']        == []
         instance."count${prop.capitalize()}"()  == 0
 
 
@@ -48,8 +49,8 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         TestCatalogueElement1   | 'childOf'
         TestCatalogueElement2   | 'parentOf'
         TestCatalogueElement2   | 'childOf'
-        TestCatalogueElement2   | 'b'
-        TestCatalogueElement2   | 'd'
+        TestCatalogueElement2   | 'br'
+        TestCatalogueElement2   | 'dr'
 
     }
 
@@ -75,7 +76,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         second.save()
 
         when:
-        Relationship relationship = first.addToB(second)
+        Relationship relationship = first.addToBr(second)
 
         then:
         relationship
@@ -85,7 +86,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         relationship.relationshipType   == type
 
         when:
-        Relationship relationship2 = first.removeFromB(second)
+        Relationship relationship2 = first.removeFromBr(second)
 
         then:
         relationship == relationship2 || !relationship2
@@ -107,8 +108,8 @@ class TestCatalogueElement1 extends CatalogueElement {
 class TestCatalogueElement2 extends TestCatalogueElement1 {
 
     static relationships = [
-        incoming: [a: 'b'],
-        outgoing: [c: 'd']
+        incoming: [a: 'br'],
+        outgoing: [c: 'dr']
     ]
 
 }

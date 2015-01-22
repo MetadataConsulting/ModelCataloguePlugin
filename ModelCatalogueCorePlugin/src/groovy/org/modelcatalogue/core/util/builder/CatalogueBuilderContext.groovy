@@ -18,7 +18,7 @@ class CatalogueBuilderContext {
 
     private static Set<Class> SUPPORTED_AS_CONTEXT  = [CatalogueElement, Classification, ValueDomain, DataType, Model, MeasurementUnit, DataElement]
 
-    private List<Map<Class, CatalogueElementProxy>> contexts = []
+    private List<Map<Class, ContextItem>> contexts = []
 
     private final CatalogueBuilder builder
 
@@ -42,15 +42,26 @@ class CatalogueBuilderContext {
      * @param contextElementType
      * @param closure
      */
-    public <T extends CatalogueElement, A extends CatalogueElementProxy<T>> WithOptionalOrClause withContextElement(Class<T> contextElementType, @DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options = ['A']) Closure closure) {
-        A contextElement = getContextElement(contextElementType) as A
+    public <T extends CatalogueElement> WithOptionalOrClause withContextElement(Class<T> contextElementType, @DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options = ['org.modelcatalogue.core.util.builder.CatalogueElementProxy<T>', 'org.modelcatalogue.core.util.builder.CatalogueElementProxy<T>,Closure']) Closure closure) {
+        ContextItem<T> contextElement = getContextElement(contextElementType) as ContextItem<T>
         if (contextElement) {
             closure.resolveStrategy = Closure.DELEGATE_FIRST
             closure.delegate = builder
-            closure(contextElement)
+            if (closure.maximumNumberOfParameters == 2) {
+                closure(contextElement.element, contextElement.relationshipConfiguration)
+            } else {
+                closure(contextElement.element)
+            }
             return WithOptionalOrClause.NOOP
         }
         new DefaultWithOptionalOrClause(builder)
+    }
+
+    void configureCurrentRelationship(@DelegatesTo(ExtensionAwareBuilder) Closure relationshipExtensionsConfiguration) {
+        ContextItem item = getContextElement(CatalogueElement, 1)
+        if (item) {
+            item.relationshipConfiguration = relationshipExtensionsConfiguration
+        }
     }
 
     private void pushContext() {
@@ -65,17 +76,22 @@ class CatalogueBuilderContext {
         if (!contextElement) {
             return contextElement
         }
+        ContextItem<T> item = new ContextItem<T>(element: contextElement)
         for (Class type in SUPPORTED_AS_CONTEXT) {
             if (type.isAssignableFrom(contextElement.domain)) {
-                contexts.last()[type] = contextElement
+                contexts.last()[type] = item
             }
         }
         contextElement
     }
 
-    private <T extends CatalogueElement, A extends CatalogueElementProxy<T>> A getContextElement(Class<T> contextElementType = CatalogueElement) {
-        for (Map<Class, CatalogueElementProxy> context in contexts.reverse()) {
-            A result = context[contextElementType] as A
+    private <T extends CatalogueElement> ContextItem<T> getContextElement(Class<T> contextElementType = CatalogueElement, int skip = 0) {
+        int skipped = 0
+        for (Map<Class, ContextItem> context in contexts.reverse()) {
+            if (skipped++ < skip) {
+                continue
+            }
+            ContextItem<T> result = context[contextElementType] as ContextItem<T>
             if (result) {
                 return result
             }
@@ -84,3 +100,9 @@ class CatalogueBuilderContext {
     }
 
 }
+
+class ContextItem<T extends CatalogueElement> {
+    CatalogueElementProxy<T> element
+    Closure relationshipConfiguration
+}
+

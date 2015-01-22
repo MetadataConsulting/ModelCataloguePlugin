@@ -6,7 +6,7 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 
 @Log4j
-class CatalogueBuilder {
+class CatalogueBuilder implements ExtensionAwareBuilder {
 
     private static Set<Class> SUPPORTED_FOR_AUTO    = [DataType, EnumeratedType, ValueDomain]
 
@@ -51,8 +51,8 @@ class CatalogueBuilder {
         CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification)
 
         context.withNewContext model, c
-        context.withContextElement(Model) {
-            child model
+        context.withContextElement(Model) { ignored, Closure relConf ->
+            child model, relConf
         }
 
         model
@@ -69,8 +69,8 @@ class CatalogueBuilder {
             }
         }
 
-        context.withContextElement(Model) {
-            contains element
+        context.withContextElement(Model) { ignored, Closure relConf ->
+            contains element, relConf
         }
 
         element
@@ -121,45 +121,49 @@ class CatalogueBuilder {
         unit
     }
 
-
-    void child(String classification, String name) {
-        rel "hierarchy" to classification, name
+    void relationship(@DelegatesTo(ExtensionAwareBuilder) Closure relationshipExtensionsConfiguration) {
+        context.configureCurrentRelationship(relationshipExtensionsConfiguration)
     }
 
-    void child(String name) {
-        rel "hierarchy" to name
+
+    void child(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        rel "hierarchy" to classification, name, extensions
     }
 
-    void child(CatalogueElementProxy<Model> model) {
-        rel "hierarchy" to model
+    void child(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        rel "hierarchy" to name, extensions
     }
 
-    void contains(String classification, String name) {
-        rel "containment" to classification, name
+    void child(CatalogueElementProxy<Model> model, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        rel "hierarchy" to model, extensions
     }
 
-    void contains(String name) {
-        rel "containment" to name
+    void contains(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        rel "containment" to classification, name, extensions
     }
 
-    void contains(CatalogueElementProxy<DataElement> element) {
-        rel "containment" to element
+    void contains(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        rel "containment" to name, extensions
     }
 
-    void basedOn(String classification, String name) {
+    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        rel "containment" to element, extensions
+    }
+
+    void basedOn(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
-            rel "base" from it.domain called classification, name
+            rel "base" from it.domain called classification, name, extensions
         }
     }
 
-    void basedOn(String name) {
+    void basedOn(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
-            rel "base" from it.domain called name
+            rel "base" from it.domain called name, extensions
         }
     }
 
-    void basedOn(CatalogueElementProxy<CatalogueElement> element) {
-        rel "base" from element
+    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        rel "base" from element, extensions
     }
 
     CatalogueElementProxy<? extends CatalogueElement> ref(String id) {
@@ -233,7 +237,7 @@ class CatalogueBuilder {
             return
         }
         context.withContextElement(Classification) {
-            element.addToPendingRelationships(new RelationshipProxy('classification', it, element))
+            element.addToPendingRelationships(new RelationshipProxy('classification', it, element, [:]))
         }
     }
 

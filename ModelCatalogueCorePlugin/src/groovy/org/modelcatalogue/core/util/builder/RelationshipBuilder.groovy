@@ -21,42 +21,42 @@ class RelationshipBuilder {
         this.type = RelationshipType.readByName(type)
     }
 
-    void to(String classification, String name) {
-        to repository.createAbstractionByClassificationAndName(getDestinationHintOrClass(), classification, name)
+    void to(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        to repository.createAbstractionByClassificationAndName(getDestinationHintOrClass(), classification, name), extensions
     }
 
-    void to(String name) {
+    void to(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         context.withContextElement(Classification) {
-            to repository.createAbstractionByClassificationAndName(getDestinationHintOrClass(), it.name, name)
+            to repository.createAbstractionByClassificationAndName(getDestinationHintOrClass(), it.name, name), extensions
         } or {
-            to repository.createAbstractionByName(getDestinationHintOrClass(), name)
+            to repository.createAbstractionByName(getDestinationHintOrClass(), name), extensions
         }
     }
 
 
-    public <T extends CatalogueElement> void to(CatalogueElementProxy<T> element) {
+    public <T extends CatalogueElement> void to(CatalogueElementProxy<T> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         context.withContextElement(getSourceHintOrClass()) {
-            return it.addToPendingRelationships(new RelationshipProxy(type.name, it, element))
+            return it.addToPendingRelationships(new RelationshipProxy(type.name, it, element, extensions))
         } or {
             throw new IllegalStateException("There is no contextual element available of type ${getSourceHintOrClass()}")
         }
     }
 
-    void from(String classification, String name) {
-        from repository.createAbstractionByClassificationAndName(getSourceHintOrClass(), classification, name)
+    void from(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+        from repository.createAbstractionByClassificationAndName(getSourceHintOrClass(), classification, name), extensions
     }
 
-    void from(String name) {
+    void from(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         context.withContextElement(Classification) {
-            from repository.createAbstractionByClassificationAndName(getSourceHintOrClass(), it.name, name)
+            from repository.createAbstractionByClassificationAndName(getSourceHintOrClass(), it.name, name), extensions
         } or {
-            from repository.createAbstractionByName(getSourceHintOrClass(), name)
+            from repository.createAbstractionByName(getSourceHintOrClass(), name), extensions
         }
     }
 
-    public <T extends CatalogueElement> void from(CatalogueElementProxy<T> element) {
+    public <T extends CatalogueElement> void from(CatalogueElementProxy<T> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         context.withContextElement(getDestinationHintOrClass()) {
-            return it.addToPendingRelationships(new RelationshipProxy(type.name, element, it))
+            return it.addToPendingRelationships(new RelationshipProxy(type.name, element, it, extensions))
         } or {
             throw new IllegalStateException("There is no contextual element available of type ${getDestinationHintOrClass()}")
         }
@@ -73,21 +73,21 @@ class RelationshipBuilder {
         this
     }
 
-    void called(String name) {
+    void called(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         if (sourceClassHint) {
-            from name
+            from name, extensions
         } else if (destinationClassHint) {
-            to name
+            to name, extensions
         } else {
             throw new IllegalStateException("Please set the domain hint first using to(Class) or from(Class) methods or use to(String) or from(String) methods directly")
         }
     }
 
-    void called(String classification, String name) {
+    void called(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         if (sourceClassHint) {
-            from classification, name
+            from classification, name, extensions
         } else if (destinationClassHint) {
-            to classification, name
+            to classification, name, extensions
         } else {
             throw new IllegalStateException("Please set the domain hint first using to(Class) or from(Class) methods or use to(String, String]) or from(String , String) methods directly")
         }

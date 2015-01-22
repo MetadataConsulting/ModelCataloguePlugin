@@ -22,7 +22,11 @@
             </valueDomain>
         </dataElement>
         <model name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
-            <dataElement ref="http://www.example.com/elements/Adhesion" />
+            <dataElement ref="http://www.example.com/elements/Adhesion">
+                <relationship>
+                    <extension key="Min. Occurs">0</extension>
+                </relationship>
+            </dataElement>
         </model>
     </model>
 </catalogue>

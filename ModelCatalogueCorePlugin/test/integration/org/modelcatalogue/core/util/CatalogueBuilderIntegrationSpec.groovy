@@ -506,6 +506,28 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     }
 
+    def "adds metadata to nested relationship like child model"() {
+        build {
+            model(name: "Parent 007") {
+                model(name: "Child 008") {
+                    relationship {
+                        ext "Min. Occurs", "1"
+                    }
+                }
+            }
+        }
+
+        when:
+        Relationship rel = Relationship.findBySourceAndDestination(Model.findByName('Parent 007'), Model.findByName('Child 008'))
+
+        then:
+        rel
+        rel.ext
+        rel.ext.size() == 1
+        rel.ext['Min. Occurs'] == '1'
+
+    }
+
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
         created = new CatalogueBuilder(classificationService, elementService).build cl
     }

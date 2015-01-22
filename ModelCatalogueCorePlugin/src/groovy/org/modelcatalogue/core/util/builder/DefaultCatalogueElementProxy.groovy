@@ -304,11 +304,11 @@ import org.modelcatalogue.core.ValueDomain
 
         other.relationships.each { RelationshipProxy relationship ->
             if (repository.equals(this, relationship.source)) {
-                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination))
+                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions))
             }
 
             if (repository.equals(this, relationship.destination)) {
-                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, relationship.source, this))
+                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, relationship.source, this, relationship.extensions))
             }
         }
 

@@ -129,21 +129,31 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
 
     List getIncomingRelationsByType(RelationshipType type) {
-        ListWithTotal<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type)
-        relationships.items.collect {
+        getIncomingRelationshipsByType(type).collect {
             it.source
         }
     }
 
     List getOutgoingRelationsByType(RelationshipType type) {
-        ListWithTotal<Relationship> relationships = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type)
-        relationships.items.collect {
+        getOutgoingRelationshipsByType(type).collect {
             it.destination
         }
     }
 
     List getRelationsByType(RelationshipType type) {
         [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
+    }
+
+    List getIncomingRelationshipsByType(RelationshipType type) {
+        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type).items
+    }
+
+    List getOutgoingRelationshipsByType(RelationshipType type) {
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type).items
+    }
+
+    List getRelationshipsByType(RelationshipType type) {
+        [getOutgoingRelationshipsByType(type), getIncomingRelationshipsByType(type)].flatten()
     }
 
     int countIncomingRelationsByType(RelationshipType type) {
