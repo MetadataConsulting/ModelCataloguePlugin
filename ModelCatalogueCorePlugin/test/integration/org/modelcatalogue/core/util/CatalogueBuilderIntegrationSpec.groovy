@@ -526,6 +526,29 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         rel.ext.size() == 1
         rel.ext['Min. Occurs'] == '1'
 
+
+        when:
+        elementService.finalizeElement(Model.findByName('Parent 007'))
+
+
+        then:
+        Model.findByName('Parent 007').status == ElementStatus.FINALIZED
+
+        when:
+        build {
+            model(name: "Parent 007") {
+                model(name: "Child 008") {
+                    relationship {
+                        ext "Min. Occurs", "0"
+                    }
+                }
+            }
+        }
+
+        then:
+        Model.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == ElementStatus.DRAFT
+
+
     }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {

@@ -199,11 +199,20 @@ import org.modelcatalogue.core.ValueDomain
 
             if (!type) return true
 
-            boolean changed = !Relationship.countBySourceAndDestinationAndRelationshipType(source, destination, type)
-            if (changed) {
+            Relationship found = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, type)
+
+            if (!found) {
                 log.debug "$this has changed at least one relationship $it"
+                return true
             }
-            changed
+
+
+            if (it.extensions != found.ext) {
+                log.debug "$this has changed at least one relationship $it. it has changed metadata. old: ${found.ext}, new: ${it.extensions}"
+                return true
+            }
+
+            return false
         }
     }
 
