@@ -9,6 +9,7 @@ import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
@@ -132,6 +133,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         domain.regexDef == /\d+/
         domain.countRelatedTo() == 1
         domain.relatedTo.contains(pressure)
+        domain.relatedToRelationships.find { it.destination.name == 'Pressure' }?.ext == [Relation: 'Derived From']
     }
 
     def "read simple data element"(){
@@ -178,6 +180,12 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         model.contains.first().name == 'Factor of Adhesion'
         model.countParentOf() == 1
         model.parentOf.first().name == 'Engine'
+
+        when:
+        Model engine = loaded.find { it.name == 'Engine' } as Model
+
+        then:
+        engine.containsRelationships.find { Relationship rel -> rel.destination.name == 'Factor of Adhesion'}?.ext == ['Min. Occurs': '0']
 
     }
 

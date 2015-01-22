@@ -9,6 +9,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipType
@@ -60,8 +61,10 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
     }
 
     def "write enumerated type"() {
+        def type = gender
         expect:
-        similar gender, 'gender.catalogue.xml'
+        type instanceof EnumeratedType
+        similar type, 'gender.catalogue.xml'
     }
 
     def "write simple value domain"() {
@@ -202,7 +205,9 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
                     description "The newton (symbol: N) is the International System of Units (SI) derived unit of force."
                     ext "From", "SI"
                 }
-                rel "relatedTo" to 'Pressure'
+                rel "relatedTo" to 'Pressure', {
+                    ext 'Relation', 'Derived From'
+                }
             }
         }
 

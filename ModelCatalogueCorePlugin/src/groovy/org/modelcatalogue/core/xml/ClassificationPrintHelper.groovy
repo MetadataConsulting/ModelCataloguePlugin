@@ -11,23 +11,19 @@ class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classificati
     }
 
     @Override
-    void processElements(Object theMkp, Classification element, PrintContext context) {
-        theMkp.yield {
-            super.processElements(mkp, element, context)
+    void processElements(Object theMkp, Classification element, PrintContext context, Relationship rel) {
+        super.processElements(theMkp, element, context, rel)
 
-            for (CatalogueElement other in context.modelService.getTopLevelModels([element], [:]).items) {
-                    printElement(mkp, other, context)
-            }
+        for (CatalogueElement other in context.modelService.getTopLevelModels([element], [:]).items) {
+                printElement(theMkp, other, context, null)
+        }
 
-            for (Class<? extends CatalogueElement> type in [Model, DataElement, ValueDomain, DataType, MeasurementUnit]) {
-                for (CatalogueElement other in allClassified(type, element, context)) {
-                    if (!context.wasPrinted(other)) {
-                        printElement(mkp, other, context)
-                    }
+        for (Class<? extends CatalogueElement> type in [Model, DataElement, ValueDomain, DataType, MeasurementUnit]) {
+            for (CatalogueElement other in allClassified(type, element, context)) {
+                if (!context.wasPrinted(other)) {
+                    printElement(theMkp, other, context, null)
                 }
             }
-
-
         }
     }
 

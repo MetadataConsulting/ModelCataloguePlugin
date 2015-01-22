@@ -11,6 +11,7 @@ import org.modelcatalogue.core.util.builder.CatalogueBuilder
 class CatalogueXmlLoader {
 
     private static final List<String> IGNORED_ATTRS = ['href']
+    private static final List<String> CATALOGUE_ELEMENT_ELEMENTS = ['classification', 'model', 'dataElement', 'valueDomain', 'dataType', 'measurementUnit', 'unitOfMeasure']
 
     CatalogueBuilder builder
 
@@ -66,6 +67,7 @@ class CatalogueXmlLoader {
             case 'extensions': handleChildren(element) ; break
             case 'relationships': handleChildren(element) ; break
             case 'enumerations': break // handled by data type
+            case 'metadata': handleMetadata(element) ; break
             case 'extension': handleExtension(element) ; break
             case 'relatedTo': handleRelationship(element, true, 'relatedTo') ; break
             case 'synonym': handleRelationship(element, true, 'synonym') ; break
@@ -82,9 +84,23 @@ class CatalogueXmlLoader {
         builder.ext(element.@key.text() ?: '', element.text() ?: '')
     }
 
+    private void handleMetadata(NodeChild element) {
+        if (element.parent()?.name() in CATALOGUE_ELEMENT_ELEMENTS) {
+            builder.relationship {
+                element.extension.each {
+                    ext(it.@key.text() ?: '', element.text() ?: '')
+                }
+            }
+        }
+    }
+
     private void handleRelationship(NodeChild element, boolean outgoing, String relType = element.attributes()['relationshipType']) {
         if (element.attributes().containsKey('ref')) {
-            builder.rel(relType)."${outgoing ? 'to' : 'from'}"(builder.ref(element.attributes()['ref'].toString()))
+            builder.rel(relType)."${outgoing ? 'to' : 'from'}"(builder.ref(element.attributes()['ref'].toString())) {
+                element.metadata.extension.each() {
+                    ext(it.@key.text() ?: '', element.text() ?: '')
+                }
+            }
             return
         }
         if (!element.attributes().containsKey('name')) {
@@ -92,10 +108,18 @@ class CatalogueXmlLoader {
             return
         }
         if (element.attributes().containsKey('classification')) {
-            builder.rel(relType)."${outgoing ? 'to' : 'from'}"(element.attributes()['classification'].toString(), element.attributes()['name'].toString())
+            builder.rel(relType)."${outgoing ? 'to' : 'from'}"(element.attributes()['classification'].toString(), element.attributes()['name'].toString()) {
+                element.metadata.extension.each() {
+                    ext(it.@key.text() ?: '', element.text() ?: '')
+                }
+            }
             return
         }
-        builder.rel(relType)."${outgoing ? 'to' : 'from'}"(element.attributes()['name'].toString())
+        builder.rel(relType)."${outgoing ? 'to' : 'from'}"(element.attributes()['name'].toString()) {
+            element.metadata.extension.each() {
+                ext(it.@key.text() ?: '', element.text() ?: '')
+            }
+        }
     }
 
     private void handleDescription(NodeChild element) {

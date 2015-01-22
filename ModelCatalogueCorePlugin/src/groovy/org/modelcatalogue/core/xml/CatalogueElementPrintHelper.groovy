@@ -31,7 +31,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         throw new IllegalArgumentException("Not yet implemented for $type")
     }
 
-    static void printElement(theMkp, CatalogueElement element, PrintContext context, String elementName = null) {
+    static void printElement(theMkp, CatalogueElement element, PrintContext context, Relationship rel, String elementName = null) {
         CatalogueElementPrintHelper helper = get(element.class)
         if (!elementName) {
             elementName = helper.topLevelName
@@ -39,8 +39,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
         if (element instanceof Classification) {
             if (context.currentClassification) {
-                theMkp.yield {
-                    "${elementName}"(ref(element, context))
+                theMkp."${elementName}"(ref(element, context)) {
+                    processRelationshipMetadata(theMkp, rel)
                 }
                 return
             }
@@ -48,18 +48,16 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         }
 
         if (context.wasPrinted(element)) {
-            theMkp.yield {
-                "${elementName}"(ref(element, context))
+            theMkp."${elementName}"(ref(element, context)) {
+                processRelationshipMetadata(theMkp, rel)
             }
             return
         }
 
         context.markAsPrinted(element)
 
-        theMkp.yield {
-            "${elementName}"(helper.collectAttributes(element, context)) {
-                helper.processElements(mkp, element, context)
-            }
+        theMkp."${elementName}"(helper.collectAttributes(element, context)) {
+            helper.processElements(theMkp, element, context, rel)
         }
 
         if (element instanceof Classification) {
@@ -95,43 +93,62 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         attrs
     }
 
-    void processElements(theMkp, E element, PrintContext context) {
-        theMkp.yield {
-            if (element.description) {
-                description element.description
+    void processElements(theMkp, E element, PrintContext context, Relationship relationship) {
+        if (element.description) {
+            theMkp.description element.description
+        }
+        for (Relationship rel in element.isBasedOnRelationships) {
+            theMkp.basedOn(ref(rel.source, context)) {
+                processRelationshipMetadata(theMkp, rel)
             }
-            for (CatalogueElement other in element.isBasedOn) {
-                basedOn(ref(other, context))
+        }
+        for (Relationship rel in element.relatedToRelationships) {
+            CatalogueElement other = rel.source == element ? rel.destination : rel.source
+            theMkp.relatedTo(ref(other, context)) {
+                processRelationshipMetadata(theMkp, rel)
             }
-            for (CatalogueElement other in element.relatedTo) {
-                relatedTo(ref(other, context))
+        }
+        for (Relationship rel in element.isSynonymForRelationships) {
+            CatalogueElement other = rel.source == element ? rel.destination : rel.source
+            theMkp.synonym(ref(other, context)){
+                processRelationshipMetadata(theMkp, rel)
             }
-            for (CatalogueElement other in element.isSynonymFor) {
-                synonym(ref(other, context))
+        }
+        if (element.ext) {
+            theMkp.extensions {
+                for (Map.Entry<String, String> entry in element.ext.entrySet()) {
+                    extension(key: entry.key, entry.value)
+                }
             }
-            if (element.ext) {
-                extensions {
-                    for (Map.Entry<String, String> entry in element.ext.entrySet()) {
-                            extension(key: entry.key, entry.value)
+        }
+
+        processRelationshipMetadata(theMkp, relationship)
+
+        List<Relationship> outgoing = restOfRelationships(Relationship.where { source == element }).list()
+        List<Relationship> incoming = restOfRelationships(Relationship.where { destination == element }).list()
+
+        if (outgoing || incoming) {
+            theMkp.relationships {
+                for (Relationship rel in outgoing){
+                    to(relationshipAttrs(rel, true, context)) {
+                        processRelationshipMetadata(theMkp, rel)
+                    }
+                }
+
+                for (Relationship rel in incoming){
+                    from(relationshipAttrs(rel, false, context)) {
+                        processRelationshipMetadata(theMkp, rel)
                     }
                 }
             }
+        }
+    }
 
-
-
-
-            List<Relationship> outgoing = restOfRelationships(Relationship.where { source == element }).list()
-            List<Relationship> incoming = restOfRelationships(Relationship.where { destination == element }).list()
-
-            if (outgoing || incoming) {
-                relationships {
-                    for (Relationship rel in outgoing){
-                        to(relationship(rel, true, context))
-                    }
-
-                    for (Relationship rel in incoming){
-                        from(relationship(rel, false, context))
-                    }
+    static void processRelationshipMetadata(theMkp, Relationship rel) {
+        if (rel?.ext) {
+            theMkp.metadata {
+                for (Map.Entry<String, String> entry in rel.ext.entrySet()) {
+                    extension(key: entry.key, entry.value)
                 }
             }
         }
@@ -164,7 +181,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         return [ref: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
     }
 
-    static Map<String, Object> relationship(Relationship relationship, boolean outgoing, PrintContext context) {
+    static Map<String, Object> relationshipAttrs(Relationship relationship, boolean outgoing, PrintContext context) {
         Map<String, Object> ret = ref(outgoing ? relationship.destination : relationship.source, context)
         ret.relationshipType = relationship.relationshipType.name
         if (!ret.ref) {

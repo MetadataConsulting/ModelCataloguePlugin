@@ -22,8 +22,8 @@ class CatalogueXmlPrinter {
         context.with contextConfigurer
         StreamingMarkupBuilder builder = new StreamingMarkupBuilder()
         builder.bind {
-            catalogue ('xmlns' : NAMESPACE_URL) {
-                CatalogueElementPrintHelper.printElement(mkp, element, context)
+            catalogue ('xmlns' : NAMESPACE_URL) { doc ->
+                CatalogueElementPrintHelper.printElement(doc, element, context, null)
             }
         }
     }

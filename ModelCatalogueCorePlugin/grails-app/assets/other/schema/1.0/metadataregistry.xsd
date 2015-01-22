@@ -125,6 +125,11 @@
                 (this is quite common for value domains and it's data types)
             </xs:documentation>
         </xs:annotation>
+        <xs:sequence>
+            <xs:sequence>
+                <xs:element name="metadata" type="mdr:Extensions" minOccurs="0"/>
+            </xs:sequence>
+        </xs:sequence>
         <xs:attribute name="name"           type="mdr:Name" />
         <xs:attribute name="classification" type="mdr:Name" />
         <xs:attribute name="ref"            type="mdr:ID" />
@@ -151,9 +156,6 @@
     <xs:complexType name="Relationship">
         <xs:complexContent>
             <xs:extension base="mdr:Reference">
-                <xs:sequence>
-                    <xs:element name="metadata" type="mdr:Extensions" minOccurs="0"/>
-                </xs:sequence>
                 <xs:attribute name="relationshipType" type="mdr:RelationshipType" use="required"/>
             </xs:extension>
         </xs:complexContent>
@@ -183,7 +185,6 @@
                         <xs:element name="synonym"      type="mdr:Reference"/>
                     </xs:choice>
                     <xs:element name="extensions"       type="mdr:Extensions"    minOccurs="0"/>
-                    <xs:element name="relationship"     type="mdr:Extensions"    minOccurs="0"/>
                     <xs:element name="relationships"    type="mdr:Relationships" minOccurs="0"/>
                 </xs:sequence>
                 <xs:attribute name="id"     type="mdr:ID"/>

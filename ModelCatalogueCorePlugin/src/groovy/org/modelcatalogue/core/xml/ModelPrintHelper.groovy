@@ -2,6 +2,7 @@ package org.modelcatalogue.core.xml
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.Relationship
 
 /**
  * Created by ladin on 15.01.15.
@@ -14,15 +15,13 @@ class ModelPrintHelper extends CatalogueElementPrintHelper<Model> {
     }
 
     @Override
-    void processElements(Object theMkp, Model element, PrintContext context) {
-        theMkp.yield {
-            super.processElements(mkp, element, context)
-            for (CatalogueElement other in element.contains) {
-                printElement(mkp, other, context)
-            }
-            for (CatalogueElement other in element.parentOf) {
-                printElement(mkp, other, context)
-            }
+    void processElements(Object mkp, Model element, PrintContext context, Relationship relationship) {
+        super.processElements(mkp, element, context, relationship)
+        for (Relationship rel in element.containsRelationships) {
+            printElement(mkp, rel.destination, context, rel)
+        }
+        for (Relationship rel in element.parentOfRelationships) {
+            printElement(mkp, rel.destination, context, rel)
         }
     }
 }

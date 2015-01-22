@@ -2,6 +2,7 @@ package org.modelcatalogue.core.xml
 
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.Relationship
 
 /**
  * Created by ladin on 15.01.15.
@@ -14,14 +15,12 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
     }
 
     @Override
-    void processElements(Object theMkp, DataType element, PrintContext context) {
-        theMkp.yield {
-            super.processElements(mkp, element, context)
-            if (element instanceof EnumeratedType) {
-                enumerations {
-                    for (Map.Entry<String, String> entry in element.enumerations) {
-                        enumeration(value: entry.key, entry.value)
-                    }
+    void processElements(Object mkp, DataType element, PrintContext context, Relationship rel) {
+        super.processElements(mkp, element, context, rel)
+        if (element instanceof EnumeratedType) {
+            mkp.enumerations {
+                for (Map.Entry<String, String> entry in element.enumerations) {
+                    enumeration(value: entry.key, entry.value)
                 }
             }
         }
