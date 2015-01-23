@@ -23,6 +23,8 @@ class InitCatalogueService {
 
     def initDefaultDataTypes(boolean failOnError = false) {
         CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
+        builder.skip ElementStatus.DRAFT
+
         GroovyShell shell = prepareGroovyShell(builder)
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
 

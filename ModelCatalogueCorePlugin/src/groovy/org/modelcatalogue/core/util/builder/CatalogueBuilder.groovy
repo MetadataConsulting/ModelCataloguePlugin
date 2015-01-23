@@ -16,6 +16,8 @@ class CatalogueBuilder implements ExtensionAwareBuilder {
     private Set<CatalogueElement> created = []
     private Set<Class> createAutomatically = []
 
+    private boolean skipDrafts
+
 
     CatalogueBuilder(ClassificationService classificationService, ElementService elementService) {
         this.repository = new CatalogueElementProxyRepository(classificationService, elementService)
@@ -27,7 +29,7 @@ class CatalogueBuilder implements ExtensionAwareBuilder {
         CatalogueBuilder self = this
         self.with c
 
-        created = repository.resolveAllProxies()
+        created = repository.resolveAllProxies(skipDrafts)
 
         // we don't want to keep any references in this point
         context.clear()
@@ -202,6 +204,14 @@ class CatalogueBuilder implements ExtensionAwareBuilder {
         values.each { String key, String value ->
             ext key, value
         }
+    }
+
+    void skip(ElementStatus draft) {
+        if (draft == ElementStatus.DRAFT) {
+            skipDrafts = true
+            return
+        }
+        throw new IllegalArgumentException("Only 'draft' is expected after 'skip' keyword")
     }
 
     static Class<Classification> getClassification() { Classification }

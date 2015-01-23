@@ -54,7 +54,7 @@ class CatalogueElementProxyRepository {
         return a.classification == b.classification && a.name == b.name
     }
 
-    public Set<CatalogueElement> resolveAllProxies() {
+    public Set<CatalogueElement> resolveAllProxies(boolean skipDirtyChecking) {
         Set<CatalogueElement> created = []
 
         Set<CatalogueElementProxy> toBeResolved     = []
@@ -88,16 +88,18 @@ class CatalogueElementProxyRepository {
             }
         }
 
-        // Step 1:check something changed this must run before any other resolution happens
-        for (CatalogueElementProxy element in toBeResolved) {
-            if (element.changed) {
-                element.requestDraft()
+        if (!skipDirtyChecking) {
+            // Step 1:check something changed this must run before any other resolution happens
+            for (CatalogueElementProxy element in toBeResolved) {
+                if (element.changed) {
+                    element.requestDraft()
+                }
             }
-        }
 
-        // Step 2: if something changed, create new versions. if run in one step, it generates false changes
-        for (CatalogueElementProxy element in toBeResolved) {
-            element.createDraftIfRequested()
+            // Step 2: if something changed, create new versions. if run in one step, it generates false changes
+            for (CatalogueElementProxy element in toBeResolved) {
+                element.createDraftIfRequested()
+            }
         }
 
 
