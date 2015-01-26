@@ -48,7 +48,8 @@ class ReportDescriptorBuilder {
     }
 
     ReportDescriptorBuilder link(Map<String, Object> linkParams) {
-        descriptor.linkParams = { linkParams } ; this
+        def copy = new HashMap(linkParams)
+        descriptor.linkParams = { copy } ; this
     }
 
     ReportDescriptorBuilder link(Closure<Map<String, Object>> linkParams) {

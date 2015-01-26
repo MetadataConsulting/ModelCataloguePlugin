@@ -80,7 +80,17 @@ class ReportDescriptor {
             }
         }
 
-        generator.link(params)
+        Exception cme = null
+
+        for (int i = 0; i < 10 ; i++) {
+            try {
+                return generator.link(params)
+            } catch (ConcurrentModificationException | ArrayIndexOutOfBoundsException e) {
+                log.warn("Exception happened generating report descriptor", e)
+                cme = e
+            }
+        }
+        throw new IllegalStateException("Unable to generate link after 10 attempts", cme)
     }
 
     String getTitle(Object model) {
