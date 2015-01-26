@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 
 class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
@@ -547,8 +548,58 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         Model.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == ElementStatus.DRAFT
+    }
 
 
+    def "migrates hierarchy relationship to new draft version"() {
+        build {
+            model(name: 'MHR ROOT') {
+                status finalized
+                model(name: 'MHR L1') {
+                    status finalized
+                    model(name: 'MHR L2') {
+                        status finalized
+                        model(name: 'MHR L3') {
+                            status finalized
+                        }
+
+                    }
+
+                }
+
+            }
+        }
+
+        Model l1Finalized = Model.findByName('MHR L1')
+
+        expect:
+        l1Finalized
+        l1Finalized.status == ElementStatus.FINALIZED
+        l1Finalized.countParentOf() == 1
+
+        when:
+        Model l1Draft = elementService.createDraftVersion(l1Finalized, DraftContext.userFriendly())
+
+        then:
+        l1Draft
+        l1Draft.status == ElementStatus.DRAFT
+        l1Draft.countParentOf() == 1
+
+        when:
+        Model l3Finalized = Model.findByName('MHR L3')
+
+        then:
+        l3Finalized
+        l3Finalized.countChildOf() == 1
+
+        when:
+        Model l3Draft = elementService.createDraftVersion(l3Finalized, DraftContext.userFriendly())
+
+        then:
+        l3Draft
+        l3Draft.status == ElementStatus.DRAFT
+        l3Draft.countChildOf()  == 1
+        l1Draft.countParentOf() == 1
     }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {

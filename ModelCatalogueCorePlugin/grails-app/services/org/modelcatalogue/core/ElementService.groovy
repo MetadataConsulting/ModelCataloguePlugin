@@ -33,15 +33,15 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext strategy) {
+    public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context) {
         CatalogueElement.withTransaction { TransactionStatus status ->
-            E draft = element.createDraftVersion(this, strategy) as E
+            E draft = element.createDraftVersion(this, context) as E
             if (draft.hasErrors()) {
                 status.setRollbackOnly()
                 return element
             }
-            strategy.classifyDrafts()
-            strategy.resolvePendingRelationships()
+            context.classifyDrafts()
+            context.resolvePendingRelationships()
             draft
         }
     }

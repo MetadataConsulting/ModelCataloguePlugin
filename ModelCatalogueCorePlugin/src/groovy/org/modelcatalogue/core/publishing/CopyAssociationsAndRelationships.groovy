@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 
@@ -36,14 +37,39 @@ class CopyAssociationsAndRelationships {
         RelationshipType supersession =  RelationshipType.readByName('supersession')
         RelationshipType classification = RelationshipType.readByName('classification')
 
+        List<Relationship> incomingToRemove = []
+        List<Relationship> outgoingToRemove = []
+
         for (Relationship r in element.incomingRelationships) {
             if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
-            draft.createLinkFrom(DraftContext.preferDraft(r.source), r.relationshipType)
+            Relationship created = draft.createLinkFrom(DraftContext.preferDraft(r.source), r.relationshipType)
+            if (created.hasErrors()) {
+                throw new IllegalStateException("Migrated relationship contains errors: $created.errors")
+            }
+            created.ext = r.ext
+            if (isOverriding(created, r)) {
+                incomingToRemove << r
+            }
         }
 
         for (Relationship r in element.outgoingRelationships) {
             if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
-            draft.createLinkTo(DraftContext.preferDraft(r.destination), r.relationshipType)
+            Relationship created = draft.createLinkTo(DraftContext.preferDraft(r.destination), r.relationshipType)
+            if (created.hasErrors()) {
+                throw new IllegalStateException("Migrated relationship contains errors: $created.errors")
+            }
+            created.ext = r.ext
+            if (isOverriding(created, r)) {
+                outgoingToRemove << r
+            }
+        }
+
+        for (Relationship r in incomingToRemove) {
+            element.removeLinkFrom(r.source, r.relationshipType)
+        }
+
+        for (Relationship r in outgoingToRemove) {
+            element.removeLinkTo(r.destination, r.relationshipType)
         }
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(draft.class.name) as GrailsDomainClass
@@ -57,6 +83,19 @@ class CopyAssociationsAndRelationships {
             }
         }
 
+    }
+
+    static boolean isOverriding(Relationship created, Relationship old) {
+        if (!(created.source.status == ElementStatus.DRAFT && created.destination.status == ElementStatus.DRAFT)) {
+            return false
+        }
+        if (old.source.status == ElementStatus.DRAFT && old.destination.status != ElementStatus.DRAFT) {
+            return true
+        }
+        if (old.source.status != ElementStatus.DRAFT && old.destination.status == ElementStatus.DRAFT) {
+            return true
+        }
+        return false
     }
 
     boolean equals(o) {
