@@ -10,7 +10,19 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeview.html'
 
-    controller: ['$scope', 'enhance', '$stateParams', ($scope, enhance, $stateParams) ->
+    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', ($scope, enhance, $stateParams, $rootScope) ->
+      setLastListToRootScope = (newList) ->
+        return unless newList
+        $rootScope.$$lastTreeLists ?= {}
+        $rootScope.$$lastTreeLists[newList.base] = newList
+
+
+      getLastListFromRootScope = (base) ->
+        return undefined unless base
+        return undefined if not $rootScope.$$lastTreeLists
+        return $rootScope.$$lastTreeLists[base]
+
+
       listEnhancer = enhance.getEnhancer('list')
 
       $scope.mode     = if $scope.element then 'element' else 'list'
@@ -24,12 +36,23 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
         return if list.$$children
         list.$$children = []
         for item in list.list
-          $scope.list.$$children.push item
+          cachedChild = if list.$$cachedChildren then list.$$cachedChildren[item.link] else undefined
+          $scope.list.$$children.push(angular.extend(cachedChild ? {}, item))
 
-      onListChange = (list) ->
+      onListChange = (list, oldList) ->
         return if not list
+
+        console.log 'old:', angular.copy(oldList), 'new:', angular.copy(list)
+
+        if oldList
+          list.$$cachedChildren = oldList.$$cachedChildren ? {}
+
+          for child in oldList.$$children
+            list.$$cachedChildren[child.link] = child
+
         addItemsFromList(list)
         nextFun = list.next
+        setLastListToRootScope(list)
 
       $scope.showMore = () ->
         return unless $scope.list.total > $scope.list.$$children.length
@@ -41,7 +64,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
           nextFun = list.next
 
       if $scope.mode == 'list'
-        onListChange $scope.list
+        onListChange $scope.list, getLastListFromRootScope($scope.list?.base)
         $scope.$watch 'list', onListChange
     ]
   }

@@ -102,8 +102,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 ])
 
 .controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope) ->
-    listEnhancer    = enhance.getEnhancer('list')
-
     if $stateParams.resource
       applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
@@ -117,17 +115,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     if $scope.resource == 'model'
       if $rootScope.$$lastModels? and angular.equals($stateParams,$rootScope.$$lastModels.params)
-        $scope.list = $rootScope.$$lastModels.list
-        $scope.element = $rootScope.$$lastModels.element
-        # let's say it's more convenient if you get back to expanded tree that the parent is selected but
-        # if this behaviour will be unintuitive as well just remove the line bellow
-        $scope.elementSelectedInTree = $rootScope.$$lastModels.elementSelectedInTree
+        $scope.element                = $rootScope.$$lastModels.element
+        $scope.elementSelectedInTree  = $rootScope.$$lastModels.elementSelectedInTree
+
       else
         $rootScope.$$lastModels =
-          list:   $scope.list
           params: angular.copy($stateParams)
-        for item in $scope.list
-          item._containedElements_ ?= listEnhancer.createEmptyList('org.modelcatalogue.core.Relationship')
 
       $scope.$on 'treeviewElementSelected', (event, element) ->
         $scope.element                  = element

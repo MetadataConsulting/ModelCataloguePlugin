@@ -47,7 +47,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
-        respond Lists.lazy(params, resource, "/${resourceName}/search", { results.searchResults }, { results.total })
+        respond Lists.lazy(params, resource, "/${resourceName}/search?search=${URLEncoder.encode(params.search, 'UTF-8')}", { results.searchResults }, { results.total })
     }
 
     protected handleParams(Integer max) {
