@@ -114,23 +114,25 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.property                 = 'contains'
 
     if $scope.resource == 'model'
-      if $rootScope.$$lastModels? and angular.equals($stateParams,$rootScope.$$lastModels.params)
-        $scope.element                = $rootScope.$$lastModels.element
-        $scope.elementSelectedInTree  = $rootScope.$$lastModels.elementSelectedInTree
-
+      if $rootScope.$$lastModels
+        $scope.element                = $rootScope.$$lastModels[$scope.list.base]?.element
+        $scope.elementSelectedInTree  = $rootScope.$$lastModels[$scope.list.base]?.elementSelectedInTree
       else
-        $rootScope.$$lastModels =
-          params: angular.copy($stateParams)
+        $rootScope.$$lastModels = {}
 
       $scope.$on 'treeviewElementSelected', (event, element) ->
         $scope.element                  = element
         $scope.elementSelectedInTree    = true
-        $rootScope.$$lastModels.element = element
-        $rootScope.$$lastModels.elementSelectedInTree = true
+        $rootScope.$$lastModels ?= {}
+        $rootScope.$$lastModels[$scope.list.base] = element: element, elementSelectedInTree: true
 
       $scope.$on 'newVersionCreated', (ignored, element) ->
         if element
           $scope.property = 'history'
+
+        if $stateParams.status != 'draft'
+          $state.go '.', {status: 'draft'}
+
   ])
 .config(['$stateProvider', ($stateProvider) ->
 

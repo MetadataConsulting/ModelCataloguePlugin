@@ -43,8 +43,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       .then ->
         messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then ->
           if $scope.resource == 'model' and $state.current.name == 'mc.resource.list'
-            # remove cached tree
-            $rootScope.$$lastModels = undefined
             # reload in draft mode
             $state.go '.', {status: 'draft'}, {reload: true}
       , (errors)->
