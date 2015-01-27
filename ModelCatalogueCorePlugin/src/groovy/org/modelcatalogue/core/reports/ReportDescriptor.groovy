@@ -86,7 +86,7 @@ class ReportDescriptor {
             try {
                 return generator.link(params)
             } catch (ConcurrentModificationException | ArrayIndexOutOfBoundsException e) {
-                log.warn("Exception happened generating report descriptor", e)
+                log.warn("Ignoring exception which happened generating report descriptor and retrying", e)
                 cme = e
             }
         }
