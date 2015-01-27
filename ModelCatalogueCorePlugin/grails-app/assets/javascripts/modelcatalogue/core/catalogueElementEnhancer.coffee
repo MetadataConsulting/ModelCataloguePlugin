@@ -79,8 +79,8 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               else
                 return @name
 
+          self.getUpdatableProperties = -> angular.copy(@updatableProperties)
 
-        getUpdatableProperties: () -> angular.copy(@updatableProperties)
       # wrap original element
       new CatalogueElement(element)
   ]
