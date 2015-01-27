@@ -31,16 +31,6 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.currentDescend = $scope.descend
           $scope.nextDescend    = $scope.descend
 
-      resetHelperProperties = (element) ->
-        if element? and element[$scope.currentDescend]
-          $scope.element.$$numberOfChildren = $scope.element[$scope.currentDescend].total
-        else
-          $scope.element.$$numberOfChildren = 0
-
-        $scope.element.$$children         ?= []
-        $scope.element.$$collapsed        ?= true
-        $scope.element.$$showMore         ?= ->
-        $scope.element.$$active           ?= false
 
       loadMoreIfNeeded = ->
         return if not $scope.element.$$numberOfChildren > $scope.element.$$children?.length
@@ -66,9 +56,20 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
             $scope.element.$$showingMore = false
 
       loadNewChildren = (firstList) ->
+        $scope.element.$$cachedChildren = {}
+        for child in $scope.element.$$children ? []
+          $scope.element.$$cachedChildren[child.link] = child
+
         newChildren = []
         for item in firstList.list when item.relation
-          newChildren.push(angular.extend(item.relation, {$$metadata: item.ext}))
+          cachedChild = $scope.element.$$cachedChildren[item.relation.link] ? {}
+
+          if cachedChild.$$collapsed
+            cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
+          else
+            cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+            
+          newChildren.push(angular.extend(cachedChild, item.relation, {$$metadata: item.ext}))
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false
@@ -83,7 +84,19 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       onElementUpdate = (element) ->
         handleDescendPaths()
-        resetHelperProperties(element)
+
+        element.$$resetHelperProperties = ->
+          if @[$scope.currentDescend]
+            @$$numberOfChildren = $scope.element[$scope.currentDescend].total
+          else
+            @$$numberOfChildren = 0
+    
+          @$$children  ?= []
+          @$$collapsed ?= true
+          @$$showMore  ?= ->
+          @$$active    ?= false
+
+        element.$$resetHelperProperties()
 
         if $scope.element.$$numberOfChildren > $scope.element.$$children.length and $scope.element.$$showMore and not $scope.element.$$collapsed
           loadMoreIfNeeded()
@@ -93,7 +106,11 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           fun = $scope.element[$scope.currentDescend]
 
           unless angular.isFunction(fun)
+            $scope.element.$$children = []
+            $scope.element.$$numberOfChildren = 0
             return
+
+          $scope.element.$$numberOfChildren = fun.total
 
           # first load
           $scope.element.$$loadingChildren = true

@@ -30,7 +30,7 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
         <catalogue-element-treeview-item element="child" descend="nextDescend" repeat="repeat" ng-repeat="child in element.$$children track by $index" root-id="rootId"></catalogue-element-treeview-item>
         <li ng-if="element.$$numberOfChildren > element.$$children.length" class="catalogue-element-treeview-item">
           <span class="catalogue-element-treeview-labels" ng-click="element.$$showMore()">
-            <a class="btn btn-link catalogue-element-treeview-show-more"><span class="fa fa-fw fa-refresh fa-spin"></span></a> <a class="text-muted">Loading</a>
+            <a class="btn btn-link catalogue-element-treeview-show-more"><span class="glyphicon glyphicon-chevron-down"></span></a> <a class="text-muted">Show more</a>
           </span>
         </li>
       </ul>

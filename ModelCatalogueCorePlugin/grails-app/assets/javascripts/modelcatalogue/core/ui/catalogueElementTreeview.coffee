@@ -36,8 +36,13 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
         return if list.$$children
         list.$$children = []
         for item in list.list
-          cachedChild = if list.$$cachedChildren then list.$$cachedChildren[item.link] else undefined
-          $scope.list.$$children.push(angular.extend(cachedChild ? {}, item))
+          cachedChild  = if list.$$cachedChildren then list.$$cachedChildren[item.link]
+          cachedChild ?= {}
+          if cachedChild.$$collapsed
+            cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
+          else
+            cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+          $scope.list.$$children.push(angular.extend(cachedChild, item))
 
       onListChange = (list, oldList) ->
         return if not list
