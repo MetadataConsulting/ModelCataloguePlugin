@@ -42,8 +42,6 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
       onListChange = (list, oldList) ->
         return if not list
 
-        console.log 'old:', angular.copy(oldList), 'new:', angular.copy(list)
-
         if oldList
           list.$$cachedChildren = oldList.$$cachedChildren ? {}
 
