@@ -38,7 +38,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         showMore = $element.find('.catalogue-element-treeview-show-more')
         return if showMore.hasClass '.hide'
         root = $element.closest('.catalogue-element-treeview-list-root')
-        if showMore.offset()?.top < root.offset()?.top + 3 * root.height()
+        if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.element.$$showMore)
           $scope.element.$$showMore().then ->
             root.hide()
             root.get(0).offsetHeight
@@ -157,15 +157,17 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
 
       $rootScope.$on 'catalogueElementCreated', (_, result) ->
-        if result and result.relation and result.element and result.type
+        if result and result.relation and result.element and result.type and result.direction
+          direction = if result.direction == 'destinationToSource' then 'incoming' else 'outgoing'
+          oppositeDirection = if result.direction == 'destinationToSource' then 'outgoing' else 'incoming'
           currentDescend = $scope.element[$scope.currentDescend]
-          if result.relation.link == $scope.element.link and endsWith(currentDescend.link, "/incoming/#{result.type.name}")
-            $scope.element.$$numberOfChildren++
-            result.element.refresh().then (newOne) ->
-              $scope.element.$$children = [newOne].concat $scope.element.$$children
-          if result.element.link == $scope.element.link and endsWith(currentDescend.link, "/outgoing/#{result.type.name}")
+          if result.element.link == $scope.element.link and endsWith(currentDescend.link, "/#{direction}/#{result.type.name}")
             $scope.element.$$numberOfChildren++
             result.relation.refresh().then (newOne) ->
+              $scope.element.$$children = [newOne].concat $scope.element.$$children
+          if result.relation.link == $scope.element.link and endsWith(currentDescend.link, "/#{oppositeDirection}/#{result.type.name}")
+            $scope.element.$$numberOfChildren++
+            result.element.refresh().then (newOne) ->
               $scope.element.$$children = [newOne].concat $scope.element.$$children
     ]
   }

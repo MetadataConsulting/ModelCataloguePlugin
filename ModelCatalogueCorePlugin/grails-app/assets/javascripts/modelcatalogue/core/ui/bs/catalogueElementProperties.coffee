@@ -182,6 +182,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     hidden: true
   }
 
+  catalogueElementPropertiesProvider.configureProperty '$$cachedChildren',   {
+    hidden: true
+  }
+
   catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.DataElement.relationships',   {
     hidden: false
   }
