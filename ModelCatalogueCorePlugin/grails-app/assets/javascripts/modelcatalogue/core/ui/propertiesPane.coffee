@@ -12,8 +12,12 @@ angular.module('mc.core.ui.propertiesPane', []).directive 'propertiesPane',  [->
     controller: ['$scope', ($scope) ->
       if not $scope.properties
         $scope.properties = []
-        for key, value of $scope.item
-          $scope.properties.push {label: key, value: value}
+        if $scope.item?.type == 'orderedMap'
+          for value in $scope.item.values
+            $scope.properties.push {label: value.key, value: value.value}
+        else
+          for key, value of $scope.item
+            $scope.properties.push {label: key, value: value}
 
       $scope.printObject = (object) ->
         vals = []

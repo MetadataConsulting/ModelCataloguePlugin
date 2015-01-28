@@ -23,6 +23,12 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
 
+      getSortedMapPropertyVal = (propertyName) ->
+        (element) ->
+          for value in element.values
+            if value.key == propertyName
+              return value.value
+
       getObjectSize   = (object) ->
         size = 0
         angular.forEach object, () ->
@@ -196,11 +202,18 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                     messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
 
 
-          for key, value of obj when not angular.isObject(value)
-            tabDefinition.properties.push {
-              label: key
-              value: getPropertyVal(key)
-            }
+          if obj.type == 'orderedMap'
+            for value in obj.values when not angular.isObject(value.value)
+              tabDefinition.properties.push {
+                label: value.key
+                value: getSortedMapPropertyVal(value.key)
+              }
+          else
+            for key, value of obj when not angular.isObject(value)
+              tabDefinition.properties.push {
+                label: key
+                value: getPropertyVal(key)
+              }
 
           if tabDefinition.name == $scope.property
             tabDefinition.active = true

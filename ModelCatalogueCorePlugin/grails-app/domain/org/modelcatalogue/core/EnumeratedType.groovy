@@ -1,8 +1,4 @@
 package org.modelcatalogue.core
-
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
@@ -96,7 +92,7 @@ class EnumeratedType extends DataType {
 
     private static String mapToString(Map<String, String> map) {
         if (map == null) return null
-        map.sort() collect { key, val ->
+        map.collect { key, val ->
             "${quote(key)}:${quote(val)}"
         }.join('|')
     }

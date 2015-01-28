@@ -10,8 +10,9 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
   getEnumerations = (enumeratedType) ->
     return '' if not enumeratedType
     return enumeratedType.description if not enumeratedType.enumerations
+    return enumeratedType.description if not enumeratedType.enumerations.values
     enumerations = []
-    enumerations.push "#{key}: #{value}" for key, value of enumeratedType.enumerations
+    enumerations.push "#{enumeration.key}: #{enumeration.value}" for enumeration in enumeratedType.enumerations.values
     enumerations.join('\n')
 
   getClassificationsForDataElement = (dataElement) ->

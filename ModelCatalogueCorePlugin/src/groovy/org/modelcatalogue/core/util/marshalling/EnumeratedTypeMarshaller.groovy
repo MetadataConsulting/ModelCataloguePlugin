@@ -14,7 +14,7 @@ class EnumeratedTypeMarshaller extends CatalogueElementMarshallers {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
         ret.putAll valueDomains: [count: element.relatedValueDomains?.size() ?: 0, itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/valueDomain"]
-        ret.putAll enumerations: element.enumerations
+        ret.putAll enumerations: [type: 'orderedMap', values: element.enumerations.collect { key, value -> [key: key, value: value]}]
         ret
     }
 
