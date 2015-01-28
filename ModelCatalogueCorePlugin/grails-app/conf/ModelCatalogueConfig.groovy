@@ -52,22 +52,33 @@ grails.assets.minifyJs = false
 modelcatalogue.defaults.relationshiptypes =  [
         [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
 
-            Integer minOccurs = ext['Min Occurs'] as Integer
-            Integer maxOccurs = ext['Max Occurs'] as Integer
-            
+            def minOccurs
+            def maxOccurs
+            if(ext['Min Occurs'] && ext['Min Occurs'].isInteger()) minOccurs = ext['Min Occurs'] as Integer
+            if(ext['Max Occurs'] && ext['Max Occurs'].isInteger()) maxOccurs = ext['Max Occurs'] as Integer
+
             if (minOccurs != null) {
-                if (minOccurs < 0) {
+                if(minOccurs instanceof String && minOccurs!="unbounded"){
                     return false
                 }
+                if (minOccurs instanceof Integer && minOccurs < 0) {
+                    return false
+                }
+
+                if(maxOccurs instanceof String && maxOccurs!="unbounded"){
+                    return false
+                }
+
                 if (maxOccurs != null && maxOccurs < minOccurs) {
                     return false
                 }
+
             } else {
-                if (maxOccurs != null && maxOccurs < 1) {
+                if ((minOccurs instanceof String && maxOccurs instanceof String) && (maxOccurs != null && maxOccurs < 1)) {
                     return false
                 }
             }
-            
+
             return true
         ''', versionSpecific: true],
         [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"],
