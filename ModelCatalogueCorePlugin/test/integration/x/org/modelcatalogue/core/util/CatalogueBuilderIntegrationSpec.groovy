@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.util
+package x.org.modelcatalogue.core.util
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*

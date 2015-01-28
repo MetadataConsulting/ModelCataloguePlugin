@@ -1,20 +1,13 @@
-package org.modelcatalogue.core.xml
+package x.org.modelcatalogue.core.xml
 
 import grails.test.spock.IntegrationSpec
 import groovy.xml.XmlUtil
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
@@ -32,7 +25,7 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
     def setupSpec() {
         XMLUnit.ignoreWhitespace = true
 
-        initCatalogueService.initCatalogue()
+        initCatalogueService.initCatalogue(true)
 
         if (!RelationshipType.findByName('derivedFrom')) {
             new RelationshipType(

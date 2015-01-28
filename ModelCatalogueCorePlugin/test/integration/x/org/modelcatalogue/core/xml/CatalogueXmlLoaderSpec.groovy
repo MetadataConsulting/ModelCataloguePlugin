@@ -1,18 +1,9 @@
-package org.modelcatalogue.core.xml
+package x.org.modelcatalogue.core.xml
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.ElementStatus
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.xml.CatalogueXmlLoader
 import spock.lang.Shared
 
 class CatalogueXmlLoaderSpec extends IntegrationSpec {

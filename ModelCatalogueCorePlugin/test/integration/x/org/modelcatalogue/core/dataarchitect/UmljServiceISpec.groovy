@@ -1,11 +1,8 @@
-package org.modelcatalogue.core.dataarchitect
+package x.org.modelcatalogue.core.dataarchitect
 
-import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Model
-import org.springframework.transaction.TransactionStatus
-import spock.lang.Ignore
 
 class UmljServiceISpec extends AbstractIntegrationSpec {
 

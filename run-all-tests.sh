@@ -10,7 +10,9 @@ bower install
 ./grailsw clean-all
 ./grailsw refresh-dependencies
 ./grailsw test-app unit:
-./grailsw test-app integration:
+./grailsw test-app integration: org.modelcatalogue.**.*
+# slow and polluting
+./grailsw test-app integration: x.org.modelcatalogue.**.*
 ./node_modules/karma/bin/karma start --single-run --browsers Firefox
 
 cd ..

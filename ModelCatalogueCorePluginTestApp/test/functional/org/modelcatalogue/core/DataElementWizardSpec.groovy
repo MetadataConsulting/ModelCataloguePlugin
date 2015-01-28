@@ -1,14 +1,11 @@
     package org.modelcatalogue.core
 
+    import geb.spock.GebReportingSpec
+    import org.modelcatalogue.core.pages.DataViewPage
+
     /**
      * Created by david on 02/11/14.
      */
-
-    import geb.spock.GebReportingSpec
-    import geb.spock.GebSpec
-    import org.modelcatalogue.core.pages.DataListPage
-    import org.modelcatalogue.core.pages.DataViewPage
-    import org.modelcatalogue.core.pages.ModalTreeViewPage
     import spock.lang.Stepwise
 
     @Stepwise
@@ -142,7 +139,7 @@
             confirmOk.click()
 
             then: "the element is finalized"
-            waitFor {
+            waitFor(120) {
                 subviewStatus.text() == 'FINALIZED'
             }
 
@@ -161,7 +158,7 @@
             confirmOk.click()
 
             then: "the element new draft version is created"
-            waitFor {
+            waitFor(120) {
                 subviewStatus.text() == 'DRAFT'
             }
 

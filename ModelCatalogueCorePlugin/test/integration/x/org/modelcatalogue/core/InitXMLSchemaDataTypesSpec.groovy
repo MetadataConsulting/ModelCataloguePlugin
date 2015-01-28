@@ -1,6 +1,9 @@
-package org.modelcatalogue.core
+package x.org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
+import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ValueDomain
 import spock.lang.Stepwise
 import spock.lang.Unroll
 

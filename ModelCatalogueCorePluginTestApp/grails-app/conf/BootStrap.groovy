@@ -3,7 +3,6 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
-import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
@@ -22,7 +21,6 @@ class BootStrap {
     CatalogueBuilder catalogueBuilder
 
     XLSXListRenderer xlsxListRenderer
-    ReportsRegistry reportsRegistry
 
     def init = { servletContext ->
 
