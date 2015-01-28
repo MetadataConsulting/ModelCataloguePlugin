@@ -13,6 +13,7 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
     controller: ['$scope', ($scope) ->
       # default values
       $scope.editableProperties = []
+      $scope.canReorder = false
 
       $scope.lastAddedRow = 0
 
@@ -20,7 +21,10 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
           current = $scope.editableProperties[index]
           unique  = $scope.isKeyUnique(current.key)
           $scope.editableProperties.splice(index, 1)
-          if unique
+
+          if $scope.object.type == 'orderedMap'
+            $scope.object.values.splice(index, 1)
+          else if unique
             delete $scope.object[current.key]
           else
             for property in $scope.editableProperties
@@ -35,14 +39,42 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
         newIndex = index + 1
         $scope.lastAddedRow = newIndex
         $scope.editableProperties.splice(newIndex, 0, newProperty)
+        if $scope.object.type == 'orderedMap'
+          $scope.object.values.splice(newIndex, 0, newProperty)
+
+      $scope.moveUp = ($index) ->
+        return unless $scope.object.type == 'orderedMap'
+        return if $index == 0
+        property = $scope.editableProperties[$index]
+        $scope.editableProperties.splice($index, 1)
+        $scope.editableProperties.splice($index - 1, 0, property)
+        value = $scope.object.values[$index]
+        $scope.object.values.splice($index, 1)
+        $scope.object.values.splice($index - 1, 0, value)
+
+      $scope.moveDown = ($index) ->
+        return unless $scope.object.type == 'orderedMap'
+        return unless $index < $scope.object.values.length - 1
+        $scope.moveUp($index + 1)
 
       $scope.keyChanged = (property) ->
+        if $scope.object.type == 'orderedMap'
+          for value, i in $scope.object.values
+            if value.key == property.originalKey
+              value.key = property.key
+          property.originalKey = property.key
+          return
         delete $scope.object[property.originalKey]
         return if not property.key
         property.originalKey = property.key
         $scope.object[property.key] = if property.value then property.value else null
 
       $scope.valueChanged = (property) ->
+        if $scope.object.type == 'orderedMap'
+          for value, i in $scope.object.values
+            if value.key == property.key
+              value.value = property.value
+          return
         return if not property.key
         $scope.object[property.key] = if property.value then property.value else null
 
@@ -66,10 +98,12 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
           for value in object.values when value.key and !(angular.isFunction(value.value) or angular.isObject(value.value))
             editableProperties.push key: value.key, value: value.value, originalKey: value.key
             remove currentHints, value.key
+          $scope.canReorder = true
         else
           for key, value of object when key and !(angular.isFunction(value) or angular.isObject(value))
             editableProperties.push key: key, value: value, originalKey: key
             remove currentHints, key
+          $scope.canReorder = false
 
         for hint in currentHints by -1
           editableProperties.unshift key: hint

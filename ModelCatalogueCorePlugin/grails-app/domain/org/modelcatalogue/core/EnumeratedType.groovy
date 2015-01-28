@@ -50,7 +50,19 @@ class EnumeratedType extends DataType {
      * @param map the map containing the enum values
      */
     void setEnumerations(Map<String, String> map) {
-        enumAsString = mapToString(map)
+        if (map.type == 'orderedMap') {
+            if (map.values instanceof List) {
+                Map<String, String> newVal = [:]
+                for (item in map.values) {
+                    newVal[item.key as String] = item.value as String
+                }
+                enumAsString = mapToString(newVal)
+            } else {
+                enumAsString = mapToString([:])
+            }
+        } else {
+            enumAsString = mapToString(map)
+        }
     }
 
     /**
