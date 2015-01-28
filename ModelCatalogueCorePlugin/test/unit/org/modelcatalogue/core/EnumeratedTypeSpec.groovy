@@ -98,7 +98,7 @@ class EnumeratedTypeSpec extends Specification {
 
 
     def "pretty print enumeration"() {
-        EnumeratedType type = new EnumeratedType(name: 'Test123', enumerations: [one: '001', two: '002', three: '003'])
+        EnumeratedType type = new EnumeratedType(name: 'Test123', enumerations: [one: '001', three: '003', two: '002'])
 
         expect:
         type.prettyPrint() == '''
