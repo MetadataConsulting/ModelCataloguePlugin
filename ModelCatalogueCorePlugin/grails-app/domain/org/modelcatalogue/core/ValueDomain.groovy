@@ -114,8 +114,8 @@ class ValueDomain extends CatalogueElement {
             return false
         }
 
-        if (hasProperty('basedOn')) {
-            for (ValueDomain domain in basedOn) {
+        if (hasProperty('isBasedOn')) {
+            for (ValueDomain domain in isBasedOn) {
                 def result = domain.validateRule(x)
                 if (result != null && (!(result instanceof Boolean) || result.is(false))) {
                     return result

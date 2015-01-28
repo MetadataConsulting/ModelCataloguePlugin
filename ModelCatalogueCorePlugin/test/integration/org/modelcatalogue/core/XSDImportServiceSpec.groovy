@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
-
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
@@ -101,9 +99,9 @@ class XSDImportServiceSpec extends IntegrationSpec {
 //
 //        valueDomain.dataType.name == "xs:string"
 //
-//        cs_NullFlavor.basedOn.contains(cs)
-//        cs_UpdateMode.basedOn.contains(cs)
-//        valueDomain.basedOn.contains(ts)
+//        cs_NullFlavor.isBasedOn.contains(cs)
+//        cs_UpdateMode.isBasedOn.contains(cs)
+//        valueDomain.isBasedOn.contains(ts)
 //
 //        nhsDateModel
 //        tsModel
@@ -111,13 +109,13 @@ class XSDImportServiceSpec extends IntegrationSpec {
 //        qty
 //        adxp
 //
-//        nhsDateModel.basedOn.contains(tsModel)
-//        tsModel.basedOn.contains(qty)
-//        qty.basedOn.contains(any)
+//        nhsDateModel.isBasedOn.contains(tsModel)
+//        tsModel.isBasedOn.contains(qty)
+//        qty.isBasedOn.contains(any)
 //        adxp.contains.contains(nullFlavor)
 //        adxp.contains.contains(updateMode)
 //        adxp.contains.contains(partType1)
-//        adxp.basedOn.contains(ST)
+//        adxp.isBasedOn.contains(ST)
 //        partType1.valueDomain == cs_AddressPartType
 //
 //
@@ -221,12 +219,12 @@ class XSDImportServiceSpec extends IntegrationSpec {
 //        NHSNumberStatusEnum
 //
 //        SACTSACTType.parentOf.contains(SACTRecord)
-//        SACTRecord.basedOn.contains(SACTSACTRecordType)
+//        SACTRecord.isBasedOn.contains(SACTSACTRecordType)
 //        SACTRecord.parentOf.contains(DemographicsAndConsultant)
 //        SACTRecord.parentOf.contains(ProgrammeAndRegimen)
 //        SACTRecord.parentOf.contains(ClinicalStatus)
 //
-//        DemographicsAndConsultant.basedOn.contains(SACTDemographicsAndConsultantType)
+//        DemographicsAndConsultant.isBasedOn.contains(SACTDemographicsAndConsultantType)
 //        DemographicsAndConsultant.contains.contains(NHSNumber)
 //        DemographicsAndConsultant.contains.contains(NHSNumberStatus)
 //        NHSNumberStatus.valueDomain == NHSNumberStatusVal

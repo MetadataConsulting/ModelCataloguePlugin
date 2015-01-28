@@ -153,7 +153,7 @@ class ValueDomainSpec extends Specification {
         ValueDomain domain = new ValueDomain(dataType: new EnumeratedType(enumerations: [one: '1', two: '2']), regexDef: /[a-z]{3}/)
         ValueDomain other  = new ValueDomain()
 
-        other.metaClass.basedOn = [domain]
+        other.metaClass.isBasedOn = [domain]
 
         expect:
         domain.validateRule(value) == result
