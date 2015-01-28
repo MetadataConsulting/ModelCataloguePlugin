@@ -68,7 +68,6 @@ class UmljService {
                 enumeration.literals.each { ev ->
                     enumMap.put(ev.name, ev.documentation)
                 }
-//                def enumString = mapToString(enumMap)
 
                 return builder.valueDomain(name: enumeration.name) {
                     dataType(name: enumeration.name, enumerations: enumMap)
@@ -101,8 +100,12 @@ class UmljService {
                         dataElement(name: att.name.replaceAll("_", " "), description: att.documentation) {
 
                             if(att.tags?.value) ext("cosd id", att.tags?.value[0])
-                            if(multiplicity["minRepeat"]) ext("Min Occurs", multiplicity["minRepeat"])
-                            if(multiplicity["maxRepeat"]) ext("Max Occurs", multiplicity["maxRepeat"])
+                            if(multiplicity.size()>0){
+                                relationship {
+                                    if (multiplicity["minRepeat"]) ext("Min Occurs", multiplicity["minRepeat"])
+                                    if (multiplicity["maxRepeat"]) ext("Max Occurs", multiplicity["maxRepeat"])
+                                }
+                            }
 
                             createValueDomain(builder, att, umlFile)
 
@@ -194,16 +197,6 @@ class UmljService {
             }.size() > 0
         }
     }
-
-
-
-    private static String mapToString(Map<String, String> map) {
-        if (map == null) return null
-        map.sort() collect { key, val ->
-            "${quote(key)}:${quote(val)}"
-        }.join('|')
-    }
-
 
 
     static String quote(String s) {
