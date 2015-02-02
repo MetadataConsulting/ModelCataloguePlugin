@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.propertiesPane', ['mc.core.ui.propertiesPane', 'ng
             <td class="pp-table-property-value-no-wrap col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}"  ng-switch-when="element"><span ng-class="theValue.getIcon()" class="text-muted"></span> <a ng-click="theValue.show()">{{theValue.name}}</a> <span class="fa fa-fw" ng-class="{'fa-plus-square-o': (!theValue._expanded &amp;&amp; !theValue._expanding), 'fa-refresh': theValue._expanding, 'fa-minus-square-o':(theValue._expanded &amp;&amp; !theValue._expanding)}" ng-click="expandOrCollapse(theValue)"></span><div collapse="!theValue._expanded">
               <blockquote>{{theValue.description ? theValue.description : 'No Description' }}</blockquote>
               <div ng-show="theValue.enumerations" class="preserve-new-lines"><strong>Enumerations</strong>
-                {{printObject(theValue.enumerations)}}
+                {{getEnumerations(theValue)}}
               </div>
             </div></td>
             <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-when="date">{{theValue | date:'short'}}</td>

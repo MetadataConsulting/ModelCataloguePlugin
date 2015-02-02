@@ -57,6 +57,7 @@
 
             when:
             $('td', 'data-value-for': 'Data Type').find('span.fa-plus-square-o').click()
+            driver.executeScript "scroll(0,250);"
 
             then: "we see enumerated values"
             waitFor {
@@ -70,7 +71,6 @@
             waitFor {
                 $('.inf-table tbody .inf-table-item-row').size() > 1
             }
-
         }
 
 

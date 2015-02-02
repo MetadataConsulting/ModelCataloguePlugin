@@ -29,6 +29,14 @@ angular.module('mc.core.ui.propertiesPane', []).directive 'propertiesPane',  [->
           vals.push "#{key}: #{value ? ''}"
         vals.join('\n')
 
+      $scope.getEnumerations = (enumeratedType) ->
+        return '' if not enumeratedType
+        return enumeratedType.description if not enumeratedType.enumerations
+        return enumeratedType.description if not enumeratedType.enumerations.values
+        enumerations = []
+        enumerations.push "#{enumeration.key}: #{enumeration.value}" for enumeration in enumeratedType.enumerations.values
+        enumerations.join('\n')
+
       $scope.evaluateValue = (value, element) ->
         if angular.isFunction(value) then value(element) else $scope.$eval(value, element)
 
