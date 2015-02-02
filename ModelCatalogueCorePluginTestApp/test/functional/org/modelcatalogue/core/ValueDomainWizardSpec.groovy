@@ -52,16 +52,16 @@
 
             then: "we expand the data type"
             waitFor {
-                $('td', 'data-value-for': 'Data Type').displayed
+                dataTypeHeader.displayed
             }
 
             when:
-            $('td', 'data-value-for': 'Data Type').find('span.fa-plus-square-o').click()
+            dataTypeHeader.find('span.fa-plus-square-o').click()
             driver.executeScript "scroll(0,250);"
 
             then: "we see enumerated values"
             waitFor {
-                $('td', 'data-value-for': 'Data Type').find('div.preserve-new-lines')?.text()?.contains('Midline')
+                dataTypeHeader.find('div.preserve-new-lines')?.text()?.contains('Midline')
             }
 
             when: "the filter is reset"

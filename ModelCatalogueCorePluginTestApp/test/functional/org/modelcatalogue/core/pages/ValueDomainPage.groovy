@@ -30,6 +30,8 @@ class ValueDomainPage extends ModelCataloguePage {
 
         newValueDomain      {$('div.inf-table-body tbody tr:nth-child(1) td:nth-child(3)')}
 
+        dataTypeHeader      { $("td[data-value-for='Data Type']") }
+
         valueDomain         { modalDialog.find('#valueDomain') }
         mapping             { modalDialog.find('#mapping') }
         value               { modalDialog.find('#value') }
