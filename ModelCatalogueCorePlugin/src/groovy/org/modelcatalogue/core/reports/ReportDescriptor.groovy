@@ -58,6 +58,7 @@ class ReportDescriptor {
     }
 
     String getLink(Object model) {
+        // TODO: try to create defensive deep copy
         Map params = new HashMap(linkParams(model))
         if (params.id) {
             if (model.hasProperty('id')) {
