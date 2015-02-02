@@ -1,9 +1,7 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.TestFor
-import grails.test.spock.IntegrationSpec
-import grails.util.GrailsNameUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
+import org.modelcatalogue.core.util.DefaultResultRecorder
+import org.modelcatalogue.core.util.ResultRecorder
 
 /**
  * Created by adammilward on 27/02/2014.
@@ -11,7 +9,13 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 
 class DashboardControllerIntegrationSpec extends AbstractIntegrationSpec{
 
+    ResultRecorder recorder
+
     def "new Test for json"(){
+        recorder = DefaultResultRecorder.create(
+                "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
+                'dashboard'
+        )
 
         def controller = new DashboardController()
 
@@ -22,6 +26,7 @@ class DashboardControllerIntegrationSpec extends AbstractIntegrationSpec{
         controller.index()
 
         def response = controller.response.json
+        recorder.recordResult('index' , controller.response.json)
 
         then:
         response
