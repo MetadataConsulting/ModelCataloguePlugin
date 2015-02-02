@@ -20,12 +20,12 @@ abstract class ModelCataloguePage extends Page {
         loginDialog(OPT)        { $("div.login-modal-prompt") }
         modalDialog(OPT)        { $("div.modal") }
         modalHeader(OPT)        { $("div.modal-header h4") }
-        modalPrimaryButton(OPT) { modalDialog.find('button.btn-primary') }
-        modalCloseButton(OPT)   { modalDialog.find('button.close') }
+        modalPrimaryButton(OPT) { $("div.modal").find('button.btn-primary') }
+        modalCloseButton(OPT)   { $("div.modal").find('button.close') }
 
-        username                { loginDialog.find("#username") }
-        password                { loginDialog.find("#password") }
-        loginButton             { loginDialog.find("button.btn-success") }
+        username                { $("div.modal").find("#username") }
+        password                { $("div.modal").find("#password") }
+        loginButton             { $("div.modal").find("button.btn-success") }
 
         confirmDialog(OPT)      { $('.modal.messages-modal-confirm') }
         confirmOk(OPT)          { $('.modal.messages-modal-confirm .btn-primary') }
