@@ -27,5 +27,5 @@ metadataCurator = angular.module('metadataCurator', [
 ])
 
 metadataCurator.config ['$stateProvider', '$urlRouterProvider', ($stateProvider, $urlRouterProvider)->
-  $urlRouterProvider.otherwise("/dashboard")
+  # $urlRouterProvider.otherwise("/dashboard")
 ]
