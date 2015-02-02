@@ -103,8 +103,8 @@ class EnumeratedTypeSpec extends Specification {
         expect:
         type.prettyPrint() == '''
             one: 001
-            three: 003
             two: 002
+            three: 003
         '''.stripIndent().trim()
     }
 }

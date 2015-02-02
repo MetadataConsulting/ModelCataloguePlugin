@@ -20,7 +20,7 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
     @Unroll
     def "get json valueDomains: #no where max: #max offset: #offset"() {
         DataType first = loadItem
-        createValueDomainsUsingDataType(first, 12)
+        createValueDomainsUsingDataType(first, 3)
 
         when:
         controller.params.id = first.id
@@ -44,10 +44,10 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
         resource.count() == totalCount
 
         cleanup:
-        deleteValueDomains(first, 12)
+        deleteValueDomains(first, 3)
 
         where:
-        [no, size, max, offset, total, next, previous] << getPaginationValueDomainsParameters("/${resourceName}/${loadItem.id}/valueDomain")
+        [no, size, max, offset, total, next, previous] << getMappingPaginationParameters("/${resourceName}/${loadItem.id}/valueDomain")
     }
 
     @Override
@@ -94,25 +94,10 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 24, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, 24, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, 24, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 4, 4, 20, 24, "", "${baseLink}?max=4&offset=16"],
-                [5, 2, 10, 22, 24, "", "${baseLink}?max=10&offset=12"],
-                [6, 2, 2, 22, 24, "", "${baseLink}?max=2&offset=20"]
+                [1, 1, 1, 0, 24, "${baseLink}?max=1&offset=1", ""],
+                [2, 1, 1, 1, 24, "${baseLink}?max=1&offset=2", "${baseLink}?max=1&offset=0"],
+                [3, 1, 1, 2, 24, "${baseLink}?max=1&offset=3", "${baseLink}?max=1&offset=1"],
         ]
-    }
-
-    def getPaginationValueDomainsParameters(baseLink){
-            [
-                    // no,size, max , off. tot. next                           , previous
-                    [1, 10, 10, 0, 12, "${baseLink}?max=10&offset=10", ""],
-                    [2, 5, 5, 0, 12, "${baseLink}?max=5&offset=5", ""],
-                    [3, 5, 5, 5, 12, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                    [4, 4, 4, 8, 12, "", "${baseLink}?max=4&offset=4"],
-                    [5, 2, 10, 10, 12, "", "${baseLink}?max=10&offset=0"],
-                    [6, 2, 2, 10, 12, "", "${baseLink}?max=2&offset=8"]
-            ]
     }
 
 
