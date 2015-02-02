@@ -6,7 +6,9 @@ describe "mc.core.ui.catalogueElementView", ->
   beforeEach module 'mc.core.ui.bs.propertiesPane'
   beforeEach module 'mc.core.ui.bs.simpleObjectEditor'
 
-  it "element get compiled",  inject ($compile, $rootScope, enhance) ->
+  it "element get compiled",  inject ($compile, $rootScope, enhance, $httpBackend) ->
+    $httpBackend.when('GET', '/api/modelCatalogue/core/dashboard').respond(fixtures.dashboard.index)
+
     catEl = enhance angular.copy(fixtures.valueDomain.showOne)
     catEl.description = "Hello World!"
 

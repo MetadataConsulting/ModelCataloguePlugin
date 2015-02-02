@@ -3,8 +3,8 @@
     <dataType name="Gender" id="http://www.example.com/types/Gender" status="DRAFT">
         <description>The state of being male or female (typically used with reference to social and cultural differences rather than biological ones)</description>
         <enumerations>
-            <enumeration value="F">Female</enumeration>
             <enumeration value="M">Male</enumeration>
+            <enumeration value="F">Female</enumeration>
         </enumerations>
     </dataType>
 </catalogue>

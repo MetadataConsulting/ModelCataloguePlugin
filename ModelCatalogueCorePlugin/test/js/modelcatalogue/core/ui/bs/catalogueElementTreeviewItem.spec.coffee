@@ -4,6 +4,8 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
   beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
 
   it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->
+    $httpBackend.when('GET', '/api/modelCatalogue/core/dashboard').respond(fixtures.dashboard.index)
+
 
     catEl = enhance angular.copy(fixtures.dataType.showOne)
     catEl.description = "Hello World!"

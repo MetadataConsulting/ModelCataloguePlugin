@@ -1,6 +1,7 @@
-package org.modelcatalogue.core
+package x.org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
+import org.modelcatalogue.core.*
 import spock.lang.Stepwise
 
 /**

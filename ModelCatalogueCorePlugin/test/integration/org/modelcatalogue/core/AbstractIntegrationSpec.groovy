@@ -20,9 +20,11 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
 
     def loadFixtures(){
         if(RelationshipType.count()<7) {
+            println "initializing default relationship types"
             initCatalogueService.initDefaultRelationshipTypes()
         }
         if(CatalogueElement.count()==0){
+            println "loading fixtures"
             fixtures = fixtureLoader.load("assets/*", "batches/*", "dataTypes/*", "enumeratedTypes/*", "measurementUnits/*", "models/*", "relationshipTypes/*", "classifications/*").load("actions/*", "valueDomains/*", "users/*").load("dataElements/*").load("extensions/*", "mappings/*").load("csvTransformations/*")
         }
     }

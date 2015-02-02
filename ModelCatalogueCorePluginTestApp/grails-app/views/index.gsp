@@ -106,7 +106,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#/dashboard"><span class="fa fa-fw fa-book"></span><span class="visible-md-inline">&nbsp; Model Catalogue</span></a>
+                <a class="navbar-brand" href="#"><span class="fa fa-fw fa-book"></span><span class="visible-md-inline">&nbsp; Model Catalogue</span></a>
             </div>
 
             <div class="navbar-collapse collapse">

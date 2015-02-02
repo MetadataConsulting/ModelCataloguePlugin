@@ -85,24 +85,21 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     def getHistoryPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 12, "${baseLink}?max=10&sort=versionNumber&order=desc&offset=10", ""],
-                [2, 5, 5, 0, 12, "${baseLink}?max=5&sort=versionNumber&order=desc&offset=5", ""],
-                [3, 5, 5, 5, 12, "${baseLink}?max=5&sort=versionNumber&order=desc&offset=10", "${baseLink}?max=5&sort=versionNumber&order=desc&offset=0"],
-                [4, 4, 4, 8, 12, "", "${baseLink}?max=4&sort=versionNumber&order=desc&offset=4"],
-                [5, 2, 10, 10, 12, "", "${baseLink}?max=10&sort=versionNumber&order=desc&offset=0"],
-                [6, 2, 2, 10, 12, "", "${baseLink}?max=2&sort=versionNumber&order=desc&offset=8"]
+                [1, 1, 1, 0, 3, "${baseLink}?max=1&sort=versionNumber&order=desc&offset=1", ""],
+                [2, 1, 1, 1, 3, "${baseLink}?max=1&sort=versionNumber&order=desc&offset=2", "${baseLink}?max=1&sort=versionNumber&order=desc&offset=0"],
+                [3, 1, 1, 2, 3, "", "${baseLink}?max=1&sort=versionNumber&order=desc&offset=1"],
         ]
     }
 
     void createDraftVersions(CatalogueElement el) {
         int counter = 0
-        while ((el.versionNumber != 12) && (counter++ < 12)) {
+        while ((el.versionNumber != 3) && (counter++ < 3)) {
             el = elementService.createDraftVersion(elementService.finalizeElement(el), DraftContext.userFriendly())
             if (el.hasErrors()) {
                 throw new IllegalStateException("Creating draft version fails with ${el.errors}")
             }
         }
-        if (counter >= 12) {
+        if (counter >= 3) {
             throw new IllegalStateException("Creating draft version wasn't successfull after ${counter} attempts. Current state is: ${el}")
         }
     }
@@ -490,13 +487,13 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
                 } else {
                     assert !controller.relationshipService.link(first, unit, relationshipType).hasErrors()
                 }
-                if (first."${incomingOrOutgoing}Relationships".size() == 11) {
+                if (first."${incomingOrOutgoing}Relationships".size() >= 3) {
                     break
                 }
             }
         }
         assert first."${incomingOrOutgoing}Relationships"
-        assert first."${incomingOrOutgoing}Relationships".size() == 11
+        assert first."${incomingOrOutgoing}Relationships".size() == 3
         first
     }
 
@@ -591,9 +588,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     def getRelationshipPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 11, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, 11, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, 11, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [1, 1, 1, 0, 3, "${baseLink}?max=1&offset=1", ""],
+                [2, 1, 1, 1, 3, "${baseLink}?max=1&offset=2", "${baseLink}?max=1&offset=0"],
+                [3, 1, 1, 2, 3, "", "${baseLink}?max=1&offset=1"],
         ]
     }
 
@@ -770,24 +767,24 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         for (domain in toBeLinked.class.list()) {
             if (domain != toBeLinked) {
                 controller.mappingService.map(toBeLinked, domain, "x")
-                if (toBeLinked.outgoingMappings.size() == 11) {
+                if (toBeLinked.outgoingMappings.size() == 3) {
                     break
                 }
             }
         }
 
         assert toBeLinked.outgoingMappings
-        assert toBeLinked.outgoingMappings.size() == 11
+        assert toBeLinked.outgoingMappings.size() == 3
         toBeLinked
     }
 
 
     def getMappingPaginationParameters(baseLink){
         [
-                // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 11, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, 11, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, 11, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                // no,size, max , off. tot. next, previous
+                [1, 1, 1, 0, 3, "${baseLink}?max=1&offset=1", ""],
+                [2, 1, 1, 1, 3, "${baseLink}?max=1&offset=2", "${baseLink}?max=1&offset=0"],
+                [3, 1, 1, 2, 3, "", "${baseLink}?max=1&offset=1"],
         ]
 
     }

@@ -85,14 +85,18 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
     @Override
     def customJsonPropertyCheck(item, json){
         super.customJsonPropertyCheck(item, json)
-        checkObjectMapStringProperty(json.enumerations , item.enumerations, "enumerations")
+        assert json.enumerations
+        assert json.enumerations.type == 'orderedMap'
+        assert json.enumerations.values
         return true
     }
 
     @Override
     def customJsonPropertyCheck(inputItem, json, outputItem){
         super.customJsonPropertyCheck(inputItem, json, outputItem)
-        checkObjectMapStringProperty(json.enumerations , inputItem.enumerations, "enumerations")
+        assert json.enumerations
+        assert json.enumerations.type == 'orderedMap'
+        assert json.enumerations.values
         return true
 
     }

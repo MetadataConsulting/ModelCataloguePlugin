@@ -139,7 +139,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   DEFAULT_ITEMS_PER_PAGE = 10
 
   $stateProvider.state 'dashboard', {
-      url: '/dashboard'
+      url: ''
       templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
       controller: 'mc.core.ui.states.DashboardCtrl'
       resolve:
