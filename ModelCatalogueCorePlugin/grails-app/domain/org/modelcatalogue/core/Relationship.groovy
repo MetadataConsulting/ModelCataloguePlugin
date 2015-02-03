@@ -40,6 +40,10 @@ class Relationship implements Extendible {
 
     Classification classification
 
+    Long incomingIndex = 0
+    Long outgoingIndex = 0
+
+
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
 
