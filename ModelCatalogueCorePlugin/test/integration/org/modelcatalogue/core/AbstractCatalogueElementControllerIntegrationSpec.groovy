@@ -294,7 +294,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     def checkJsonRelationsWithRightType(no, size, max, offset, total, next, previous, incomingOrOutgoing) {
-        checkJsonRelationsInternal("relationship", no, size, max, offset, total, next, previous, incomingOrOutgoing)
+        checkJsonRelationsInternal("relatedTo", no, size, max, offset, total, next, previous, incomingOrOutgoing)
         resourceCount == totalCount
     }
 
@@ -408,7 +408,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resourceCount == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/relationship"))
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/outgoing/relatedTo"))
     }
 
     @Unroll
@@ -419,7 +419,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resourceCount == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/relationship"))
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/incoming/relatedTo"))
     }
 
     @Unroll
@@ -430,7 +430,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         resourceCount == totalCount
 
         where:
-        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relationship"))
+        [no, size, max, offset, total, next, previous] << optimize(getRelationshipPaginationParameters("/${resourceName}/${loadItem.id}/relationships/relatedTo"))
     }
 
 
@@ -514,14 +514,14 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         assert json.itemType == Relationship.name
         def item = json.list[0]
         assert item.type
-        assert item.type.name == "relationship"
-        assert item.type.sourceToDestination == "relates to"
+        assert item.type.name == "relatedTo"
+        assert item.type.sourceToDestination == "related to"
         assert item.direction == incomingOrOutgoing == "incoming" ? "destinationToSource" : "sourceToDestination"
-        assert item.type.destinationToSource == "is relationship of"
+        assert item.type.destinationToSource == "related to"
         assert item.relation
         assert item.relation.id
         assert item.relation.elementType
-        assert item.removeLink == "/${GrailsNameUtils.getPropertyName(first.class)}/${first.id}/${incomingOrOutgoing}/relationship"
+        assert item.removeLink == "/${GrailsNameUtils.getPropertyName(first.class)}/${first.id}/${incomingOrOutgoing}/relatedTo"
         def relation = Class.forName(item.relation.elementType).get(item.relation.id)
         assert item.relation.name == relation.name
         assert item.relation.id == relation.id

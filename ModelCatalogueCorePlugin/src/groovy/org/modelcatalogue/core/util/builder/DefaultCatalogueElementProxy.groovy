@@ -1,18 +1,7 @@
 package org.modelcatalogue.core.util.builder
 
 import groovy.util.logging.Log4j
-import org.modelcatalogue.core.Asset
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.ElementStatus
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.MeasurementUnit
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.*
 
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T> {
 
@@ -284,9 +273,11 @@ import org.modelcatalogue.core.ValueDomain
 
     @Override
     Set<Relationship> resolveRelationships() {
-        relationships.collect {
-            it.resolve()
+        Set<Relationship> ret = []
+        relationships.eachWithIndex {RelationshipProxy it, Integer index ->
+            it.resolve(index)
         }
+        ret
     }
 
     String toString() {

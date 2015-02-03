@@ -6,7 +6,6 @@ import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.ExtensionsWrapper
-import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
@@ -178,12 +177,12 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
 
-    Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
-        relationshipService.link(this, destination, type)
+    Relationship createLinkTo(CatalogueElement destination, RelationshipType type, Long indexHint = null) {
+        relationshipService.link(this, destination, type, null,  false, false, indexHint)
     }
 
-    Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
-        relationshipService.link(source, this, type)
+    Relationship createLinkFrom(CatalogueElement source, RelationshipType type, Long indexHint = null) {
+        relationshipService.link(source, this, type, null, false, false, indexHint)
     }
 
     Relationship removeLinkTo(CatalogueElement destination, RelationshipType type) {

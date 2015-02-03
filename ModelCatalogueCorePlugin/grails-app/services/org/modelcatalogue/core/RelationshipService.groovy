@@ -6,7 +6,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 class RelationshipService {
 
-    private static final long INDEX_STEP = 1000
+    static final long INDEX_STEP = 1000
 
     static transactional = true
 
@@ -21,10 +21,16 @@ class RelationshipService {
         Lists.fromCriteria(params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 
-    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false) {
+    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false, Long indexHint = null) {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
-            if (relationshipInstance) { return relationshipInstance }
+            if (relationshipInstance) {
+                if (indexHint == null) {
+                    return relationshipInstance
+                }
+                relationshipInstance.outgoingIndex = indexHint
+                return relationshipInstance.save(flush: true)
+            }
         }
 
         Relationship relationshipInstance = new Relationship(
@@ -32,7 +38,8 @@ class RelationshipService {
                 destination: destination?.id ? destination : null,
                 relationshipType: relationshipType?.id ? relationshipType : null,
                 classification: classification?.id ? classification : null,
-                archived: archived
+                archived: archived,
+                outgoingIndex: indexHint ?: 0
         )
 
         //specific rules when creating links to and from published elements
@@ -203,10 +210,10 @@ class RelationshipService {
         moveAfterWithRearrange(relationship, other)
     }
 
-    private Relationship moveAfterWithRearrange(Relationship relationship, Relationship other) {
+    private static Relationship moveAfterWithRearrange(Relationship relationship, Relationship other) {
         List<Relationship> relationships  = RelationshipDirection.OUTGOING.composeWhere(relationship.source, relationship.relationshipType, []).list()
         int correction = 0
-        relationships.eachWithIndex { Relationship entry, int i ->
+        relationships.eachWithIndex { Relationship entry, Integer i ->
             if (entry == relationship) {
                 correction = -1
                 return
