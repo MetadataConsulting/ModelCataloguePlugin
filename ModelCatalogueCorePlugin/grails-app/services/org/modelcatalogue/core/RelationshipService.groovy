@@ -6,6 +6,8 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 class RelationshipService {
 
+    private static final long INDEX_STEP = 1000
+
     static transactional = true
 
     def modelCatalogueSecurityService
@@ -46,6 +48,15 @@ class RelationshipService {
 
         if (relationshipInstance.hasErrors()) {
             return relationshipInstance
+        }
+
+        if (relationshipType.sortable) {
+            def maxIndex = Relationship.executeQuery("""
+                select max(r.outgoingIndex) from Relationship r
+                where r.source = :source
+                and r.relationshipType = :type
+            """, [source: source, type: relationshipType])[0]
+            relationshipInstance.outgoingIndex = (maxIndex ?: 0) + INDEX_STEP
         }
 
         relationshipInstance.save(flush: true)

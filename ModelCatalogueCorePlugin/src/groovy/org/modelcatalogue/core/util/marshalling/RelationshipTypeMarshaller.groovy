@@ -24,6 +24,7 @@ class RelationshipTypeMarshaller extends AbstractMarshallers {
                 versionSpecific: el.versionSpecific,
                 rule: el.rule,
                 bidirectional: el.bidirectional,
+                sortable: el.sortable,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 metadataHints: el.metadataHints?.split(/\s*,\s*/)?.grep() ?: []
         ]

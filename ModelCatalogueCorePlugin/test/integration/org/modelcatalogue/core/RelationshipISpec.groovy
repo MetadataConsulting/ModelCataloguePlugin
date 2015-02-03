@@ -138,7 +138,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         testNumber | validates  | args
         1  | false | [:]
         2  | false | [source: new DataElement(name: 'element1'), destination: de1]
-        3  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.contextType]
         5  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.containmentType]
         6  | true  | [source: md1, destination: de1, relationshipType: RelationshipType.containmentType]
         7  | false | [source: new DataElement(name: 'parentModel'), destination: md1, relationshipType: RelationshipType.hierarchyType]
@@ -195,4 +194,68 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         classification?.delete()
         model?.delete()
     }
+
+
+    def "init default indexes assigned when linking sortable relationship type"() {
+        given:
+        Model m1 = new Model(name: 'M1').save(failOnError: true)
+
+        DataElement de1 = new DataElement(name: "DE1").save(failOnError: true)
+        DataElement de2 = new DataElement(name: "DE2").save(failOnError: true)
+        DataElement de3 = new DataElement(name: "DE3").save(failOnError: true)
+
+        expect:
+        RelationshipType.containmentType.sortable
+
+        when:
+        Relationship m1de1 = relationshipService.link(m1, de1, RelationshipType.containmentType)
+
+        then:
+        !m1de1.errors.errorCount
+        m1de1.outgoingIndex
+
+        when:
+        Relationship m1de2 = relationshipService.link(m1, de2, RelationshipType.containmentType)
+
+        then:
+        !m1de2.errors.errorCount
+        m1de2.outgoingIndex
+        m1de1.outgoingIndex < m1de2.outgoingIndex
+
+        when:
+        Relationship m1de3 = relationshipService.link(m1, de3, RelationshipType.containmentType)
+
+        then:
+        !m1de3.errors.errorCount
+        m1de3.outgoingIndex
+        m1de2.outgoingIndex < m1de3.outgoingIndex
+    }
+
+    def "init default indexes not assigned when linking non-sortable relationship type"() {
+        given:
+        Model m1 = new Model(name: 'M1').save(failOnError: true)
+
+        DataElement de1 = new DataElement(name: "DE1").save(failOnError: true)
+        DataElement de2 = new DataElement(name: "DE2").save(failOnError: true)
+        DataElement de3 = new DataElement(name: "DE3").save(failOnError: true)
+
+        when:
+        Relationship m1de1 = relationshipService.link(m1, de1, RelationshipType.relatedToType)
+
+        then:
+        !m1de1.outgoingIndex
+
+        when:
+        Relationship m1de2 = relationshipService.link(m1, de2, RelationshipType.relatedToType)
+
+        then:
+        !m1de2.outgoingIndex
+
+        when:
+        Relationship m1de3 = relationshipService.link(m1, de3, RelationshipType.relatedToType)
+
+        then:
+        !m1de3.outgoingIndex
+    }
+
 }

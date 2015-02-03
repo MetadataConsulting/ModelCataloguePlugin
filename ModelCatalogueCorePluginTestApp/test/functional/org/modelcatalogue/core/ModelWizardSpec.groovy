@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import geb.spock.GebReportingSpec
-import geb.spock.GebSpec
 import org.modelcatalogue.core.pages.ModalTreeViewPage
 import spock.lang.Stepwise
 
@@ -83,6 +82,8 @@ class ModelWizardSpec extends GebReportingSpec {
             $('.list-group-item.item-found').displayed
         }
         $('.list-group-item.item-found').click()
+
+        waitUntilModalClosed()
 
         and: 'create child from scratch and leave it filled in'
         name = 'This should create new child model'

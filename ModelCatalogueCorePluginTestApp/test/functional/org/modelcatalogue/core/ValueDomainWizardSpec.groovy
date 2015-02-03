@@ -31,6 +31,7 @@
 
 
         def "filter by name in header and expand enumerations"() {
+            waitUntilModalClosed()
             when: "the header is expanded"
             $('.inf-table thead .inf-cell-expand').click()
 
@@ -76,6 +77,7 @@
 
 
         def "Add new value domain"(){
+            waitUntilModalClosed()
             when: 'I click the add value domain button'
             actionButton('create-catalogue-element', 'list').click()
 
@@ -115,6 +117,7 @@
         }
 
         def "Check the value domain shows up with own details"(){
+            waitUntilModalClosed()
             when: 'Value domain is located'
 
             waitFor {
@@ -134,6 +137,7 @@
         }
 
         def "update metadata"() {
+            waitUntilModalClosed()
             when:
             selectTab('ext')
 
@@ -161,6 +165,7 @@
         }
 
         def "validate value"() {
+            waitUntilModalClosed()
             when: "validate action is clicked"
             actionButton('validate-value').click()
 
@@ -200,6 +205,7 @@
 
 
         def "create new mapping"() {
+            waitUntilModalClosed()
             when: "create new mapping action is clicked"
             actionButton('create-new-mapping').click()
 
@@ -227,6 +233,7 @@
         }
 
         def "convert value"() {
+            waitUntilModalClosed()
             when: "convert action is clicked"
             actionButton('convert').click()
 
@@ -270,6 +277,7 @@
         }
 
         def "edit mapping"() {
+            waitUntilModalClosed()
             when: "mappings tab selected"
             selectTab('mappings')
 
@@ -300,6 +308,7 @@
 
 
         def "create relationship"() {
+            waitUntilModalClosed()
             when: "create relationship action is clicked"
             actionButton('create-new-relationship').click()
 
@@ -326,6 +335,7 @@
         }
 
         def "create relationship from footer action"() {
+            waitUntilModalClosed()
             when: "related to tab selected"
             selectTab('relatedTo')
 
@@ -357,6 +367,7 @@
         }
 
         def "remove relationship"() {
+            waitUntilModalClosed()
             when:
             toggleInfTableRow(1)
             actionButton('remove-relationship').click()
@@ -376,6 +387,7 @@
         }
 
         def "remove mapping"() {
+            waitUntilModalClosed()
             when:
             selectTab('mappings')
             toggleInfTableRow(1)
@@ -396,6 +408,7 @@
         }
 
         def "Edit the value domain"() {
+            waitUntilModalClosed()
             selectTab('properties')
 
             when: "edit action is clicked"
@@ -423,6 +436,7 @@
 
         // following is just copy-pasted until we find better way how to run feature methods stepwise
         def "finalize domain"() {
+            waitUntilModalClosed()
             when: "finalize is clicked"
             actionButton('finalize').click()
 
@@ -442,6 +456,7 @@
         }
 
         def "create new version of the domain"() {
+            waitUntilModalClosed()
             when: "new version is clicked"
             actionButton('create-new-version').click()
 
@@ -462,6 +477,7 @@
         }
 
         def "merge domain"() {
+            waitUntilModalClosed()
             when:
             actionButton('merge').click()
 

@@ -41,6 +41,9 @@ class RelationshipType {
     /** if relationships of this type shall not be carried over when new draft version is created */
     Boolean versionSpecific = Boolean.FALSE
 
+    /** if outgoing relationships of this type can be reordered by user */
+    Boolean sortable = Boolean.FALSE
+
     /**
      * This is a script which will be evaluated with following binding:
      * source
@@ -134,20 +137,16 @@ class RelationshipType {
         readByName("classification")
     }
 
-    static getContextType() {
-        readByName("context")
+    static getSynonymType() {
+        readByName("synonym")
     }
 
-    static getRelationshipType() {
-        readByName("relationship")
+    static getRelatedToType() {
+        readByName("relatedTo")
     }
 
     static getHierarchyType() {
         readByName("hierarchy")
-    }
-
-    static getInclusionType() {
-        readByName("inclusion")
     }
 
     static getSupersessionType() {

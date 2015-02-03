@@ -50,6 +50,10 @@ abstract class ModelCataloguePage extends Page {
                 showLogoutButton.click()
             }
 
+            waitFor {
+                showLoginButton.displayed
+            }
+
             showLoginButton.click()
         }
 
@@ -60,6 +64,12 @@ abstract class ModelCataloguePage extends Page {
         username = user
         password = pwd
         loginButton.click()
+    }
+
+    void waitUntilModalClosed() {
+        waitFor(10){
+            !$('.modal-backdrop').displayed
+        }
     }
 
     /**
