@@ -4,7 +4,7 @@
   echo -e "Starting to update gh-pages\n"
 
   #copy data we're interested in to other place
-  cp -R geb-reports $HOME/ModelCatalogueCorePluginTestApp/target/geb-reports
+  cp -R ModelCatalogueCorePluginTestApp/target/geb-reports $HOME/geb-reports
 
   #go to home and setup git
   cd $HOME
