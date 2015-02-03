@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.RelationshipDirection
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -25,17 +26,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         reltype = RelationshipType.findByName("relationship")
         vd1 = ValueDomain.findByName("school subject")
     }
-
-    /*def cleanupSpec(){
-
-        de1.delete()
-        de2.delete()
-        dt.delete()
-        ms.delete()
-        md1.delete()
-        reltype.delete()
-        vd1.delete()
-    }*/
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
@@ -196,7 +186,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
     }
 
 
-    def "init default indexes assigned when linking sortable relationship type"() {
+    def "init default indexes assigned when linking sortable relationship type so we are able to reorder"() {
         given:
         Model m1 = new Model(name: 'M1').save(failOnError: true)
 
@@ -229,6 +219,57 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         !m1de3.errors.errorCount
         m1de3.outgoingIndex
         m1de2.outgoingIndex < m1de3.outgoingIndex
+
+        when: "first relationship is moved after the third"
+        m1de1 = relationshipService.moveAfter(m1de1, m1de3)
+        !m1de1.errors.errorCount
+
+        then: "the index of first is bigger than the third one"
+        m1de1.outgoingIndex > m1de3.outgoingIndex
+        getOutgoingContainmentIds(m1) == [m1de2, m1de3, m1de1]*.id
+
+        when: "there is no element to move after"
+        m1de1 = relationshipService.moveAfter(m1de1, null)
+
+        then: "then it will be moved to the beginning"
+        !m1de1.errors.errorCount
+        m1de1.outgoingIndex < m1de3.outgoingIndex
+        m1de1.outgoingIndex < m1de2.outgoingIndex
+        getOutgoingContainmentIds(m1) == [m1de1, m1de2, m1de3]*.id
+
+        when: "there is no gap between the relationships"
+        m1de1.outgoingIndex = 1
+        m1de2.outgoingIndex = 2
+        m1de3.outgoingIndex = 3
+
+        [m1de1, m1de2, m1de3]*.save(failOnError: true)
+
+        m1de1 = relationshipService.moveAfter(m1de1, m1de2)
+
+        then: "the index of first is bigger than the second one"
+        m1de1.outgoingIndex > m1de2.outgoingIndex
+
+        and: "the index of first is smaller than the third one"
+        m1de1.outgoingIndex < m1de3.outgoingIndex
+
+        when: "all indexes are zero (legacy database)"
+        m1de1.outgoingIndex = 0
+        m1de2.outgoingIndex = 0
+        m1de3.outgoingIndex = 0
+
+        [m1de1, m1de2, m1de3]*.save(failOnError: true)
+
+        m1de1 = relationshipService.moveAfter(m1de1, m1de2)
+
+        then: "the index of first is bigger than the second one"
+        m1de1.outgoingIndex > m1de2.outgoingIndex
+
+        and: "the index of first is smaller than the third one"
+        m1de1.outgoingIndex < m1de3.outgoingIndex
+    }
+
+    private ArrayList<Long> getOutgoingContainmentIds(Model m1) {
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, m1, RelationshipType.containmentType).items*.id
     }
 
     def "init default indexes not assigned when linking non-sortable relationship type"() {

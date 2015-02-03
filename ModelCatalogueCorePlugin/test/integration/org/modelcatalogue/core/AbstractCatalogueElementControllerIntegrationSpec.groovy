@@ -472,7 +472,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     RelationshipType getRelationshipType(){
-        RelationshipType.relationshipType
+        RelationshipType.relatedToType
     }
 
 

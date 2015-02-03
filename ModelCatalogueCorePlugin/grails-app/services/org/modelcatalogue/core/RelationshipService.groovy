@@ -13,7 +13,12 @@ class RelationshipService {
     def modelCatalogueSecurityService
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
-        Lists.fromCriteria([sort: 'id'] << params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
+        if (type && type.sortable) {
+            params.sort = 'outgoingIndex'
+        } else {
+            params.sort = 'id'
+        }
+        Lists.fromCriteria(params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 
     Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false) {
@@ -51,12 +56,7 @@ class RelationshipService {
         }
 
         if (relationshipType.sortable) {
-            def maxIndex = Relationship.executeQuery("""
-                select max(r.outgoingIndex) from Relationship r
-                where r.source = :source
-                and r.relationshipType = :type
-            """, [source: source, type: relationshipType])[0]
-            relationshipInstance.outgoingIndex = (maxIndex ?: 0) + INDEX_STEP
+            relationshipInstance.outgoingIndex = (getMaxOutgoingIndex(source, relationshipType) ?: 0) + INDEX_STEP
         }
 
         relationshipInstance.save(flush: true)
@@ -167,6 +167,86 @@ class RelationshipService {
             and rel.destination.id = :elementId
             order by c.name
         """, [classification: classification, elementId: element.id]
+    }
+
+    Relationship moveAfter(Relationship relationship, Relationship other) {
+        if (!relationship || relationship.hasErrors() || !relationship.relationshipType.sortable) {
+            return relationship
+        }
+
+        if (!other) {
+            relationship.outgoingIndex = getMinOutgoingIndex(relationship.source, relationship.relationshipType) - INDEX_STEP
+            return relationship.save()
+        }
+
+        if (!other.outgoingIndex) {
+            return moveAfterWithRearrange(relationship, other)
+        }
+
+        if (relationship.source != other.source) {
+            relationship.errors.reject('relationship.moveAfter.different.source', "Cannot reorder as the sources are different ($relationship.source, $other.source)")
+            return relationship
+        }
+
+        Long nextIndex = getMinOutgoingIndexAfter(relationship.source, relationship.relationshipType, other.outgoingIndex)
+
+        if (nextIndex == null) {
+            relationship.outgoingIndex = other.outgoingIndex + INDEX_STEP
+            return relationship.save()
+        }
+
+        if (nextIndex - other.outgoingIndex > 1) {
+            relationship.outgoingIndex = other.outgoingIndex + Math.round((nextIndex.doubleValue() - other.outgoingIndex) / 2)
+            return relationship.save()
+        }
+
+        moveAfterWithRearrange(relationship, other)
+    }
+
+    private Relationship moveAfterWithRearrange(Relationship relationship, Relationship other) {
+        List<Relationship> relationships  = RelationshipDirection.OUTGOING.composeWhere(relationship.source, relationship.relationshipType, []).list()
+        int correction = 0
+        relationships.eachWithIndex { Relationship entry, int i ->
+            if (entry == relationship) {
+                correction = -1
+                return
+            }
+            entry.outgoingIndex = (i + correction ) * INDEX_STEP
+
+            if (entry == other) {
+                correction++
+                relationship.outgoingIndex = (i + correction) * INDEX_STEP
+                relationship.save(failOnError: true)
+            }
+
+            entry.save(failOnError: true)
+        }
+        relationship
+    }
+
+    private static Long getMaxOutgoingIndex(CatalogueElement source, RelationshipType relationshipType) {
+        Relationship.executeQuery("""
+            select max(r.outgoingIndex) from Relationship r
+            where r.source = :source
+            and r.relationshipType = :type
+        """, [source: source, type: relationshipType])[0] as Long
+    }
+
+    private static Long getMinOutgoingIndex(CatalogueElement source, RelationshipType relationshipType) {
+        Relationship.executeQuery("""
+            select min(r.outgoingIndex) from Relationship r
+            where r.source = :source
+            and r.relationshipType = :type
+        """, [source: source, type: relationshipType])[0] as Long
+    }
+
+    private static Long getMinOutgoingIndexAfter(CatalogueElement source, RelationshipType relationshipType, Long current) {
+        Relationship.executeQuery("""
+            select min(r.outgoingIndex) from Relationship r
+            where r.source = :source
+            and r.relationshipType = :type
+            and r.outgoingIndex > :current
+        """, [source: source, type: relationshipType, current: current])[0] as Long
     }
 
 
