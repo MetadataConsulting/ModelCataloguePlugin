@@ -23,6 +23,7 @@
   cd gh-pages
   mkdir -p ./reports/$TRAVIS_BUILD_NUMBER/
   cp -Rf $HOME/reports/* ./reports/$TRAVIS_BUILD_NUMBER/
+  rm -rf ./reports/latest/
   mkdir -p ./reports/latest/
   cp -Rf $HOME/reports/* ./reports/latest/
 
