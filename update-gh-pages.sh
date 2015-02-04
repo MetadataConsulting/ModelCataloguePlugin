@@ -4,7 +4,7 @@
   echo -e "Starting to update gh-pages\n"
 
   #copy data we're interested in to other place
-  cp -R ModelCatalogueCorePluginTestApp/target/geb-reports $HOME/geb-reports
+  cp -R /reports $HOME/reports
 
   #go to home and setup git
   cd $HOME
@@ -16,12 +16,12 @@
 
   #go into diractory and copy data we're interested in to that directory
   cd gh-pages
-  cp -Rf $HOME/geb-reports/* .
+  cp -Rf $HOME/reports/* ./reports/$TRAVIS_BUILD_NUMBER/
 
   #add, commit and push files
   git add -f .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
 
-  echo -e "Done magic with geb\n"
+  echo -e "Done magic with reports\n"
 #fi
