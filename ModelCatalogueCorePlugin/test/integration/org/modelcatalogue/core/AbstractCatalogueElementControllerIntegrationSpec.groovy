@@ -512,6 +512,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         recordResult "${method}${no}", json
         checkJsonCorrectListValues(json, total, size, offset, max, next, previous)
         assert json.itemType == Relationship.name
+        if (typeParam) {
+            assert json.type?.name == typeParam
+        }
         def item = json.list[0]
         assert item.type
         assert item.type.name == "relatedTo"

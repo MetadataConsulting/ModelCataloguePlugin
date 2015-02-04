@@ -194,6 +194,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         respond new Relationships(
+                type: type,
                 owner: element,
                 direction: direction,
                 list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, modelCatalogueSecurityService.currentUser?.classifications ?: []))
@@ -238,7 +239,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 total: total,
                 items: results.searchResults,
         )
-        respond new Relationships(owner: element, direction: direction, list: withLinks(elements))
+        respond new Relationships(owner: element, direction: direction, type: relationshipType, list: withLinks(elements))
     }
 
 

@@ -130,7 +130,6 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       $scope.sortableOptions =
         cursor: 'move'
         handle: '.handle'
-        disabled: not $scope.isSortable
         update: ($event, $ui) ->
           rowAndIndex = getRowAndIndexBefore $ui.item.index()
 
@@ -138,14 +137,15 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
             row: $ui.item.scope().$parent.row
             index: 0
 
+          for row, i in $scope.rows
+            if row.$$hashKey == original.row.$$hashKey
+              original.index = i
+              break
+
+          return if original.index is rowAndIndex.index
+
           $q.when($scope.reorder($row: original, $current: rowAndIndex))
           .then ->
-            for row, i in $scope.rows
-              if row.$$hashKey == original.row.$$hashKey
-                original.index = i
-                break
-
-
             insertIndex = if rowAndIndex.index >= original.index then rowAndIndex.index - 1 else rowAndIndex.index
 
             $scope.rows.splice(original.index, 1)
