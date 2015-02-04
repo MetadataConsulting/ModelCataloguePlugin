@@ -1,8 +1,9 @@
-angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate']).directive 'infiniteTable',  [-> {
+angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate', 'mc.util.ui.sortable']).directive 'infiniteTable',  [-> {
     restrict: 'E'
     replace: true
     scope:
       list: '='
+      isSortable: '=?'
       columns: '=?'
       transform: '&?'
 
@@ -107,6 +108,43 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       $scope.$on 'infiniteTableRedraw', ->
         updateHeader()
         $timeout updateHeader, 100
+
+
+
+      getRowAndIndexBefore = (tableRowIndex) ->
+        return {row: null, index: 0} unless $scope.rows
+        return {row: null, index: 0} unless $scope.rows.length > 0
+
+        return {index: 0, row: null} if tableRowIndex == 0
+
+        counter = tableRowIndex
+
+        for row, i in $scope.rows
+          continue unless $scope.isNotFiltered(row)
+          counter--
+          counter-- if row.$$expanded
+          return {index: i, row: row} if counter <= 0
+
+      $scope.sortableOptions =
+        cursor: 'move'
+        disabled: not $scope.isSortable
+        update: ($event, $ui) ->
+          rowAndIndex = getRowAndIndexBefore $ui.item.index()
+
+          original =
+            row: $ui.item.scope().$parent.row
+            index: 0
+
+          for row, i in $scope.rows
+            if row.$$hashKey == original.row.$$hashKey
+              original.index = i
+              break
+
+
+          insertIndex = if rowAndIndex.index >= original.index then rowAndIndex.index - 1 else rowAndIndex.index
+
+          $scope.rows.splice(original.index, 1)
+          $scope.rows.splice(insertIndex, 0, original.row)
 
       windowEl.resize -> update
 

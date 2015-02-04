@@ -40,6 +40,9 @@
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
 
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        %{--<script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>--}%
+        %{--this is minimized jquery ui needed for ui-sortable plugin, if there is a need to add more functionality from jquery ui--}%
+        <script type="application/javascript" src="//cdn.jsdelivr.net/g/jquery.ui@1.10%28jquery.ui.core.min.js+jquery.ui.widget.min.js+jquery.ui.mouse.min.js+jquery.ui.sortable.min.js%29"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.0/angular.min.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap-tpls.min.js"></script>
@@ -61,6 +64,7 @@
         <asset:stylesheet href="modelcatalogue.css"/>
 
         <asset:javascript src="jquery/dist/jquery.js"/>
+        <asset:javascript src="jquery-ui/jquery-ui.js"/>
         <asset:javascript src="bootstrap/dist/js/bootstrap.js"/>
         <asset:javascript src="angular/angular.js"/>
         <asset:javascript src="angular-animate/angular-animate.js"/>

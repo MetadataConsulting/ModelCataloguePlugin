@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
+angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSanitize', 'mc.util.ui.sortable']).run [ '$templateCache', ($templateCache) ->
     # language=HTML
     $templateCache.put 'modelcatalogue/core/ui/infiniteTable.html', '''
     <div>
@@ -36,7 +36,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
       </div>
       <div class="inf-table-body">
         <table class="inf-table table">
-          <tbody ng-if="rows">
+          <tbody ng-if="rows" sortable="sortableOptions">
              <tr class="inf-table-item-row" ng-repeat-start="row in rows"  ng-class="row.classesForStatus" ng-if="isNotFiltered(row)">
                 <td class="inf-table-item-cell" ng-class="row.head.classes" ng-switch="row.head.type">
                   <a title="Show row actions" ng-click="row.$$expanded = !row.$$expanded" class="inf-cell-expand"><span class="fa fa-fw" ng-class="{'fa-minus-square-o ': row.$$expanded, 'fa-plus-square-o ': !row.$$expanded}"></span></a>
