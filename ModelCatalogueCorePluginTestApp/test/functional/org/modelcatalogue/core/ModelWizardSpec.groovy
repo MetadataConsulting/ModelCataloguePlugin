@@ -32,7 +32,6 @@ class ModelWizardSpec extends GebReportingSpec {
     }
 
     def "Add new model"() {
-
         when: 'I click the add model button'
         addModelButton.click()
 
@@ -83,8 +82,6 @@ class ModelWizardSpec extends GebReportingSpec {
         }
         $('.list-group-item.item-found').click()
 
-        waitUntilModalClosed()
-
         and: 'create child from scratch and leave it filled in'
         name = 'This should create new child model'
 
@@ -130,6 +127,7 @@ class ModelWizardSpec extends GebReportingSpec {
             $('span.catalogue-element-treeview-name', text: "New").displayed
         }
 
+        waitUntilModalClosed(30)
     }
     def "filter by classification"() {
         expect:

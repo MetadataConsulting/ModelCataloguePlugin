@@ -23,6 +23,8 @@
   cd gh-pages
   mkdir -p ./reports/$TRAVIS_BUILD_NUMBER/
   cp -Rf $HOME/reports/* ./reports/$TRAVIS_BUILD_NUMBER/
+  mkdir -p ./reports/latest/
+  cp -Rf $HOME/reports/* ./reports/latest/
 
   #add, commit and push files
   git add -f .
