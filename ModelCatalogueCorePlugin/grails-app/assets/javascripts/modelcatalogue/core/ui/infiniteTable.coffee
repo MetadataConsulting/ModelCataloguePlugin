@@ -129,6 +129,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
       $scope.sortableOptions =
         cursor: 'move'
+        handle: '.handle'
         disabled: not $scope.isSortable
         update: ($event, $ui) ->
           rowAndIndex = getRowAndIndexBefore $ui.item.index()
