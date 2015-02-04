@@ -4,8 +4,12 @@
   echo -e "Starting to update gh-pages\n"
 
   #copy data we're interested in to other place
-  # this is already done in run-all-tests.sh
-  #cp -R /reports $HOME/reports
+  mkdir -p $HOME/reports/last-tests-reports
+  cp -Rf ModelCatalogueCorePlugin/target/test-reports $HOME/reports/last-tests-reports
+  mkdir -p $HOME/reports/test-app-last-tests-reports
+  cp -Rf ModelCatalogueCorePluginTestApp/target/test-reports $HOME/reports/test-app-functional-tests-reports
+  mkdir -p $HOME/reports/test-app-functional-geb-reports
+  cp -Rf ModelCatalogueCorePluginTestApp/target/geb-reports $HOME/reports/test-app-functional-geb-reports
 
   #go to home and setup git
   cd $HOME

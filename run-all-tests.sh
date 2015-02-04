@@ -44,7 +44,5 @@ cp -Rf target/test-reports $HOME/reports/test-app-integration-tests-reports
 ./grailsw test-app functional: -war
 mkdir -p $HOME/reports/test-app-functional-tests-reports
 cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
-mkdir -p $HOME/reports/test-app-functional-geb-reports
-cp -Rf target/geb-reports $HOME/reports/test-app-functional-geb-reports
 
 cd ..
