@@ -94,7 +94,7 @@ class ValueDomain extends CatalogueElement {
         if (!x) {
             return true
         }
-        Set<String> enums = new HashSet<String>((dataType as EnumeratedType).enumerations.keySet())
+        Set<String> enums = new HashSet<String>(dataType.enumerations.keySet())
         if (!enums.contains(x.toString())) {
             return false
         }
