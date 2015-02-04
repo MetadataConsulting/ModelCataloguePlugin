@@ -17,6 +17,7 @@
 
   #go into diractory and copy data we're interested in to that directory
   cd gh-pages
+  mkdir -p ./reports/$TRAVIS_BUILD_NUMBER/
   cp -Rf $HOME/reports/* ./reports/$TRAVIS_BUILD_NUMBER/
 
   #add, commit and push files
