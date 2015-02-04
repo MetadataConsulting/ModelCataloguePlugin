@@ -7,7 +7,7 @@
   mkdir -p $HOME/reports/last-tests-reports
   cp -Rf ModelCatalogueCorePlugin/target/test-reports $HOME/reports/last-tests-reports
   mkdir -p $HOME/reports/test-app-last-tests-reports
-  cp -Rf ModelCatalogueCorePluginTestApp/target/test-reports $HOME/reports/test-app-functional-tests-reports
+  cp -Rf ModelCatalogueCorePluginTestApp/target/test-reports $HOME/reports/test-app-last-tests-reports
   mkdir -p $HOME/reports/test-app-functional-geb-reports
   cp -Rf ModelCatalogueCorePluginTestApp/target/geb-reports $HOME/reports/test-app-functional-geb-reports
 
