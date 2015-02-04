@@ -3,6 +3,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
     replace: true
     scope:
       list: '='
+      reorder: '&?'
       isSortable: '=?'
       columns: '=?'
       transform: '&?'
@@ -21,7 +22,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
 
       windowEl = angular.element($window)
-      handler = (scope) -> $scope.scroll = windowEl.scrollTop()
+      handler = ($scope) -> $scope.scroll = windowEl.scrollTop()
       windowEl.on 'scroll', ->
         $scope.$apply (scope) -> handler(scope)
 
@@ -125,6 +126,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
           counter-- if row.$$expanded
           return {index: i, row: row} if counter <= 0
 
+
       $scope.sortableOptions =
         cursor: 'move'
         disabled: not $scope.isSortable
@@ -135,16 +137,18 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
             row: $ui.item.scope().$parent.row
             index: 0
 
-          for row, i in $scope.rows
-            if row.$$hashKey == original.row.$$hashKey
-              original.index = i
-              break
+          $q.when($scope.reorder($row: original, $current: rowAndIndex))
+          .then ->
+            for row, i in $scope.rows
+              if row.$$hashKey == original.row.$$hashKey
+                original.index = i
+                break
 
 
-          insertIndex = if rowAndIndex.index >= original.index then rowAndIndex.index - 1 else rowAndIndex.index
+            insertIndex = if rowAndIndex.index >= original.index then rowAndIndex.index - 1 else rowAndIndex.index
 
-          $scope.rows.splice(original.index, 1)
-          $scope.rows.splice(insertIndex, 0, original.row)
+            $scope.rows.splice(original.index, 1)
+            $scope.rows.splice(insertIndex, 0, original.row)
 
       windowEl.resize -> update
 
