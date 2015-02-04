@@ -66,10 +66,11 @@ abstract class ModelCataloguePage extends Page {
         loginButton.click()
     }
 
-    void waitUntilModalClosed(int timeout = 10) {
+    boolean waitUntilModalClosed(int timeout = 10) {
         waitFor(timeout){
             !$('.modal-backdrop').displayed
         }
+        return true
     }
 
     /**
