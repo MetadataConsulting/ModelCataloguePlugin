@@ -178,6 +178,9 @@ class ModelWizardSpec extends GebReportingSpec {
     }
 
     def "open the detail view"() {
+        waitFor(30) {
+            subviewTitle.displayed
+        }
 
         when: 'the item is double-clicked'
         $('a.catalogue-element-treeview-link', title: "New").click()
