@@ -4,7 +4,8 @@
   echo -e "Starting to update gh-pages\n"
 
   #copy data we're interested in to other place
-  cp -R /reports $HOME/reports
+  # this is already done in run-all-tests.sh
+  #cp -R /reports $HOME/reports
 
   #go to home and setup git
   cd $HOME
