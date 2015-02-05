@@ -167,7 +167,7 @@ class CatalogueElementProxyRepository {
         DraftContext context = DraftContext.importFriendly()
         T draft = element.createDraftVersion(elementService, context) as T
         if (draft.hasErrors()) {
-            throw new IllegalStateException("Failed to create draft version of $element. Errors: $draft.errors")
+            throw new IllegalStateException(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create draft version of $element", draft.errors))
         }
         context.classifyDrafts()
         draft

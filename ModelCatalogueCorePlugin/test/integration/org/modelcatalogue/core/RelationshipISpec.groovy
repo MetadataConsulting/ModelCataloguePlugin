@@ -186,106 +186,123 @@ class RelationshipISpec extends AbstractIntegrationSpec{
     }
 
 
-    def "init default indexes assigned when linking sortable relationship type so we are able to reorder"() {
-        RelationshipDirection direction = RelationshipDirection.OUTGOING
-
+    @Unroll
+    def "init default indexes assigned when linking sortable relationship type so we are able to reorder (#direction)"() {
         given:
+        RelationshipType type = RelationshipType.relatedToType
         Model m1 = new Model(name: 'M1').save(failOnError: true)
 
         DataElement de1 = new DataElement(name: "DE1").save(failOnError: true)
         DataElement de2 = new DataElement(name: "DE2").save(failOnError: true)
         DataElement de3 = new DataElement(name: "DE3").save(failOnError: true)
 
+
         when:
-        Relationship m1de1 = relationshipService.link(m1, de1, RelationshipType.containmentType)
+        Relationship m1de1 = link(direction, m1, de1, type)
 
         then:
         !m1de1.errors.errorCount
-        m1de1.outgoingIndex
+        direction.getIndex(m1de1)
 
         when:
-        Relationship m1de2 = relationshipService.link(m1, de2, RelationshipType.containmentType)
+        Relationship m1de2 = link(direction, m1, de2, type)
 
         then:
         !m1de2.errors.errorCount
-        m1de2.outgoingIndex
-        m1de1.outgoingIndex < m1de2.outgoingIndex
+        direction.getIndex(m1de2)
+        direction.getIndex(m1de1) < direction.getIndex(m1de2)
 
         when:
-        Relationship m1de3 = relationshipService.link(m1, de3, RelationshipType.containmentType)
+        Relationship m1de3 = link(direction, m1, de3, type)
 
         then:
         !m1de3.errors.errorCount
-        m1de3.outgoingIndex
-        m1de2.outgoingIndex < m1de3.outgoingIndex
+        direction.getIndex(m1de3)
+        direction.getIndex(m1de2) < direction.getIndex(m1de3)
 
         expect: "relationships are sorted from first to the third"
-        getOutgoingContainmentIds(m1) == [m1de1, m1de2, m1de3]*.id
+        getIds(direction, type, m1) == [m1de1, m1de2, m1de3]*.id
 
         when: "first relationship is moved after the third"
-        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de3)
+        printIndexes direction, 'before move', m1de1: m1de1, m2de2: m1de2, m1de3: m1de3
+        m1de1 = relationshipService.moveAfter(direction, m1, m1de1, m1de3)
+        printIndexes direction, 'after move', m1de1: m1de1, m2de2: m1de2, m1de3: m1de3
         !m1de1.errors.errorCount
 
         then: "the index of first is bigger than the third one"
-        m1de1.outgoingIndex > m1de3.outgoingIndex
-        getOutgoingContainmentIds(m1) == [m1de2, m1de3, m1de1]*.id
+        direction.getIndex(m1de1) > direction.getIndex(m1de3)
+        getIds(direction, type, m1) == [m1de2, m1de3, m1de1]*.id
 
         when: "there is no element to move after"
-        m1de1 = relationshipService.moveAfter(direction, m1de1, null)
+        printIndexes direction, 'before move', m1de1: m1de1, m2de2: m1de2, m1de3: m1de3
+        m1de1 = relationshipService.moveAfter(direction, m1, m1de1, null)
+        printIndexes direction, 'after move', m1de1: m1de1, m2de2: m1de2, m1de3: m1de3
 
         then: "then it will be moved to the beginning"
         !m1de1.errors.errorCount
-        m1de1.outgoingIndex < m1de3.outgoingIndex
-        m1de1.outgoingIndex < m1de2.outgoingIndex
-        getOutgoingContainmentIds(m1) == [m1de1, m1de2, m1de3]*.id
+        direction.getIndex(m1de1) < direction.getIndex(m1de3)
+        direction.getIndex(m1de1) < direction.getIndex(m1de2)
+        getIds(direction, type, m1) == [m1de1, m1de2, m1de3]*.id
 
         when: "there is no gap between the relationships"
-        m1de1.outgoingIndex = 1
-        m1de2.outgoingIndex = 2
-        m1de3.outgoingIndex = 3
+        direction.setIndex(m1de1, 1)
+        direction.setIndex(m1de2, 2)
+        direction.setIndex(m1de3, 3)
 
         [m1de1, m1de2, m1de3]*.save(failOnError: true)
 
-        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
-
-        println "Current Order: ${getOutgoingContainmentIds(m1)}"
+        m1de1 = relationshipService.moveAfter(direction, m1, m1de1, m1de2)
 
         then: "the index of first is bigger than the second one"
-        m1de1.outgoingIndex > m1de2.outgoingIndex
+        direction.getIndex(m1de1) > direction.getIndex(m1de2)
 
         and: "the index of first is smaller than the third one"
-        m1de1.outgoingIndex < m1de3.outgoingIndex
+        direction.getIndex(m1de1) < direction.getIndex(m1de3)
 
         when: "all indexes are zero (legacy database)"
-        m1de1.outgoingIndex = 0
-        m1de2.outgoingIndex = 0
-        m1de3.outgoingIndex = 0
+        direction.setIndex(m1de1, 0)
+        direction.setIndex(m1de2, 0)
+        direction.setIndex(m1de3, 0)
 
         [m1de1, m1de2, m1de3]*.save(failOnError: true)
 
-        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
+        m1de1 = relationshipService.moveAfter(direction, m1, m1de1, m1de2)
 
         then: "the index of first is bigger than the second one"
-        m1de1.outgoingIndex > m1de2.outgoingIndex
+        direction.getIndex(m1de1) > direction.getIndex(m1de2)
 
         when: "some indexes are negative"
-        m1de1.outgoingIndex = -1000
-        m1de2.outgoingIndex = 0
-        m1de3.outgoingIndex = 1000
+        direction.setIndex(m1de1, -1000)
+        direction.setIndex(m1de2, 0)
+        direction.setIndex(m1de3, 1000)
 
         [m1de1, m1de2, m1de3]*.save(failOnError: true)
 
-        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
+        m1de1 = relationshipService.moveAfter(direction, m1, m1de1, m1de2)
 
         then: "the index of first is bigger than the second one"
-        m1de1.outgoingIndex > m1de2.outgoingIndex
+        direction.getIndex(m1de1) > direction.getIndex(m1de2)
 
         and: "the index of first is smaller than the third one"
-        m1de1.outgoingIndex < m1de3.outgoingIndex
+        direction.getIndex(m1de1) < direction.getIndex(m1de3)
+
+        where:
+        direction << RelationshipDirection.values()
     }
 
-    private ArrayList<Long> getOutgoingContainmentIds(Model m1) {
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, m1, RelationshipType.containmentType).items*.id
+    private static void printIndexes(Map<String, Relationship> relationships, RelationshipDirection direction, String label) {
+        println "$label:\n    ${relationships.sort {entry -> direction.getIndex(entry.value) } collect { key, value -> "$key: ${direction.getIndex(value)}"} join(', ')}"
+    }
+
+    private Relationship link(RelationshipDirection direction, CatalogueElement source, CatalogueElement destination, RelationshipType type) {
+        if (direction == RelationshipDirection.INCOMING) {
+            return relationshipService.link(destination, source, type)
+        }
+        return relationshipService.link(source, destination, type)
+    }
+
+    private List<Long> getIds(RelationshipDirection direction, RelationshipType type, Model m1) {
+        relationshipService.getRelationships([sort: direction.sortProperty], direction, m1, type).items*.id
     }
 
 }

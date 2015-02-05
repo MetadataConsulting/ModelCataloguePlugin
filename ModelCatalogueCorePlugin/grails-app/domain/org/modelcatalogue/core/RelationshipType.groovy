@@ -88,6 +88,10 @@ class RelationshipType {
 
         if (rule && rule.trim()) {
             def result = validateRule(source, destination, ext)
+            if (result instanceof List && result.size() > 1 && result.first() instanceof String) {
+                return result
+            }
+
             if (result instanceof CharSequence) {
                 return result
             }
@@ -100,8 +104,7 @@ class RelationshipType {
             }
 
             if (result instanceof Throwable) {
-                log.info("Rule thrown an exception. This is slightly discouraged!", result)
-                return result.message
+                return ['rule.did.not.pass.with.exception', result.message]
             }
 
             if (result) {

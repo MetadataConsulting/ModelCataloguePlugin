@@ -554,21 +554,15 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "migrates hierarchy relationship to new draft version"() {
         build {
             model(name: 'MHR ROOT') {
-                status finalized
                 model(name: 'MHR L1') {
-                    status finalized
                     model(name: 'MHR L2') {
-                        status finalized
-                        model(name: 'MHR L3') {
-                            status finalized
-                        }
-
+                        model(name: 'MHR L3')
                     }
-
                 }
-
             }
         }
+
+        elementService.finalizeElement(Model.findByName('MHR ROOT'))
 
         Model l1Finalized = Model.findByName('MHR L1')
 

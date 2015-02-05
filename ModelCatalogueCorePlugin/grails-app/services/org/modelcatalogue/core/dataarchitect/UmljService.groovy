@@ -16,8 +16,7 @@ class UmljService {
     static transactional = false
 
 
-
-    protected void importUmlDiagram(InputStream is, String name, Classification classification) {
+    public void importUmlDiagram(InputStream is, String name, Classification classification) {
 
         def allClasses, topLevelClasses, allDataTypes, allEnumerations;
 

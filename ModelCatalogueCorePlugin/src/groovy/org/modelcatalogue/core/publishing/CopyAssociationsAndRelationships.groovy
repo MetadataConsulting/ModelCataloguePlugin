@@ -1,14 +1,10 @@
 package org.modelcatalogue.core.publishing
 
 import grails.util.Holders
-
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ElementStatus
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.FriendlyErrors
 
 class CopyAssociationsAndRelationships {
 
@@ -44,7 +40,7 @@ class CopyAssociationsAndRelationships {
             if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
             Relationship created = draft.createLinkFrom(DraftContext.preferDraft(r.source), r.relationshipType)
             if (created.hasErrors()) {
-                throw new IllegalStateException("Migrated relationship contains errors: $created.errors")
+                throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship contains errors", created.errors))
             }
             created.ext = r.ext
             if (isOverriding(created, r)) {
@@ -56,7 +52,7 @@ class CopyAssociationsAndRelationships {
             if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
             Relationship created = draft.createLinkTo(DraftContext.preferDraft(r.destination), r.relationshipType)
             if (created.hasErrors()) {
-                throw new IllegalStateException("Migrated relationship contains errors: $created.errors")
+                throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship contains errors", created.errors))
             }
             created.ext = r.ext
             if (isOverriding(created, r)) {

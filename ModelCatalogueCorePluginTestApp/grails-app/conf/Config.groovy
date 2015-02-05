@@ -160,9 +160,11 @@ elasticSearch.datastoreImpl = 'hibernateDatastore'
 
 modelcatalogue.defaults.relationshiptypes =  [
         [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
+            String minOccursString = ext['Min Occurs']
+            String maxOccursString = ext['Max Occurs']
 
-            Integer minOccurs = ext['Min Occurs'] as Integer
-            Integer maxOccurs = ext['Max Occurs'] as Integer
+            Integer minOccurs = minOccursString == 'unbounded' ? Integer.MIN_VALUE : (minOccursString as Integer)
+            Integer maxOccurs = maxOccursString == 'unbounded' ? Integer.MAX_VALUE : (maxOccursString as Integer)
 
             if (minOccurs != null) {
                 if (minOccurs < 0) {

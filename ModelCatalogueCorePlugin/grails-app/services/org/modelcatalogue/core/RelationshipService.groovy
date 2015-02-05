@@ -165,26 +165,31 @@ class RelationshipService {
         """, [classification: classification, elementId: element.id]
     }
 
-    Relationship moveAfter(RelationshipDirection direction, Relationship relationship, Relationship other) {
+    Relationship moveAfter(RelationshipDirection direction, CatalogueElement owner,  Relationship relationship, Relationship other) {
         if (!relationship || relationship.hasErrors()) {
             return relationship
         }
 
         if (!other) {
-            direction.setIndex(relationship, getMinIndex(direction, relationship.source, relationship.relationshipType) - INDEX_STEP)
+            direction.setIndex(relationship, direction.getMinIndexAfter(owner, relationship.relationshipType, Long.MIN_VALUE) - INDEX_STEP)
             return relationship.save()
         }
 
         if (direction.getIndex(relationship) == null) {
-            return moveAfterWithRearrange(direction, relationship, other)
+            return moveAfterWithRearrange(direction, owner, relationship, other)
         }
 
-        if (relationship.source != other.source) {
-            relationship.errors.reject('relationship.moveAfter.different.source', "Cannot reorder as the sources are different ($relationship.source, $other.source)")
+        if (!direction.isOwnedBy(owner, relationship)) {
+            relationship.errors.reject('relationship.moveAfter.different.owner', "Cannot reorder as the relationship $relationship.source is not owned by the element $owner")
             return relationship
         }
 
-        Long nextIndex = getMinIndexAfter(direction, relationship.source, relationship.relationshipType, direction.getIndex(other))
+        if (!direction.isOwnedBy(owner, other)) {
+            relationship.errors.reject('relationship.moveAfter.different.source', "Cannot reorder as the relationship $other.source is not owned by the element $owner")
+            return relationship
+        }
+
+        Long nextIndex = direction.getMinIndexAfter(owner, relationship.relationshipType, direction.getIndex(other))
 
         if (nextIndex == null) {
             direction.setIndex(relationship, direction.getIndex(other) + INDEX_STEP)
@@ -196,11 +201,11 @@ class RelationshipService {
             return relationship.save()
         }
 
-        moveAfterWithRearrange(direction, relationship, other)
+        moveAfterWithRearrange(direction, owner, relationship, other)
     }
 
-    private static Relationship moveAfterWithRearrange(RelationshipDirection direction, Relationship relationship, Relationship other) {
-        List<Relationship> relationships  = RelationshipDirection.OUTGOING.composeWhere(relationship.source, relationship.relationshipType, []).list()
+    private static Relationship moveAfterWithRearrange(RelationshipDirection direction, CatalogueElement owner, Relationship relationship, Relationship other) {
+        List<Relationship> relationships = direction.composeWhere(owner, relationship.relationshipType, []).list([sort: direction.sortProperty])
         int correction = 0
         relationships.eachWithIndex { Relationship entry, Integer i ->
             if (entry == relationship) {
@@ -218,23 +223,6 @@ class RelationshipService {
             entry.save(failOnError: true)
         }
         relationship
-    }
-
-    private static Long getMinIndex(RelationshipDirection direction, CatalogueElement source, RelationshipType relationshipType) {
-        Relationship.executeQuery("""
-            select min(r.""" + direction.sortProperty + """) from Relationship r
-            where r.source = :source
-            and r.relationshipType = :type
-        """, [source: source, type: relationshipType])[0] as Long
-    }
-
-    private static Long getMinIndexAfter(RelationshipDirection direction, CatalogueElement source, RelationshipType relationshipType, Long current) {
-        Relationship.executeQuery("""
-            select min(r.""" + direction.sortProperty + """) from Relationship r
-            where r.source = :source
-            and r.relationshipType = :type
-            and r.""" + direction.sortProperty + """ > :current
-        """, [source: source, type: relationshipType, current: current])[0] as Long
     }
 
 

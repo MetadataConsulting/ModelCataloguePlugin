@@ -4,6 +4,7 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.util.FriendlyErrors
 
 @Log4j
 class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> implements ExtensionAwareBuilder {
@@ -42,7 +43,7 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
             }
             Relationship relationship = sourceElement.createLinkTo(destinationElement, type, true)
             if (relationship.hasErrors()) {
-                log.error(relationship.errors)
+                log.error(FriendlyErrors.printErrors("Cannot create relationship of type  $relationshipTypeName between $sourceElement and $destinationElement", relationship.errors))
                 throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement.")
             }
             if (extensions) {

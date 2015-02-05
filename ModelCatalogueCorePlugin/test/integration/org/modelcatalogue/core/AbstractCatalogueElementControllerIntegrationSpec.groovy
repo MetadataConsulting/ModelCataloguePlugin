@@ -5,6 +5,7 @@ import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Unroll
 
@@ -96,7 +97,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         while ((el.versionNumber != 3) && (counter++ < 3)) {
             el = elementService.createDraftVersion(elementService.finalizeElement(el), DraftContext.userFriendly())
             if (el.hasErrors()) {
-                throw new IllegalStateException("Creating draft version fails with ${el.errors}")
+                throw new IllegalStateException(FriendlyErrors.printErrors("Creating draft version fails with errors", el.errors))
             }
         }
         if (counter >= 3) {

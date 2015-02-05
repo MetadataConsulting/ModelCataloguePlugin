@@ -84,7 +84,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (!resource.get(id)) {
+
+        CatalogueElement owner = resource.get(id)
+        if (!owner) {
             notFound()
             return
         }
@@ -117,7 +119,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        rel = relationshipService.moveAfter(direction, rel, current)
+        rel = relationshipService.moveAfter(direction, owner, rel, current)
 
         respond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)
     }

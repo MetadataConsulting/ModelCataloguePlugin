@@ -523,7 +523,7 @@ class XSDImporter {
             if (r.archived || r.relationshipType.name == 'supersession' || r.relationshipType.name == 'base' || r.relationshipType.name == 'hierarchy') continue
             def newR = relationshipService.link(r.source, newModel, r.relationshipType)
             if (newR.hasErrors()) {
-                log.error("ERROR copying relationships: $newR.errors")
+                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("ERROR copying relationships", newR.errors))
             } else {
                 r.ext.each { key, value ->
                     newR.ext.put(key, value)
@@ -535,7 +535,7 @@ class XSDImporter {
             if (r.archived || r.relationshipType.name == 'supersession' || r.relationshipType.name == 'base') continue
             def newR = relationshipService.link(newModel, r.destination, r.relationshipType)
             if (newR.hasErrors()) {
-                log.error("ERROR copying relationships: $newR.errors")
+                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("ERROR copying relationships", newR.errors))
             } else {
                 r.ext.each { key, value ->
                     newR.ext.put(key, value)

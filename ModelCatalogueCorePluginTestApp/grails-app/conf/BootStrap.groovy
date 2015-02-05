@@ -169,7 +169,7 @@ class BootStrap {
 
             Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
             if (createRelationshipAction.hasErrors()) {
-                println createRelationshipAction.errors
+                println(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
