@@ -13,11 +13,6 @@ class RelationshipService {
     def modelCatalogueSecurityService
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
-        if (type && type.sortable) {
-            params.sort = 'outgoingIndex'
-        } else {
-            params.sort = 'id'
-        }
         Lists.fromCriteria(params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 

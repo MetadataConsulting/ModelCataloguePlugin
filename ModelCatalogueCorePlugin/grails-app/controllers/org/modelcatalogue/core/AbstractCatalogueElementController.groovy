@@ -240,10 +240,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (direction == RelationshipDirection.OUTGOING && !params.sort) {
-            params.sort = 'outgoingIndex'
-        }
-
         respond new Relationships(
                 type: type,
                 owner: element,

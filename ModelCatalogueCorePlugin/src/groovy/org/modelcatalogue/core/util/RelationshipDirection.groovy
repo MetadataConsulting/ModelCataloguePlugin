@@ -69,6 +69,8 @@ enum RelationshipDirection {
                 }
             }
 
+            criteria.sort('outgoingIndex')
+
             criteria
         }
 
