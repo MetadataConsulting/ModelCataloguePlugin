@@ -102,7 +102,7 @@
 <body>
 <div id="metadataCurator" ng-app="metadataCurator" >
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container">
+        <div class="container-fluid">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -134,7 +134,7 @@
         </div>
     </div>
 
-    <div class="container container-main">
+    <div class="container-fluid container-main">
         <div class="row">
             <div class="col-md-12">
                 <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
@@ -146,7 +146,7 @@
     </div>
 
     <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
-        <div class="container">
+        <div class="container-fluid">
             <contextual-menu role="navigation-bottom-left"></contextual-menu>
             <contextual-menu role="navigation-bottom-right" right="true"></contextual-menu>
             <g:if env="test">
