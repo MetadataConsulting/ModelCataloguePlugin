@@ -1,8 +1,10 @@
-angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate']).directive 'infiniteTable',  [-> {
+angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.core.ui.columnsSupportCtrl', 'ngAnimate', 'mc.util.ui.sortable']).directive 'infiniteTable',  [-> {
     restrict: 'E'
     replace: true
     scope:
       list: '='
+      reorder: '&?'
+      isSortable: '=?'
       columns: '=?'
       transform: '&?'
 
@@ -20,7 +22,7 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
 
       windowEl = angular.element($window)
-      handler = (scope) -> $scope.scroll = windowEl.scrollTop()
+      handler = ($scope) -> $scope.scroll = windowEl.scrollTop()
       windowEl.on 'scroll', ->
         $scope.$apply (scope) -> handler(scope)
 
@@ -107,6 +109,53 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       $scope.$on 'infiniteTableRedraw', ->
         updateHeader()
         $timeout updateHeader, 100
+
+
+
+      getRowAndIndexBefore = (tableRowIndex, originalRowAndIndex) ->
+        return {row: null, index: -1} unless $scope.rows
+        return {row: null, index: -1} unless $scope.rows.length > 0
+
+        return {index: -1, row: null} if tableRowIndex == 0
+
+        counter = tableRowIndex
+
+        for row, i in $scope.rows
+          continue unless $scope.isNotFiltered(row)
+          counter++ if i == originalRowAndIndex.index
+          counter--
+          counter-- if row.$$expanded
+          if counter <= 0
+            return {index: i, row: row}
+        return { index: $scope.rows.length - 1, row: $scope.rows[-1] }
+
+
+      $scope.sortableOptions =
+        cursor: 'move'
+        handle: '.handle'
+        update: ($event, $ui) ->
+          original =
+            row: $ui.item.scope().$parent.row
+            index: 0
+
+          for row, i in $scope.rows
+            if row.$$hashKey == original.row.$$hashKey
+              original.index = i
+              break
+
+          rowAndIndex = getRowAndIndexBefore $ui.item.index(), original
+
+
+
+          return if original.index is rowAndIndex.index
+
+          $scope.$apply (scope) ->
+            $q.when(scope.reorder($row: original, $current: rowAndIndex))
+            .then ->
+              insertIndex = if original.index < rowAndIndex.index then rowAndIndex.index else rowAndIndex.index + 1
+
+              scope.rows.splice(original.index, 1)
+              scope.rows.splice(insertIndex, 0, original.row)
 
       windowEl.resize -> update
 

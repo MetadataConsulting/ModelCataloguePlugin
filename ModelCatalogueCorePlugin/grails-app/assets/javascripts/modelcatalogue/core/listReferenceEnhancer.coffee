@@ -31,6 +31,12 @@ angular.module('mc.core.listReferenceEnhancer', ['mc.util.rest', 'mc.util.enhanc
         enhance(rest(method: 'DELETE', url: url, data: payload)).then (result)->
           $rootScope.$broadcast 'catalogueElementDeleted', payload, result, url
           result
+
+      query.reorder = (moved, current) ->
+        enhance(rest(method: 'PUT', url: link, data: {moved: moved, current: current})).then (result)->
+          $rootScope.$broadcast 'listReferenceReordered', query, moved, current
+          result
+
       query
   ]
 

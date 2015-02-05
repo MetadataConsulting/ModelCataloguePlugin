@@ -6,18 +6,29 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 class RelationshipService {
 
+    static final long INDEX_STEP = 1000
+
     static transactional = true
 
     def modelCatalogueSecurityService
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
-        Lists.fromCriteria([sort: 'id'] << params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
+        if (!params.sort) {
+            params.sort = direction.sortProperty
+        }
+        Lists.fromCriteria(params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 
-    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false) {
+    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false, boolean resetIndexes = false) {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
-            if (relationshipInstance) { return relationshipInstance }
+            if (relationshipInstance) {
+                if (!resetIndexes) {
+                    return relationshipInstance
+                }
+                relationshipInstance.resetIndexes()
+                return relationshipInstance.save(flush: true)
+            }
         }
 
         Relationship relationshipInstance = new Relationship(
@@ -31,15 +42,11 @@ class RelationshipService {
         //specific rules when creating links to and from published elements
         // TODO: it doesn't seem to be good idea place it here. would be nice if you can put it somewhere where it is more pluggable
         if(!ignoreRules) {
-            if (relationshipType.name == "containment" && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+            if (relationshipType.name in ["containment", "hierarchy"] && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
                 relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new data elements to {0} models. Please create a new version before adding any additional elements")
                 return relationshipInstance
             }
 
-            if (relationshipType.name == "instantiation" && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new value domain elements to {0} data element. Please create a new version before adding any additional values")
-                return relationshipInstance
-            }
         }
 
         relationshipInstance.validate()
@@ -156,6 +163,78 @@ class RelationshipService {
             and rel.destination.id = :elementId
             order by c.name
         """, [classification: classification, elementId: element.id]
+    }
+
+    Relationship moveAfter(RelationshipDirection direction, Relationship relationship, Relationship other) {
+        if (!relationship || relationship.hasErrors()) {
+            return relationship
+        }
+
+        if (!other) {
+            direction.setIndex(relationship, getMinIndex(direction, relationship.source, relationship.relationshipType) - INDEX_STEP)
+            return relationship.save()
+        }
+
+        if (direction.getIndex(relationship) == null) {
+            return moveAfterWithRearrange(direction, relationship, other)
+        }
+
+        if (relationship.source != other.source) {
+            relationship.errors.reject('relationship.moveAfter.different.source', "Cannot reorder as the sources are different ($relationship.source, $other.source)")
+            return relationship
+        }
+
+        Long nextIndex = getMinIndexAfter(direction, relationship.source, relationship.relationshipType, direction.getIndex(other))
+
+        if (nextIndex == null) {
+            direction.setIndex(relationship, direction.getIndex(other) + INDEX_STEP)
+            return relationship.save()
+        }
+
+        if (nextIndex - direction.getIndex(other) > 1) {
+            direction.setIndex(relationship, direction.getIndex(other) + Math.round((nextIndex.doubleValue() - direction.getIndex(other)) / 2))
+            return relationship.save()
+        }
+
+        moveAfterWithRearrange(direction, relationship, other)
+    }
+
+    private static Relationship moveAfterWithRearrange(RelationshipDirection direction, Relationship relationship, Relationship other) {
+        List<Relationship> relationships  = RelationshipDirection.OUTGOING.composeWhere(relationship.source, relationship.relationshipType, []).list()
+        int correction = 0
+        relationships.eachWithIndex { Relationship entry, Integer i ->
+            if (entry == relationship) {
+                correction = -1
+                return
+            }
+            direction.setIndex(entry, (i + correction ) * INDEX_STEP)
+
+            if (entry == other) {
+                correction++
+                direction.setIndex(relationship, (i + correction) * INDEX_STEP)
+                relationship.save(failOnError: true)
+            }
+
+            entry.save(failOnError: true)
+        }
+        relationship
+    }
+
+    private static Long getMinIndex(RelationshipDirection direction, CatalogueElement source, RelationshipType relationshipType) {
+        Relationship.executeQuery("""
+            select min(r.""" + direction.sortProperty + """) from Relationship r
+            where r.source = :source
+            and r.relationshipType = :type
+        """, [source: source, type: relationshipType])[0] as Long
+    }
+
+    private static Long getMinIndexAfter(RelationshipDirection direction, CatalogueElement source, RelationshipType relationshipType, Long current) {
+        Relationship.executeQuery("""
+            select min(r.""" + direction.sortProperty + """) from Relationship r
+            where r.source = :source
+            and r.relationshipType = :type
+            and r.""" + direction.sortProperty + """ > :current
+        """, [source: source, type: relationshipType, current: current])[0] as Long
     }
 
 

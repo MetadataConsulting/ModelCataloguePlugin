@@ -115,6 +115,30 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
 
       onObjectOrHintsChanged($scope.object, $scope.hints ? [])
 
+      $scope.sortableOptions = {
+        cursor: 'move'
+        handle: '.handle'
+        update: ($event, $ui) ->
+          return unless $scope.object.type == 'orderedMap'
+
+          newIndex = $ui.item.index()
+          property = $ui.item.scope().property
+          propertyIndex = 0
+          for prop, i in $scope.editableProperties
+            if prop.$$hashKey == property.$$hashKey
+              propertyIndex = i
+              break
+
+          $scope.$apply (scope)->
+            scope.editableProperties.splice(propertyIndex, 1)
+            scope.editableProperties.splice(newIndex, 0, property)
+
+            value = $scope.object.values[propertyIndex]
+
+            scope.object.values.splice(propertyIndex, 1)
+            scope.object.values.splice(newIndex, 0, value)
+      }
+
       $scope.addNewRowOnTab = ($event, index, last)->
         $scope.addProperty(index, {key: '', value: ''}) if $event.keyCode == 9 and last
 

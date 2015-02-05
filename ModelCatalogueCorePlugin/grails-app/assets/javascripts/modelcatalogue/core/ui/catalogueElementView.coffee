@@ -279,6 +279,13 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         $scope.property = tab.name
         $scope.$broadcast 'infiniteTableRedraw'
 
+      $scope.isTableSortable = (tab) ->
+        return false unless tab.value?.size > 1
+        return false unless tab.value?.type
+        return true
+
+      $scope.reorder = (tab, $row, $current) ->
+        tab.loader.reorder($row.row.element, $current?.row?.element)
 
       refreshElement = () ->
         if $scope.element

@@ -2,12 +2,11 @@
 
     import geb.spock.GebReportingSpec
     import org.modelcatalogue.core.pages.DataViewPage
+    import spock.lang.Stepwise
 
     /**
      * Created by david on 02/11/14.
      */
-    import spock.lang.Stepwise
-
     @Stepwise
     class DataElementWizardSpec extends GebReportingSpec  {
 
@@ -35,6 +34,7 @@
 
 
         def "Add new data element"(){
+            waitUntilModalClosed()
             when: 'I click the add model button'
             addNewDataElementButton.click()
 
@@ -66,6 +66,7 @@
 
 
         def "Check the data element shows up with own details"(){
+            waitUntilModalClosed()
             when: 'Data Element is located'
 
             waitFor {
@@ -84,6 +85,7 @@
         }
 
         def "Edit the value domain"() {
+            waitUntilModalClosed()
             when: "edit action is clicked"
             actionButton('edit-catalogue-element').click()
 
@@ -106,6 +108,7 @@
         }
 
         def "Remove the value domain"() {
+            waitUntilModalClosed()
             when: "edit action is clicked"
             actionButton('edit-catalogue-element').click()
 
@@ -127,6 +130,7 @@
         }
 
         def "finalize element"() {
+            waitUntilModalClosed()
             when: "finalize is clicked"
             actionButton('finalize').click()
 
@@ -146,6 +150,7 @@
         }
 
         def "create new version of the element"() {
+            waitUntilModalClosed()
             when: "new version is clicked"
             actionButton('create-new-version').click()
 
@@ -165,6 +170,7 @@
         }
 
         def "deprecate the element"() {
+            waitUntilModalClosed()
             when: "depracete action is clicked"
             actionButton('archive').click()
 
@@ -184,6 +190,7 @@
         }
 
         def "hard delete the element"() {
+            waitUntilModalClosed()
             when: "delete action is clicked"
             actionButton('delete').click()
 

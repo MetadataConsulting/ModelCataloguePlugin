@@ -134,20 +134,16 @@ class RelationshipType {
         readByName("classification")
     }
 
-    static getContextType() {
-        readByName("context")
+    static getSynonymType() {
+        readByName("synonym")
     }
 
-    static getRelationshipType() {
-        readByName("relationship")
+    static getRelatedToType() {
+        readByName("relatedTo")
     }
 
     static getHierarchyType() {
         readByName("hierarchy")
-    }
-
-    static getInclusionType() {
-        readByName("inclusion")
     }
 
     static getSupersessionType() {

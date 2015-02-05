@@ -6,6 +6,7 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
+import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
 
@@ -60,6 +61,65 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     def removeIncoming(Long id, String type) {
         removeRelation(id, type, false)
+    }
+
+
+    def reorderOutgoing(Long id, String type) {
+        reorderInternal(RelationshipDirection.OUTGOING, id, type)
+    }
+
+    def reorderIncoming(Long id, String type) {
+        reorderInternal(RelationshipDirection.INCOMING, id, type)
+    }
+
+    def reorderCombined(Long id, String type) {
+        reorderInternal(RelationshipDirection.BOTH, id, type)
+    }
+
+
+    private reorderInternal(RelationshipDirection direction, Long id, String type) {
+        // begin sanity checks
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (!resource.get(id)) {
+            notFound()
+            return
+        }
+
+        if (!RelationshipType.findByName(type)) {
+            notFound()
+            return
+        }
+        // end sanity checks
+
+        Long movedId = objectToBind?.moved?.id
+        Long currentId = objectToBind?.current?.id
+
+        if (!movedId) {
+            render status: HttpStatus.NOT_ACCEPTABLE
+            return
+        }
+
+        Relationship rel = Relationship.get(movedId)
+
+        if (!rel) {
+            notFound()
+            return
+        }
+
+        Relationship current = currentId ? Relationship.get(currentId) : null
+
+        if (!current && currentId) {
+            notFound()
+            return
+        }
+
+        rel = relationshipService.moveAfter(direction, rel, current)
+
+        respond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)
     }
 
     private void removeRelation(Long id, String type, boolean outgoing) {
@@ -181,6 +241,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
         handleParams(max)
 
+        if (!params.sort) {
+            params.sort = direction.sortProperty
+        }
+
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
@@ -194,6 +258,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         respond new Relationships(
+                type: type,
                 owner: element,
                 direction: direction,
                 list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, modelCatalogueSecurityService.currentUser?.classifications ?: []))
@@ -238,7 +303,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 total: total,
                 items: results.searchResults,
         )
-        respond new Relationships(owner: element, direction: direction, list: withLinks(elements))
+        respond new Relationships(owner: element, direction: direction, type: relationshipType, list: withLinks(elements))
     }
 
 

@@ -49,6 +49,16 @@ enum RelationshipDirection {
         String getActionName() {
             "incoming"
         }
+
+        @Override
+        String getSortProperty() {
+            "incomingIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.incomingIndex
+        }
     },
     OUTGOING {
 
@@ -68,6 +78,8 @@ enum RelationshipDirection {
                     isNull('classification')
                 }
             }
+
+            criteria.sort('outgoingIndex')
 
             criteria
         }
@@ -90,6 +102,16 @@ enum RelationshipDirection {
         @Override
         String getActionName() {
             "outgoing"
+        }
+
+        @Override
+        String getSortProperty() {
+            "outgoingIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.outgoingIndex
         }
 
     },
@@ -136,6 +158,16 @@ enum RelationshipDirection {
         String getActionName() {
             "relationships"
         }
+
+        @Override
+        String getSortProperty() {
+            "combinedIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.combinedIndex
+        }
     }
 
     abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications)
@@ -143,7 +175,12 @@ enum RelationshipDirection {
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)
     abstract String getActionName()
+    abstract String getSortProperty()
+    abstract Long getIndex(Relationship rel)
 
+    void setIndex(Relationship rel, Long value) {
+        rel.setProperty(sortProperty, value)
+    }
     static RelationshipDirection parse(String direction) {
         switch (direction) {
             case ['incoming', 'destinationToSource']: return INCOMING

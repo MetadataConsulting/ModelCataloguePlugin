@@ -607,4 +607,46 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
 
+    def "order from builder is persisted"() {
+        when:
+        build {
+            classification (name: 'Order Test') {
+                model (name: 'OT Parent') {
+                    dataElement (name: 'OT Child 002')
+                    dataElement (name: 'OT Child 001')
+                    dataElement (name: 'OT Child 004')
+                    dataElement (name: 'OT Child 003')
+                }
+            }
+        }
+
+        then:
+        Model.findByName('OT Parent').contains*.name == [
+                'OT Child 002',
+                'OT Child 001',
+                'OT Child 004',
+                'OT Child 003'
+        ]
+
+        when:
+        build {
+            classification (name: 'Order Test') {
+                model (name: 'OT Parent') {
+                    dataElement (name: 'OT Child 001')
+                    dataElement (name: 'OT Child 002')
+                    dataElement (name: 'OT Child 003')
+                    dataElement (name: 'OT Child 004')
+                }
+            }
+        }
+
+        then:
+        Model.findByName('OT Parent').contains*.name == [
+                'OT Child 001',
+                'OT Child 002',
+                'OT Child 003',
+                'OT Child 004'
+        ]
+    }
+
 }

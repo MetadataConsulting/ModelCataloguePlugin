@@ -1,4 +1,3 @@
-import grails.util.Environment
 import org.modelcatalogue.core.*
 
 // locations to search for config files that get merged into the main config;

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.RelationshipDirection
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -25,17 +26,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         reltype = RelationshipType.findByName("relationship")
         vd1 = ValueDomain.findByName("school subject")
     }
-
-    /*def cleanupSpec(){
-
-        de1.delete()
-        de2.delete()
-        dt.delete()
-        ms.delete()
-        md1.delete()
-        reltype.delete()
-        vd1.delete()
-    }*/
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
@@ -138,7 +128,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         testNumber | validates  | args
         1  | false | [:]
         2  | false | [source: new DataElement(name: 'element1'), destination: de1]
-        3  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.contextType]
         5  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.containmentType]
         6  | true  | [source: md1, destination: de1, relationshipType: RelationshipType.containmentType]
         7  | false | [source: new DataElement(name: 'parentModel'), destination: md1, relationshipType: RelationshipType.hierarchyType]
@@ -195,4 +184,108 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         classification?.delete()
         model?.delete()
     }
+
+
+    def "init default indexes assigned when linking sortable relationship type so we are able to reorder"() {
+        RelationshipDirection direction = RelationshipDirection.OUTGOING
+
+        given:
+        Model m1 = new Model(name: 'M1').save(failOnError: true)
+
+        DataElement de1 = new DataElement(name: "DE1").save(failOnError: true)
+        DataElement de2 = new DataElement(name: "DE2").save(failOnError: true)
+        DataElement de3 = new DataElement(name: "DE3").save(failOnError: true)
+
+        when:
+        Relationship m1de1 = relationshipService.link(m1, de1, RelationshipType.containmentType)
+
+        then:
+        !m1de1.errors.errorCount
+        m1de1.outgoingIndex
+
+        when:
+        Relationship m1de2 = relationshipService.link(m1, de2, RelationshipType.containmentType)
+
+        then:
+        !m1de2.errors.errorCount
+        m1de2.outgoingIndex
+        m1de1.outgoingIndex < m1de2.outgoingIndex
+
+        when:
+        Relationship m1de3 = relationshipService.link(m1, de3, RelationshipType.containmentType)
+
+        then:
+        !m1de3.errors.errorCount
+        m1de3.outgoingIndex
+        m1de2.outgoingIndex < m1de3.outgoingIndex
+
+        expect: "relationships are sorted from first to the third"
+        getOutgoingContainmentIds(m1) == [m1de1, m1de2, m1de3]*.id
+
+        when: "first relationship is moved after the third"
+        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de3)
+        !m1de1.errors.errorCount
+
+        then: "the index of first is bigger than the third one"
+        m1de1.outgoingIndex > m1de3.outgoingIndex
+        getOutgoingContainmentIds(m1) == [m1de2, m1de3, m1de1]*.id
+
+        when: "there is no element to move after"
+        m1de1 = relationshipService.moveAfter(direction, m1de1, null)
+
+        then: "then it will be moved to the beginning"
+        !m1de1.errors.errorCount
+        m1de1.outgoingIndex < m1de3.outgoingIndex
+        m1de1.outgoingIndex < m1de2.outgoingIndex
+        getOutgoingContainmentIds(m1) == [m1de1, m1de2, m1de3]*.id
+
+        when: "there is no gap between the relationships"
+        m1de1.outgoingIndex = 1
+        m1de2.outgoingIndex = 2
+        m1de3.outgoingIndex = 3
+
+        [m1de1, m1de2, m1de3]*.save(failOnError: true)
+
+        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
+
+        println "Current Order: ${getOutgoingContainmentIds(m1)}"
+
+        then: "the index of first is bigger than the second one"
+        m1de1.outgoingIndex > m1de2.outgoingIndex
+
+        and: "the index of first is smaller than the third one"
+        m1de1.outgoingIndex < m1de3.outgoingIndex
+
+        when: "all indexes are zero (legacy database)"
+        m1de1.outgoingIndex = 0
+        m1de2.outgoingIndex = 0
+        m1de3.outgoingIndex = 0
+
+        [m1de1, m1de2, m1de3]*.save(failOnError: true)
+
+        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
+
+        then: "the index of first is bigger than the second one"
+        m1de1.outgoingIndex > m1de2.outgoingIndex
+
+        when: "some indexes are negative"
+        m1de1.outgoingIndex = -1000
+        m1de2.outgoingIndex = 0
+        m1de3.outgoingIndex = 1000
+
+        [m1de1, m1de2, m1de3]*.save(failOnError: true)
+
+        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
+
+        then: "the index of first is bigger than the second one"
+        m1de1.outgoingIndex > m1de2.outgoingIndex
+
+        and: "the index of first is smaller than the third one"
+        m1de1.outgoingIndex < m1de3.outgoingIndex
+    }
+
+    private ArrayList<Long> getOutgoingContainmentIds(Model m1) {
+        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, m1, RelationshipType.containmentType).items*.id
+    }
+
 }

@@ -26,7 +26,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     cell
 
   getRowForElement = (element) ->
-    row = {element: element, properties: [], classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll}
+    row = {element: element, properties: [], sortable: $scope.isSortable, classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll}
 
     if $scope.columns
       row.head = getCellForColumn(element, $scope.columns[0])

@@ -12,6 +12,8 @@ class RelationshipsMarshaller extends ListWrapperMarshaller {
     @Override
     protected Map<String, Object> prepareJsonMap(Object relationsList) {
         def ret = super.prepareJsonMap(relationsList)
+        ret.type = relationsList.type
+        ret.direction = relationsList.direction.actionName
         ret.list = relationsList.items.collect {
             [id: it.id, type: it.relationshipType, ext: it.ext, element: CatalogueElementMarshallers.minimalCatalogueElementJSON(relationsList.direction.getElement(relationsList.owner, it)),  relation: relationsList.direction.getRelation(relationsList.owner, it), direction: relationsList.direction.getDirection(relationsList.owner, it), removeLink: getDeleteLink(relationsList.owner, it), archived: it.archived, elementType: Relationship.name, classification: CatalogueElementMarshallers.minimalCatalogueElementJSON(it.classification)]
         }
