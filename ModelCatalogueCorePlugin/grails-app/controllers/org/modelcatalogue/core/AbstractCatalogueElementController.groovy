@@ -65,6 +65,19 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
 
     def reorderOutgoing(Long id, String type) {
+        reorderInternal(RelationshipDirection.OUTGOING, id, type)
+    }
+
+    def reorderIncoming(Long id, String type) {
+        reorderInternal(RelationshipDirection.INCOMING, id, type)
+    }
+
+    def reorderCombined(Long id, String type) {
+        reorderInternal(RelationshipDirection.BOTH, id, type)
+    }
+
+
+    private reorderInternal(RelationshipDirection direction, Long id, String type) {
         // begin sanity checks
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             notAuthorized()
@@ -104,7 +117,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        rel = relationshipService.moveAfter(rel, current)
+        rel = relationshipService.moveAfter(direction, rel, current)
 
         respond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)
     }
@@ -227,6 +240,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     private relationshipsInternal(Integer max, String typeParam, RelationshipDirection direction) {
         handleParams(max)
+
+        if (!params.sort) {
+            params.sort = direction.sortProperty
+        }
 
         CatalogueElement element = queryForResource(params.id)
         if (!element) {

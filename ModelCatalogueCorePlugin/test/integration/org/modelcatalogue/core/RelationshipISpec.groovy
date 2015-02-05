@@ -187,15 +187,14 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
 
     def "init default indexes assigned when linking sortable relationship type so we are able to reorder"() {
+        RelationshipDirection direction = RelationshipDirection.OUTGOING
+
         given:
         Model m1 = new Model(name: 'M1').save(failOnError: true)
 
         DataElement de1 = new DataElement(name: "DE1").save(failOnError: true)
         DataElement de2 = new DataElement(name: "DE2").save(failOnError: true)
         DataElement de3 = new DataElement(name: "DE3").save(failOnError: true)
-
-        expect:
-        RelationshipType.containmentType.sortable
 
         when:
         Relationship m1de1 = relationshipService.link(m1, de1, RelationshipType.containmentType)
@@ -220,8 +219,11 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         m1de3.outgoingIndex
         m1de2.outgoingIndex < m1de3.outgoingIndex
 
+        expect: "relationships are sorted from first to the third"
+        getOutgoingContainmentIds(m1) == [m1de1, m1de2, m1de3]*.id
+
         when: "first relationship is moved after the third"
-        m1de1 = relationshipService.moveAfter(m1de1, m1de3)
+        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de3)
         !m1de1.errors.errorCount
 
         then: "the index of first is bigger than the third one"
@@ -229,7 +231,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         getOutgoingContainmentIds(m1) == [m1de2, m1de3, m1de1]*.id
 
         when: "there is no element to move after"
-        m1de1 = relationshipService.moveAfter(m1de1, null)
+        m1de1 = relationshipService.moveAfter(direction, m1de1, null)
 
         then: "then it will be moved to the beginning"
         !m1de1.errors.errorCount
@@ -244,7 +246,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         [m1de1, m1de2, m1de3]*.save(failOnError: true)
 
-        m1de1 = relationshipService.moveAfter(m1de1, m1de2)
+        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
 
         then: "the index of first is bigger than the second one"
         m1de1.outgoingIndex > m1de2.outgoingIndex
@@ -259,7 +261,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         [m1de1, m1de2, m1de3]*.save(failOnError: true)
 
-        m1de1 = relationshipService.moveAfter(m1de1, m1de2)
+        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
 
         then: "the index of first is bigger than the second one"
         m1de1.outgoingIndex > m1de2.outgoingIndex
@@ -271,7 +273,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         [m1de1, m1de2, m1de3]*.save(failOnError: true)
 
-        m1de1 = relationshipService.moveAfter(m1de1, m1de2)
+        m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
 
         then: "the index of first is bigger than the second one"
         m1de1.outgoingIndex > m1de2.outgoingIndex
@@ -282,33 +284,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     private ArrayList<Long> getOutgoingContainmentIds(Model m1) {
         relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, m1, RelationshipType.containmentType).items*.id
-    }
-
-    def "init default indexes not assigned when linking non-sortable relationship type"() {
-        given:
-        Model m1 = new Model(name: 'M1').save(failOnError: true)
-
-        DataElement de1 = new DataElement(name: "DE1").save(failOnError: true)
-        DataElement de2 = new DataElement(name: "DE2").save(failOnError: true)
-        DataElement de3 = new DataElement(name: "DE3").save(failOnError: true)
-
-        when:
-        Relationship m1de1 = relationshipService.link(m1, de1, RelationshipType.relatedToType)
-
-        then:
-        !m1de1.outgoingIndex
-
-        when:
-        Relationship m1de2 = relationshipService.link(m1, de2, RelationshipType.relatedToType)
-
-        then:
-        !m1de2.outgoingIndex
-
-        when:
-        Relationship m1de3 = relationshipService.link(m1, de3, RelationshipType.relatedToType)
-
-        then:
-        !m1de3.outgoingIndex
     }
 
 }

@@ -13,6 +13,9 @@ class RelationshipService {
     def modelCatalogueSecurityService
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
+        if (!params.sort) {
+            params.sort = direction.sortProperty
+        }
         Lists.fromCriteria(params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 
@@ -54,10 +57,6 @@ class RelationshipService {
 
         if (relationshipInstance.hasErrors()) {
             return relationshipInstance
-        }
-
-        if (relationshipType.sortable) {
-            relationshipInstance.outgoingIndex = (getMaxOutgoingIndex(source, relationshipType) ?: 0) + INDEX_STEP
         }
 
         relationshipInstance.save(flush: true)
@@ -170,18 +169,18 @@ class RelationshipService {
         """, [classification: classification, elementId: element.id]
     }
 
-    Relationship moveAfter(Relationship relationship, Relationship other) {
-        if (!relationship || relationship.hasErrors() || !relationship.relationshipType.sortable) {
+    Relationship moveAfter(RelationshipDirection direction, Relationship relationship, Relationship other) {
+        if (!relationship || relationship.hasErrors()) {
             return relationship
         }
 
         if (!other) {
-            relationship.outgoingIndex = getMinOutgoingIndex(relationship.source, relationship.relationshipType) - INDEX_STEP
+            direction.setIndex(relationship, getMinIndex(direction, relationship.source, relationship.relationshipType) - INDEX_STEP)
             return relationship.save()
         }
 
-        if (other.outgoingIndex == null) {
-            return moveAfterWithRearrange(relationship, other)
+        if (direction.getIndex(relationship) == null) {
+            return moveAfterWithRearrange(direction, relationship, other)
         }
 
         if (relationship.source != other.source) {
@@ -189,22 +188,22 @@ class RelationshipService {
             return relationship
         }
 
-        Long nextIndex = getMinOutgoingIndexAfter(relationship.source, relationship.relationshipType, other.outgoingIndex)
+        Long nextIndex = getMinIndexAfter(direction, relationship.source, relationship.relationshipType, direction.getIndex(other))
 
         if (nextIndex == null) {
-            relationship.outgoingIndex = other.outgoingIndex + INDEX_STEP
+            direction.setIndex(relationship, direction.getIndex(other) + INDEX_STEP)
             return relationship.save()
         }
 
-        if (nextIndex - other.outgoingIndex > 1) {
-            relationship.outgoingIndex = other.outgoingIndex + Math.round((nextIndex.doubleValue() - other.outgoingIndex) / 2)
+        if (nextIndex - direction.getIndex(other) > 1) {
+            direction.setIndex(relationship, direction.getIndex(other) + Math.round((nextIndex.doubleValue() - direction.getIndex(other)) / 2))
             return relationship.save()
         }
 
-        moveAfterWithRearrange(relationship, other)
+        moveAfterWithRearrange(direction, relationship, other)
     }
 
-    private static Relationship moveAfterWithRearrange(Relationship relationship, Relationship other) {
+    private static Relationship moveAfterWithRearrange(RelationshipDirection direction, Relationship relationship, Relationship other) {
         List<Relationship> relationships  = RelationshipDirection.OUTGOING.composeWhere(relationship.source, relationship.relationshipType, []).list()
         int correction = 0
         relationships.eachWithIndex { Relationship entry, Integer i ->
@@ -212,11 +211,11 @@ class RelationshipService {
                 correction = -1
                 return
             }
-            entry.outgoingIndex = (i + correction ) * INDEX_STEP
+            direction.setIndex(entry, (i + correction ) * INDEX_STEP)
 
             if (entry == other) {
                 correction++
-                relationship.outgoingIndex = (i + correction) * INDEX_STEP
+                direction.setIndex(relationship, (i + correction) * INDEX_STEP)
                 relationship.save(failOnError: true)
             }
 
@@ -225,28 +224,20 @@ class RelationshipService {
         relationship
     }
 
-    private static Long getMaxOutgoingIndex(CatalogueElement source, RelationshipType relationshipType) {
+    private static Long getMinIndex(RelationshipDirection direction, CatalogueElement source, RelationshipType relationshipType) {
         Relationship.executeQuery("""
-            select max(r.outgoingIndex) from Relationship r
+            select min(r.""" + direction.sortProperty + """) from Relationship r
             where r.source = :source
             and r.relationshipType = :type
         """, [source: source, type: relationshipType])[0] as Long
     }
 
-    private static Long getMinOutgoingIndex(CatalogueElement source, RelationshipType relationshipType) {
+    private static Long getMinIndexAfter(RelationshipDirection direction, CatalogueElement source, RelationshipType relationshipType, Long current) {
         Relationship.executeQuery("""
-            select min(r.outgoingIndex) from Relationship r
+            select min(r.""" + direction.sortProperty + """) from Relationship r
             where r.source = :source
             and r.relationshipType = :type
-        """, [source: source, type: relationshipType])[0] as Long
-    }
-
-    private static Long getMinOutgoingIndexAfter(CatalogueElement source, RelationshipType relationshipType, Long current) {
-        Relationship.executeQuery("""
-            select min(r.outgoingIndex) from Relationship r
-            where r.source = :source
-            and r.relationshipType = :type
-            and r.outgoingIndex > :current
+            and r.""" + direction.sortProperty + """ > :current
         """, [source: source, type: relationshipType, current: current])[0] as Long
     }
 

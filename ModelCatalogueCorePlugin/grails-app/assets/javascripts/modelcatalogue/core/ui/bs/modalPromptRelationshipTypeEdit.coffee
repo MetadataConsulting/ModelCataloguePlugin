@@ -49,11 +49,6 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
                   <input type="checkbox" ng-model="copy.bidirectional"> Bidirectional
                 </label>
               </div>
-              <div class="checkbox">
-                <label>
-                  <input type="checkbox" ng-model="copy.sortable"> Sortable
-                </label>
-              </div>
               <div class="form-group">
                 <label for="metadataHits" class="">Metadata Hints</label>
                 <input type="text" class="form-control" id="metadataHits" placeholder="Metadata hints separated by comma" ng-model="copy.metadataHints">

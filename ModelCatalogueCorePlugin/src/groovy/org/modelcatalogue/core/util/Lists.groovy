@@ -205,6 +205,9 @@ class Lists {
             link += "max=${params.max ?: 10}"
         }
         params.each { String k, Object v ->
+            if (k == 'sort' && RelationshipDirection.values()*.sortProperty.contains(v)) {
+                return
+            }
             if (v && !(k in ['offset', 'max', 'type', 'action', 'controller', 'id']) && !(baseLink =~ /[\?&]${k}=/)) {
                 link += "&$k=$v"
             }
