@@ -248,6 +248,8 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         m1de1 = relationshipService.moveAfter(direction, m1de1, m1de2)
 
+        println "Current Order: ${getOutgoingContainmentIds(m1)}"
+
         then: "the index of first is bigger than the second one"
         m1de1.outgoingIndex > m1de2.outgoingIndex
 
