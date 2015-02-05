@@ -85,6 +85,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       onElementUpdate = (element) ->
         handleDescendPaths()
 
+        $scope.descendFun = $scope.element[$scope.currentDescend]
+
         element.$$resetHelperProperties = ->
           if @[$scope.currentDescend]
             @$$numberOfChildren = $scope.element[$scope.currentDescend].total
@@ -103,18 +105,17 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $element.closest('.catalogue-element-treeview-list-root').on 'scroll', loadMoreIfNeeded
 
         $scope.element.$$loadChildren = ->
-          fun = $scope.element[$scope.currentDescend]
 
-          unless angular.isFunction(fun)
+          unless angular.isFunction($scope.descendFun)
             $scope.element.$$children = []
             $scope.element.$$numberOfChildren = 0
             return
 
-          $scope.element.$$numberOfChildren = fun.total
+          $scope.element.$$numberOfChildren = $scope.descendFun.total
 
           # first load
           $scope.element.$$loadingChildren = true
-          fun().then(loadNewChildren).then ->
+          $scope.descendFun().then(loadNewChildren).then ->
             $scope.element.$$loadingChildren = false
 
       $scope.collapseOrExpand = ->
@@ -169,6 +170,12 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
             $scope.element.$$numberOfChildren++
             result.element.refresh().then (newOne) ->
               $scope.element.$$children = [newOne].concat $scope.element.$$children
+
+
+
+
+      $scope.$on 'listReferenceReordered', (ignored, listReference) ->
+        $scope.element.$$loadChildren() if $scope.descendFun.link == listReference.link
     ]
   }
 ]
