@@ -1,13 +1,12 @@
 package org.modelcatalogue.core.util.builder
 
 import grails.gorm.DetachedCriteria
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ClassificationService
-import org.modelcatalogue.core.ElementService
-import org.modelcatalogue.core.MeasurementUnit
+import groovy.util.logging.Log4j
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
+import org.springframework.util.StopWatch
 
+@Log4j
 class CatalogueElementProxyRepository {
 
     private Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, Classification]
@@ -55,12 +54,14 @@ class CatalogueElementProxyRepository {
     }
 
     public Set<CatalogueElement> resolveAllProxies(boolean skipDirtyChecking) {
+        StopWatch watch =  new StopWatch('catalogue proxy repository')
         Set<CatalogueElement> created = []
 
         Set<CatalogueElementProxy> toBeResolved     = []
         Map<String, CatalogueElementProxy> byID     = [:]
         Map<String, CatalogueElementProxy> byName   = [:]
 
+        watch.start('merging proxies')
         for (CatalogueElementProxy proxy in pendingProxies) {
             if (proxy.id) {
                 CatalogueElementProxy existing = byID[proxy.id]
@@ -87,31 +88,42 @@ class CatalogueElementProxyRepository {
                 throw new IllegalStateException("Proxy $proxy does not provide ID nor name")
             }
         }
+        watch.stop()
 
         if (!skipDirtyChecking) {
             // Step 1:check something changed this must run before any other resolution happens
+            watch.start('dirty checking')
             for (CatalogueElementProxy element in toBeResolved) {
                 if (element.changed) {
                     element.requestDraft()
                 }
             }
+            watch.stop()
 
             // Step 2: if something changed, create new versions. if run in one step, it generates false changes
+            watch.start('requesting drafts')
             for (CatalogueElementProxy element in toBeResolved) {
                 element.createDraftIfRequested()
             }
+            watch.stop()
         }
 
 
         // Step 3: resolve elements (set properties, update metadata)
+        watch.start('resolving elements')
         for (CatalogueElementProxy element in toBeResolved) {
             created << element.resolve()
         }
+        watch.stop()
 
         // Step 4: resolve pending relationships
+        watch.start('resolving relationships')
         for (CatalogueElementProxy element in toBeResolved) {
             element.resolveRelationships()
         }
+        watch.stop()
+
+        log.info "Proxies resolved:\n${watch.prettyPrint()}"
 
         created
     }

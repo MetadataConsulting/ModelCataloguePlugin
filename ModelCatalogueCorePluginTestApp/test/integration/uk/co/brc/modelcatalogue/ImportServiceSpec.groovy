@@ -8,18 +8,11 @@ import org.modelcatalogue.core.*
  */
 class ImportServiceSpec extends IntegrationSpec {
 
-//    def importService
-//    def initCatalogueService
-
 
     def
     "import nhic spreadsheet"() {
 
         when:
-        // this is done in bootstrap already
-//        initCatalogueService.initDefaultRelationshipTypes()
-//        importService.importData(true)
-
         expect:
         def models = Model.list()
         !models.isEmpty()
