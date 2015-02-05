@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, $injector, applicationTitle) ->
+    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', '$http', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, $injector, applicationTitle, $http) ->
       updateFrom = (original, update) ->
         for originalKey of original
           if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
@@ -286,8 +286,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         return true
 
       $scope.reorder = (tab, $row, $current) ->
-        # console.log 'reorder', tab, $row, $current
-
+        data =
+          moved: $row.row.element
+          current: $current?.row?.element
+        $http {
+          url: tab.loader.link
+          method: 'PUT'
+          data: data
+        }
 
       refreshElement = () ->
         if $scope.element

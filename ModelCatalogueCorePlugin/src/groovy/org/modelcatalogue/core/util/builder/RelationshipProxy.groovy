@@ -3,7 +3,6 @@ package org.modelcatalogue.core.util.builder
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType
 
 @Log4j
@@ -30,7 +29,7 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
         }
     }
 
-    Relationship resolve(int index) {
+    Relationship resolve() {
         try {
             RelationshipType type = RelationshipType.readByName(relationshipTypeName)
             T sourceElement = source.resolve()
@@ -41,7 +40,7 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
             if (!destinationElement.readyForQueries) {
                 throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
             }
-            Relationship relationship = sourceElement.createLinkTo(destinationElement, type, index * RelationshipService.INDEX_STEP)
+            Relationship relationship = sourceElement.createLinkTo(destinationElement, type, System.currentTimeMillis())
             if (relationship.hasErrors()) {
                 log.error(relationship.errors)
                 throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement.")

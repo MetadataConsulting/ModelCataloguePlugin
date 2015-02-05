@@ -52,6 +52,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'outgoing', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'addOutgoing', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'removeOutgoing', method: HttpMethod.DELETE)
+                "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'reorderOutgoing', method: HttpMethod.PUT)
                 "/api/modelCatalogue/core/$controllerName/$id/incoming/search" (controller: controllerName, action: 'searchIncoming', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/incoming/$type/search" (controller: controllerName, action: 'searchIncoming', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/incoming/$type" (controller: controllerName, action: 'incoming', method: HttpMethod.GET)

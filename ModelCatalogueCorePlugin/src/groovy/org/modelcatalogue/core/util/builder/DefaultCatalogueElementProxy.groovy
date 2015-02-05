@@ -273,11 +273,9 @@ import org.modelcatalogue.core.*
 
     @Override
     Set<Relationship> resolveRelationships() {
-        Set<Relationship> ret = []
-        relationships.eachWithIndex {RelationshipProxy it, Integer index ->
-            it.resolve(index)
+        relationships.collect { RelationshipProxy it ->
+            it.resolve()
         }
-        ret
     }
 
     String toString() {

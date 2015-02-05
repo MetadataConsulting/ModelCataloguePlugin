@@ -25,7 +25,7 @@ class RelationshipService {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
             if (relationshipInstance) {
-                if (indexHint == null) {
+                if (indexHint == null || indexHint == relationshipInstance.outgoingIndex) {
                     return relationshipInstance
                 }
                 relationshipInstance.outgoingIndex = indexHint
@@ -39,7 +39,7 @@ class RelationshipService {
                 relationshipType: relationshipType?.id ? relationshipType : null,
                 classification: classification?.id ? classification : null,
                 archived: archived,
-                outgoingIndex: indexHint ?: 0
+                outgoingIndex: indexHint ?: System.currentTimeMillis()
         )
 
         //specific rules when creating links to and from published elements
@@ -186,7 +186,7 @@ class RelationshipService {
             return relationship.save()
         }
 
-        if (!other.outgoingIndex) {
+        if (other.outgoingIndex == null) {
             return moveAfterWithRearrange(relationship, other)
         }
 

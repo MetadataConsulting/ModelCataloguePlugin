@@ -6,6 +6,7 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
+import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
 
@@ -60,6 +61,52 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     def removeIncoming(Long id, String type) {
         removeRelation(id, type, false)
+    }
+
+
+    def reorderOutgoing(Long id, String type) {
+        // begin sanity checks
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
+
+        if (!resource.get(id)) {
+            notFound()
+            return
+        }
+
+        if (!RelationshipType.findByName(type)) {
+            notFound()
+            return
+        }
+        // end sanity checks
+
+        Long movedId = objectToBind?.moved?.id
+        Long currentId = objectToBind?.current?.id
+
+        if (!movedId) {
+            render status: HttpStatus.NOT_ACCEPTABLE
+            return
+        }
+
+        Relationship rel = Relationship.get(movedId)
+
+        if (!rel) {
+            notFound()
+            return
+        }
+
+        Relationship current = currentId ? Relationship.get(currentId) : null
+
+        if (!current && currentId) {
+            notFound()
+            return
+        }
+
+        rel = relationshipService.moveAfter(rel, current)
+
+        respond(id: rel.id, type: rel.relationshipType, ext: rel.ext, element: rel.source, relation: rel.destination, direction: 'sourceToDestination', removeLink: RelationshipsMarshaller.getDeleteLink(rel.source, rel), archived: rel.archived, elementType: Relationship.name)
     }
 
     private void removeRelation(Long id, String type, boolean outgoing) {
@@ -191,6 +238,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (typeParam && !type) {
             notFound()
             return
+        }
+
+        if (direction == RelationshipDirection.OUTGOING && !params.sort) {
+            params.sort = 'outgoingIndex'
         }
 
         respond new Relationships(

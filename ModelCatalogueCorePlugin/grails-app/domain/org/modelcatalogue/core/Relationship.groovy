@@ -40,7 +40,7 @@ class Relationship implements Extendible {
 
     Classification classification
 
-    Long outgoingIndex = 0
+    Long outgoingIndex = System.currentTimeMillis()
 
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']

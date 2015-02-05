@@ -264,6 +264,18 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         then: "the index of first is bigger than the second one"
         m1de1.outgoingIndex > m1de2.outgoingIndex
 
+        when: "some indexes are negative"
+        m1de1.outgoingIndex = -1000
+        m1de2.outgoingIndex = 0
+        m1de3.outgoingIndex = 1000
+
+        [m1de1, m1de2, m1de3]*.save(failOnError: true)
+
+        m1de1 = relationshipService.moveAfter(m1de1, m1de2)
+
+        then: "the index of first is bigger than the second one"
+        m1de1.outgoingIndex > m1de2.outgoingIndex
+
         and: "the index of first is smaller than the third one"
         m1de1.outgoingIndex < m1de3.outgoingIndex
     }

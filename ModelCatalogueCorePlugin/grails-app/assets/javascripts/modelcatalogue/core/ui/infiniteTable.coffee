@@ -112,27 +112,28 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
 
 
 
-      getRowAndIndexBefore = (tableRowIndex) ->
-        return {row: null, index: 0} unless $scope.rows
-        return {row: null, index: 0} unless $scope.rows.length > 0
+      getRowAndIndexBefore = (tableRowIndex, originalRowAndIndex) ->
+        return {row: null, index: -1} unless $scope.rows
+        return {row: null, index: -1} unless $scope.rows.length > 0
 
-        return {index: 0, row: null} if tableRowIndex == 0
+        return {index: -1, row: null} if tableRowIndex == 0
 
         counter = tableRowIndex
 
         for row, i in $scope.rows
           continue unless $scope.isNotFiltered(row)
+          counter++ if i == originalRowAndIndex.index
           counter--
           counter-- if row.$$expanded
-          return {index: i, row: row} if counter <= 0
+          if counter <= 0
+            return {index: i, row: row}
+        return { index: $scope.rows.length - 1, row: $scope.rows[-1] }
 
 
       $scope.sortableOptions =
         cursor: 'move'
         handle: '.handle'
         update: ($event, $ui) ->
-          rowAndIndex = getRowAndIndexBefore $ui.item.index()
-
           original =
             row: $ui.item.scope().$parent.row
             index: 0
@@ -142,11 +143,15 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
               original.index = i
               break
 
+          rowAndIndex = getRowAndIndexBefore $ui.item.index(), original
+
+
+
           return if original.index is rowAndIndex.index
 
           $q.when($scope.reorder($row: original, $current: rowAndIndex))
           .then ->
-            insertIndex = if rowAndIndex.index >= original.index then rowAndIndex.index - 1 else rowAndIndex.index
+            insertIndex = if original.index < rowAndIndex.index then rowAndIndex.index else rowAndIndex.index + 1
 
             $scope.rows.splice(original.index, 1)
             $scope.rows.splice(insertIndex, 0, original.row)
