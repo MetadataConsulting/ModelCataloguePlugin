@@ -16,14 +16,14 @@ class RelationshipService {
         Lists.fromCriteria(params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 
-    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false, Long indexHint = null) {
+    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false, boolean resetIndexes = false) {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
             if (relationshipInstance) {
-                if (indexHint == null || indexHint == relationshipInstance.outgoingIndex) {
+                if (!resetIndexes) {
                     return relationshipInstance
                 }
-                relationshipInstance.outgoingIndex = indexHint
+                relationshipInstance.resetIndexes()
                 return relationshipInstance.save(flush: true)
             }
         }
@@ -33,8 +33,7 @@ class RelationshipService {
                 destination: destination?.id ? destination : null,
                 relationshipType: relationshipType?.id ? relationshipType : null,
                 classification: classification?.id ? classification : null,
-                archived: archived,
-                outgoingIndex: indexHint ?: System.currentTimeMillis()
+                archived: archived
         )
 
         //specific rules when creating links to and from published elements

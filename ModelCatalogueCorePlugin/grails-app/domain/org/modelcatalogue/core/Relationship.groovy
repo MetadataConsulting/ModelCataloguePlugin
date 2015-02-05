@@ -88,6 +88,10 @@ class Relationship implements Extendible {
         }
     }
 
+    void resetIndexes() {
+        outgoingIndex = System.currentTimeMillis()
+    }
+
     @Override
     Set<Extension> listExtensions() {
         extensions

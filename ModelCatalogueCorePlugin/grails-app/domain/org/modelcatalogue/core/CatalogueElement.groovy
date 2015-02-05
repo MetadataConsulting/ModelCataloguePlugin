@@ -177,12 +177,12 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
 
-    Relationship createLinkTo(CatalogueElement destination, RelationshipType type, Long indexHint = null) {
-        relationshipService.link(this, destination, type, null,  false, false, indexHint)
+    Relationship createLinkTo(CatalogueElement destination, RelationshipType type, Boolean resetIndexes = false) {
+        relationshipService.link(this, destination, type, null,  false, false, resetIndexes)
     }
 
-    Relationship createLinkFrom(CatalogueElement source, RelationshipType type, Long indexHint = null) {
-        relationshipService.link(source, this, type, null, false, false, indexHint)
+    Relationship createLinkFrom(CatalogueElement source, RelationshipType type, Boolean resetIndexes = false) {
+        relationshipService.link(source, this, type, null, false, false, resetIndexes)
     }
 
     Relationship removeLinkTo(CatalogueElement destination, RelationshipType type) {
