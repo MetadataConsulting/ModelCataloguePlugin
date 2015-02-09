@@ -28,6 +28,7 @@ class BatchAndActionsSpec extends GebReportingSpec {
     }
 
     def "generate suggestions"() {
+        waitUntilModalClosed()
         when:
         actionButton('generate-merge-models', 'list').click()
 
@@ -45,7 +46,7 @@ class BatchAndActionsSpec extends GebReportingSpec {
     }
 
     def "go to detail page and execute few actions"() {
-
+        waitUntilModalClosed()
         when:
         linkToTestBatch.click()
 

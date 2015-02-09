@@ -4,7 +4,6 @@ import geb.spock.GebReportingSpec
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.pages.AssetListPage
-import org.modelcatalogue.core.pages.ModalTreeViewPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -88,18 +87,18 @@ class AssetWizardSpec extends GebReportingSpec {
         }
 
         when:
-        $('#xml').value(download('sample.xml', SAMPLE_VALID_XML_URL).absolutePath)
+        $('#xml').value(download('valid.xml', SAMPLE_VALID_XML_URL).absolutePath)
 
         then:
-        waitFor {
+        waitFor(60) {
             $('.modal-footer .alert-success').displayed
         }
 
         when:
-        $('#xml').value(download('sample.xml', SAMPLE_INVALID_XML_URL).absolutePath)
+        $('#xml').value(download('invalid.xml', SAMPLE_INVALID_XML_URL).absolutePath)
 
         then:
-        waitFor {
+        waitFor(60) {
             $('.modal-footer .alert-danger').displayed
         }
 

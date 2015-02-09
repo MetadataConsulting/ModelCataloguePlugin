@@ -9,9 +9,9 @@ abstract class ModelCataloguePage extends Page {
 
     static content = {
 
-        viewTitle               { $("h2") }
-        subviewTitle            { $("h3:not(.ng-hide)") }
-        subviewStatus           { $("h3 small span.label") }
+        viewTitle(OPT)          { $("h2") }
+        subviewTitle(OPT)       { $("h3:not(.ng-hide)") }
+        subviewStatus(OPT)      { $("h3 small span.label") }
 
         showLoginButton(OPT)    { $(".navbar-form i.glyphicon.glyphicon-log-in") }
         showLogoutButton(OPT)   { $(".navbar-form i.glyphicon.glyphicon-log-out") }
@@ -50,6 +50,10 @@ abstract class ModelCataloguePage extends Page {
                 showLogoutButton.click()
             }
 
+            waitFor {
+                showLoginButton.displayed
+            }
+
             showLoginButton.click()
         }
 
@@ -60,6 +64,13 @@ abstract class ModelCataloguePage extends Page {
         username = user
         password = pwd
         loginButton.click()
+    }
+
+    boolean waitUntilModalClosed(int timeout = 10) {
+        waitFor(timeout){
+            !$('.modal-backdrop').displayed
+        }
+        return true
     }
 
     /**
@@ -117,11 +128,11 @@ abstract class ModelCataloguePage extends Page {
     }
 
     void selectTab(String name) {
-        tab(name).find('a').click()
+        $("li[data-tab-name='$name'] a").click()
     }
 
     boolean tabActive(String name) {
-        tab(name).hasClass('active')
+        $("li[data-tab-name='$name'].active").displayed
     }
 
     /**

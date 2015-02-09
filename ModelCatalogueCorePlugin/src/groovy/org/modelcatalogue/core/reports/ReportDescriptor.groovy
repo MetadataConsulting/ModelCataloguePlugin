@@ -2,6 +2,7 @@ package org.modelcatalogue.core.reports
 
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import org.springframework.util.SerializationUtils
 
 /**
  * Created by ladin on 09.06.14.
@@ -58,8 +59,7 @@ class ReportDescriptor {
     }
 
     String getLink(Object model) {
-        // TODO: try to create defensive deep copy
-        Map params = new HashMap(linkParams(model))
+        Map params = new HashMap(SerializationUtils.deserialize(SerializationUtils.serialize(linkParams(model))) as Map)
         if (params.id) {
             if (model.hasProperty('id')) {
                 params.id = model.id

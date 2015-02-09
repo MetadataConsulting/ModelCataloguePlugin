@@ -5,7 +5,7 @@ import org.modelcatalogue.core.util.ExtensionsWrapper
 /*
 * Users can create relationships between all catalogue elements. They include
 * DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
-* Relationshipss have a source element, a destination element and a relationship type.
+* Relationships have a source element, a destination element and a relationship type.
 * There are a number of different predefined relationship types that describe the ways catalogue
 * elements are related in the model catalogue
 
@@ -40,6 +40,17 @@ class Relationship implements Extendible {
 
     Classification classification
 
+    Long outgoingIndex = System.currentTimeMillis()
+    Long incomingIndex = System.currentTimeMillis()
+
+    /*
+     * Reordeing bidirectional relationships is not supported as the combined index is
+     * actually same for all group of related elements
+     * and change from the other side would change the view from the opposite side
+     */
+    @Deprecated
+    Long combinedIndex = System.currentTimeMillis()
+
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
 
@@ -63,8 +74,8 @@ class Relationship implements Extendible {
 
             if (!val) return true;
 
-            String errorMessage = val.validateSourceDestination(obj.source, obj.destination, obj.ext)
-            if (errorMessage) {
+            def errorMessage = val.validateSourceDestination(obj.source, obj.destination, obj.ext)
+            if (errorMessage instanceof String || (errorMessage instanceof List && errorMessage.size() > 1 && errorMessage.first() instanceof String)) {
                 return errorMessage;
             }
             return true;
@@ -84,6 +95,12 @@ class Relationship implements Extendible {
         if(destination){
             destination?.removeFromIncomingRelationships(this)
         }
+    }
+
+    void resetIndexes() {
+        outgoingIndex = System.currentTimeMillis()
+        incomingIndex = System.currentTimeMillis()
+        combinedIndex = System.currentTimeMillis()
     }
 
     @Override

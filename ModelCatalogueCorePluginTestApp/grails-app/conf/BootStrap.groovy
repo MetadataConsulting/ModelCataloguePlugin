@@ -10,6 +10,7 @@ import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.http.HttpMethod
+import org.springframework.util.StopWatch
 
 class BootStrap {
 
@@ -24,8 +25,13 @@ class BootStrap {
 
     def init = { servletContext ->
 
-        initCatalogueService.initCatalogue(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
+        StopWatch watch = new StopWatch('bootstrap')
 
+        watch.start('init catalogue')
+        initCatalogueService.initCatalogue(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
+        watch.stop()
+
+        watch.start('init security')
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
@@ -98,28 +104,31 @@ class BootStrap {
 //        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
 
 
+        watch.stop()
 
         environments {
             development {
-                setupStuff()
+                setupStuff(watch)
 
             }
             test {
-                setupStuff()
+                setupStuff(watch)
             }
 
         }
-
     }
 
-    def setupStuff(){
+    def setupStuff(StopWatch watch){
         actionService.resetAllRunningActions()
         try {
             println 'Running post init job'
             println 'Importing data'
-            importService.importData(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
+            watch.start('import data')
+            importService.importData()
+            watch.stop()
 
             println 'Finalizing all published elements'
+            watch.start('finalizing all elements')
             CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
                 if (it instanceof Model) {
                     elementService.finalizeElement(it)
@@ -128,9 +137,11 @@ class BootStrap {
                     it.save failOnError: true
                 }
             }
+            watch.stop()
+
 
             println "Creating some actions"
-
+            watch.start('test actions')
             Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
 
             15.times {
@@ -147,9 +158,6 @@ class BootStrap {
                 }
             }
 
-            def parent = new Model(name:"parent1", status: ElementStatus.FINALIZED).save(flush:true)
-            parent.addToChildOf(parent)
-
             assert !actionService.create(batch, TestAction, fail: true).hasErrors()
             assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
             assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
@@ -158,14 +166,18 @@ class BootStrap {
 
             Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
             if (createRelationshipAction.hasErrors()) {
-                println createRelationshipAction.errors
+                println(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
+            watch.stop()
 
+            watch.start('setting up csv transformation')
             setupSimpleCsvTransformation()
+            watch.stop()
 
             // for generate suggestion test
+            watch.start('generating suggestions test data')
             catalogueBuilder.build {
                 automatic dataType
 
@@ -182,8 +194,10 @@ class BootStrap {
                 }
 
             }
+            watch.stop()
 
             println "Init finished in ${new Date()}"
+            println watch.prettyPrint()
         } catch (e) {
             e.printStackTrace()
         }

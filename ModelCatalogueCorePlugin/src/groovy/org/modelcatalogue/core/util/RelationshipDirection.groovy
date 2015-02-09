@@ -49,6 +49,31 @@ enum RelationshipDirection {
         String getActionName() {
             "incoming"
         }
+
+        @Override
+        String getSortProperty() {
+            "incomingIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.incomingIndex
+        }
+
+        @Override
+        boolean isOwnedBy(CatalogueElement owner, Relationship relationship) {
+            relationship?.destination == owner
+        }
+
+        @Override
+        Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) {
+            Relationship.executeQuery("""
+                select min(r.incomingIndex) from Relationship r
+                where r.destination = :destination
+                and r.relationshipType = :type
+                and r.incomingIndex > :current
+            """, [destination: owner, type: relationshipType, current: current])[0] as Long
+        }
     },
     OUTGOING {
 
@@ -68,6 +93,8 @@ enum RelationshipDirection {
                     isNull('classification')
                 }
             }
+
+            criteria.sort('outgoingIndex')
 
             criteria
         }
@@ -92,6 +119,30 @@ enum RelationshipDirection {
             "outgoing"
         }
 
+        @Override
+        String getSortProperty() {
+            "outgoingIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.outgoingIndex
+        }
+
+        @Override
+        boolean isOwnedBy(CatalogueElement owner, Relationship relationship) {
+            relationship?.source == owner
+        }
+
+        @Override
+        Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) {
+            Relationship.executeQuery("""
+                select min(r.outgoingIndex) from Relationship r
+                where r.source = :source
+                and r.relationshipType = :type
+                and r.outgoingIndex > :current
+            """, [source: owner, type: relationshipType, current: current])[0] as Long
+        }
     },
     BOTH {
         @Override
@@ -136,6 +187,32 @@ enum RelationshipDirection {
         String getActionName() {
             "relationships"
         }
+
+        @Override
+        String getSortProperty() {
+            "combinedIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.combinedIndex
+        }
+
+        @Override
+        boolean isOwnedBy(CatalogueElement owner, Relationship relationship) {
+            relationship?.destination == owner || relationship?.source == owner
+        }
+
+
+        @Override
+        Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) {
+            Relationship.executeQuery("""
+                select min(r.combinedIndex) from Relationship r
+                where (r.source = :owner or r.destination = :owner)
+                and r.relationshipType = :type
+                and r.combinedIndex > :current
+            """, [owner: owner, type: relationshipType, current: current])[0] as Long
+        }
     }
 
     abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications)
@@ -143,7 +220,14 @@ enum RelationshipDirection {
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)
     abstract String getActionName()
+    abstract String getSortProperty()
+    abstract Long getIndex(Relationship rel)
+    abstract boolean isOwnedBy(CatalogueElement owner, Relationship relationship)
+    abstract Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current)
 
+    void setIndex(Relationship rel, Long value) {
+        rel.setProperty(sortProperty, value)
+    }
     static RelationshipDirection parse(String direction) {
         switch (direction) {
             case ['incoming', 'destinationToSource']: return INCOMING

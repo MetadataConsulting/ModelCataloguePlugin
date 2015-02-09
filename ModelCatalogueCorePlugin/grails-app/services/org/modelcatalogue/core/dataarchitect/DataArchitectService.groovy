@@ -3,12 +3,7 @@ package org.modelcatalogue.core.dataarchitect
 import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.actions.Batch
-import org.modelcatalogue.core.actions.MergePublishedElements
-import org.modelcatalogue.core.actions.UpdateCatalogueElement
-import org.modelcatalogue.core.actions.CreateRelationship
-import org.modelcatalogue.core.actions.Action
-import org.modelcatalogue.core.actions.ActionState
+import org.modelcatalogue.core.actions.*
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
@@ -397,7 +392,7 @@ class DataArchitectService {
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
-                    log.error "Error generating create synonym action: $action.errors"
+                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
@@ -410,7 +405,7 @@ class DataArchitectService {
             sources.each { srcId ->
                 Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId"
                 if (action.hasErrors()) {
-                    log.error "Error generating create synonym action: $action.errors"
+                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
@@ -424,7 +419,7 @@ class DataArchitectService {
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
-                    log.error "Error generating create synonym action: $action.errors"
+                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
@@ -437,7 +432,7 @@ class DataArchitectService {
             sources.each { srcId ->
                 Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
                 if (action.hasErrors()) {
-                    log.error "Error generating create synonym action: $action.errors"
+                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
             }
             batch.archived = false
@@ -450,7 +445,7 @@ class DataArchitectService {
             batch.description = """Model '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
             Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$sourceId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
             if (action.hasErrors()) {
-                log.error "Error generating merge model action: $action.errors"
+                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge model action", action.errors))
             }
             batch.archived = false
             batch.save()

@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import geb.spock.GebReportingSpec
-import geb.spock.GebSpec
 import org.modelcatalogue.core.pages.ModalTreeViewPage
 import spock.lang.Stepwise
 
@@ -33,7 +32,6 @@ class ModelWizardSpec extends GebReportingSpec {
     }
 
     def "Add new model"() {
-
         when: 'I click the add model button'
         addModelButton.click()
 
@@ -129,6 +127,7 @@ class ModelWizardSpec extends GebReportingSpec {
             $('span.catalogue-element-treeview-name', text: "New").displayed
         }
 
+        waitUntilModalClosed(30)
     }
     def "filter by classification"() {
         expect:
@@ -179,12 +178,17 @@ class ModelWizardSpec extends GebReportingSpec {
     }
 
     def "open the detail view"() {
+        waitFor(30) {
+            $('a.catalogue-element-treeview-link', title: "New").displayed
+        }
 
-        when: 'the item is double-clicked'
+        when: 'the item is clicked'
         $('a.catalogue-element-treeview-link', title: "New").click()
 
         then:
-        subviewTitle.text().trim() == 'New DRAFT'
+        waitFor {
+            subviewTitle.text().trim() == 'New DRAFT'
+        }
 
         totalOf('parentOf') == 2
         totalOf('contains') == 1

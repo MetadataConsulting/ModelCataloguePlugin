@@ -113,7 +113,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         page = undefined if page == 1 or isNaN(page)
         options.location = "replace" if newProperty and not oldProperty
-        if(!$state.$current.name=="mc.resource.list") then $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
+        if($state.$current.name isnt "mc.resource.list") then $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
 
       onElementUpdate = (element, oldEl) ->
 
@@ -202,7 +202,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                     messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
 
 
-          if obj.type == 'orderedMap'
+          if obj?.type == 'orderedMap'
             for value in obj.values when not angular.isObject(value.value)
               tabDefinition.properties.push {
                 label: value.key
@@ -279,6 +279,14 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         $scope.property = tab.name
         $scope.$broadcast 'infiniteTableRedraw'
 
+      $scope.isTableSortable = (tab) ->
+        return false unless tab.value?.size > 1
+        return false unless tab.value?.type
+        return false if tab.value.type.bidirectional
+        return true
+
+      $scope.reorder = (tab, $row, $current) ->
+        tab.loader.reorder($row.row.element, $current?.row?.element)
 
       refreshElement = () ->
         if $scope.element

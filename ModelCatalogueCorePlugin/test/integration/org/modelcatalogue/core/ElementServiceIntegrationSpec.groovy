@@ -346,4 +346,20 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     }
 
+    def "change value domains in data elements while merging value domains"() {
+        ValueDomain vd1 = new ValueDomain(name: "vd1").save(failOnError: true)
+        ValueDomain vd2 = new ValueDomain(name: "vd2").save(failOnError: true)
+
+        DataElement de = new DataElement(name: "de", valueDomain: vd1).save(failOnError: true)
+
+        expect:
+        de.valueDomain == vd1
+
+        when:
+        elementService.merge(vd1, vd2)
+
+        then:
+        de.valueDomain == vd2
+    }
+
 }

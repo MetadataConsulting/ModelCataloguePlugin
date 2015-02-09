@@ -13,6 +13,7 @@
 #= require focusMe
 #= require menuItemDropdown
 #= require menuItemSingle
+#= require sortable
 
 angular.module 'mc.util.ui', [
   # dependencies
@@ -33,4 +34,5 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.contextualMenu'
   'mc.util.ui.menuItemDropdown'
   'mc.util.ui.menuItemSingle'
+  'mc.util.ui.sortable'
 ]

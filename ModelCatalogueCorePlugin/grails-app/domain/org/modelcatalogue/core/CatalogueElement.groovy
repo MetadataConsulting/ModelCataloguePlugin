@@ -6,7 +6,6 @@ import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.ExtensionsWrapper
-import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
@@ -178,12 +177,12 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
 
-    Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
-        relationshipService.link(this, destination, type)
+    Relationship createLinkTo(CatalogueElement destination, RelationshipType type, Boolean resetIndexes = false) {
+        relationshipService.link(this, destination, type, null,  false, false, resetIndexes)
     }
 
-    Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
-        relationshipService.link(source, this, type)
+    Relationship createLinkFrom(CatalogueElement source, RelationshipType type, Boolean resetIndexes = false) {
+        relationshipService.link(source, this, type, null, false, false, resetIndexes)
     }
 
     Relationship removeLinkTo(CatalogueElement destination, RelationshipType type) {
@@ -337,5 +336,13 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     boolean isPublished() {
         return status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]
     }
+
+    /**
+     * Method called after successfully finishing the generic merge
+     * to finish domain class specific action such as changing the value domain of data elements.
+     *
+     * @param destination element in which this element was successfully merged
+     */
+    void afterMerge(CatalogueElement destination) {}
 
 }

@@ -6,6 +6,7 @@ import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
 import org.grails.datastore.gorm.GormStaticApi
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
 
@@ -77,7 +78,7 @@ class InitCatalogueService {
                 type.save()
 
                 if (type.hasErrors()) {
-                    log.error("Cannot create relationship type $definition.name. $type.errors")
+                    log.error(FriendlyErrors.printErrors("Cannot create relationship type $definition.name", type.errors))
                 }
             }
         }

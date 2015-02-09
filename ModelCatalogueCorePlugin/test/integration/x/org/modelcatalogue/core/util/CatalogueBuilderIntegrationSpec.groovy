@@ -554,21 +554,15 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "migrates hierarchy relationship to new draft version"() {
         build {
             model(name: 'MHR ROOT') {
-                status finalized
                 model(name: 'MHR L1') {
-                    status finalized
                     model(name: 'MHR L2') {
-                        status finalized
-                        model(name: 'MHR L3') {
-                            status finalized
-                        }
-
+                        model(name: 'MHR L3')
                     }
-
                 }
-
             }
         }
+
+        elementService.finalizeElement(Model.findByName('MHR ROOT'))
 
         Model l1Finalized = Model.findByName('MHR L1')
 
@@ -606,5 +600,47 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         created = new CatalogueBuilder(classificationService, elementService).build cl
     }
 
+
+    def "order from builder is persisted"() {
+        when:
+        build {
+            classification (name: 'Order Test') {
+                model (name: 'OT Parent') {
+                    dataElement (name: 'OT Child 002')
+                    dataElement (name: 'OT Child 001')
+                    dataElement (name: 'OT Child 004')
+                    dataElement (name: 'OT Child 003')
+                }
+            }
+        }
+
+        then:
+        Model.findByName('OT Parent').contains*.name == [
+                'OT Child 002',
+                'OT Child 001',
+                'OT Child 004',
+                'OT Child 003'
+        ]
+
+        when:
+        build {
+            classification (name: 'Order Test') {
+                model (name: 'OT Parent') {
+                    dataElement (name: 'OT Child 001')
+                    dataElement (name: 'OT Child 002')
+                    dataElement (name: 'OT Child 003')
+                    dataElement (name: 'OT Child 004')
+                }
+            }
+        }
+
+        then:
+        Model.findByName('OT Parent').contains*.name == [
+                'OT Child 001',
+                'OT Child 002',
+                'OT Child 003',
+                'OT Child 004'
+        ]
+    }
 
 }

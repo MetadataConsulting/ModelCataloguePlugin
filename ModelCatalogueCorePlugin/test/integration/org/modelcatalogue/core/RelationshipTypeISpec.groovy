@@ -1,25 +1,17 @@
 package org.modelcatalogue.core
-
-import spock.lang.Shared
-
 /**
  * Created by ladin on 10.02.14.
  */
 class RelationshipTypeISpec extends AbstractIntegrationSpec {
 
-    @Shared
     def md1, de1, md2, vd
 
-    def setupSpec(){
+    def setup(){
         loadFixtures()
-        md1 = Model.findByName("book")
-        md2 = Model.findByName("chapter1")
-        de1 = DataElement.findByName("DE_author1")
-        vd = ValueDomain.findByName("value domain uni subjects 2")
-
-    }
-
-    def cleanupSpec(){
+        md1 = new Model(name: "book").save(failOnError: true)
+        md2 = new Model(name: "chapter1").save(failOnError: true)
+        de1 = new DataElement(name: "DE_author1").save(failOnError: true)
+        vd = new ValueDomain(name: "value domain uni subjects 2").save(failOnError: true)
 
     }
 

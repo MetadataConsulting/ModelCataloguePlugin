@@ -5,9 +5,9 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
 
 class ModelCatalogueCoreGrailsPlugin {
     // the plugin version
@@ -242,12 +242,6 @@ Model catalogue core plugin (metadata registry)
 
         ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
 
-        reportsRegistry.register {
-            creates asset
-            title { "Export All Elements of ${it.name} to XML" }
-            type Model
-            link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xml'], id: true
-        }
 
         reportsRegistry.register {
             creates asset
@@ -350,6 +344,9 @@ Model catalogue core plugin (metadata registry)
         ValueDomain valueDomain = getValueDomain(dataElement)
         if(valueDomain) {
             DataType dataType = valueDomain.dataType
+            if (!dataType) {
+                return ''
+            }
             if (dataType instanceof EnumeratedType) {
                 return dataType.enumAsString
             }

@@ -15,6 +15,7 @@ log4j = {
     debug 'org.modelcatalogue.core.publishing'
 
     warn 'org.modelcatalogue.core.xml'
+    info 'org.modelcatalogue.core.RelationshipType'
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
            'org.codehaus.groovy.grails.web.pages', //  GSP
