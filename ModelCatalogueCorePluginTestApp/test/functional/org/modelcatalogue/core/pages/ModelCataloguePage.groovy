@@ -128,11 +128,11 @@ abstract class ModelCataloguePage extends Page {
     }
 
     void selectTab(String name) {
-        tab(name).find('a').click()
+        $("li[data-tab-name='$name'] a").click()
     }
 
     boolean tabActive(String name) {
-        tab(name).hasClass('active')
+        $("li[data-tab-name='$name'].active").displayed
     }
 
     /**
