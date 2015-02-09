@@ -70,4 +70,18 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
         subviewTitle.text().trim() == 'Foos DRAFT'
     }
 
+    def "going to metadata tab changes the url"() {
+        waitFor {
+            $('li', 'data-tab-name': 'ext').displayed
+        }
+
+        when:
+        $('li', 'data-tab-name': 'ext').find('a').click()
+
+        then:
+        waitFor {
+            currentUrl.toString().endsWith('/ext')
+        }
+    }
+
 }
