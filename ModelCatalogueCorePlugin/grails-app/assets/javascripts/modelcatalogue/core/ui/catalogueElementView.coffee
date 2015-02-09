@@ -282,6 +282,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.isTableSortable = (tab) ->
         return false unless tab.value?.size > 1
         return false unless tab.value?.type
+        return false if tab.value.type.bidirectional
         return true
 
       $scope.reorder = (tab, $row, $current) ->

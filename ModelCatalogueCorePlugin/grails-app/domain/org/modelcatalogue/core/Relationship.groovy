@@ -42,6 +42,13 @@ class Relationship implements Extendible {
 
     Long outgoingIndex = System.currentTimeMillis()
     Long incomingIndex = System.currentTimeMillis()
+
+    /*
+     * Reordeing bidirectional relationships is not supported as the combined index is
+     * actually same for all group of related elements
+     * and change from the other side would change the view from the opposite side
+     */
+    @Deprecated
     Long combinedIndex = System.currentTimeMillis()
 
     static hasMany = [extensions: RelationshipMetadata]

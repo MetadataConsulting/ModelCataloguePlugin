@@ -47,7 +47,9 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/$id/relationships/search" (controller: controllerName, action: "searchRelationships", method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/relationships/$type/search" (controller: controllerName, action: "searchRelationships", method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/relationships/$type" (controller: controllerName, action: "relationships", method: HttpMethod.GET)
-                "/api/modelCatalogue/core/$controllerName/$id/relationships/$type" (controller: controllerName, action: "reorderCombined", method: HttpMethod.PUT)
+                // reordeing bidirectional relationships is not supported as the combined index is actually same for all group of related elements
+                // and change from the other side would change the view from the opposite side
+                // "/api/modelCatalogue/core/$controllerName/$id/relationships/$type" (controller: controllerName, action: "reorderCombined", method: HttpMethod.PUT)
                 "/api/modelCatalogue/core/$controllerName/$id/outgoing/search" (controller: controllerName, action: 'searchOutgoing', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type/search" (controller: controllerName, action: 'searchOutgoing', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/outgoing/$type" (controller: controllerName, action: 'outgoing', method: HttpMethod.GET)
