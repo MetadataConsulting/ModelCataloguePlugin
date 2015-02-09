@@ -101,6 +101,9 @@
             and: 'save button clicked'
             saveButton.click()
 
+            and: "properties tab is shown"
+            selectTab('properties')
+
             then: 'the data element is saved and and different value domain is shown'
             waitFor(120) {
                 $('td', 'data-value-for': "Value Domain").text().contains('VD4Dent2')
