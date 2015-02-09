@@ -186,7 +186,9 @@ class ModelWizardSpec extends GebReportingSpec {
         $('a.catalogue-element-treeview-link', title: "New").click()
 
         then:
-        subviewTitle.text().trim() == 'New DRAFT'
+        waitFor {
+            subviewTitle.text().trim() == 'New DRAFT'
+        }
 
         totalOf('parentOf') == 2
         totalOf('contains') == 1

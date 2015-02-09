@@ -170,7 +170,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', 'delayedQueueExecutor', '$q', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args, delayedQueueExecutor, $q) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', 'delayedQueueExecutor', '$q', '$log', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args, delayedQueueExecutor, $q, $log) ->
           execAfter50 = delayedQueueExecutor(500)
 
           $scope.reset = ->
@@ -215,6 +215,10 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
 
           $scope.push = (arrayName, propertyName) ->
             value = $scope[propertyName]
+            unless value
+              $log.warn "no scope value for #{propertyName}", $scope
+              return
+
             if angular.isString value.element
               value.name = value.element
               value.create = true
@@ -395,7 +399,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   angular.forEach result.list, (relation) ->
                     $scope[property] = element: relation.relation, ext: relation.ext
                     $scope.push container, property
-                  $scope[property] = null
+                  $scope[property] {ext: {}}
 
               promises.push model.childOf(null, max: 100).then push('parents', 'parent')
               promises.push model.parentOf(null, max: 100).then push('children', 'child')

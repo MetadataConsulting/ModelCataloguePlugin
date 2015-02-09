@@ -202,7 +202,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
                     messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
 
 
-          if obj.type == 'orderedMap'
+          if obj?.type == 'orderedMap'
             for value in obj.values when not angular.isObject(value.value)
               tabDefinition.properties.push {
                 label: value.key
