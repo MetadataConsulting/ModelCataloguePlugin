@@ -82,29 +82,4 @@ class ModelControllerIntegrationSpec extends AbstractCatalogueElementControllerI
         ]
     }
 
-    def "new Test for json"(){
-
-        def x = new Model(name:"test").save(flush:true)
-
-        when:
-
-        def string2 = '{"modelCatalogueId":"' + x.defaultModelCatalogueId + '","archived":false,"name":"adam123123","description":"test","version":0,"elementType":"org.modelcatalogue.core.Model","dateCreated":"2014-08-15T13:02:27.000Z","lastUpdated":"2014-08-15T13:02:27.000Z","link":"/model/182","availableReports":[{"title":"Export All Elements of test to XML","url":"/ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/dataArchitect/getSubModelElements?format=xml&asset=true&name=Export+All+Elements+of+test+to+XML&id=182","type":"ASSET"},{"title":"","url":"/ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/model?asset=true&name=","type":"ASSET"}],"ext":{},"versionNumber":1,"status":"DRAFT","versionCreated":"2014-08-15T13:02:27.000Z","defaultExcludes":["id","elementType","incomingRelationships","outgoingRelationships","link","mappings"],"updatableProperties":["modelCatalogueId","archived","name","description","version","dateCreated","lastUpdated","relationships","childOf","hasAttachmentOf","contains","parentOf","relatedTo","availableReports","ext","versionNumber","status","versionCreated","history"],"__enhancedBy":["catalogueElement"]}'
-
-        controller.params.id  = x.id
-        controller.request.method = "PUT"
-        controller.request.format = "json"
-        controller.request.content = string2.getBytes()
-        controller.request.makeAjaxRequest()
-
-        controller.update()
-
-        def response2 = controller.response.json
-
-        then:
-        response2.name == "adam123123"
-
-
-
-    }
-
 }

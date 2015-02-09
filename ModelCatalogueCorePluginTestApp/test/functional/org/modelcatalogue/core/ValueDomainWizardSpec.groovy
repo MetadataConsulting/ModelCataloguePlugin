@@ -158,8 +158,8 @@
             $('button.btn-primary.update-object').click()
 
             then:
-            waitFor {
-                $('button.btn-primary.update-object').disabled
+            waitFor(30) {
+                $('button.btn-primary.update-object').displayed && $('button.btn-primary.update-object').disabled
             }
 
         }
@@ -469,9 +469,11 @@
             confirmOk.click()
 
             then: "the element new draft version is created"
-            waitFor {
-                subviewStatus.text() == 'DRAFT'
+            waitFor(30) {
                 totalOf('history') == 2
+            }
+            waitFor(30) {
+                subviewStatus.text() == 'DRAFT'
             }
 
         }
