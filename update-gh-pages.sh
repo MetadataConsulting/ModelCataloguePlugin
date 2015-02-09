@@ -26,7 +26,7 @@
   cp -Rf $HOME/reports/* ./reports/latest/
 
   #add, commit and push files
-  git add -f .
+  git add -u -f .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
 
