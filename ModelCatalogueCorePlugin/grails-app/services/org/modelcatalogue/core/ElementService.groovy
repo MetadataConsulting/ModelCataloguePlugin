@@ -175,7 +175,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         for (Relationship rel in new HashSet<Relationship>(source.outgoingRelationships)) {
             if (rel.relationshipType.system) {
-                // skip system, currency only supersession
+                // skip system, currently only supersession
                 continue
             }
 
@@ -255,6 +255,8 @@ class ElementService implements Publisher<CatalogueElement> {
 
         destination.status = originalStatus
         destination.save(failOnError: true)
+
+        source.afterMerge(destination)
 
         log.info "Merged $source into $destination"
 

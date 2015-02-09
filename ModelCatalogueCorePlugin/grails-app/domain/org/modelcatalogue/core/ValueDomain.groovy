@@ -165,4 +165,16 @@ class ValueDomain extends CatalogueElement {
         .add(this.dataElements)
         .run(publisher)
     }
+
+    @Override
+    void afterMerge(CatalogueElement destination) {
+        if (!(destination.instanceOf(ValueDomain))) {
+            return
+        }
+        List<DataElement> dataElements = new ArrayList<DataElement>(dataElements)
+        for (DataElement element in dataElements) {
+            element.valueDomain = destination as ValueDomain
+            element.save(failOnError: true)
+        }
+    }
 }

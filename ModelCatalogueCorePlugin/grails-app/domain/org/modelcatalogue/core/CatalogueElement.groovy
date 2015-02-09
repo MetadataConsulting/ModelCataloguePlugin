@@ -337,4 +337,12 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         return status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]
     }
 
+    /**
+     * Method called after successfully finishing the generic merge
+     * to finish domain class specific action such as changing the value domain of data elements.
+     *
+     * @param destination element in which this element was successfully merged
+     */
+    void afterMerge(CatalogueElement destination) {}
+
 }
