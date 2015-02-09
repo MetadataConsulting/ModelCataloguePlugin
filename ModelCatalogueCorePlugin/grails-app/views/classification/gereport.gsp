@@ -39,54 +39,54 @@
             </br>
             </br>
 
-                <p><span class="label label-info pull-right">${classification.status}</span>  </p>
-                <h1 class="text-center">${classification.name} <span class="badge">v${classification.versionNumber}</span></h1>
+                %{--<p><span class="label label-info pull-right">${classification.status}</span>  </p>--}%
+                %{--<h1 class="text-center">${classification.name} <span class="badge">v${classification.versionNumber}</span></h1>--}%
 
-                <p>${classification.description}</p>
-            </br>
-            </br>
-            </br>
-                <h2>Contents:</h2>
+                %{--<p>${classification.description}</p>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+                %{--<h2>Contents:</h2>--}%
 
-                <h3>1. Essential Sample Metadata</h3>
-                <h3>2. Core Data</h3>
-                <h3>3. Additional Data</h3>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
+                %{--<h3>1. Essential Sample Metadata</h3>--}%
+                %{--<h3>2. Core Data</h3>--}%
+                %{--<h3>3. Additional Data</h3>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
 
-            </br>
-            </br></br>
-            </br>
-            </br>
+            %{--</br>--}%
+            %{--</br></br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
 
-            </br>
-            </br></br>
-            </br>
-            </br>
+            %{--</br>--}%
+            %{--</br></br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
 
-            </br>
-            </br></br>
-            </br>
-            </br>
+            %{--</br>--}%
+            %{--</br></br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
 
-            </br>
-            </br></br>
-            </br>
-            </br>
+            %{--</br>--}%
+            %{--</br></br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
 
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
-            </br>
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
+            %{--</br>--}%
 
 
 

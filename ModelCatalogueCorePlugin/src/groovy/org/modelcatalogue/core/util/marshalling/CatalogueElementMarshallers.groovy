@@ -152,7 +152,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     static Map<String, Object> minimumValueDomain(ValueDomain element) {
         if (!element) return null
-        [name: element.name, id: element.id, dataType: minimumDataType(element.dataType), elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id"]
+        [name: element.name, id: element.id, dataType: minimumDataType(element.dataType), unitOfMeasure: element?.unitOfMeasure?.name, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id"]
     }
 
     static Map<String, Object> minimumDataType(DataType element) {

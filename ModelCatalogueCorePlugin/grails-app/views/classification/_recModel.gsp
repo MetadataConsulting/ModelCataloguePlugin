@@ -85,6 +85,8 @@
                                     <g:if test="${relationship.destination?.valueDomain?.dataType?.name}">(${relationship.destination?.valueDomain?.dataType?.name})</g:if>
                                     <g:if test="${relationship.destination?.valueDomain?.dataType?.description}">(${relationship.destination?.valueDomain?.dataType?.description})</g:if>
                                     <g:if test="${relationship.destination?.valueDomain?.rule}"><p> Format: <code>${relationship.destination?.valueDomain?.rule}</code></p></g:if>
+                                    <g:if test="${relationship.destination?.valueDomain?.unitOfMeasure?.name}">(${relationship.destination?.valueDomain?.unitOfMeasure?.name})</g:if>
+                                    <g:if test="${relationship.destination?.valueDomain?.unitOfMeasure?.symbol}">(${relationship.destination?.valueDomain?.unitOfMeasure?.symbol})</g:if>
                                 </g:else>
 
                         %{--<g:if test="${relationship.destination?.valueDomain?.dataType?.enumerations}">--}%
