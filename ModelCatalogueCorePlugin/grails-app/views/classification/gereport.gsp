@@ -88,9 +88,12 @@
                                     <g:else>
                                         <td width="200">No Datatype defined</td>
                                     </g:else>
-                                    <g:if test="${relationship.destination.valueDomain.dataType instanceof EnumeratedType}">
-                                        <td width="400">${relationship.destination.valueDomain.dataType.prettyPrint()}</td>
+                                    <g:if test="${!relationship.destination.valueDomain.dataType}">
+                                        <td width="400"></td>
                                     </g:if>
+                                    <g:elseif test="${relationship.destination.valueDomain.dataType instanceof EnumeratedType}">
+                                        <td width="400">${relationship.destination.valueDomain.dataType.prettyPrint()}</td>
+                                    </g:elseif>
                                     <g:else>
                                         <td width="400">${relationship.destination.valueDomain.dataType.description}</td>
                                     </g:else>
