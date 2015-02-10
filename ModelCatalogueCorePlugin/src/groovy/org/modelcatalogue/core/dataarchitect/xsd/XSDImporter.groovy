@@ -61,35 +61,37 @@ class XSDImporter {
     Model rootElementsContainer
 
     def createAll() {
-        log.info("Processing simple types")
-        createValueDomainsAndDataTypes()
-        log.info("Processing complex types")
-        createModelsAndElements()
+        org.modelcatalogue.core.util.FriendlyErrors.withFriendlyFailure {
+            log.info("Processing simple types")
+            createValueDomainsAndDataTypes()
+            log.info("Processing complex types")
+            createModelsAndElements()
 
-        log.info("Publishing elements as DRAFT")
-        for (DataElement element in elementsCreated) {
-            element.status = ElementStatus.DRAFT
-            element.save(failOnError: true)
+            log.info("Publishing elements as DRAFT")
+            for (DataElement element in elementsCreated) {
+                element.status = ElementStatus.DRAFT
+                element.save(failOnError: true)
+            }
+
+            log.info("Publishing models as DRAFT")
+            for (Model model in modelsCreated) {
+                model.status = ElementStatus.DRAFT
+                model.save(failOnError: true)
+            }
+
+            if (publicTypesContainer) {
+                publicTypesContainer.status = ElementStatus.DRAFT
+                publicTypesContainer.save(failOnError: true)
+            }
+
+            if (rootElementsContainer) {
+                rootElementsContainer.status = ElementStatus.DRAFT
+                rootElementsContainer.save(failOnError: true)
+            }
+
+
+            log.info("Processing FINISHED")
         }
-
-        log.info("Publishing models as DRAFT")
-        for (Model model in modelsCreated) {
-            model.status = ElementStatus.DRAFT
-            model.save(failOnError: true)
-        }
-
-        if (publicTypesContainer) {
-            publicTypesContainer.status = ElementStatus.DRAFT
-            publicTypesContainer.save(failOnError: true)
-        }
-
-        if (rootElementsContainer) {
-            rootElementsContainer.status = ElementStatus.DRAFT
-            rootElementsContainer.save(failOnError: true)
-        }
-
-
-        log.info("Processing FINISHED")
     }
 
     def createValueDomainsAndDataTypes() {

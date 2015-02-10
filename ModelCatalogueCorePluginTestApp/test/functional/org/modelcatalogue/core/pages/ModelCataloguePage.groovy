@@ -77,9 +77,9 @@ abstract class ModelCataloguePage extends Page {
      * Selects the first item from catalogue element picker if any element is found.
      * returns true if the element was selected, false otherwise
      */
-    boolean selectCepItemIfExists() {
+    boolean selectCepItemIfExists(long waitTime = 3) {
         try {
-            waitFor(3) {
+            waitFor(waitTime) {
                 $('.cep-item').displayed
             }
             $('.cep-item').click()

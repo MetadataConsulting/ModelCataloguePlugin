@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -217,10 +218,9 @@ class RelationshipService {
             if (entry == other) {
                 correction++
                 direction.setIndex(relationship, (i + correction) * INDEX_STEP)
-                relationship.save(failOnError: true)
+                FriendlyErrors.failFriendlySave(relationship)
             }
-
-            entry.save(failOnError: true)
+            FriendlyErrors.failFriendlySave(entry)
         }
         relationship
     }

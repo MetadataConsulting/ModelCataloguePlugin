@@ -5,6 +5,7 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.util.FriendlyErrors
 
 class DraftChain extends PublishingChain {
 
@@ -66,7 +67,7 @@ class DraftChain extends PublishingChain {
     private CatalogueElement createDraft(Publisher<CatalogueElement> archiver) {
         if (!published.latestVersionId) {
             published.latestVersionId = published.id
-            published.save(failOnError: true)
+            FriendlyErrors.failFriendlySave(published)
         }
 
         if (published.archived) {

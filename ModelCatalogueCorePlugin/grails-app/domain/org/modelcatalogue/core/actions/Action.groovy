@@ -1,9 +1,9 @@
 package org.modelcatalogue.core.actions
 
-import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.Extension
 import org.modelcatalogue.core.util.ExtensionsWrapper
+import org.modelcatalogue.core.util.FriendlyErrors
 
 class Action implements Extendible {
 
@@ -51,7 +51,7 @@ class Action implements Extendible {
     @Override
     Extension addExtension(String name, String value) {
         ActionParameter newOne = new ActionParameter(name: name, extensionValue: value, action: this)
-        newOne.save(failOnError: true)
+        FriendlyErrors.failFriendlySave(newOne)
         addToExtensions(newOne)
         newOne
     }

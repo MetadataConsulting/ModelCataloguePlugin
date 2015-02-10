@@ -100,7 +100,7 @@
             selectCepItemIfExists()
 
             unitOfMeasure       = "meter"
-            selectCepItemIfExists()
+            selectCepItemIfExists(10)
 
             expandRuleButton.click()
 

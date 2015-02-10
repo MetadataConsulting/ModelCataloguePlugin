@@ -143,7 +143,10 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
       $q.when(loginFn(username, password, rememberMe)).then (user) ->
         if not user.errors
           $rootScope.$broadcast 'userLoggedIn', user
-        user
+          return user
+        else
+          $log.warn "login finished with errors", user.errors
+          return $q.reject user
 
     logoutFn        = security.logout
     security.logout = ->

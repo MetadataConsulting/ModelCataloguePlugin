@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.web.multipart.MultipartFile
 
 class CsvTransformationController extends AbstractRestfulController<CsvTransformation>{
@@ -52,7 +53,7 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
                         destination: getByIdOrNull(definition.destination),
                         header: definition.header
                 )
-                columnTransformationDefinition.save(failOnError: true)
+                FriendlyErrors.failFriendlySave(columnTransformationDefinition)
             }
         }
     }

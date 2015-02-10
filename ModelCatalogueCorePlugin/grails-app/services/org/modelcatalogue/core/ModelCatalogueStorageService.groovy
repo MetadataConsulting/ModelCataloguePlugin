@@ -2,9 +2,8 @@ package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.runtime.IOGroovyMethods
-import org.hibernate.LobHelper
-import org.hibernate.Session
 import org.hibernate.SessionFactory
+import org.modelcatalogue.core.util.FriendlyErrors
 
 import javax.annotation.PostConstruct
 
@@ -51,7 +50,7 @@ class ModelCatalogueStorageService implements StorageService {
 
         IOGroovyMethods.withStream(file.content.setBinaryStream(1), withOutputStream)
 
-        file.save(failOnError: true)
+        FriendlyErrors.failFriendlySave(file)
     }
 
     /**
