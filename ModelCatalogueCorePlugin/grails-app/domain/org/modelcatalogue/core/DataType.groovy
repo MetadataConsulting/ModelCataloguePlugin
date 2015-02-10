@@ -4,6 +4,7 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.util.FriendlyErrors
 
 /*
 * A Data Type is like a primitive type
@@ -87,7 +88,7 @@ class DataType extends CatalogueElement {
 
     DataType removeFromRelatedValueDomains(ValueDomain domain) {
         domain.dataType = null
-        domain.save(failOnError: true)
+        FriendlyErrors.failFriendlySave(domain)
         this
     }
 

@@ -5,6 +5,7 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.transaction.TransactionStatus
 
 class ElementService implements Publisher<CatalogueElement> {
@@ -58,7 +59,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 return
             }
             it.archived = true
-            it.save(failOnError: true)
+            FriendlyErrors.failFriendlySave(it)
         }
 
         archived.outgoingRelationships.each {
@@ -66,7 +67,7 @@ class ElementService implements Publisher<CatalogueElement> {
                 return
             }
             it.archived = true
-            it.save(failOnError: true)
+            FriendlyErrors.failFriendlySave(it)
         }
 
         modelCatalogueSearchService.unindex(archived)
@@ -254,7 +255,8 @@ class ElementService implements Publisher<CatalogueElement> {
         destination.addToSupersededBy(source)
 
         destination.status = originalStatus
-        destination.save(failOnError: true)
+
+        FriendlyErrors.failFriendlySave(destination)
 
         source.afterMerge(destination)
 

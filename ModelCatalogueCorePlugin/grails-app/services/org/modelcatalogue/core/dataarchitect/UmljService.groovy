@@ -196,19 +196,6 @@ class UmljService {
         }
     }
 
-    /**
-     * Returns existing classification or new one with given name and namespace.
-     * @param name the name of the newly created classification
-     * @param namespace the namespace of the newly created classification
-     * @return existing classification or new one with given name and namespace
-     */
-    private Classification findOrCreateClassification(String name, String namespace) {
-        Classification classification = Classification.findByNamespace(namespace)
-        if (classification) {
-            return classification
-        }
-        new Classification(name: name, namespace: namespace).save(failOnError: true)
-    }
 
     private static String mapToString(Map<String, String> map) {
         if (map == null) return null

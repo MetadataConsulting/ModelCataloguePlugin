@@ -4,12 +4,13 @@ import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
 
 @Log4j
 class CatalogueElementProxyRepository {
 
-    private Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, Classification]
+    static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, Classification]
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
 
     private final ClassificationService classificationService
@@ -160,14 +161,16 @@ class CatalogueElementProxyRepository {
 
 
     public static <T extends CatalogueElement> T save(T element) {
-        element.save(flush: true, failOnError: true)
+        FriendlyErrors.withFriendlyFailure {
+            element.save(flush: true, failOnError: true)
+        }
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
         DraftContext context = DraftContext.importFriendly()
         T draft = element.createDraftVersion(elementService, context) as T
         if (draft.hasErrors()) {
-            throw new IllegalStateException(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create draft version of $element", draft.errors))
+            throw new IllegalStateException(FriendlyErrors.printErrors("Failed to create draft version of $element", draft.errors))
         }
         context.classifyDrafts()
         draft

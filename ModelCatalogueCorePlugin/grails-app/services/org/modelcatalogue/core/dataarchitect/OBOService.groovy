@@ -2,19 +2,14 @@ package org.modelcatalogue.core.dataarchitect
 
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.ElementStatus
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.obolibrary.oboformat.model.Clause
 import org.obolibrary.oboformat.model.Frame
 import org.obolibrary.oboformat.model.OBODoc
 import org.obolibrary.oboformat.parser.OBOFormatParser
 
 import javax.xml.bind.DatatypeConverter
-
 
 class OBOService {
 
@@ -186,7 +181,7 @@ class OBOService {
             }
             log.info "[${(i + 1).toString().padLeft(6, '0')}/${models.size().toString().padLeft(6, '0')}] Publishing model ${model.ext[OBO_ID]}: ${model.name} as DRAFT"
             model.status = ElementStatus.DRAFT
-            model.save(failOnError: true)
+            FriendlyErrors.failFriendlySave(model)
             if (i % 1000 == 0) {
                 cleanUpGorm()
             }
@@ -433,7 +428,8 @@ class OBOService {
             throw new IllegalArgumentException("Frame ${frame.id} is missing the 'name' property")
         }
 
-        Model model = new Model(name: name.value.toString(), status: ElementStatus.PENDING, modelCatalogueId: mcid).save(failOnError: true)
+        Model model = new Model(name: name.value.toString(), status: ElementStatus.PENDING, modelCatalogueId: mcid)
+        FriendlyErrors.failFriendlySave(model)
         model.ext[OBO_ID] = frame.id
         model
     }
@@ -472,7 +468,9 @@ class OBOService {
         if (classification) {
             return classification
         }
-        new Classification(name: name, namespace: namespace).save(failOnError: true)
+        classification = new Classification(name: name, namespace: namespace)
+        FriendlyErrors.failFriendlySave(classification)
+        classification
     }
 
     /**

@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.modelcatalogue.core.util.ValueDomainRuleScript
 
@@ -174,7 +175,7 @@ class ValueDomain extends CatalogueElement {
         List<DataElement> dataElements = new ArrayList<DataElement>(dataElements)
         for (DataElement element in dataElements) {
             element.valueDomain = destination as ValueDomain
-            element.save(failOnError: true)
+            FriendlyErrors.failFriendlySave(element)
         }
     }
 }
