@@ -11,7 +11,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         angular.extend $scope,  result
       )
 
-    $rootScope.$on('userLoggedIn', (ignored, user) ->
+    $scope.$on('userLoggedIn', (ignored, user) ->
       if user?.data?.error
         updateDashboard undefined
       else
@@ -64,10 +64,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', 'names' , ($scope, $stateParams, $state, element, $rootScope, names) ->
     $scope.element = element
     $rootScope.elementToShow = element
-
-    $scope.$on 'newVersionCreated', (ignored, element) ->
-      if element
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history'}
 ])
 
 .controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', 'element', ($scope, $stateParams, $state, element) ->

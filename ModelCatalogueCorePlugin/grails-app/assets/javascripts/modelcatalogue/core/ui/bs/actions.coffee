@@ -131,7 +131,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
-    $rootScope.$on 'newVersionCreated', updateAction
+    $scope.$on 'newVersionCreated', updateAction
 
     return action
 
@@ -233,7 +233,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         catalogueElementResource($scope.element.elementType).update($scope.element, {newVersion: true}).then (updated) ->
           updateFrom $scope.element, updated
           messages.success("New version created for #{$scope.element.name}")
-          $rootScope.$broadcast 'newVersionCreated', $scope.element
+          $rootScope.$broadcast 'newVersionCreated', updated
         , showErrorsUsingMessages(messages)
     }
 
@@ -242,7 +242,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
-    $rootScope.$on 'newVersionCreated', updateAction
+    $scope.$on 'newVersionCreated', updateAction
 
     action
   ]
@@ -270,7 +270,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
-    $rootScope.$on 'newVersionCreated', updateAction
+    $scope.$on 'newVersionCreated', updateAction
 
     action
   ]
@@ -297,7 +297,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
-    $rootScope.$on 'newVersionCreated', updateAction
+    $scope.$on 'newVersionCreated', updateAction
 
     action
   ]
@@ -326,7 +326,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
-    $rootScope.$on 'newVersionCreated', updateAction
+    $scope.$on 'newVersionCreated', updateAction
 
     action
   ]

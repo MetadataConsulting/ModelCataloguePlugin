@@ -142,11 +142,11 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
       $scope.select = (element) ->
         $rootScope.$broadcast 'treeviewElementSelected', element, $scope.rootId
 
-      $rootScope.$on 'treeviewElementSelected', (event, element, id) ->
+      $scope.$on 'treeviewElementSelected', (event, element, id) ->
         return if id and $scope.rootId and id != $scope.rootId
         $scope.element.$$active = $scope.element.link == element.link
 
-      $rootScope.$on 'catalogueElementDeleted', (event, element) ->
+      $scope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
         for item, i in $scope.element.$$children
           if element.relation and item.link == element.relation.link
@@ -157,7 +157,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.element.$$numberOfChildren--
 
 
-      $rootScope.$on 'catalogueElementCreated', (_, result) ->
+      $scope.$on 'catalogueElementCreated', (_, result) ->
         if result and result.relation and result.element and result.type and result.direction
           direction = if result.direction == 'destinationToSource' then 'incoming' else 'outgoing'
           oppositeDirection = if result.direction == 'destinationToSource' then 'outgoing' else 'incoming'

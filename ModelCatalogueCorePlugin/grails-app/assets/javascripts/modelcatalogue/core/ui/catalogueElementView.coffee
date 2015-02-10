@@ -294,12 +294,15 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             updateFrom($scope.element, refreshed)
             onElementUpdate($scope.element)
 
-      $rootScope.$on 'userLoggedIn', refreshElement
-      $rootScope.$on 'userLoggedIn', refreshElement
-      $rootScope.$on 'userLoggedOut', refreshElement
-      $rootScope.$on 'catalogueElementCreated', refreshElement
-      $rootScope.$on 'catalogueElementDeleted', refreshElement
-      $rootScope.$on 'catalogueElementUpdated', refreshElement
+      $scope.$on 'userLoggedIn', refreshElement
+      $scope.$on 'userLoggedIn', refreshElement
+      $scope.$on 'userLoggedOut', refreshElement
+      $scope.$on 'catalogueElementCreated', refreshElement
+      $scope.$on 'catalogueElementDeleted', refreshElement
+      $scope.$on 'catalogueElementUpdated', refreshElement
+      $scope.$on 'newVersionCreated', (ignored, element) ->
+        if($state.$current.name isnt "mc.resource.list")
+          $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history', page: undefined, q: undefined}
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
