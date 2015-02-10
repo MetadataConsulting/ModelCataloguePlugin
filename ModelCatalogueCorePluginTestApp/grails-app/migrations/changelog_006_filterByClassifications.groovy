@@ -72,6 +72,9 @@ databaseChangeLog = {
     changeSet(author: "Vladimir Orany", id: "1412847974051-03") {
         preConditions(onFail: 'MARK_RAN') {
             tableExists tableName: "published_element"
+            not {
+                columnExists tableName: "catalogue_element", columnName: "status"
+            }
         }
 
         addColumn(tableName: 'catalogue_element') {
