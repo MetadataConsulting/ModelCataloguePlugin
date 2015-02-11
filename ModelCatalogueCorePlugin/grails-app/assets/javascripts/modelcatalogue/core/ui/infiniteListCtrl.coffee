@@ -41,7 +41,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
       if element and element.ext
         properties.push label: ''
-        properties.push label: 'Metadata'
+        properties.push label: "#{element.getElementTypeName()} Metadata"
 
         angular.forEach element.ext, (value, key) ->
           properties.push label: names.getNaturalName(key), value: -> value
