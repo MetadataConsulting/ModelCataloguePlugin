@@ -5,17 +5,20 @@ import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.RelationshipDirection
 
 class CopyAssociationsAndRelationships {
 
     private final CatalogueElement draft
     private final CatalogueElement element
     private final boolean classificationOnly
+    private RelationshipService relationshipService
 
     CopyAssociationsAndRelationships(CatalogueElement draft, CatalogueElement element, boolean classificationOnly) {
         this.draft = draft
         this.element = element
         this.classificationOnly = classificationOnly
+        relationshipService = Holders.applicationContext.getBean(RelationshipService)
     }
 
 
@@ -30,43 +33,8 @@ class CopyAssociationsAndRelationships {
             return
         }
 
-        RelationshipType supersession =  RelationshipType.readByName('supersession')
-        RelationshipType classification = RelationshipType.readByName('classification')
-
-        List<Relationship> incomingToRemove = []
-        List<Relationship> outgoingToRemove = []
-
-        for (Relationship r in element.incomingRelationships) {
-            if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
-            Relationship created = draft.createLinkFrom(DraftContext.preferDraft(r.source), r.relationshipType)
-            if (created.hasErrors()) {
-                throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship contains errors", created.errors))
-            }
-            created.ext = r.ext
-            if (isOverriding(created, r)) {
-                incomingToRemove << r
-            }
-        }
-
-        for (Relationship r in element.outgoingRelationships) {
-            if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
-            Relationship created = draft.createLinkTo(DraftContext.preferDraft(r.destination), r.relationshipType)
-            if (created.hasErrors()) {
-                throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship contains errors", created.errors))
-            }
-            created.ext = r.ext
-            if (isOverriding(created, r)) {
-                outgoingToRemove << r
-            }
-        }
-
-        for (Relationship r in incomingToRemove) {
-            element.removeLinkFrom(r.source, r.relationshipType)
-        }
-
-        for (Relationship r in outgoingToRemove) {
-            element.removeLinkTo(r.destination, r.relationshipType)
-        }
+        copyRelationshipsInternal(RelationshipDirection.INCOMING)
+        copyRelationshipsInternal(RelationshipDirection.OUTGOING)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(draft.class.name) as GrailsDomainClass
 
@@ -78,7 +46,41 @@ class CopyAssociationsAndRelationships {
                 }
             }
         }
+    }
 
+
+    void copyRelationshipsInternal(RelationshipDirection direction) {
+        RelationshipType supersession =  RelationshipType.readByName('supersession')
+        RelationshipType classification = RelationshipType.readByName('classification')
+
+        List<Relationship> toRemove = []
+
+        def relationships = direction == RelationshipDirection.INCOMING ? element.incomingRelationships : element.outgoingRelationships
+
+        for (Relationship r in relationships) {
+            if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
+            Relationship created
+            if (direction == RelationshipDirection.INCOMING) {
+                created = relationshipService.link(DraftContext.preferDraft(r.source), draft, r.relationshipType, r.classification, false)
+            } else {
+                created = relationshipService.link(draft, DraftContext.preferDraft(r.destination), r.relationshipType, r.classification, false)
+            }
+            if (created.hasErrors()) {
+                throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship contains errors", created.errors))
+            }
+            created.ext = r.ext
+            if (isOverriding(created, r)) {
+                toRemove << r
+            }
+        }
+
+        for (Relationship r in toRemove) {
+            if (direction == RelationshipDirection.INCOMING) {
+                element.removeLinkFrom(r.source, r.relationshipType)
+            } else {
+                element.removeLinkTo(r.destination, r.relationshipType)
+            }
+        }
     }
 
     static boolean isOverriding(Relationship created, Relationship old) {
