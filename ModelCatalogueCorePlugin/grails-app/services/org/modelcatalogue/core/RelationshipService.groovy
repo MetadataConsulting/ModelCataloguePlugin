@@ -24,10 +24,13 @@ class RelationshipService {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
             if (relationshipInstance) {
-                if (!resetIndexes) {
+                if (!resetIndexes && relationshipInstance.archived == archived) {
                     return relationshipInstance
                 }
-                relationshipInstance.resetIndexes()
+                if (resetIndexes) {
+                    relationshipInstance.resetIndexes()
+                }
+                relationshipInstance.archived = archived
                 return relationshipInstance.save(flush: true)
             }
         }

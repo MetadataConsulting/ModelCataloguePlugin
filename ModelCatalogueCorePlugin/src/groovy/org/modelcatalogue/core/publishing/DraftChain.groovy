@@ -49,7 +49,7 @@ class DraftChain extends PublishingChain {
 
         for (Collection<CatalogueElement> elements in queue) {
             for (CatalogueElement element in elements) {
-                if (element.id in processed || isUpdatingInProgress(element)) {
+                if (element.id in processed || isUpdatingInProgress(element) || isDeprecated(element)) {
                     continue
                 }
                 processed << element.id
@@ -130,6 +130,10 @@ class DraftChain extends PublishingChain {
 
     private static isDraft(CatalogueElement element) {
         element.status == ElementStatus.DRAFT
+    }
+
+    private static isDeprecated(CatalogueElement element) {
+        element.status == ElementStatus.DEPRECATED
     }
 
 }

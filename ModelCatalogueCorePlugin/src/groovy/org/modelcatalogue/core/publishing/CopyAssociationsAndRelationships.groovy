@@ -58,12 +58,16 @@ class CopyAssociationsAndRelationships {
         def relationships = direction == RelationshipDirection.INCOMING ? element.incomingRelationships : element.outgoingRelationships
 
         for (Relationship r in relationships) {
-            if (r.archived || r.relationshipType == supersession || r.relationshipType == classification) continue
+            if (r.relationshipType == supersession || r.relationshipType == classification) continue
             Relationship created
             if (direction == RelationshipDirection.INCOMING) {
-                created = relationshipService.link(DraftContext.preferDraft(r.source), draft, r.relationshipType, r.classification, false)
+                if (r.archived && r.relationshipType.versionSpecific) {
+                    // e.g. don't copy archived parents, but copy children (that's why this is in the incoming branch)
+                    continue
+                }
+                created = relationshipService.link(DraftContext.preferDraft(r.source), draft, r.relationshipType, r.classification, r.archived)
             } else {
-                created = relationshipService.link(draft, DraftContext.preferDraft(r.destination), r.relationshipType, r.classification, false)
+                created = relationshipService.link(draft, DraftContext.preferDraft(r.destination), r.relationshipType, r.classification, r.archived)
             }
             if (created.hasErrors()) {
                 throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship contains errors", created.errors))
