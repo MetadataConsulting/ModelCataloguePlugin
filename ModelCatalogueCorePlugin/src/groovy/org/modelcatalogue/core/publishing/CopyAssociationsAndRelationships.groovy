@@ -24,7 +24,7 @@ class CopyAssociationsAndRelationships {
 
     void copyClassifications() {
         for (Classification classification in element.classifications) {
-            draft.addToClassifications(classification)
+            draft.addToClassifications(DraftContext.preferDraft(classification))
         }
     }
 
