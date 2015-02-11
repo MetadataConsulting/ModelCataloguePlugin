@@ -17,13 +17,6 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     {header: 'Metadata',  value: printMetadata, classes: 'col-md-4'}
   ]
 
-  classifiedElement = ->  [
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'href()' }
-    { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alphabet'} }
-    { header: "Description", value: "description" , classes: "col-md-4"}
-    { header: "Value Domain", value: "valueDomain.name", classes: "col-md-3", show: true, href: 'href()'}
-  ]
-
   containsDataElements= -> [
     {header: 'Name', value: "relation.name", classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
     {header: "Description", value: "relation.description" , classes: "col-md-5"}
@@ -79,7 +72,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Models', columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments', columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf', label: 'Conceptual Domains', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'classifies', label: 'Classifies', columns: classifiedElement()
+  catalogueElementPropertiesProvider.configureProperty 'classifies', label: 'Classifies', columns: localNameAndIdent()
 
   catalogueElementPropertiesProvider.configureProperty 'instantiates', label: 'Data Elements', columns: nameAndIdAndMetadata()
 
