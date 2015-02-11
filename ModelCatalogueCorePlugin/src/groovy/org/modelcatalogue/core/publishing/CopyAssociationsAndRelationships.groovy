@@ -51,14 +51,16 @@ class CopyAssociationsAndRelationships {
 
     void copyRelationshipsInternal(RelationshipDirection direction) {
         RelationshipType supersession =  RelationshipType.readByName('supersession')
-        RelationshipType classification = RelationshipType.readByName('classification')
 
         List<Relationship> toRemove = []
 
         def relationships = direction == RelationshipDirection.INCOMING ? element.incomingRelationships : element.outgoingRelationships
 
         for (Relationship r in relationships) {
-            if (r.relationshipType == supersession || r.relationshipType == classification) continue
+            if (r.relationshipType == supersession) {
+                continue
+            }
+
             Relationship created
             if (direction == RelationshipDirection.INCOMING) {
                 if (r.archived && r.relationshipType.versionSpecific) {

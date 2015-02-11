@@ -279,7 +279,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         if (controller instanceof AbstractRestfulController) {
             controller.cleanRelations(elementToDelete)
             elementToDelete.save()
-            controller.bindRelations(elementToDelete, newInstance)
+            controller.bindRelations(elementToDelete, false, newInstance)
             return elementToDelete
         }
         elementToDelete.save()

@@ -44,7 +44,7 @@ class CsvTransformationController extends AbstractRestfulController<CsvTransform
     }
 
     @Override
-    protected bindRelations(CsvTransformation instance, Object objectToBind) {
+    protected bindRelations(CsvTransformation instance, boolean newVersion, Object objectToBind) {
         if (objectToBind.columns != null) {
             for (definition in objectToBind.columns) {
                 ColumnTransformationDefinition columnTransformationDefinition = new ColumnTransformationDefinition(
