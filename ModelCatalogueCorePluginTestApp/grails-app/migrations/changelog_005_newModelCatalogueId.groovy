@@ -16,8 +16,15 @@ databaseChangeLog = {
 
 	changeSet(author: "Vladimir Orany", id: "1412847974035-02") {
         preConditions (onFail: 'MARK_RAN') {
-            not {
-                columnExists tableName: "catalogue_element", columnName: "model_catalogue_id_old"
+            and {
+                not {
+                    sqlCheck expectedResult: '0', """
+                    select count(id) from catalogue_element where model_catalogue_id like 'MC%'
+                    """
+                }
+                not {
+                    columnExists tableName: "catalogue_element", columnName: "model_catalogue_id_old"
+                }
             }
         }
         grailsChange {

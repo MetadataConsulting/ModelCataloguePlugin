@@ -24,7 +24,7 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
         render view: 'gereport', model: [classification: classification]
     }
 
-    protected bindRelations(Classification instance, Object objectToBind) {
+    protected bindRelations(Classification instance, boolean newVersion, Object objectToBind) {
         if (objectToBind.classifies != null) {
             for (domain in instance.classifies.findAll { !(it.id in objectToBind.classifies*.id) }) {
                 instance.removeFromClassifies(domain)

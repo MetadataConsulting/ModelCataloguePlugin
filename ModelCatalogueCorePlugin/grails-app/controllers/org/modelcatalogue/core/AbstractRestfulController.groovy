@@ -5,13 +5,11 @@ import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.hibernate.StaleStateException
-import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.http.HttpStatus
 
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
@@ -186,7 +184,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.save flush:true
 
-        bindRelations(instance)
+        bindRelations(instance, false)
 
 
         respond instance, [status: CREATED]
@@ -224,7 +222,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.save flush:true
 
-        bindRelations(instance)
+        bindRelations(instance, false)
 
         respond instance, [status: OK]
     }
@@ -309,11 +307,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * Bind the relations as soon as the instance is persisted.
      * @param instance the persisted instance
      */
-    protected final bindRelations(T instance) {
-        bindRelations(instance, objectToBind)
+    protected final bindRelations(T instance, boolean newVersion) {
+        bindRelations(instance, newVersion, objectToBind)
     }
 
-    protected bindRelations(T instance, Object objectToBind) {}
+    protected bindRelations(T instance, boolean newVersion, Object objectToBind) {}
 
     private Random random = new Random()
 

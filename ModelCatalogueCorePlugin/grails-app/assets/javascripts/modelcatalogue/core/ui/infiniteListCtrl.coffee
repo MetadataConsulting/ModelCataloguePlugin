@@ -25,8 +25,30 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
     cell
 
+  getPropertiesForElement = (element) ->
+    properties = []
+    if element and angular.isFunction(element.isInstanceOf)
+      if element.isInstanceOf('catalogueElement') and not element.isInstanceOf('classification')
+        properties.push label: 'Classifications', value: -> element.classifications
+      if element.isInstanceOf('dataElement')
+        properties.push label: 'Value Domain', value: -> element.valueDomain
+      if element.isInstanceOf('valueDomain')
+        properties.push label: 'Data Type', value: -> element.dataType
+        properties.push label: 'Unit of Measure', value: -> element.unitOfMeasure
+        properties.push label: 'Rule', value: -> element.rule
+      if element.isInstanceOf('enumeratedType')
+        properties.push label: 'Enumerations', value: getEnumerations
+
+      if element and element.ext
+        properties.push label: ''
+        properties.push label: "#{element.getElementTypeName()} Metadata"
+
+        angular.forEach element.ext, (value, key) ->
+          properties.push label: names.getNaturalName(key), value: -> value
+    properties
+
   getRowForElement = (element) ->
-    row = {element: element, properties: [], sortable: $scope.isSortable, classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll}
+    row = {element: element, properties: getPropertiesForElement(if element.relation then element.relation else element), sortable: $scope.isSortable, classesForStatus: $scope.classesForStatus(element), tail: [], $$expanded: $scope.$$expandAll}
 
     if $scope.columns
       row.head = getCellForColumn(element, $scope.columns[0])
@@ -34,24 +56,12 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         for column in $scope.columns.slice(1)
           row.tail.push getCellForColumn(element, column)
 
-    if element and angular.isFunction(element.isInstanceOf)
-      if element.isInstanceOf('catalogueElement') and not element.isInstanceOf('classification')
-        row.properties.push label: 'Classifications', value: -> element.classifications
-      if element.isInstanceOf('dataElement')
-        row.properties.push label: 'Value Domain', value: -> element.valueDomain
-      if element.isInstanceOf('valueDomain')
-        row.properties.push label: 'Data Type', value: -> element.dataType
-        row.properties.push label: 'Unit of Measure', value: -> element.unitOfMeasure
-        row.properties.push label: 'Rule', value: -> element.rule
-      if element.isInstanceOf('enumeratedType')
-        row.properties.push label: 'Enumerations', value: getEnumerations
+    if element.relation and element.ext
+        row.properties.push label: ''
+        row.properties.push label: 'Relationship Metadata'
 
-    if element and element.ext
-      row.properties.push label: ''
-      row.properties.push label: 'Metadata'
-
-      angular.forEach element.ext, (value, key) ->
-        row.properties.push label: names.getNaturalName(key), value: -> value
+        angular.forEach element.ext, (value, key) ->
+          row.properties.push label: names.getNaturalName(key), value: -> value
 
     row
 

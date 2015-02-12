@@ -449,7 +449,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
 
-        bindRelations(instance)
+        bindRelations(instance, newVersion)
 
         respond instance, [status: OK]
     }
@@ -587,7 +587,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     }
 
     // classifications are marshalled with the published element so no need for special method to fetch them
-    protected bindRelations(T instance, Object objectToBind) {
+    protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
         def classifications = objectToBind.classifications ?: []
         for (classification in instance.classifications.findAll { !(it.id in classifications*.id) }) {
             instance.removeFromClassifications classification
@@ -595,6 +595,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
         for (domain in classifications) {
             Classification classification = Classification.get(domain.id as Long)
+            if (newVersion) {
+                classification = DraftContext.preferDraft(classification)
+            }
             instance.addToClassifications classification
             classification.addToClassifies instance
         }

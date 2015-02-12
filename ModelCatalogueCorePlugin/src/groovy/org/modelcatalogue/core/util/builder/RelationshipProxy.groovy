@@ -44,7 +44,7 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
             Relationship relationship = sourceElement.createLinkTo(destinationElement, type, true)
             if (relationship.hasErrors()) {
                 log.error(FriendlyErrors.printErrors("Cannot create relationship of type  $relationshipTypeName between $sourceElement and $destinationElement", relationship.errors))
-                throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement.")
+                throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement. Requested source was $source and destination $destination")
             }
             if (extensions) {
                 relationship.ext.putAll(extensions)

@@ -207,7 +207,13 @@ import org.modelcatalogue.core.*
 
     T findExisting() {
         if (id) {
-            return repository.findById(domain, id)
+            T result = repository.findById(domain, id)
+            if (result) {
+                return result
+            }
+            if (!name) {
+                throw new IllegalStateException("Missing id, classification and name so there is no way how to find existing element")
+            }
         }
         if (name) {
             if (classification) {

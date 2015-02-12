@@ -189,7 +189,10 @@ class CatalogueElementProxyRepository {
 
     protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<Classification> classifications, Object name, Object id) {
         if (id) {
-            return findById(type, id)
+            T result = findById(type, id)
+            if (result) {
+                return result
+            }
         }
         if (!name) {
             return null
@@ -203,7 +206,10 @@ class CatalogueElementProxyRepository {
             T result = getLatestFromCriteria(classificationService.classified(criteria, classifications))
 
             if (result) {
-                return result
+                if (!id || !result.modelCatalogueId) {
+                    return result
+                }
+                return null
             }
 
             // we are looking for results within classification, no way to go if not found
@@ -224,8 +230,13 @@ class CatalogueElementProxyRepository {
             return null
         }
 
-        // ok unclassified, return it
-        return result
+        // return only if there is no id or the modelCatalogueId is null
+        if (!id || !result.modelCatalogueId) {
+            return result
+        }
+
+        // not found
+        return null
     }
 
     protected <T extends CatalogueElement> T findById(Class<T> type, Object id) {
