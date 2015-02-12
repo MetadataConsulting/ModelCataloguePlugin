@@ -11,6 +11,9 @@ angular.module('mc.core.ui.elementsAsTags', ['mc.util.names', 'ui.router']).dire
         $window.open(url,'_blank')
         return
 
+      $scope.getStatus = (element) ->
+        element?.element?.status ? element?.status ? 'FINALIZED'
+
       $scope.removeItem = (index) ->
         $scope.elements.splice index, 1
 

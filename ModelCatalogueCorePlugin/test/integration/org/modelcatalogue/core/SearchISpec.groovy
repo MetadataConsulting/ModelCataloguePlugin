@@ -72,7 +72,7 @@ class SearchISpec extends AbstractIntegrationSpec{
        11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees Celsius"         | 1
        13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1
        15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1
-        17 | "RelationshipType" | new RelationshipTypeController() | "classification" | "json" | "classification" | 1
+        17 | "RelationshipType" | new RelationshipTypeController() | "classification" | "json" | "classification" | 2
 
     }
 

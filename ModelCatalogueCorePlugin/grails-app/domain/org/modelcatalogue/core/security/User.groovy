@@ -21,7 +21,8 @@ class User extends CatalogueElement {
     }
 
     static relationships = [
-            outgoing: [favourite: 'favourites']
+        outgoing: [favourite: 'favourites'],
+        incoming: [classificationFilter: 'filteredBy']
     ]
 
     static mapping = {

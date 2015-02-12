@@ -21,8 +21,8 @@ class UserController extends AbstractCatalogueElementController<User> {
 
         User user = modelCatalogueSecurityService.currentUser
 
-        user.classifications.each { Classification c ->
-            user.removeFromClassifications(c)
+        user.filteredBy.each { Classification c ->
+            user.removeFromFilteredBy(c)
         }
 
         if (!params.ids) {
@@ -31,7 +31,7 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
         Set<Long> ids = params.ids.toString().split(/\s*,\s*/).toList().collect{ it as Long }.toSet()
-        ids.each { user.addToClassifications(Classification.get(it)) }
+        ids.each { user.addToFilteredBy(Classification.get(it)) }
         user.save(flush: true)
 
         redirect controller: 'user', action: 'current'
@@ -48,7 +48,7 @@ class UserController extends AbstractCatalogueElementController<User> {
                 username: modelCatalogueSecurityService.currentUser.username,
                 roles: modelCatalogueSecurityService.currentUser.authorities*.authority,
                 id: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.id : null,
-                classifications: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.classifications?.collect{ CatalogueElementMarshallers.minimalCatalogueElementJSON(it) } : []
+                classifications: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.filteredBy?.collect{ CatalogueElementMarshallers.minimalCatalogueElementJSON(it) } : []
         ] as JSON)
     }
 

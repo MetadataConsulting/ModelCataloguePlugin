@@ -15,7 +15,7 @@ angular.module('mc.core.ui.bs.propertiesPane', ['mc.core.ui.propertiesPane', 'ng
               </div>
             </div></td>
             <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-when="date">{{theValue | date:'short'}}</td>
-            <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-when="elementArray"><span ng-repeat="element in theValue"><span ng-class="element.getIcon()" class="text-muted"></span> <a ng-click="element.show()">{{element.name}}</a><span ng-hide="$last">, </span></span></td>
+            <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-when="elementArray"><span ng-repeat="element in theValue"><a class="label with-pointer" ng-class="{'label-warning': element.status == 'DRAFT', 'label-info': element.status == 'PENDING', 'label-primary': element.status == 'FINALIZED', 'label-danger': element.status == 'DEPRECATED'}" ng-href="{{element.href()}}"><span ng-class="element.getIcon()"></span> {{element.name}}</a> </span></td>
             <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-when="array"><span ng-repeat="element in theValue">{{element}}<span ng-hide="$last">, </span></span></td>
             <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-default ng-bind-html="theValue == null ? '' : ('' + theValue) | linky:'_blank'"></td>
           </tr>

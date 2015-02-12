@@ -32,7 +32,6 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
                 classifiedName: relationshipService.getClassifiedName(el),
-                classifications: relationshipService.getClassificationsInfo(el),
                 ext: el.ext,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 relationships: [count: el.countRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
@@ -53,6 +52,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         relationships.bidirectional?.each   addRelationsJson('relationships', el, ret, types)
 
         ret.availableReports = getAvailableReports(el)
+        ret.classifications  = relationshipService.getClassificationsInfo(el)
 
         if (modelCatalogueSecurityService.currentUser) {
             RelationshipType favorite = RelationshipType.findByName('favourite')
@@ -147,18 +147,18 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     static Map<String, Object> minimalCatalogueElementJSON(CatalogueElement element) {
         if (!element) return null
-        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id"]
+        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}"]
     }
 
     static Map<String, Object> minimumValueDomain(ValueDomain element) {
         if (!element) return null
-        [name: element.name, id: element.id, dataType: minimumDataType(element.dataType), unitOfMeasure: element?.unitOfMeasure?.name, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id"]
+        [name: element.name, id: element.id, dataType: minimumDataType(element.dataType), elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}"]
     }
 
     static Map<String, Object> minimumDataType(DataType element) {
         if (!element) return null
-        if (element instanceof EnumeratedType) [name: element.name, id: element.id, enumerations: element.enumerations,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id"]
-        else [name: element.name, id: element.id,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id"]
+        if (element instanceof EnumeratedType) [name: element.name, id: element.id, enumerations: element.enumerations,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}"]
+        else [name: element.name, id: element.id,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}"]
     }
 
 

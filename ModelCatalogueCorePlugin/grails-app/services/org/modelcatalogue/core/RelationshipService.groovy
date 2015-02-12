@@ -46,7 +46,7 @@ class RelationshipService {
         //specific rules when creating links to and from published elements
         // TODO: it doesn't seem to be good idea place it here. would be nice if you can put it somewhere where it is more pluggable
         if(!ignoreRules) {
-            if ((relationshipType.versionSpecific && relationshipType != RelationshipType.supersessionType) && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+            if (relationshipType.versionSpecific && !relationshipType.system && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
                 relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new elements to {0}. Please create a new version before adding any additional elements")
                 return relationshipInstance
             }
@@ -82,7 +82,7 @@ class RelationshipService {
             // specific rules when creating links to and from published elements
             // XXX: this should be in the relationship type!
             if(!ignoreRules) {
-                if (relationshipType.name == "containment" && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
+                if (relationshipType.versionSpecific && !relationshipType.system && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
                     relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version of the MODEL before removing any additional elements or archive the element first if you want to delete it.")
                     return relationshipInstance
                 }
@@ -138,13 +138,13 @@ class RelationshipService {
         RelationshipType classification = RelationshipType.findByName('classification')
 
         Relationship.executeQuery("""
-            select r.source.name, r.source.id
+            select r.source.name, r.source.id, r.source.status
             from Relationship as r
             where r.relationshipType = :classification
             and r.destination.id = :elementId
             order by r.source.name
         """, [classification: classification, elementId: element.id]).collect {
-            [name: it[0], id: it[1], elementType: Classification.name, link:  "/classification/${it[1]}"]
+            [name: it[0], id: it[1], status: "${it[2]}", elementType: Classification.name, link:  "/classification/${it[1]}"]
         }
     }
 
