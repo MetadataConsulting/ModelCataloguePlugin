@@ -50,7 +50,7 @@
                     <mc:relationships element="${model}" var="relationship" direction="outgoing" type="containment">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h3 class="panel-title text-center"><span class="badge pull-left">${relationship.destination.id}</span>${relationship.destination.name} <small><span class="badge pull-right">v${model.versionNumber}</span><span class="label label-info pull-right">${model.status}</span></small></h3>
+                                <h3 class="panel-title text-center"><span class="badge pull-left">${relationship?.destination?.id}</span>${relationship?.destination?.name} <small><span class="badge pull-right">v${model.versionNumber}</span><span class="label label-info pull-right">${model.status}</span></small></h3>
                             </div>
                             <div class="panel-body">
                                 <p>${relationship.destination.description}</p>
@@ -58,12 +58,12 @@
                                     <g:each in="${relationship.destination?.valueDomain?.classifications}" var="cls">
                                         <span class="pull-right badge">${cls.name}</span>
                                     </g:each>
-                                <p><strong>${relationship.destination.valueDomain.name}</strong>
-                                <g:if test="${relationship.destination.valueDomain.description!=relationship.destination.description}">
-                                     - ${relationship.destination.valueDomain.description}
+                                <p><strong>${relationship?.destination?.valueDomain?.name}</strong>
+                                <g:if test="${relationship?.destination?.valueDomain?.description!=relationship?.destination?.description}">
+                                     - ${relationship?.destination?.valueDomain?.description}
                                 </g:if>
                                 </p>
-                                <g:if test="${relationship.destination.valueDomain.dataType instanceof EnumeratedType}">
+                                <g:if test="${relationship.destination?.valueDomain.dataType instanceof EnumeratedType}">
                                  %{--<p>${relationship.destination.valueDomain.dataType.prettyPrint()}</p>--}%
                                     <table class="table table-striped">
                                         <thead>
@@ -72,7 +72,7 @@
                                         <th width="200">Description</th>
                                         </tr>
                                         </thead>
-                                        <g:each in="${relationship.destination.valueDomain.dataType?.enumerations}" var="key, value">
+                                        <g:each in="${relationship?.destination?.valueDomain?.dataType?.enumerations}" var="key, value">
 
                                         <tr><td>${key}</td><td>${value}</td></tr>
 
