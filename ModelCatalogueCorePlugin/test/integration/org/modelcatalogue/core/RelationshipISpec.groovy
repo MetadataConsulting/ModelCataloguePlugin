@@ -177,7 +177,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         then:
         info == [
-                [name: classification.name, id: classification.id, elementType: Classification.name, link: "/classification/${classification.id}"]
+                [name: classification.name, id: classification.id, elementType: Classification.name, link: "/classification/${classification.id}", status: 'DRAFT']
         ]
 
         cleanup:
