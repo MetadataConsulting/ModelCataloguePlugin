@@ -26,7 +26,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   printDataType = (relationship) ->
     result  = ''
-    dataType = relationship.relation.valueDomain.dataType
+    dataType = relationship?.relation?.valueDomain?.dataType
     if dataType?.enumerations?.values
       ext     = dataType?.enumerations?.values ? []
       for e in ext
