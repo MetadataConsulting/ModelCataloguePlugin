@@ -138,13 +138,13 @@ class RelationshipService {
         RelationshipType classification = RelationshipType.findByName('classification')
 
         Relationship.executeQuery("""
-            select r.source.name, r.source.id
+            select r.source.name, r.source.id, r.source.status
             from Relationship as r
             where r.relationshipType = :classification
             and r.destination.id = :elementId
             order by r.source.name
         """, [classification: classification, elementId: element.id]).collect {
-            [name: it[0], id: it[1], elementType: Classification.name, link:  "/classification/${it[1]}"]
+            [name: it[0], id: it[1], status: "${it[2]}", elementType: Classification.name, link:  "/classification/${it[1]}"]
         }
     }
 
