@@ -46,8 +46,8 @@ class RelationshipService {
         //specific rules when creating links to and from published elements
         // TODO: it doesn't seem to be good idea place it here. would be nice if you can put it somewhere where it is more pluggable
         if(!ignoreRules) {
-            if (relationshipType.name in ["containment", "hierarchy"] && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new data elements to {0} models. Please create a new version before adding any additional elements")
+            if ((relationshipType.versionSpecific && relationshipType != RelationshipType.supersessionType) && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+                relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new elements to {0}. Please create a new version before adding any additional elements")
                 return relationshipInstance
             }
 

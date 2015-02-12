@@ -35,11 +35,6 @@ class Classification extends CatalogueElement {
     ]
 
     @Override
-    void beforeDraftPersisted() {
-        namespace = null
-    }
-
-    @Override
     CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain.finalize(this)
         .add(this.classifies)
