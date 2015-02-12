@@ -32,7 +32,6 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
                 classifiedName: relationshipService.getClassifiedName(el),
-                classifications: relationshipService.getClassificationsInfo(el),
                 ext: el.ext,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 relationships: [count: el.countRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
@@ -53,6 +52,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         relationships.bidirectional?.each   addRelationsJson('relationships', el, ret, types)
 
         ret.availableReports = getAvailableReports(el)
+        ret.classifications  = relationshipService.getClassificationsInfo(el)
 
         if (modelCatalogueSecurityService.currentUser) {
             RelationshipType favorite = RelationshipType.findByName('favourite')

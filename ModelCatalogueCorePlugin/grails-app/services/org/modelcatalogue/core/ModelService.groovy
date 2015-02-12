@@ -11,7 +11,7 @@ class ModelService {
     SecurityService modelCatalogueSecurityService
 
     ListWithTotalAndType<Model> getTopLevelModels(Map params) {
-        getTopLevelModels(modelCatalogueSecurityService.currentUser?.classifications, params)
+        getTopLevelModels(modelCatalogueSecurityService.currentUser?.filteredBy, params)
     }
 
     ListWithTotalAndType<Model> getTopLevelModels(List<Classification> classifications, Map params) {

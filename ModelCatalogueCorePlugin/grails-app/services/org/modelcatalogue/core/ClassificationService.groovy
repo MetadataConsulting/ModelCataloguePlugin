@@ -72,9 +72,9 @@ class ClassificationService {
             return Collections.emptyList()
         }
 
-        if (!modelCatalogueSecurityService.currentUser.classifications) {
+        if (!modelCatalogueSecurityService.currentUser.filteredBy) {
             return Collections.emptyList()
         }
-        modelCatalogueSecurityService.currentUser.classifications
+        modelCatalogueSecurityService.currentUser.filteredBy
     }
 }

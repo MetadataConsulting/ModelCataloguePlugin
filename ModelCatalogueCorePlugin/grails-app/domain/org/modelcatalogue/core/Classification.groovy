@@ -31,7 +31,7 @@ class Classification extends CatalogueElement {
     static transients = ['namespace']
 
     static relationships = [
-            outgoing: [classification: 'classifies']
+            outgoing: [classification: 'classifies', classificationFilter: 'usedAsFilterBy']
     ]
 
     @Override

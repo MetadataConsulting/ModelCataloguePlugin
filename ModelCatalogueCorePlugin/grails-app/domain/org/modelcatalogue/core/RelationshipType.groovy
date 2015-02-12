@@ -137,6 +137,10 @@ class RelationshipType {
         readByName("classification")
     }
 
+    static getFavouriteType() {
+        readByName("favourite")
+    }
+
     static getSynonymType() {
         readByName("synonym")
     }
