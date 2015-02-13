@@ -38,7 +38,7 @@ databaseChangeLog = {
             not {
                 // language=SQL
                 sqlCheck expectedResult: '0', """
-                select count(id) from relationship where incoming_index is null
+                select count(id) from relationship where incoming_index is null or incoming_index = 0
                 """
             }
         }
@@ -46,7 +46,7 @@ databaseChangeLog = {
 
         // language=SQL
         sql """
-          update relationship set incoming_index = id where incoming_index is null
+          update relationship set incoming_index = id where incoming_index is null or incoming_index = 0
         """
     }
 
@@ -56,7 +56,7 @@ databaseChangeLog = {
             not {
                 // language=SQL
                 sqlCheck expectedResult: '0', """
-                select count(id) from relationship where outgoing_index is null
+                select count(id) from relationship where outgoing_index is null or outgoing_index = 0
                 """
             }
 
@@ -65,7 +65,7 @@ databaseChangeLog = {
 
         // language=SQL
         sql """
-          update relationship set outgoing_index = id where outgoing_index is null
+          update relationship set outgoing_index = id where outgoing_index is null or outgoing_index = 0
         """
     }
 
@@ -75,7 +75,7 @@ databaseChangeLog = {
             not {
                 // language=SQL
                 sqlCheck expectedResult: '0', """
-                select count(id) from relationship where combined_index is null
+                select count(id) from relationship where combined_index is null or combined_index = 0
                 """
             }
         }
@@ -83,7 +83,7 @@ databaseChangeLog = {
 
         // language=SQL
         sql """
-          update relationship set combined_index = id where combined_index is null
+          update relationship set combined_index = id where combined_index is null or combined_index = 0
         """
     }
 

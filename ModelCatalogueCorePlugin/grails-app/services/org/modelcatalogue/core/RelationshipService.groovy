@@ -43,8 +43,6 @@ class RelationshipService {
                 archived: archived
         )
 
-        //specific rules when creating links to and from published elements
-        // TODO: it doesn't seem to be good idea place it here. would be nice if you can put it somewhere where it is more pluggable
         if(!ignoreRules) {
             if (relationshipType.versionSpecific && !relationshipType.system && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
                 relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new elements to {0}. Please create a new version before adding any additional elements")
@@ -79,8 +77,6 @@ class RelationshipService {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
 
-            // specific rules when creating links to and from published elements
-            // XXX: this should be in the relationship type!
             if(!ignoreRules) {
                 if (relationshipType.versionSpecific && !relationshipType.system && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
                     relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot add removed data elements from {0} models. Please create a new version of the MODEL before removing any additional elements or archive the element first if you want to delete it.")
@@ -174,13 +170,13 @@ class RelationshipService {
             return relationship
         }
 
+        if (!direction.getIndex(relationship)) {
+            return moveAfterWithRearrange(direction, owner, relationship, other)
+        }
+
         if (!other) {
             direction.setIndex(relationship, direction.getMinIndexAfter(owner, relationship.relationshipType, Long.MIN_VALUE) - INDEX_STEP)
             return relationship.save()
-        }
-
-        if (direction.getIndex(relationship) == null) {
-            return moveAfterWithRearrange(direction, owner, relationship, other)
         }
 
         if (!direction.isOwnedBy(owner, relationship)) {
@@ -216,11 +212,11 @@ class RelationshipService {
                 correction = -1
                 return
             }
-            direction.setIndex(entry, (i + correction ) * INDEX_STEP)
+            direction.setIndex(entry, (i + correction ) * INDEX_STEP + 1)
 
             if (entry == other) {
                 correction++
-                direction.setIndex(relationship, (i + correction) * INDEX_STEP)
+                direction.setIndex(relationship, (i + correction) * INDEX_STEP + 1)
                 FriendlyErrors.failFriendlySave(relationship)
             }
             FriendlyErrors.failFriendlySave(entry)
