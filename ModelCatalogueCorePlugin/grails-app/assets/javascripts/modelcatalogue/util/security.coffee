@@ -71,10 +71,6 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
                 currentUser.roles.push roleName
         else
           currentUser = null
-
-        console.log "user result: ", result
-        console.log "user: ", currentUser
-
         result
 
       security =
@@ -147,7 +143,6 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
     loginFn         = security.login
     security.login  = (username, password, rememberMe) ->
       $q.when(loginFn(username, password, rememberMe)).then (user) ->
-        console.log 'user in login wrapper function', user
         if not user.errors
           $rootScope.$broadcast 'userLoggedIn', user
           return user
