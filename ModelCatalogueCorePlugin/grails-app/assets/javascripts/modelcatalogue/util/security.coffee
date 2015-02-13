@@ -62,7 +62,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
         if result.data.success
           currentUser = result.data
           currentUser.displayName     ?= currentUser.username
-          currentUser.rodles           ?= []
+          currentUser.roles           ?= []
           currentUser.classifications ?= []
 
           for roleName, roleSynonyms of (config.roles ? [])
