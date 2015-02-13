@@ -58,16 +58,22 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
       currentUser = config.currentUser
 
       handleUserResponse = (result) ->
+        return result if not result.data.username
         if result.data.success
           currentUser = result.data
           currentUser.displayName     ?= currentUser.username
-          currentUser.roles           ?= []
+          currentUser.rodles           ?= []
           currentUser.classifications ?= []
 
           for roleName, roleSynonyms of (config.roles ? [])
             for role in roleSynonyms
               if role in currentUser.roles
                 currentUser.roles.push roleName
+        else
+          currentUser = null
+
+        console.log "user result: ", result
+        console.log "user: ", currentUser
 
         result
 
@@ -141,6 +147,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
     loginFn         = security.login
     security.login  = (username, password, rememberMe) ->
       $q.when(loginFn(username, password, rememberMe)).then (user) ->
+        console.log 'user in login wrapper function', user
         if not user.errors
           $rootScope.$broadcast 'userLoggedIn', user
           return user
