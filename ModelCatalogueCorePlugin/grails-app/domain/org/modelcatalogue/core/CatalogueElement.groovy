@@ -329,7 +329,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     @Override
     CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        PublishingChain.createDraft(this, strategy).run(publisher)
+        PublishingChain.createDraft(this, strategy).add(classifications).run(publisher)
     }
 
     @Override

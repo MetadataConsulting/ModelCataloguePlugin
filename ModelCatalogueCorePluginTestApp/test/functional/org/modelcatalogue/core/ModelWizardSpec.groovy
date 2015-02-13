@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.ModalTreeViewPage
+import org.openqa.selenium.Keys
 import spock.lang.Stepwise
 
 @Stepwise
@@ -17,9 +18,11 @@ class ModelWizardSpec extends GebReportingSpec {
             viewTitle.displayed
         }
         waitFor {
-            viewTitle.text().trim() == 'Models'
+            viewTitle.text()?.trim() == 'Models'
         }
-        subviewTitle.text().trim()  == 'NHIC Datasets FINALIZED'
+        waitFor {
+            subviewTitle.text()?.trim()  == 'NHIC Datasets FINALIZED'
+        }
 
         when:
         loginAdmin()
@@ -109,8 +112,9 @@ class ModelWizardSpec extends GebReportingSpec {
         }
 
         when: 'the classification is selected'
-        name = 'nhic'
+        name = 'TEST CLASSIFICATION'
         selectCepItemIfExists()
+        name << Keys.ENTER
 
         and: 'finish is clicked'
         stepFinish.click()

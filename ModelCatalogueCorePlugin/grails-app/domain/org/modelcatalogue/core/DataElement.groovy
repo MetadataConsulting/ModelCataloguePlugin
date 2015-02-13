@@ -50,6 +50,7 @@ class DataElement extends CatalogueElement {
     CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
         PublishingChain.createDraft(this, strategy)
         .add(this.containedIn)
+        .add(this.classifications)
         .run(publisher)
     }
 }

@@ -113,7 +113,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         page = undefined if page == 1 or isNaN(page)
         options.location = "replace" if newProperty and not oldProperty
-        if($state.$current.name isnt "mc.resource.list") then $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
+        if($state.$current.name isnt "mc.resource.list") and $scope.element
+          $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options
 
       onElementUpdate = (element, oldEl) ->
 
@@ -124,8 +125,6 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         resource = catalogueElementResource(element.elementType) if element and element.elementType
 
         activeTabSet = false
-
-        onPropertyUpdate($scope.property, $rootScope?.$stateParams?.property)
 
         tabs = []
 

@@ -164,6 +164,7 @@ class ValueDomain extends CatalogueElement {
     CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
         PublishingChain.createDraft(this, strategy)
         .add(this.dataElements)
+        .add(this.classifications)
         .run(publisher)
     }
 
