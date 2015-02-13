@@ -94,6 +94,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     }
 
     void processElements(theMkp, E element, PrintContext context, Relationship relationship) {
+        processRelationshipMetadata(theMkp, relationship)
+
         if (element.description) {
             theMkp.description element.description
         }
@@ -121,8 +123,6 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
                 }
             }
         }
-
-        processRelationshipMetadata(theMkp, relationship)
 
         List<Relationship> outgoing = restOfRelationships(Relationship.where { source == element }).list()
         List<Relationship> incoming = restOfRelationships(Relationship.where { destination == element }).list()
