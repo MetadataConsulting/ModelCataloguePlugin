@@ -89,7 +89,7 @@
 
             when: 'the value domain details are filled in'
 
-            classification      = "Java"
+            classification      = "TEST CLASSIFICATION"
             selectCepItemIfExists()
 
             name                = "New"

@@ -15,11 +15,18 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     enumerations.push "#{enumeration.key}: #{enumeration.value}" for enumeration in enumeratedType.enumerations.values
     enumerations.join('\n')
 
+  getStatusClass = (status) ->
+    return 'label-warning'  if status == 'DRAFT'
+    return 'label-info'     if status == 'PENDING'
+    return 'label-danger'   if status == 'DEPRECATED'
+    return 'label-primary'
+
   getClassificationsForDataElement = (dataElement) ->
     return '' if not dataElement?.classifications
+
     classificationNames = for classification in dataElement.classifications
-      "<a href='#/catalogue/classification/#{classification.id}'>#{classification.name}</a>"
-    classificationNames.join(', ')
+      """<a class="label #{getStatusClass(classification.status)}"  href='#/catalogue/classification/#{classification.id}'><span class="#{classification.getIcon()}"></span> #{classification.name}</a>"""
+    classificationNames.join(' ')
 
   # default
   columnsProvider.registerColumns 'org.modelcatalogue.core.Model', idNameAndDescription()

@@ -464,17 +464,18 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "creates new version of the element"() {
         build {
             classification(name: "NewVersion1") {
-                status finalized
                 // creates finalized model
-                model name: "ModelNV1", id: "http://www.example.com/models/ModelNV1", {
-                    status finalized
-                }
+                model name: "ModelNV1", id: "http://www.example.com/models/ModelNV1"
             }
+        }
+
+        created.each {
+            it.publish(elementService)
+        }
+
+        build {
             classification(name: "NewVersion2") {
-                status finalized
-                model name: "ModelNVX1", id: "http://www.example.com/models/ModelNVX1", {
-                    status finalized
-                }
+                model name: "ModelNVX1", id: "http://www.example.com/models/ModelNVX1"
             }
         }
 

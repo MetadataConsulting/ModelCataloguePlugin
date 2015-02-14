@@ -58,6 +58,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
       currentUser = config.currentUser
 
       handleUserResponse = (result) ->
+        return result if not result.data.username
         if result.data.success
           currentUser = result.data
           currentUser.displayName     ?= currentUser.username
@@ -68,7 +69,8 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
             for role in roleSynonyms
               if role in currentUser.roles
                 currentUser.roles.push roleName
-
+        else
+          currentUser = null
         result
 
       security =

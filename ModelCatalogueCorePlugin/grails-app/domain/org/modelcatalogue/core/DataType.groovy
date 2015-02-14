@@ -96,6 +96,7 @@ class DataType extends CatalogueElement {
     CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
         PublishingChain.createDraft(this, strategy)
         .add(this.relatedValueDomains)
+        .add(this.classifications)
         .run(publisher)
     }
 }
