@@ -150,7 +150,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Classifications</label>
                   <elements-as-tags elements="classifications"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification" focus-me="step=='classifications'" catalogue-element-picker="classification"  typeahead-on-select="classifications.push(classification);classification = null">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification" focus-me="step=='classifications'" catalogue-element-picker="classification"  typeahead-on-select="classifications.push(classification);classification = null" status="draft">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="classifications.push(classification);classification = null" ng-disabled="isEmpty(classification)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>

@@ -451,6 +451,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
         bindRelations(instance, newVersion)
 
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+
         respond instance, [status: OK]
     }
 
@@ -594,9 +599,9 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             classification.removeFromClassifies instance
         }
         for (domain in classifications) {
-            Classification classification = Classification.get(domain.id as Long)
-            if (newVersion) {
-                classification = DraftContext.preferDraft(classification)
+            Classification classification = DraftContext.preferDraft(Classification.get(domain.id as Long)) as Classification
+            if (!(classification.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+                classification = elementService.createDraftVersion(classification, DraftContext.userFriendly())
             }
             instance.addToClassifications classification
             classification.addToClassifies instance

@@ -54,6 +54,7 @@
 #= require classificationWizard
 #= require elementsAsTags
 #= require diffTable
+#= require withClassificationCtrlMixin
 
 
 angular.module('mc.core.ui.bs', [
@@ -117,4 +118,5 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.classificationWizard'
   'mc.core.ui.bs.elementsAsTags'
   'mc.core.ui.bs.diffTable'
+  'mc.core.ui.bs.withClassificationCtrlMixin'
 ])

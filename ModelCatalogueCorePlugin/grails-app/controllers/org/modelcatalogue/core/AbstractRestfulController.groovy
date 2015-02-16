@@ -176,7 +176,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.validate()
         if (instance.hasErrors()) {
-            respond instance.errors, view:'create' // STATUS CODE 422
+            respond instance.errors
             return
         }
 
@@ -185,6 +185,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         instance.save flush:true
 
         bindRelations(instance, false)
+
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
 
 
         respond instance, [status: CREATED]
@@ -223,6 +228,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         instance.save flush:true
 
         bindRelations(instance, false)
+
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
 
         respond instance, [status: OK]
     }
@@ -308,7 +318,11 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
      * @param instance the persisted instance
      */
     protected final bindRelations(T instance, boolean newVersion) {
-        bindRelations(instance, newVersion, objectToBind)
+        try {
+            bindRelations(instance, newVersion, objectToBind)
+        } catch (Exception e) {
+            instance.errors.reject 'error.binding.relations', e.toString()
+        }
     }
 
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {}

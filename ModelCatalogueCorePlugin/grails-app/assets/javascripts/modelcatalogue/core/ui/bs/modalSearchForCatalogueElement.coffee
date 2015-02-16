@@ -54,10 +54,13 @@ module.config ['messagesProvider', (messagesProvider)->
             $scope.selected = -1
 
           listOrSearch = (query, callback) ->
+            params = {}
+            params.status = args.status if args.status
+
             if query
-              catalogueElementResource(args.resource ? 'catalogueElement').search(query).then(callback)
+              catalogueElementResource(args.resource ? 'catalogueElement').search(query, params).then(callback)
             else
-              catalogueElementResource(args.resource ? 'catalogueElement').list().then(callback)
+              catalogueElementResource(args.resource ? 'catalogueElement').list(params).then(callback)
 
           reset()
           listOrSearch($scope.query ? args.query, replaceElements)
