@@ -54,6 +54,7 @@
                             </div>
                             <div class="panel-body">
                                 <p>${relationship.destination.description}</p>
+                                <g:if test="${relationship?.destination?.valueDomain}">
                                 <div class="panel panel-default">
                                     <g:each in="${relationship.destination?.valueDomain?.classifications}" var="cls">
                                         <span class="pull-right badge">${cls.name}</span>
@@ -95,6 +96,7 @@
                              %{--</g:each>--}%
                         %{--</g:if>--}%
                                     </div>
+                                </g:if>
                             </div>
                         </div>
                     </mc:relationships>
