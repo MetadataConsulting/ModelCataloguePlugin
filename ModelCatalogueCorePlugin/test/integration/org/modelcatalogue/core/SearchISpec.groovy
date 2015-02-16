@@ -50,6 +50,11 @@ class SearchISpec extends AbstractIntegrationSpec{
         when:
         controller.response.format = 'json'
         controller.params.search = searchString
+
+        if (status) {
+            controller.params.status = status
+        }
+
         controller.search(10)
         String recordName = "searchElement${no}"
         JSONElement json = controller.response.json
@@ -59,21 +64,22 @@ class SearchISpec extends AbstractIntegrationSpec{
         then:
         assert json
         assert json.total == total
-        assert json.list.get(0).id == expectedResult.id
-        assert json.list.get(0).name == expectedResult.name
+        assert !total || json.list.get(0).id == expectedResult.id
+        assert !total || json.list.get(0).name == expectedResult.name
 
         where:
 
-        no| className           | controller                          | searchString                    | response  | expectedResultName        | total
-        1 | "DataType"          | new DataTypeController()            | "boolean"                       | "json"    | "boolean"                 | 1
-        2 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "json"    | "boolean"                 | 1
-        5 | "DataElement"       | new DataElementController()         | "de_author1"                    | "json"    | "DE_author1"              | 1
-        9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1
-       11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees Celsius"         | 1
-       13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1
-       15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1
-        17 | "RelationshipType" | new RelationshipTypeController() | "classification" | "json" | "classification" | 2
-
+        no| className           | controller                          | searchString                    | response  | expectedResultName        | total     | status
+        1 | "DataType"          | new DataTypeController()            | "boolean"                       | "json"    | "boolean"                 | 1         | null
+        2 | "DataType"          | new DataTypeController()            | "xdfxdf"                        | "json"    | "boolean"                 | 1         | null
+        5 | "DataElement"       | new DataElementController()         | "de_author1"                    | "json"    | "DE_author1"              | 1         | null
+        9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1         | null
+       11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees Celsius"         | 1         | null
+       13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1         | null
+       14 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 0         | 'deprecated'
+       15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1         | null
+       17 | "RelationshipType"  | new RelationshipTypeController()    | "classification"                | "json"    | "classification"          | 2         | null
+       18 | "RelationshipType"  | new RelationshipTypeController()    | "classification"                | "json"    | "classification"          | 2         | null
     }
 
     @Unroll
@@ -133,7 +139,6 @@ class SearchISpec extends AbstractIntegrationSpec{
 
         def controller = new SearchController()
         ResultRecorder recorder = DefaultResultRecorder.create(
-                "../ModelCatalogueCorePlugin/target/xml-samples/modelcatalogue/core",
                 "../ModelCatalogueCorePlugin/test/js/modelcatalogue/core",
                 "badSearch"
         )
