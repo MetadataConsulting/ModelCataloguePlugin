@@ -16,13 +16,15 @@ angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']
           $scope.messages.info("You have already selected draft version of '#{c.name}'")
           return
     else
-      for c in $scope.copy.classifications
+      replaceIndex = -1
+      for c, index in $scope.copy.classifications
         if c.name == classification.name
-          angular.extend(c, classification)
-          classificationsChanged $scope.copy.classifications
-          $scope.pending.classification = null if $scope.pending
-          return
-
+          replaceIndex = index
+          break
+      if replaceIndex >= 0
+        $scope.copy.classifications.splice(replaceIndex, 1, classification)
+        $scope.pending.classification = null if $scope.pending
+        return
 
     $scope.copy.classifications.push(classification)
     $scope.pending.classification = null if $scope.pending
