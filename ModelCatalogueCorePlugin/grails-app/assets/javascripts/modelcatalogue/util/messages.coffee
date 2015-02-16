@@ -81,6 +81,11 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
           messages.removeMessage(msg)
 
 
+        msg.timeout = (timeout) ->
+          $timeout((-> msg.remove()), timeout)
+          msg
+
+
         for existing in messagesStack
           return msg if existing.type == msg.type and existing.title == msg.title and existing.body == msg.body
 

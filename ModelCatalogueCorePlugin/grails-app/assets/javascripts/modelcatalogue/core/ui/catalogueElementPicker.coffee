@@ -17,15 +17,19 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
 
 
   controller: ['$scope', '$q', '$parse',  ($scope, $q, $parse) ->
-    $scope.searchForElement = (query, pickerValue, resourceAttr) ->
+    $scope.searchForElement = (query, pickerValue, resourceAttr, statusAttr) ->
       searchFun     = null
       resource      = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
       value         = if pickerValue then pickerValue else resource
+      params        = {}
+
+      if statusAttr
+        params.status = statusAttr
 
       if (value)
-        searchFun = (query) -> catalogueElementResource(value).search(query)
+        searchFun = (query) -> catalogueElementResource(value).search(query, params)
       else
-        searchFun = (query) -> modelCatalogueSearch(query)
+        searchFun = (query) -> modelCatalogueSearch(query, params)
 
       deferred = $q.defer()
       searchFun(query).then (result) ->
@@ -37,14 +41,14 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
       return '' + customLabel    if customLabel
       return '' + el.getLabel()  if angular.isFunction(el.getLabel)
       return '' + el
-    $scope.searchForMore = (ngModel, pickerValue, resourceAttr, onSelect)->
+    $scope.searchForMore = (ngModel, pickerValue, resourceAttr, statusAttr, onSelect)->
       unless ngModel
         throw "ng-model for catalogue-element-picker is missing cannot search for more elements"
 
       resource      = if resourceAttr then $scope.$eval(resourceAttr) ? $scope.$parent.$eval(resourceAttr) else undefined
       value         = if pickerValue then pickerValue else resource
 
-      messages.prompt(null, null, {type: 'search-catalogue-element', resource: value}).then (element) ->
+      messages.prompt(null, null, {type: 'search-catalogue-element', resource: value, status: statusAttr}).then (element) ->
         $parse(ngModel).assign($scope, element)
         $scope.$eval onSelect, {$item: element, $model: element, $label: element.classifiedName} if onSelect
 
@@ -55,10 +59,10 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
       stringified = JSON.stringify(string)
       stringified.substring(1,stringified.length - 1).replace(/&/, "&amp;").replace(/"/g, "&quot;")
 
-    icon  = """<span class="input-group-addon search-for-more-icon" ng-click="searchForMore(&quot;""" + escape(attrs.ngModel ? '') + "&quot;, &quot;" + escape(attrs.catalogueElementPicker ? '') + "&quot;, &quot;" + escape(attrs.resource ? '') + """&quot;,&quot;""" + escape(attrs.typeaheadOnSelect ? '')  + """&quot;)" title="Search more ..."><catalogue-element-icon type="'#{attrs.catalogueElementPicker ? ''}' ? '#{attrs.catalogueElementPicker ? ''}' : #{attrs.resource ? 'null'}"></catalogue-element-icon></span>"""
+    icon  = """<span class="input-group-addon search-for-more-icon" ng-click="searchForMore(&quot;""" + escape(attrs.ngModel ? '') + "&quot;, &quot;" + escape(attrs.catalogueElementPicker ? '') + "&quot;, &quot;" + escape(attrs.resource ? '') + "&quot;, &quot;" + escape(attrs.status ? '') + """&quot;,&quot;""" + escape(attrs.typeaheadOnSelect ? '')  + """&quot;)" title="Search more ..."><catalogue-element-icon type="'#{attrs.catalogueElementPicker ? ''}' ? '#{attrs.catalogueElementPicker ? ''}' : #{attrs.resource ? 'null'}"></catalogue-element-icon></span>"""
     label = if attrs.label then attrs.label else 'null'
 
-    element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.catalogueElementPicker ? '') + "\", \"" + escape(attrs.resource ? '') + "\")" )
+    element.attr('typeahead', "el as label(el, #{label}) for el in searchForElement($viewValue, \"" + escape(attrs.catalogueElementPicker ? '') + "\", \"" + escape(attrs.resource ? '') + "\", \"" + escape(attrs.status ? '') + "\")" )
     element.attr('autocomplete', "off")
     element.attr('typeahead-wait-ms', "500") unless element.attr('typeahead-wait-ms')
     element.attr('typeahead-template-url', 'modelcatalogue/core/ui/catalogueElementPickerTypeahead.html')

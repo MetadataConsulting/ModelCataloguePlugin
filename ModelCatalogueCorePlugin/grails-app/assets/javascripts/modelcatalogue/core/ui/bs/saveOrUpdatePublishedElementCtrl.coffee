@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', []).controller 'saveOrUpdatePublishedElementCtrl', ['$scope', 'messages', '$controller', '$modalInstance', 'args', 'catalogueElementResource', '$q', 'classificationInUse', ($scope, messages, $controller, $modalInstance, args, catalogueElementResource, $q ,classificationInUse) ->
+angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs.withClassificationCtrlMixin']).controller 'saveOrUpdatePublishedElementCtrl', ['$scope', 'messages', '$controller', '$modalInstance', 'args', 'catalogueElementResource', '$q', ($scope, messages, $controller, $modalInstance, args, catalogueElementResource, $q) ->
   $scope.$modalInstance = $modalInstance
   $scope.pending        = {classification: null}
   $scope.newEntity      = -> {classifications: $scope.copy?.classifications ? []}
@@ -7,9 +7,7 @@ angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', []).controller 
   $scope.messages       = messages.createNewMessages()
   $scope.create         = args.create
 
-  if args.create and classificationInUse
-    $scope.copy.classifications.push classificationInUse
-
+  angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
   angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
   # required by save and update action

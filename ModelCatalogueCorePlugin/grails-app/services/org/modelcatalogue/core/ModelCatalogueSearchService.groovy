@@ -73,6 +73,9 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                 ilike('description', query)
                 ilike('modelCatalogueId', query)
             }
+            if (params.status) {
+                criteria.eq('status', ElementStatus.valueOf(params.status.toString().toUpperCase()))
+            }
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
@@ -91,9 +94,15 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                     )
             """
 
+            List<ElementStatus> statuses = [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED]
+
+            if (params.status) {
+                statuses = [ElementStatus.valueOf(params.status.toString().toUpperCase())]
+            }
+
             Map<String, Object> arguments = [
                     query: query,
-                    statuses: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED]
+                    statuses: statuses
             ]
 
             if (classifications) {

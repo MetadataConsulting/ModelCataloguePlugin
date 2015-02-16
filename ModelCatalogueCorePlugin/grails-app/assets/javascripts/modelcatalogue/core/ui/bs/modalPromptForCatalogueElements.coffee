@@ -12,7 +12,7 @@ angular.module('mc.core.ui.bs.modalPromptForCatalogueElements', ['mc.util.messag
               <div class="form-group">
                 <label for="elements">''' + body + '''</label>
                 <elements-as-tags elements="copy.elements"></elements-as-tags>
-                <input id="elements" placeholder="Name or Catalogue ID" ng-model="pending.element" catalogue-element-picker="''' + (args.resource ? 'catalogueElement') + '''" focus-me="true" label="el.name" typeahead-on-select="copy.elements.push(pending.element);pending.element = null">
+                <input id="elements" placeholder="Name or Catalogue ID" ng-model="pending.element" status="''' + (args.status ? '') + '''" catalogue-element-picker="''' + (args.resource ? 'catalogueElement') + '''" focus-me="true" label="el.name" typeahead-on-select="copy.elements.push(pending.element);pending.element = null">
               </div>
             </form>
         </div>

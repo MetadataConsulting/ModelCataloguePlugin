@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -17,7 +17,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
               <div class="form-group">
                 <label for="classification"> Classifications</label>
                 <elements-as-tags elements="copy.classifications"></elements-as-tags>
-                <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(pending.classification);pending.classification = null">
+                <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addToClassifications()">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -50,6 +50,7 @@ angular.module('mc.core.ui.bs.modalPromptMeasurementUnitEdit', ['mc.util.message
           $scope.hasChanged   = ->
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.symbol != $scope.original.symbol or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.classifications ? {}, $scope.copy.classifications ? {})
 
+          angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
         ]

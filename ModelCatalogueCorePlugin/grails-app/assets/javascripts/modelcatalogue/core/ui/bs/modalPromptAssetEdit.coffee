@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angularFileUpload']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angularFileUpload', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -11,10 +11,6 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
         keyboard: false
         resolve:
           args: -> args
-          classificationInUse: ['$stateParams', 'catalogueElementResource',  ($stateParams, catalogueElementResource)->
-            return undefined if not $stateParams.classification
-            catalogueElementResource('classification').get($stateParams.classification)
-          ]
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>
@@ -25,7 +21,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
               <div class="form-group">
                 <label for="classification"> Classifications</label>
                 <elements-as-tags elements="copy.classifications"></elements-as-tags>
-                <input id="classification-{{$index}}" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(pending.classification);pending.classification = null">
+                <input id="classification-{{$index}}" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addToClassifications()">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -47,7 +43,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', 'classificationInUse', '$rootScope', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance, classificationInUse, $rootScope) ->
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance, $rootScope, $controller) ->
           $scope.pending        = {classification: null}
           $scope.newEntity      = -> {classifications: $scope.copy?.classifications ? []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
@@ -55,8 +51,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
 
-          if args.create and classificationInUse
-            $scope.copy.classifications.push classificationInUse
+          angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
 
           $scope.hasChanged   = ->
             $scope.copy.file or $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.classifications != $scope.original.classifications

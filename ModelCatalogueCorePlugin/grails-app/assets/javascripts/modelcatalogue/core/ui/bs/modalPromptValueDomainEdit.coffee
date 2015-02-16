@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       if not args?.element? and not args?.create?
@@ -17,7 +17,7 @@ angular.module('mc.core.ui.bs.modalPromptValueDomainEdit', ['mc.util.messages'])
               <div class="form-group">
                 <label for="classification"> Classifications</label>
                 <elements-as-tags elements="copy.classifications"></elements-as-tags>
-                <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="copy.classifications.push(pending.classification);pending.classification = null">
+                <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addToClassifications()">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -85,6 +85,7 @@ x in ['apple', 'banana', 'cherry']
           $scope.showRegexExample = showExample(REGEX_EXAMPLE)
           $scope.showSetExample = showExample(SET_EXAMPLE)
 
+          angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
           $scope.beforeSave = ->
