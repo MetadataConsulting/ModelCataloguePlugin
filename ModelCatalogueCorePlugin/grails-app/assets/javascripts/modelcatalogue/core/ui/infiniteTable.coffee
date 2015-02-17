@@ -64,9 +64,9 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
         if not initialOffset
           header.find('.contextual-actions button.dropdown-toggle').parent().addClass('dropup')
           return
-        topPadding = angular.element('.navbar .container').outerHeight() + 1
+        topPadding = angular.element('.navbar .container-fluid').outerHeight() + 1
         if scroll > initialOffset.top - topPadding
-          header.css(position: 'fixed', top: angular.element('.navbar .container').outerHeight() + 1)
+          header.css(position: 'fixed', top: angular.element('.navbar .container-fluid').outerHeight() + 1)
           spacer.css('min-height': "#{header.outerHeight()}px")
           header.find('.contextual-actions button.dropdown-toggle').parent().removeClass('dropup')
         else
