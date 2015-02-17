@@ -16,8 +16,12 @@ class FriendlyErrors {
         Locale locale = Locale.UK
         StringBuilder builder = new StringBuilder(message)
         builder << ':\n'
+        Set<String> messages = []
         for (ObjectError error in errors.allErrors) {
-            builder << '    ' << messageSource.getMessage(error, locale)
+            messages << messageSource.getMessage(error, locale)
+        }
+        for (String msg in messages) {
+            builder << '    ' << msg << '\n'
         }
         builder.toString()
     }
