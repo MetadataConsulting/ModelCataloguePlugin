@@ -5,7 +5,9 @@ import org.modelcatalogue.core.util.FriendlyErrors
 
 class AuditService {
 
-    static List<String> IGNORED_PROPERTIES = ['password']
+    static transactional = false
+
+    static List<String> IGNORED_PROPERTIES = ['password', 'version', 'outgoingRelationships', 'incomingRelationships', 'outgoingMappings', 'incomingMappings']
 
     def modelCatalogueSecurityService
 
@@ -13,7 +15,7 @@ class AuditService {
         logChange(element,
             changedId: element.id,
             latestVersionId: element.latestVersionId ?: element.id,
-            author: modelCatalogueSecurityService.currentUser,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
             type: element.latestVersionId && element.latestVersionId != element.id ? ChangeType.NEW_VERSION_CREATED : ChangeType.NEW_ELEMENT_CREATED
         )
     }
@@ -22,7 +24,7 @@ class AuditService {
         logChange(element,
             changedId: element.id,
             latestVersionId: element.latestVersionId ?: element.id,
-            author: modelCatalogueSecurityService.currentUser,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
             type: ChangeType.ELEMENT_DELETED
         )
     }
@@ -38,7 +40,7 @@ class AuditService {
             logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
-                author: modelCatalogueSecurityService.currentUser,
+                authorId: modelCatalogueSecurityService.currentUser?.id,
                 type: ChangeType.PROPERTY_CHANGED,
                 property: name,
                 oldValue: originalValue?.toString(),

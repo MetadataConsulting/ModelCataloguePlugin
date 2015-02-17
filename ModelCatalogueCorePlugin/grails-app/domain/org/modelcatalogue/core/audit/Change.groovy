@@ -7,7 +7,7 @@ class Change {
 
     Long latestVersionId
     Long changedId
-    User author
+    Long authorId
 
     ChangeType type
 
@@ -19,7 +19,7 @@ class Change {
     Date dateCreated
 
     static constraints = {
-        author nullable: true
+        authorId nullable: true
         property maxSize: 250, nullable: true
         newValue maxSize: 2000, nullable: true
         oldValue maxSize: 2000, nullable: true
@@ -29,5 +29,6 @@ class Change {
 
     CatalogueElement getChanged() { CatalogueElement.get(changedId) }
     CatalogueElement getLatestVersion() { CatalogueElement.get(latestVersionId) }
+    User getAuthor() { authorId ? User.get(authorId) : null}
 
 }

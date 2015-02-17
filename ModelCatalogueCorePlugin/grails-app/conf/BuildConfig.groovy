@@ -48,6 +48,7 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
         test 'xmlunit:xmlunit:1.6'
+        test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }
 
     plugins {
@@ -62,7 +63,7 @@ grails.project.dependency.resolution = {
         compile ":coffee-asset-pipeline:1.9.0"
         compile ":less-asset-pipeline:1.10.0"
 //        runtime ":hibernate4:4.3.5.5"
-        runtime  ":hibernate:3.6.10.17"
+        runtime  ":hibernate:3.6.10.18"
 
         compile ":excel-export:0.2.1"
         compile ":executor:0.3"
