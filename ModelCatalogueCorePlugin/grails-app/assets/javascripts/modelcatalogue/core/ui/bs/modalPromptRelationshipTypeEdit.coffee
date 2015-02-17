@@ -55,7 +55,7 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
               </div>
               <div class="form-group">
                 <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
-                <textarea ng-disabled="!create" collapse="ruleCollapsed" rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
+                <textarea collapse="ruleCollapsed" rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
               </div>
             </form>
         </div>

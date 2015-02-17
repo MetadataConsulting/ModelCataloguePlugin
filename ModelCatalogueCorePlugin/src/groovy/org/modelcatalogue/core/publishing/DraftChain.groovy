@@ -20,7 +20,7 @@ class DraftChain extends PublishingChain {
         return new DraftChain(published, strategy)
     }
 
-    CatalogueElement run(Publisher<CatalogueElement> publisher) {
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
         if (!strategy.forceNew) {
             if (isDraft(published) || isUpdatingInProgress(published)) {
                 return published

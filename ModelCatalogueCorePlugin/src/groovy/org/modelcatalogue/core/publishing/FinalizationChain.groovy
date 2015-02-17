@@ -14,7 +14,7 @@ class FinalizationChain extends PublishingChain {
         return new FinalizationChain(published)
     }
 
-    CatalogueElement run(Publisher<CatalogueElement> publisher) {
+    protected CatalogueElement doRun(Publisher<CatalogueElement> publisher) {
         if (published.published || isUpdatingInProgress(published)) {
             return published
         }

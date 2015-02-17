@@ -62,7 +62,16 @@ abstract class PublishingChain {
         this
     }
 
-    abstract CatalogueElement run(Publisher<CatalogueElement> publisher)
+    final CatalogueElement run(Publisher<CatalogueElement> publisher) {
+        try {
+            return doRun(publisher)
+        } catch (Exception e) {
+            published.errors.reject('publishing.error', e.toString())
+            return published
+        }
+    }
+
+    protected abstract CatalogueElement doRun(Publisher<CatalogueElement> publisher)
 
     protected void restoreStatus() {
         if (published.status != initialStatus) {

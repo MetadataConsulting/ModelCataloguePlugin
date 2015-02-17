@@ -51,30 +51,21 @@ grails.assets.minifyJs = false
 
 modelcatalogue.defaults.relationshiptypes =  [
         [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
+            String minOccursString = ext['Min Occurs']
+            String maxOccursString = ext['Max Occurs']
 
-            def minOccurs
-            def maxOccurs
-            if(ext['Min Occurs'] && ext['Min Occurs'].isInteger()) minOccurs = ext['Min Occurs'] as Integer
-            if(ext['Max Occurs'] && ext['Max Occurs'].isInteger()) maxOccurs = ext['Max Occurs'] as Integer
+            Integer minOccurs = minOccursString in ['unbounded', 'null'] ? 0 : (minOccursString as Integer)
+            Integer maxOccurs = maxOccursString in ['unbounded', 'null'] ? Integer.MAX_VALUE : (maxOccursString as Integer)
 
             if (minOccurs != null) {
-                if(minOccurs instanceof String && minOccurs!="unbounded"){
+                if (minOccurs < 0) {
                     return false
                 }
-                if (minOccurs instanceof Integer && minOccurs < 0) {
+                if (maxOccurs != null && maxOccurs < minOccurs) {
                     return false
                 }
-
-                if(maxOccurs instanceof String && maxOccurs!="unbounded"){
-                    return false
-                }
-
-                if (maxOccurs != null && (maxOccurs < minOccurs)) {
-                    return false
-                }
-
             } else {
-                if (!(minOccurs instanceof String && maxOccurs instanceof String) && (maxOccurs != null && maxOccurs<1)) {
+                if (maxOccurs != null && maxOccurs < 1) {
                     return false
                 }
             }
