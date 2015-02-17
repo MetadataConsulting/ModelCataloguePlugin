@@ -18,6 +18,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     def grailsLinkGenerator
     def relationshipService
+    def auditService
 
     String name
     String description
@@ -232,6 +233,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
             mapping.beforeDelete()
             mapping.delete(flush:true)
         }
+        auditService?.logElementDeleted(this)
     }
 
     void setModelCatalogueId(String mcID) {
@@ -345,4 +347,11 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
      */
     void afterMerge(CatalogueElement destination) {}
 
+    void afterInsert() {
+        auditService?.logElementCreated(this)
+    }
+
+    void beforeUpdate() {
+        auditService?.logElementUpdated(this)
+    }
 }

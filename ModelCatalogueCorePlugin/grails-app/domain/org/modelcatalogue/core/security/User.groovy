@@ -37,10 +37,11 @@ class User extends CatalogueElement {
         encodePassword()
     }
 
-    def beforeUpdate() {
+    void beforeUpdate() {
         if (isDirty('password') && !hasErrors()) {
             encodePassword()
         }
+        super.beforeUpdate()
     }
 
     protected void encodePassword() {

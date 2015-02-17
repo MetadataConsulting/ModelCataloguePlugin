@@ -12,7 +12,6 @@ import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.dao.DataIntegrityViolationException
 
 import javax.servlet.http.HttpServletResponse
-import java.util.concurrent.ExecutorService
 
 import static org.springframework.http.HttpStatus.*
 
@@ -23,7 +22,6 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     AssetService assetService
     SearchCatalogue modelCatalogueSearchService
     SecurityService modelCatalogueSecurityService
-    ExecutorService executorService
 
     XLSXListRenderer xlsxListRenderer
 
