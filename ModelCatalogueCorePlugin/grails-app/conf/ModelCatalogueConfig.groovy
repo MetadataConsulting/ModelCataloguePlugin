@@ -69,12 +69,12 @@ modelcatalogue.defaults.relationshiptypes =  [
                     return false
                 }
 
-                if (maxOccurs != null && maxOccurs < minOccurs) {
+                if (maxOccurs != null && (maxOccurs < minOccurs)) {
                     return false
                 }
 
             } else {
-                if ((minOccurs instanceof String && maxOccurs instanceof String) && (maxOccurs != null && maxOccurs < 1)) {
+                if (!(minOccurs instanceof String && maxOccurs instanceof String) && (maxOccurs != null && maxOccurs<1)) {
                     return false
                 }
             }

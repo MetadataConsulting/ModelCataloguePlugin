@@ -1,55 +1,50 @@
 package org.modelcatalogue.core.actions
 
-import grails.test.mixin.Mock
+import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.RelationshipTypeService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
-import spock.lang.Specification
-
+import spock.lang.Shared
 import static org.modelcatalogue.core.actions.AbstractActionRunner.encodeEntity
 import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDescription
 
 
-@Mock([Model, ExtensionValue, RelationshipType, Relationship])
-class CreateRelationshipSpec extends Specification {
+class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
-    CreateRelationship createAction = new CreateRelationship()
-    RelationshipTypeService relationshipTypeService = new RelationshipTypeService()
-
-    Model one
-    Model two
-    RelationshipType relation
-    RelationshipType contains
-
+    def relationshipTypeService
+    def modelCatalogueSecurityService
+    def modelCatalogueSearchService
+    def relationshipService
+    def elementService
+    def actionService
+    def classificationService
+    @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
+    @Shared
+    Model one, two
+    @Shared
+    RelationshipType relation, contains
+    @Shared
+    CreateRelationship createAction
 
     def setup() {
-        createAction.relationshipService = new RelationshipService()
-
-        one = new Model(name: 'one').save(failOnError: true)
-        two = new Model(name: 'two').save(failOnError: true)
-        relation = new RelationshipType(name: 'relation', sourceClass: CatalogueElement, sourceToDestination: 'is related to', destinationClass: CatalogueElement, destinationToSource: 'is relation for').save(failOnError: true)
-        contains = new RelationshipType(name: 'containment', sourceClass: CatalogueElement, sourceToDestination: 'contains', destinationClass: DataElement, destinationToSource: 'is contained in').save(failOnError: true)
-
-        relation.relationshipTypeService = relationshipTypeService
-        contains.relationshipTypeService = relationshipTypeService
-
-        createAction.autowireCapableBeanFactory = Mock(AutowireCapableBeanFactory)
-        createAction.autowireCapableBeanFactory.autowireBean(_) >> { it ->
-            if (it instanceof RelationshipType) {
-                it.relationshipTypeService = relationshipTypeService
-            }
-
-        }
+        loadFixtures()
+        createAction = new CreateRelationship()
+        createAction.relationshipService = relationshipService
+        createAction.autowireCapableBeanFactory = autowireCapableBeanFactory
+        one = Model.findByName("book")
+        two = Model.findByName("chapter1")
+        relation = RelationshipType.relatedToType
+        contains = RelationshipType.containmentType
     }
 
     def "uses default action natural name"() {
-       expect:
+
+        expect:
         createAction.naturalName == "Create Relationship"
         createAction.description == normalizeDescription(CreateRelationship.description)
 
@@ -58,11 +53,11 @@ class CreateRelationshipSpec extends Specification {
 
         then:
         createAction.message == """
-            Create new relationship 'one is related to two' with following parameters:
+            Create new relationship '   <a href='#/catalogue/model/16'> Model 'book'</a>  related to <a href='#/catalogue/model/70'> Model 'chapter1'</a> with following parameters:
 
-            Source: one
-            Destination: two
-            Type: relation
+                        Source: book
+            Destination: chapter1
+            Type: relatedTo
         """.stripIndent().trim()
     }
 
@@ -125,7 +120,7 @@ class CreateRelationshipSpec extends Specification {
 
         then:
         !createAction.failed
-        sw.toString() == "<a href='#/catalogue/model/${one.id}'>Model 'one'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>is related to</a> <a href='#/catalogue/model/${two.id}'>Model 'two'</a>"
+        sw.toString() == "<a href='#/catalogue/model/340'>Model 'book'</a> now <a href='#/catalogue/relationshipType/54'>related to</a> <a href='#/catalogue/model/394'>Model 'chapter1'</a>"
         createAction.result == encodeEntity(Relationship.list(limit: 1)[0])
     }
 
@@ -147,4 +142,7 @@ class CreateRelationshipSpec extends Specification {
         Relationship.count() == 0
         sw.toString().startsWith('Unable to create new relationship')
     }
+
+
+
 }

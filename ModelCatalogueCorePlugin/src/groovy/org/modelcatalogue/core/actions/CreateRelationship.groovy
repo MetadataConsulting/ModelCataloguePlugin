@@ -29,10 +29,12 @@ class CreateRelationship extends AbstractActionRunner {
 
     String getMessage() {
         normalizeDescription """
-            Create new relationship '   <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.source)?.class)}/${decodeEntity(parameters.source)?.id}'>${relationshipService.getClassificationName(decodeEntity(parameters.source)?.id.toInteger())}  ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.source)?.class.simpleName)} '${decodeEntity(parameters.source)?.name}'</a>  ${decodeEntity(parameters.type)?.sourceToDestination} <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.source)?.class)}/${decodeEntity(parameters.destination)?.id}'>${relationshipService.getClassificationName(decodeEntity(parameters.destination)?.id.toInteger())} ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.destination)?.class.simpleName)} ${decodeEntity(parameters.destination)?.name}'</a> with following parameters:
+            Create new relationship '   <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.source)?.class)}/${decodeEntity(parameters.source)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.source)?.class.simpleName)} '${relationshipService.getClassifiedName(decodeEntity(parameters.source))}'</a>  ${decodeEntity(parameters.type)?.sourceToDestination} <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.source)?.class)}/${decodeEntity(parameters.destination)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.destination)?.class.simpleName)} '${relationshipService.getClassifiedName(decodeEntity(parameters.destination))}'</a> with following parameters:
 
 
-${parameters.collect { key, value -> "${GrailsNameUtils.getNaturalName(key)}: ${decodeEntity(value)?.name}"}.join('\n\n')}
+            ${parameters.collect {  key, value ->
+                "${GrailsNameUtils.getNaturalName(key)}: ${decodeEntity(value)?.name}"}.join('\n\n')
+            }
         """
     }
 
