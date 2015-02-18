@@ -5,7 +5,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
-    def setupSpec() {
+    def setup() {
         loadFixtures()
     }
 

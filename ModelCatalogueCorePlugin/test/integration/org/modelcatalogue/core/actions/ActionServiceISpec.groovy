@@ -1,9 +1,8 @@
 package org.modelcatalogue.core.actions
 
-import org.modelcatalogue.core.AbstractIntegrationSpec
+import grails.test.spock.IntegrationSpec
 
-
-class ActionServiceISpec extends AbstractIntegrationSpec {
+class ActionServiceISpec extends IntegrationSpec {
 
     ActionService actionService
 
