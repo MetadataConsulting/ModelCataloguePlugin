@@ -43,8 +43,8 @@ class AuditService {
                 authorId: modelCatalogueSecurityService.currentUser?.id,
                 type: ChangeType.PROPERTY_CHANGED,
                 property: name,
-                oldValue: originalValue?.toString(),
-                newValue: newValue?.toString()
+                oldValue: storeValue(originalValue),
+                newValue: storeValue(newValue)
             )
         }
     }
@@ -52,13 +52,15 @@ class AuditService {
 
     void logChange(Map <String, Object> changeProps, CatalogueElement element) {
         try {
-            if (element.hasErrors() || !element.id) {
-                log.warn "Error logging ${changeProps.type} of $element, not ready for queries"
-                return
-            }
+            Change.withNewSession {
+                if (element.hasErrors() || !element.id) {
+                    log.warn "Error logging ${changeProps.type} of $element, not ready for queries"
+                    return
+                }
             Change change = new Change(changeProps).save()
-            if (change.hasErrors()) {
-                log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
+                if (change.hasErrors()) {
+                    log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
+                }
             }
         } catch (Exception e) {
             log.error "Exception writing audit log for $element", e
@@ -66,4 +68,17 @@ class AuditService {
 
     }
 
+
+    static String storeValue(Object object) {
+        if (object instanceof CatalogueElement) {
+            return object.modelCatalogueId
+        }
+
+        String ret = object?.toString()
+
+        if (ret && ret.size() > 2000) {
+            return ret[0..2000]
+        }
+        return ret
+    }
 }

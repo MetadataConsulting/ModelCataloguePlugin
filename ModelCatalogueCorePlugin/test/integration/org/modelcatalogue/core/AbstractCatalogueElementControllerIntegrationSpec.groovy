@@ -479,9 +479,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
 
     protected linkRelationshipsToDummyEntities(String incomingOrOutgoing) {
-        def first = loadItem
-        first."${incomingOrOutgoing}Relationships" = first."${incomingOrOutgoing}Relationships" ?: []
+        def first = loadItem.save(flush: true)
         for (unit in resource.list()) {
+            unit.save(flush: true)
             if (unit != first) {
                 if (incomingOrOutgoing == "incoming") {
                     assert !controller.relationshipService.link(unit, first, relationshipType).hasErrors()
@@ -768,7 +768,9 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     }
 
     protected mapToDummyEntities(CatalogueElement toBeLinked) {
+        toBeLinked.save(flush: true)
         for (domain in toBeLinked.class.list()) {
+            domain.save(flush: true)
             if (domain != toBeLinked) {
                 controller.mappingService.map(toBeLinked, domain, "x")
                 if (toBeLinked.outgoingMappings.size() == 3) {
@@ -776,7 +778,6 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
                 }
             }
         }
-
         assert toBeLinked.outgoingMappings
         assert toBeLinked.outgoingMappings.size() == 3
         toBeLinked

@@ -16,7 +16,7 @@ class MappingService {
                 return existing
             }
 
-            return existing.save()
+            return existing.save(flush: true)
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
         newOne.validate()
@@ -25,7 +25,7 @@ class MappingService {
             return newOne
         }
 
-        newOne.save()
+        newOne.save(flush: true)
         source.addToOutgoingMappings(newOne)
         destination.addToIncomingMappings(newOne)
         newOne
