@@ -57,10 +57,12 @@ class AuditService {
                     log.warn "Error logging ${changeProps.type} of $element, not ready for queries"
                     return
                 }
-            Change change = new Change(changeProps).save()
+                Change change = new Change(changeProps)
+                change.validate()
                 if (change.hasErrors()) {
                     log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
                 }
+                change.save()
             }
         } catch (Exception e) {
             log.error "Exception writing audit log for $element", e

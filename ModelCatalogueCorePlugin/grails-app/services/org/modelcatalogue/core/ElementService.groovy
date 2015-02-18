@@ -73,7 +73,7 @@ class ElementService implements Publisher<CatalogueElement> {
         modelCatalogueSearchService.unindex(archived)
 
         archived.status = ElementStatus.DEPRECATED
-        archived.save()
+        archived.save(flush: true)
         return archived
     }
 

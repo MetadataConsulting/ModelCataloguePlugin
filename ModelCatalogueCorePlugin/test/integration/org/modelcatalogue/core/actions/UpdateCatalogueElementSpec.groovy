@@ -1,20 +1,16 @@
 package org.modelcatalogue.core.actions
 
-import grails.test.mixin.Mock
-import org.modelcatalogue.core.ExtensionValue
+import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipType
-import spock.lang.Specification
 
-
-@Mock([Model, ExtensionValue])
-class UpdateCatalogueElementSpec extends Specification {
+class UpdateCatalogueElementSpec extends IntegrationSpec {
 
     UpdateCatalogueElement updateAction = new UpdateCatalogueElement()
     Model model
 
     def setup() {
-        model = new Model(name: 'The Model').save(failOnError: true)
+        model = new Model(name: 'The Model UA').save(failOnError: true)
         model.ext.bar = 'foo'
     }
 
@@ -28,7 +24,7 @@ class UpdateCatalogueElementSpec extends Specification {
 
         then:
         updateAction.message == """
-            Update the Model 'The Model' with following parameters:
+            Update the Model 'The Model UA' with following parameters:
 
             Name: The Updated Model
         """.stripIndent().trim()
@@ -105,21 +101,23 @@ class UpdateCatalogueElementSpec extends Specification {
 
         updateAction.out = pw
 
-        expect:
-        Model.count() == 1
+        int initialCount = Model.count()
 
         when:
         updateAction.initWith(name: "The New Model Name", type: Model.name, id: model.id.toString(), 'ext:foo': 'bar', 'ext:bar': '')
         updateAction.run()
 
+        Model changed = Model.findByName('The New Model Name')
+
         then:
+        changed
         !updateAction.failed
-        Model.count() == 1
-        Model.countByName('The Model') == 0
+        Model.count() == initialCount
+        Model.countByName('The Model UA') == 0
         Model.countByName('The New Model Name') == 1
-        sw.toString() == "<a href='#/catalogue/model/1'>Model 'The New Model Name'</a> updated"
-        Model.findByName('The New Model Name').ext.foo == 'bar'
-        Model.findByName('The New Model Name').ext.bar == null
+        sw.toString() == "<a href='#/catalogue/model/${changed.id}'>Model 'The New Model Name'</a> updated"
+        changed.ext.foo == 'bar'
+        changed.ext.bar == null
         updateAction.result == AbstractActionRunner.encodeEntity(Model.findByName('The New Model Name'))
     }
 

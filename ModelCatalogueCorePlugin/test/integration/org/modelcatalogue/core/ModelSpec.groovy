@@ -1,9 +1,7 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
-
 /**
  * Created by adammilward on 05/02/2014.
  *
@@ -11,14 +9,11 @@ import spock.lang.Unroll
  * They contain data elements
  */
 
-@Mock([Model, ExtensionValue])
-class ModelSpec extends Specification {
+class ModelSpec extends IntegrationSpec {
 
     @Unroll
     def "Model creation for #args results in #validates"() {
-
-        expect:
-        Model.list().isEmpty()
+        int initialSize = Model.count()
 
         when:
         Model modelInstance = new Model(args)
@@ -28,7 +23,7 @@ class ModelSpec extends Specification {
         then:
         (modelInstance.errors.errorCount == 0) == validates
         modelInstance.versionNumber == 1
-        modelInstance.list().size() == size
+        modelInstance.list().size() == size + initialSize
         modelInstance.modelCatalogueId == args.modelCatalogueId
 
 
@@ -46,11 +41,6 @@ class ModelSpec extends Specification {
 
     @Unroll
     def "create a new model and extend it to include additional metadata"() {
-
-        expect:
-
-        Model.list().isEmpty()
-
         when:
 
         def dataExtension = ["ip": "x.xx.xx.xx", "owner": "BRC_Informatics"]

@@ -1,22 +1,16 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
-
 /**
  * Created by adammilward on 03/02/2014.
  */
-@Mock (DataType)
-class DataTypeSpec extends Specification{
+class DataTypeSpec extends IntegrationSpec {
 
 
     @Unroll
     def "create a new data type from #args validates to #validates" (){
-
-        expect:
-
-        DataType.list().isEmpty()
+        int initialSize = DataType.count()
 
         when:
 
@@ -27,7 +21,7 @@ class DataTypeSpec extends Specification{
         then:
 
         !type.hasErrors() == validates
-        DataType.list().size() == size
+        DataType.list().size() == size + initialSize
 
         where:
         validates | args             | size

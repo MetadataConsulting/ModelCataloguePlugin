@@ -1,23 +1,13 @@
 package org.modelcatalogue.core.actions
 
-import grails.test.mixin.Mock
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipService
-import org.modelcatalogue.core.RelationshipType
-import org.modelcatalogue.core.RelationshipTypeService
+import grails.test.spock.IntegrationSpec
+import org.modelcatalogue.core.*
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
-import spock.lang.Specification
 
 import static org.modelcatalogue.core.actions.AbstractActionRunner.encodeEntity
 import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDescription
 
-
-@Mock([Model, ExtensionValue, RelationshipType, Relationship])
-class CreateRelationshipSpec extends Specification {
+class CreateRelationshipSpec extends IntegrationSpec {
 
     CreateRelationship createAction = new CreateRelationship()
     RelationshipTypeService relationshipTypeService = new RelationshipTypeService()
@@ -33,8 +23,8 @@ class CreateRelationshipSpec extends Specification {
 
         one = new Model(name: 'one').save(failOnError: true)
         two = new Model(name: 'two').save(failOnError: true)
-        relation = new RelationshipType(name: 'relation', sourceClass: CatalogueElement, sourceToDestination: 'is related to', destinationClass: CatalogueElement, destinationToSource: 'is relation for').save(failOnError: true)
-        contains = new RelationshipType(name: 'containment', sourceClass: CatalogueElement, sourceToDestination: 'contains', destinationClass: DataElement, destinationToSource: 'is contained in').save(failOnError: true)
+        relation = RelationshipType.relatedToType
+        contains = RelationshipType.containmentType
 
         relation.relationshipTypeService = relationshipTypeService
         contains.relationshipTypeService = relationshipTypeService
@@ -58,11 +48,11 @@ class CreateRelationshipSpec extends Specification {
 
         then:
         createAction.message == """
-            Create new relationship 'one is related to two' with following parameters:
+            Create new relationship 'one related to two' with following parameters:
 
             Source: one
             Destination: two
-            Type: relation
+            Type: relatedTo
         """.stripIndent().trim()
     }
 
@@ -125,7 +115,7 @@ class CreateRelationshipSpec extends Specification {
 
         then:
         !createAction.failed
-        sw.toString() == "<a href='#/catalogue/model/${one.id}'>Model 'one'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>is related to</a> <a href='#/catalogue/model/${two.id}'>Model 'two'</a>"
+        sw.toString() == "<a href='#/catalogue/model/${one.id}'>Model 'one'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>related to</a> <a href='#/catalogue/model/${two.id}'>Model 'two'</a>"
         createAction.result == encodeEntity(Relationship.list(limit: 1)[0])
     }
 

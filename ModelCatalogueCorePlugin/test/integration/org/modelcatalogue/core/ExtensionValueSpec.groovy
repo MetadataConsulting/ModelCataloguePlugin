@@ -1,30 +1,16 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Shared
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
 
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
-@Mock([ExtensionValue, DataElement])
-class ExtensionValueSpec extends Specification {
-
-    @Shared
-    DataElement de = new DataElement(name: "element")
-
-    def setup() { de.save(flush: true) }
-
-    def cleanup() { de.delete() }
+class ExtensionValueSpec extends IntegrationSpec{
 
     @Unroll
-    def "#r: create a mew extension value from #args validates to #validates"() {
-
-        expect:
-
-        ExtensionValue.list().isEmpty()
-
+    def "#r: create a new extension value from #args validates to #validates"() {
+        int initialSize = ExtensionValue.count()
         when:
 
         ExtensionValue type = new ExtensionValue(args)
@@ -35,7 +21,7 @@ class ExtensionValueSpec extends Specification {
         then:
 
         !type.hasErrors() == validates
-        ExtensionValue.list().size() == size
+        ExtensionValue.count() == size + initialSize
 
         where:
         r | validates | size | args
@@ -48,7 +34,10 @@ class ExtensionValueSpec extends Specification {
         7 | false     | 0    | [name: "xxx" * 256, extensionValue: "x", element: de]
         8 | false     | 0    | [name: "xxx" * 256, extensionValue: "x" * 1001, element: de]
         9 | true      | 1    | [name: "xxx", extensionValue: "x", element: de]
+    }
 
+    DataElement getDe() {
+        new DataElement(name: "element").save(failOnError: true)
     }
 
 

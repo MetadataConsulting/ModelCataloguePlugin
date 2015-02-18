@@ -1,15 +1,11 @@
 package org.modelcatalogue.core.actions
 
-import grails.test.mixin.Mock
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Model
+import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipType
-import spock.lang.Specification
 
-
-@Mock([Model, ExtensionValue])
-class CreateCatalogueElementSpec extends Specification {
+class CreateCatalogueElementSpec extends IntegrationSpec {
 
     CreateCatalogueElement createAction = new CreateCatalogueElement()
 
@@ -82,20 +78,23 @@ class CreateCatalogueElementSpec extends Specification {
 
         createAction.out = pw
 
-        expect:
-        Model.count() == 0
+        int initialCount = Model.count()
+        int draftCount   = Model.countByStatus(ElementStatus.DRAFT)
 
         when:
         createAction.initWith(name: "The Model", type: Model.name, description: "The Description", status: 'DRAFT', 'ext:foo': 'bar')
         createAction.run()
 
+        Model created = Model.findByName('The Model')
+
         then:
         !createAction.failed
-        Model.count() == 1
+        created
+        Model.count() == 1 + initialCount
         Model.countByName('The Model') == 1
-        Model.countByStatus(ElementStatus.DRAFT) == 1
-        sw.toString() == "New <a href='#/catalogue/model/1'>Model 'The Model'</a> created"
-        Model.findByName('The Model').ext.foo == 'bar'
+        Model.countByStatus(ElementStatus.DRAFT) == 1 + draftCount
+        sw.toString() == "New <a href='#/catalogue/model/${created.id}'>Model 'The Model'</a> created"
+        created.ext.foo == 'bar'
         createAction.result == AbstractActionRunner.encodeEntity(Model.findByName('The Model'))
     }
 
@@ -105,8 +104,7 @@ class CreateCatalogueElementSpec extends Specification {
 
         createAction.out = pw
 
-        expect:
-        Model.count() == 0
+        int initialCount = Model.count()
 
         when:
         createAction.initWith(name: "x" * 300, type: Model.name)
@@ -114,7 +112,7 @@ class CreateCatalogueElementSpec extends Specification {
 
         then:
         createAction.failed
-        Model.count() == 0
+        Model.count() == initialCount
         sw.toString().startsWith('Unable to create new Model')
     }
 }

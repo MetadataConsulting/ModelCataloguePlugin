@@ -1,58 +1,58 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
-
 /**
  * Created by adammilward on 05/02/2014.
  * A value domain instantiates a data element it includes information regarding the set of values and constraints that
  * describe the data element within the context of a conceptual domain
  * value domains are invluded in conceptual domains
  */
-@Mock([ValueDomain, DataElement, MeasurementUnit, DataType, EnumeratedType])
-class ValueDomainSpec extends Specification {
+class ValueDomainSpec extends IntegrationSpec {
 
     def fixtureLoader
 
     @Unroll
     def "Value Domain creation for #args results in #validates"() {
-
-        expect:
-
-        ValueDomain.list().isEmpty()
-
         when:
-
         ValueDomain valueDomainInstance = new ValueDomain(args)
-
         valueDomainInstance.save()
 
         then:
-
         !valueDomainInstance.hasErrors() == validates
 
         where:
-
         validates | args
-        true  | [name: "e", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
-        true  | [name: "ground_speed1", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
-        false | [name: "ground_speed2", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "x" * 2001, dataType: new DataType(name: "Float")]
-        false | [name: "ground_speed3", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "x" * 10001, description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        false | [name: "ground_speed4", unitOfMeasure: "x" * 256, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        false | [name: "x" * 256, unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        true  | [name: "ground_speed6", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
-        true  | [name: "ground_speed7", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown'])]
+        true  | [name: "e", unitOfMeasure: createMeasurementUnit(), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
+        true  | [name: "ground_speed1", unitOfMeasure: createMeasurementUnit(), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
+        false | [name: "ground_speed2", unitOfMeasure: createMeasurementUnit(), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "x" * 2001, dataType: createDataType()]
+        false | [name: "ground_speed3", unitOfMeasure: createMeasurementUnit(), regexDef: "x" * 10001, description: "the ground speed of the moving vehicle", dataType: createDataType()]
+        false | [name: "ground_speed4", unitOfMeasure: "x" * 256, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: createDataType()]
+        false | [name: "x" * 256, unitOfMeasure: createMeasurementUnit(), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: createDataType()]
+        true  | [name: "ground_speed6", unitOfMeasure: createMeasurementUnit(), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: createDataType()]
+        true  | [name: "ground_speed7", unitOfMeasure: createMeasurementUnit(), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: createEnumeratedType()]
 
+    }
+
+    private static EnumeratedType createEnumeratedType() {
+        new EnumeratedType(name: 'test', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown']).save(failOnError: true)
+    }
+
+    private static MeasurementUnit createMeasurementUnit() {
+        new MeasurementUnit(name: "MPH${System.currentTimeMillis()}").save(failOnError: true)
+    }
+
+    private static DataType createDataType() {
+        new DataType(name: "Float").save(failOnError: true)
     }
 
     def "check one to many relationship exits between data type and value domain"(){
 
         when:
 
-        def mu = new MeasurementUnit(name: "MPH").save()
-        def dt = new DataType(name: "Float").save()
+        def mu = createMeasurementUnit()
+        def dt = createDataType()
         def valueDomain = new ValueDomain(name: "ground_speed6", unitOfMeasure: mu, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: dt).save()
 
         then:
@@ -66,7 +66,7 @@ class ValueDomainSpec extends Specification {
 
         when:
 
-        def mu = new MeasurementUnit(name: "MPH").save()
+        def mu = createMeasurementUnit()
         def et = new EnumeratedType(name: 'test', enumerations: ['m': 'male', 'f': 'female', 'u': 'unknown']).save()
         def valueDomain = new ValueDomain(name: "ground_speed6", unitOfMeasure: mu, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save()
 
@@ -79,30 +79,22 @@ class ValueDomainSpec extends Specification {
 
 
     def "create value domain with invalid regex definition"() {
-
-        expect:
-
-        ValueDomain.list().isEmpty()
-
         when:
-
         ValueDomain valueDomainInstance = [regexDef: "(blah"]
         valueDomainInstance.validate()
 
         then:
-
         valueDomainInstance.hasErrors()
-        // the third argument is the real error message passed from the validator
     }
 
 
     def "check toString works"() {
 
         when:
-        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: [male: 'male', female: 'female', unknown:'unknown'])).save()
+        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: createMeasurementUnit(), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: [male: 'male', female: 'female', unknown:'unknown']).save(failOnError: true)).save()
 
         then:
-        a.toString() == "ValueDomain[id: 1, name: ground_speed, status: DRAFT, modelCatalogueId: null]"
+        a.toString() == "ValueDomain[id: ${a.id}, name: ground_speed, status: DRAFT, modelCatalogueId: null]"
 
     }
 

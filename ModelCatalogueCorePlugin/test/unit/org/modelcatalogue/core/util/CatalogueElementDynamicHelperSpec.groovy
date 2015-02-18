@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.audit.AuditService
 import spock.lang.Specification
 import spock.lang.Unroll
 import spock.util.mop.ConfineMetaClassChanges
@@ -10,6 +11,7 @@ import spock.util.mop.ConfineMetaClassChanges
 @TestFor(InitCatalogueService)
 @Mock([RelationshipType, TestCatalogueElement1, TestCatalogueElement2, Relationship])
 class CatalogueElementDynamicHelperSpec extends Specification {
+    // TODO: try to move to integration folder so we get rid off all the @Mock tests
 
     @Unroll @ConfineMetaClassChanges([TestCatalogueElement1, TestCatalogueElement2])
     def "Relationships from #clazz are added to the transients so they are #transients"() {
@@ -57,6 +59,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
     @ConfineMetaClassChanges(TestCatalogueElement2)
     def "Link and unlink"() {
         RelationshipService service = new RelationshipService()
+        AuditService auditService = Mock(AuditService)
         CatalogueElementDynamicHelper.addShortcuts(TestCatalogueElement2)
         RelationshipType type = new RelationshipType(name: 'a', sourceToDestination: "a to b", destinationToSource: "b to a", sourceClass: CatalogueElement, destinationClass: CatalogueElement)
         type.relationshipTypeService = new RelationshipTypeService()
@@ -69,7 +72,10 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         TestCatalogueElement2 second    = [name: "Second"]
 
         first.relationshipService       = service
+        first.auditService              = auditService
+
         second.relationshipService      = service
+        second.auditService             = auditService
 
         then:
         first.save()

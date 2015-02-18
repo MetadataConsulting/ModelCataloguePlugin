@@ -1,23 +1,16 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
-
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  * a measurement unit can be
  */
-@Mock(MeasurementUnit)
-class MeasurementUnitSpec extends Specification {
+class MeasurementUnitSpec extends IntegrationSpec {
 
     @Unroll
     def "create a new measurement from #args validates to #validates"() {
-
-        expect:
-
-        MeasurementUnit.list().isEmpty()
-
+        int initialSize = MeasurementUnit.count()
         when:
 
         MeasurementUnit measurementUnitInstance = new MeasurementUnit(args)
@@ -27,7 +20,7 @@ class MeasurementUnitSpec extends Specification {
         then:
 
         !measurementUnitInstance.hasErrors() == validates
-        MeasurementUnit.list().size() == size
+        MeasurementUnit.count() == size + initialSize
 
 
         where:

@@ -1,17 +1,15 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
 
-@Mock([DataElement, ExtensionValue, Relationship, Model,  RelationshipType, RelationshipMetadata])
-class ExtendibleElementExtensionsWrapperSpec extends Specification {
+class ExtendibleElementExtensionsWrapperSpec extends IntegrationSpec {
 
 
     @Unroll
     def "Extendible elements have live map to extension values for #extensionClass"() {
-        expect:
-        !extensionClass.count()
+
+        int initialSize = extensionClass.count()
 
         when:
         def element = newElementFactory.call().save(flush: true)
@@ -30,7 +28,7 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         then:
         element[extensionProperty]
         element[extensionProperty].size() == 1
-        extensionClass.count() == 1
+        extensionClass.count() == 1 + initialSize
         element.ext.keySet() == ['foo'] as Set
         element.ext.values()?.contains('bar')
         element.ext.entrySet() == [foo: 'bar'].entrySet()
