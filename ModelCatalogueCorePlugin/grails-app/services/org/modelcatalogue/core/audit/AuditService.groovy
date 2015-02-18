@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.audit
 
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.util.FriendlyErrors
 
 class AuditService {
@@ -17,6 +18,42 @@ class AuditService {
             latestVersionId: element.latestVersionId ?: element.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             type: element.latestVersionId && element.latestVersionId != element.id ? ChangeType.NEW_VERSION_CREATED : ChangeType.NEW_ELEMENT_CREATED
+        )
+    }
+
+    void logNewMetadata(ExtensionValue extension) {
+        logChange(extension.element,
+            changedId: extension.element.id,
+            latestVersionId: extension.element.latestVersionId ?: extension.element.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: extension.name,
+            newValue: extension.extensionValue,
+            type: ChangeType.METADATA_CREATED
+        )
+    }
+
+    void logMetadataUpdated(ExtensionValue extension) {
+        logChange(extension.element,
+            changedId: extension.element.id,
+            latestVersionId: extension.element.latestVersionId ?: extension.element.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: extension.name,
+            oldValue: extension.getPersistentValue('extensionValue'),
+            newValue: extension.extensionValue,
+            type: ChangeType.METADATA_UPDATED
+        )
+    }
+    void logMetadataDeleted(ExtensionValue extension) {
+        if (!extension.element) {
+            return
+        }
+        logChange(extension.element,
+            changedId: extension.element.id,
+            latestVersionId: extension.element.latestVersionId ?: extension.element.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: extension.name,
+            oldValue: extension.extensionValue,
+            type: ChangeType.METADATA_DELETED
         )
     }
 

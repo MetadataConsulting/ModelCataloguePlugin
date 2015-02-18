@@ -2,6 +2,7 @@ package org.modelcatalogue.core.audit
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.publishing.DraftContext
 
 class AuditingIntegrationSpec extends IntegrationSpec {
@@ -92,6 +93,64 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.property == null
         change.newValue == null
         change.oldValue == null
+    }
+
+    def "adding new metadata is logged"() {
+        DataType type = new DataType(name: 'DT4ANM').save(failOnError: true, flush: true)
+        ExtensionValue ext = new ExtensionValue(name: 'foo', extensionValue: 'bar', element: type).save(failOnError: true, flush: true)
+        type.refresh()
+
+        Change change = Change.findByChangedIdAndType(type.id, ChangeType.METADATA_CREATED)
+
+        expect:
+        type.ext.foo == ext.extensionValue
+
+        change
+        change.latestVersionId == type.id
+        change.author   == null
+        change.property == 'foo'
+        change.newValue == 'bar'
+        change.oldValue == null
+
+    }
+
+    def "editing metadata is logged"() {
+        DataType type = new DataType(name: 'DT4ANM').save(failOnError: true, flush: true)
+        ExtensionValue ext = new ExtensionValue(name: 'foo', extensionValue: 'bar', element: type).save(failOnError: true, flush: true)
+        ext.extensionValue = 'boo'
+        ext.save(failOnError: true, flush: true)
+        type.refresh()
+
+        Change change = Change.findByChangedIdAndType(type.id, ChangeType.METADATA_UPDATED)
+
+        expect:
+        type.ext.foo == ext.extensionValue
+
+        change
+        change.latestVersionId == type.id
+        change.author   == null
+        change.property == 'foo'
+        change.oldValue == 'bar'
+        change.newValue == 'boo'
+    }
+
+    def "deleting metadata is logged"() {
+        DataType type = new DataType(name: 'DT4ANM').save(failOnError: true, flush: true)
+        ExtensionValue ext = new ExtensionValue(name: 'foo', extensionValue: 'bar', element: type).save(failOnError: true, flush: true)
+        ext.delete(failOnError: true, flush: true)
+        type.refresh()
+
+        Change change = Change.findByChangedIdAndType(type.id, ChangeType.METADATA_DELETED)
+
+        expect:
+        !type.ext.foo
+
+        change
+        change.latestVersionId == type.id
+        change.author   == null
+        change.property == 'foo'
+        change.oldValue == 'bar'
+        change.newValue == null
     }
 
 }

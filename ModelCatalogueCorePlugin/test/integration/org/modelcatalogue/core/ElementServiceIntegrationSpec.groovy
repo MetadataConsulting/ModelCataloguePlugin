@@ -128,7 +128,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         archived.ext.something == 'anything'
 
-        !archived.valueDomain
         !(archived in domain.dataElements)
     }
 

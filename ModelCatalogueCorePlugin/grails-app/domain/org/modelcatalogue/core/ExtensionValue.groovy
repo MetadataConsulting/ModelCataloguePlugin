@@ -11,6 +11,8 @@ class ExtensionValue implements Extension {
         except = ['element']
     }
 
+    def auditService
+
     String name
     String extensionValue
 
@@ -27,5 +29,16 @@ class ExtensionValue implements Extension {
         return "extension for ${element} (${name}=${extensionValue})"
     }
 
+    void afterInsert() {
+        auditService.logNewMetadata(this)
+    }
+
+    void beforeUpdate() {
+        auditService.logMetadataUpdated(this)
+    }
+
+    void beforeDelete() {
+        auditService.logMetadataDeleted(this)
+    }
 
 }

@@ -6,6 +6,7 @@ import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.ExtensionsWrapper
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
 
 /**
@@ -300,8 +301,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     @Override
     Extension addExtension(String name, String value) {
         ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
-        newOne.save()
-        assert !newOne.errors.hasErrors()
+        FriendlyErrors.failFriendlySave(newOne)
         addToExtensions(newOne)
         newOne
     }
