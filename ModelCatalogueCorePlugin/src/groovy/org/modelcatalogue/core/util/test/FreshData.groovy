@@ -13,7 +13,7 @@ class FreshData {
             throw new IllegalStateException("Only H2 Database supported!")
         }
 
-        String scriptLocation = "${System.getProperty('java.io.tmpdir')}mc/${tempSqlFileName}"
+        String scriptLocation = "${System.getProperty('java.io.tmpdir')}/mc/${tempSqlFileName}"
 
         def sql = new Sql(sessionFactory.currentSession.connection())
 
@@ -26,7 +26,7 @@ class FreshData {
         }
 
         long start = System.currentTimeMillis()
-        String clearScriptLocation = "${System.getProperty('java.io.tmpdir')}mc/dropfiles/$tempSqlFileName"
+        String clearScriptLocation = "${System.getProperty('java.io.tmpdir')}/mc/dropfiles/$tempSqlFileName"
         sql.execute("SCRIPT NODATA DROP TO ${clearScriptLocation}")
         println "Clear script created in $clearScriptLocation"
         sql.execute("RUNSCRIPT FROM ${clearScriptLocation}")
