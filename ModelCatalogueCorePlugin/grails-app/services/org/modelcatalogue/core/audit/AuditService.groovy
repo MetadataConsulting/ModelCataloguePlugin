@@ -3,6 +3,7 @@ package org.modelcatalogue.core.audit
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipMetadata
 import org.modelcatalogue.core.util.FriendlyErrors
 
 class AuditService {
@@ -55,6 +56,70 @@ class AuditService {
             property: extension.name,
             oldValue: extension.extensionValue,
             type: ChangeType.METADATA_DELETED
+        )
+    }
+
+    void logNewRelationshipMetadata(RelationshipMetadata extension) {
+        logChange(extension.relationship.source,
+            changedId: extension.relationship.source.id,
+            latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
+            newValue: extension.extensionValue,
+            type: ChangeType.RELATIONSHIP_METADATA_CREATED
+        )
+        logChange(extension.relationship.destination,
+            changedId: extension.relationship.destination.id,
+            latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
+            newValue: extension.extensionValue,
+            type: ChangeType.RELATIONSHIP_METADATA_CREATED
+        )
+    }
+
+    void logRelationshipMetadataUpdated(RelationshipMetadata extension) {
+        logChange(extension.relationship.source,
+            changedId: extension.relationship.source.id,
+            latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
+            oldValue: extension.getPersistentValue('extensionValue'),
+            newValue: extension.extensionValue,
+            type: ChangeType.RELATIONSHIP_METADATA_UPDATED
+        )
+        logChange(extension.relationship.destination,
+            changedId: extension.relationship.destination.id,
+            latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
+            oldValue: extension.getPersistentValue('extensionValue'),
+            newValue: extension.extensionValue,
+            type: ChangeType.RELATIONSHIP_METADATA_UPDATED
+        )
+    }
+    void logRelationshipMetadataDeleted(RelationshipMetadata extension) {
+        if (!extension.relationship?.source) {
+            return
+        }
+        logChange(extension.relationship.source,
+            changedId: extension.relationship.source.id,
+            latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
+            oldValue: extension.extensionValue,
+            type: ChangeType.RELATIONSHIP_METADATA_DELETED
+        )
+        if (!extension.relationship?.destination) {
+            return
+        }
+        logChange(extension.relationship.destination,
+                changedId: extension.relationship.destination.id,
+                latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
+                authorId: modelCatalogueSecurityService.currentUser?.id,
+                property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
+                oldValue: extension.extensionValue,
+                type: ChangeType.RELATIONSHIP_METADATA_DELETED
         )
     }
 

@@ -37,7 +37,7 @@ class ExtensionValue implements Extension {
         auditService.logMetadataUpdated(this)
     }
 
-    void beforeDelete() {
+    void beforeRemove() {
         auditService.logMetadataDeleted(this)
     }
 

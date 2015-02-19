@@ -9,5 +9,6 @@ public interface Extension {
     String getExtensionValue()
     void setExtensionValue(String value)
     public <T extends Extension> T save()
+    void beforeRemove()
 
 }

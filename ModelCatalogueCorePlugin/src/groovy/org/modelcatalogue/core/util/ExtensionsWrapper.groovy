@@ -99,6 +99,7 @@ class ExtensionsWrapper implements Map<String, String> {
     }
 
     private String createOrUpdate(String name, String value) {
+        // TODO: what should happen if the value is null, delete?
         Extension existing = findExtensionValueByName(name)
         if (existing) {
             String old = existing.extensionValue
@@ -116,6 +117,7 @@ class ExtensionsWrapper implements Map<String, String> {
     private String deleteIfPresent(Object key) {
         Extension existing = findExtensionValueByName(key?.toString())
         if (!existing) return null
+        existing.beforeRemove()
         element.removeExtension(existing)
         existing.extensionValue
     }

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ExtensionsWrapper
+import org.modelcatalogue.core.util.FriendlyErrors
 
 /*
 * Users can create relationships between all catalogue elements. They include
@@ -113,8 +114,7 @@ class Relationship implements Extendible {
     @Override
     Extension addExtension(String name, String value) {
         RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
-        newOne.save()
-        assert !newOne.errors.hasErrors()
+        FriendlyErrors.failFriendlySave(newOne)
         addToExtensions(newOne)
         newOne
     }
