@@ -129,5 +129,20 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: "Message"     , value: 'message'                      , classes: 'col-md-7' }
   ]
 
+  valueOrName = (property) ->
+    (change) ->
+      object = change[property]
+      return '' if not object
+      return object.value if object.value
+
+      return """<a href=#{object.href()}}>#{object.classifiedName}</a>""" if object.instanceOf and object.instanceOf('catalogueElement')
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.audit.Change', [
+    {header: "Type"       , value: "type" }
+    {header: "Property"   , value: "property" }
+    {header: "Old Value"  , value: valueOrName('oldValue') }
+    {header: "New Value"  , value: valueOrName('newValue') }
+  ]
+
 
 ]

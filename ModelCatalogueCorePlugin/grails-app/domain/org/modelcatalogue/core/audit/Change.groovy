@@ -25,6 +25,10 @@ class Change {
         oldValue maxSize: 2000, nullable: true
     }
 
+    static mapping = {
+        version false
+    }
+
     static transients = ['changed', 'latestVersion']
 
     CatalogueElement getChanged() { CatalogueElement.get(changedId) }

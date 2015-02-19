@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util.marshalling
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -14,6 +15,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
     @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
     @Autowired RelationshipService relationshipService
+    @Autowired AuditService auditService
 
     CatalogueElementMarshallers(Class type) {
         super(type)
@@ -40,7 +42,8 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 versionNumber        : el.versionNumber,
                 status               : el.status.toString(),
                 versionCreated       : el.versionCreated,
-                history              : [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history"]
+                history              : [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history"],
+                changes              : [count: auditService.getChanges([:], el).total, itemType: org.modelcatalogue.core.audit.Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/changes"]
         ]
 
         Map<String, Map<String, String>> relationships = getRelationshipConfiguration(el.getClass())

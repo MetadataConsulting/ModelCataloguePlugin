@@ -1,18 +1,30 @@
 package org.modelcatalogue.core.audit
 
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipMetadata
+import grails.web.JSONBuilder
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.ListWithTotalAndType
+import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
 class AuditService {
 
     static transactional = false
 
-    static List<String> IGNORED_PROPERTIES = ['password', 'version', 'outgoingRelationships', 'incomingRelationships', 'outgoingMappings', 'incomingMappings']
+    static List<String> IGNORED_PROPERTIES = ['password', 'version', 'outgoingRelationships', 'incomingRelationships', 'outgoingMappings', 'incomingMappings', 'latestVersionId']
 
     def modelCatalogueSecurityService
+
+    ListWithTotalAndType<Change> getChanges(Map params, CatalogueElement element) {
+        long latestId = element.latestVersionId ?: element.id
+        if (!params.sort) {
+            params.sort  = 'dateCreated'
+            params.order = 'desc'
+        }
+        Lists.fromCriteria(params, Change) {
+            eq 'latestVersionId', latestId
+        }
+    }
 
     void logElementCreated(CatalogueElement element) {
         logChange(element,
@@ -45,6 +57,7 @@ class AuditService {
             type: ChangeType.METADATA_UPDATED
         )
     }
+
     void logMetadataDeleted(ExtensionValue extension) {
         if (!extension.element) {
             return
@@ -60,6 +73,9 @@ class AuditService {
     }
 
     void logNewRelationshipMetadata(RelationshipMetadata extension) {
+        if (extension.relationship.relationshipType.system) {
+            return
+        }
         logChange(extension.relationship.source,
             changedId: extension.relationship.source.id,
             latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
@@ -79,6 +95,9 @@ class AuditService {
     }
 
     void logRelationshipMetadataUpdated(RelationshipMetadata extension) {
+        if (extension.relationship.relationshipType.system) {
+            return
+        }
         logChange(extension.relationship.source,
             changedId: extension.relationship.source.id,
             latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
@@ -98,8 +117,9 @@ class AuditService {
             type: ChangeType.RELATIONSHIP_METADATA_UPDATED
         )
     }
+
     void logRelationshipMetadataDeleted(RelationshipMetadata extension) {
-        if (!extension.relationship?.source) {
+        if (extension.relationship.relationshipType.system) {
             return
         }
         logChange(extension.relationship.source,
@@ -110,9 +130,6 @@ class AuditService {
             oldValue: extension.extensionValue,
             type: ChangeType.RELATIONSHIP_METADATA_DELETED
         )
-        if (!extension.relationship?.destination) {
-            return
-        }
         logChange(extension.relationship.destination,
                 changedId: extension.relationship.destination.id,
                 latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
@@ -138,20 +155,28 @@ class AuditService {
             if (name in IGNORED_PROPERTIES) {
                 continue
             }
-            def originalValue = element.getPersistentValue(name)
-            def newValue = element.getProperty(name)
+            def originalValue = storeValue(element.getPersistentValue(name))
+            def newValue = storeValue(element.getProperty(name))
+
+            if (name == 'status' && originalValue == storeValue(ElementStatus.UPDATED)) {
+                Change ch = Change.findByChangedIdAndPropertyAndTypeAndOldValueNotEqual(element.id, name, ChangeType.PROPERTY_CHANGED, storeValue(ElementStatus.UPDATED), [sort: 'dateCreated', order: 'desc'])
+                if (ch) {
+                    originalValue = ch.oldValue
+                    ch.delete()
+                }
+            }
+
             logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
                 authorId: modelCatalogueSecurityService.currentUser?.id,
                 type: ChangeType.PROPERTY_CHANGED,
                 property: name,
-                oldValue: storeValue(originalValue),
-                newValue: storeValue(newValue)
+                oldValue: originalValue,
+                newValue: newValue
             )
         }
     }
-
 
     void logChange(Map <String, Object> changeProps, CatalogueElement element) {
         try {
@@ -174,6 +199,9 @@ class AuditService {
     }
 
     void logNewRelation(Relationship relationship) {
+        if (relationship.relationshipType.system) {
+            return
+        }
         logChange(relationship.source,
             changedId: relationship.source.id,
             latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
@@ -195,6 +223,9 @@ class AuditService {
     }
 
     void logRelationRemoved(Relationship relationship) {
+        if (relationship.relationshipType.system) {
+            return
+        }
         logChange(relationship.source,
                 changedId: relationship.source.id,
                 latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
@@ -215,17 +246,26 @@ class AuditService {
         )
     }
 
-
     static String storeValue(Object object) {
+        Object toStore = objectToStore(object)
+        if (toStore == null) {
+            return null
+        }
+        new JSONBuilder().build {
+            toStore instanceof Map ? toStore : [value: toStore]
+        }.toString()
+    }
+
+    private static objectToStore(Object object) {
         if (object instanceof CatalogueElement) {
-            return object.modelCatalogueId
+            return CatalogueElementMarshallers.minimalCatalogueElementJSON(object)
+        } else if (object instanceof Enum) {
+            return object.toString()
+        } else if (object instanceof CharSequence) {
+            if (object.size() > 1950) {
+                return object.toString()[0..1950] + '...'
+            }
         }
-
-        String ret = object?.toString()
-
-        if (ret && ret.size() > 2000) {
-            return ret[0..2000]
-        }
-        return ret
+        return object
     }
 }

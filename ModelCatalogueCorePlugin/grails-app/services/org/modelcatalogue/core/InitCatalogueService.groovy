@@ -9,7 +9,7 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
-import org.modelcatalogue.core.util.test.FreshData
+import org.modelcatalogue.core.util.test.TestDataHelper
 
 @Transactional
 class InitCatalogueService {
@@ -25,7 +25,7 @@ class InitCatalogueService {
             initDefaultDataTypes(test)
         }
         if (test) {
-            FreshData.initFreshDb(sessionFactory, 'initCatalogue.sql', init)
+            TestDataHelper.initFreshDb(sessionFactory, 'initCatalogue.sql', init)
         } else {
             init()
         }
