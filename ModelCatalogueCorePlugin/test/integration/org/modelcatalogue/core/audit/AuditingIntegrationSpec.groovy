@@ -153,4 +153,70 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.newValue == null
     }
 
+    def "adding relationship is logged"() {
+        initCatalogueService.initDefaultRelationshipTypes()
+
+        DataType type = new DataType(name: 'DT4ANR').save(failOnError: true, flush: true)
+        DataType base = new DataType(name: 'DT4ANR').save(failOnError: true, flush: true)
+
+        type.addToIsBasedOn base
+
+        Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_CREATED)
+        Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_CREATED)
+
+
+        expect:
+        base in type.isBasedOn
+        type in base.isBaseFor
+
+        change1
+        change1.latestVersionId == type.id
+        change1.author   == null
+        change1.property == 'is based on'
+        change1.newValue == AuditService.storeValue(base)
+        change1.oldValue == null
+
+        change2
+        change2.latestVersionId == base.id
+        change2.author   == null
+        change2.property == 'is base for'
+        change2.newValue == AuditService.storeValue(base)
+        change2.oldValue == null
+    }
+
+    def "removing relationship is logged"() {
+        initCatalogueService.initDefaultRelationshipTypes()
+
+        DataType type = new DataType(name: 'DT4ANR').save(failOnError: true, flush: true)
+        DataType base = new DataType(name: 'DT4ANR').save(failOnError: true, flush: true)
+
+        type.addToIsBasedOn base
+        type.removeFromIsBasedOn base
+
+
+        Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_DELETED)
+        Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_DELETED)
+
+
+        expect:
+        !(base in type.isBasedOn)
+        !(type in base.isBaseFor)
+
+        change1
+        change1.latestVersionId == type.id
+        change1.author   == null
+        change1.property == 'is based on'
+        change1.newValue == AuditService.storeValue(base)
+        change1.oldValue == null
+
+        change2
+        change2.latestVersionId == base.id
+        change2.author   == null
+        change2.property == 'is base for'
+        change2.newValue == AuditService.storeValue(base)
+        change2.oldValue == null
+    }
+
+
+
 }

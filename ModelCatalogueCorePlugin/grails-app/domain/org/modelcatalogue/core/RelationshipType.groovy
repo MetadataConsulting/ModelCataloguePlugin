@@ -157,6 +157,10 @@ class RelationshipType {
         readByName("supersession")
     }
 
+    static getBaseType() {
+        readByName("base")
+    }
+
     static readByName(String name) {
         findByName(name, [readOnly: true])
     }

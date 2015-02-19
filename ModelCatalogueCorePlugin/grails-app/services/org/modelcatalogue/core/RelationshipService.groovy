@@ -12,6 +12,7 @@ class RelationshipService {
     static transactional = true
 
     def modelCatalogueSecurityService
+    def auditService
 
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
         if (!params.sort) {
@@ -85,6 +86,7 @@ class RelationshipService {
             }
 
             if (relationshipInstance && source && destination) {
+                auditService.logRelationRemoved(relationshipInstance)
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
                 relationshipInstance.classification = null

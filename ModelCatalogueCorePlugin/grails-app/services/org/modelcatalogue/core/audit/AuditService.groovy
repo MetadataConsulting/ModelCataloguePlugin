@@ -2,6 +2,7 @@ package org.modelcatalogue.core.audit
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ExtensionValue
+import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.FriendlyErrors
 
 class AuditService {
@@ -105,6 +106,48 @@ class AuditService {
             log.error "Exception writing audit log for $element", e
         }
 
+    }
+
+    void logNewRelation(Relationship relationship) {
+        logChange(relationship.source,
+            changedId: relationship.source.id,
+            latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: relationship.relationshipType.sourceToDestination,
+            newValue: storeValue(relationship.destination),
+            oldValue: storeValue(relationship.classification),
+            type: ChangeType.RELATIONSHIP_CREATED
+        )
+        logChange(relationship.destination,
+            changedId: relationship.destination.id,
+            latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
+            authorId: modelCatalogueSecurityService.currentUser?.id,
+            property: relationship.relationshipType.destinationToSource,
+            newValue: storeValue(relationship.source),
+            oldValue: storeValue(relationship.classification),
+            type: ChangeType.RELATIONSHIP_CREATED
+        )
+    }
+
+    void logRelationRemoved(Relationship relationship) {
+        logChange(relationship.source,
+                changedId: relationship.source.id,
+                latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
+                authorId: modelCatalogueSecurityService.currentUser?.id,
+                property: relationship.relationshipType.sourceToDestination,
+                newValue: storeValue(relationship.destination),
+                oldValue: storeValue(relationship.classification),
+                type: ChangeType.RELATIONSHIP_DELETED
+        )
+        logChange(relationship.destination,
+                changedId: relationship.destination.id,
+                latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
+                authorId: modelCatalogueSecurityService.currentUser?.id,
+                property: relationship.relationshipType.destinationToSource,
+                newValue: storeValue(relationship.source),
+                oldValue: storeValue(relationship.classification),
+                type: ChangeType.RELATIONSHIP_DELETED
+        )
     }
 
 

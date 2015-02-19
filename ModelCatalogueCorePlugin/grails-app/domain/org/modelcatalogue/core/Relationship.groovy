@@ -24,6 +24,8 @@ import org.modelcatalogue.core.util.ExtensionsWrapper
 
 class Relationship implements Extendible {
 
+    def auditService
+
     //WIP gormElasticSearch will support aliases in the future for now we will use searchable
 
     static searchable = {
@@ -125,6 +127,10 @@ class Relationship implements Extendible {
         } else {
             throw new IllegalArgumentException("Only instances of RelationshipMetadata are supported")
         }
+    }
+
+    void afterInsert() {
+        auditService.logNewRelation(this)
     }
 
 }
