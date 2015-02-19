@@ -135,7 +135,7 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
       return '' if not object
       return object.value if object.value
 
-      return """<a href=#{object.href()}}>#{object.classifiedName}</a>""" if object.instanceOf and object.instanceOf('catalogueElement')
+      return """<a href=#{object.href()}}><span class="#{object.getIcon()}"></span> #{object.name}</a>""" if object.isInstanceOf and object.isInstanceOf('catalogueElement')
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.audit.Change', [
     {header: "Type"       , value: "type" }

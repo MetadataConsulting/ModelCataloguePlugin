@@ -163,6 +163,8 @@ class AuditService {
                 if (ch) {
                     originalValue = ch.oldValue
                     ch.delete()
+                } else {
+                    originalValue = null
                 }
             }
 
