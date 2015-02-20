@@ -12,6 +12,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def elementService
     def initCatalogueService
     def sessionFactory
+    def auditService
 
     def "creation of new element is logged"() {
         when:
@@ -62,8 +63,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == vOne.id
         change.authorId == null
         change.property == 'status'
-        change.newValue == AuditService.storeValue(ElementStatus.FINALIZED)
-        change.oldValue == AuditService.storeValue(ElementStatus.DRAFT)
+        change.newValue == DefaultAuditor.storeValue(ElementStatus.FINALIZED)
+        change.oldValue == DefaultAuditor.storeValue(ElementStatus.DRAFT)
     }
 
     def "deprecation is logged"() {
@@ -81,8 +82,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == vOne.id
         change.authorId == null
         change.property == 'status'
-        change.newValue == AuditService.storeValue(ElementStatus.DEPRECATED)
-        change.oldValue == AuditService.storeValue(ElementStatus.DRAFT)
+        change.newValue == DefaultAuditor.storeValue(ElementStatus.DEPRECATED)
+        change.oldValue == DefaultAuditor.storeValue(ElementStatus.DRAFT)
     }
 
     def "valid updating property is logged"() {
@@ -102,8 +103,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.type == ChangeType.PROPERTY_CHANGED
         change.authorId == null
         change.property == 'description'
-        change.newValue == AuditService.storeValue(changed)
-        change.oldValue == AuditService.storeValue(original)
+        change.newValue == DefaultAuditor.storeValue(changed)
+        change.oldValue == DefaultAuditor.storeValue(original)
     }
 
     def "invalid updating property is not logged"() {
@@ -125,7 +126,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         when:
         DataType type = new DataType(name: "DT4CL").save(failOnError: true, flush: true)
 
-        String expectedOldValue = AuditService.storeValue(type)
+        String expectedOldValue = DefaultAuditor.storeValue(type)
 
         type.delete(flush: true)
         Change change = Change.findByChangedIdAndType(type.id, ChangeType.ELEMENT_DELETED)
@@ -153,7 +154,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == type.id
         change.authorId   == null
         change.property == 'foo'
-        change.newValue == AuditService.storeValue('bar')
+        change.newValue == DefaultAuditor.storeValue('bar')
         change.oldValue == null
 
     }
@@ -174,8 +175,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == type.id
         change.authorId   == null
         change.property == 'foo'
-        change.oldValue == AuditService.storeValue('bar')
-        change.newValue == AuditService.storeValue('boo')
+        change.oldValue == DefaultAuditor.storeValue('bar')
+        change.newValue == DefaultAuditor.storeValue('boo')
     }
 
     def "deleting metadata is logged"() {
@@ -197,7 +198,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == type.id
         change.authorId   == null
         change.property == 'foo'
-        change.oldValue == AuditService.storeValue('bar')
+        change.oldValue == DefaultAuditor.storeValue('bar')
         change.newValue == null
     }
 
@@ -221,14 +222,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.latestVersionId == type.id
         change1.authorId   == null
         change1.property == 'is based on'
-        change1.newValue == AuditService.storeValue(base)
+        change1.newValue == DefaultAuditor.storeValue(base)
         change1.oldValue == null
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for'
-        change2.newValue == AuditService.storeValue(type)
+        change2.newValue == DefaultAuditor.storeValue(type)
         change2.oldValue == null
     }
 
@@ -253,14 +254,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.latestVersionId == type.id
         change1.authorId   == null
         change1.property == 'is based on'
-        change1.newValue == AuditService.storeValue(base)
+        change1.newValue == DefaultAuditor.storeValue(base)
         change1.oldValue == null
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for'
-        change2.newValue == AuditService.storeValue(type)
+        change2.newValue == DefaultAuditor.storeValue(type)
         change2.oldValue == null
     }
 
@@ -283,14 +284,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.latestVersionId == type.id
         change1.authorId   == null
         change1.property == 'is based on [foo]'
-        change1.newValue == AuditService.storeValue('bar')
+        change1.newValue == DefaultAuditor.storeValue('bar')
         change1.oldValue == null
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for [foo]'
-        change2.newValue == AuditService.storeValue('bar')
+        change2.newValue == DefaultAuditor.storeValue('bar')
         change2.oldValue == null
     }
 
@@ -316,15 +317,15 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.latestVersionId == type.id
         change1.authorId   == null
         change1.property == 'is based on [foo]'
-        change1.newValue == AuditService.storeValue('baz')
-        change1.oldValue == AuditService.storeValue('bar')
+        change1.newValue == DefaultAuditor.storeValue('baz')
+        change1.oldValue == DefaultAuditor.storeValue('bar')
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for [foo]'
-        change2.newValue == AuditService.storeValue('baz')
-        change2.oldValue == AuditService.storeValue('bar')
+        change2.newValue == DefaultAuditor.storeValue('baz')
+        change2.oldValue == DefaultAuditor.storeValue('bar')
     }
 
     def "deleting relationship metadata is logged"() {
@@ -350,14 +351,14 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.authorId   == null
         change1.property == 'is based on [foo]'
         change1.newValue == null
-        change1.oldValue == AuditService.storeValue('bar')
+        change1.oldValue == DefaultAuditor.storeValue('bar')
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for [foo]'
         change2.newValue == null
-        change2.oldValue == AuditService.storeValue('bar')
+        change2.oldValue == DefaultAuditor.storeValue('bar')
     }
 
     def "creating draft is ignored as it is already logged as creating new version"() {
@@ -368,7 +369,15 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         expect:
         !Change.findByTypeAndChangedIdAndProperty(ChangeType.PROPERTY_CHANGED, type.id, 'status')
+    }
 
+    def "auditing can be disabled"() {
+        DataType type = AuditService.noAudit {
+             new DataType(name: 'DT4DSI', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+        }
+
+        expect:
+        !Change.findByTypeAndChangedId(ChangeType.NEW_ELEMENT_CREATED, type.id)
     }
 
 }
