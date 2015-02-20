@@ -163,11 +163,6 @@ class AuditService {
 
             ChangeType type = ChangeType.PROPERTY_CHANGED
 
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // WARNING: this piece of code is extremely fragile, for some reason any changes might trigger            //
-            // exception with collection not being flushed as soon as the ElementStatus.UPDATED is referenced here    //
-            // when value domain is finalized                                                                         //
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
             if (name == 'status') {
                 if (newValueRaw == ElementStatus.FINALIZED) {
                     type = ChangeType.ELEMENT_FINALIZED
@@ -177,7 +172,6 @@ class AuditService {
                     continue
                 }
             }
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             logChange(element,
                 changedId: element.id,
