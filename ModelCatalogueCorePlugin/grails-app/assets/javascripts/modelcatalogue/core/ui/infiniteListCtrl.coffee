@@ -27,7 +27,6 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
   getPropertiesForElement = (element) ->
     properties = []
-    console.log element
     if element and angular.isFunction(element.isInstanceOf)
       if element.isInstanceOf('catalogueElement') and not element.isInstanceOf('classification')
         properties.push label: 'Classifications', value: -> element.classifications
