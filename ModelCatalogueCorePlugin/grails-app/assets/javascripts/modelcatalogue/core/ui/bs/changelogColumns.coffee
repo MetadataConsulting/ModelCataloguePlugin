@@ -18,6 +18,7 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
       when 'RELATIONSHIP_METADATA_DELETED' then """<span title="Relationship Metadata Deleted"><span class="fa fa-list-ul fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
 
   getLinkTo = (element) ->
+    return "<code>null</code>" unless element
     return """<span class="text-muted"><span class="#{element.getIcon()}"></span> #{element.name} [#{element.versionNumber}]</span>""" if element.deleted
     return """<a href="#{element.href()}"><span class="#{element.getIcon()}"></span> #{element.name} [#{element.versionNumber}]</a>"""
 
@@ -48,7 +49,7 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
 
       when 'RELATIONSHIP_METADATA_CREATED' then """Relationship metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} created with value #{getValue(change.newValue)}"""
       when 'RELATIONSHIP_METADATA_UPDATED' then """Relationship metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} updated from value #{getValue(change.oldValue)} to #{getValue(change.newValue)}"""
-      when 'RELATIONSHIP_METADATA_DELETED' then """Deleted relationship metadata #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(change.newValue)}"""
+      when 'RELATIONSHIP_METADATA_DELETED' then """Deleted relationship metadata #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getValue(change.oldValue)}"""
 
 
 

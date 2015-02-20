@@ -86,7 +86,7 @@ class RelationshipService {
             }
 
             if (relationshipInstance && source && destination) {
-                auditService
+                auditService.logRelationRemoved(relationshipInstance)
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
                 relationshipInstance.classification = null

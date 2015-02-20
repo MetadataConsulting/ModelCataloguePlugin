@@ -61,9 +61,9 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.changedId == vOne.id
         change.latestVersionId == vOne.id
         change.authorId == null
-        change.property == null
-        change.newValue == null
-        change.oldValue == null
+        change.property == 'status'
+        change.newValue == AuditService.storeValue(ElementStatus.FINALIZED)
+        change.oldValue == AuditService.storeValue(ElementStatus.DRAFT)
     }
 
     def "deprecation is logged"() {
@@ -80,9 +80,9 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.changedId == vOne.id
         change.latestVersionId == vOne.id
         change.authorId == null
-        change.property == null
-        change.newValue == null
-        change.oldValue == null
+        change.property == 'status'
+        change.newValue == AuditService.storeValue(ElementStatus.DEPRECATED)
+        change.oldValue == AuditService.storeValue(ElementStatus.DRAFT)
     }
 
     def "valid updating property is logged"() {
@@ -240,7 +240,6 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         type.addToIsBasedOn base
         type.removeFromIsBasedOn base
-
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_DELETED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_DELETED)

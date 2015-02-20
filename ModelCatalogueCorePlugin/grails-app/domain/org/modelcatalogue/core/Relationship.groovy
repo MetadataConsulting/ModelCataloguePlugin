@@ -60,7 +60,9 @@ class Relationship implements Extendible {
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
-        this.ext.clear()
+        for (String key in this.ext.keySet() - ext.keySet()) {
+            this.ext.remove key
+        }
         this.ext.putAll(ext)
     }
 
