@@ -373,11 +373,24 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "auditing can be disabled"() {
         DataType type = AuditService.noAudit {
-             new DataType(name: 'DT4DSI', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+             new DataType(name: 'DT4DIS', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
 
         expect:
         !Change.findByTypeAndChangedId(ChangeType.NEW_ELEMENT_CREATED, type.id)
+    }
+
+    def "you can set default author id"() {
+        def defaultAuthorId = 1234567890
+        DataType type = AuditService.withDefaultAuthorId(defaultAuthorId) {
+            new DataType(name: 'DT4DA', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+        }
+
+        Change change = Change.findByTypeAndChangedId(ChangeType.NEW_ELEMENT_CREATED, type.id)
+
+        expect:
+        change
+        change.authorId == defaultAuthorId
     }
 
 }

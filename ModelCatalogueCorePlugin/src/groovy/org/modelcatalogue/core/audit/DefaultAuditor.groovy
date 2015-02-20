@@ -37,11 +37,13 @@ class DefaultAuditor implements Auditor {
         return object
     }
 
+    Long defaultAuthorId
+
     void logElementCreated(CatalogueElement element, Long authorId) {
         logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 type: element.latestVersionId && element.latestVersionId != element.id ? ChangeType.NEW_VERSION_CREATED : ChangeType.NEW_ELEMENT_CREATED
         )
     }
@@ -50,7 +52,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.element,
                 changedId: extension.element.id,
                 latestVersionId: extension.element.latestVersionId ?: extension.element.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: extension.name,
                 newValue: storeValue(extension.extensionValue),
                 type: ChangeType.METADATA_CREATED
@@ -61,7 +63,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.element,
                 changedId: extension.element.id,
                 latestVersionId: extension.element.latestVersionId ?: extension.element.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: extension.name,
                 oldValue: storeValue(extension.getPersistentValue('extensionValue')),
                 newValue: storeValue(extension.extensionValue),
@@ -76,7 +78,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.element,
                 changedId: extension.element.id,
                 latestVersionId: extension.element.latestVersionId ?: extension.element.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: extension.name,
                 oldValue: storeValue(extension.extensionValue),
                 type: ChangeType.METADATA_DELETED
@@ -90,7 +92,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.relationship.source,
                 changedId: extension.relationship.source.id,
                 latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
                 newValue: storeValue(extension.extensionValue),
                 type: ChangeType.RELATIONSHIP_METADATA_CREATED
@@ -98,7 +100,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.relationship.destination,
                 changedId: extension.relationship.destination.id,
                 latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
                 newValue: storeValue(extension.extensionValue),
                 type: ChangeType.RELATIONSHIP_METADATA_CREATED
@@ -112,7 +114,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.relationship.source,
                 changedId: extension.relationship.source.id,
                 latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
                 oldValue: storeValue(extension.getPersistentValue('extensionValue')),
                 newValue: storeValue(extension.extensionValue),
@@ -121,7 +123,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.relationship.destination,
                 changedId: extension.relationship.destination.id,
                 latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
                 oldValue: storeValue(extension.getPersistentValue('extensionValue')),
                 newValue: storeValue(extension.extensionValue),
@@ -136,7 +138,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.relationship.source,
                 changedId: extension.relationship.source.id,
                 latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
                 oldValue: storeValue(extension.extensionValue),
                 type: ChangeType.RELATIONSHIP_METADATA_DELETED
@@ -144,7 +146,7 @@ class DefaultAuditor implements Auditor {
         logChange(extension.relationship.destination,
                 changedId: extension.relationship.destination.id,
                 latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
                 oldValue: storeValue(extension.extensionValue),
                 type: ChangeType.RELATIONSHIP_METADATA_DELETED
@@ -155,7 +157,7 @@ class DefaultAuditor implements Auditor {
         logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 type: ChangeType.ELEMENT_DELETED,
                 oldValue: storeValue(element)
         )
@@ -187,7 +189,7 @@ class DefaultAuditor implements Auditor {
             logChange(element,
                     changedId: element.id,
                     latestVersionId: element.latestVersionId ?: element.id,
-                    authorId: authorId,
+                    authorId: authorId ?: defaultAuthorId,
                     type: type,
                     property: name,
                     oldValue: originalValue,
@@ -223,7 +225,7 @@ class DefaultAuditor implements Auditor {
         logChange(relationship.source,
                 changedId: relationship.source.id,
                 latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: relationship.relationshipType.sourceToDestination,
                 newValue: storeValue(relationship.destination),
                 oldValue: storeValue(relationship.classification),
@@ -232,7 +234,7 @@ class DefaultAuditor implements Auditor {
         logChange(relationship.destination,
                 changedId: relationship.destination.id,
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: relationship.relationshipType.destinationToSource,
                 newValue: storeValue(relationship.source),
                 oldValue: storeValue(relationship.classification),
@@ -247,7 +249,7 @@ class DefaultAuditor implements Auditor {
         logChange(relationship.source,
                 changedId: relationship.source.id,
                 latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: relationship.relationshipType.sourceToDestination,
                 newValue: storeValue(relationship.destination),
                 oldValue: storeValue(relationship.classification),
@@ -256,7 +258,7 @@ class DefaultAuditor implements Auditor {
         logChange(relationship.destination,
                 changedId: relationship.destination.id,
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
-                authorId: authorId,
+                authorId: authorId ?: defaultAuthorId,
                 property: relationship.relationshipType.destinationToSource,
                 newValue: storeValue(relationship.source),
                 oldValue: storeValue(relationship.classification),

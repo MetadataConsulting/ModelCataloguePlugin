@@ -7,6 +7,9 @@ import org.modelcatalogue.core.RelationshipMetadata
 
 interface Auditor {
 
+    Long getDefaultAuthorId()
+    void setDefaultAuthorId(Long id)
+
     void logElementCreated(CatalogueElement element, Long authorId)
     void logElementDeleted(CatalogueElement element, Long authorId)
     void logElementUpdated(CatalogueElement element, Long authorId)

@@ -18,8 +18,9 @@ class AuditService {
     }
 
     /**
-     * Allows to run block of code without logging any activity. This is supposed to be used when setting and reseting
-     * the UPDATED state and
+     * Allows to run block of code without logging any activity. This is supposed to be used when setting and resetting
+     * the UPDATED state and creating drafts.
+     *
      * @param noAuditBlock code to be executed without logging the changes
      * @return the value returned from the noAuditBlock
      */
@@ -28,6 +29,23 @@ class AuditService {
         auditor.set(NoOpAuditor.INSTANCE)
         R result = noAuditBlock()
         auditor.set(old)
+        return result
+    }
+
+
+    /**
+     * Allows to run block as given author if no author is available. This is supposed to be used to set the author
+     * for actions happening in separate thread.
+     * @param defaultAuthorId default author id to be used if no author is known
+     * @param withDefaultAuthorBlock code to be executed with default author
+     * @return the value returned from the withDefaultAuthor
+     */
+    static <R> R withDefaultAuthorId(Long defaultAuthorId, Closure<R> withDefaultAuthorBlock) {
+        Auditor auditor = auditor.get()
+        Long currentDefault = auditor.defaultAuthorId
+        auditor.defaultAuthorId = defaultAuthorId
+        R result = withDefaultAuthorBlock()
+        auditor.defaultAuthorId = currentDefault
         return result
     }
 

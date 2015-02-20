@@ -13,6 +13,10 @@ enum NoOpAuditor implements Auditor {
 
     INSTANCE;
 
+    @Override Long getDefaultAuthorId() { null }
+
+    @Override void setDefaultAuthorId(Long id) { }
+
     @Override void logElementCreated(CatalogueElement element, Long authorId) { }
 
     @Override void logElementDeleted(CatalogueElement element, Long authorId) { }

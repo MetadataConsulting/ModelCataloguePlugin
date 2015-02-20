@@ -1,9 +1,8 @@
 package org.modelcatalogue.core
 
-
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
-
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.xml.CatalogueXmlLoader
@@ -78,7 +77,7 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
             HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
-            executorService.submit {
+            executeInBackground {
                 try {
                     ExcelLoader parser = new ExcelLoader(inputStream)
                     def (headers, rows) = parser.parse()
@@ -96,8 +95,8 @@ class DataImportController  {
             def asset = storeAsset(params, file, 'application/xml')
             def id = asset.id
             InputStream inputStream = file.inputStream
-            HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
-            executorService.submit {
+            populateHeaders(request.JSON.headersMap ?: [:])
+            executeInBackground {
                 try {
                     CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
                     Collection<CatalogueElement> catElements = loader.load(inputStream)
@@ -116,7 +115,7 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             String name = params?.name
             String idpattern = params.idpattern
-            executorService.submit {
+            executeInBackground {
                 try {
                     Classification classification = OBOService.importOntology(inputStream, name, idpattern)
                     Asset updated = finalizeAsset(id)
@@ -135,7 +134,7 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
 
-            executorService.submit {
+            executeInBackground {
                 try {
                     Set<CatalogueElement> created = LoincImportService.serviceMethod(inputStream)
                     for (CatalogueElement element in created) {
@@ -158,7 +157,7 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
 
-            executorService.submit {
+            executeInBackground {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
                     for (CatalogueElement element in created) {
@@ -182,7 +181,7 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             String name = params?.name
 
-            executorService.submit {
+            executeInBackground {
                 try {
                     Classification classification = Classification.findByName(name)
                     if(!classification) classification =  new Classification(name: name).save(flush:true, failOnError:true)
@@ -296,7 +295,7 @@ class DataImportController  {
         Long id = asset.id
         Boolean createModelsForElements = params.boolean('createModelsForElements')
 
-        executorService.submit {
+        executeInBackground {
             Asset updated = Asset.get(id)
             try {
                 XsdLoader parserXSD = new XsdLoader(inputStream)
@@ -336,5 +335,10 @@ class DataImportController  {
         headersMap.classification = params.classification ?: "Classification"
         headersMap.metadata = params.metadata ?: "Metadata"
         return headersMap
+    }
+
+    protected executeInBackground(Closure code) {
+        Long userId = modelCatalogueSecurityService.currentUser?.id
+        executorService.submit { AuditService.withDefaultAuthorId(userId, code) }
     }
 }

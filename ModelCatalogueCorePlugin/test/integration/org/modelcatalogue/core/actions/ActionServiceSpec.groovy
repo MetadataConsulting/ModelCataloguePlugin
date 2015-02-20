@@ -1,30 +1,35 @@
 package org.modelcatalogue.core.actions
 
-import grails.test.mixin.Mock
+import grails.test.spock.IntegrationSpec
+import grails.util.Holders
 import org.modelcatalogue.core.util.ListWithTotalAndType
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory
-import spock.lang.Specification
 
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.FutureTask
 
-@Mock([Action, ActionDependency, ActionParameter, Batch])
-class ActionServiceSpec extends Specification {
+/**
+ * Created by ladin on 20.02.15.
+ */
+class ActionServiceSpec extends IntegrationSpec {
 
-    ActionService service = new ActionService()
+    ActionService service
     Batch batch
 
     def setup() {
-        service.autowireBeanFactory = Mock(AutowireCapableBeanFactory)
+        service = Holders.applicationContext.getBean(ActionService)
         batch = new Batch(name: "Test Batch").save(failOnError: true)
     }
 
     def "performing action does all necessary steps"() {
         def queue = []
         ExecutorService executorService = Mock(ExecutorService)
-        executorService.submit(_ as Runnable) >> { Runnable task -> queue.add task ; new FutureTask<ActionResult>({ new ActionResult(outcome: "BLAH", failed: false) })}
+        executorService.submit(_ as Runnable) >> { Runnable task ->
+            queue.add task; new FutureTask<ActionResult>({
+                new ActionResult(outcome: "BLAH", failed: false)
+            })
+        }
 
-        service.executorService =  executorService
+        service.executorService = executorService
 
 
         Action action = createAction()
@@ -41,7 +46,7 @@ class ActionServiceSpec extends Specification {
         action.state == ActionState.PERFORMING
 
         when:
-        for(task in queue) {
+        for (task in queue) {
             task.run()
         }
         action = Action.get(action.id)
@@ -68,7 +73,7 @@ class ActionServiceSpec extends Specification {
         dependant.state == ActionState.FAILED
     }
 
-    def "circular dependency fails the actions"(){
+    def "circular dependency fails the actions"() {
         setupExecutorServiceForImmediateExecution()
 
         Action one = createAction()
@@ -84,7 +89,7 @@ class ActionServiceSpec extends Specification {
 
         then:
         one.state == ActionState.FAILED
-        one.outcome == "Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\nCircular dependency found: 1 -> 3 -> 2 -> 1"
+        one.outcome == "Action failed because at least one of the dependencies failed. The error from the dependency follows:\n\nCircular dependency found: ${one.id} -> ${three.id} -> ${two.id} -> ${one.id}"
     }
 
     private void setupExecutorServiceForImmediateExecution() {
@@ -101,6 +106,7 @@ class ActionServiceSpec extends Specification {
     private Action createAction(Map<String, String> parameters = [test: 'ok']) {
         createAction(parameters, ActionState.PENDING)
     }
+
     private Action createAction(Map<String, String> parameters = [test: 'ok'], ActionState state) {
         Action action = new Action()
         action.state = state
@@ -238,10 +244,11 @@ class ActionServiceSpec extends Specification {
         when:
         Action third = service.create batch, TestActionRunner, two: 345, action: first
         Action fourth = service.create batch, TestActionRunner, two: 345, action: second
-        Action fifth = service.create batch, TestActionRunner, two: 345, action: service.create(batch, TestActionRunner, one: 56789)
+        Action dep4a5 = service.create(batch, TestActionRunner, one: 56789)
+        Action fifth = service.create batch, TestActionRunner, two: 345, action: dep4a5
 
         then:
-        third  == fourth
+        third == fourth
         fourth != fifth
     }
 

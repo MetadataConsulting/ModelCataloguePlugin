@@ -12,15 +12,7 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
     def initCatalogueService
 
-    def setup() {
-    }
-
-    def cleanup() {
-    }
-
-
     def "init default measurement units"() {
-        // just call once in the spec
         initCatalogueService.initCatalogue(true)
 
         when:
@@ -34,7 +26,6 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         dt3
 
     }
-
 
     def "init default relationship types"() {
 

@@ -9,6 +9,7 @@ import org.codehaus.groovy.grails.web.mime.MimeType
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -56,7 +57,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
         }
     }
 
-    private void renderDirectly(container, XLSXRowWriter writer, ServletRenderContext context) {
+    private static void renderDirectly(container, XLSXRowWriter writer, ServletRenderContext context) {
         context.setContentType(GrailsWebUtil.getContentType(XLSX.name, GrailsWebUtil.DEFAULT_ENCODING))
 
         String layoutFileName = getLayoutResourceFileName()
@@ -110,71 +111,75 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
         Long id = asset.id
 
+        Long authorId = modelCatalogueSecurityService.currentUser?.id
+
         executorService.submit {
-            try {
-                WebXlsxExporter exporter
-                if (layoutFileName) {
-                    exporter = new WebXlsxExporter(layoutFileName)
-                } else {
-                    exporter = new WebXlsxExporter()
-                }
+            AuditService.withDefaultAuthorId(authorId) {
+                try {
+                    WebXlsxExporter exporter
+                    if (layoutFileName) {
+                        exporter = new WebXlsxExporter(layoutFileName)
+                    } else {
+                        exporter = new WebXlsxExporter()
+                    }
 
-                exporter.setWorksheetName('Export')
+                    exporter.setWorksheetName('Export')
 
-                int counter = 0
+                    int counter = 0
 
-                List<Object> headers = writer.getHeaders()
+                    List<Object> headers = writer.getHeaders()
 
-                if (writer.appendingMetadata) {
-                    Map<String, Integer> headers2index = [:]
-                    List<List<Object>> rowsToWrite = [headers]
-                    for (item in container.items) {
-                        List<List<Object>> rows = writer.getRows(item)
-                        for (List<Object> row in rows) {
-                            List<Object> extendibleRow = row.withDefault { "" }
-                            if (item instanceof Extendible) {
-                                item.listExtensions().each {
-                                    Integer index = headers2index[it.name]
-                                    if (index == null) {
-                                        index = headers.size()
-                                        headers.add(it.name)
-                                        headers2index.put(it.name, index)
+                    if (writer.appendingMetadata) {
+                        Map<String, Integer> headers2index = [:]
+                        List<List<Object>> rowsToWrite = [headers]
+                        for (item in container.items) {
+                            List<List<Object>> rows = writer.getRows(item)
+                            for (List<Object> row in rows) {
+                                List<Object> extendibleRow = row.withDefault { "" }
+                                if (item instanceof Extendible) {
+                                    item.listExtensions().each {
+                                        Integer index = headers2index[it.name]
+                                        if (index == null) {
+                                            index = headers.size()
+                                            headers.add(it.name)
+                                            headers2index.put(it.name, index)
+                                        }
+                                        extendibleRow[index] = it.extensionValue
                                     }
-                                    extendibleRow[index] = it.extensionValue
                                 }
+                                rowsToWrite << extendibleRow
                             }
-                            rowsToWrite << extendibleRow
                         }
-                    }
 
-                    for (row in rowsToWrite) {
-                        exporter.fillRow(row, counter++)
-                    }
-                } else {
-                    if (headers) {
-                        exporter.fillRow(headers, counter++)
-                    }
-
-                    for (item in container.items) {
-                        List<List<Object>> rows = writer.getRows(item)
-                        for (List<Object> row in rows) {
+                        for (row in rowsToWrite) {
                             exporter.fillRow(row, counter++)
                         }
+                    } else {
+                        if (headers) {
+                            exporter.fillRow(headers, counter++)
+                        }
+
+                        for (item in container.items) {
+                            List<List<Object>> rows = writer.getRows(item)
+                            for (List<Object> row in rows) {
+                                exporter.fillRow(row, counter++)
+                            }
+                        }
                     }
+
+                    Asset updated = Asset.get(id)
+
+                    assetService.storeAssetWithSteam(updated, XLSX.name) {
+                        exporter.save(it)
+                    }
+
+                    updated.status = ElementStatus.FINALIZED
+                    updated.description = "Your export is ready. Use Download button to view it."
+                    updated.save(flush: true, failOnError: true)
+                } catch (e) {
+                    log.error "Exception of type ${e.class} exporting asset ${id}", e
+                    throw e
                 }
-
-                Asset updated = Asset.get(id)
-
-                assetService.storeAssetWithSteam(updated, XLSX.name) {
-                    exporter.save(it)
-                }
-
-                updated.status = ElementStatus.FINALIZED
-                updated.description = "Your export is ready. Use Download button to view it."
-                updated.save(flush: true, failOnError: true)
-            } catch (e) {
-                log.error "Exception of type ${e.class} exporting asset ${id}", e
-                throw e
             }
         }
 
