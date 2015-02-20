@@ -606,7 +606,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
         def classifications = objectToBind.classifications ?: []
-        for (classification in instance.classifications.findAll { !(it.id in classifications*.id) }) {
+        for (classification in instance.classifications.findAll { !(it.id in classifications.collect { it.id as Long }) }) {
             instance.removeFromClassifications classification
             classification.removeFromClassifies instance
         }
@@ -617,15 +617,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             }
             instance.addToClassifications classification
             classification.addToClassifies instance
-        }
-    }
-
-    @Override
-    protected checkAssociationsBeforeDelete(T instance) {
-        super.checkAssociationsBeforeDelete(instance)
-
-        if (instance.id == instance.latestVersionId) {
-            instance.errors.reject "cant.delete.latest", "You cannot delete the root element"
         }
     }
 

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', 'security', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, security) ->
   angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
 
   columnsDefined = $scope.columns?
@@ -27,6 +27,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
   getPropertiesForElement = (element) ->
     properties = []
+    console.log element
     if element and angular.isFunction(element.isInstanceOf)
       if element.isInstanceOf('catalogueElement') and not element.isInstanceOf('classification')
         properties.push label: 'Classifications', value: -> element.classifications
@@ -45,6 +46,14 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
 
         angular.forEach element.ext, (value, key) ->
           properties.push label: names.getNaturalName(key), value: -> value
+    if security.hasRole('ADMIN') and element and element.changed and element.latestVersion
+      properties.push label: 'Type', value: -> element.type
+      properties.push label: 'Changed Element', value: -> element.changed
+      properties.push label: 'Root Element', value: -> element.latestVersion
+      properties.push label: 'Author', value: -> element.author
+      properties.push label: 'Property', value: -> element.property
+      properties.push label: 'Old Value', value: -> if element.oldValue?.value then element.oldValue.value else element.oldValue
+      properties.push label: 'New Value', value: -> if element.newValue?.value then element.newValue.value else element.newValue
     properties
 
   getRowForElement = (element) ->
