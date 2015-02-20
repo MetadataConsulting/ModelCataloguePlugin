@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsProvider)->
+angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvider', 'names', (columnsProvider, names)->
 
 
   idNameAndDescription = -> [
@@ -128,21 +128,5 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: "Created"     , value: "dateCreated | date:'short'"   , classes: 'col-md-2', sort: {property: 'dateCreated', type: 'order'}}
     {header: "Message"     , value: 'message'                      , classes: 'col-md-7' }
   ]
-
-  valueOrName = (property) ->
-    (change) ->
-      object = change[property]
-      return '' if not object
-      return object.value if object.value
-
-      return """<a href=#{object.href()}}><span class="#{object.getIcon()}"></span> #{object.name}</a>""" if object.isInstanceOf and object.isInstanceOf('catalogueElement')
-
-  columnsProvider.registerColumns 'org.modelcatalogue.core.audit.Change', [
-    {header: "Type"       , value: "type" }
-    {header: "Property"   , value: "property" }
-    {header: "Old Value"  , value: valueOrName('oldValue') }
-    {header: "New Value"  , value: valueOrName('newValue') }
-  ]
-
 
 ]

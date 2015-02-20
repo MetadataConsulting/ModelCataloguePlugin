@@ -104,7 +104,7 @@ class ExtensionsWrapper implements Map<String, String> {
         if (existing) {
             String old = existing.extensionValue
             existing.extensionValue = value?.toString()
-            if (existing.save()) {
+            if (existing.save(flush: true)) {
                 return old
             }
         }

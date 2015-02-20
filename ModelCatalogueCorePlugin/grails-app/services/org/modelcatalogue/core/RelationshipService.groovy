@@ -86,7 +86,7 @@ class RelationshipService {
             }
 
             if (relationshipInstance && source && destination) {
-                auditService.logRelationRemoved(relationshipInstance)
+                auditService
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
                 relationshipInstance.classification = null
@@ -178,7 +178,7 @@ class RelationshipService {
 
         if (!other) {
             direction.setIndex(relationship, direction.getMinIndexAfter(owner, relationship.relationshipType, Long.MIN_VALUE) - INDEX_STEP)
-            return relationship.save()
+            return relationship.save(flush: true)
         }
 
         if (!direction.isOwnedBy(owner, relationship)) {
@@ -195,12 +195,12 @@ class RelationshipService {
 
         if (nextIndex == null) {
             direction.setIndex(relationship, direction.getIndex(other) + INDEX_STEP)
-            return relationship.save()
+            return relationship.save(flush: true)
         }
 
         if (nextIndex - direction.getIndex(other) > 1) {
             direction.setIndex(relationship, direction.getIndex(other) + Math.round((nextIndex.doubleValue() - direction.getIndex(other)) / 2))
-            return relationship.save()
+            return relationship.save(flush: true)
         }
 
         moveAfterWithRearrange(direction, owner, relationship, other)

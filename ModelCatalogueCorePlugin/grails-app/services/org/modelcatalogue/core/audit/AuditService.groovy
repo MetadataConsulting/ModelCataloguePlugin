@@ -11,7 +11,7 @@ class AuditService {
 
     static transactional = false
 
-    static List<String> IGNORED_PROPERTIES = ['password', 'version', 'outgoingRelationships', 'incomingRelationships', 'outgoingMappings', 'incomingMappings', 'latestVersionId']
+    static List<String> IGNORED_PROPERTIES = ['password', 'version', 'versionNumber', 'outgoingRelationships', 'incomingRelationships', 'outgoingMappings', 'incomingMappings', 'latestVersionId', 'extensions']
 
     def modelCatalogueSecurityService
 
@@ -41,7 +41,7 @@ class AuditService {
             latestVersionId: extension.element.latestVersionId ?: extension.element.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             property: extension.name,
-            newValue: extension.extensionValue,
+            newValue: storeValue(extension.extensionValue),
             type: ChangeType.METADATA_CREATED
         )
     }
@@ -52,8 +52,8 @@ class AuditService {
             latestVersionId: extension.element.latestVersionId ?: extension.element.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             property: extension.name,
-            oldValue: extension.getPersistentValue('extensionValue'),
-            newValue: extension.extensionValue,
+            oldValue: storeValue(extension.getPersistentValue('extensionValue')),
+            newValue: storeValue(extension.extensionValue),
             type: ChangeType.METADATA_UPDATED
         )
     }
@@ -67,7 +67,7 @@ class AuditService {
             latestVersionId: extension.element.latestVersionId ?: extension.element.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             property: extension.name,
-            oldValue: extension.extensionValue,
+            oldValue: storeValue(extension.extensionValue),
             type: ChangeType.METADATA_DELETED
         )
     }
@@ -81,7 +81,7 @@ class AuditService {
             latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
-            newValue: extension.extensionValue,
+            newValue: storeValue(extension.extensionValue),
             type: ChangeType.RELATIONSHIP_METADATA_CREATED
         )
         logChange(extension.relationship.destination,
@@ -89,7 +89,7 @@ class AuditService {
             latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
-            newValue: extension.extensionValue,
+            newValue: storeValue(extension.extensionValue),
             type: ChangeType.RELATIONSHIP_METADATA_CREATED
         )
     }
@@ -103,8 +103,8 @@ class AuditService {
             latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
-            oldValue: extension.getPersistentValue('extensionValue'),
-            newValue: extension.extensionValue,
+            oldValue: storeValue(extension.getPersistentValue('extensionValue')),
+            newValue: storeValue(extension.extensionValue),
             type: ChangeType.RELATIONSHIP_METADATA_UPDATED
         )
         logChange(extension.relationship.destination,
@@ -112,8 +112,8 @@ class AuditService {
             latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
-            oldValue: extension.getPersistentValue('extensionValue'),
-            newValue: extension.extensionValue,
+            oldValue: storeValue(extension.getPersistentValue('extensionValue')),
+            newValue: storeValue(extension.extensionValue),
             type: ChangeType.RELATIONSHIP_METADATA_UPDATED
         )
     }
@@ -127,7 +127,7 @@ class AuditService {
             latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
             property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
-            oldValue: extension.extensionValue,
+            oldValue: storeValue(extension.extensionValue),
             type: ChangeType.RELATIONSHIP_METADATA_DELETED
         )
         logChange(extension.relationship.destination,
@@ -135,7 +135,7 @@ class AuditService {
                 latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
                 authorId: modelCatalogueSecurityService.currentUser?.id,
                 property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
-                oldValue: extension.extensionValue,
+                oldValue: storeValue(extension.extensionValue),
                 type: ChangeType.RELATIONSHIP_METADATA_DELETED
         )
     }
@@ -145,7 +145,8 @@ class AuditService {
             changedId: element.id,
             latestVersionId: element.latestVersionId ?: element.id,
             authorId: modelCatalogueSecurityService.currentUser?.id,
-            type: ChangeType.ELEMENT_DELETED
+            type: ChangeType.ELEMENT_DELETED,
+            oldValue: storeValue(element)
         )
     }
 
@@ -155,24 +156,34 @@ class AuditService {
             if (name in IGNORED_PROPERTIES) {
                 continue
             }
-            def originalValue = storeValue(element.getPersistentValue(name))
-            def newValue = storeValue(element.getProperty(name))
 
-            if (name == 'status' && originalValue == storeValue(ElementStatus.UPDATED)) {
-                Change ch = Change.findByChangedIdAndPropertyAndTypeAndOldValueNotEqual(element.id, name, ChangeType.PROPERTY_CHANGED, storeValue(ElementStatus.UPDATED), [sort: 'dateCreated', order: 'desc'])
-                if (ch) {
-                    originalValue = ch.oldValue
-                    ch.delete()
+            def originalValue = storeValue(element.getPersistentValue(name))
+            def newValueRaw = element.getProperty(name)
+            def newValue = storeValue(newValueRaw)
+
+            ChangeType type = ChangeType.PROPERTY_CHANGED
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // WARNING: this piece of code is extremely fragile, for some reason any changes might trigger            //
+            // exception with collection not being flushed as soon as the ElementStatus.UPDATED is referenced here    //
+            // when value domain is finalized                                                                         //
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (name == 'status') {
+                if (newValueRaw == ElementStatus.FINALIZED) {
+                    type = ChangeType.ELEMENT_FINALIZED
+                } else if (newValueRaw == ElementStatus.DEPRECATED) {
+                    type = ChangeType.ELEMENT_DEPRECATED
                 } else {
-                    originalValue = null
+                    continue
                 }
             }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             logChange(element,
                 changedId: element.id,
                 latestVersionId: element.latestVersionId ?: element.id,
                 authorId: modelCatalogueSecurityService.currentUser?.id,
-                type: ChangeType.PROPERTY_CHANGED,
+                type: type,
                 property: name,
                 oldValue: originalValue,
                 newValue: newValue

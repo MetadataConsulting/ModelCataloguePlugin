@@ -1,8 +1,5 @@
 package org.modelcatalogue.core.audit
 
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.security.User
-
 class Change {
 
     Long latestVersionId
@@ -20,19 +17,18 @@ class Change {
 
     static constraints = {
         authorId nullable: true
-        property maxSize: 250, nullable: true
+        property maxSize: 255, nullable: true
         newValue maxSize: 2000, nullable: true
         oldValue maxSize: 2000, nullable: true
     }
 
     static mapping = {
+        table '`change`'
         version false
     }
 
-    static transients = ['changed', 'latestVersion']
-
-    CatalogueElement getChanged() { CatalogueElement.get(changedId) }
-    CatalogueElement getLatestVersion() { CatalogueElement.get(latestVersionId) }
-    User getAuthor() { authorId ? User.get(authorId) : null}
-
+    @Override
+    String toString() {
+        "Change[change: $changedId, latest: $latestVersionId, author: $authorId, type: $type, property: $property, newValue: $newValue, oldValue: $oldValue]"
+    }
 }

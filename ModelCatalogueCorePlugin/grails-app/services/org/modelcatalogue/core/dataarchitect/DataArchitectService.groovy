@@ -82,7 +82,7 @@ class DataArchitectService {
 
     def actionRelationshipList(Collection<Relationship> list){
         list.each { relationship ->
-            relationship.save()
+            relationship.save(flush: true)
         }
     }
 
@@ -356,7 +356,7 @@ class DataArchitectService {
                 }
             }
             batch.archived =  true
-            batch.save()
+            batch.save(flush: true)
         }
 
         Batch.findAllByNameIlike("Create Synonyms for Model '%'").each reset
@@ -381,7 +381,7 @@ class DataArchitectService {
                 }
             }
             renameBatch.archived = false
-            renameBatch.save()
+            renameBatch.save(flush: true)
         }
 
         elementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
@@ -395,7 +395,7 @@ class DataArchitectService {
                 }
             }
             batch.archived = false
-            batch.save()
+            batch.save(flush: true)
         }
 
         elementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
@@ -408,7 +408,7 @@ class DataArchitectService {
                 }
             }
             batch.archived = false
-            batch.save()
+            batch.save(flush: true)
         }
 
         elementService.findDuplicateModelsSuggestions().each { destId, sources ->
@@ -422,7 +422,7 @@ class DataArchitectService {
                 }
             }
             batch.archived = false
-            batch.save()
+            batch.save(flush: true)
         }
 
         elementService.findDuplicateModelsSuggestions().each { destId, sources ->
@@ -435,7 +435,7 @@ class DataArchitectService {
                 }
             }
             batch.archived = false
-            batch.save()
+            batch.save(flush: true)
         }
 
         elementService.findModelsToBeInlined().each { sourceId, destId ->
@@ -447,7 +447,7 @@ class DataArchitectService {
                 log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge model action", action.errors))
             }
             batch.archived = false
-            batch.save()
+            batch.save(flush: true)
         }
     }
 }

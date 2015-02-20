@@ -158,7 +158,7 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         destination.status = ElementStatus.UPDATED
-        destination.save()
+        destination.save(flush: true)
 
 
         for (Classification classification in new HashSet<Classification>(source.classifications)) {

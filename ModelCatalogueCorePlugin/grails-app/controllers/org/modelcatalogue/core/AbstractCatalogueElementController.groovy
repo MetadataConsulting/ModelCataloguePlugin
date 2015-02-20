@@ -570,6 +570,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     }
 
     def history(Integer max) {
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            notAuthorized()
+            return
+        }
         params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
@@ -613,6 +617,15 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             }
             instance.addToClassifications classification
             classification.addToClassifies instance
+        }
+    }
+
+    @Override
+    protected checkAssociationsBeforeDelete(T instance) {
+        super.checkAssociationsBeforeDelete(instance)
+
+        if (instance.id == instance.latestVersionId) {
+            instance.errors.reject "cant.delete.latest", "You cannot delete the root element"
         }
     }
 

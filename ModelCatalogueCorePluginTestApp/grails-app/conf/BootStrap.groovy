@@ -25,25 +25,15 @@ class BootStrap {
     XLSXListRenderer xlsxListRenderer
 
     def init = { servletContext ->
-        initCatalogueService.initCatalogue(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
-
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
-            TestDataHelper.runOnceAndPreserve(sessionFactory, 'initSecurity.sql') {
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                initCatalogueService.initCatalogue(true)
                 initSecurity()
+                setupStuff()
             }
         } else {
+            initCatalogueService.initCatalogue()
             initSecurity()
-        }
-
-        environments {
-            development {
-                setupStuff()
-
-            }
-            test {
-                setupStuff()
-            }
-
         }
     }
 
@@ -121,77 +111,75 @@ class BootStrap {
     }
 
     def setupStuff(){
-        TestDataHelper.runOnceAndPreserve(sessionFactory, 'setupStuff.sql') {
-            actionService.resetAllRunningActions()
-            try {
+        actionService.resetAllRunningActions()
+        try {
 
-                println 'Running post init job'
-                println 'Importing data'
-                importService.importData()
+            println 'Running post init job'
+            println 'Importing data'
+            importService.importData()
 
-                println 'Finalizing all published elements'
-                CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
-                    if (it instanceof Model) {
-                        elementService.finalizeElement(it)
-                    } else {
-                        it.status = ElementStatus.FINALIZED
-                        it.save failOnError: true
-                    }
+            println 'Finalizing all published elements'
+            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
+                if (it instanceof Model) {
+                    elementService.finalizeElement(it)
+                } else {
+                    it.status = ElementStatus.FINALIZED
+                    it.save failOnError: true
                 }
-
-
-                println "Creating some actions"
-                Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
-
-                15.times {
-                    Action action
-                    if (it == 7) {
-                        action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: Model.name)
-                    } else if (it == 4) {
-                        action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: Model.name)
-                    } else {
-                        action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
-                    }
-                    if (it % 3 == 0) {
-                        actionService.dismiss(action)
-                    }
-                }
-
-                assert !actionService.create(batch, TestAction, fail: true).hasErrors()
-                assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
-                assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
-                assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
-
-
-                Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
-                if (createRelationshipAction.hasErrors()) {
-                    println(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
-                    throw new AssertionError("Failed to create relationship actions!")
-                }
-
-                setupSimpleCsvTransformation()
-
-                // for generate suggestion test
-                catalogueBuilder.build {
-                    automatic dataType
-
-                    classification(name: 'Test 1') {
-                        dataElement(name: 'Test Element 1') {
-                            valueDomain(name: 'Same Name')
-                        }
-                    }
-
-                    classification(name: 'Test 2') {
-                        dataElement(name: 'Test Element 2') {
-                            valueDomain(name: 'Same Name')
-                        }
-                    }
-
-                }
-                println "Init finished in ${new Date()}"
-            } catch (e) {
-                e.printStackTrace()
             }
+
+
+            println "Creating some actions"
+            Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
+
+            15.times {
+                Action action
+                if (it == 7) {
+                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: Model.name)
+                } else if (it == 4) {
+                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: Model.name)
+                } else {
+                    action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
+                }
+                if (it % 3 == 0) {
+                    actionService.dismiss(action)
+                }
+            }
+
+            assert !actionService.create(batch, TestAction, fail: true).hasErrors()
+            assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
+            assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
+            assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
+
+
+            Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
+            if (createRelationshipAction.hasErrors()) {
+                println(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
+                throw new AssertionError("Failed to create relationship actions!")
+            }
+
+            setupSimpleCsvTransformation()
+
+            // for generate suggestion test
+            catalogueBuilder.build {
+                automatic dataType
+
+                classification(name: 'Test 1') {
+                    dataElement(name: 'Test Element 1') {
+                        valueDomain(name: 'Same Name')
+                    }
+                }
+
+                classification(name: 'Test 2') {
+                    dataElement(name: 'Test Element 2') {
+                        valueDomain(name: 'Same Name')
+                    }
+                }
+
+            }
+            println "Init finished in ${new Date()}"
+        } catch (e) {
+            e.printStackTrace()
         }
     }
 

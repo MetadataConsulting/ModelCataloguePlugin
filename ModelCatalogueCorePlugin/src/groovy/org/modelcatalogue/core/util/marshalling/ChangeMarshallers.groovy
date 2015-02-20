@@ -1,7 +1,9 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.JSON
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.audit.Change
+import org.modelcatalogue.core.audit.ChangeType
 
 class ChangeMarshallers extends AbstractMarshallers {
 
@@ -12,10 +14,10 @@ class ChangeMarshallers extends AbstractMarshallers {
     protected Map<String, Object> prepareJsonMap(change) {
         if (!change) return [:]
         [
-                changed:        CatalogueElementMarshallers.minimalCatalogueElementJSON(change.changed),
-                latestVersion:  CatalogueElementMarshallers.minimalCatalogueElementJSON(change.latestVersion),
+                changed:        getPotentiallyDeletedInfo(change.changedId),
+                latestVersion:  getPotentiallyDeletedInfo(change.latestVersionId),
                 type:           change.type.toString(),
-                author:         CatalogueElementMarshallers.minimalCatalogueElementJSON(change.author),
+                author:         getPotentiallyDeletedInfo(change.authorId),
                 dateCreated:    change.dateCreated,
                 property:       change.property,
                 oldValue:       change.oldValue != null ? JSON.parse(change.oldValue as String) : null,
@@ -23,4 +25,20 @@ class ChangeMarshallers extends AbstractMarshallers {
         ]
     }
 
+    private static getPotentiallyDeletedInfo(Long id) {
+        CatalogueElement existing = CatalogueElement.get(id)
+        if (existing) {
+            return CatalogueElementMarshallers.minimalCatalogueElementJSON(existing)
+        }
+
+        Change change = Change.findByChangedIdAndType(id, ChangeType.ELEMENT_DELETED)
+
+        if (change) {
+            def deleted = JSON.parse(change.oldValue as String)
+            deleted.deleted = true
+            return deleted
+        }
+
+        return null
+    }
 }
