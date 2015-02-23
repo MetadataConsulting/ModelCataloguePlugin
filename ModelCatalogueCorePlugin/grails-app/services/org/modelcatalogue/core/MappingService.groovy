@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 
 class MappingService {
 
+    def auditService
+
     static transactional = true
 
     Mapping map(CatalogueElement source, CatalogueElement destination, String mapping) {
@@ -39,6 +41,9 @@ class MappingService {
     Mapping unmap(CatalogueElement source, CatalogueElement destination) {
         Mapping old = Mapping.findBySourceAndDestination(source, destination)
         if (!old) return null
+
+        auditService.logMappingDeleted(old)
+
         source.removeFromOutgoingMappings(old)
         destination.removeFromIncomingMappings(old)
         old.delete(flush: true)

@@ -23,8 +23,8 @@ class Change {
     static constraints = {
         authorId nullable: true
         property maxSize: 255, nullable: true
-        newValue maxSize: 2000, nullable: true
-        oldValue maxSize: 2000, nullable: true
+        newValue maxSize: 15000, nullable: true
+        oldValue maxSize: 15000, nullable: true
     }
 
     static mapping = {

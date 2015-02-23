@@ -1,10 +1,7 @@
 package org.modelcatalogue.core.audit
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.ElementStatus
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
 
 class AuditingIntegrationSpec extends IntegrationSpec {
@@ -12,7 +9,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def elementService
     def initCatalogueService
     def sessionFactory
-    def auditService
+    def mappingService
 
     def "creation of new element is logged"() {
         when:
@@ -391,6 +388,96 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         expect:
         change
         change.authorId == defaultAuthorId
+    }
+
+    def "creating mapping is logged"() {
+        DataType type = new DataType(name: 'DT4ANM ONE').save(failOnError: true, flush: true)
+        DataType base = new DataType(name: 'DT4ANM TWO').save(failOnError: true, flush: true)
+
+        Mapping mapping = mappingService.map(type, base, "x / 2")
+
+        Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.MAPPING_CREATED)
+        Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.MAPPING_CREATED)
+
+
+        expect:
+        mapping.errors.errorCount == 0
+
+        change1
+        change1.latestVersionId == type.id
+        change1.authorId == null
+        change1.newValue == DefaultAuditor.storeValue(mapping)
+        change1.oldValue == null
+        !change1.otherSide
+
+        change2
+        change2.latestVersionId == base.id
+        change2.authorId == null
+        change2.newValue == DefaultAuditor.storeValue(mapping)
+        change2.oldValue == null
+        change2.otherSide
+    }
+
+    def "deleting mapping is logged"() {
+        DataType type = new DataType(name: 'DT4RM ONE').save(failOnError: true, flush: true)
+        DataType base = new DataType(name: 'DT4RM TWO').save(failOnError: true, flush: true)
+
+        Mapping mapping = mappingService.map(type, base, "x / 2")
+        String mappingVal = DefaultAuditor.storeValue(mapping)
+        mappingService.unmap(type, base)
+
+        Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.MAPPING_DELETED)
+        Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.MAPPING_DELETED)
+
+        expect:
+        change1
+        change1.latestVersionId == type.id
+        change1.authorId == null
+        change1.newValue == null
+        change1.oldValue == mappingVal
+        !change1.otherSide
+
+        change2
+        change2.latestVersionId == base.id
+        change2.authorId == null
+        change2.newValue == null
+        change2.oldValue == mappingVal
+        change2.otherSide
+    }
+
+
+    def "updating mapping is logged"() {
+        DataType type = new DataType(name: 'DT4UM ONE').save(failOnError: true, flush: true)
+        DataType base = new DataType(name: 'DT4UM TWO').save(failOnError: true, flush: true)
+
+        Mapping mapping = mappingService.map(type, base, "x / 2")
+
+        String oldVal = DefaultAuditor.storeValue(mapping.mapping)
+
+        mapping.mapping = "x / 3"
+        mapping.save(flush: true, failOnError: true)
+
+
+
+        Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.MAPPING_UPDATED)
+        Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.MAPPING_UPDATED)
+
+        expect:
+        mapping.errors.errorCount == 0
+
+        change1
+        change1.latestVersionId == type.id
+        change1.authorId == null
+        change1.newValue == DefaultAuditor.storeValue(mapping)
+        change1.oldValue == oldVal
+        !change1.otherSide
+
+        change2
+        change2.latestVersionId == base.id
+        change2.authorId == null
+        change2.newValue == DefaultAuditor.storeValue(mapping)
+        change2.oldValue == oldVal
+        change2.otherSide
     }
 
 }

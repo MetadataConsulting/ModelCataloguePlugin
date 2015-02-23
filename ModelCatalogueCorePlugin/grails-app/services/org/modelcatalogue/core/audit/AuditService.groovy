@@ -1,9 +1,6 @@
 package org.modelcatalogue.core.audit
 
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipMetadata
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
@@ -73,10 +70,6 @@ class AuditService {
         }
     }
 
-    void logElementCreated(CatalogueElement element) {
-        auditor.get().logElementCreated(element, modelCatalogueSecurityService.currentUser?.id)
-    }
-
     void logNewMetadata(ExtensionValue extension) {
         auditor.get().logNewMetadata(extension, modelCatalogueSecurityService.currentUser?.id)
     }
@@ -101,12 +94,28 @@ class AuditService {
         auditor.get().logRelationshipMetadataDeleted(extension, modelCatalogueSecurityService.currentUser?.id)
     }
 
+    void logElementCreated(CatalogueElement element) {
+        auditor.get().logElementCreated(element, modelCatalogueSecurityService.currentUser?.id)
+    }
+
     void logElementDeleted(CatalogueElement element) {
         auditor.get().logElementDeleted(element, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logElementUpdated(CatalogueElement element) {
         auditor.get().logElementUpdated(element, modelCatalogueSecurityService.currentUser?.id)
+    }
+
+    void logMappingCreated(Mapping mapping) {
+        auditor.get().logMappingCreated(mapping, modelCatalogueSecurityService.currentUser?.id)
+    }
+
+    void logMappingDeleted(Mapping mapping) {
+        auditor.get().logMappingDeleted(mapping, modelCatalogueSecurityService.currentUser?.id)
+    }
+
+    void logMappingUpdated(Mapping mapping) {
+        auditor.get().logMappingUpdated(mapping, modelCatalogueSecurityService.currentUser?.id)
     }
 
     void logNewRelation(Relationship relationship) {

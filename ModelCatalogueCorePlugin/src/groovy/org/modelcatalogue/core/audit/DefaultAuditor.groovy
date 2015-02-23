@@ -27,6 +27,12 @@ class DefaultAuditor implements Auditor {
     private static objectToStore(Object object) {
         if (object instanceof CatalogueElement) {
             return CatalogueElementMarshallers.minimalCatalogueElementJSON(object)
+        } else if (object instanceof Mapping) {
+            return [
+                source: CatalogueElementMarshallers.minimalCatalogueElementJSON(object.source),
+                destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(object.destination),
+                mapping: object.mapping
+            ]
         } else if (object instanceof Enum) {
             return object.toString()
         } else if (object instanceof CharSequence) {
@@ -167,7 +173,6 @@ class DefaultAuditor implements Auditor {
     }
 
     void logElementUpdated(CatalogueElement element, Long authorId) {
-        // TODO: changes in statuses might have to be handled differently
         for (String name in element.dirtyPropertyNames) {
             if (name in IGNORED_PROPERTIES) {
                 continue
@@ -199,6 +204,65 @@ class DefaultAuditor implements Auditor {
                     newValue: newValue
             )
         }
+    }
+
+    @Override
+    void logMappingCreated(Mapping mapping, Long authorId) {
+        logChange(mapping.source,
+                changedId: mapping.source.id,
+                latestVersionId: mapping.source.latestVersionId ?: mapping.source.id,
+                authorId: authorId ?: defaultAuthorId,
+                newValue: storeValue(mapping),
+                type: ChangeType.MAPPING_CREATED
+        )
+        logChange(mapping.destination,
+                changedId: mapping.destination.id,
+                latestVersionId: mapping.destination.latestVersionId ?: mapping.destination.id,
+                authorId: authorId ?: defaultAuthorId,
+                newValue: storeValue(mapping),
+                type: ChangeType.MAPPING_CREATED,
+                otherSide: true
+        )
+    }
+
+    @Override
+    void logMappingDeleted(Mapping mapping, Long authorId) {
+        logChange(mapping.source,
+                changedId: mapping.source.id,
+                latestVersionId: mapping.source.latestVersionId ?: mapping.source.id,
+                authorId: authorId ?: defaultAuthorId,
+                oldValue: storeValue(mapping),
+                type: ChangeType.MAPPING_DELETED
+        )
+        logChange(mapping.destination,
+                changedId: mapping.destination.id,
+                latestVersionId: mapping.destination.latestVersionId ?: mapping.destination.id,
+                authorId: authorId ?: defaultAuthorId,
+                oldValue: storeValue(mapping),
+                type: ChangeType.MAPPING_DELETED,
+                otherSide: true
+        )
+    }
+
+    @Override
+    void logMappingUpdated(Mapping mapping, Long authorId) {
+        logChange(mapping.source,
+                changedId: mapping.source.id,
+                latestVersionId: mapping.source.latestVersionId ?: mapping.source.id,
+                authorId: authorId ?: defaultAuthorId,
+                oldValue: storeValue(mapping.getPersistentValue('mapping')),
+                newValue: storeValue(mapping),
+                type: ChangeType.MAPPING_UPDATED
+        )
+        logChange(mapping.destination,
+                changedId: mapping.destination.id,
+                latestVersionId: mapping.destination.latestVersionId ?: mapping.destination.id,
+                authorId: authorId ?: defaultAuthorId,
+                oldValue: storeValue(mapping.getPersistentValue('mapping')),
+                newValue: storeValue(mapping),
+                type: ChangeType.MAPPING_UPDATED,
+                otherSide: true
+        )    
     }
 
     static void logChange(Map <String, Object> changeProps, CatalogueElement element) {

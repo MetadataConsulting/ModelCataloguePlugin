@@ -6,6 +6,8 @@ import org.springframework.validation.Errors
 
 class Mapping {
 
+    def auditService
+
     // placeholder for situation where no mapping is expected
     // do not save of modify this value
     // static final Mapping DIRECT_MAPPING = new Mapping(mapping: 'x')
@@ -77,4 +79,11 @@ class Mapping {
         }
     }
 
+    void beforeUpdate() {
+        auditService.logMappingUpdated(this)
+    }
+
+    void afterInsert() {
+        auditService.logMappingCreated(this)
+    }
 }

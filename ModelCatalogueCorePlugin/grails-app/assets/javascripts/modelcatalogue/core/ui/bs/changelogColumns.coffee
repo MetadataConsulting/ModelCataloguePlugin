@@ -11,6 +11,9 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
       when 'METADATA_CREATED' then """<span title="Metadata Created"><span class="fa fa-th-list fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
       when 'METADATA_UPDATED' then """<span title="Metadata Updated"><span class="fa fa-th-list fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
       when 'METADATA_DELETED' then """<span title="Metadata Deleted"><span class="fa fa-th-list fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
+      when 'MAPPING_CREATED' then """<span title="Mapping Created"><span class="fa fa-superscript fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
+      when 'MAPPING_UPDATED' then """<span title="Mapping Updated"><span class="fa fa-superscript fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
+      when 'MAPPING_DELETED' then """<span title="Mapping Deleted"><span class="fa fa-superscript fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
       when 'RELATIONSHIP_CREATED' then """<span title="Relationship Created"><span class="fa fa-link fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
       when 'RELATIONSHIP_DELETED' then """<span title="Relationship Deleted"><span class="fa fa-link fa-fw text-danger"></span> <span class="fa fa-remove fa-fw text-danger"></span></span>"""
       when 'RELATIONSHIP_METADATA_CREATED' then """<span title="Relationship Metadata Created"><span class="fa fa-list-ul fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
@@ -24,6 +27,7 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
 
   getValue = (value) ->
     return "<code>null</code>" unless value
+    return """<pre>#{value}</pre>""" if angular.isString(value)
     return """<pre>#{value.value}</pre>""" if value.value
     return getLinkTo(value) if value.isInstanceOf and value.isInstanceOf('catalogueElement')
 
@@ -44,6 +48,9 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
       when 'METADATA_CREATED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} created with value #{getValue(change.newValue)}"""
       when 'METADATA_UPDATED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} updated from value #{getValue(change.oldValue)} to #{getValue(change.newValue)}"""
       when 'METADATA_DELETED' then """Metadata <code>#{change.property}</code> of #{getLinkTo(change.changed)} deleted value #{getValue(change.oldValue)}"""
+      when 'MAPPING_CREATED' then """Mapped #{getLinkTo(change.newValue.source)} to #{getLinkTo(change.newValue.destination)} with rule #{getValue(change.newValue.mapping)}"""
+      when 'MAPPING_UPDATED' then """Changed mapping from #{getLinkTo(change.newValue.source)} to #{getLinkTo(change.newValue.destination)} from #{getValue(change.oldValue)} to #{getValue(change.newValue.mapping)} """
+      when 'MAPPING_DELETED' then """Removed mapping from #{getLinkTo(change.oldValue.source)} to #{getLinkTo(change.oldValue.destination)} with rule #{getValue(change.oldValue.mapping)}"""
       when 'RELATIONSHIP_CREATED' then """Created relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(change.newValue)}"""
       when 'RELATIONSHIP_DELETED' then """Deleted relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(change.newValue)}"""
 

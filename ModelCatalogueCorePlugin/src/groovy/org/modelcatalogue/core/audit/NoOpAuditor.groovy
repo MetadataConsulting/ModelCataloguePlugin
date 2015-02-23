@@ -1,9 +1,6 @@
 package org.modelcatalogue.core.audit
 
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipMetadata
+import org.modelcatalogue.core.*
 
 /**
  * Auditor for the situation we want to disable auditing such as restoring element state.
@@ -23,6 +20,12 @@ enum NoOpAuditor implements Auditor {
 
     @Override void logElementUpdated(CatalogueElement element, Long authorId) { }
 
+    @Override void logMappingCreated(Mapping mapping, Long authorId) { }
+
+    @Override void logMappingDeleted(Mapping mapping, Long authorId) { }
+
+    @Override void logMappingUpdated(Mapping mapping, Long authorId) { }
+
     @Override void logNewMetadata(ExtensionValue extension, Long authorId) { }
 
     @Override void logMetadataUpdated(ExtensionValue extension, Long authorId) { }
@@ -38,4 +41,6 @@ enum NoOpAuditor implements Auditor {
     @Override void logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) { }
 
     @Override void logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) { }
+
+
 }

@@ -1,9 +1,6 @@
 package org.modelcatalogue.core.audit
 
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipMetadata
+import org.modelcatalogue.core.*
 
 interface Auditor {
 
@@ -13,6 +10,10 @@ interface Auditor {
     void logElementCreated(CatalogueElement element, Long authorId)
     void logElementDeleted(CatalogueElement element, Long authorId)
     void logElementUpdated(CatalogueElement element, Long authorId)
+
+    void logMappingCreated(Mapping mapping, Long authorId)
+    void logMappingDeleted(Mapping mapping, Long authorId)
+    void logMappingUpdated(Mapping mapping, Long authorId)
 
     void logNewMetadata(ExtensionValue extension, Long authorId)
     void logMetadataUpdated(ExtensionValue extension, Long authorId)
