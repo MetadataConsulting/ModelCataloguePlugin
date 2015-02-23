@@ -4,6 +4,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ExtensionValue
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipMetadata
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 
@@ -47,6 +48,18 @@ class AuditService {
         R result = withDefaultAuthorBlock()
         auditor.defaultAuthorId = currentDefault
         return result
+    }
+
+    ListWithTotalAndType<Change> getChangesForUser(Map params, User user) {
+        long authorId = user.id
+        if (!params.sort) {
+            params.sort  = 'dateCreated'
+            params.order = 'desc'
+        }
+        Lists.fromCriteria(params, Change) {
+            eq 'authorId', authorId
+            ne 'otherSide', Boolean.TRUE
+        }
     }
 
     ListWithTotalAndType<Change> getChanges(Map params, CatalogueElement element) {

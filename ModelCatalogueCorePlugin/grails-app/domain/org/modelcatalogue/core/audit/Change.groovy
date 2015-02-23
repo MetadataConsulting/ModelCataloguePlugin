@@ -15,6 +15,11 @@ class Change {
 
     Date dateCreated
 
+    /**
+     * Other side changes don't appear in user, classification or global feeds
+     */
+    Boolean otherSide = Boolean.FALSE
+
     static constraints = {
         authorId nullable: true
         property maxSize: 255, nullable: true

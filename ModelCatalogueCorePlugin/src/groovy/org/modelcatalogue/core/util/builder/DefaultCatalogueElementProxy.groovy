@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.builder
 
-import grails.util.Holders
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 
@@ -280,7 +279,6 @@ import org.modelcatalogue.core.*
 
     @Override
     Set<Relationship> resolveRelationships() {
-        Holders.applicationContext.getBean('sessionFactory').currentSession?.flush()
         relationships.collect { RelationshipProxy it ->
             it.resolve()
         }

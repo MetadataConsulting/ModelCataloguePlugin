@@ -137,8 +137,9 @@ class DataImportController  {
             executeInBackground {
                 try {
                     Set<CatalogueElement> created = LoincImportService.serviceMethod(inputStream)
+                    Asset theAsset = Asset.get(id)
                     for (CatalogueElement element in created) {
-                        asset.addToRelatedTo(element)
+                        theAsset.addToRelatedTo(element)
                     }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
@@ -160,8 +161,9 @@ class DataImportController  {
             executeInBackground {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
+                    Asset theAsset = Asset.get(id)
                     for (CatalogueElement element in created) {
-                        asset.addToRelatedTo(element)
+                        theAsset.addToRelatedTo(element)
                     }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification

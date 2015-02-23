@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.converters.JSON
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
 class UserController extends AbstractCatalogueElementController<User> {
@@ -35,6 +36,17 @@ class UserController extends AbstractCatalogueElementController<User> {
         user.save(flush: true)
 
         redirect controller: 'user', action: 'current'
+    }
+
+    def activity(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        User element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond Lists.wrap(params, "/${resourceName}/${params.id}/activity", auditService.getChangesForUser(params, element))
     }
 
     def current() {

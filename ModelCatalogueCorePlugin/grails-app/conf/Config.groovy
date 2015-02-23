@@ -13,6 +13,7 @@ log4j = {
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
     debug 'org.modelcatalogue.core.util.builder'
     debug 'org.modelcatalogue.core.publishing'
+    debug 'org.modelcatalogue.core.util.test'
 
     warn 'org.modelcatalogue.core.xml'
     info 'org.modelcatalogue.core.RelationshipType'

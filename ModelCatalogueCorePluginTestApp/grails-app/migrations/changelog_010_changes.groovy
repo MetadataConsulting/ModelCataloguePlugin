@@ -31,12 +31,16 @@ databaseChangeLog = {
                 constraints(nullable: "true")
             }
 
+            column(name: "other_side", type: "BIT") {
+                constraints(nullable: "true")
+            }
+
             column(name: "type", type: "VARCHAR(255)") {
                 constraints(nullable: "false")
             }
 
-            column(name: "newValue", type: "LONGTEXT")
-            column(name: "oldValue", type: "LONGTEXT")
+            column(name: "new_value", type: "LONGTEXT")
+            column(name: "old_value", type: "LONGTEXT")
         }
     }
 

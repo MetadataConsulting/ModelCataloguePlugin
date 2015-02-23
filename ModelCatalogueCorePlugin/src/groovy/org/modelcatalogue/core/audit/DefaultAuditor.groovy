@@ -103,7 +103,8 @@ class DefaultAuditor implements Auditor {
                 authorId: authorId ?: defaultAuthorId,
                 property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
                 newValue: storeValue(extension.extensionValue),
-                type: ChangeType.RELATIONSHIP_METADATA_CREATED
+                type: ChangeType.RELATIONSHIP_METADATA_CREATED,
+                otherSide: true
         )
     }
 
@@ -127,7 +128,8 @@ class DefaultAuditor implements Auditor {
                 property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
                 oldValue: storeValue(extension.getPersistentValue('extensionValue')),
                 newValue: storeValue(extension.extensionValue),
-                type: ChangeType.RELATIONSHIP_METADATA_UPDATED
+                type: ChangeType.RELATIONSHIP_METADATA_UPDATED,
+                otherSide: true
         )
     }
 
@@ -149,7 +151,8 @@ class DefaultAuditor implements Auditor {
                 authorId: authorId ?: defaultAuthorId,
                 property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
                 oldValue: storeValue(extension.extensionValue),
-                type: ChangeType.RELATIONSHIP_METADATA_DELETED
+                type: ChangeType.RELATIONSHIP_METADATA_DELETED,
+                otherSide: true
         )
     }
 
@@ -238,7 +241,8 @@ class DefaultAuditor implements Auditor {
                 property: relationship.relationshipType.destinationToSource,
                 newValue: storeValue(relationship.source),
                 oldValue: storeValue(relationship.classification),
-                type: ChangeType.RELATIONSHIP_CREATED
+                type: ChangeType.RELATIONSHIP_CREATED,
+                otherSide: true
         )
     }
 
@@ -262,7 +266,8 @@ class DefaultAuditor implements Auditor {
                 property: relationship.relationshipType.destinationToSource,
                 newValue: storeValue(relationship.source),
                 oldValue: storeValue(relationship.classification),
-                type: ChangeType.RELATIONSHIP_DELETED
+                type: ChangeType.RELATIONSHIP_DELETED,
+                otherSide: true
         )
     }
 }
