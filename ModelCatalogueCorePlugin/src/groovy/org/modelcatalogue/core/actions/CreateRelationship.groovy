@@ -2,7 +2,6 @@ package org.modelcatalogue.core.actions
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType
@@ -29,11 +28,12 @@ class CreateRelationship extends AbstractActionRunner {
 
     String getMessage() {
         normalizeDescription """
-            Create new relationship '${decodeEntity(parameters.source)?.name} ${decodeEntity(parameters.type)?.sourceToDestination} ${decodeEntity(parameters.destination)?.name}' with following parameters:
+            Create new relationship '   <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.source)?.class)}/${decodeEntity(parameters.source)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.source)?.class.simpleName)} '${relationshipService.getClassifiedName(decodeEntity(parameters.source))}'</a>  ${decodeEntity(parameters.type)?.sourceToDestination} <a href='#/catalogue/${GrailsNameUtils.getPropertyName(decodeEntity(parameters.source)?.class)}/${decodeEntity(parameters.destination)?.id}'> ${GrailsNameUtils.getNaturalName(decodeEntity(parameters.destination)?.class.simpleName)} '${relationshipService.getClassifiedName(decodeEntity(parameters.destination))}'</a> with following parameters:
 
 
-
-${parameters.collect { key, value -> "${GrailsNameUtils.getNaturalName(key)}: ${decodeEntity(value)?.name}"}.join('\n\n')}
+            ${parameters.collect {  key, value ->
+                "${GrailsNameUtils.getNaturalName(key)}: ${decodeEntity(value)?.name}"}.join('\n\n')
+            }
         """
     }
 
