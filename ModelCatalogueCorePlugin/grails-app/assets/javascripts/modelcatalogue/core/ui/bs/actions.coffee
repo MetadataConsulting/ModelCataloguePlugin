@@ -262,6 +262,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/finalize", method: 'POST')).then (finalized) ->
             updateFrom $scope.element, finalized
             $rootScope.$broadcast 'catalogueElementUpdated', finalized
+            $rootScope.$broadcast 'catalogueElementFinalized', finalized
           , showErrorsUsingMessages(messages)
     }
 

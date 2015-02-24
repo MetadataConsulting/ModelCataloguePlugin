@@ -132,6 +132,13 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           $rootScope.$$lastModels ?= {}
           $rootScope.$$lastModels[getLastModelsKey('draft')] = element: element, elementSelectedInTree: true, property: 'history'
           $state.go '.', {status: 'draft'}, { reload: true }
+
+      $scope.$on 'catalogueElementFinalized', (ignored, element) ->
+        if element
+          if element.childOf.total == 0
+            $rootScope.$$lastModels ?= {}
+            $rootScope.$$lastModels[getLastModelsKey('finalized')] = element: element, elementSelectedInTree: true, property: 'history'
+            $state.go '.', {status: undefined}, { reload: true }
   ])
 .config(['$stateProvider', ($stateProvider) ->
 
