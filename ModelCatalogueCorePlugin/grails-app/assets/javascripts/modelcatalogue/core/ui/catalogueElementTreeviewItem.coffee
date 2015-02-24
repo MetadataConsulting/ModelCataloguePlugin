@@ -59,18 +59,24 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         $scope.element.$$numberOfChildren = firstList.total
         $scope.element.$$cachedChildren = {}
         for child in $scope.element.$$children ? []
-          $scope.element.$$cachedChildren[child.link] = child
+          $scope.element.$$cachedChildren[child.latestVersionId] = child
 
         newChildren = []
         for item in firstList.list when item.relation
-          cachedChild = $scope.element.$$cachedChildren[item.relation.link] ? {}
+          cachedChild = $scope.element.$$cachedChildren[item.relation.latestVersionId] ? {}
 
           if cachedChild.$$collapsed
             cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
           else
             cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
-            
-          newChildren.push(angular.extend(cachedChild, item.relation, {$$metadata: item.ext}))
+          objectToExtend = {}
+          if cachedChild.id == item.relation.id
+            objectToExtend = cachedChild
+          else
+            for key, prop of cachedChild
+              if key.indexOf('$') == 0
+                objectToExtend[key] = prop
+          newChildren.push(angular.extend(objectToExtend, item.relation, {$$metadata: item.ext}))
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false

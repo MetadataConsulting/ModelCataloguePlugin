@@ -76,6 +76,8 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
         $scope.$on 'catalogueElementCreated', refreshList
         $scope.$on 'catalogueElementDeleted', refreshList
+        $scope.$on 'newVersionCreated', refreshList
+        $scope.$on 'catalogueElementUpdated', refreshList
     ]
   }
 ]
