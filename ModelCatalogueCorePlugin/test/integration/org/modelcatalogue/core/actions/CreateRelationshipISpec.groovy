@@ -1,45 +1,44 @@
 package org.modelcatalogue.core.actions
 
-import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.AbstractIntegrationSpec
+import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipType
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
+import spock.lang.Shared
 
 import static org.modelcatalogue.core.actions.AbstractActionRunner.encodeEntity
 import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDescription
 
-class CreateRelationshipSpec extends IntegrationSpec {
+class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
-    CreateRelationship createAction = new CreateRelationship()
-    RelationshipTypeService relationshipTypeService = new RelationshipTypeService()
+    def modelCatalogueSecurityService
+    def relationshipService
 
-    Model one
-    Model two
-    RelationshipType relation
-    RelationshipType contains
-
+    @Autowired
+    AutowireCapableBeanFactory autowireCapableBeanFactory
+    @Shared
+    Model one, two
+    @Shared
+    RelationshipType relation, contains
+    @Shared
+    CreateRelationship createAction
 
     def setup() {
-        createAction.relationshipService = new RelationshipService()
-
-        one = new Model(name: 'one').save(failOnError: true)
-        two = new Model(name: 'two').save(failOnError: true)
+        loadFixtures()
+        createAction = new CreateRelationship()
+        createAction.relationshipService = relationshipService
+        createAction.autowireCapableBeanFactory = autowireCapableBeanFactory
+        one = Model.findByName("book")
+        two = Model.findByName("chapter1")
         relation = RelationshipType.relatedToType
         contains = RelationshipType.containmentType
-
-        relation.relationshipTypeService = relationshipTypeService
-        contains.relationshipTypeService = relationshipTypeService
-
-        createAction.autowireCapableBeanFactory = Mock(AutowireCapableBeanFactory)
-        createAction.autowireCapableBeanFactory.autowireBean(_) >> { it ->
-            if (it instanceof RelationshipType) {
-                it.relationshipTypeService = relationshipTypeService
-            }
-
-        }
     }
 
     def "uses default action natural name"() {
-       expect:
+
+        expect:
         createAction.naturalName == "Create Relationship"
         createAction.description == normalizeDescription(CreateRelationship.description)
 
@@ -48,10 +47,10 @@ class CreateRelationshipSpec extends IntegrationSpec {
 
         then:
         createAction.message == """
-            Create new relationship 'one related to two' with following parameters:
-
-            Source: one
-            Destination: two
+            Create new relationship '   <a href='#/catalogue/model/${one.id}'> Model 'book'</a>  related to <a href='#/catalogue/model/${two.id}'> Model 'chapter1'</a> with following parameters:
+ 
+                        Source: book
+            Destination: chapter1
             Type: relatedTo
         """.stripIndent().trim()
     }
@@ -115,7 +114,7 @@ class CreateRelationshipSpec extends IntegrationSpec {
 
         then:
         !createAction.failed
-        sw.toString() == "<a href='#/catalogue/model/${one.id}'>Model 'one'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>related to</a> <a href='#/catalogue/model/${two.id}'>Model 'two'</a>"
+        sw.toString() == "<a href='#/catalogue/model/${one.id}'>Model 'book'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>related to</a> <a href='#/catalogue/model/${two.id}'>Model 'chapter1'</a>"
         createAction.result == encodeEntity(Relationship.list(limit: 1)[0])
     }
 
