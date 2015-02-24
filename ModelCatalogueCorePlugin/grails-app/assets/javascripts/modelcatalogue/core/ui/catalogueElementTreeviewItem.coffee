@@ -164,12 +164,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           currentDescend = $scope.element[$scope.currentDescend]
           if result.element.link == $scope.element.link and endsWith(currentDescend.link, "/#{direction}/#{result.type.name}")
             $scope.element.$$numberOfChildren++
-            result.relation.refresh().then (newOne) ->
-              $scope.element.$$children = [newOne].concat $scope.element.$$children
+            $scope.currentDescend.total++
+            if $scope.element.$$numberOfChildren == 1 or $scope.element.$$children.length > 0
+              result.relation.refresh().then (newOne) ->
+                $scope.element.$$children = [newOne].concat $scope.element.$$children
           if result.relation.link == $scope.element.link and endsWith(currentDescend.link, "/#{oppositeDirection}/#{result.type.name}")
             $scope.element.$$numberOfChildren++
-            result.element.refresh().then (newOne) ->
-              $scope.element.$$children = [newOne].concat $scope.element.$$children
+            $scope.currentDescend.total++
+            if $scope.element.$$numberOfChildren == 1 or $scope.element.$$children.length > 0
+              result.element.refresh().then (newOne) ->
+                $scope.element.$$children = [newOne].concat $scope.element.$$children
 
 
 
