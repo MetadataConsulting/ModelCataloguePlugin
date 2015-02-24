@@ -97,7 +97,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
 ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope, catalogueElementResource) ->
     if $stateParams.resource
       applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
@@ -105,30 +105,33 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.title                    = names.getNaturalName($stateParams.resource) + ' List'
     $scope.natural                  = (name) -> if name then names.getNaturalName(name) else "General"
     $scope.resource                 = $stateParams.resource
-    $scope.elementSelectedInTree    = false
-    $scope.element                  = if list.size > 0 then list.list[0]
-    $scope.property                 = 'contains'
+
+    getLastModelsKey = (status = $stateParams.status)->
+      "#{status ? 'finalized'}"
 
     if $scope.resource == 'model'
-      if $rootScope.$$lastModels
-        $scope.element                = $rootScope.$$lastModels[$scope.list.base]?.element
-        $scope.elementSelectedInTree  = $rootScope.$$lastModels[$scope.list.base]?.elementSelectedInTree
+      if $rootScope.$$lastModels and $rootScope.$$lastModels[getLastModelsKey()]
+        $scope.element                = $rootScope.$$lastModels[getLastModelsKey()]?.element
+        $scope.elementSelectedInTree  = $rootScope.$$lastModels[getLastModelsKey()]?.elementSelectedInTree
+        $scope.property               = $rootScope.$$lastModels[getLastModelsKey()]?.property
       else
-        $rootScope.$$lastModels = {}
+        $rootScope.$$lastModels       = {}
+        $scope.elementSelectedInTree  = false
+        $scope.element                = if list.size > 0 then list.list[0]
+        $scope.property               =  'contains'
+
 
       $scope.$on 'treeviewElementSelected', (event, element) ->
         $scope.element                  = element
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels ?= {}
-        $rootScope.$$lastModels[$scope.list.base] = element: element, elementSelectedInTree: true
+        $rootScope.$$lastModels[getLastModelsKey()] = element: element, elementSelectedInTree: true, property: 'contains'
 
       $scope.$on 'newVersionCreated', (ignored, element) ->
         if element
-          $scope.property = 'history'
-
-        if $stateParams.status != 'draft'
-          $state.go '.', {status: 'draft'}
-
+          $rootScope.$$lastModels ?= {}
+          $rootScope.$$lastModels[getLastModelsKey('draft')] = element: element, elementSelectedInTree: true, property: 'history'
+          $state.go '.', {status: 'draft'}, { reload: true }
   ])
 .config(['$stateProvider', ($stateProvider) ->
 
