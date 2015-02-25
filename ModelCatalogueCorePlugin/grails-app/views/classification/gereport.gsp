@@ -33,8 +33,8 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h3>Genomics England: Clinical Dataset</h3>
-
+                <h3>Genomics England Data Model Summary Report</h3>
+                <h4>${new Date()}</h4>
             </br>
             </br>
             </br>
@@ -81,6 +81,7 @@
             %{--</br>--}%
             %{--</br>--}%
 
+
             %{--</br>--}%
             %{--</br>--}%
             %{--</br>--}%
@@ -96,6 +97,7 @@
 
                     <h3>${i+1}. ${model.name}  <small><span class="badge">${model.id}</span><span class="badge pull-right">v${model.versionNumber}</span> <span class="label label-info pull-right">${model.status}</span></small></h3>
                     <p>${model.description}</p>
+                    <g:if test="${model?.contains}"><g:render template="recDataElements" model="${[model: model]}" /></g:if>
                     <g:render template="recModel" model="${[models: model.parentOf, index:i+1]}" />
                     </g:if>
                 %{--<div class="table-responsive">--}%

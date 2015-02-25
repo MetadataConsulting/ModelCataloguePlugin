@@ -141,6 +141,8 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         21 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 5, 'Max Occurs': 5]]
         22 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 6, 'Max Occurs': 5]]
         23 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Max Occurs': 0]]
+        24 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 1, 'Max Occurs': 'unbounded']]
+        25 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 'unbounded', 'Max Occurs': 'unbounded']]
 
     }
 
