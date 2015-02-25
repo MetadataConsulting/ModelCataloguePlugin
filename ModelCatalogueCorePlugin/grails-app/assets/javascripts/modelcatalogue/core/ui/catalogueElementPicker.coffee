@@ -66,11 +66,16 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
     element.attr('autocomplete', "off")
     element.attr('typeahead-wait-ms', "500") unless element.attr('typeahead-wait-ms')
     element.attr('typeahead-template-url', 'modelcatalogue/core/ui/catalogueElementPickerTypeahead.html')
-    element.attr('placeholder', 'Start typing or click icon on the left for advanced search')
+    element.attr('placeholder', if attrs.status then "Start typing or click icon on the left for advanced search for #{attrs.status} elements" else 'Start typing or click icon on the left for advanced search')
     element.removeAttr('catalogue-element-picker')
     element.removeAttr('catalogueElementPicker')
     element.removeAttr('data-catalogue-element-picker')
     element.addClass('form-control')
+
+    element.addClass('cep-' + attrs.status.toLowerCase()) if (attrs.status)
+
+
+
 
     unless element.parent().hasClass('input-group')
       group = angular.element("""<span class="input-group"></span>""")
