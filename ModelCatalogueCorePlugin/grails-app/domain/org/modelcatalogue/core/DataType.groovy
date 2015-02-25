@@ -16,13 +16,6 @@ import org.modelcatalogue.core.util.FriendlyErrors
 
 class DataType extends CatalogueElement {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        name boost:5
-        except = ['relatedValueDomains', 'incomingRelationships', 'outgoingRelationships']
-    }
-
     static constraints = {
         name size: 1..255
     }

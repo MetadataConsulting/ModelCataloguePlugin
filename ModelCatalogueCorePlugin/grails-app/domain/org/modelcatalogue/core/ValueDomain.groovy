@@ -41,17 +41,6 @@ import org.modelcatalogue.core.util.ValueDomainRuleScript
 
 class ValueDomain extends CatalogueElement {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        name boost:5
-        dataType component:true
-        unitOfMeasure component:true
-        extensions component:true
-
-        except = ['incomingRelationships', 'outgoingRelationships', 'dataElements']
-    }
-
     DataType dataType
     MeasurementUnit unitOfMeasure
 

@@ -7,13 +7,6 @@ class RelationshipType {
 
     def relationshipTypeService
 
-    static searchable = {
-        name boost: 5
-        sourceClass converter: RelationshipTypeClassConverter
-        destinationClass converter: RelationshipTypeClassConverter
-        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions']
-    }
-
     //name of the relationship type i.e. parentChild  or synonym
     String name
 

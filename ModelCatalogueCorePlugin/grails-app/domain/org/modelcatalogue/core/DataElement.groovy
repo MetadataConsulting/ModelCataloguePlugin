@@ -19,15 +19,6 @@ class DataElement extends CatalogueElement {
         valueDomain nullable: true
     }
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        modelCatalogueId boost:10
-        name boost:5
-        extensions component:true
-        except = ['incomingRelationships', 'outgoingRelationships', 'valueDomain']
-    }
-
     static relationships = [
             incoming: [containment: 'containedIn'],
     ]

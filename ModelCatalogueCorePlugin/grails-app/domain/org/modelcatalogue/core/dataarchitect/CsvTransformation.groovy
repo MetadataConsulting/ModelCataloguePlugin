@@ -2,13 +2,6 @@ package org.modelcatalogue.core.dataarchitect
 
 class CsvTransformation {
 
-    static searchable = {
-        name boost: 10
-        description boost: 5
-
-        except = ['separator', 'columnDefinitions']
-    }
-
     String name
     String description
 

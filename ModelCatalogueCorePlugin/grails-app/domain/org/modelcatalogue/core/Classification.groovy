@@ -23,11 +23,6 @@ class Classification extends CatalogueElement {
         name unique: 'versionNumber'
     }
 
-    static searchable = {
-        name boost:5
-        except = ['incomingRelationships', 'outgoingRelationships']
-    }
-
     static transients = ['namespace']
 
     static relationships = [

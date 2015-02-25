@@ -70,16 +70,6 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         latestVersionId bindable: false, nullable: true
     }
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-		modelCatalogueId boost:10
-        name boost:5
-        incomingMappings component: true
-        extensions component:true
-        except = ['versionNumber', 'incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
-    }
-
     static mapping = {
         tablePerHierarchy false
         sort "name"
