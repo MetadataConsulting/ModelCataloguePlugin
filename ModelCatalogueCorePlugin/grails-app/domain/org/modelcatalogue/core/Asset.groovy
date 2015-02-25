@@ -7,14 +7,6 @@ class Asset extends CatalogueElement {
     String  originalFileName
     String  md5
 
-
-    static searchable = {
-        modelCatalogueId boost:10
-        name boost:5
-        extensions component:true
-        except = ['md5', 'incomingRelationships', 'outgoingRelationships']
-    }
-
     static constraints = {
         contentType maxSize: 255, nullable: true
         md5 maxSize: 32, nullable: true

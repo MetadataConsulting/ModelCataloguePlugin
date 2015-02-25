@@ -12,12 +12,6 @@ class Mapping {
 
     static Mapping getDIRECT_MAPPING() { new Mapping(mapping: 'x') }
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        except = ['source', 'destination']
-    }
-
     CatalogueElement source
     CatalogueElement destination
 
