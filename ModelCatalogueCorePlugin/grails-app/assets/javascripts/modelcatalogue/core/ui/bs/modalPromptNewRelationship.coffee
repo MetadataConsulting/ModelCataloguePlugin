@@ -111,7 +111,6 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
 
             $q.all(promises).then (results) ->
-              console.log results
               $modalInstance.close(results)
 
 
