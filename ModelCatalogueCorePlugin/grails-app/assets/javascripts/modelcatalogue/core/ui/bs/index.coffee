@@ -28,6 +28,7 @@
 #= require messagesPanel
 #= require modalConfirm
 #= require modalPrompt
+#= require modalPromptEditRelationship
 #= require modalPromptNewRelationship
 #= require modalPromptNewMapping
 #= require modalPromptXmlValidate
@@ -95,6 +96,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPrompt'
   'mc.core.ui.bs.modalPromptCsvHeaders'
   'mc.core.ui.bs.modalPromptCsvTransform'
+  'mc.core.ui.bs.modalPromptEditRelationship'
   'mc.core.ui.bs.modalPromptNewRelationship'
   'mc.core.ui.bs.modalPromptNewMapping'
   'mc.core.ui.bs.modalPromptXmlValidate'

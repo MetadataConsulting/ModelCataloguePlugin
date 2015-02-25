@@ -78,6 +78,10 @@ class CopyAssociationsAndRelationships {
             if (isOverriding(created, r)) {
                 toRemove << r
             }
+            created.incomingIndex = r.incomingIndex
+            created.outgoingIndex = r.outgoingIndex
+            created.combinedIndex = r.combinedIndex
+            created.save(flush: true)
         }
 
         for (Relationship r in toRemove) {

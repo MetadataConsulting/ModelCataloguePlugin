@@ -644,4 +644,19 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         ]
     }
 
+    def "define id as closure"() {
+        build {
+            model(name: "Model_ID") {
+                id { String name, Class type ->
+                    "http://www.example.com/classification/${type.simpleName[0].toLowerCase()}/$name"
+                }
+            }
+        }
+
+        Model model = Model.findByName('Model_ID')
+
+        expect:
+        model.modelCatalogueId == "http://www.example.com/classification/m/Model_ID"
+    }
+
 }

@@ -25,6 +25,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         if (!el) return [:]
         def ret = [
                 id: el.id,
+                latestVersionId: el.latestVersionId ?: el.id,
 				modelCatalogueId: el.modelCatalogueId ?: el.defaultModelCatalogueId,
                 archived: el.archived,
                 name: el.name,
@@ -150,18 +151,18 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     static Map<String, Object> minimalCatalogueElementJSON(CatalogueElement element) {
         if (!element) return null
-        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber]
+        [name: element.name, id: element.id, elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", versionNumber: element.versionNumber, latestVersionId: element.latestVersionId ?: element.id]
     }
 
     static Map<String, Object> minimumValueDomain(ValueDomain element) {
         if (!element) return null
-        [name: element.name, id: element.id, dataType: minimumDataType(element.dataType), elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}"]
+        [name: element.name, id: element.id, dataType: minimumDataType(element.dataType), elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
     }
 
     static Map<String, Object> minimumDataType(DataType element) {
         if (!element) return null
-        if (element instanceof EnumeratedType) [name: element.name, id: element.id, enumerations: element.enumerations,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}"]
-        else [name: element.name, id: element.id,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}"]
+        if (element instanceof EnumeratedType) [name: element.name, id: element.id, enumerations: element.enumerations,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
+        else [name: element.name, id: element.id,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
     }
 
 

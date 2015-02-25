@@ -5,11 +5,13 @@ import grails.transaction.Transactional
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
 import org.hibernate.StaleStateException
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.validation.Errors
 
 import javax.servlet.http.HttpServletResponse
 
@@ -22,6 +24,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     AssetService assetService
     SearchCatalogue modelCatalogueSearchService
     SecurityService modelCatalogueSecurityService
+    ElementService elementService
 
     XLSXListRenderer xlsxListRenderer
 
@@ -72,6 +75,7 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected getBasePath()     { "/${resourceName}/" }
     protected getDefaultSort()  { null }
     protected getDefaultOrder() { null }
+    protected boolean hasUniqueName() { false }
 
 
     def validate() {
@@ -174,7 +178,29 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
         instance.validate()
         if (instance.hasErrors()) {
-            respond instance.errors
+            if (!hasUniqueName() || getObjectToBind().size() > 1 || !getObjectToBind().containsKey('name')) {
+                respond instance.errors
+                return
+            }
+
+            Errors errors = instance.errors
+
+            if (errors.getFieldError('name').any { it.code == 'unique' }) {
+                T found = resource.findByName(getObjectToBind().name, [sort: 'versionNumber', order: 'desc'])
+                if (found) {
+                    if (!found.instanceOf(CatalogueElement)) {
+                        respond found
+                        return
+                    }
+                    if (found.status != ElementStatus.DRAFT) {
+                        found = elementService.createDraftVersion(found, DraftContext.userFriendly())
+                    }
+                    respond found
+                    return
+                }
+            }
+
+            respond errors
             return
         }
 

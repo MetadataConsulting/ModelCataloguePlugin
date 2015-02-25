@@ -150,9 +150,9 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Classifications</label>
                   <elements-as-tags elements="classifications"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification" focus-me="step=='classifications'" catalogue-element-picker="classification"  typeahead-on-select="classifications.push(classification);classification = null" status="draft">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="classification.element" focus-me="step=='classifications'" catalogue-element-picker="classification"  typeahead-on-select="push('classifications', 'classification')" status="draft">
                     <span class="input-group-btn">
-                      <button class="btn btn-success" ng-click="classifications.push(classification);classification = null" ng-disabled="isEmpty(classification)"><span class="glyphicon glyphicon-plus"></span></button>
+                      <button class="btn btn-success" ng-click="push('classifications', 'classification')" ng-disabled="isEmpty(classification.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
                   </div>
                 </div>
@@ -183,7 +183,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.children = []
             $scope.dataElement = args.dataElement ? {ext: {}}
             $scope.dataElements = []
-            $scope.classification = null
+            $scope.classification = {}
             $scope.classifications = []
             $scope.classificationInUse = classificationInUse
             $scope.messages = messages.createNewMessages()
@@ -236,9 +236,10 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             return if $scope.finishInProgress
             $scope.finishInProgress = true
 
-            $scope.parents.push($scope.parent)            if angular.isString($scope.parent?.element)
-            $scope.children.push($scope.child)            if angular.isString($scope.child?.element)
-            $scope.dataElements.push($scope.dataElement)  if angular.isString($scope.dataElement?.element)
+            $scope.parents.push($scope.parent)                  if angular.isString($scope.parent?.element)
+            $scope.children.push($scope.child)                  if angular.isString($scope.child?.element)
+            $scope.dataElements.push($scope.dataElement)        if angular.isString($scope.dataElement?.element)
+            $scope.classifications.push($scope.classification)  if angular.isString($scope.classification?.element)
 
             unless $scope.isEmpty($scope.metadata)
               $scope.pendingActions.push (model)->
@@ -279,9 +280,9 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 model
 
             angular.forEach $scope.classifications, (classification) ->
-              if angular.isString classification
+              if angular.isString classification.element
                 $scope.pendingActions.push (model) ->
-                  catalogueElementResource('classification').save({name: classification}).then (newClassification) ->
+                  catalogueElementResource('classification').save({name: classification.element}).then (newClassification) ->
                     model.classifications.push newClassification
                     execAfter50.submit -> catalogueElementResource('model').update(model)
               else

@@ -7,6 +7,45 @@ import grails.util.GrailsNameUtils
  */
 class MeasurementUnitControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
+
+    def "when trying to create unit with the same name the existing is returned"() {
+        if (controller.readOnly) return
+
+        MeasurementUnit expected = loadItem
+
+        expect:
+        expected
+
+        when:
+        controller.response.format = "json"
+        controller.request.json = [name: "Degrees Celsius"]
+        controller.save()
+        def created = controller.response.json
+
+        then:
+        created
+        created.latestVersionId == (expected.latestVersionId ?: expected.id)
+    }
+
+    def "when trying to create unit with the same name error is shown if the params contains more than name"() {
+        if (controller.readOnly) return
+
+        MeasurementUnit expected = loadItem
+
+        expect:
+        expected
+
+        when:
+        controller.response.format = "json"
+        controller.request.json = [name: "Degrees Celsius", description: "Some Desc"]
+        controller.save()
+        def created = controller.response.json
+
+        then:
+        created
+        created.errors
+    }
+
     @Override
     Map getPropertiesToEdit(){
         [name: "changedName", description: "edited description ", symbol: "R"]

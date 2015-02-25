@@ -56,20 +56,27 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
             $scope.element.$$showingMore = false
 
       loadNewChildren = (firstList) ->
+        $scope.element.$$numberOfChildren = firstList.total
         $scope.element.$$cachedChildren = {}
         for child in $scope.element.$$children ? []
-          $scope.element.$$cachedChildren[child.link] = child
+          $scope.element.$$cachedChildren[child.latestVersionId] = child
 
         newChildren = []
         for item in firstList.list when item.relation
-          cachedChild = $scope.element.$$cachedChildren[item.relation.link] ? {}
+          cachedChild = $scope.element.$$cachedChildren[item.relation.latestVersionId] ? {}
 
           if cachedChild.$$collapsed
             cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
           else
             cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
-            
-          newChildren.push(angular.extend(cachedChild, item.relation, {$$metadata: item.ext}))
+          objectToExtend = {}
+          if cachedChild.id == item.relation.id
+            objectToExtend = cachedChild
+          else
+            for key, prop of cachedChild
+              if key.indexOf('$') == 0
+                objectToExtend[key] = prop
+          newChildren.push(angular.extend(objectToExtend, item.relation, {$$metadata: item.ext}))
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false
@@ -146,6 +153,16 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         return if id and $scope.rootId and id != $scope.rootId
         $scope.element.$$active = $scope.element.link == element.link
 
+      reloadChildrenOnChange = (_, result) ->
+        if result and result.relation and result.element and result.type and result.direction
+          direction = if result.direction == 'destinationToSource' then 'incoming' else 'outgoing'
+          oppositeDirection = if result.direction == 'destinationToSource' then 'outgoing' else 'incoming'
+          currentDescend = $scope.element[$scope.currentDescend]
+          if result.element.link == $scope.element.link and endsWith(currentDescend.link, "/#{direction}/#{result.type.name}")
+            $scope.element.$$loadChildren()
+          if result.relation.link == $scope.element.link and endsWith(currentDescend.link, "/#{oppositeDirection}/#{result.type.name}")
+            $scope.element.$$loadChildren()
+
       $scope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
         for item, i in $scope.element.$$children
@@ -156,24 +173,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.element.$$children.splice index - i, 1
           $scope.element.$$numberOfChildren--
 
+        reloadChildrenOnChange event, element
 
-      $scope.$on 'catalogueElementCreated', (_, result) ->
-        if result and result.relation and result.element and result.type and result.direction
-          direction = if result.direction == 'destinationToSource' then 'incoming' else 'outgoing'
-          oppositeDirection = if result.direction == 'destinationToSource' then 'outgoing' else 'incoming'
-          currentDescend = $scope.element[$scope.currentDescend]
-          if result.element.link == $scope.element.link and endsWith(currentDescend.link, "/#{direction}/#{result.type.name}")
-            $scope.element.$$numberOfChildren++
-            result.relation.refresh().then (newOne) ->
-              $scope.element.$$children = [newOne].concat $scope.element.$$children
-          if result.relation.link == $scope.element.link and endsWith(currentDescend.link, "/#{oppositeDirection}/#{result.type.name}")
-            $scope.element.$$numberOfChildren++
-            result.element.refresh().then (newOne) ->
-              $scope.element.$$children = [newOne].concat $scope.element.$$children
-
-
-
-
+      $scope.$on 'catalogueElementCreated', reloadChildrenOnChange
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
         $scope.element.$$loadChildren() if $scope.descendFun.link == listReference.link
     ]
