@@ -244,7 +244,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
         then: "modal is shown"
         waitFor {
-            modalDialog.displayed && modalHeader.text() == 'Create Relationship'
+            modalDialog.displayed
         }
 
         when:

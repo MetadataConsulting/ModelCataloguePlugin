@@ -38,15 +38,12 @@ angular.module('mc.core.ui.infiniteTable', ['mc.core.ui.infiniteListCtrl', 'mc.c
       initialOffset = updateOffset()
 
       $scope.sortBy = (column) ->
-        $state.go '.', {sort: column.sort.property, order: if $stateParams.order == 'desc' then undefined else 'desc'}
+        $state.go '.', {sort: column.sort.property, order: if $scope.list.order == 'desc' then 'asc' else 'desc'}
 
       $scope.getSortClass = (column) ->
-        return 'glyphicon-sort' if column.sort.property != $scope.list.sort
-        ret = "glyphicon-sort-by-#{if column.sort.type then column.sort.type else 'attributes'}"
-
-        return ret if $scope.list.order == 'asc'
-        ret + '-alt'
-
+        return 'fa-sort'                                          if column.sort.property != $scope.list.sort
+        return "fa-sort-#{column.sort.type}-#{$scope.list.order}" if column.sort.type
+        return "fa-sort-#{$scope.list.order}"
 
 
       $scope.$$headerExpanded = false

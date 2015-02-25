@@ -28,5 +28,10 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
 
     }
 
+    @Override
+    protected boolean hasUniqueName() {
+        true
+    }
+
 
 }

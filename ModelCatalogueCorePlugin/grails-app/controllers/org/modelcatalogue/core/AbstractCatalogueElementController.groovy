@@ -19,7 +19,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     def relationshipService
     def mappingService
-    def elementService
 
 	def uuid(String uuid){
         respond resource.findByModelCatalogueId(uuid)

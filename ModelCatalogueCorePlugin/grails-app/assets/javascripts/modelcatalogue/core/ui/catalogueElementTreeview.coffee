@@ -69,6 +69,15 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
       if $scope.mode == 'list'
         onListChange $scope.list, getLastListFromRootScope($scope.list?.base)
         $scope.$watch 'list', onListChange
+
+        refreshList = ->
+          $scope.list.reload(status: $stateParams.status, toplevel: true).then (newList) ->
+            $scope.list = newList
+
+        $scope.$on 'catalogueElementCreated', refreshList
+        $scope.$on 'catalogueElementDeleted', refreshList
+        $scope.$on 'newVersionCreated', refreshList
+        $scope.$on 'catalogueElementUpdated', refreshList
     ]
   }
 ]
