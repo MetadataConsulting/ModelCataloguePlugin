@@ -315,7 +315,6 @@
             then: "modal is shown"
             waitFor {
                 modalDialog.displayed
-                modalHeader.text() == 'Create Relationship'
             }
 
             when:
@@ -351,7 +350,6 @@
             then: "modal is shown"
             waitFor {
                 modalDialog.displayed
-                modalHeader.text() == 'Create Relationship'
             }
 
             when:
