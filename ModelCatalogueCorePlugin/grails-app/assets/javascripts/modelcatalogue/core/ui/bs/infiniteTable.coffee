@@ -10,7 +10,7 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
                 <a title="Show row actions" ng-if="$first" ng-click="triggerHeaderExpanded()" class="inf-cell-expand"><span class="fa fa-fw" ng-class="{'fa-minus-square-o': $$headerExpanded, 'fa-plus-square-o': !$$headerExpanded}"></span></a>
                 <span ng-if="!column.sort">{{column.header}}<span ng-if="!$$headerExpanded &amp;&amp; filters[column.header]" class="text-info" ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span></span>
                 <span ng-if=" column.sort"><a class="inf-table-header-sortable" ng-click="sortBy(column)" >
-                  <span class="glyphicon" ng-class="getSortClass(column)"></span>
+                  <span class="fa fa-fw" ng-class="getSortClass(column)"></span>
                   {{column.header}}
                 </a>
                 <span ng-if="!$$headerExpanded &amp;&amp; filters[column.header]" class="text-info" ng-click="triggerHeaderExpanded()"> [{{filters[column.header]}}]</span>

@@ -29,6 +29,8 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
 
+  catalogueProvider.setDefaultSort 'catalogueElement',  sort: 'name',         order: 'asc'
+  catalogueProvider.setDefaultSort 'asset',             sort: 'lastUpdated',  order: 'desc'
 
 
 ]

@@ -140,7 +140,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             $rootScope.$$lastModels[getLastModelsKey('finalized')] = element: element, elementSelectedInTree: true, property: 'history'
             $state.go '.', {status: undefined}, { reload: true }
   ])
-.config(['$stateProvider', ($stateProvider) ->
+.config(['$stateProvider', 'catalogueProvider', ($stateProvider, catalogueProvider) ->
 
   DEFAULT_ITEMS_PER_PAGE = 10
 
@@ -244,10 +244,12 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           page = parseInt($stateParams.page ? 1, 10)
           page = 1 if isNaN(page)
           # it's safe to call top level for each controller, only model controller will respond on it
+
+          defaultSorts = catalogueProvider.getDefaultSort($stateParams.resource) ? {sort: 'name', order: 'asc'}
+
           params                = offset: (page - 1) * DEFAULT_ITEMS_PER_PAGE, toplevel: true, system: true
-          params.order          = $stateParams.order ? 'asc'
-          params.sort           = $stateParams.sort ? 'name'
-          params.status         = $stateParams.status ? 'finalized'
+          params.order          = $stateParams.order ? defaultSorts.order
+          params.sort           = $stateParams.sort ? defaultSorts.sort
           params.status         = $stateParams.status ? 'finalized'
           params.max            = $stateParams.max ? 10
           params.classification = $stateParams.classification ? undefined

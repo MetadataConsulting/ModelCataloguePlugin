@@ -29,13 +29,34 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
   # provider
   catalogueProvider = {}
+
+  catalogueProvider.getDefaultSort = (type) ->
+    readMetadata type, 'sort'
+
+  catalogueProvider.setDefaultSort = (type, sort) ->
+    writeMetadata type, 'sort', sort
+
   catalogueProvider.setIcon = (type, icon) ->
     writeMetadata type, 'icon', icon
+
+  catalogueProvider.getIcon = (type) ->
+    readMetadata type, 'icon'
 
   catalogueProvider.setInstanceOf = (type, supertype) ->
     supertypes = angular.copy(readMetadata(supertype, 'supertypes') ? [])
     supertypes.push supertype
     writeMetadata type, 'supertypes', supertypes, true
+
+  catalogueProvider.isInstanceOf = (type, supertype) ->
+    return false if not type
+    type = names.getPropertyNameFromType(type)
+    supertype = names.getPropertyNameFromType(supertype)
+    return true if type == supertype
+    supertypes = readMetadata(type, 'supertypes')
+    return false if not supertypes
+    for theSuperType in supertypes
+      return true if theSuperType == supertype
+    return false
 
 
   # factory function
@@ -43,18 +64,9 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
     catalogue = {}
 
     catalogue.getIcon = (type) ->
-      readMetadata type, 'icon'
+      catalogueProvider.getIcon(type)
 
-    catalogue.isInstanceOf = (type, supertype) ->
-      return false if not type
-      type = names.getPropertyNameFromType(type)
-      supertype = names.getPropertyNameFromType(supertype)
-      return true if type == supertype
-      supertypes = readMetadata(type, 'supertypes')
-      return false if not supertypes
-      for theSuperType in supertypes
-        return true if theSuperType == supertype
-      return false
+    catalogue.isInstanceOf = (type, supertype) -> catalogueProvider.isInstanceOf(type, supertype)
 
     catalogue.getStatistics = ->
       rest method: 'GET', url: "#{modelCatalogueApiRoot}/dashboard"
