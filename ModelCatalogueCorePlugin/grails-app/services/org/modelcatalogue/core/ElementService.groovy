@@ -115,16 +115,14 @@ class ElementService implements Publisher<CatalogueElement> {
 
 
         // do not merge with already archived ones
-        if (destination.archived) {
-            destination.errors.reject('merge.destination.already.archived', 'Destination is already archived')
+        if (destination.status != ElementStatus.DRAFT) {
+            destination.errors.reject('merge.destination.no.draft', 'Destination is not draft')
             return destination
         }
 
         // do not merge with already archived ones
-        if (source.archived) {
-            if (!(source in destination.supersededBy)) {
-                destination.errors.reject('merge.source.already.archived', 'Source is already archived')
-            }
+        if (source.status != ElementStatus.DRAFT) {
+            destination.errors.reject('merge.source.no.draft', 'Source is not draft')
             return destination
         }
 
