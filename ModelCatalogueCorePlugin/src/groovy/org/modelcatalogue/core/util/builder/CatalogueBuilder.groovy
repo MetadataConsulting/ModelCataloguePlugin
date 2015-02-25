@@ -1,8 +1,9 @@
 package org.modelcatalogue.core.util.builder
 
 import grails.util.GrailsNameUtils
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.FromString
 import groovy.util.logging.Log4j
-
 import org.modelcatalogue.core.*
 
 @Log4j
@@ -166,6 +167,18 @@ class CatalogueBuilder implements ExtensionAwareBuilder {
 
     void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         rel "base" from element, extensions
+    }
+
+    void id(@DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options=['String,Class']) Closure<String> idBuilder) {
+        context.withContextElement(CatalogueElement) {
+            String name = it.getParameter('name')
+            if (!name) {
+                throw new IllegalStateException("Missing name of $it")
+            }
+            it.setId(idBuilder(name, it.domain))
+        } or {
+            throw new IllegalStateException("No element to set id on")
+        }
     }
 
     CatalogueElementProxy<? extends CatalogueElement> ref(String id) {

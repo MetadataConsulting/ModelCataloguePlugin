@@ -21,6 +21,8 @@ interface CatalogueElementProxy<T extends CatalogueElement> {
     Class<T> getDomain()
 
     String getId()
+    void setId(String id)
+
     String getName()
     String getClassification()
 
