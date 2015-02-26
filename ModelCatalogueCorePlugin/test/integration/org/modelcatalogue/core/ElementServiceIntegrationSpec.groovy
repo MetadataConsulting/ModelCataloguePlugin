@@ -11,6 +11,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def elementService
     def relationshipService
+    def mappingService
 
     def "return only finalized elements by default"() {
         expect:
@@ -359,6 +360,27 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         de.valueDomain == vd2
+    }
+
+
+    def "mappings are transferred to the new draft"() {
+        ValueDomain d1 = new ValueDomain(name: "VD4MT1", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+        ValueDomain d2 = new ValueDomain(name: "VD4MT2", status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+
+        Mapping mapping = mappingService.map(d1, d2, "x")
+
+        expect:
+        mapping.errors.errorCount == 0
+
+        when:
+        ValueDomain d1draft = elementService.createDraftVersion(d1, DraftContext.userFriendly())
+
+        then:
+        d1draft
+        d1draft.outgoingMappings
+        d1draft.outgoingMappings.size() == 1
+        d1draft.outgoingMappings[0].destination == d2
+
     }
 
 }
