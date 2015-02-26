@@ -18,6 +18,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     def grailsLinkGenerator
     def relationshipService
+    def mappingService
 
     String name
     String description
@@ -260,6 +261,12 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     void afterDraftPersisted(CatalogueElement draft) {
         draft.ext.putAll this.ext
+        for(Mapping mapping in outgoingMappings) {
+            mappingService.map(draft, mapping.destination, mapping.mapping)
+        }
+        for (Mapping mapping in incomingMappings) {
+            mappingService.map(mapping.source, draft, mapping.mapping)
+        }
     }
 
     static String fixResourceName(String resourceName) {
