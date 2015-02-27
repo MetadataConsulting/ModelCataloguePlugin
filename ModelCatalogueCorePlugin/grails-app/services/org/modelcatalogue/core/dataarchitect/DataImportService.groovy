@@ -1,7 +1,8 @@
 package org.modelcatalogue.core.dataarchitect
 
 import grails.transaction.Transactional
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 
 class DataImportService {
@@ -37,8 +38,8 @@ class DataImportService {
                 classification(name: getRowValue(row,classificationsIndex)) {
                     globalSearchFor dataType
 
-                    model(name:getRowValue(row,parentModelIndex), id:getRowValue(row,parentModelCodeIndex)){
-                        model(name:getRowValue(row,modelIndex),id: getRowValue(row,modelCodeIndex) ){
+                    def createChildModel = {
+                        def createDataElement = {
                             if(getRowValue(row,dataItemNameIndex)) {
                                 dataElement(name: getRowValue(row, dataItemNameIndex), description: getRowValue(row, dataItemDescriptionIndex), id: getRowValue(row, dataItemCodeIndex)) {
                                     if (getRowValue(row, unitsIndex) || getRowValue(row, dataTypeIndex)) {
@@ -62,7 +63,26 @@ class DataImportService {
                                 }
                             }
                         }
+
+
+                        def modelName = getRowValue(row, modelIndex)
+                        def modelId = getRowValue(row, modelCodeIndex)
+
+                        if (modelName || modelId) {
+                            model(name: modelName, id: modelId, createDataElement)
+                        } else {
+                            builder.with createDataElement
+                        }
                     }
+
+                    def parentModelName = getRowValue(row, parentModelIndex)
+                    def parentModelCode = getRowValue(row, parentModelCodeIndex)
+                    if (parentModelName || parentModelCode) {
+                        model(name: parentModelName, id: parentModelCode, createChildModel)
+                    } else {
+                        builder.with createChildModel
+                    }
+
                 }
             }
         }
