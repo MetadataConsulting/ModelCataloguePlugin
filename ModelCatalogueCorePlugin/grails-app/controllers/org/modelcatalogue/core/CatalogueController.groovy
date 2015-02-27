@@ -1,7 +1,9 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
-import org.springframework.http.HttpStatus
+
+import static org.springframework.http.HttpStatus.*
 
 class CatalogueController {
 
@@ -24,7 +26,7 @@ class CatalogueController {
             element = CatalogueElement.get(id)
         }
         if (!element) {
-            render status: HttpStatus.NOT_FOUND
+            render status: NOT_FOUND
             return
         }
 
@@ -38,6 +40,22 @@ class CatalogueController {
 
 
         redirect controller: resource, action: 'show', id: element.id
+    }
+
+    def undo() {
+        Change change = Change.get(params.id)
+
+        if (!change) {
+            render status: NOT_FOUND
+            return
+        }
+
+        if (change.undo()) {
+            render status: OK
+            return
+        }
+
+        render status: NOT_ACCEPTABLE
     }
 
 }

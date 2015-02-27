@@ -102,6 +102,15 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.property == 'description'
         change.newValue == DefaultAuditor.storeValue(changed)
         change.oldValue == DefaultAuditor.storeValue(original)
+
+        expect:
+        ChangeType.PROPERTY_CHANGED.undoSupported
+
+        when:
+        ChangeType.PROPERTY_CHANGED.undo(change)
+
+        then:
+        type.description == original
     }
 
     def "invalid updating property is not logged"() {
@@ -154,6 +163,15 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.newValue == DefaultAuditor.storeValue('bar')
         change.oldValue == null
 
+        and:
+        ChangeType.METADATA_CREATED.undoSupported
+
+        when:
+        ChangeType.METADATA_CREATED.undo(change)
+
+        then:
+        type.ext.foo == null
+
     }
 
     def "editing metadata is logged"() {
@@ -174,6 +192,15 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.property == 'foo'
         change.oldValue == DefaultAuditor.storeValue('bar')
         change.newValue == DefaultAuditor.storeValue('boo')
+
+        and:
+        ChangeType.METADATA_UPDATED.undoSupported
+
+        when:
+        ChangeType.METADATA_UPDATED.undo(change)
+
+        then:
+        type.ext.foo == 'bar'
     }
 
     def "deleting metadata is logged"() {
@@ -197,6 +224,15 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.property == 'foo'
         change.oldValue == DefaultAuditor.storeValue('bar')
         change.newValue == null
+
+        and:
+        ChangeType.METADATA_DELETED.undoSupported
+
+        when:
+        ChangeType.METADATA_DELETED.undo(change)
+
+        then:
+        type.ext.foo == 'bar'
     }
 
     def "adding relationship is logged"() {
@@ -205,7 +241,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType type = new DataType(name: 'DT4ANR TYPE').save(failOnError: true, flush: true)
         DataType base = new DataType(name: 'DT4ANR BASE').save(failOnError: true, flush: true)
 
-        type.addToIsBasedOn base
+        Relationship rel = type.addToIsBasedOn base
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_CREATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_CREATED)
@@ -219,15 +255,25 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.latestVersionId == type.id
         change1.authorId   == null
         change1.property == 'is based on'
-        change1.newValue == DefaultAuditor.storeValue(base)
+        change1.newValue == DefaultAuditor.storeValue(rel)
         change1.oldValue == null
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for'
-        change2.newValue == DefaultAuditor.storeValue(type)
+        change2.newValue == DefaultAuditor.storeValue(rel)
         change2.oldValue == null
+
+        and:
+        ChangeType.RELATIONSHIP_CREATED.undoSupported
+
+        when:
+        ChangeType.RELATIONSHIP_CREATED.undo(change1)
+
+        then:
+        !(base in type.isBasedOn)
+
     }
 
     def "removing relationship is logged"() {
@@ -236,7 +282,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         DataType type = new DataType(name: 'DT4ANR').save(failOnError: true, flush: true)
         DataType base = new DataType(name: 'DT4ANR').save(failOnError: true, flush: true)
 
-        type.addToIsBasedOn base
+        String initialValue = DefaultAuditor.storeValue(type.addToIsBasedOn(base))
         type.removeFromIsBasedOn base
 
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_DELETED)
@@ -251,15 +297,26 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1.latestVersionId == type.id
         change1.authorId   == null
         change1.property == 'is based on'
-        change1.newValue == DefaultAuditor.storeValue(base)
-        change1.oldValue == null
+        change1.oldValue == initialValue
+        change1.newValue == null
+        change1.otherSide
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
         change2.property == 'is base for'
-        change2.newValue == DefaultAuditor.storeValue(type)
-        change2.oldValue == null
+        change2.oldValue == initialValue
+        change2.newValue == null
+        !change2.otherSide
+
+        and:
+        ChangeType.RELATIONSHIP_DELETED.undoSupported
+
+        when:
+        ChangeType.RELATIONSHIP_DELETED.undo change1
+
+        then:
+        base in type.isBasedOn
     }
 
     def "adding relationship metadata is logged"() {
@@ -275,21 +332,31 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_METADATA_CREATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_METADATA_CREATED)
 
+        String newValue = DefaultAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'bar', relationship: relationship))
 
         expect:
         change1
         change1.latestVersionId == type.id
         change1.authorId   == null
-        change1.property == 'is based on [foo]'
-        change1.newValue == DefaultAuditor.storeValue('bar')
+        change1.property == 'is based on'
+        change1.newValue == newValue
         change1.oldValue == null
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
-        change2.property == 'is base for [foo]'
-        change2.newValue == DefaultAuditor.storeValue('bar')
+        change2.property == 'is base for'
+        change2.newValue == newValue
         change2.oldValue == null
+
+        and:
+        ChangeType.RELATIONSHIP_METADATA_CREATED.undoSupported
+
+        when:
+        ChangeType.RELATIONSHIP_METADATA_CREATED.undo(change1)
+
+        then:
+        !relationship.ext.foo
     }
 
     def "editing relationship metadata is logged"() {
@@ -306,6 +373,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         relationship.ext.foo = 'baz'
         sessionFactory.currentSession.flush()
 
+        String newValue = DefaultAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'baz', relationship: relationship))
+
         Change change1 = Change.findByChangedIdAndType(type.id, ChangeType.RELATIONSHIP_METADATA_UPDATED)
         Change change2 = Change.findByChangedIdAndType(base.id, ChangeType.RELATIONSHIP_METADATA_UPDATED)
 
@@ -313,16 +382,25 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1
         change1.latestVersionId == type.id
         change1.authorId   == null
-        change1.property == 'is based on [foo]'
-        change1.newValue == DefaultAuditor.storeValue('baz')
+        change1.property == 'is based on'
+        change1.newValue == newValue
         change1.oldValue == DefaultAuditor.storeValue('bar')
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
-        change2.property == 'is base for [foo]'
-        change2.newValue == DefaultAuditor.storeValue('baz')
+        change2.property == 'is base for'
+        change2.newValue == newValue
         change2.oldValue == DefaultAuditor.storeValue('bar')
+
+        and:
+        ChangeType.RELATIONSHIP_METADATA_UPDATED
+
+        when:
+        ChangeType.RELATIONSHIP_METADATA_UPDATED.undo(change1)
+
+        then:
+        relationship.ext.foo == 'bar'
     }
 
     def "deleting relationship metadata is logged"() {
@@ -336,6 +414,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         relationship.ext.foo = 'bar'
         sessionFactory.currentSession.flush()
 
+        String oldValue = DefaultAuditor.storeValue(new RelationshipMetadata(name: 'foo', extensionValue: 'bar', relationship: relationship))
+
         relationship.ext.remove('foo')
         sessionFactory.currentSession.flush()
 
@@ -346,16 +426,25 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change1
         change1.latestVersionId == type.id
         change1.authorId   == null
-        change1.property == 'is based on [foo]'
+        change1.property == 'is based on'
         change1.newValue == null
-        change1.oldValue == DefaultAuditor.storeValue('bar')
+        change1.oldValue == oldValue
 
         change2
         change2.latestVersionId == base.id
         change2.authorId   == null
-        change2.property == 'is base for [foo]'
+        change2.property == 'is base for'
         change2.newValue == null
-        change2.oldValue == DefaultAuditor.storeValue('bar')
+        change2.oldValue == oldValue
+
+        and:
+        ChangeType.RELATIONSHIP_METADATA_DELETED.undoSupported
+
+        when:
+        ChangeType.RELATIONSHIP_METADATA_DELETED.undo(change1)
+
+        then:
+        relationship.ext.foo == 'bar'
     }
 
     def "creating draft is ignored as it is already logged as creating new version"() {
@@ -416,6 +505,16 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change2.newValue == DefaultAuditor.storeValue(mapping)
         change2.oldValue == null
         change2.otherSide
+
+        and:
+        ChangeType.MAPPING_CREATED.undoSupported
+        type.outgoingMappings.size() == 1
+
+        when:
+        ChangeType.MAPPING_CREATED.undo(change1)
+
+        then:
+        type.outgoingMappings.size() == 0
     }
 
     def "deleting mapping is logged"() {
@@ -443,6 +542,18 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change2.newValue == null
         change2.oldValue == mappingVal
         change2.otherSide
+
+        and:
+        ChangeType.MAPPING_DELETED.undoSupported
+        type.outgoingMappings.size() == 0
+
+        when:
+        ChangeType.MAPPING_DELETED.undo(change1)
+
+        then:
+        type.outgoingMappings.size() == 1
+        type.outgoingMappings[0].destination == base
+        type.outgoingMappings[0].mapping == mapping.mapping
     }
 
 
@@ -478,6 +589,17 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change2.newValue == DefaultAuditor.storeValue(mapping)
         change2.oldValue == oldVal
         change2.otherSide
+
+        and:
+        ChangeType.MAPPING_UPDATED.undoSupported
+        type.outgoingMappings.size() == 1
+
+        when:
+        ChangeType.MAPPING_UPDATED.undo(change1)
+
+        then:
+        type.outgoingMappings.size() == 1
+        type.outgoingMappings[0].mapping == "x / 2"
     }
 
 }

@@ -1,10 +1,13 @@
 package org.modelcatalogue.core.audit
 
 import grails.web.JSONBuilder
+import groovy.json.JsonSlurper
 import groovy.util.logging.Log4j
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
+import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
 
 /**
  * Default auditor auditing the changes using the change table/entity.
@@ -13,35 +16,6 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 class DefaultAuditor implements Auditor {
 
     static List<String> IGNORED_PROPERTIES = ['password', 'version', 'versionNumber', 'outgoingRelationships', 'incomingRelationships', 'outgoingMappings', 'incomingMappings', 'latestVersionId', 'extensions']
-
-    static String storeValue(Object object) {
-        Object toStore = objectToStore(object)
-        if (toStore == null) {
-            return null
-        }
-        new JSONBuilder().build {
-            toStore instanceof Map ? toStore : [value: toStore]
-        }.toString()
-    }
-
-    private static objectToStore(Object object) {
-        if (object instanceof CatalogueElement) {
-            return CatalogueElementMarshallers.minimalCatalogueElementJSON(object)
-        } else if (object instanceof Mapping) {
-            return [
-                source: CatalogueElementMarshallers.minimalCatalogueElementJSON(object.source),
-                destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(object.destination),
-                mapping: object.mapping
-            ]
-        } else if (object instanceof Enum) {
-            return object.toString()
-        } else if (object instanceof CharSequence) {
-            if (object.size() > 1950) {
-                return object.toString()[0..1950] + '...'
-            }
-        }
-        return object
-    }
 
     Long defaultAuthorId
 
@@ -99,16 +73,16 @@ class DefaultAuditor implements Auditor {
                 changedId: extension.relationship.source.id,
                 latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
                 authorId: authorId ?: defaultAuthorId,
-                property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
-                newValue: storeValue(extension.extensionValue),
+                property: extension.relationship.relationshipType.sourceToDestination,
+                newValue: storeValue(extension),
                 type: ChangeType.RELATIONSHIP_METADATA_CREATED
         )
         logChange(extension.relationship.destination,
                 changedId: extension.relationship.destination.id,
                 latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
                 authorId: authorId ?: defaultAuthorId,
-                property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
-                newValue: storeValue(extension.extensionValue),
+                property: extension.relationship.relationshipType.destinationToSource,
+                newValue: storeValue(extension),
                 type: ChangeType.RELATIONSHIP_METADATA_CREATED,
                 otherSide: true
         )
@@ -122,18 +96,18 @@ class DefaultAuditor implements Auditor {
                 changedId: extension.relationship.source.id,
                 latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
                 authorId: authorId ?: defaultAuthorId,
-                property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
+                property: extension.relationship.relationshipType.sourceToDestination,
                 oldValue: storeValue(extension.getPersistentValue('extensionValue')),
-                newValue: storeValue(extension.extensionValue),
+                newValue: storeValue(extension),
                 type: ChangeType.RELATIONSHIP_METADATA_UPDATED
         )
         logChange(extension.relationship.destination,
                 changedId: extension.relationship.destination.id,
                 latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
                 authorId: authorId ?: defaultAuthorId,
-                property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
+                property: extension.relationship.relationshipType.destinationToSource,
                 oldValue: storeValue(extension.getPersistentValue('extensionValue')),
-                newValue: storeValue(extension.extensionValue),
+                newValue: storeValue(extension),
                 type: ChangeType.RELATIONSHIP_METADATA_UPDATED,
                 otherSide: true
         )
@@ -147,16 +121,16 @@ class DefaultAuditor implements Auditor {
                 changedId: extension.relationship.source.id,
                 latestVersionId: extension.relationship.source.latestVersionId ?: extension.relationship.source.id,
                 authorId: authorId ?: defaultAuthorId,
-                property: "${extension.relationship.relationshipType.sourceToDestination} [${extension.name}]",
-                oldValue: storeValue(extension.extensionValue),
+                property: extension.relationship.relationshipType.sourceToDestination,
+                oldValue: storeValue(extension),
                 type: ChangeType.RELATIONSHIP_METADATA_DELETED
         )
         logChange(extension.relationship.destination,
                 changedId: extension.relationship.destination.id,
                 latestVersionId: extension.relationship.destination.latestVersionId ?: extension.relationship.destination.id,
                 authorId: authorId ?: defaultAuthorId,
-                property: "${extension.relationship.relationshipType.destinationToSource} [${extension.name}]",
-                oldValue: storeValue(extension.extensionValue),
+                property: extension.relationship.relationshipType.destinationToSource,
+                oldValue: storeValue(extension),
                 type: ChangeType.RELATIONSHIP_METADATA_DELETED,
                 otherSide: true
         )
@@ -294,8 +268,7 @@ class DefaultAuditor implements Auditor {
                 latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
                 authorId: authorId ?: defaultAuthorId,
                 property: relationship.relationshipType.sourceToDestination,
-                newValue: storeValue(relationship.destination),
-                oldValue: storeValue(relationship.classification),
+                newValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_CREATED
         )
         logChange(relationship.destination,
@@ -303,8 +276,7 @@ class DefaultAuditor implements Auditor {
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
                 authorId: authorId ?: defaultAuthorId,
                 property: relationship.relationshipType.destinationToSource,
-                newValue: storeValue(relationship.source),
-                oldValue: storeValue(relationship.classification),
+                newValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_CREATED,
                 otherSide: true
         )
@@ -319,8 +291,7 @@ class DefaultAuditor implements Auditor {
                 latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
                 authorId: authorId ?: defaultAuthorId,
                 property: relationship.relationshipType.sourceToDestination,
-                newValue: storeValue(relationship.destination),
-                oldValue: storeValue(relationship.classification),
+                oldValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_DELETED
         )
         logChange(relationship.destination,
@@ -328,10 +299,75 @@ class DefaultAuditor implements Auditor {
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
                 authorId: authorId ?: defaultAuthorId,
                 property: relationship.relationshipType.destinationToSource,
-                newValue: storeValue(relationship.source),
-                oldValue: storeValue(relationship.classification),
+                oldValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_DELETED,
                 otherSide: true
         )
+    }
+
+    static String storeValue(Object object) {
+        Object toStore = objectToStore(object)
+        if (toStore == null) {
+            return null
+        }
+        new JSONBuilder().build {
+            toStore instanceof Map ? toStore : [value: toStore]
+        }.toString()
+    }
+
+    private static objectToStore(Object object) {
+        if (object instanceof CatalogueElement) {
+            return CatalogueElementMarshallers.minimalCatalogueElementJSON(object)
+        }
+        if (object instanceof Mapping) {
+            return [
+                    source : CatalogueElementMarshallers.minimalCatalogueElementJSON(object.source),
+                    destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(object.destination),
+                    mapping: object.mapping,
+                    id     : object.id
+            ]
+        }
+        if (object instanceof RelationshipMetadata) {
+            return [
+                    name: object.name,
+                    extensionValue: object.extensionValue,
+                    relationship: objectToStore(object.relationship)
+            ]
+        }
+        if (object instanceof Relationship){
+            def ret = RelationshipMarshallers.getRelationshipAsMap(object)
+            ret.remove('ext')
+            return ret
+        }
+        if (object instanceof Enum) {
+            return object.toString()
+        }
+        if (object instanceof CharSequence) {
+            if (object.size() > 14950) {
+                return object.toString()[0..14950] + '...(text truncated)'
+            }
+        }
+        return object
+    }
+
+    static Object readValue(String string) {
+        if (string == null) {
+            return null
+        }
+        JsonSlurper jsonSlurper = new JsonSlurper()
+        JSONObject object = jsonSlurper.parseText(string) as JSONObject
+        if (object.containsKey('value')) {
+            return object.value
+        }
+        if (object.containsKey('mapping') || object.containsKey('extensionValue')) {
+            return object
+        }
+        if (object.containsKey('elementType')) {
+            if (object.elementType == Relationship.name) {
+                return object
+            }
+            return Class.forName(object.elementType).get(object.id)
+        }
+        throw new IllegalArgumentException("Unsupported stored value: $string")
     }
 }

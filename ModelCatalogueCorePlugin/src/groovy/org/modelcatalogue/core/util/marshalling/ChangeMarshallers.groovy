@@ -14,9 +14,13 @@ class ChangeMarshallers extends AbstractMarshallers {
     protected Map<String, Object> prepareJsonMap(change) {
         if (!change) return [:]
         [
+                elementType:    Change.name,
+                id:             change.id,
                 changed:        getPotentiallyDeletedInfo(change.changedId),
                 latestVersion:  getPotentiallyDeletedInfo(change.latestVersionId),
                 type:           change.type.toString(),
+                undoSupported:  change.type.undoSupported,
+                otherSide:      change.otherSide,
                 author:         getPotentiallyDeletedInfo(change.authorId),
                 dateCreated:    change.dateCreated,
                 property:       change.property,

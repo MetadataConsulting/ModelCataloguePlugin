@@ -36,4 +36,11 @@ class Change {
     String toString() {
         "Change[change: $changedId, latest: $latestVersionId, author: $authorId, type: $type, property: $property, newValue: $newValue, oldValue: $oldValue]"
     }
+
+    boolean undo() {
+        if (!type) {
+            return false
+        }
+        return type.undo(this)
+    }
 }
