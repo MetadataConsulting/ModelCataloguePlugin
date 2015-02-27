@@ -7,13 +7,6 @@ package org.modelcatalogue.core
 
 class MeasurementUnit extends CatalogueElement {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        name boost:5
-        except = ['incomingRelationships', 'outgoingRelationships']
-    }
-
     String symbol
 
     static constraints = {

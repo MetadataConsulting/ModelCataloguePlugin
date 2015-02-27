@@ -23,6 +23,11 @@ class RelationshipService {
     Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false, boolean resetIndexes = false) {
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
+
+            if (!relationshipInstance && relationshipType.bidirectional) {
+                relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(destination, source, relationshipType, classification)
+            }
+
             if (relationshipInstance) {
                 if (!resetIndexes && relationshipInstance.archived == archived) {
                     return relationshipInstance

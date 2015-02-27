@@ -18,6 +18,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     def grailsLinkGenerator
     def relationshipService
+    def mappingService
 
     String name
     String description
@@ -66,16 +67,6 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         archived bindable: false
         versionNumber bindable: false
         latestVersionId bindable: false, nullable: true
-    }
-
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-		modelCatalogueId boost:10
-        name boost:5
-        incomingMappings component: true
-        extensions component:true
-        except = ['versionNumber', 'incomingRelationships', 'outgoingRelationships', 'incomingMappings', 'outgoingMappings']
     }
 
     static mapping = {
@@ -270,6 +261,12 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     void afterDraftPersisted(CatalogueElement draft) {
         draft.ext.putAll this.ext
+        for(Mapping mapping in outgoingMappings) {
+            mappingService.map(draft, mapping.destination, mapping.mapping)
+        }
+        for (Mapping mapping in incomingMappings) {
+            mappingService.map(mapping.source, draft, mapping.mapping)
+        }
     }
 
     static String fixResourceName(String resourceName) {

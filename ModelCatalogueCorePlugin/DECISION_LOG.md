@@ -1,3 +1,7 @@
+# 2015-02-25
+Deleted `ModelCatalogueElasticSearchPlugin` and the `searchable` configuration in the domain classes as it become very
+stale. It will be very difficult to provide classifications filters in elastic search at the current status.
+
 # 2014-11-04
 Reverted `CatalogueElement.latestVersion` to be a just `Long` because otherwise Hibernate is pretty confused by it (or
 at least Fixtures plugin).
