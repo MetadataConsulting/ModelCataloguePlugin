@@ -290,6 +290,14 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         direction << RelationshipDirection.values()
     }
 
+    def "only one relationship is created for bidirectional relationship type"() {
+        Relationship rel1 = relationshipService.link(de1, de2, RelationshipType.synonymType)
+        Relationship rel2 = relationshipService.link(de2, de1, RelationshipType.synonymType)
+
+        expect:
+        rel1 == rel2
+    }
+
     private static void printIndexes(Map<String, Relationship> relationships, RelationshipDirection direction, String label) {
         println "$label:\n    ${relationships.sort {entry -> direction.getIndex(entry.value) } collect { key, value -> "$key: ${direction.getIndex(value)}"} join(', ')}"
     }
