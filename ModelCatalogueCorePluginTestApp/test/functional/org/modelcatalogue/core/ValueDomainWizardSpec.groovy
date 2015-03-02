@@ -488,14 +488,14 @@
             }
 
             when: "langauge is select and confirmed"
-            value = 'xs:language'
+            value = 'temperature US'
             selectCepItemIfExists()
 
             modalPrimaryButton().click()
 
             then: "the item is merged and we are redirected to destination domain"
             waitFor {
-                subviewTitle.text().trim() == 'xs:language FINALIZED'
+                subviewTitle.text().trim() == 'temperature US DRAFT'
             }
 
             and: "the relationships are copied to the destination domain"
