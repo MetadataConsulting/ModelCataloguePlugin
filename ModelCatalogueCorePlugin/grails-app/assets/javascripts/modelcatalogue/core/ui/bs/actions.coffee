@@ -389,7 +389,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       label:      'Undo'
       icon:       'fa fa-undo'
       type:       'primary'
-      disabled:   not $scope.element.undoSupported
+      disabled:   not $scope.element.undoSupported or $scope.element.undone
       action:     ->
         security.requireRole('CURATOR').then ->
           messages.confirm("Do you want to undo selected change?", "Current element will be reverted to the previous state if it is still possible. Undoing change does not check if the current state").then ->

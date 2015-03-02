@@ -26,6 +26,7 @@ class ChangeMarshallers extends AbstractMarshallers {
                 property:       change.property,
                 oldValue:       change.oldValue != null ? JSON.parse(change.oldValue as String) : null,
                 newValue:       change.newValue != null ? JSON.parse(change.newValue as String) : null,
+                undone:         change.undone
         ]
     }
 

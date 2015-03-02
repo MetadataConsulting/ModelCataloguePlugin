@@ -58,4 +58,28 @@ databaseChangeLog = {
           update relationship_type set destination_to_source = 'is classified by' where name = 'classification'
         """
     }
+
+
+    changeSet(author: "Vladimir Orany", id: "1412847974092-03") {
+        preConditions (onFail: 'MARK_RAN') {
+            not {
+                columnExists tableName: "change", columnName: "undone"
+            }
+        }
+        addColumn(tableName: 'change') {
+            column name: 'undone', type: 'BIT'
+        }
+    }
+
+
+    changeSet(author: "Vladimir Orany", id: "1412847974092-04") {
+        preConditions (onFail: 'MARK_RAN') {
+            not {
+                columnExists tableName: "change", columnName: "parent_id"
+            }
+        }
+        addColumn(tableName: 'change') {
+            column name: 'parent_id', type: 'BIGINT'
+        }
+    }
 }
