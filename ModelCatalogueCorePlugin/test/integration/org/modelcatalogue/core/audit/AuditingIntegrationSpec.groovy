@@ -31,7 +31,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         initCatalogueService.initDefaultRelationshipTypes()
         when:
         DataType vOne = new DataType(name: "DT4DCL").save(failOnError: true)
-        DataType type = vOne.publish(elementService).createDraftVersion(elementService, DraftContext.userFriendly())
+        DataType type = elementService.createDraftVersion(vOne.publish(elementService), DraftContext.userFriendly()) as DataType
         Change change = Change.findByChangedId(type.id)
 
         then:
