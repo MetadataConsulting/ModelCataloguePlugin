@@ -18,7 +18,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           original[newKey] = update[newKey]
         original
 
-      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'downloadUrl', 'archived', 'status', '__enhancedBy', 'parent']
+      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'downloadUrl', 'archived', 'status', '__enhancedBy', 'parent', 'oldValue', 'newValue']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]

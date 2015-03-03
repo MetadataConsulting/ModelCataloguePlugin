@@ -30,6 +30,32 @@ class DefaultAuditor implements Auditor {
         )
     }
 
+    Long logElementFinalized(CatalogueElement element, Long authorId) {
+        logChange(element,
+                changedId: element.id,
+                latestVersionId: element.latestVersionId ?: element.id,
+                authorId: authorId ?: defaultAuthorId,
+                parentId: parentChangeId,
+                property: 'status',
+                type: ChangeType.ELEMENT_FINALIZED,
+                oldValue: storeValue(element.status),
+                newValue: storeValue(ElementStatus.FINALIZED)
+        )
+    }
+
+    Long logElementDeprecated(CatalogueElement element, Long authorId) {
+        logChange(element,
+                changedId: element.id,
+                latestVersionId: element.latestVersionId ?: element.id,
+                authorId: authorId ?: defaultAuthorId,
+                parentId: parentChangeId,
+                property: 'status',
+                type: ChangeType.ELEMENT_DEPRECATED,
+                oldValue: storeValue(element.status),
+                newValue: storeValue(ElementStatus.DEPRECATED)
+        )
+    }
+
     Long logElementCreated(CatalogueElement element, Long authorId) {
         logChange(element,
                 changedId: element.id,
@@ -188,16 +214,6 @@ class DefaultAuditor implements Auditor {
 
             ChangeType type = ChangeType.PROPERTY_CHANGED
 
-            if (name == 'status') {
-                if (newValueRaw == ElementStatus.FINALIZED) {
-                    type = ChangeType.ELEMENT_FINALIZED
-                } else if (newValueRaw == ElementStatus.DEPRECATED) {
-                    type = ChangeType.ELEMENT_DEPRECATED
-                } else {
-                    continue
-                }
-            }
-
             logChange(element,
                     changedId: element.id,
                     latestVersionId: element.latestVersionId ?: element.id,
@@ -206,7 +222,8 @@ class DefaultAuditor implements Auditor {
                     type: type,
                     property: name,
                     oldValue: originalValue,
-                    newValue: newValue
+                    newValue: newValue,
+                    system: name == 'status'
             )
         }
     }
@@ -298,9 +315,6 @@ class DefaultAuditor implements Auditor {
     }
 
     Long logNewRelation(Relationship relationship, Long authorId) {
-        if (relationship.relationshipType.system) {
-            return null
-        }
         logChange(relationship.destination,
                 changedId: relationship.destination.id,
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
@@ -309,7 +323,8 @@ class DefaultAuditor implements Auditor {
                 property: relationship.relationshipType.destinationToSource,
                 newValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_CREATED,
-                otherSide: true
+                otherSide: true,
+                system: relationship.relationshipType.system
         )
         logChange(relationship.source,
                 changedId: relationship.source.id,
@@ -318,14 +333,12 @@ class DefaultAuditor implements Auditor {
                 parentId: parentChangeId,
                 property: relationship.relationshipType.sourceToDestination,
                 newValue: storeValue(relationship),
-                type: ChangeType.RELATIONSHIP_CREATED
+                type: ChangeType.RELATIONSHIP_CREATED,
+                system: relationship.relationshipType.system
         )
     }
 
     Long logRelationRemoved(Relationship relationship, Long authorId) {
-        if (relationship.relationshipType.system) {
-            return null
-        }
         logChange(relationship.destination,
                 changedId: relationship.destination.id,
                 latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
@@ -334,7 +347,8 @@ class DefaultAuditor implements Auditor {
                 property: relationship.relationshipType.destinationToSource,
                 oldValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_DELETED,
-                otherSide: true
+                otherSide: true,
+                system: relationship.relationshipType.system
         )
         logChange(relationship.source,
                 changedId: relationship.source.id,
@@ -343,7 +357,33 @@ class DefaultAuditor implements Auditor {
                 parentId: parentChangeId,
                 property: relationship.relationshipType.sourceToDestination,
                 oldValue: storeValue(relationship),
-                type: ChangeType.RELATIONSHIP_DELETED
+                type: ChangeType.RELATIONSHIP_DELETED,
+                system: relationship.relationshipType.system
+        )
+    }
+
+
+    Long logRelationArchived(Relationship relationship, Long authorId) {
+        logChange(relationship.destination,
+                changedId: relationship.destination.id,
+                latestVersionId: relationship.destination.latestVersionId ?: relationship.destination.id,
+                authorId: authorId ?: defaultAuthorId,
+                parentId: parentChangeId,
+                property: relationship.relationshipType.destinationToSource,
+                oldValue: storeValue(relationship),
+                type: ChangeType.RELATIONSHIP_ARCHIVED,
+                otherSide: true,
+                system: true
+        )
+        logChange(relationship.source,
+                changedId: relationship.source.id,
+                latestVersionId: relationship.source.latestVersionId ?: relationship.source.id,
+                authorId: authorId ?: defaultAuthorId,
+                parentId: parentChangeId,
+                property: relationship.relationshipType.sourceToDestination,
+                oldValue: storeValue(relationship),
+                type: ChangeType.RELATIONSHIP_ARCHIVED,
+                system: true
         )
     }
 

@@ -29,9 +29,16 @@ class Change {
      */
     Boolean otherSide = Boolean.FALSE
 
+    /**
+     * System changes don't appear in user, classification or global feeds
+     */
+    Boolean system = Boolean.FALSE
+
     static constraints = {
         authorId nullable: true
         parentId nullable: true
+        undone nullable: true
+        system nullable: true
         property maxSize: 255, nullable: true
         newValue maxSize: 15000, nullable: true
         oldValue maxSize: 15000, nullable: true

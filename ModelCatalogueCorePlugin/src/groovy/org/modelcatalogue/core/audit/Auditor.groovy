@@ -11,6 +11,9 @@ interface Auditor {
     void setParentChangeId(Long id)
 
     Long logNewVersionCreated(CatalogueElement element, Long authorId)
+    Long logElementFinalized(CatalogueElement element, Long authorId)
+    Long logElementDeprecated(CatalogueElement element, Long authorId)
+
     Long logElementCreated(CatalogueElement element, Long authorId)
     Long logElementDeleted(CatalogueElement element, Long authorId)
     Long logElementUpdated(CatalogueElement element, Long authorId)
@@ -25,6 +28,7 @@ interface Auditor {
 
     Long logNewRelation(Relationship relationship, Long authorId)
     Long logRelationRemoved(Relationship relationship, Long authorId)
+    Long logRelationArchived(Relationship relationship, Long authorId)
 
     Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId)
     Long logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId)

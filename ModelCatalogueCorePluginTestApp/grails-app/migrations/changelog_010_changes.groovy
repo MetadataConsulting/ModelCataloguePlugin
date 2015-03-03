@@ -71,7 +71,6 @@ databaseChangeLog = {
         }
     }
 
-
     changeSet(author: "Vladimir Orany", id: "1412847974092-04") {
         preConditions (onFail: 'MARK_RAN') {
             not {
@@ -80,6 +79,17 @@ databaseChangeLog = {
         }
         addColumn(tableName: 'change') {
             column name: 'parent_id', type: 'BIGINT'
+        }
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1412847974092-05") {
+        preConditions (onFail: 'MARK_RAN') {
+            not {
+                columnExists tableName: "change", columnName: "system"
+            }
+        }
+        addColumn(tableName: 'change') {
+            column name: 'system', type: 'BIT'
         }
     }
 }

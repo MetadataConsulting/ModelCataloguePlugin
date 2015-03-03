@@ -43,31 +43,7 @@ enum ChangeType {
 
         @Override
         boolean doUndo(Change change, CatalogueElement target) {
-            Logger log = Logger.getLogger(ChangeType)
-            if (!change) {
-                return false
-            }
-
-            List<Change> changes = Change.findAllByParentId(change.id, [sort: 'dateCreated', order: 'desc'])
-
-
-            boolean undone = true
-            for (Change ch in changes) {
-                if (!ch.type.undoSupported) {
-                    log.warn "Change not undoable $ch"
-                    continue
-                }
-                if (ch.undone) {
-                    log.info "Change already undone $ch"
-                    continue
-                }
-                if (!ch.undo()) {
-                    log.warn "Undo unsuccessful $ch"
-                    undone = false
-                }
-            }
-
-            return undone
+            undoChildChanges(change)
         }
     },
 
@@ -86,8 +62,42 @@ enum ChangeType {
     },
 
     ELEMENT_DELETED,
-    ELEMENT_DEPRECATED,
-    ELEMENT_FINALIZED,
+
+    ELEMENT_DEPRECATED {
+        @Override
+        boolean isUndoSupported() {
+            true
+        }
+
+        @Override
+        boolean doUndo(Change change, CatalogueElement target) {
+            undoChildChanges(change)
+        }
+    },
+
+    EXTERNAL_UPDATE {
+        @Override
+        boolean isUndoSupported() {
+            true
+        }
+
+        @Override
+        boolean doUndo(Change change, CatalogueElement target) {
+            undoChildChanges(change)
+        }
+    },
+
+    ELEMENT_FINALIZED {
+        @Override
+        boolean isUndoSupported() {
+            true
+        }
+
+        @Override
+        boolean doUndo(Change change, CatalogueElement target) {
+            undoChildChanges(change)
+        }
+    },
 
     METADATA_CREATED {
         @Override
@@ -225,6 +235,24 @@ enum ChangeType {
         }
     },
 
+    RELATIONSHIP_ARCHIVED {
+        @Override
+        boolean isUndoSupported() {
+            true
+        }
+
+        @Override
+        boolean doUndo(Change change, CatalogueElement target) {
+            def rel = DefaultAuditor.readValue(change.oldValue)
+            if (!rel) {
+                return false
+            }
+            rel.archived = true
+            rel.save(flush: true)
+            return !rel.hasErrors()
+        }
+    },
+
 
     RELATIONSHIP_METADATA_CREATED {
         @Override
@@ -315,6 +343,33 @@ enum ChangeType {
         false
     }
 
+    protected static boolean undoChildChanges(Change change) {
+        Logger log = Logger.getLogger(ChangeType)
+        if (!change) {
+            return false
+        }
+
+        List<Change> changes = Change.findAllByParentIdAndOtherSideNotEqual(change.id, Boolean.TRUE, [sort: 'dateCreated', order: 'desc'])
+
+
+        boolean undone = true
+        for (Change ch in changes) {
+            if (!ch.type.undoSupported) {
+                log.warn "Change not undoable $ch"
+                continue
+            }
+            if (ch.undone) {
+                log.info "Change already undone $ch"
+                continue
+            }
+            if (!ch.undo()) {
+                log.warn "Undo unsuccessful $ch"
+                undone = false
+            }
+        }
+
+        return undone
+    }
 
 
 }

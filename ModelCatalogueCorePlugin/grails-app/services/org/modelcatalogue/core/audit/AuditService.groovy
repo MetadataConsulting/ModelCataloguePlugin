@@ -80,6 +80,7 @@ class AuditService {
         Lists.fromCriteria(params, Change) {
             eq 'authorId', authorId
             ne 'otherSide', Boolean.TRUE
+            ne 'system', Boolean.TRUE
         }
     }
 
@@ -91,6 +92,7 @@ class AuditService {
         }
         Lists.fromCriteria(params, Change) {
             eq 'latestVersionId', latestId
+            ne 'system', Boolean.TRUE
         }
     }
 
@@ -106,6 +108,8 @@ class AuditService {
 
         Lists.fromCriteria(params, Change) {
             eq 'parentId', change.id
+            ne 'system', Boolean.TRUE
+            ne 'otherSide', Boolean.TRUE
         }
     }
 
@@ -121,6 +125,15 @@ class AuditService {
             FriendlyErrors.failFriendlySave(change)
         }
         ce
+    }
+
+    CatalogueElement logElementFinalized(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
+        withParentId(auditor.get().logElementFinalized(element, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
+    }
+
+
+    CatalogueElement logElementDeprecated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
+        withParentId(auditor.get().logElementDeprecated(element, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
     }
 
     void logNewMetadata(ExtensionValue extension) {
@@ -177,6 +190,10 @@ class AuditService {
 
     void logRelationRemoved(Relationship relationship) {
         auditor.get().logRelationRemoved(relationship, modelCatalogueSecurityService.currentUser?.id)
+    }
+
+    void logRelationArchived(Relationship relationship) {
+        auditor.get().logRelationArchived(relationship, modelCatalogueSecurityService.currentUser?.id)
     }
 
 

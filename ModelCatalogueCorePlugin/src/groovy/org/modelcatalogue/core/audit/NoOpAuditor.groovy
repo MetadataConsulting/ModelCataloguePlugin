@@ -20,6 +20,10 @@ enum NoOpAuditor implements Auditor {
 
     @Override Long logNewVersionCreated(CatalogueElement element, Long authorId) { null }
 
+    @Override Long logElementFinalized(CatalogueElement element, Long authorId) { null }
+
+    @Override Long logElementDeprecated(CatalogueElement element, Long authorId) { null }
+
     @Override Long logElementCreated(CatalogueElement element, Long authorId) { null }
 
     @Override Long logElementDeleted(CatalogueElement element, Long authorId) {
@@ -44,6 +48,8 @@ enum NoOpAuditor implements Auditor {
     @Override Long logNewRelation(Relationship relationship, Long authorId) { null }
 
     @Override Long logRelationRemoved(Relationship relationship, Long authorId) { null }
+
+    @Override Long logRelationArchived(Relationship relationship, Long authorId) { null }
 
     @Override Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) { null }
 

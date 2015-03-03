@@ -48,9 +48,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def "finalization is logged"() {
         initCatalogueService.initDefaultRelationshipTypes()
         when:
-        DataType vOne = new DataType(name: "DT4DEF").save(flush: true, failOnError: true)
-        vOne.status = ElementStatus.FINALIZED
-        vOne.save(flush: true, failOnError: true)
+        DataType vOne = elementService.finalizeElement(new DataType(name: "DT4DEF").save(flush: true, failOnError: true))
 
         Change change = Change.findByChangedIdAndType(vOne.id, ChangeType.ELEMENT_FINALIZED)
 
