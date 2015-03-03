@@ -329,9 +329,6 @@ enum ChangeType {
 
         CatalogueElement target = CatalogueElement.get(change.changedId)
 
-        if (target.status != ElementStatus.DRAFT && !change.otherSide) {
-            return false
-        }
         if (change.latestVersionId != (target.latestVersionId ?: target.id)) {
             return false
         }

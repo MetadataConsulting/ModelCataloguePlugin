@@ -15,6 +15,7 @@ angular.module('mc.core.changeEnhancer', ['mc.util.rest', 'mc.util.enhance', 'mc
           
     getTitleChangeType = (change, catalogueElementProperties) ->
       switch change.type
+        when 'EXTERNAL_UPDATE' then """#{change.property} (from #{change.changed.getLabel()})"""
         when 'NEW_ELEMENT_CREATED' then """#{change.changed.getLabel()} created"""
         when 'NEW_VERSION_CREATED' then """New version #{change.changed.getLabel()} created"""
         when 'PROPERTY_CHANGED' then """Property #{getProperty(change.property, catalogueElementProperties)} of #{change.changed.getLabel()} changed from #{getPlainValue(change.oldValue)} to #{getPlainValue(change.newValue)} """

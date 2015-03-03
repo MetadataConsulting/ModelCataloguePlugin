@@ -64,7 +64,7 @@ class Change {
         }
 
         Change.withTransaction { TransactionStatus status ->
-            AuditService.noAudit {
+            AuditService.mute {
                 if (type.undo(this)) {
                     undone = true
                     FriendlyErrors.failFriendlySave(this)

@@ -76,7 +76,7 @@ abstract class PublishingChain {
 
     protected void restoreStatus() {
         if (published.status != initialStatus) {
-            AuditService.noAudit {
+            AuditService.mute {
                 published.status = initialStatus
                 published.clearErrors()
                 FriendlyErrors.failFriendlySave(published)
@@ -85,7 +85,7 @@ abstract class PublishingChain {
     }
 
     protected void startUpdating() {
-        AuditService.noAudit {
+        AuditService.mute {
             published.status = ElementStatus.UPDATED
             published.clearErrors()
             FriendlyErrors.failFriendlySave(published)

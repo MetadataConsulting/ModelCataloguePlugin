@@ -381,7 +381,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerActionInRole 'undo-change', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'security', '$http', 'modelCatalogueApiRoot', '$state', ($scope, messages, security, $http, modelCatalogueApiRoot, $state) ->
     return undefined unless $scope.element
     return undefined unless $scope.element.changed
-    return undefined unless $scope.element.changed.status == 'DRAFT'
+    return undefined unless $scope.element.changed.status == 'DRAFT' or ($scope.element.changed.isInstanceOf('asset') and $scope.element.changed.status == 'FINALIZED')
     return undefined if not security.hasRole('CURATOR')
 
     {

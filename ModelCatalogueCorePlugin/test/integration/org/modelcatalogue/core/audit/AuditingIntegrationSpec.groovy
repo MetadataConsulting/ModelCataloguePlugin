@@ -66,7 +66,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         initCatalogueService.initDefaultRelationshipTypes()
         when:
         DataType vOne = new DataType(name: "DT4DEF").save(flush: true, failOnError: true)
-        vOne.status = ElementStatus.DEPRECATED
+        vOne = elementService.archive(vOne)
         vOne.save(flush: true, failOnError: true)
 
         Change change = Change.findByChangedIdAndType(vOne.id, ChangeType.ELEMENT_DEPRECATED)
@@ -452,16 +452,16 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         type.save(failOnError: true, flush: true)
 
         expect:
-        !Change.findByTypeAndChangedIdAndProperty(ChangeType.PROPERTY_CHANGED, type.id, 'status')
+        !Change.findByTypeAndChangedIdAndPropertyAndSystemNotEqual(ChangeType.PROPERTY_CHANGED, type.id, 'status', true)
     }
 
     def "auditing can be disabled"() {
-        DataType type = AuditService.noAudit {
+        DataType type = AuditService.mute {
              new DataType(name: 'DT4DIS', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
 
         expect:
-        !Change.findByTypeAndChangedId(ChangeType.NEW_ELEMENT_CREATED, type.id)
+        !Change.findByTypeAndChangedIdAndSystemNotEqual(ChangeType.NEW_ELEMENT_CREATED, type.id, true)
     }
 
     def "you can set default author id"() {

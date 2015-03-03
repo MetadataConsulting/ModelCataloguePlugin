@@ -2,6 +2,7 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
 
   getIconForChangeType = (change) ->
     switch change.type
+      when 'EXTERNAL_UPDATE' then """<span title="External Change"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-cloud-upload fa-fw text-success"></span></span>"""
       when 'NEW_ELEMENT_CREATED' then """<span title="New Element Created"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-plus fa-fw text-success"></span></span>"""
       when 'NEW_VERSION_CREATED' then """<span title="New Version Created"><span class="#{change.changed.getIcon()} fa-fw text-success"></span> <span class="fa fa-arrow-circle-up fa-fw text-success"></span></span>"""
       when 'PROPERTY_CHANGED' then """<span title="Property Changed"><span class="#{change.changed.getIcon()} fa-fw text-info"></span> <span class="fa fa-edit fa-fw text-info"></span></span>"""
@@ -39,6 +40,7 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
 
   getChangeForChangeType = (change, catalogueElementProperties) ->
     switch change.type
+      when 'EXTERNAL_UPDATE' then """#{change.property} (from #{getLinkTo(change.changed)})"""
       when 'NEW_ELEMENT_CREATED' then """#{getLinkTo(change.changed)} created"""
       when 'NEW_VERSION_CREATED' then """New version #{getLinkTo(change.changed)} created"""
       when 'PROPERTY_CHANGED' then """Property #{getProperty(change.property, catalogueElementProperties)} of #{getLinkTo(change.changed)} changed from #{getValue(change.oldValue)} to #{getValue(change.newValue)} """

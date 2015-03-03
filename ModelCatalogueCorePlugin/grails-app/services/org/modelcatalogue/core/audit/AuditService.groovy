@@ -25,11 +25,12 @@ class AuditService {
      * @param noAuditBlock code to be executed without logging the changes
      * @return the value returned from the noAuditBlock
      */
-    static <R> R noAudit(Closure<R> noAuditBlock) {
-        Auditor old = auditor.get()
-        auditor.set(NoOpAuditor.INSTANCE)
+    static <R> R mute(Closure<R> noAuditBlock) {
+        Auditor auditor = auditor.get()
+        Boolean currentSystem = auditor.system
+        auditor.system = true
         R result = noAuditBlock()
-        auditor.set(old)
+        auditor.system = currentSystem
         return result
     }
 
@@ -134,6 +135,10 @@ class AuditService {
 
     CatalogueElement logElementDeprecated(CatalogueElement element, Closure<CatalogueElement> createDraftBlock) {
         withParentId(auditor.get().logElementDeprecated(element, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
+    }
+
+    CatalogueElement logExternalChange(CatalogueElement source, String message, Closure<CatalogueElement> createDraftBlock) {
+        withParentId(auditor.get().logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
     }
 
     void logNewMetadata(ExtensionValue extension) {

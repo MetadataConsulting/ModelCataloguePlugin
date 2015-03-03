@@ -19,6 +19,19 @@ class DefaultAuditor implements Auditor {
 
     Long defaultAuthorId
     Long parentChangeId
+    Boolean system
+
+
+    Long logExternalChange(CatalogueElement source, String message, Long authorId) {
+        logChange(source,
+                changedId: source.id,
+                latestVersionId: source.latestVersionId ?: source.id,
+                authorId: authorId ?: defaultAuthorId,
+                property: message,
+                parentId: parentChangeId,
+                type: ChangeType.EXTERNAL_UPDATE
+        )
+    }
 
     Long logNewVersionCreated(CatalogueElement element, Long authorId) {
         logChange(element,
@@ -293,7 +306,7 @@ class DefaultAuditor implements Auditor {
         )
     }
 
-    static Long logChange(Map <String, Object> changeProps, CatalogueElement element) {
+    Long logChange(Map <String, Object> changeProps, CatalogueElement element) {
         try {
             Change.withNewSession {
                 if (element.hasErrors() || !element.id) {
@@ -301,6 +314,7 @@ class DefaultAuditor implements Auditor {
                     return null
                 }
                 Change change = new Change(changeProps)
+                change.system = change.system || system
                 change.validate()
                 if (change.hasErrors()) {
                     log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)

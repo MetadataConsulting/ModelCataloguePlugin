@@ -10,6 +10,10 @@ interface Auditor {
     Long getParentChangeId()
     void setParentChangeId(Long id)
 
+    Boolean getSystem()
+    void setSystem(Boolean system)
+
+    Long logExternalChange(CatalogueElement source, String message, Long authorId)
     Long logNewVersionCreated(CatalogueElement element, Long authorId)
     Long logElementFinalized(CatalogueElement element, Long authorId)
     Long logElementDeprecated(CatalogueElement element, Long authorId)
