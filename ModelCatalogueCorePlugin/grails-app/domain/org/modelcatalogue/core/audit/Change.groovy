@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.audit
 
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.springframework.transaction.TransactionStatus
 
 class Change {
 
@@ -43,7 +44,7 @@ class Change {
 
     @Override
     String toString() {
-        "Change[change: $changedId, latest: $latestVersionId, author: $authorId, type: $type, property: $property, newValue: $newValue, oldValue: $oldValue]"
+        "Change[id: $id, change: $changedId, parent: $parentId, latest: $latestVersionId, author: $authorId, type: $type, property: $property, newValue: $newValue, oldValue: $oldValue, undone: $undone, otherSide: $otherSide]"
     }
 
     boolean undo() {
@@ -52,15 +53,20 @@ class Change {
         }
 
         if (undone) {
-            return false
-        }
-
-        if (type.undo(this)) {
-            undone = true
-            FriendlyErrors.failFriendlySave(this)
             return true
         }
 
-        return false
+        Change.withTransaction { TransactionStatus status ->
+            AuditService.noAudit {
+                if (type.undo(this)) {
+                    undone = true
+                    FriendlyErrors.failFriendlySave(this)
+                    return true
+                } else {
+                    status.setRollbackOnly()
+                    return false
+                }
+            }
+        }
     }
 }

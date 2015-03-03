@@ -14,6 +14,7 @@ log4j = {
     debug 'org.modelcatalogue.core.util.builder'
     debug 'org.modelcatalogue.core.publishing'
     debug 'org.modelcatalogue.core.util.test'
+    debug 'org.modelcatalogue.core.audit'
 
     warn 'org.modelcatalogue.core.xml'
     info 'org.modelcatalogue.core.RelationshipType'

@@ -167,13 +167,7 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
-        DraftContext context = DraftContext.importFriendly()
-        T draft = element.createDraftVersion(elementService, context) as T
-        if (draft.hasErrors()) {
-            throw new IllegalStateException(FriendlyErrors.printErrors("Failed to create draft version of $element", draft.errors))
-        }
-        context.classifyDrafts()
-        draft
+        elementService.createDraftVersion(element, DraftContext.importFriendly(), true )
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {

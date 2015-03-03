@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -40,10 +39,7 @@ class DataElement extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        PublishingChain.createDraft(this, strategy)
-        .add(this.containedIn)
-        .add(this.classifications)
-        .run(publisher)
+    protected PublishingChain prepareDraftChain(PublishingChain chain) {
+        chain.add(this.containedIn).add(this.classifications)
     }
 }

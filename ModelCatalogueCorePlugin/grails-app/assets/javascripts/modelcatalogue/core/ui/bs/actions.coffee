@@ -393,11 +393,14 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action:     ->
         security.requireRole('CURATOR').then ->
           messages.confirm("Do you want to undo selected change?", "Current element will be reverted to the previous state if it is still possible. Undoing change does not check if the current state").then ->
-            $http(url: "#{modelCatalogueApiRoot}/changes/#{$scope.element.id}", method: 'DELETE').then ->
+            $http(url: "#{modelCatalogueApiRoot}/change/#{$scope.element.id}", method: 'DELETE').then ->
               messages.success "Change was reverted successfully"
               $state.go '.', {}, {inherit: true, reload: true}
             ,  ->
-              messages.error "Cannot undo selected change. Either the change is already reverted or it would leave catalogue in inconsistent state."
+              msg = "Cannot undo selected change. It would leave catalogue in inconsistent state."
+              if $scope.element.changes.total > 0
+                msg += " Try undo child actions one by one first."
+              messages.error msg
     }
   ]
 

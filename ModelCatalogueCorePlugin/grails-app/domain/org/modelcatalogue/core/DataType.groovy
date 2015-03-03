@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.FriendlyErrors
 
@@ -66,10 +64,7 @@ class DataType extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        PublishingChain.createDraft(this, strategy)
-        .add(this.relatedValueDomains)
-        .add(this.classifications)
-        .run(publisher)
+    protected PublishingChain prepareDraftChain(PublishingChain chain) {
+        chain.add(this.relatedValueDomains).add(this.classifications)
     }
 }

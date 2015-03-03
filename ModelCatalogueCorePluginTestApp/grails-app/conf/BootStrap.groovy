@@ -89,7 +89,7 @@ class BootStrap {
         createRequestmapIfMissing('/user/current', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/catalogue/upload', 'ROLE_METADATA_CURATOR', org.springframework.http.HttpMethod.POST)
         createRequestmapIfMissing('/catalogue/*/**', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
-        createRequestmapIfMissing('/api/modelCatalogue/core/changes/**', 'ROLE_METADATA_CURATOR', org.springframework.http.HttpMethod.DELETE)
+        createRequestmapIfMissing('/api/modelCatalogue/core/change/**', 'ROLE_METADATA_CURATOR', org.springframework.http.HttpMethod.DELETE)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR', org.springframework.http.HttpMethod.POST)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR', org.springframework.http.HttpMethod.PUT)

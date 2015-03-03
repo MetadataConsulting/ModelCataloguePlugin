@@ -9,7 +9,9 @@ class ModelCatalogueCorePluginUrlMappings {
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
         "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
 
-        "/api/modelCatalogue/core/changes/$id" (controller: 'catalogue', action: 'undo', method: HttpMethod.DELETE)
+        "/api/modelCatalogue/core/change/$id" (controller: 'change', action: 'show', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/change/$id/changes" (controller: 'change', action: 'changes', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/change/$id" (controller: 'change', action: 'undo', method: HttpMethod.DELETE)
 
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
         def catalogueElements = ['asset', 'dataElement', 'model', 'catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']

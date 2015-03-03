@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.audit
 
 import grails.util.Holders
+import org.apache.log4j.Logger
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
 
@@ -9,8 +10,66 @@ import org.modelcatalogue.core.util.FriendlyErrors
  */
 enum ChangeType {
 
-    NEW_ELEMENT_CREATED,
-    NEW_VERSION_CREATED,
+    NEW_ELEMENT_CREATED  {
+        @Override
+        boolean isUndoSupported() {
+            true
+        }
+
+        @Override
+        boolean doUndo(Change change, CatalogueElement target) {
+            if (!change) {
+                return false
+            }
+
+            CatalogueElement created = CatalogueElement.get(change.changedId)
+
+            if (!created) {
+                return true
+            }
+
+            created.clearAssociationsBeforeDelete()
+            created.delete(flush: true)
+
+            return true
+        }
+    },
+
+    NEW_VERSION_CREATED {
+        @Override
+        boolean isUndoSupported() {
+            true
+        }
+
+        @Override
+        boolean doUndo(Change change, CatalogueElement target) {
+            Logger log = Logger.getLogger(ChangeType)
+            if (!change) {
+                return false
+            }
+
+            List<Change> changes = Change.findAllByParentId(change.id, [sort: 'dateCreated', order: 'desc'])
+
+
+            boolean undone = true
+            for (Change ch in changes) {
+                if (!ch.type.undoSupported) {
+                    log.warn "Change not undoable $ch"
+                    continue
+                }
+                if (ch.undone) {
+                    log.info "Change already undone $ch"
+                    continue
+                }
+                if (!ch.undo()) {
+                    log.warn "Undo unsuccessful $ch"
+                    undone = false
+                }
+            }
+
+            return undone
+        }
+    },
 
     PROPERTY_CHANGED {
         @Override
@@ -132,9 +191,15 @@ enum ChangeType {
             CatalogueElement source = CatalogueElement.get(rel.source.id)
             CatalogueElement destination = CatalogueElement.get(rel.destination.id)
             RelationshipType type = RelationshipType.readByName(rel.type.name)
+
+            if (!source || !destination || !type) {
+                return true
+            }
+
             Relationship old = source.removeLinkTo(destination, type)
+
             if (!old) {
-                return false
+                return true
             }
             return !old.hasErrors()
         }
@@ -236,7 +301,7 @@ enum ChangeType {
 
         CatalogueElement target = CatalogueElement.get(change.changedId)
 
-        if (target.status != ElementStatus.DRAFT) {
+        if (target.status != ElementStatus.DRAFT && !change.otherSide) {
             return false
         }
         if (change.latestVersionId != (target.latestVersionId ?: target.id)) {

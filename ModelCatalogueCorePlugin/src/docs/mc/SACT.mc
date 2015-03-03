@@ -327,7 +327,7 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             ext 'Data Item Number', '15'
         }
         dataElement(name: 'Regimen') {
-            description 'To be consistent with the National Regimen List (when established)'
+            description 'To be consistent with the National Regimen (when established)'
             valueDomain(name: 'DRUG REGIMEN ACRONYM') {
                 basedOn 'max an35'
             }

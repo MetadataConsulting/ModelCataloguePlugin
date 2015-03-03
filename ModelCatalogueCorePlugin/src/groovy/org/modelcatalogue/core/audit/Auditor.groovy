@@ -7,23 +7,27 @@ interface Auditor {
     Long getDefaultAuthorId()
     void setDefaultAuthorId(Long id)
 
-    void logElementCreated(CatalogueElement element, Long authorId)
-    void logElementDeleted(CatalogueElement element, Long authorId)
-    void logElementUpdated(CatalogueElement element, Long authorId)
+    Long getParentChangeId()
+    void setParentChangeId(Long id)
 
-    void logMappingCreated(Mapping mapping, Long authorId)
-    void logMappingDeleted(Mapping mapping, Long authorId)
-    void logMappingUpdated(Mapping mapping, Long authorId)
+    Long logNewVersionCreated(CatalogueElement element, Long authorId)
+    Long logElementCreated(CatalogueElement element, Long authorId)
+    Long logElementDeleted(CatalogueElement element, Long authorId)
+    Long logElementUpdated(CatalogueElement element, Long authorId)
 
-    void logNewMetadata(ExtensionValue extension, Long authorId)
-    void logMetadataUpdated(ExtensionValue extension, Long authorId)
-    void logMetadataDeleted(ExtensionValue extension, Long authorId)
+    Long logMappingCreated(Mapping mapping, Long authorId)
+    Long logMappingDeleted(Mapping mapping, Long authorId)
+    Long logMappingUpdated(Mapping mapping, Long authorId)
 
-    void logNewRelation(Relationship relationship, Long authorId)
-    void logRelationRemoved(Relationship relationship, Long authorId)
+    Long logNewMetadata(ExtensionValue extension, Long authorId)
+    Long logMetadataUpdated(ExtensionValue extension, Long authorId)
+    Long logMetadataDeleted(ExtensionValue extension, Long authorId)
 
-    void logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId)
-    void logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId)
-    void logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId)
+    Long logNewRelation(Relationship relationship, Long authorId)
+    Long logRelationRemoved(Relationship relationship, Long authorId)
+
+    Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId)
+    Long logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId)
+    Long logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId)
 
 }

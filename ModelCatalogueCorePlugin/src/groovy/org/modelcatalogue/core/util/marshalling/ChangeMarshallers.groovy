@@ -1,11 +1,16 @@
 package org.modelcatalogue.core.util.marshalling
 
 import grails.converters.JSON
+import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
+import org.springframework.beans.factory.annotation.Autowired
 
 class ChangeMarshallers extends AbstractMarshallers {
+
+    @Autowired AuditService auditService
 
     ChangeMarshallers() {
         super(Change)
@@ -26,7 +31,9 @@ class ChangeMarshallers extends AbstractMarshallers {
                 property:       change.property,
                 oldValue:       change.oldValue != null ? JSON.parse(change.oldValue as String) : null,
                 newValue:       change.newValue != null ? JSON.parse(change.newValue as String) : null,
-                undone:         change.undone
+                undone:         change.undone,
+                parent:         Change.get(change.parentId),
+                changes:        [count: auditService.getSubChanges([:], change).total, itemType: Change.name, link: "/${GrailsNameUtils.getPropertyName(change.getClass())}/$change.id/changes"]
         ]
     }
 

@@ -52,13 +52,19 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
       when 'MAPPING_UPDATED' then """Changed mapping from #{getLinkTo(change.newValue.source)} to #{getLinkTo(change.newValue.destination)} from #{getValue(change.oldValue)} to #{getValue(change.newValue.mapping)} """
       when 'MAPPING_DELETED' then """Removed mapping from #{getLinkTo(change.oldValue.source)} to #{getLinkTo(change.oldValue.destination)} with rule #{getValue(change.oldValue.mapping)}"""
       when 'RELATIONSHIP_CREATED' then """Created relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.source else change.newValue.destination)}"""
-      when 'RELATIONSHIP_DELETED' then """Deleted relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.source else change.newValue.destination)}"""
+      when 'RELATIONSHIP_DELETED' then """Deleted relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.oldValue.source else change.oldValue.destination)}"""
 
       when 'RELATIONSHIP_METADATA_CREATED' then """Relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.relationship.source else change.newValue.relationship.destination)} metadata <code>#{change.newValue.name}</code> created with value #{getValue(change.newValue.extensionValue)}"""
       when 'RELATIONSHIP_METADATA_UPDATED' then """Relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.newValue.relationship.source else change.newValue.relationship.destination)} metadata <code>#{change.newValue.name}</code> updated from value #{getValue(change.oldValue)} to #{getValue(change.newValue.extensionValue)}"""
       when 'RELATIONSHIP_METADATA_DELETED' then """Deleted relationship #{getLinkTo(change.changed)} <code>#{change.property}</code> #{getLinkTo(if change.otherSide then change.oldValue.relationship.source else change.oldValue.relationship.destination)} <code>#{change.oldValue.name}</code> with value #{getValue(change.oldValue.extensionValue)}"""
 
 
+  getLinkToParent = (change) ->
+    return '' unless change?.parent
+    return """<a title="Parent Action: #{change.parent.name}" href="#/catalogue/change/#{change.parent.id}/changes"><span class="fa fa-fw fa-level-up"></span></a>"""
+
+  getIcon = (change) -> "#{getIconForChangeType(change)}#{getLinkToParent(change)}"
+  getChangeDescription = (change, catalogueElementProperties) -> """<a href="#/catalogue/change/#{change.id}"><span class="fa fa-fw fa-link"></span></a> #{getChangeForChangeType(change, catalogueElementProperties)}"""
 
   valueOrName = (property) ->
     (change) ->
@@ -69,9 +75,9 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
       return """<a href=#{object.href()}><span class="#{object.getIcon()}"></span> #{object.name}</a>""" if object.isInstanceOf and object.isInstanceOf('catalogueElement')
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.audit.Change', [
-    {header: "Type"       , value: getIconForChangeType      , classes: 'col-md-1' }
+    {header: "Type"       , value: getIcon                   , classes: 'col-md-1' }
     {header: "Author"     , value: valueOrName('author')     , classes: 'col-md-2' }
-    {header: "Change"     , value: getChangeForChangeType    , classes: 'col-md-9' }
+    {header: "Change"     , value: getChangeDescription      , classes: 'col-md-9' }
   ]
 
 

@@ -5,6 +5,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -330,7 +331,11 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     @Override
     CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        PublishingChain.createDraft(this, strategy).add(classifications).run(publisher)
+        prepareDraftChain(PublishingChain.createDraft(this, strategy)).run(publisher)
+    }
+
+    protected PublishingChain prepareDraftChain(PublishingChain chain) {
+        chain.add(classifications)
     }
 
     @Override
@@ -352,5 +357,22 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
 
     void beforeUpdate() {
         auditService.logElementUpdated(this)
+    }
+    
+    void clearAssociationsBeforeDelete() {
+        for (Classification c in this.classifications) {
+            this.removeFromClassifications(c)
+        }
+
+        // it is safe to remove all versioning informations
+        for (CatalogueElement e in this.supersededBy) {
+            this.removeFromSupersededBy(e)
+        }
+        for (CatalogueElement e in this.supersedes) {
+            this.removeFromSupersedes(e)
+        }
+        for (User u in this.isFavouriteOf) {
+            this.removeFromIsFavouriteOf(u)
+        }
     }
 }

@@ -257,6 +257,9 @@ import org.modelcatalogue.core.*
                 element.setProperty(key, value.resolve())
                 return
             }
+            if (value instanceof String) {
+                element.setProperty(key, value.trim())
+            }
             element.setProperty(key, value)
         }
     }

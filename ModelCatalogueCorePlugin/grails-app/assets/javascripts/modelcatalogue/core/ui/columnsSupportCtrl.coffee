@@ -15,6 +15,6 @@ angular.module('mc.core.ui.columnsSupportCtrl', ['mc.core.ui.catalogueElementPro
 
    $scope.classesForStatus = (element) ->
      status = element?.status ? element?.relation?.status
-     {'warning': status == 'DRAFT', 'info': status == 'PENDING' , 'danger': status == 'DEPRECATED' }
+     {'warning': status == 'DRAFT', 'info': status == 'PENDING' or element?.parent, 'danger': status == 'DEPRECATED' or element?.undone }
 
 ]

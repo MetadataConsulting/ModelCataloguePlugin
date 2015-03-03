@@ -14,33 +14,42 @@ enum NoOpAuditor implements Auditor {
 
     @Override void setDefaultAuthorId(Long id) { }
 
-    @Override void logElementCreated(CatalogueElement element, Long authorId) { }
+    @Override Long getParentChangeId() { null }
 
-    @Override void logElementDeleted(CatalogueElement element, Long authorId) { }
+    @Override void setParentChangeId(Long id) { }
 
-    @Override void logElementUpdated(CatalogueElement element, Long authorId) { }
+    @Override Long logNewVersionCreated(CatalogueElement element, Long authorId) { null }
 
-    @Override void logMappingCreated(Mapping mapping, Long authorId) { }
+    @Override Long logElementCreated(CatalogueElement element, Long authorId) { null }
 
-    @Override void logMappingDeleted(Mapping mapping, Long authorId) { }
+    @Override Long logElementDeleted(CatalogueElement element, Long authorId) {
+        // cannot ignore deleting element, could not render changes otherwise
+        new DefaultAuditor().logElementDeleted(element, authorId)
+    }
 
-    @Override void logMappingUpdated(Mapping mapping, Long authorId) { }
+    @Override Long logElementUpdated(CatalogueElement element, Long authorId) { null }
 
-    @Override void logNewMetadata(ExtensionValue extension, Long authorId) { }
+    @Override Long logMappingCreated(Mapping mapping, Long authorId) { null }
 
-    @Override void logMetadataUpdated(ExtensionValue extension, Long authorId) { }
+    @Override Long logMappingDeleted(Mapping mapping, Long authorId) { null }
 
-    @Override void logMetadataDeleted(ExtensionValue extension, Long authorId) { }
+    @Override Long logMappingUpdated(Mapping mapping, Long authorId) { null }
 
-    @Override void logNewRelation(Relationship relationship, Long authorId) { }
+    @Override Long logNewMetadata(ExtensionValue extension, Long authorId) { null }
 
-    @Override void logRelationRemoved(Relationship relationship, Long authorId) { }
+    @Override Long logMetadataUpdated(ExtensionValue extension, Long authorId) { null }
 
-    @Override void logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) { }
+    @Override Long logMetadataDeleted(ExtensionValue extension, Long authorId) { null }
 
-    @Override void logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) { }
+    @Override Long logNewRelation(Relationship relationship, Long authorId) { null }
 
-    @Override void logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) { }
+    @Override Long logRelationRemoved(Relationship relationship, Long authorId) { null }
+
+    @Override Long logNewRelationshipMetadata(RelationshipMetadata extension, Long authorId) { null }
+
+    @Override Long logRelationshipMetadataUpdated(RelationshipMetadata extension, Long authorId) { null }
+
+    @Override Long logRelationshipMetadataDeleted(RelationshipMetadata extension, Long authorId) { null }
 
 
 }

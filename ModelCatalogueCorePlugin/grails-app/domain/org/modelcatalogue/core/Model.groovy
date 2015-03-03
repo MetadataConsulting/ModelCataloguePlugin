@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 
@@ -20,10 +19,7 @@ class Model extends CatalogueElement {
     }
 
     @Override
-    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
-        PublishingChain.createDraft(this, strategy)
-        .add(this.childOf)
-        .add(this.classifications)
-        .run(publisher)
+    protected PublishingChain prepareDraftChain(PublishingChain chain) {
+        chain.add(this.childOf).add(this.classifications)
     }
 }

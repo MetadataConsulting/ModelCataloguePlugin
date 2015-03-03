@@ -1,14 +1,14 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 
-import static org.springframework.http.HttpStatus.*
+import static org.springframework.http.HttpStatus.NOT_FOUND
 
 class CatalogueController {
 
     def classificationService
     def modelService
+    def auditService
 
     def xref() {
         String resource = params.resource
@@ -40,22 +40,6 @@ class CatalogueController {
 
 
         redirect controller: resource, action: 'show', id: element.id
-    }
-
-    def undo() {
-        Change change = Change.get(params.id)
-
-        if (!change) {
-            render status: NOT_FOUND
-            return
-        }
-
-        if (change.undo()) {
-            render status: OK
-            return
-        }
-
-        render status: NOT_ACCEPTABLE
     }
 
 }

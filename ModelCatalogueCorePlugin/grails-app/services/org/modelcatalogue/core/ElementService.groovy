@@ -16,6 +16,7 @@ class ElementService implements Publisher<CatalogueElement> {
     def relationshipService
     def modelCatalogueSearchService
     def messageSource
+    def auditService
 
     List<CatalogueElement> list(Map params = [:]) {
         CatalogueElement.findAllByStatus(getStatusFromParams(params), params)
@@ -34,16 +35,25 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context) {
-        CatalogueElement.withTransaction { TransactionStatus status ->
-            E draft = element.createDraftVersion(this, context) as E
-            if (draft.hasErrors()) {
-                status.setRollbackOnly()
-                return element
+    public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context, boolean skipRelationships = false) {
+        Closure<E> code = { TransactionStatus status = null ->
+            auditService.logNewVersionCreated(element) {
+                E draft = element.createDraftVersion(this, context) as E
+                if (draft.hasErrors()) {
+                    status?.setRollbackOnly()
+                    return element
+                }
+                context.classifyDrafts()
+                if (!skipRelationships) {
+                    context.resolvePendingRelationships()
+                }
+                return draft
             }
-            context.classifyDrafts()
-            context.resolvePendingRelationships()
-            draft
+        }
+        if (skipRelationships) {
+            return code()
+        } else {
+            return CatalogueElement.withTransaction(code)
         }
     }
 
