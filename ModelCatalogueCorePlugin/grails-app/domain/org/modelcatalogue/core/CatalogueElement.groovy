@@ -302,14 +302,14 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     Extension addExtension(String name, String value) {
         ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
         FriendlyErrors.failFriendlySave(newOne)
-        addToExtensions(newOne)
+        addToExtensions(newOne).save()
         newOne
     }
 
     @Override
     void removeExtension(Extension extension) {
         if (extension instanceof ExtensionValue) {
-            removeFromExtensions(extension)
+            removeFromExtensions(extension).save()
             extension.delete(flush: true)
         } else {
             throw new IllegalArgumentException("Only instances of ExtensionValue are supported")

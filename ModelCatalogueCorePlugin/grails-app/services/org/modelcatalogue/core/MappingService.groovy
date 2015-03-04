@@ -28,8 +28,8 @@ class MappingService {
         }
 
         newOne.save(flush: true)
-        source.addToOutgoingMappings(newOne)
-        destination.addToIncomingMappings(newOne)
+        source.addToOutgoingMappings(newOne).save()
+        destination.addToIncomingMappings(newOne).save()
         newOne
     }
 
@@ -44,8 +44,8 @@ class MappingService {
 
         auditService.logMappingDeleted(old)
 
-        source.removeFromOutgoingMappings(old)
-        destination.removeFromIncomingMappings(old)
+        source.removeFromOutgoingMappings(old).save()
+        destination.removeFromIncomingMappings(old).save()
         old.delete(flush: true)
         old
     }

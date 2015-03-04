@@ -108,14 +108,14 @@ class Relationship implements Extendible {
     Extension addExtension(String name, String value) {
         RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
         FriendlyErrors.failFriendlySave(newOne)
-        addToExtensions(newOne)
+        addToExtensions(newOne).save()
         newOne
     }
 
     @Override
     void removeExtension(Extension extension) {
         if (extension instanceof RelationshipMetadata) {
-            removeFromExtensions(extension)
+            removeFromExtensions(extension).save()
             extension.delete(flush: true)
         } else {
             throw new IllegalArgumentException("Only instances of RelationshipMetadata are supported")
