@@ -25,11 +25,9 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         de5 = DataElement.findByName("auth5")
         vd = ValueDomain.findByName("value domain Celsius")
         md = new Model(name: "tsdfafsd").save()
-        de1.refresh()
-        de2.refresh()
-        md.refresh()
         md.addToContains(de1)
         de2.valueDomain = vd
+        de2.save()
         de1.ext.put("localIdentifier", "test")
         de4.ext.put("test2", "test2")
         de4.ext.put("metadata", "test2")

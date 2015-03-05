@@ -5,7 +5,7 @@ import org.modelcatalogue.core.Extension
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 
-class Action implements Extendible {
+class Action implements Extendible<ActionParameter> {
 
     Class<? extends ActionRunner> type
 
@@ -49,21 +49,41 @@ class Action implements Extendible {
     }
 
     @Override
-    Extension addExtension(String name, String value) {
-        ActionParameter newOne = new ActionParameter(name: name, extensionValue: value, action: this)
-        FriendlyErrors.failFriendlySave(newOne)
-        addToExtensions(newOne)
-        newOne
+    ActionParameter addExtension(String name, String value) {
+        if (id && isAttached() && !hasErrors()) {
+            ActionParameter newOne = new ActionParameter(name: name, extensionValue: value, action: this)
+            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
+            addToExtensions(newOne)
+            newOne
+        }
+        throw new IllegalStateException("Cannot add extension before saving the element")
     }
 
     @Override
-    void removeExtension(Extension extension) {
-        if (extension instanceof ActionParameter) {
-            removeFromExtensions(extension)
-            extension.delete(flush: true)
-        } else {
-            throw new IllegalArgumentException("Only instances of ActionParameter are supported")
-        }
+    void removeExtension(ActionParameter extension) {
+        removeFromExtensions(extension).save()
+        extension.delete(flush: true)
     }
 
+    @Override
+    ActionParameter findExtensionByName(String name) {
+        if (id && isAttached() && !hasErrors()) {
+            return ActionParameter.findByActionAndName(this, name)
+        }
+        return null
+    }
+
+    @Override
+    int countExtensions() {
+        if (id && isAttached() && !hasErrors()) {
+            return ActionParameter.countByAction(this)
+        }
+        return 0
+    }
+
+    @Override
+    ActionParameter updateExtension(ActionParameter old, String value) {
+        old.extensionValue = value
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
+    }
 }

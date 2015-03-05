@@ -21,16 +21,4 @@ class ExtensionValue implements Extension {
         return "extension for ${element} (${name}=${extensionValue})"
     }
 
-    void afterInsert() {
-        auditService.logNewMetadata(this)
-    }
-
-    void beforeUpdate() {
-        auditService.logMetadataUpdated(this)
-    }
-
-    void beforeRemove() {
-        auditService.logMetadataDeleted(this)
-    }
-
 }

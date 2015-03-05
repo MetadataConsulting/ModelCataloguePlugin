@@ -146,13 +146,12 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "adding new metadata is logged"() {
         DataType type = new DataType(name: 'DT4ANM').save(failOnError: true, flush: true)
-        ExtensionValue ext = new ExtensionValue(name: 'foo', extensionValue: 'bar', element: type).save(failOnError: true, flush: true)
-        type.refresh()
+        type.ext.foo = 'bar'
 
         Change change = Change.findByChangedIdAndType(type.id, ChangeType.METADATA_CREATED)
 
         expect:
-        type.ext.foo == ext.extensionValue
+        type.ext.foo == 'bar'
 
         change
         change.latestVersionId == type.id
@@ -174,15 +173,13 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "editing metadata is logged"() {
         DataType type = new DataType(name: 'DT4ANM').save(failOnError: true, flush: true)
-        ExtensionValue ext = new ExtensionValue(name: 'foo', extensionValue: 'bar', element: type).save(failOnError: true, flush: true)
-        ext.extensionValue = 'boo'
-        ext.save(failOnError: true, flush: true)
-        type.refresh()
+        type.ext.foo = 'bar'
+        type.ext.foo = 'boo'
 
         Change change = Change.findByChangedIdAndType(type.id, ChangeType.METADATA_UPDATED)
 
         expect:
-        type.ext.foo == ext.extensionValue
+        type.ext.foo == 'boo'
 
         change
         change.latestVersionId == type.id

@@ -20,16 +20,4 @@ class RelationshipMetadata implements Extension {
         return "metadata for ${relationship} (${name}=${extensionValue})"
     }
 
-    void afterInsert() {
-        auditService.logNewRelationshipMetadata(this)
-    }
-
-    void beforeUpdate() {
-        auditService.logRelationshipMetadataUpdated(this)
-    }
-
-    void beforeRemove() {
-        auditService.logRelationshipMetadataDeleted(this)
-    }
-
 }

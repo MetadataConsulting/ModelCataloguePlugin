@@ -16,7 +16,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class CatalogueElement implements Extendible, Published<CatalogueElement> {
+abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement> {
 
     def grailsLinkGenerator
     def relationshipService
@@ -294,26 +294,35 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
     @Override
-    Set<Extension> listExtensions() {
+    Set<ExtensionValue> listExtensions() {
         extensions
     }
 
     @Override
-    Extension addExtension(String name, String value) {
-        ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
-        FriendlyErrors.failFriendlySave(newOne)
-        addToExtensions(newOne).save()
-        newOne
+    ExtensionValue addExtension(String name, String value) {
+        if (id && readyForQueries) {
+            ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
+            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
+            addToExtensions(newOne).save()
+            auditService.logNewMetadata(newOne)
+            return newOne
+        }
+        throw new IllegalStateException("Cannot add extension before saving the element")
     }
 
     @Override
-    void removeExtension(Extension extension) {
-        if (extension instanceof ExtensionValue) {
-            removeFromExtensions(extension).save()
-            extension.delete(flush: true)
-        } else {
-            throw new IllegalArgumentException("Only instances of ExtensionValue are supported")
+    void removeExtension(ExtensionValue extension) {
+        auditService.logMetadataDeleted(extension)
+        removeFromExtensions(extension).save()
+        extension.delete(flush: true)
+    }
+
+    @Override
+    ExtensionValue findExtensionByName(String name) {
+        if (id && readyForQueries) {
+            return ExtensionValue.findByElementAndName(this, name)
         }
+        return null
     }
 
     List<Classification> getClassifications() {
@@ -374,5 +383,22 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         for (User u in this.isFavouriteOf) {
             this.removeFromIsFavouriteOf(u)
         }
+    }
+
+    @Override
+    int countExtensions() {
+        if (id && readyForQueries) {
+            return ExtensionValue.countByElement(this)
+        }
+        return 0
+
+    }
+
+    ExtensionValue updateExtension(ExtensionValue old, String value) {
+        old.extensionValue = value
+        if (old.validate()) {
+            auditService.logMetadataUpdated(old)
+        }
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
     }
 }

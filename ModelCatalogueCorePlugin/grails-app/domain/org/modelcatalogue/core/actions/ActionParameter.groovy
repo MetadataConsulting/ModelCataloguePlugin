@@ -19,6 +19,4 @@ class ActionParameter implements Extension {
     static mapping = {
         sort 'name'
     }
-
-    @Override void beforeRemove() {}
 }

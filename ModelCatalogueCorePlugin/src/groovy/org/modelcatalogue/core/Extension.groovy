@@ -7,8 +7,5 @@ public interface Extension {
 
     String getName()
     String getExtensionValue()
-    void setExtensionValue(String value)
-    public <T extends Extension> T save()
-    void beforeRemove()
 
 }

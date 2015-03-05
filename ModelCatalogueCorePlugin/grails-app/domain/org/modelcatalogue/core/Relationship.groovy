@@ -23,7 +23,7 @@ import org.modelcatalogue.core.util.FriendlyErrors
 *
 */
 
-class Relationship implements Extendible {
+class Relationship implements Extendible<RelationshipMetadata> {
 
     def auditService
 
@@ -100,26 +100,51 @@ class Relationship implements Extendible {
     }
 
     @Override
-    Set<Extension> listExtensions() {
+    Set<RelationshipMetadata> listExtensions() {
         extensions
     }
 
     @Override
-    Extension addExtension(String name, String value) {
-        RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
-        FriendlyErrors.failFriendlySave(newOne)
-        addToExtensions(newOne).save()
-        newOne
+    RelationshipMetadata findExtensionByName(String name) {
+        if (id && isAttached() && !hasErrors()) {
+            RelationshipMetadata.findByRelationshipAndName(this, name)
+        }
     }
 
     @Override
-    void removeExtension(Extension extension) {
-        if (extension instanceof RelationshipMetadata) {
-            removeFromExtensions(extension).save()
-            extension.delete(flush: true)
-        } else {
-            throw new IllegalArgumentException("Only instances of RelationshipMetadata are supported")
+    int countExtensions() {
+        if (id && isAttached() && !hasErrors()) {
+            return RelationshipMetadata.countByRelationship(this)
         }
+        return 0
+    }
+
+    @Override
+    RelationshipMetadata addExtension(String name, String value) {
+        if (id && isAttached() && !hasErrors()) {
+            RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
+            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
+            addToExtensions(newOne).save()
+            auditService.logNewRelationshipMetadata(newOne)
+            return newOne
+        }
+        throw new IllegalStateException("Cannot add extension before saving the element")
+    }
+
+    @Override
+    void removeExtension(RelationshipMetadata extension) {
+        auditService.logRelationshipMetadataDeleted(extension)
+        removeFromExtensions(extension).save()
+        extension.delete(flush: true)
+    }
+
+    @Override
+    RelationshipMetadata updateExtension(RelationshipMetadata old, String value) {
+        old.extensionValue = value
+        if (old.validate()) {
+            auditService.logRelationshipMetadataUpdated(old)
+        }
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
     }
 
     void afterInsert() {
