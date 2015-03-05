@@ -5,6 +5,7 @@ import spock.lang.Unroll
 
 class ExtendibleElementExtensionsWrapperSpec extends IntegrationSpec {
 
+    def relationshipService
 
     @Unroll
     def "Extendible elements have live map to extension values for #extensionClass"() {
@@ -103,7 +104,7 @@ class ExtendibleElementExtensionsWrapperSpec extends IntegrationSpec {
     }
 
     private DataElement createDataElement() {
-        new DataElement(name: "element")
+        new DataElement(name: "element").save()
     }
 
     private Relationship createRelationship() {
@@ -114,12 +115,10 @@ class ExtendibleElementExtensionsWrapperSpec extends IntegrationSpec {
         assert target.save()
 
         RelationshipType type = new RelationshipType(sourceToDestination: "src to dest", destinationToSource: "dest to src", sourceClass: CatalogueElement, destinationClass: CatalogueElement, name: "type")
-        type.relationshipTypeService = new RelationshipTypeService()
         assert type.save()
 
-        RelationshipService relationshipService = new RelationshipService()
 
-        Relationship rel = relationshipService.link(source, target, type)
+        def rel = relationshipService.link(source, target, type)
 
         assert !rel.errors.hasErrors()
 

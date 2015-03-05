@@ -141,9 +141,4 @@ class Relationship implements Extendible<RelationshipMetadata> {
         }
         FriendlyErrors.failFriendlySaveWithoutFlush(old)
     }
-
-    void afterInsert() {
-        auditService.logNewRelation(this)
-    }
-
 }
