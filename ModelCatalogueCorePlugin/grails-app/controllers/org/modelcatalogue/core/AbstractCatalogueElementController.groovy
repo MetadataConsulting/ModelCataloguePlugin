@@ -441,12 +441,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             }
         }
 
-        if (ext) {
-            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
-        }
 
         bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
+
+        if (ext) {
+            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
+        }
 
         bindRelations(instance, newVersion)
 

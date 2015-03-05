@@ -37,7 +37,7 @@ class ExtensionsWrapper implements Map<String, String> {
 
     @Override
     String get(Object key) {
-        if (isEmpty()) return null
+        if (!key) return null
         findExtensionValueByName(key?.toString())?.extensionValue
     }
 

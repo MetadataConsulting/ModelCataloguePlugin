@@ -300,14 +300,15 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
 
     @Override
     ExtensionValue addExtension(String name, String value) {
-        if (id && readyForQueries) {
+        if (getId() && isAttached()) {
             ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
             FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
             addToExtensions(newOne).save()
             auditService.logNewMetadata(newOne)
             return newOne
         }
-        throw new IllegalStateException("Cannot add extension before saving the element")
+
+        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
     }
 
     @Override
@@ -319,10 +320,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
 
     @Override
     ExtensionValue findExtensionByName(String name) {
-        if (id && readyForQueries) {
-            return ExtensionValue.findByElementAndName(this, name)
-        }
-        return null
+        listExtensions()?.find { it.name == name }
     }
 
     List<Classification> getClassifications() {
@@ -387,11 +385,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
 
     @Override
     int countExtensions() {
-        if (id && readyForQueries) {
-            return ExtensionValue.countByElement(this)
-        }
-        return 0
-
+        listExtensions()?.size() ?: 0
     }
 
     ExtensionValue updateExtension(ExtensionValue old, String value) {

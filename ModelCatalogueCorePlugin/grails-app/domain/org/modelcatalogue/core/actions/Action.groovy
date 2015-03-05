@@ -50,13 +50,13 @@ class Action implements Extendible<ActionParameter> {
 
     @Override
     ActionParameter addExtension(String name, String value) {
-        if (id && isAttached() && !hasErrors()) {
+        if (getId() && isAttached()) {
             ActionParameter newOne = new ActionParameter(name: name, extensionValue: value, action: this)
             FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
             addToExtensions(newOne)
-            newOne
+            return newOne
         }
-        throw new IllegalStateException("Cannot add extension before saving the element")
+        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
     }
 
     @Override
@@ -67,18 +67,12 @@ class Action implements Extendible<ActionParameter> {
 
     @Override
     ActionParameter findExtensionByName(String name) {
-        if (id && isAttached() && !hasErrors()) {
-            return ActionParameter.findByActionAndName(this, name)
-        }
-        return null
+        listExtensions()?.find { it.name == name }
     }
 
     @Override
     int countExtensions() {
-        if (id && isAttached() && !hasErrors()) {
-            return ActionParameter.countByAction(this)
-        }
-        return 0
+        listExtensions()?.size() ?: 0
     }
 
     @Override

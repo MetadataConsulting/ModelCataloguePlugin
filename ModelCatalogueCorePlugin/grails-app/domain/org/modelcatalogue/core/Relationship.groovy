@@ -106,29 +106,24 @@ class Relationship implements Extendible<RelationshipMetadata> {
 
     @Override
     RelationshipMetadata findExtensionByName(String name) {
-        if (id && isAttached() && !hasErrors()) {
-            RelationshipMetadata.findByRelationshipAndName(this, name)
-        }
+        listExtensions()?.find { it.name == name }
     }
 
     @Override
     int countExtensions() {
-        if (id && isAttached() && !hasErrors()) {
-            return RelationshipMetadata.countByRelationship(this)
-        }
-        return 0
+        listExtensions()?.size() ?: 0
     }
 
     @Override
     RelationshipMetadata addExtension(String name, String value) {
-        if (id && isAttached() && !hasErrors()) {
+        if (getId() && isAttached()) {
             RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
             FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
             addToExtensions(newOne).save()
             auditService.logNewRelationshipMetadata(newOne)
             return newOne
         }
-        throw new IllegalStateException("Cannot add extension before saving the element")
+        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
     }
 
     @Override
