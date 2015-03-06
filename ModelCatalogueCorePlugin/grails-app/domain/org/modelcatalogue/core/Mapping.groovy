@@ -72,12 +72,4 @@ class Mapping {
             destination?.removeFromIncomingMappings(this)
         }
     }
-
-    void beforeUpdate() {
-        auditService.logMappingUpdated(this)
-    }
-
-    void afterInsert() {
-        auditService.logMappingCreated(this)
-    }
 }

@@ -11,6 +11,9 @@ class MappingService {
         if (!source || !source.id || !destination || !destination.id || !mapping) return null
         Mapping existing = Mapping.findBySourceAndDestination(source, destination)
         if (existing) {
+            if (existing.mapping == mapping) {
+                return existing
+            }
             existing.mapping = mapping
             existing.validate()
 
@@ -18,7 +21,9 @@ class MappingService {
                 return existing
             }
 
-            return existing.save(flush: true)
+            auditService.logMappingUpdated(existing)
+            existing.save()
+            return existing
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
         newOne.validate()
@@ -27,9 +32,12 @@ class MappingService {
             return newOne
         }
 
-        newOne.save(flush: true)
+        newOne.save()
         source.addToOutgoingMappings(newOne).save()
         destination.addToIncomingMappings(newOne).save()
+
+        auditService.logMappingCreated(newOne)
+
         newOne
     }
 

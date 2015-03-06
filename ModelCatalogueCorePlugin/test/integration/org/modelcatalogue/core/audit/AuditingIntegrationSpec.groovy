@@ -560,8 +560,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
         String oldVal = DefaultAuditor.storeValue(mapping.mapping)
 
-        mapping.mapping = "x / 3"
-        mapping.save(flush: true, failOnError: true)
+        mapping = mappingService.map(type, base, "x / 3")
 
 
 
