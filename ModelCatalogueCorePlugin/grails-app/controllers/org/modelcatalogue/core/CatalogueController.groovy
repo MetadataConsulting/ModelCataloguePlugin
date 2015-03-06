@@ -1,14 +1,12 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
-
-import static org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus
 
 class CatalogueController {
 
     def classificationService
     def modelService
-    def auditService
 
     def xref() {
         String resource = params.resource
@@ -26,7 +24,7 @@ class CatalogueController {
             element = CatalogueElement.get(id)
         }
         if (!element) {
-            render status: NOT_FOUND
+            render status: HttpStatus.NOT_FOUND
             return
         }
 

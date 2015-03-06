@@ -3,8 +3,6 @@ package org.modelcatalogue.core
 class ExtensionValue implements Extension {
 
 
-    def auditService
-
     String name
     String extensionValue
 
@@ -20,5 +18,6 @@ class ExtensionValue implements Extension {
     public String toString() {
         return "extension for ${element} (${name}=${extensionValue})"
     }
+
 
 }

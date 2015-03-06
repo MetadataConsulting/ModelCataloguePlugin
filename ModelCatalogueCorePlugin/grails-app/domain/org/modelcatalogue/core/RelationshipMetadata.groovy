@@ -2,8 +2,6 @@ package org.modelcatalogue.core
 
 class RelationshipMetadata implements Extension {
 
-    def auditService
-
     String name
     String extensionValue
 
@@ -19,5 +17,6 @@ class RelationshipMetadata implements Extension {
     public String toString() {
         return "metadata for ${relationship} (${name}=${extensionValue})"
     }
+
 
 }
