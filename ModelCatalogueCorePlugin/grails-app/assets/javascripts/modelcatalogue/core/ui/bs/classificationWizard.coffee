@@ -22,22 +22,23 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                 <button id="step-classification" ng-click="select('classification')" class="btn btn-default" ng-class="{'btn-primary': step == 'classification'}">1. Classification</button>
               </li>
               <li>
-                <button id="step-elements" ng-disabled="!classification.name" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">2. Elements</button>
+                <button id="step-elements" ng-disabled="!nameUnique" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">2. Elements</button>
               </li>
               <li>
-                <button id="step-next" ng-disabled="!classification.name || step == 'elements'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
+                <button id="step-next" ng-disabled="!nameUnique || step == 'elements'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
               </li>
               <li>
-                <button id="step-finish" ng-disabled="!classification.name" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+                <button id="step-finish" ng-disabled="!nameUnique" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
               </li>
             </ul>
         </div>
         <div class="modal-body" ng-switch="step">
+          <messages-panel messages="messages"></messages-panel>
           <div ng-switch-when="classification" id="classification">
               <form role="form" ng-submit="select('elements')">
                 <div class="form-group">
                   <label for="name" class="">Name</label>
-                  <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="classification.name" focus-me="step=='classification'" required>
+                  <input type="text" class="form-control" id="name" placeholder="Name (Required)" ng-model="classification.name" focus-me="step=='classification'" required ng-model-options="{debounce: 500}">
                 </div>
                 <div class="form-group">
                   <label for="name" class="">Catalogue ID (URL)</label>
@@ -88,6 +89,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
             $scope.step = 'classification'
             $scope.finishInProgress = false
             $scope.finished = false
+            $scope.nameUnique = false
 
           $scope.reset()
 
@@ -114,29 +116,63 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
             $window.open(url,'_blank')
             return
 
-          $scope.finish = () ->
+
+          isNameUnique = (name) ->
+            deferred = $q.defer()
+
+            unless name
+              deferred.resolve false
+              return deferred.promise
+
+            checkForUniqueness = (list) ->
+              if list.total == 0
+                deferred.resolve true
+                return
+
+              for classification in list.list
+                if classification.name == name
+                  deferred.resolve false
+                  $scope.messages.error "Name is not unique"
+                  return
+              if list.next.size != 0
+                list.next.then checkForUniqueness
+              else
+                deferred.resolve true
+            catalogueElementResource('classification').search(name).then checkForUniqueness
+            deferred.promise
+
+          $scope.finish = ->
             return if $scope.finishInProgress
             $scope.finishInProgress = true
 
-            $scope.step = 'summary'
+            isNameUnique($scope.classification.name).then (unique) ->
+              return if not unique
+              $scope.step = 'summary'
 
-            promise = $q.when {}
+              promise = $q.when {}
 
-            angular.forEach $scope.dataElements, (element, i)->
-              unless element.element and element.name
-                promise = promise.then ->
-                  catalogueElementResource('dataElement').save({name: element.name}).then (newElement) ->
-                    $scope.dataElements[i] = newElement
-              else
-                $scope.dataElements[i] = element.element
+              angular.forEach $scope.dataElements, (element, i)->
+                unless element.element and element.name
+                  promise = promise.then ->
+                    catalogueElementResource('dataElement').save({name: element.name}).then (newElement) ->
+                      $scope.dataElements[i] = newElement
+                else
+                  $scope.dataElements[i] = element.element
 
-            promise = promise.then ->
-              $scope.classification.classifies = $scope.dataElements
-              catalogueElementResource('classification').save($scope.classification)
+              promise = promise.then ->
+                $scope.classification.classifies = $scope.dataElements
+                catalogueElementResource('classification').save($scope.classification)
 
-            promise = promise.then (classification) ->
-                messages.success "Classification #{classification.name} created"
-                $scope.finished = true
+              promise = promise.then (classification) ->
+                  messages.success "Classification #{classification.name} created"
+                  $scope.finished = true
+
+          $scope.$watch 'classification.name', (name) ->
+            $scope.nameUnique = false
+            $scope.messages.clearAllMessages()
+
+            isNameUnique(name).then (unique) ->
+              $scope.nameUnique = unique
 
           $scope.select = (step) ->
             return if step != 'classification' and not $scope.classification.name
