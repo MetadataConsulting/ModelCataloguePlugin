@@ -26,10 +26,13 @@ class AuditService {
      * @return the value returned from the noAuditBlock
      */
     static <R> R mute(Closure<R> noAuditBlock) {
+        SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
         Auditor auditor = auditor.get()
         Boolean currentSystem = auditor.system
         auditor.system = true
+        sessionFactory.currentSession?.flush()
         R result = noAuditBlock()
+        sessionFactory.currentSession?.flush()
         auditor.system = currentSystem
         return result
     }
@@ -43,10 +46,13 @@ class AuditService {
      * @return the value returned from the withDefaultAuthor
      */
     static <R> R withDefaultAuthorId(Long defaultAuthorId, Closure<R> withDefaultAuthorBlock) {
+        SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
         Auditor auditor = auditor.get()
         Long currentDefault = auditor.defaultAuthorId
         auditor.defaultAuthorId = defaultAuthorId
+        sessionFactory.currentSession?.flush()
         R result = withDefaultAuthorBlock()
+        sessionFactory.currentSession?.flush()
         auditor.defaultAuthorId = currentDefault
         return result
     }
@@ -69,6 +75,28 @@ class AuditService {
         R result = withParentBlock()
         sessionFactory.currentSession?.flush()
         auditor.parentChangeId = currentParent
+        return result
+    }
+
+    static <R> R withDefaultAuthorAndParentAction(Long defaultAuthorId, Long parentId, Closure<R> withDefaultAuthorBlock) {
+        SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
+        Auditor auditor = auditor.get()
+
+        Long currentDefault = auditor.defaultAuthorId
+        auditor.defaultAuthorId = defaultAuthorId
+
+        Long currentParent = auditor.parentChangeId
+        auditor.parentChangeId = parentId
+
+        sessionFactory.currentSession?.flush()
+
+        R result = withDefaultAuthorBlock()
+
+        sessionFactory.currentSession?.flush()
+
+        auditor.defaultAuthorId = currentDefault
+        auditor.parentChangeId = currentParent
+
         return result
     }
 
@@ -137,8 +165,8 @@ class AuditService {
         withParentId(auditor.get().logElementDeprecated(element, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
     }
 
-    CatalogueElement logExternalChange(CatalogueElement source, String message, Closure<CatalogueElement> createDraftBlock) {
-        withParentId(auditor.get().logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
+    CatalogueElement logExternalChange(CatalogueElement source, Long authorId, String message, Closure<CatalogueElement> createDraftBlock) {
+        withDefaultAuthorAndParentAction(authorId ,auditor.get().logExternalChange(source, message, modelCatalogueSecurityService.currentUser?.id), createDraftBlock)
     }
 
     void logNewMetadata(ExtensionValue extension) {

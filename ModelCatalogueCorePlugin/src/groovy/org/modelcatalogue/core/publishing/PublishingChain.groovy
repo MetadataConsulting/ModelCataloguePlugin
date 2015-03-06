@@ -2,7 +2,6 @@ package org.modelcatalogue.core.publishing
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementStatus
-import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.util.FriendlyErrors
 
 abstract class PublishingChain {
@@ -76,20 +75,16 @@ abstract class PublishingChain {
 
     protected void restoreStatus() {
         if (published.status != initialStatus) {
-            AuditService.mute {
-                published.status = initialStatus
-                published.clearErrors()
-                FriendlyErrors.failFriendlySave(published)
-            }
+            published.status = initialStatus
+            published.clearErrors()
+            FriendlyErrors.failFriendlySave(published)
         }
     }
 
     protected void startUpdating() {
-        AuditService.mute {
-            published.status = ElementStatus.UPDATED
-            published.clearErrors()
-            FriendlyErrors.failFriendlySave(published)
-        }
+        published.status = ElementStatus.UPDATED
+        published.clearErrors()
+        FriendlyErrors.failFriendlySave(published)
     }
 
     protected static boolean isUpdatingInProgress(CatalogueElement element) {

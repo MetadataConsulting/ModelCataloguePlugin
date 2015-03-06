@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
@@ -343,9 +342,7 @@ class DataImportController  {
     protected executeInBackground(Long assetId, String message, Closure code) {
         Long userId = modelCatalogueSecurityService.currentUser?.id
         executorService.submit {
-            AuditService.withDefaultAuthorId(userId) {
-                auditService.logExternalChange(Asset.get(assetId), message, code)
-            }
+            auditService.logExternalChange(Asset.get(assetId), userId, message, code)
         }
     }
 }
