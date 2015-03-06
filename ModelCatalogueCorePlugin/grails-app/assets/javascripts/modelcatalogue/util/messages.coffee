@@ -26,7 +26,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
     hideAfter = newHideAfter
 
   # factory method
-  @$get = [ '$injector', '$q', '$log', '$window', '$timeout', ($injector, $q, $log, $window, $timeout) ->
+  @$get = [ '$injector', '$q', '$log', '$window', '$timeout', '$rootScope', ($injector, $q, $log, $window, $timeout, $rootScope) ->
     createNewMessages = (timeout) ->
       messagesStack = []
 
@@ -98,6 +98,10 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
           msg.noTimeout = ->
 
         msg
+
+      $rootScope.$on 'displayGlobalMessage', (ignored, title, body, type, noTimeout) ->
+        msg = addMessage(title, body, type)
+        msg.noTimeout() if noTimeout
 
       ###
         Shows the info message to the user. Returns the message instance.

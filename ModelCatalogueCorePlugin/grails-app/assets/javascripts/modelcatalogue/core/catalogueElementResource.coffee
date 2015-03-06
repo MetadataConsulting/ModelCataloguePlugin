@@ -23,7 +23,13 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
 
       save: (data) ->
         url = "#{@getIndexPath()}"
-        enhance(rest(method: 'POST', url: url, data: data)).then (result)->
+        thePathName = @pathName
+
+        creationChecker = (status) ->
+          if status == 200
+            $rootScope.$broadcast 'displayGlobalMessage', "#{names.getNaturalName(names.getPropertyNameFromType(thePathName))} not created", "Reused existing #{names.getNaturalName(names.getPropertyNameFromType(thePathName))} '#{data.name}' instead of creating new one.", 'warning', true
+
+        enhance(rest(method: 'POST', url: url, data: data, statusListener: creationChecker)).then (result)->
           $rootScope.$broadcast 'catalogueElementCreated', result, url, data
           result
 
