@@ -308,20 +308,14 @@ class DefaultAuditor implements Auditor {
 
     Long logChange(Map <String, Object> changeProps, CatalogueElement element) {
         try {
-            Change.withNewSession {
-                if (element.hasErrors() || !element.id) {
-                    log.warn "Error logging ${changeProps.type} of $element, not ready for queries"
-                    return null
-                }
-                Change change = new Change(changeProps)
-                change.system = change.system || system
-                change.validate()
-                if (change.hasErrors()) {
-                    log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
-                }
-                change.save()
-                return change.id
+            Change change = new Change(changeProps)
+            change.system = change.system || system
+            change.validate()
+            if (change.hasErrors()) {
+                log.warn FriendlyErrors.printErrors("Error logging ${changeProps.type} of $element", change.errors)
             }
+            change.save()
+            return change.id
         } catch (Exception e) {
             log.error "Exception writing audit log for $element", e
         }
