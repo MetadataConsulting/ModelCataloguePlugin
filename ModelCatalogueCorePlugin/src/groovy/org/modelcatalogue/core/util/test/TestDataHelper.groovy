@@ -27,7 +27,7 @@ class TestDataHelper {
 
     private static initDb(SessionFactory sessionFactory, boolean drop, String tempSqlFileName, Closure initCode) {
         if (sessionFactory.currentSession.connection().metaData.databaseProductName != 'H2') {
-            throw new IllegalStateException("Only H2 Database supported!")
+            return initCode()
         }
 
         String scriptLocation = "${System.getProperty('java.io.tmpdir')}/mc/${tempSqlFileName}"

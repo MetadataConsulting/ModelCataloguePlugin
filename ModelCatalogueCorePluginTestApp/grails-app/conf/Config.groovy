@@ -101,7 +101,7 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = System.getenv('METADATA_SERVER_URL')
+        grails.serverURL = System.getenv('METADATA_SERVER_URL') ?:  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
 }
 

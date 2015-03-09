@@ -32,7 +32,7 @@ class BootStrap {
                 setupStuff()
             }
         } else {
-            initCatalogueService.initCatalogue()
+            initCatalogueService.initDefaultRelationshipTypes()
             initSecurity()
         }
     }

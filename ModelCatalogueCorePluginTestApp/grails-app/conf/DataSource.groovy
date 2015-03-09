@@ -52,7 +52,7 @@ environments {
 //            jndiName = 'java:comp/env/jdbc/mcc-testapp'
 //        }
         dataSource {
-            dbCreate = "create"
+            dbCreate = ""
             url = "jdbc:mysql://localhost:3306/${System.getProperty('mc.db.schema') ?: System.getenv('METADATA_DB_SCHEMA') ?: 'nhic'}?autoReconnect=true&useUnicode=yes"
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
