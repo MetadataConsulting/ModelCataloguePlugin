@@ -370,6 +370,44 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
     /**
+     * Return enumerated types which are very likely to be duplicates.
+     * Enums are very likely duplicates if they have similar enum values.
+     * @return map with the enum id as key and set of ids of duplicate enums as value
+     */
+    Map<Long, Set<Long>> findDuplicateEnumerationsSuggestions() {
+        Object[][] results = EnumeratedType.executeQuery """
+            select e.id, e.enumAsString
+            from EnumeratedType e
+            where e.status in :states
+            order by e.name
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED]]
+
+
+        Map<String, Set<Long>> enums = [:].withDefault { [] as TreeSet<Long> }
+
+        for (Object[] row in results) {
+            enums[getNormalizedEnumValues(EnumeratedType.stringToMap(row[1]))] << row[0]
+        }
+
+        enums.findAll { String key, Set<Long> values -> values.size() > 1 }.collectEntries { String key, Set<Long> values ->
+            def valuesAsList = values.asList()
+            [valuesAsList.first(), valuesAsList[1..-1]]
+        }
+
+    }
+
+    String getNormalizedEnumValues(Map<String, String> enumValues) {
+        enumValues.keySet().collect {
+            if (it ==~ /\d+/) {
+                return "" + Long.parseLong(it, 10)
+            }
+            return it
+        }.sort().join(':')
+    }
+
+
+
+    /**
      * Returns data elements which are very likely to be duplicates.
      *
      * Data elements are considered duplicates if they share the exactly same value domain and they are having the same

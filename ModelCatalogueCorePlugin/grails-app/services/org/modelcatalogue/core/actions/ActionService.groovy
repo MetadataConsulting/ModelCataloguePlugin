@@ -357,6 +357,10 @@ class ActionService {
             }
         }
 
+        if (!ids) {
+            return Lists.emptyListWithTotalAndType(Action)
+        }
+
         Lists.fromCriteria(queryParams, Action) {
             inList 'id', ids
             eq 'type', type

@@ -361,12 +361,42 @@ class DataArchitectService {
 
         Batch.findAllByNameIlike("Create Synonyms for Model '%'").each reset
         Batch.findAllByNameIlike("Create Synonyms for Data Element '%'").each reset
+        Batch.findAllByNameIlike("Create Synonyms for Enumerated Type '%'").each reset
+        Batch.findAllByNameIlike("Duplicate Candidates of Enumerated Type  '%'").each reset
         Batch.findAllByNameIlike("Inline Model '%'").each reset
         Batch.findAllByNameIlike("Merge Model '%'").each reset
         Batch.findAllByNameIlike("Merge Data Element '%'").each reset
 
         Batch.findAllByName("Rename Data Types and Value Domains").each reset
 
+        def possibleDuplicateEnums = elementService.findDuplicateEnumerationsSuggestions()
+
+        possibleDuplicateEnums.each { first, other ->
+            EnumeratedType enumeratedType = EnumeratedType.get(first)
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for Enumerated Type '$enumeratedType.name'")
+            RelationshipType type = RelationshipType.readByName("synonym")
+            other.each { otherId ->
+                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                if (action.hasErrors()) {
+                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
+                }
+            }
+            batch.archived = false
+            batch.save()
+        }
+
+        possibleDuplicateEnums.each { first, other ->
+            EnumeratedType enumeratedType = EnumeratedType.get(first)
+            Batch batch = Batch.findOrSaveByName("Duplicate Candidates of Enumerated Type '$enumeratedType.name'")
+            other.each { otherId ->
+                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.EnumeratedType:$otherId", destination: "gorm://org.modelcatalogue.core.EnumeratedType:$first"
+                if (action.hasErrors()) {
+                    log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+                }
+            }
+            batch.archived = false
+            batch.save()
+        }
 
         Map<Long, String> suggestions = dataTypesNamesSuggestions()
         if (suggestions) {
