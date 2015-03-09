@@ -145,9 +145,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'NHS NUMBER') {
                 basedOn 'n10'
             }
-            ext 'Usage', 'Mandatory'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '1'
         }
         dataElement(name: 'Date of birth') {
@@ -155,9 +157,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PERSON BIRTH DATE') {
                 basedOn 'an10 ccyy-mm-dd'
             }
-            ext 'Usage', 'Mandatory'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '2'
         }
         dataElement(name: 'Gender - current') {
@@ -165,9 +169,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PERSON GENDER CODE CURRENT') {
                 basedOn 'an1'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '3'
         }
         dataElement(name: 'Ethnicity') {
@@ -175,9 +181,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'ETHNIC CATEGORY') {
                 basedOn 'an2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '4'
         }
         dataElement(name: 'Patient postcode') {
@@ -185,9 +193,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'POSTCODE OF USUAL ADDRESS') {
                 basedOn 'max an8'
             }
-            ext 'Usage', 'Mandatory'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '5'
         }
         dataElement(name: 'Registered GP practice code') {
@@ -195,9 +205,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION)') {
                 basedOn 'an6'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '6'
         }
         dataElement(name: 'Consultant GMC code') {
@@ -205,9 +217,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'CONSULTANT CODE (INITIATED SYSTEMIC ANTI-CANCER THERAPY)') {
                 basedOn 'an8'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '7'
         }
         dataElement(name: 'Consultant speciality code') {
@@ -215,9 +229,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'CARE PROFESSIONAL MAIN SPECIALTY CODE') {
                 basedOn 'an3'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '8'
         }
         dataElement(name: 'Organisation code of provider') {
@@ -225,9 +241,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'ORGANISATION CODE (CODE OF PROVIDER)') {
                 basedOn 'an3 or an5'
             }
-            ext 'Usage', 'Mandatory'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '9'
         }
     }
@@ -237,9 +255,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PRIMARY DIAGNOSIS(ICD AT START SYSTEMIC ANTI - CANCER THERAPY)') {
                 basedOn 'an6'
             }
-            ext 'Usage', 'Mandatory or field 11'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory or field 11'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '10'
         }
         dataElement(name: 'Morphology') {
@@ -247,9 +267,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'MORPHOLOGY(ICD - O AT START SYSTEMIC ANTI - CANCER THERAPY)') {
                 basedOn 'an6'
             }
-            ext 'Usage', 'Mandatory or field 10'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory or field10'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '11'
         }
 
@@ -258,9 +280,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'TNM CATEGORY(FINAL PRETREATMENT)') {
                 basedOn 'an5'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '12'
         }
     }
@@ -270,9 +294,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'SYSTEMIC ANTI-CANCER THERAPY PROGRAMME NUMBER') {
                 basedOn 'max n2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '13'
         }
 
@@ -281,9 +307,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'ANTI-CANCER REGIMEN NUMBER') {
                 basedOn 'max n2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '14'
         }
         dataElement(name: 'Intent of treatment') {
@@ -291,9 +319,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'DRUG TREATMENT INTENT') {
                 basedOn 'an1'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '15'
         }
         dataElement(name: 'Regimen') {
@@ -301,9 +331,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'DRUG REGIMEN ACRONYM') {
                 basedOn 'max an35'
             }
-            ext 'Usage', 'Mandatory'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '16'
         }
         dataElement(name: 'Height at start of regimen') {
@@ -311,9 +343,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PERSON HEIGHT IN METRES') {
                 basedOn 'n1.max n2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '17'
         }
         dataElement(name: 'Weight at start of regimen') {
@@ -321,9 +355,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PERSON WEIGHT') {
                 basedOn 'max n3.max n3'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '18'
         }
         dataElement(name: 'Performance status at start of regimen') {
@@ -332,9 +368,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
                 // TODO this shuld be declared as union of two value domains
                 basedOn 'an1 or an2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '19'
         }
 
@@ -343,9 +381,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'CO-MORBIDITY ADJUSTMENT INDICATOR') {
                 basedOn 'an1'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '20'
         }
         dataElement(name: 'Date decision to treat') {
@@ -353,9 +393,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: ' DECISION TO TREAT DATE (ANTI-CANCER DRUG REGIMEN)') {
                 basedOn 'an10 ccyy-mm-dd'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '21'
         }
         dataElement(name: 'Start date of regimen') {
@@ -363,9 +405,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'START DATE ANTI- CANCER DRUG REGIMEN') {
                 basedOn 'an10 ccyy-mm-dd'
             }
-            ext 'Usage', 'Mandatory'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '16'
         }
         dataElement(name: 'Clinical trial') {
@@ -373,9 +417,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'CLINICAL TRIAL INDICATOR') {
                 basedOn 'an2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '23'
         }
         dataElement(name: 'Chemo-radiation') {
@@ -383,9 +429,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'CHEMO-RADIATION INDICATOR') {
                 basedOn 'an1'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '24'
         }
         dataElement(name: 'Number of cycles planned') {
@@ -393,9 +441,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'NUMBER OF SYSTEMIC ANTI-CANCER THERAPY CYCLES PLANNED') {
                 basedOn 'max n2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '25'
         }
     }
@@ -405,9 +455,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'ANTI-CANCER DRUG CYCLE IDENTIFIER') {
                 basedOn 'max n2'
             }
-            ext 'Usage', 'Mandatory'
-            ext 'Min Occurs', '1'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Mandatory'
+                ext 'Min Occurs', '1'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '26'
         }
         dataElement(name: 'Start date of cycle') {
@@ -425,9 +477,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PERSON WEIGHT') {
                 basedOn 'max n3.max n3'
             }
-            ext 'Usage', 'Optional'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Optional'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '28'
         }
         dataElement(name: 'Performance status at start of cycle') {
@@ -435,9 +489,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PERFORMANCE STATUS FOR (ADULT) or PERFORMANCE STATUS CODE (YOUNG PERSON)') {
                 basedOn 'an1 or an2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '29'
         }
         dataElement(name: 'OPCS procurement code') {
@@ -445,9 +501,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'To await final decision on PbR structure') {
                 basedOn 'an4'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '30'
         }
     }
@@ -457,9 +515,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'SYSTEMIC ANTI-CANCER DRUG NAME') {
                 basedOn 'max an35'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '31'
         }
         dataElement(name: 'Actual dose per administration') {
@@ -467,9 +527,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'CHEMOTHERAPY ACTUAL DOSE') {
                 basedOn 'max n7'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '32'
         }
         dataElement(name: 'Administration route') {
@@ -477,9 +539,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'SYSTEMIC ANTI-CANCER THERAPY DRUG ROUTE OF ADMINISTRATION') {
                 basedOn 'an2'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '33'
         }
         dataElement(name: 'Administration date') {
@@ -487,9 +551,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'SYSTEMIC ANTI-CANCER THERAPY ADMINISTRATION DATE') {
                 basedOn 'an10 ccyy-mm-dd'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '34'
         }
         dataElement(name: 'Organisation code of provider') {
@@ -497,9 +563,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'ORGANISATION CODE (CODE OF PROVIDER)') {
                 basedOn 'an3 or an5'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '35'
         }
         dataElement(name: 'OPCS delivery code') {
@@ -507,9 +575,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PRIMARY PROCEDURE (OPCS)') {
                 basedOn 'an4'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '36'
         }
     }
@@ -519,9 +589,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'START DATE (FINAL SYSTEMIC ANTI-CANCER THERAPY)') {
                 basedOn 'an10 ccyy-mm-dd'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '37'
         }
         dataElement(name: 'Regimen modification - dose reduction') {
@@ -529,9 +601,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'SYSTEMIC ANTI-CANCER THERAPY REGIMEN MODIFICATION INDICATOR (DOSE REDUCTION)') {
                 basedOn 'an1'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '38'
         }
         dataElement(name: 'Regimen modification - time delay') {
@@ -539,9 +613,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'SYSTEMIC ANTI-CANCER THERAPY REGIMEN MODIFICATION INDICATOR (TIME DELAY)') {
                 basedOn 'an1'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '39'
         }
         dataElement(name: 'Regimen modification - stopped early') {
@@ -549,9 +625,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'SYSTEMIC ANTI-CANCER THERAPY REGIMEN MODIFICATION INDICATOR (DAYS REDUCED)') {
                 basedOn 'an1'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '40'
         }
         dataElement(name: 'Regimen outcome summary') {
@@ -559,9 +637,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PLANNED TREATMENT CHANGE REASON') {
                 basedOn 'an1'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '41'
         }
         dataElement(name: 'Date of death') {
@@ -569,9 +649,11 @@ classification(name: 'SACT', id: 'http://www.chemodataset.nhs.uk/') {
             valueDomain(name: 'PERSON DEATH DATE') {
                 basedOn 'an10 ccyy-mm-dd'
             }
-            ext 'Usage', 'Required'
-            ext 'Min Occurs', '0'
-            ext 'Max Occurs', '1'
+            relationship {
+                ext 'Usage', 'Required'
+                ext 'Min Occurs', '0'
+                ext 'Max Occurs', '1'
+            }
             ext 'Data Item Number', '42'
         }
     }
