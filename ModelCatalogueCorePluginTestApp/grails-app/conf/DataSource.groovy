@@ -45,19 +45,24 @@ environments {
         }
     }
     production {
-//        dataSource {
-//            dialect = 'org.hibernate.dialect.MySQL5InnoDBDialect'
-//            pooled = false
-//            dbCreate = 'update' // use 'update', 'validate', 'create' or 'create-drop'
-//            jndiName = 'java:comp/env/jdbc/mcc-testapp'
-//        }
         dataSource {
-            dbCreate = "create"
-            url = "jdbc:mysql://localhost:3306/${System.getProperty('mc.db.schema') ?: System.getenv('METADATA_DB_SCHEMA') ?: 'nhic'}?autoReconnect=true&useUnicode=yes"
+            driverClassName = "com.mysql.jdbc.Driver"
+            url = System.getenv('METADATA_DB_NAME')
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
-            driverClassName = "com.mysql.jdbc.Driver"
-
+            dbCreate = "update"
+            properties {
+                maxActive = -1
+                minEvictableIdleTimeMillis=1800000
+                timeBetweenEvictionRunsMillis=1800000
+                numTestsPerEvictionRun=3
+                testOnBorrow=true
+                testWhileIdle=true
+                testOnReturn=false
+                validationQuery="SELECT 1"
+                jdbcInterceptors="ConnectionState"
+            }
         }
+
     }
 }
