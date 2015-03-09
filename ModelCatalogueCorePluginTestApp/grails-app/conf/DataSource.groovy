@@ -47,7 +47,7 @@ environments {
     production {
         dataSource {
             driverClassName = "com.mysql.jdbc.Driver"
-            url = System.getenv('METADATA_DB_NAME')
+            url = System.getenv('METADATA_DB_NAME') ?: "jdbc:mysql://localhost:3306/${System.getProperty('mc.db.schema') ?: System.getenv('METADATA_DB_SCHEMA') ?: 'nhic'}?autoReconnect=true&useUnicode=yes"
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
             dbCreate = "update"

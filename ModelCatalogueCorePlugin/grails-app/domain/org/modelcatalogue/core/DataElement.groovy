@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.util.FriendlyErrors
 
 /*
 * A data element is an atomic unit of data
@@ -34,6 +35,7 @@ class DataElement extends CatalogueElement {
         super.afterDraftPersisted(draft)
         if (valueDomain) {
             (draft as DataElement).valueDomain = valueDomain
+            FriendlyErrors.failFriendlySave(draft)
         }
     }
 
