@@ -41,14 +41,14 @@ import org.modelcatalogue.core.*
     private Set<CatalogueElement> created = []
 
     /**
-     * Set of type to be created automatically.
+     * Set of types to be created automatically.
      *
      * @see #automatic(java.lang.Class)
      */
     private Set<Class> createAutomatically = []
 
     /**
-     * Top level builder settings to skip dirty checking during the resoluion.
+     * Top level builder settings to skip dirty checking during the resolution.
      */
     private boolean skipDrafts
 
@@ -87,8 +87,8 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Creates new classification, reuses the latest draft or creates new draft. Accepts any bindable parameters which
-     * Classification instances does.
+     * Creates new classification, reuses the latest draft or creates new draft unless the exactly same classification
+     * already exists in the catalogue. Accepts any bindable parameters which Classification instances does.
      *
      * All elements resolved from DSL method calls inside the closure provided will be classified by this classification
      * automatically. This is the reason why most of the use cases will uses this classification method call as top
@@ -109,8 +109,8 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Creates new model, reuses the latest draft or creates new draft. Accepts any bindable parameters which Model
-     * instances does.
+     * Creates new model, reuses the latest draft or creates new draft unless the exactly same model already exists
+     * in the catalogue. Accepts any bindable parameters which Model instances does.
      *
      * Models nested inside the DSL definition closure will be set as child models for this model.
      * Data elements nested inside the DSL definition closure will be set as contained elements for this model.
@@ -131,8 +131,8 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Creates new data element, reuses the latest draft or creates new draft. Accepts any bindable parameters which
-     * DataElement instances does.
+     * Creates new data element, reuses the latest draft or creates new draft unless the exactly same data element
+     * already exists in the catalogue. Accepts any bindable parameters which DataElement instances does.
      *
      * Value domain nested inside the DSL definition closure will be set as value domain of this element.
      *
@@ -162,8 +162,8 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Creates new value domain, reuses the latest draft or creates new draft. Accepts any bindable parameters which
-     * ValueDomain instances does.
+     * Creates new value domain, reuses the latest draft or creates new draft unless the exactly same value domain
+     * already exists in the catalogue. Accepts any bindable parameters which ValueDomain instances does.
      *
      * Measurement unit nested inside the DSL definition closure will be set as unit of measure of this element.
      * Data type nested inside the DSL definition closure will be set as data type of this element.
@@ -193,8 +193,8 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Creates new data type, reuses the latest draft or creates new draft. Accepts any bindable parameters which
-     * DataType instances does.
+     * Creates new data type, reuses the latest draft or creates new draft unless the exactly same data type
+     * already exists in the catalogue. Accepts any bindable parameters which DataType instances does.
      *
      * @param parameters map of parameters such as name or id
      * @param c DSL definition closure
@@ -217,8 +217,8 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Creates new measurement unit, reuses the latest draft or creates new draft. Accepts any bindable parameters which
-     * MeasurementUnit instances does.
+     * Creates new measurement unit, reuses the latest draft or creates new draft unless the exactly same measurement
+     * unit already exists in the catalogue. Accepts any bindable parameters which MeasurementUnit instances does.
      *
      * @param parameters map of parameters such as name or id
      * @param c DSL definition closure
@@ -237,7 +237,7 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Configures the relationship created automatically for nested elements such as the containment relationship
+     * Configures the relationships created automatically for nested elements such as the containment relationship
      * for data element nested in model.
      *
      * Primary use case for this method call is to configure the relationship metadata such as "Min. Occurs".
@@ -422,27 +422,27 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Sets the description of parent element.
-     * @param description description of parent element
+     * Sets the description of element.
+     * @param description description of element
      */
     void description(String description) { setStringValue('description', description) }
 
     /**
-     * Sets the rule of the value domain. Fails if the parent is not a value domain or any other catalogue element
+     * Sets the rule of the value domain. Fails if not inside value domain definition or any other catalogue element
      * having the rule property.
      * @param rule rule of the parent value domain
      */
     void rule(String rule)               { setStringValue('rule', rule) }
 
     /**
-     * Sets the regular expression rule of the value domain. Fails if the parent is not a value domain or any other
+     * Sets the regular expression rule of the value domain. Fails if the current is not a value domain or any other
      * catalogue element supporting setting the regular expression rule property.
      * @param rule rule of the parent value domain
      */
     void regex(String regex)             { setStringValue('regexDef', regex) }
 
     /**
-     * Sets the model catalogue id of the parent element. The id must be a valid URL.
+     * Sets the model catalogue id of the current element. The id must be a valid URL.
      * @param id id which must be valid URL
      * @see #id(groovy.lang.Closure)
      */
@@ -451,8 +451,8 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Sets the status of the parent element. Currently it does not work as expected as it sets the status property
-     * right after object is resolved instead of e.g. finalizing the element after all the work is done.
+     * Sets the status of the current element. Currently it does not work as expected as it sets the status property
+     * right after object is resolved instead e.g. finalizing the element after all the work is done.
      * @param status new status of the element
      * @see https://metadata.atlassian.net/browse/MET-620
      */
@@ -466,9 +466,10 @@ import org.modelcatalogue.core.*
     }
 
     /**
-     * Sets the extension (metadata) for parent element from given key and value pair.
+     * Sets the extension (metadata) for current element from given key and value pair.
      *
-     * For setting the extension (metadata) of the parent and its parent relationship use #relationship(Closure).
+     * For setting the extensions (metadata) of relationship between current element and its parent element
+     * use #relationship(Closure).
      *
      * @param key metadata key
      * @param value metadata value
@@ -484,7 +485,8 @@ import org.modelcatalogue.core.*
     /**
      * Sets the extensions (metadata) for parent element from given map.
      *
-     * For setting the extensions (metadata) of the parent and its parent relationship use #relationship(Closure).
+     * For setting the extensions (metadata) of relationship between current element and its parent element
+     * use #relationship(Closure).
      *
      * @param values metadata
      */

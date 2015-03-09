@@ -11,10 +11,6 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
         size: 'lg'
         resolve:
           args: -> args
-          classificationInUse: ['$stateParams', 'catalogueElementResource',  ($stateParams, catalogueElementResource)->
-            return undefined if not $stateParams.classification
-            catalogueElementResource('classification').get($stateParams.classification)
-          ]
 
         #language=HTML
         template: '''
@@ -170,7 +166,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'classificationInUse', 'args', 'delayedQueueExecutor', '$q', '$log', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, classificationInUse, args, delayedQueueExecutor, $q, $log) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log) ->
           execAfter50 = delayedQueueExecutor(500)
 
           $scope.reset = ->
@@ -185,7 +181,6 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.dataElements = []
             $scope.classification = {}
             $scope.classifications = []
-            $scope.classificationInUse = classificationInUse
             $scope.messages = messages.createNewMessages()
             $scope.steps = ['model', 'metadata', 'parents', 'children', 'elements', 'classifications']
             $scope.step = 'model'
@@ -197,9 +192,6 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
 
             $scope.parentsVisited = false
             $scope.classificationsVisited = false
-
-            if classificationInUse
-              $scope.classifications.push classificationInUse
 
             if args.parent
               $scope.parents.push {element: args.parent, name: args.parent.name, metadata: {}}
@@ -287,7 +279,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     execAfter50.submit -> catalogueElementResource('model').update(model)
               else
                 $scope.pendingActions.push (model) ->
-                    model.classifications.push classification
+                    model.classifications.push classification.element
                     execAfter50.submit -> catalogueElementResource('model').update(model)
 
             $scope.totalActions = $scope.pendingActionsCount = $scope.pendingActions.length + 1
