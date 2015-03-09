@@ -93,14 +93,14 @@ class EnumeratedType extends DataType {
         }
     }
 
-    private static String mapToString(Map<String, String> map) {
+    static String mapToString(Map<String, String> map) {
         if (map == null) return null
         map.collect { key, val ->
             "${quote(key)}:${quote(val)}"
         }.join('|')
     }
 
-    private static Map<String, String> stringToMap(String s) {
+    static Map<String, String> stringToMap(String s) {
         if (s == null) return null
         Map<String, String> ret = [:]
         s.split(/\|/).each { String part ->
