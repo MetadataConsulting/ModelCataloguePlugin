@@ -679,7 +679,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 			<h1>Model Catalogue</h1>
 			<p class="lead">
 				<b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b>
-				new pathways, forms, data storage, studies. <b><em>Generate</em></b> better
+				and version new datasets <b><em>Generate</em></b> better
 				software components
 			</p>
 
@@ -692,30 +692,24 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 		<!-- Example row of columns -->
 		<div id="info" class="row">
       <div class="col-sm-4">
-				<h2>Architecture</h2>
-				<p>Track your data elements from collection - model services,
-					databases and warehouses. Generate your own feeds, and generate
-					components for integration engines.</p>
+				<h2>Data Quality</h2>
+				<p>Build up datasets using existing data elements from existing datasets and add them to new data elements to compose new data models.</p>
 				<p>
-					<a href="#">More info&hellip;</a>
+
 				</p>
 			</div>
 			<div class="col-sm-4">
-				<h2>Forms</h2>
-				<p>Build forms from standard data elements in our friendly
-					drag-n-drop interface. Export your forms to your favourite tool.</p>
+				<h2>Dataset Curation</h2>
+				<p>Link and compose data-sets to create uniquely identified and versioned "metadata-sets", thus ensuring preservation of data semantics between applications</p>
 				<p>
-					<a href="#">Coming soon&hellip;</a>
+
 				</p>
 			</div>
       <div class="col-sm-4">
-				<h2>Pathways</h2>
-				<p>Design your workflows and visualise your patient pathways.
-					Annotate nodes with data elements, forms, and decisions.
-					Automatically build databases, dashboard interfaces and reporting
-					data.</p>
+				<h2>Dataset Comparison</h2>
+				<p>Discover synonyms, hyponyms and duplicate data elements within datasets, and compare data elements from differing datasets.</p>
 				<p>
-					<a href="#">Coming soon&hellip;</a>
+
 				</p>
 			</div>
 
