@@ -1,5 +1,3 @@
-import org.modelcatalogue.core.*
-
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -101,7 +99,7 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = System.getenv('METADATA_SERVER_URL')
+        grails.serverURL = System.getenv('METADATA_SERVER_URL') ?: "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
 }
 
