@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="0" hostname="Adams-Mac-Pro.local" name="uk.co.brc.modelcatalogue.ImportServiceSpec" tests="1" time="2.948" timestamp="2014-03-27T15:22:22">
+  <properties />
+  <testcase classname="uk.co.brc.modelcatalogue.ImportServiceSpec" name="import nhic spreadsheet" time="2.947" />
+  <system-out><![CDATA[--Output from import nhic spreadsheet--
+importing: TEST_1_Round1_CAN
+importing: TEST_2_Round1_CAN
+importing: TEST_3_Round1_CAN
+importing: TEST_4_Round1_CAN
+importing: TEST_5_Round1_CAN
+importing: TEST_6_Round1_CAN
+importing: TEST_7_Round1_CAN
+importing: TEST_8_Round1_CAN
+importing: TEST_9_Round1_CAN
+importing: TEST_10_Round1_CAN
+importing: TEST_11_Round1_CAN
+importing: TEST_12_Round1_CAN
+importing: TEST_13_Round1_CAN
+importing: TEST_14_Round1_CAN
+importing: TEST_15_Round1_CAN
+importing: TEST_16_Round1_CAN
+importing: TEST_17_Round1_CAN
+importing: TEST_18_Round1_CAN
+importing: TEST_19_Round1_CAN
+importing: TEST_20_Round1_CAN
+importing: TEST_21_Round1_CAN
+importing: TEST_22_Round1_CAN
+importing: TEST_23_Round1_CAN
+importing: TEST_24_Round1_CAN
+importing: TEST_25_Round1_CAN
+importing: TEST_26_Round1_CAN
+importing: TEST_27_Round1_CAN
+importing: TEST_28_Round1_CAN
+importing: TEST_29_Round1_CAN
+importing: TEST_30_Round1_CAN
+importing: TEST_31_Round1_CAN
+importing: TEST_32_Round1_CAN
+importing: TEST_33_Round1_CAN
+importing: TEST_GENDER_Round1_CAN
+]]></system-out>
+  <system-err><![CDATA[--Output from import nhic spreadsheet--
+]]></system-err>
+</testsuite>

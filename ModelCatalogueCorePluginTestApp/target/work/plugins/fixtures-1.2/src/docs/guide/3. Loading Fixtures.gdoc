@@ -1,0 +1,1 @@
+Fixtures are loaded via the @fixtureLoader@ bean which is available by autowiring in integration tests. It provides a @load(String[])@ method that will load fixtures from the given filenames, and a @load(Closure)@ method that takes inline DSL definition as a closure.

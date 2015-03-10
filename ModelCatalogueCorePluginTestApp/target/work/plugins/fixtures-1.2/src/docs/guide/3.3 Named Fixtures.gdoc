@@ -1,0 +1,17 @@
+A fixture can be loaded with a name, which allows the same fixture to be referenced via the same name later on.
+
+{code}
+// load it and name it 'myFixture'
+fixtureLoader['myFixture'].load('someFixtureFile')
+// access it
+fixtureLoader['myFixture'].someObjectFromTheFixture
+{code}
+
+Property access notation also works...
+
+{code}
+// load it and name it 'myFixture'
+fixtureLoader.myFixture.load('someFixtureFile')
+// access it
+fixtureLoader.myFixture.someObjectFromTheFixture
+{code}
