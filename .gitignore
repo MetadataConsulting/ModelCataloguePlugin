@@ -13,3 +13,5 @@ ModelCatalogueCorePluginTestApp/test/integration/resources/DataTemplateChangeDat
 ModelCatalogueCorePluginTestApp/test/integration/resources/example.xls
 ModelCatalogueCorePluginTestApp/test/integration/resources/rare_diseases_combined.umlj
 out/**/*
+**/target/**/*
+**/target-eclipse/**/*
