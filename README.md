@@ -79,7 +79,7 @@ There are three default users available
 Username      | Password      | Description 
 ------------- | ------------- | -------------  
 viewer        | viewer        | User with role `VIEWER` can only browse the catalogue without any   
-curator       | curator       | User with role `CURATOR` has most of the privileges except editing relationship types and 
+curator       | curator       | User with role `CURATOR` has most of the privileges except editing relationship types and user management
 admin         | admin         | User with role `ADMIN`  has all the privileges
 
 You should change the default passwords before deploying to public site:
