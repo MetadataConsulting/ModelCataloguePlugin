@@ -646,10 +646,11 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def "define id as closure"() {
         build {
-            model(name: "Model_ID") {
+            classification(name: 'CS4ID') {
                 id { String name, Class type ->
                     "http://www.example.com/classification/${type.simpleName[0].toLowerCase()}/$name"
                 }
+                model(name: "Model_ID")
             }
         }
 
