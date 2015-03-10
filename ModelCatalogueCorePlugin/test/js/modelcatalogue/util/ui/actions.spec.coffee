@@ -25,13 +25,27 @@ describe "mc.util.ui.actions", ->
       }
     ]
 
+    actionsProvider.registerAction 'update-catalogue-element', ['security', '$scope', (security, $scope)->
+      {
+        position:   100
+        label:      'Edit'
+        icon:       'edit'
+        type:       'primary'
+        action: ->
+          $scope.element.update()
+      }
+    ], ['navigation']
+
     return
 
   it "registers and retrieves action", inject (actions) ->
-    editCalled =  false
+    editCalled    =  false
+    updateCalled  = false
     element =
-      edit: -> editCalled = true
+      edit:   -> editCalled   = true
+      update: -> updateCalled = true
       name: "Foo"
+
     currentActions = actions.getActions({element: element})
 
     expect(editCalled).toBeFalsy()

@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import groovy.transform.CompileStatic
 import org.apache.commons.io.input.CountingInputStream
 import org.apache.commons.io.output.CountingOutputStream
+import org.modelcatalogue.core.publishing.DraftContext
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
 
@@ -17,7 +18,7 @@ import java.security.MessageDigest
 class AssetService {
 
     StorageService modelCatalogueStorageService
-    PublishedElementService publishedElementService
+    ElementService elementService
 
     private static final long GIGA = 1024 * 1024 * 1024
     private static final long MEGA = 1024 * 1024
@@ -60,7 +61,12 @@ class AssetService {
                 return null
             }
 
-            publishedElementService.archiveAndIncreaseVersion(existing)
+            existing = elementService.createDraftVersion(existing, DraftContext.forceNew()) as Asset
+
+            if (existing.hasErrors()) {
+                return existing
+            }
+
 
             existing.name              = asset.name
             existing.description       = asset.description
@@ -89,7 +95,25 @@ class AssetService {
             MessageDigest md5 = MessageDigest.getInstance('MD5')
             dis = new DigestInputStream(file.inputStream, md5)
             CountingInputStream countingInputStream = new CountingInputStream(dis)
-            modelCatalogueStorageService.store('assets', asset.modelCatalogueId, file.contentType, { OutputStream it -> it << countingInputStream })
+            modelCatalogueStorageService.store('assets', "${asset.id}", file.contentType, { OutputStream it -> it << countingInputStream })
+            asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
+            asset.size = countingInputStream.byteCount
+            asset.save()
+        } catch (Exception e) {
+            log.error("Exception storing asset from file", e)
+            throw e
+        } finally {
+            dis?.close()
+        }
+    }
+
+    void storeAssetFromInputStream(InputStream inputStream, String contentType, Asset asset) {
+        DigestInputStream dis = null
+        try {
+            MessageDigest md5 = MessageDigest.getInstance('MD5')
+            dis = new DigestInputStream(inputStream, md5)
+            CountingInputStream countingInputStream = new CountingInputStream(dis)
+            modelCatalogueStorageService.store('assets', "${asset.id}", contentType, { OutputStream it -> it << countingInputStream })
             asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
             asset.size = countingInputStream.byteCount
             asset.save()
@@ -104,7 +128,7 @@ class AssetService {
     void storeAssetWithSteam(Asset asset, String contentType, Closure withOutputStream) {
         if (!asset) throw new IllegalArgumentException("Please, provide valid asset.")
         MessageDigest md5 = MessageDigest.getInstance('MD5')
-        modelCatalogueStorageService.store('assets', asset.modelCatalogueId, contentType) { OutputStream it ->
+        modelCatalogueStorageService.store('assets', "${asset.id}", contentType) { OutputStream it ->
             DigestOutputStream dos      = null
             CountingOutputStream cos    = null
             try {

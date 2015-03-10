@@ -1,14 +1,16 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.util.MappingScript
 import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.springframework.validation.Errors
 
 class Mapping {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+    // placeholder for situation where no mapping is expected
+    // do not save of modify this value
+    // static final Mapping DIRECT_MAPPING = new Mapping(mapping: 'x')
 
-    static searchable = {
-        except = ['source', 'destination']
-    }
+    static Mapping getDIRECT_MAPPING() { new Mapping(mapping: 'x') }
 
     CatalogueElement source
     CatalogueElement destination
@@ -19,24 +21,41 @@ class Mapping {
         mapValue(mapping, value)
     }
 
+    /**
+     * Creates new reusable mapping. Execute the mapper with <code>execute(x: valueToBeMapped)</code>
+     * to get the mapped value.
+     * @return reusable mapping
+     */
+    SecuredRuleExecutor.ReusableScript mapper() {
+        reusableMapping(mapping)
+    }
+
+    static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
+
     static constraints = {
         source nullable: false, unique: ['destination']
         destination nullable: false, validator: { val, obj ->
             if (!val || !obj.source) return true
             return val != obj.source && val.class == obj.source.class
         }
-        mapping nullable: false, blank: false, maxSize: 10000, validator: { val, obj ->
+        mapping nullable: false, blank: false, maxSize: 10000, validator: { val, obj, Errors errors ->
             if (!val) return true
-            return validateMapping(val)
+            SecuredRuleExecutor.ValidationResult result = validateMapping(val)
+            if (result) return true
+            errors.rejectValue 'mapping', "wontCompile", [result.compilationFailedMessage] as Object[],  "Mapping compilation failed:\n {0}"
         }
     }
 
-    static boolean validateMapping(String mappingText) {
-        new SecuredRuleExecutor(x: 0).validate(mappingText)
+    static SecuredRuleExecutor.ValidationResult validateMapping(String mappingText) {
+        new SecuredRuleExecutor(MappingScript, x: 0).validate(mappingText)
     }
 
     static Object mapValue(String mapping, Object value) {
-        new SecuredRuleExecutor(x: value).execute(mapping)
+        new SecuredRuleExecutor(MappingScript, x: value).execute(mapping)
+    }
+
+    static SecuredRuleExecutor.ReusableScript reusableMapping(String mappingText) {
+        new SecuredRuleExecutor(MappingScript, x: 0).reuse(mappingText)
     }
 
     String toString() {
@@ -44,9 +63,11 @@ class Mapping {
     }
 
     def beforeDelete(){
-        if (source || destination) {
-            destination?.removeFromIncomingMappings(this)
+        if (source) {
             source?.removeFromOutgoingMappings(this)
+        }
+        if(destination){
+            destination?.removeFromIncomingMappings(this)
         }
     }
 

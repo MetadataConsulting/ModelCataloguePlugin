@@ -1,7 +1,10 @@
 package org.modelcatalogue.core
 
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
+import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.util.FriendlyErrors
 
 /*
 * A Data Type is like a primitive type
@@ -13,26 +16,15 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class DataType extends CatalogueElement {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static hasMany  = [relatedValueDomains: ValueDomain]
-
-    static searchable = {
-        name boost:5
-        except = ['relatedValueDomains', 'incomingRelationships', 'outgoingRelationships']
-    }
-
     static constraints = {
-        name unique: true, size: 2..255
+        name size: 1..255
     }
 
     static mapping = {
-        relatedValueDomains cascade: "all-delete-orphan"
+        tablePerHierarchy false
     }
 
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
-    }
+    static transients = ['relatedValueDomains']
 
     private final static defaultRelationshipTypesDefinitions = [
             [name: "String", description: "java.lang.String"],
@@ -54,4 +46,50 @@ class DataType extends CatalogueElement {
     }
 
 
+    static String suggestName(Set<String> suggestions) {
+        if (!suggestions) {
+            return null
+        }
+        if (suggestions.size() == 1) {
+            return suggestions[0]
+        }
+
+        List<List<String>> words = suggestions.collect { GrailsNameUtils.getNaturalName(it).split(/\s/).toList() }
+
+        List<String> result = words.head()
+
+        for (List<String> others in words.tail()) {
+            result = result.intersect(others)
+        }
+
+        result.join(" ")
+    }
+
+    List<ValueDomain> getRelatedValueDomains() {
+        if (!readyForQueries) {
+            return []
+        }
+        return ValueDomain.findAllByDataType(this)
+    }
+
+    Long countRelatedValueDomains() {
+        if (!readyForQueries) {
+            return 0
+        }
+        return ValueDomain.countByDataType(this)
+    }
+
+    DataType removeFromRelatedValueDomains(ValueDomain domain) {
+        domain.dataType = null
+        FriendlyErrors.failFriendlySave(domain)
+        this
+    }
+
+    @Override
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
+        PublishingChain.createDraft(this, strategy)
+        .add(this.relatedValueDomains)
+        .add(this.classifications)
+        .run(publisher)
+    }
 }

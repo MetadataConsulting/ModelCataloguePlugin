@@ -1,5 +1,6 @@
 describe "mc.core.ui.catalogueElementPicker", ->
   beforeEach module 'mc.core.ui.catalogueElementPicker'
+  beforeEach module 'mc.core.catalogueElementEnhancer'
 
   it "element uses global search by default",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
     catEl = enhance angular.copy(fixtures.valueDomain.showOne)
@@ -7,13 +8,13 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.element = catEl
 
     element = $compile('''
-        <input ng-model="element" catalogue-element-picker>
+        <input ng-model="element" catalogue-element-picker typeahead-wait-ms="0">
       ''')($rootScope)
 
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('school subject')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -29,13 +30,13 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.element = catEl
 
     element = $compile('''
-        <input ng-model="element" catalogue-element-picker label="el.name">
+        <input ng-model="element" catalogue-element-picker label="el.name" typeahead-wait-ms="0">
       ''')($rootScope)
 
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius')
+    expect(element.val()).toBe('school subject')
 
 
   it "the resource can be specified as string",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
@@ -44,13 +45,13 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $rootScope.element = catEl
 
     element = $compile('''
-          <input ng-model="element" catalogue-element-picker="valueDomain">
+          <input ng-model="element" catalogue-element-picker="valueDomain" typeahead-wait-ms="0">
         ''')($rootScope)
 
     $rootScope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('school subject')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -62,17 +63,19 @@ describe "mc.core.ui.catalogueElementPicker", ->
   it "the resource can be specified as reference",  inject ($compile, $rootScope, enhance, $httpBackend, modelCatalogueApiRoot) ->
     catEl = enhance angular.copy(fixtures.valueDomain.showOne)
 
-    $rootScope.element = catEl
-    $rootScope.resource = 'valueDomain'
+    $scope = $rootScope.$new(true)
+
+    $scope.element = catEl
+    $scope.resource = 'valueDomain'
 
     element = $compile('''
-          <input ng-model="element" catalogue-element-picker resource="resource">
-        ''')($rootScope)
+          <input ng-model="element" catalogue-element-picker resource="resource" typeahead-wait-ms="0">
+        ''')($scope)
 
-    $rootScope.$digest()
+    $scope.$digest()
 
     expect(element.prop('tagName')).toBe('INPUT')
-    expect(element.val()).toBe('value domain Celsius (Value Domain: ' + fixtures.valueDomain.showOne.id + ')')
+    expect(element.val()).toBe('school subject')
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/valueDomain/search?search=test").respond(fixtures.valueDomain.searchElement15)
 
@@ -81,8 +84,8 @@ describe "mc.core.ui.catalogueElementPicker", ->
 
     $httpBackend.flush()
 
-    $rootScope.resource = 'model'
-    $rootScope.$digest()
+    $scope.resource = 'model'
+    $scope.$digest()
 
     $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/model/search?search=other+test").respond(fixtures.model.searchElement13)
 

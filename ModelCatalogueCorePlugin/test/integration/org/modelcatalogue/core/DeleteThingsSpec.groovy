@@ -37,7 +37,7 @@ class DeleteThingsSpec extends IntegrationSpec{
     @Unroll
     def "json bad delete i.e. MU used in another resource, returns errors"(){
 
-        def m, et, vd1
+        def m, et
         expect:
 
         assert(m = new MeasurementUnit(name:"cm per hour", symbol: "cmph").save())
@@ -59,43 +59,10 @@ class DeleteThingsSpec extends IntegrationSpec{
 
         then:
 
-        json.errors == "Cannot delete cm per hour due to referential integrity constraint violation (/measurementUnit/delete/${m.id})"
+        json.errors
+        json.errors.startsWith "Cannot delete cm per hour due to referential integrity constraint violation"
         controller.response.status == HttpServletResponse.SC_CONFLICT
 
     }
-
-    @Unroll
-    def "xml bad delete i.e. MU used in another resource, returns errors"(){
-
-        def m, et, vd1
-        expect:
-
-        def controller = new MeasurementUnitController()
-
-        assert(m = new MeasurementUnit(name:"cm per hour", symbol: "cmph").save())
-        assert(et = new EnumeratedType(name: "enum", enumerations:['1':'this', '2':'that', '3':'theOther']).save())
-        assert(new ValueDomain(name: "ground_speed", unitOfMeasure: m, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: et).save())
-
-
-        when:
-
-        controller.response.format = "xml"
-
-        controller.params.id = m.id
-
-        controller.delete()
-
-        GPathResult xml = controller.response.xml
-
-        recorder.recordResult 'deleteFailed', xml
-
-        then:
-
-        xml == "Cannot delete cm per hour due to referential integrity constraint violation (/measurementUnit/delete/${m.id})"
-        controller.response.status == HttpServletResponse.SC_CONFLICT
-
-    }
-
-
 
 }

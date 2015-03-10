@@ -1,6 +1,4 @@
-import org.modelcatalogue.core.Asset
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.*
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -31,7 +29,7 @@ grails.mime.types = [ // the first one is the default format
                       rss          : 'application/rss+xml',
                       text         : 'text/plain',
                       hal          : ['application/hal+json', 'application/hal+xml'],
-                      xml          : ['text/xml', 'application/xml'],
+//                      xml          : ['text/xml', 'application/xml'],
                       xlsx         : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                       all          : '*/*', // 'all' maps to '*' or the first available format in withFormat
 ]
@@ -91,11 +89,26 @@ grails.hibernate.cache.queries = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+        grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+    }
+    local {
+        grails.logging.jul.usebridge = true
+        grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+    }
+    test {
+        grails.plugin.console.enabled = true
+        grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://mcc-testapp.metadata.eu.cloudbees.net/"
+        grails.serverURL = System.getenv('METADATA_SERVER_URL')
     }
+}
+
+hibernate {
+    format_sql = true
+    use_sql_comments = true
+    generate_statistics = true
 }
 
 // log4j configuration
@@ -106,12 +119,28 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'org.modelcatalogue'
-    debug 'org.codehaus.groovy.grails.web.mapping'
+    debug 'grails.app.services.org.modelcatalogue.core.ElementService'
+    debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
+    debug 'grails.app.services.org.modelcatalogue.core.InitCatalogueService'
+    debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
+
+    debug 'org.modelcatalogue.core.util.builder'
+    debug 'org.modelcatalogue.core.publishing'
+
+//    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
 //    debug 'org.grails.plugins.elasticsearch'
 
-    error 'org.codehaus.groovy.grails.web.servlet',        // controllers
+//    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
+//        trace 'org.hibernate.type'
+//        trace 'org.hibernate.stat'
+//        debug 'org.hibernate.SQL'
+//    }
+
+    warn 'org.modelcatalogue.core.xml'
+    warn 'org.modelcatalogue.core.reports.ReportDescriptor'
+
+    error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
             'org.codehaus.groovy.grails.web.sitemesh',       // layouts
             'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -129,109 +158,136 @@ elasticSearch.client.mode = 'local'
 elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
 elasticSearch.datastoreImpl = 'hibernateDatastore'
 
+modelcatalogue.defaults.relationshiptypes =  [
+        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
+            String minOccursString = ext['Min Occurs']
+            String maxOccursString = ext['Max Occurs']
 
-modelcatalogue.defaults.datatypes = [
-        [name: "String", description: "java.lang.String"],
-        [name: "Integer", description: "java.lang.Integer"],
-        [name: "Double", description: "java.lang.Double"],
-        [name: "Boolean", description: "java.lang.Boolean"],
-        [name: "Date", description: "java.util.Date"],
-        [name: "Time", description: "java.sql.Time"],
-        [name: "Currency", description: "java.util.Currency"]
-]
+            Integer minOccurs = minOccursString in ['unbounded', 'null'] ? 0 : (minOccursString as Integer)
+            Integer maxOccurs = maxOccursString in ['unbounded', 'null'] ? Integer.MAX_VALUE : (maxOccursString as Integer)
 
-
-modelcatalogue.defaults.measurementunits = [
-        [name: "celsius", description: "degrees celsius", symbol: "°C"],
-        [name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"],
-        [name: "newtons", description: "measurement of force", symbol: "N"],
-        [name: 'meter', description: 'length', symbol: 'm'],
-        [name: 'kilogram', description: 'mass', symbol: 'kg'],
-        [name: 'second', description: 'time', symbol: 's'],
-        [name: 'ampere', description: 'electric current', symbol: 'A'],
-        [name: 'kelvin', description: 'thermodynamic temperature', symbol: 'K'],
-        [name: 'mole', description: 'amount of substance', symbol: 'mol'],
-        [name: 'candela', description: 'luminous intensity', symbol: 'cd'],
-        [name: 'area', description: 'square meter', symbol: 'm2'],
-        [name: 'volume', description: 'cubic meter', symbol: 'm3'],
-        [name: 'speed, velocity', description: 'meter per second', symbol: 'm/s'],
-        [name: 'acceleration', description: 'meter per second squared  ', symbol: 'm/s2'],
-        [name: 'wave number', description: 'reciprocal meter', symbol: 'm-1'],
-        [name: 'mass density', description: 'kilogram per cubic meter', symbol: 'kg/m3'],
-        [name: 'specific volume', description: 'cubic meter per kilogram', symbol: 'm3/kg'],
-        [name: 'current density', description: 'ampere per square meter', symbol: 'A/m2'],
-        [name: 'magnetic field strength  ', description: 'ampere per meter', symbol: 'A/m'],
-        [name: 'amount-of-substance concentration', description: 'mole per cubic meter', symbol: 'mol/m3'],
-        [name: 'luminance', description: 'candela per square meter', symbol: 'cd/m2'],
-        [name: 'mass fraction', description: 'kilogram per kilogram', symbol: 'kg/kg = 1']
-]
-
-
-modelcatalogue.defaults.relationshiptypes = [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Source Min Occurs, Source Max Occurs, Destination Min Occurs, Destination Max Occurs", rule: '''
-            Integer sourceMinOccurs = ext['Source Min Occurs'] as Integer
-            Integer sourceMaxOccurs = ext['Source Max Occurs'] as Integer
-            Integer destinationMinOccurs = ext['Destination Min Occurs'] as Integer
-            Integer destinationMaxOccurs = ext['Destination Max Occurs'] as Integer
-
-            if (sourceMinOccurs != null) {
-                if (sourceMinOccurs < 0) {
+            if (minOccurs != null) {
+                if (minOccurs < 0) {
                     return false
                 }
-                if (sourceMaxOccurs != null && sourceMaxOccurs < sourceMinOccurs) {
+                if (maxOccurs != null && maxOccurs < minOccurs) {
                     return false
                 }
             } else {
-                if (sourceMaxOccurs != null && sourceMaxOccurs < 1) {
-                    return false
-                }
-            }
-
-            if (destinationMinOccurs != null) {
-                if (destinationMinOccurs < 0) {
-                    return false
-                }
-                if (destinationMaxOccurs != null && destinationMaxOccurs < destinationMinOccurs) {
-                    return false
-                }
-            } else {
-                if (destinationMaxOccurs != null && destinationMaxOccurs < 1) {
+                if (maxOccurs != null && maxOccurs < 1) {
                     return false
                 }
             }
 
             return true
-        '''],
-        [name: 'base', sourceToDestination: 'based on', destinationToSource: 'is base for', sourceClass: ValueDomain, destinationClass: ValueDomain],
-        [name: "attachment", sourceToDestination: "attachments", destinationToSource: "owners", sourceClass: CatalogueElement, destinationClass: Asset],
-        [name: "context", sourceToDestination: "provides context for", destinationToSource: "has context of", sourceClass: ConceptualDomain, destinationClass: Model],
-        [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model],
-        [name: "inclusion", sourceToDestination: "includes", destinationToSource: "included in", sourceClass: ConceptualDomain, destinationClass: ValueDomain],
-        [name: "instantiation", sourceToDestination: "instantiated by", destinationToSource: "instantiates", sourceClass: DataElement, destinationClass: ValueDomain],
-        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: PublishedElement, destinationClass: PublishedElement, rule: "source.class == destination.class", system: true],
-        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true]
+        ''', versionSpecific: true],
+        [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"],
+        [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
+        [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model, versionSpecific: true],
+        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class", system: true, versionSpecific: true],
+        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
+        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true, rule: "source.class == destination.class"],
+        [name: "favourite", sourceToDestination: "favourites", destinationToSource: "is favourite of", sourceClass: User, destinationClass: CatalogueElement, system: true],
+        [name: "classification", sourceToDestination: "classifies", destinationToSource: "classifications", sourceClass: Classification, destinationClass: CatalogueElement, versionSpecific: true],
+        [name: "classificationFilter", sourceToDestination: "used as filter by", destinationToSource: "filtered by", sourceClass: Classification, destinationClass: User, system: true],
+
 ]
 
 // configure the default storage
 modelcatalogue.storage.directory = "/tmp/modelcatalogue/storage"
 modelcatalogue.storage.maxSize = 50 * 1024 * 1024
 // Added by the Spring Security Core plugin:
-grails.plugin.springsecurity.userLookup.userDomainClassName = 'org.modelcatalogue.core.testapp.User'
-grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatalogue.core.testapp.UserRole'
-grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.testapp.Role'
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'org.modelcatalogue.core.security.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'org.modelcatalogue.core.security.UserRole'
+grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.security.Role'
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
 
-grails.assets.excludes = ["bootstrap/**/*.less", "jquery/**/*.js", "angular/**/*.js"]
+grails.assets.excludes =  [
+        "bootstrap/**/*.*",
+        "bootstrap/**/*.*",
+        "font-awesome/**/*.*",
+        "jquery/**/*.*",
+        "angular/**/*.*",
+        "angular-animate/**/*.*",
+        "angular-bootstrap/**/*.*",
+        "angular-cookies/**/*.*",
+        "angular-i18n/**/*.*",
+        "angular-mocks/**/*.*",
+        "angular-sanitize/**/*.*",
+        "jasmine/**/*.*",
+        "**/*/GruntFile",
+        "**/*/Gruntfile",
+        "**/*/Gruntfile.coffee",
+        "**/*/LICENSE",
+        "**/*/COPYING",
+        "**/*/README",
+        "**/*/*.md",
+        "**/*/*.json",
+        "**/src/*.*",
+        "**/test/*.*",
+        "**/cpp/*.*",
+        "**/csharp/*.*",
+        "**/dart/*.*",
+        "**/demos/*.*",
+        "**/java/*.*",
+        "**/lua/*.*",
+        "**/maven/*.*",
+        "**/objectivec/*.*",
+        "**/python2/*.*",
+        "**/python3/*.*",
+]
 
-grails.assets.plugin."model-catalogue-core-plugin".excludes = ["bootstrap/**/*.less", "jquery/**/*.js", "angular/**/*.js"]
-grails.assets.plugin."model-catalogue-core-plugin".includes = ["bootstrap.less"]
-//
-//grails.assets.minifyOptions = [
-//        strictSemicolons: false,
-//        mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
-//        genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
-//]
+grails.assets.plugin."model-catalogue-core-plugin".excludes = [
+        "bootstrap/**/*.*",
+        "bootstrap/**/*.*",
+        "font-awesome/**/*.*",
+        "jquery/**/*.*",
+        "angular/**/*.*",
+        "angular-animate/**/*.*",
+        "angular-bootstrap/**/*.*",
+        "angular-cookies/**/*.*",
+        "angular-i18n/**/*.*",
+        "angular-mocks/**/*.*",
+        "angular-sanitize/**/*.*",
+        "jasmine/**/*.*",
+        "**/*/GruntFile",
+        "**/*/Gruntfile",
+        "**/*/Gruntfile.coffee",
+        "**/*/LICENSE",
+        "**/*/COPYING",
+        "**/*/README",
+        "**/*/*.md",
+        "**/*/*.json",
+        "**/src/*.*",
+        "**/test/*.*",
+        "**/cpp/*.*",
+        "**/csharp/*.*",
+        "**/dart/*.*",
+        "**/demos/*.*",
+        "**/java/*.*",
+        "**/lua/*.*",
+        "**/maven/*.*",
+        "**/objectivec/*.*",
+        "**/python2/*.*",
+        "**/python3/*.*",
+]
 
-// grails.assets.minifyJs = false
+grails.assets.minifyOptions = [
+        strictSemicolons: false,
+        mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
+        genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
+]
+
+//grails.assets.bundle=false
+
+grails.assets.minifyJs = true
+
+
+grails.plugin.springsecurity.useBasicAuth = true
+grails.plugin.springsecurity.basic.realmName = "Model Catalogue"
+grails.plugin.springsecurity.filterChain.chainMap = [
+        '/catalogue/upload': 'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
+]

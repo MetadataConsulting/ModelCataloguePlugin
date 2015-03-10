@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<xs:schema xmlns="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" xmlns:SACT="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all" version="2-0">
+
+	<!--ST Restriction to support Dictionary Dates-->
+	<xs:simpleType name="ST.GB-en-NHS.StringType1">
+		<xs:annotation>
+			<xs:documentation>This data type supports the representation of dictionary dates.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="st">
+			<xs:pattern value="(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])"/>
+		</xs:restriction>
+	</xs:simpleType>
+    <xs:simpleType name="st">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+
+</xs:schema>

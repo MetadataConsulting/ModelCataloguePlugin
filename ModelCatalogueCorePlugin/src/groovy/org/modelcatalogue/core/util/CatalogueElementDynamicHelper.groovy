@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util
 import groovy.util.logging.Log
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 
 /**
@@ -43,6 +44,18 @@ class CatalogueElementDynamicHelper {
                     }
                     delegate."get${direction.capitalize()}RelationsByType"(relType)
                 }
+                type.metaClass."get${name.capitalize()}Relationships" = {->
+                    RelationshipType relType = RelationshipType.findByName(relName)
+                    if (!relType) {
+                        log.warning "querying for $name for $delegate.name but the relationship type $relName does not exist"
+                        return []
+                    }
+                    if (!delegate.id) {
+                        log.info "trying to get relations on transient object, returning empty list"
+                        return []
+                    }
+                    delegate."get${direction.capitalize()}RelationshipsByType"(relType)
+                }
             }
             String countMethodName = "count${name.capitalize()}"
             if (!type.metaClass.metaMethods.any {it.name == countMethodName}) {
@@ -61,7 +74,11 @@ class CatalogueElementDynamicHelper {
                 type.metaClass[addMethodName] = { other ->
                     RelationshipType relType = RelationshipType.findByName(relName)
                     if (!relType) throw new IllegalArgumentException("Unknown relationship type $relName")
-                    delegate."createLink${direction == 'incoming' ? 'From' : 'To'}"(other, relType)
+                    Relationship rel = delegate."createLink${direction == 'incoming' ? 'From' : 'To'}"(other, relType)
+                    if (rel.hasErrors()) {
+                        throw new IllegalArgumentException(FriendlyErrors.printErrors("Cannot add to $name $delegate value $other", rel.errors))
+                    }
+                    rel
                 }
             }
 

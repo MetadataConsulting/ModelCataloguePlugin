@@ -1,9 +1,8 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.util.Elements
-import org.modelcatalogue.core.util.ListWithTotal
+import org.modelcatalogue.core.util.Lists
 
-class ModelController extends AbstractPublishedElementController<Model> {
+class ModelController extends AbstractCatalogueElementController<Model> {
 
     def modelService
 
@@ -18,13 +17,7 @@ class ModelController extends AbstractPublishedElementController<Model> {
         }
         handleParams(max)
 
-        ListWithTotal topLevel = modelService.getTopLevelModels(params)
-
-        respondWithLinks new Elements(
-                base: "/${resourceName}/",
-                total: topLevel.total,
-                items: topLevel.items
-        )
+        respond Lists.wrap(params, "/${resourceName}/", modelService.getTopLevelModels(params))
     }
 
 }

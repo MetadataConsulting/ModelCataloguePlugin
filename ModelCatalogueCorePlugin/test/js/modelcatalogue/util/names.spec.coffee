@@ -16,6 +16,7 @@ describe 'mc.util.names', ->
   propertyNamesData = {
     'com.modelacatalogue.core.CatalogueElement' : 'catalogueElement'
     'catalogueElement'                          : 'catalogueElement'
+    'catalogueElement_bla_bla_bla'              : 'catalogueElement'
   }
 
 

@@ -9,14 +9,39 @@ class CatalogueElementFinderSpec extends Specification {
         def candidatesClasses = CatalogueElementFinder.catalogueElementClasses
 
         expect:
-        ConceptualDomain.name   in candidatesClasses
         DataElement.name        in candidatesClasses
         DataType.name           in candidatesClasses
         MeasurementUnit.name    in candidatesClasses
         Model.name              in candidatesClasses
-        PublishedElement.name   in candidatesClasses
         ValueDomain.name        in candidatesClasses
         CatalogueElement.name   in candidatesClasses
+
+    }
+
+
+    def "Find all element types"() {
+        when:
+        def relTypeTypes = CatalogueElementFinder.getAllTypesNames(RelationshipType)
+
+        then:
+        !relTypeTypes
+
+        when:
+        def ceTypes = CatalogueElementFinder.getAllTypesNames(CatalogueElement)
+
+        then:
+        ceTypes == [CatalogueElement.name]
+
+        when:
+        def assetTypes = CatalogueElementFinder.getAllTypesNames(Asset)
+
+        then:
+        assetTypes
+        assetTypes.size() == 2
+
+        CatalogueElement.name in assetTypes
+        Asset.name in assetTypes
+
 
     }
 

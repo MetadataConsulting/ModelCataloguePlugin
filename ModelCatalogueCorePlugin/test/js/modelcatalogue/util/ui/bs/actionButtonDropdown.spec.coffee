@@ -7,7 +7,7 @@ describe "mc.util.ui.actionButtonDropdown", ->
       {
         position:   100
         label:      'Edit'
-        icon:       'edit'
+        icon:       'glyphicon glyphicon-edit'
         type:       'primary'
         action: ->
           $scope.element.name = 'The Earth Element'
@@ -18,7 +18,7 @@ describe "mc.util.ui.actionButtonDropdown", ->
 
       {
         label:      'Edit as Admin'
-        icon:       'edit'
+        icon:       'glyphicon glyphicon-edit'
         action: ->
           $scope.element.name = 'The Element Edited'
       }

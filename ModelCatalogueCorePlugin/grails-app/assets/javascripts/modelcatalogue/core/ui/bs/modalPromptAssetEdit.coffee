@@ -1,28 +1,33 @@
-angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angularFileUpload']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angularFileUpload', 'mc.core.ui.bs.withClassificationCtrlMixin']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
-      deferred = $q.defer()
-
       if not args?.element? and not args?.create?
         messages.error('Cannot create edit dialog.', 'The element to be edited is missing.')
-        deferred.reject('Missing element argument!')
-        return deferred.promise
+        return $q.reject('Missing element argument!')
 
       dialog = $modal.open {
         windowClass: 'basic-edit-modal-prompt'
         backdrop: 'static'
         keyboard: false
+        resolve:
+          args: -> args
         template: '''
          <div class="modal-header">
             <h4>''' + title + '''</h4>
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
-            <form role="form">
+            <form role="form" ng-submit="saveElement()">
+              <div class="form-group">
+                <label for="classification"> Classifications</label>
+                <elements-as-tags elements="copy.classifications"></elements-as-tags>
+                <input id="classification-{{$index}}" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addToClassifications()">
+              </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
                 <input type="text" class="form-control" id="name" placeholder="Name (leave blank to use filename)" ng-model="copy.name">
               </div>
+
               <div class="form-group">
                 <label for="asset" class="">File</label>
                 <input ng-hide="uploading &amp;&amp; progress" type="file" class="form-control" id="asset" placeholder="File" ng-model="copy.asset" ng-file-select="onFileSelect($files)">
@@ -35,20 +40,21 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
             </form>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-success" ng-click="saveElement()" ng-disabled="!hasChanged() || uploading"><span class="glyphicon glyphicon-ok"></span> Save</button>
-            <button class="btn btn-success" ng-hide="create" ng-click="saveElement(true)"><span class="glyphicon glyphicon-circle-arrow-up"></span> Save as New Version</button>
-            <button class="btn btn-success" ng-hide="create" ng-click="copy.status = 'FINALIZED' ; saveElement(true)"><span class="glyphicon glyphicon-check"></span> Finalize</button>
-            <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+          <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance) ->
-          $scope.copy     = angular.copy(args.element ? {})
+        controller: ['$scope', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$upload', 'modelCatalogueApiRoot', 'enhance', '$rootScope', '$controller', ($scope, messages, names, catalogueElementResource, $modalInstance, $upload, modelCatalogueApiRoot, enhance, $rootScope, $controller) ->
+          $scope.pending        = {classification: null}
+          $scope.newEntity      = -> {classifications: $scope.copy?.classifications ? []}
+          $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.original = args.element ? {}
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
 
+          angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
+
           $scope.hasChanged   = ->
-            $scope.copy.file or $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description
+            $scope.copy.file or $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.classifications != $scope.original.classifications
 
           $scope.cancel = ->
             $scope.progress = undefined
@@ -67,6 +73,12 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
               $scope.copy.name = $scope.copy.file.name
 
           $scope.saveElement = (newVersion) ->
+
+            if angular.isString($scope.pending.classification)
+              promise.then -> catalogueElementResource('classification').save({name: $scope.pending.classification}).then (newClassification) ->
+                $scope.copy.classifications.push newClassification
+                $scope.pending.classification = null
+
             $scope.messages.clearAllMessages()
             if not $scope.copy.name and not $scope.copy.file
               $scope.messages.error 'Empty Name', 'Please fill the name'
@@ -76,23 +88,32 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
             if $scope.copy.file
               $scope.uploading = true
               $scope.upload = $upload.upload({
-                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description }
+                params: {id: $scope.copy.id, name: $scope.copy.name, description: $scope.copy.description}
                 url:                "#{modelCatalogueApiRoot}/asset/upload"
                 file:               $scope.copy.file
                 fileFormDataName:   'asset'
               }).progress((evt) ->
                 $scope.progress = parseInt(100.0 * evt.loaded / evt.total)
               ).success((result) ->
+                result = enhance result
+
+                $rootScope.$broadcast 'catalogueElementCreated', result, "#{modelCatalogueApiRoot}/asset/upload"
+
                 $scope.uploading = false
                 if result.errors
                   for err in result.errors
                     $scope.messages.error err.message
                 else
-                  if args?.create
-                    messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
-                  else
-                    messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
-                  $modalInstance.close(enhance result)
+                  promise = $q.when result
+                  if not angular.equals(result.classifications, $scope.copy.classifications)
+                    result.classifications = $scope.copy.classifications
+                    promise = catalogueElementResource(result.elementType).update(result)
+                  promise.then ->
+                    if args?.create
+                      messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
+                    else
+                      messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
+                    $modalInstance.close(result)
               ).error((data) ->
                 for err in data.errors
                   $scope.messages.error err.message
@@ -109,9 +130,9 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
 
               promise.then (result) ->
                 if args?.create
-                  messages.success('Created ' + result.elementTypeName, "You have created #{result.elementTypeName} #{result.name}.")
+                  messages.success('Created ' + result.getElementTypeName(), "You have created #{result.getElementTypeName()} #{result.name}.")
                 else
-                  messages.success('Updated ' + result.elementTypeName, "You have updated #{result.elementTypeName} #{result.name}.")
+                  messages.success('Updated ' + result.getElementTypeName(), "You have updated #{result.getElementTypeName()} #{result.name}.")
                 $modalInstance.close(enhance result)
               , (response) ->
                 for err in response.data.errors
@@ -121,12 +142,7 @@ angular.module('mc.core.ui.bs.modalPromptAssetEdit', ['mc.util.messages', 'angul
 
       }
 
-      dialog.result.then (result) ->
-        deferred.resolve(result)
-      , (reason) ->
-        deferred.reject(reason)
-
-      deferred.promise
+      dialog.result
   ]
 
   messagesProvider.setPromptFactory 'edit-asset', factory

@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.converters.XML
 import org.modelcatalogue.core.Relationship
 
 /**
@@ -16,47 +15,13 @@ class RelationshipMarshallers extends AbstractMarshallers {
         if (!rel) return [:]
         [
                 id: rel.id,
-                source: rel.source.info,
-                destination: rel.destination.info,
+                source: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.source),
+                destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.destination),
                 type: rel.relationshipType.info,
-                ext: rel.ext
+                archived: rel.archived,
+                ext: rel.ext,
+                elementType: Relationship.name,
+                classification: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.classification)
         ]
-    }
-
-    protected void buildXml(rel, XML xml) {
-        super.buildXml(rel, xml)
-        xml.build {
-            renderInfo('source', rel.source.info, xml)
-            renderInfo('destination', rel.destination.info, xml)
-            renderInfo('type', rel.relationshipType.info, xml)
-        }
-        if (rel.ext) {
-            xml.build {
-                extensions {
-                    for (e in rel.ext.entrySet()) {
-                        extension key: e.key, e.value
-                    }
-                }
-            }
-        }
-    }
-
-    protected void addXmlAttributes(rel, XML xml) {
-        super.addXmlAttributes(rel, xml)
-        addXmlAttribute(rel.id, "id", xml)
-    }
-
-    static void renderInfo(String what, Map info, XML xml) {
-        xml.build {
-            "$what" {
-                for (e in info.entrySet()) {
-                    if (e.key == 'id') {
-                        xml.attribute('id', "$e.value")
-                    } else {
-                        "$e.key" e.value
-                    }
-                }
-            }
-        }
     }
 }

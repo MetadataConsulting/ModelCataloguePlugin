@@ -10,8 +10,4 @@ class ListWithTotalAndTypeWrapperMarshaller extends ListWrapperMarshaller {
     ListWithTotalAndTypeWrapperMarshaller() {
         super(ListWithTotalAndTypeWrapper)
     }
-
-    protected String getItemNodeName() {
-        "element"
-    }
 }

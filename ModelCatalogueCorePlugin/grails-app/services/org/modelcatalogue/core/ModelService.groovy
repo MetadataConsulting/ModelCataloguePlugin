@@ -1,31 +1,58 @@
 package org.modelcatalogue.core
 
 import grails.transaction.Transactional
-import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListCountAndType
-import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
-import org.modelcatalogue.core.util.QueryListWithTotalAndType
 
 @Transactional
 class ModelService {
 
-    ListWithTotalAndType<Model> getTopLevelModels(Map params) {
-        RelationshipType hierarchy      = RelationshipType.hierarchyType
-        PublishedElementStatus status   = PublishedElementService.getStatusFromParams(params)
+    SecurityService modelCatalogueSecurityService
 
-        Lists.fromQuery params, Model, """
+    ListWithTotalAndType<Model> getTopLevelModels(Map params) {
+        getTopLevelModels(modelCatalogueSecurityService.currentUser?.filteredBy, params)
+    }
+
+    ListWithTotalAndType<Model> getTopLevelModels(List<Classification> classifications, Map params) {
+        RelationshipType hierarchy      = RelationshipType.hierarchyType
+        ElementStatus status            = ElementService.getStatusFromParams(params)
+        RelationshipType classification = RelationshipType.classificationType
+
+
+        if (classifications) {
+            // language=HQL
+            Lists.fromQuery params, Model, """
+            select distinct m
+            from Model as m join m.incomingRelationships as rel
+            where m.status = :status
+                and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+                and rel.source in (:classifications)
+                and rel.relationshipType = :classificationType
+            group by m.name, m.id
+            order by m.name
+        ""","""
+            select count(m.id)
+            from Model as m join m.incomingRelationships as rel
+            where m.status = :status
+                and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
+                and rel.source in (:classifications)
+                and rel.relationshipType = :classificationType
+        """, [type: hierarchy, status: status, classifications: classifications, classificationType: classification ]
+        } else {
+            // language=HQL
+            Lists.fromQuery params, Model, """
             select distinct m
             from Model m
             where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-            group by m.name
+            group by m.name, m.id
             order by m.name
         ""","""
             select count(m.id)
             from Model m
             where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
         """, [type: hierarchy, status: status]
+        }
     }
 
     ListWithTotalAndType<Model> getSubModels(Model model) {

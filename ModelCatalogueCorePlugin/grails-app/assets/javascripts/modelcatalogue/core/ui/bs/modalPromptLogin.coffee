@@ -1,7 +1,6 @@
 angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies']).config ['messagesProvider', (messagesProvider)->
   factory = [ '$modal', '$q', 'messages', 'security', ($modal, $q, messages, security) ->
     ->
-      deferred = $q.defer()
       dialog = $modal.open {
         windowClass: 'login-modal-prompt'
         template: '''
@@ -53,12 +52,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
 
       }
 
-      dialog.result.then (result) ->
-        deferred.resolve(result)
-      , (reason) ->
-        deferred.reject(reason)
-
-      deferred.promise
+      dialog.result
   ]
 
   messagesProvider.setPromptFactory 'login', factory

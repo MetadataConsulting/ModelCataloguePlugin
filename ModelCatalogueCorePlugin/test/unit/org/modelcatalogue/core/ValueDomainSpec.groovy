@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.test.mixin.Mock
 import spock.lang.Specification
 import spock.lang.Unroll
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Created by adammilward on 05/02/2014.
@@ -35,10 +36,10 @@ class ValueDomainSpec extends Specification {
         where:
 
         validates | args
-        false | [name: "e", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
-        false | [name: "ground_speed1", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
+        true  | [name: "e", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
+        true  | [name: "ground_speed1", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: null]
         false | [name: "ground_speed2", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "x" * 2001, dataType: new DataType(name: "Float")]
-        false | [name: "ground_speed3", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "x" * 501, description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
+        false | [name: "ground_speed3", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "x" * 10001, description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         false | [name: "ground_speed4", unitOfMeasure: "x" * 256, regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         false | [name: "x" * 256, unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
         true  | [name: "ground_speed6", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new DataType(name: "Float")]
@@ -98,10 +99,10 @@ class ValueDomainSpec extends Specification {
     def "check toString works"() {
 
         when:
-        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: ['male', 'female', 'unknown'])).save()
+        def a = new ValueDomain(name: "ground_speed", unitOfMeasure: new MeasurementUnit(name: "MPH"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: new EnumeratedType(name: 'test', enumerations: [male: 'male', female: 'female', unknown:'unknown'])).save()
 
         then:
-        a.toString() == "ValueDomain[id: 1, name: ground_speed]"
+        a.toString() == "ValueDomain[id: 1, name: ground_speed, status: DRAFT, modelCatalogueId: null]"
 
     }
 
@@ -116,7 +117,7 @@ class ValueDomainSpec extends Specification {
 
         where:
         regexp         | rule                   | matches
-        "(?i)google"   | "x ==~ /(?i)google/"   | "gOOgle"
+        "(?i)google"   | "x ==~ /(?i)google/"  | "gOOgle"
 
     }
 
@@ -127,6 +128,44 @@ class ValueDomainSpec extends Specification {
         where:
         rule        | x
         "x > 10"    | 20
+        "x ==~ /(?i)google/ || x ==~/g01gle/" |  "g01gle"
+    }
+
+
+    def "uses enum type enum constants for validation"() {
+        ValueDomain domain = new ValueDomain(dataType: new EnumeratedType(enumerations: [one: '1', two: '2']), regexDef: /[a-z]{3}/)
+
+        expect:
+        domain.validateRule(value) == result
+
+
+        where:
+        result  | value
+        true    | 'one'
+        true    | 'two'
+        false   | 'six'
+        false   | 'blah'
+
+    }
+
+    @ConfineMetaClassChanges(ValueDomain)
+    def "uses base for validation"() {
+        ValueDomain domain = new ValueDomain(dataType: new EnumeratedType(enumerations: [one: '1', two: '2']), regexDef: /[a-z]{3}/)
+        ValueDomain other  = new ValueDomain()
+
+        other.metaClass.isBasedOn = [domain]
+
+        expect:
+        domain.validateRule(value) == result
+
+
+        where:
+        result  | value
+        true    | 'one'
+        true    | 'two'
+        false   | 'six'
+        false   | 'blah'
+
     }
 
 }

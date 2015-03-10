@@ -26,26 +26,21 @@ class ModelSpec extends Specification {
         modelInstance.save()
 
         then:
-        !modelInstance.hasErrors() == validates
+        (modelInstance.errors.errorCount == 0) == validates
         modelInstance.versionNumber == 1
         modelInstance.list().size() == size
-        if(modelCatalogueId) {
-            modelInstance.modelCatalogueId == modelCatalogueId
-        }else{
-            modelInstance.modelCatalogueId
-        }
+        modelInstance.modelCatalogueId == args.modelCatalogueId
 
 
 
         where:
-
-        no | validates | size | args | modelCatalogueId
-        1 | false      | 0    | [name: "", description: "test model description"] | null
-        2 | false      | 0    | [name: "t" * 256, description: "test model description"] | null
-        3 | false      | 0    | [name: "test model", description: "t" * 2001] | null
-        4 | false      | 0    | [name: "test model", description: "test model description", modelCatalogueId: "MC_12asd_3"] | "MC_12asd_3"
-        5 | true       | 1    | [name: "test model", description: "test model description"] | null
-        6 | true       | 1    | [name: "test model2", description: "test model description", modelCatalogueId: "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"] | "MC_067e6162-3b6f-4ae2-a171-2470b63dff00_3"
+        no | validates | size | args
+        1  | false     | 0    | [name: "x" * 256, description: "this is the the result description"]
+        2  | false     | 0    | [name: "x", description: "x" * 2001]
+        3  | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "x" * 256]
+        4  | true      | 1    | [name: "result1", description: "this is the the result description", modelCatalogueId: "http://example.com/123"]
+        5  | true      | 1    | [name: "result2", description: "this is the the result description"]
+        6  | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_12asd33_3"]
 
     }
 

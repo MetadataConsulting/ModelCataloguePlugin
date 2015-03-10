@@ -26,8 +26,8 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
     hideAfter = newHideAfter
 
   # factory method
-  @$get = [ '$injector', '$q', '$log', '$window', '$timeout', ($injector, $q, $log, $window, $timeout) ->
-    createNewMessages = () ->
+  @$get = [ '$injector', '$q', '$log', '$window', '$timeout', '$rootScope', ($injector, $q, $log, $window, $timeout, $rootScope) ->
+    createNewMessages = (timeout) ->
       messagesStack = []
 
       messages = {}
@@ -81,16 +81,27 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
           messages.removeMessage(msg)
 
 
+        msg.timeout = (timeout) ->
+          $timeout((-> msg.remove()), timeout)
+          msg
+
+
         for existing in messagesStack
           return msg if existing.type == msg.type and existing.title == msg.title and existing.body == msg.body
 
         messagesStack.push msg
 
-        afterTimeout = $timeout((-> msg.remove()), hideAfter)
-
-        msg.noTimeout = -> $timeout.cancel(afterTimeout)
+        if timeout
+          afterTimeout = $timeout((-> msg.remove()), hideAfter)
+          msg.noTimeout = -> $timeout.cancel(afterTimeout)
+        else
+          msg.noTimeout = ->
 
         msg
+
+      $rootScope.$on 'displayGlobalMessage', (ignored, title, body, type, noTimeout) ->
+        msg = addMessage(title, body, type)
+        msg.noTimeout() if noTimeout
 
       ###
         Shows the info message to the user. Returns the message instance.
@@ -133,7 +144,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
         customPrompt = promptByTypes[args.type]
 
         if not customPrompt?
-          $log.warn("Prompt for type #type is not registered, using default instead")
+          $log.warn("Prompt for type #{args.type} is not registered, using default instead")
           return prompt(title, body, args)
 
         customPrompt title, body, args
@@ -165,15 +176,17 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
         removed
 
-      messages.createNewMessages = ->
-        createNewMessages()
+      # by default custom messages does not timeout
+      messages.createNewMessages = (timeout) ->
+        createNewMessages(timeout)
 
       messages.hasPromptFactory = (type) ->
         messagesProvider.hasPromptFactory(type)
 
       messages
 
-    createNewMessages()
+    # messages timeouts by default
+    createNewMessages(true)
   ]
 
   # Always return this from CoffeeScript AngularJS factory functions!

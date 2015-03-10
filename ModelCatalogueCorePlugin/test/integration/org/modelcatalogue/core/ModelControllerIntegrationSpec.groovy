@@ -5,7 +5,15 @@ import grails.util.GrailsNameUtils
 /**
  * Created by adammilward on 27/02/2014.
  */
-class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+class ModelControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+
+    protected boolean getRecord() {
+        true
+    }
+
+    def setupSpec(){
+        totalCount = 12
+    }
 
     @Override
     Map getPropertiesToEdit(){
@@ -20,12 +28,6 @@ class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerI
     @Override
     Map getBadInstance(){
         [name: "t"*300, description: "asdf"]
-    }
-
-    @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.Model] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
     }
 
     @Override
@@ -45,28 +47,12 @@ class ModelControllerIntegrationSpec extends AbstractPublishedElementControllerI
 
     @Override
     Model getLoadItem() {
-        Model.findByName("book")
+        Model.findByName("mTest3")
     }
 
     @Override
     Model getAnotherLoadItem() {
-        Model.findByName("chapter1")
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(xml, item){
-        super.xmlCustomPropertyCheck(xml, item)
-        checkStatusProperty(xml.@status, item.status, "status")
-        checkProperty(xml.@versionNumber, item.versionNumber, "versionNumber")
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkStatusProperty(xml.@status, outputItem.status, "status")
-        checkProperty(xml.@versionNumber, outputItem.versionNumber, "versionNumber")
-        return true
+        Model.findByName("mTest4")
     }
 
     @Override

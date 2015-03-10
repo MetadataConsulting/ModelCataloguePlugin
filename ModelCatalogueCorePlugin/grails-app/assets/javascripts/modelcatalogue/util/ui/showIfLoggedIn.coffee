@@ -5,9 +5,9 @@ angular.module('mc.util.ui.showIfLoggedIn', ['mc.util.security']).directive 'sho
     link: (scope, element) ->
       updateElement = ->
         if security.isUserLoggedIn()
-          $animate.removeClass(element, 'ng-hide')
+          $animate.removeClass(element, 'security-hide')
         else
-          $animate.addClass(element, 'ng-hide')
+          $animate.addClass(element, 'security-hide')
 
       updateElement()
 
@@ -18,4 +18,5 @@ angular.module('mc.util.ui.showIfLoggedIn', ['mc.util.security']).directive 'sho
         updateElement()
 
 
-    }]
+    }
+]

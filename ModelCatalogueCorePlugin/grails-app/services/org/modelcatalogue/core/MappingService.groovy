@@ -9,9 +9,22 @@ class MappingService {
         if (!source || !source.id || !destination || !destination.id || !mapping) return null
         Mapping existing = Mapping.findBySourceAndDestination(source, destination)
         if (existing) {
-            return existing
+            existing.mapping = mapping
+            existing.validate()
+
+            if (existing.hasErrors()) {
+                return existing
+            }
+
+            return existing.save()
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
+        newOne.validate()
+
+        if (newOne.hasErrors()) {
+            return newOne
+        }
+
         newOne.save()
         source.addToOutgoingMappings(newOne)
         destination.addToIncomingMappings(newOne)
@@ -28,7 +41,7 @@ class MappingService {
         if (!old) return null
         source.removeFromOutgoingMappings(old)
         destination.removeFromIncomingMappings(old)
-        old.delete()
+        old.delete(flush: true)
         old
     }
 

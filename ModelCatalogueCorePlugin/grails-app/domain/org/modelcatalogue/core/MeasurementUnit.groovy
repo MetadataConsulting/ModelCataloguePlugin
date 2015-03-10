@@ -1,8 +1,4 @@
 package org.modelcatalogue.core
-
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
 /*
 * Measurement units are units such as MPH, cm3, cm2, m etc.
 * They are used by value domains to instantiate a data element
@@ -11,22 +7,31 @@ import org.apache.commons.lang.builder.HashCodeBuilder
 
 class MeasurementUnit extends CatalogueElement {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        name boost:5
-        except = ['incomingRelationships', 'outgoingRelationships']
-    }
-
     String symbol
 
     static constraints = {
-        name unique:true
+        name unique: 'versionNumber'
         symbol nullable: true, size: 1..100
     }
 
+    static transients = ['valueDomains']
+
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, symbol: ${symbol}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
+    }
+
+    List<ValueDomain> getValueDomains() {
+        if (!readyForQueries) {
+            return []
+        }
+        return ValueDomain.findAllByUnitOfMeasure(this)
+    }
+
+    Long countValueDomains() {
+        if (!readyForQueries) {
+            return 0
+        }
+        return ValueDomain.countByUnitOfMeasure(this)
     }
 
 }

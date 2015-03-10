@@ -11,15 +11,15 @@ import org.springframework.core.type.filter.TypeFilter
 
 class CatalogueElementFinder {
 
-    static final Set<String> catalogueElementClasses
+    static Set<String> catalogueElementClasses = null
+    static Map<Class, List<String>> allTypesCache = [:]
 
-    private static final ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false) {
-        protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-            return true
+    private static initCatalogueElementClasses() {
+        ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false) {
+            protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
+                return true
+            }
         }
-    }
-
-    static {
         provider.addIncludeFilter(new TypeFilter() {
             boolean isCatalogueElementOrSubclass(ClassMetadata classMetadata, MetadataReaderFactory metadataReaderFactory) {
                 if (classMetadata.className == CatalogueElement.name) {
@@ -47,6 +47,27 @@ class CatalogueElementFinder {
 
         Set<BeanDefinition> candidates = provider.findCandidateComponents("")
         catalogueElementClasses = Collections.unmodifiableSet(candidates.collect { it.beanClassName } as Set)
+    }
+
+    static Set<String> getCatalogueElementClasses() {
+        if (catalogueElementClasses == null) {
+            initCatalogueElementClasses()
+        }
+        catalogueElementClasses
+    }
+
+    static List<String> getAllTypesNames(Class cls) {
+        List<String> ret = allTypesCache[cls]
+        if (ret != null) {
+            return ret
+        }
+        if (!cls || !CatalogueElement.isAssignableFrom(cls)) {
+            allTypesCache[cls] = []
+            return []
+        }
+        ret = [cls.name, *getAllTypesNames(cls.superclass)]
+        allTypesCache[cls] = ret
+        ret
     }
 
 

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'ui.router', 'mc.core.ui.catalogueElementProperties']).directive 'catalogueElementView',  [-> {
+angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnhancer', 'mc.core.listReferenceEnhancer', 'mc.core.listEnhancer', 'mc.util.names', 'mc.util.messages', 'mc.core.ui.columns', 'mc.util.ui.actions', 'mc.util.ui.applicationTitle', 'ui.router', 'mc.core.ui.catalogueElementProperties', 'ngSanitize']).directive 'catalogueElementView',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -8,11 +8,26 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties) ->
-      propExcludes     = ['version', 'name', 'description', 'incomingRelationships', 'outgoingRelationships', 'availableReports', 'downloadUrl', 'archived', 'status']
+    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, $injector, applicationTitle) ->
+      updateFrom = (original, update) ->
+        for originalKey of original
+          if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
+            delete original[originalKey]
+
+        for newKey of update
+          original[newKey] = update[newKey]
+        original
+
+      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'downloadUrl', 'archived', 'status', '__enhancedBy']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
+
+      getSortedMapPropertyVal = (propertyName) ->
+        (element) ->
+          for value in element.values
+            if value.key == propertyName
+              return value.value
 
       getObjectSize   = (object) ->
         size = 0
@@ -26,10 +41,16 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
       $scope.reports  = []
 
 
+
       loadTab = (property) ->
+
         tab = tabsByName[property]
 
-        return if not tab?.loader?
+        applicationTitle "#{if tab and tab.heading then tab.heading else names.getNaturalName(property)} of #{$scope.element.getLabel()}"
+
+        if not tab?.loader?
+          $scope.reports  = []
+          return
 
         if !tab.disabled and (tab.value.empty or tab.search != $state.params.q)
           promise = null
@@ -38,7 +59,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             if $state.params.q
               promise = tab.loader 'search', {search: $state.params.q}
             else
-              promise = tab.loader()
+              if not tab.promise
+                promise = tab.loader()
+                tab.promise = promise
+              else
+                promise = tab.promise
           else
             promise = $q.when tab.value
 
@@ -52,6 +77,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
       onPropertyUpdate = (newProperty, oldProperty) ->
+
+        return if oldProperty is newProperty
         loadTab(newProperty)
 
         propCfg = catalogueElementProperties.getConfigurationFor("#{$scope.element.elementType}.#{newProperty}")
@@ -63,10 +90,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
             $scope.naturalPropertyName = propCfg.label
 
-            $rootScope.$$searchContext = if tabsByName[newProperty]?.loader then propCfg.label else undefined
+            $rootScope.$$searchContext = if tabsByName[newProperty]?.loader && tabsByName[newProperty]?.search then propCfg.label else undefined
 
             for tab in $scope.tabs
               tab.active = tab.name == newProperty
+              $scope.$broadcast 'infiniteTableRedraw'
               if tab.active
                 isTable = tab.type == 'decorated-list'
                 if isTable and tab.value.total
@@ -85,14 +113,18 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         page = undefined if page == 1 or isNaN(page)
         options.location = "replace" if newProperty and not oldProperty
-        $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options if $scope.element
+        if($state.$current.name isnt "mc.resource.list") and $scope.element
+          $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType($scope.element.elementType), id: $scope.element.id, property: newProperty, page: page, q: $state.params.q}, options
 
-      onElementUpdate = (element) ->
+      onElementUpdate = (element, oldEl) ->
+
+        return if angular.equals element, oldEl
+
+        applicationTitle "#{element.getLabel()}"
+
         resource = catalogueElementResource(element.elementType) if element and element.elementType
 
         activeTabSet = false
-
-        onPropertyUpdate($scope.property, $rootScope?.$stateParams?.property)
 
         tabs = []
 
@@ -107,40 +139,18 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           tabDefinition =
             heading:  propertyConfiguration.label
-            value:    listEnhancer.createEmptyList(fn.itemType)
+            value:    angular.extend(listEnhancer.createEmptyList(fn.itemType, fn.total), {base: fn.base})
             disabled: fn.total == 0
             loader:   fn
             type:     'decorated-list'
             columns:   propertyConfiguration.columns ? columns(fn.itemType)
-            actions:  []
             name:     name
             reports:  []
 
 
-          if fn.itemType == 'org.modelcatalogue.core.Relationship' and security.hasRole('CURATOR')
-            tabDefinition.actions.push {
-              title:  'Remove'
-              icon:   'remove'
-              type:   'danger'
-              action: (rel) ->
-                deferred = $q.defer()
-                messages.confirm('Removing Relationship', "Do you really want to remove relation '#{element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
-                    rel.remove().then ->
-                      messages.success('Relationship removed!', "#{rel.relation.name} is no longer related to #{element.name}")
-                      # reloads the table
-                      deferred.resolve(true)
-                    , (response) ->
-                      if response.status == 404
-                        messages.error('Error removing relationship', 'Relationship cannot be removed, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
-                        deferred.resolve(true)
-                      else
-                        messages.error('Error removing relationship', 'Relationship cannot be removed, see application logs for details')
-
-                deferred.promise
-            }
-
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
+            $scope.$broadcast 'infiniteTableRedraw'
             activeTabSet = true
 
           tabs.push tabDefinition
@@ -164,9 +174,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             original:   angular.copy(obj ? {})
             properties: []
             type:       if security.hasRole('CURATOR') then 'simple-object-editor' else 'properties-pane'
-            isDirty:    () -> angular.equals(@original, @value)
-            reset:      () -> @value = angular.copy @original
-            update:     () ->
+            isDirty:    -> angular.equals(@original, @value)
+            reset:      -> @value = angular.copy @original
+            update:     ->
               if not resource
                 messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
                 return
@@ -177,21 +187,36 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               payload[@name] = angular.copy(@value)
               self = @
               resource.update(payload).then (updated) ->
-                $scope.element = updated
+                updateFrom($scope.element, updated)
                 messages.success("Property #{names.getNaturalName(self.name)} of #{element.name} successfully updated")
                 updated
-              ,  ->
-                messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
+              ,  (response) ->
+                  if response.data.errors
+                    if angular.isString response.data.errors
+                      messages.error response.data.errors
+                    else
+                      for err in response.data.errors
+                        messages.error err.message
+                  else
+                    messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{element.name}. See application logs for details.")
 
 
-          for key, value of obj when not angular.isObject(value)
-            tabDefinition.properties.push {
-              label: key
-              value: getPropertyVal(key)
-            }
+          if obj?.type == 'orderedMap'
+            for value in obj.values when not angular.isObject(value.value)
+              tabDefinition.properties.push {
+                label: value.key
+                value: getSortedMapPropertyVal(value.key)
+              }
+          else
+            for key, value of obj when not angular.isObject(value)
+              tabDefinition.properties.push {
+                label: key
+                value: getPropertyVal(key)
+              }
 
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
+            $scope.$broadcast 'infiniteTableRedraw'
             activeTabSet = true
 
           tabs.push tabDefinition
@@ -203,7 +228,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           newProperties = []
           for prop in element.getUpdatableProperties()
             obj = element[prop]
-            if prop in propExcludes
+            if prop in propExcludes or angular.isFunction(obj)
               continue
             if enhance.isEnhancedBy(obj, 'listReference')
               continue
@@ -221,6 +246,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
           if tabDefinition.name == $scope.property
             tabDefinition.active = true
+            $scope.$broadcast 'infiniteTableRedraw'
             activeTabSet = true
 
           tabs.unshift tabDefinition
@@ -231,53 +257,62 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
 
         showTabs = false
+
         if not activeTabSet
           for tab in tabs
             if not tab.disabled
               tab.active = true
+              $scope.$broadcast 'infiniteTableRedraw'
               $scope.property = tab.name
               showTabs = true
               break
         else
           showTabs = true
+          loadTab($scope.property)
 
         $scope.tabs = tabs
         $scope.showTabs = showTabs
 
       $scope.tabs   = []
       $scope.select = (tab) ->
-        if $state.current.abstract
-          $scope.property = tab.name
-          loadTab(tab.property)
-        else
-          $state.go '.', {property: tab.name, q: tab.search}
+        $scope.property = tab.name
+        $scope.$broadcast 'infiniteTableRedraw'
 
-      # watches
-      $scope.$watch 'element', onElementUpdate
-      $scope.$watch 'property', onPropertyUpdate
+      $scope.isTableSortable = (tab) ->
+        return false unless tab.value?.size > 1
+        return false unless tab.value?.type
+        return false if tab.value.type.bidirectional
+        return true
 
+      $scope.reorder = (tab, $row, $current) ->
+        tab.loader.reorder($row.row.element, $current?.row?.element)
 
       refreshElement = () ->
         if $scope.element
           $scope.element.refresh().then (refreshed)->
-            $scope.element = refreshed
+            updateFrom($scope.element, refreshed)
+            onElementUpdate($scope.element)
 
+      $scope.$on 'userLoggedIn', refreshElement
+      $scope.$on 'userLoggedIn', refreshElement
+      $scope.$on 'userLoggedOut', refreshElement
       $scope.$on 'catalogueElementCreated', refreshElement
       $scope.$on 'catalogueElementDeleted', refreshElement
-
-      $rootScope.$on 'userLoggedIn', refreshElement
-      $rootScope.$on 'userLoggedOut', refreshElement
-
+      $scope.$on 'catalogueElementUpdated', refreshElement
+      $scope.$on 'newVersionCreated', (ignored, element) ->
+        if($state.$current.name isnt "mc.resource.list")
+          $state.go 'mc.resource.show.property', {resource: names.getPropertyNameFromType(element.elementType), id: element.id, property: 'history', page: undefined, q: undefined}
 
       $scope.$on '$stateChangeSuccess', (event, state, params) ->
         return if state.name != 'mc.resource.show.property'
-
         $scope.property = params.property
-
-        loadTab(params.property)
 
       # init
       onElementUpdate($scope.element)
+
+      # watches
+      $scope.$watch 'element', onElementUpdate
+      $scope.$watch 'property', onPropertyUpdate
     ]
   }
 ]

@@ -1,31 +1,40 @@
 #= require_self
-#= require angular-ui-router/release/angular-ui-router
-#= require ng-file-upload/angular-file-upload.js
 #= require modelcatalogue/core/index
-#= require decoratedList
+#= require infiniteList
+#= require infiniteTable
+#= require infiniteListCtrl
+#= require columnsSupportCtrl
 #= require catalogueElementView
-#= require importView
+#= require csvTransformationView
+#= require batchView
 #= require catalogueElementTreeviewItem
 #= require catalogueElementTreeview
 #= require catalogueElementPicker
+#= require catalogueElementIcon
 #= require catalogueElementProperties
 #= require propertiesPane
 #= require messagesPanel
 #= require columns
 #= require columnsConfiguration
 #= require simpleObjectEditor
-#= require resizable
+#= require elementsAsTags
+#= require diffTable
 
 angular.module('mc.core.ui', [
   # depends on
   'ui.router',
   'mc.core'
   # list of modules
-  'mc.core.ui.decoratedList'
+  'mc.core.ui.infiniteList'
+  'mc.core.ui.infiniteTable'
+  'mc.core.ui.infiniteListCtrl'
+  'mc.core.ui.columnsSupportCtrl'
   'mc.core.ui.catalogueElementView'
-  'mc.core.ui.importView'
+  'mc.core.ui.csvTransformationView'
+  'mc.core.ui.batchView'
   'mc.core.ui.catalogueElementTreeviewItem'
   'mc.core.ui.catalogueElementTreeview'
+  'mc.core.ui.catalogueElementIcon'
   'mc.core.ui.catalogueElementPicker'
   'mc.core.ui.catalogueElementProperties'
   'mc.core.ui.propertiesPane'
@@ -33,5 +42,6 @@ angular.module('mc.core.ui', [
   'mc.core.ui.columns'
   'mc.core.ui.columnsConfiguration'
   'mc.core.ui.simpleObjectEditor'
-  'mc.core.ui.resizable'
+  'mc.core.ui.elementsAsTags'
+  'mc.core.ui.diffTable'
 ])

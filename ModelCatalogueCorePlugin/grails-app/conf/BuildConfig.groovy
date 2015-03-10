@@ -8,7 +8,7 @@ grails.project.fork = [
 
     // configure settings for the test-app JVM, uses the daemon by default
     test: false,
-    // test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    // test: [maxMemory: 2048, minMemory: 1024, debug: false, maxPerm: 512, daemon:true],
     // configure settings for the run-app JVM
     run: false,
     // configure settings for the run-war JVM
@@ -38,11 +38,16 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
         mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
+        mavenRepo "http://dl.dropbox.com/u/326301/repository"
+//        mavenRepo "http://www.biojava.org/download/maven/"
+
+
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        test "org.modelcatalogue:simple-fixtures:0.1.3"
+        compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
+        test 'xmlunit:xmlunit:1.6'
     }
 
     plugins {
@@ -51,16 +56,21 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        compile ":asset-pipeline:1.9.4"
-        compile ":coffee-asset-pipeline:1.8.0"
-        compile ":less-asset-pipeline:1.9.0"
-        compile ":hibernate:3.6.10.8"
+        runtime ':database-migration:1.3.6'
+
+        compile ":asset-pipeline:1.9.9"
+        compile ":coffee-asset-pipeline:1.9.0"
+        compile ":less-asset-pipeline:1.10.0"
+//        runtime ":hibernate4:4.3.5.5"
+        runtime  ":hibernate:3.6.10.17"
 
         compile ":excel-export:0.2.1"
         compile ":executor:0.3"
 
-        test ':build-test-data:1.1.1'
-        test ':fixtures:1.2'
+        compile ":csv:0.3.1"
+
+        test ':build-test-data:2.1.2'
+        test ':fixtures:1.3'
 
         // codenarc static analysis
         build ":codenarc:0.20"
@@ -68,7 +78,7 @@ grails.project.dependency.resolution = {
         // test coverage
         test ":code-coverage:1.2.7"
 
-        build ":tomcat:7.0.50"
+        build ":tomcat:7.0.55"
 
     }
 }

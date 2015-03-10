@@ -1,48 +1,46 @@
-import grails.rest.render.RenderContext
-import org.modelcatalogue.core.reports.ReportsRegistry
-import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.core.testapp.UserRole
-import org.modelcatalogue.core.testapp.Role
-import org.modelcatalogue.core.testapp.User
-import org.modelcatalogue.core.util.ListWrapper
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import grails.util.Environment
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.actions.*
+import org.modelcatalogue.core.dataarchitect.ColumnTransformationDefinition
+import org.modelcatalogue.core.dataarchitect.CsvTransformation
+import org.modelcatalogue.core.security.Role
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.security.UserRole
+import org.modelcatalogue.core.testapp.Requestmap
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.springframework.http.HttpMethod
+import org.springframework.util.StopWatch
 
 class BootStrap {
 
     def importService
-    def domainModellerService
     def initCatalogueService
-    def publishedElementService
-    def executorService
-
+    def elementService
+    def actionService
+    def mappingService
+    CatalogueBuilder catalogueBuilder
 
     XLSXListRenderer xlsxListRenderer
-    ReportsRegistry reportsRegistry
 
     def init = { servletContext ->
 
-        initCatalogueService.initDefaultRelationshipTypes()
-        initCatalogueService.initDefaultDataTypes()
-        initCatalogueService.initDefaultMeasurementUnits()
+        StopWatch watch = new StopWatch('bootstrap')
 
-        xlsxListRenderer.registerRowWriter('reversed') {
-            title "Reversed DEMO Export"
-            headers 'Description', 'Name', 'ID'
-            when { ListWrapper container, RenderContext context ->
-                context.actionName in ['index', 'search'] && container.itemType && CatalogueElement.isAssignableFrom(container.itemType)
-            } then { CatalogueElement element ->
-                [[element.description, element.name, element.id]]
-            }
-        }
+        watch.start('init catalogue')
+        initCatalogueService.initCatalogue(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
+        watch.stop()
 
+        watch.start('init security')
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 
-        def admin   = User.findByUsername('admin') ?: new User(username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
-        def viewer  = User.findByUsername('viewer') ?: new User(username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
-        def curator = User.findByUsername('curator') ?: new User(username: 'curator', enabled: true, password: 'curator').save(failOnError: true)
+        // keep the passwords lame, they are only for dev/test or very first setup
+        // sauce labs connector for some reason fails with the six in the input
+        def admin   = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+        def viewer  = User.findByName('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
+        def curator = User.findByName('curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'creator').save(failOnError: true)
 
 
         if (!admin.authorities.contains(roleAdmin)) {
@@ -75,73 +73,169 @@ class BootStrap {
                 '/**/img/**',
                 '/login', '/login.*', '/login/*',
                 '/logout', '/logout.*', '/logout/*',
-                '/register/*', '/errors', '/errors/*'
+                '/register/*', '/errors', '/errors/*',
+                '/index.gsp'
         ]) {
-            new Requestmap(url: url, configAttribute: 'permitAll').save(failOnError: true)
+            createRequestmapIfMissing(url, 'permitAll', null)
         }
 
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY',   httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
-        new Requestmap(url: '/asset/download/*',             configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY',   httpMethod: org.springframework.http.HttpMethod.GET).save(failOnError: true)
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.POST).save(failOnError: true)
-        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR',          httpMethod: org.springframework.http.HttpMethod.PUT).save(failOnError: true)
+        createRequestmapIfMissing('/asset/download/*',             'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/user/current',                 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/catalogue/upload',             'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.POST)
+        createRequestmapIfMissing('/catalogue/*/**',               'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'IS_AUTHENTICATED_ANONYMOUSLY', org.springframework.http.HttpMethod.GET)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.POST)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.PUT)
+        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',        org.springframework.http.HttpMethod.DELETE)
 
-//        new Requestmap(url: '/api/modelCatalogue/core/model/**', configAttribute: 'IS_AUTHENTICATED_ANONYMOUSLY').save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/dataElement/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/dataType/**', configAttribute: 'ROLE_USER').save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/*/**', configAttribute: 'ROLE_METADATA_CURATOR').save(failOnError: true)
-//        new Requestmap(url: '/api/modelCatalogue/core/relationshipTypes/**', configAttribute: 'ROLE_ADMIN').save(failOnError: true)
+        createRequestmapIfMissing('/role/**',                      'ROLE_ADMIN')
+        createRequestmapIfMissing('/userAdmin/**',                 'ROLE_ADMIN')
+        createRequestmapIfMissing('/requestMap/**',                'ROLE_ADMIN')
+        createRequestmapIfMissing('/registrationCode/**',          'ROLE_ADMIN')
+        createRequestmapIfMissing('/securityInfo/**',              'ROLE_ADMIN')
+        createRequestmapIfMissing('/console/**',                   'ROLE_ADMIN')
+        createRequestmapIfMissing('/dbconsole/**',                 'ROLE_ADMIN')
+        createRequestmapIfMissing('/plugins/console-1.5.0/**',     'ROLE_ADMIN')
+
+//        createRequestmapIfMissing('/api/modelCatalogue/core/model/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
+//        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
 
 
+        watch.stop()
 
         environments {
             development {
-                executorService.submit {
-                    println 'Running post init job'
-                    println 'Importing data'
-                    importService.importData()
-                    def de = new DataElement(name: "testera", description: "test data architect").save(failOnError: true)
-                    de.ext.metadata = "test metadata"
+                setupStuff(watch)
 
-                    println 'Creating dummy models'
-                    15.times {
-                        new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
-                    }
-
-                    def parentModel1 = Model.findByName("Another root #001")
-
-                    15.times{
-                        def child = new Model(name: "Another root #${String.format('%03d', it)}").save(failOnError: true)
-                        parentModel1.addToParentOf(child)
-                    }
-
-
-                    for (DataElement element in DataElement.list()) {
-                        parentModel1.addToContains element
-                    }
-
-
-                    println 'Finalizing all published elements'
-                    PublishedElement.list().each {
-                        it.status = PublishedElementStatus.FINALIZED
-                        it.save(failOnError: true)
-                    }
-
-//                    println 'Creating history for NHS NUMBER STATUS INDICATOR CODE'
-//                    def withHistory = DataElement.findByName("NHS NUMBER STATUS INDICATOR CODE")
-//
-//                    10.times {
-//                        println "Creating archived version #${it}"
-//                        publishedElementService.archiveAndIncreaseVersion(withHistory)
-//                    }
-                    println "Init finished in ${new Date()}"
-                }
-                //domainModellerService.modelDomains()
             }
-        }
+            test {
+                setupStuff(watch)
+            }
 
+        }
     }
 
-    def destroy = {
+    def setupStuff(StopWatch watch){
+        actionService.resetAllRunningActions()
+        try {
+            println 'Running post init job'
+            println 'Importing data'
+            watch.start('import data')
+            importService.importData()
+            watch.stop()
+
+            println 'Finalizing all published elements'
+            watch.start('finalizing all elements')
+            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
+                if (it instanceof Model) {
+                    elementService.finalizeElement(it)
+                } else {
+                    it.status = ElementStatus.FINALIZED
+                    it.save failOnError: true
+                }
+            }
+            watch.stop()
+
+
+            println "Creating some actions"
+            watch.start('test actions')
+            Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
+
+            15.times {
+                Action action
+                if (it == 7) {
+                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: Model.name)
+                } else if (it == 4) {
+                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: Model.name)
+                } else {
+                    action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
+                }
+                if (it % 3 == 0) {
+                    actionService.dismiss(action)
+                }
+            }
+
+            assert !actionService.create(batch, TestAction, fail: true).hasErrors()
+            assert !actionService.create(batch, TestAction, fail: true, timeout: 10000).hasErrors()
+            assert !actionService.create(batch, TestAction, timeout: 5000, result: "the result").hasErrors()
+            assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
+
+
+            Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
+            if (createRelationshipAction.hasErrors()) {
+                println(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
+                throw new AssertionError("Failed to create relationship actions!")
+            }
+
+            watch.stop()
+
+            watch.start('setting up csv transformation')
+            setupSimpleCsvTransformation()
+            watch.stop()
+
+            // for generate suggestion test
+            watch.start('generating suggestions test data')
+            catalogueBuilder.build {
+                automatic dataType
+
+                classification(name: 'Test 1') {
+                    dataElement (name: 'Test Element 1') {
+                        valueDomain(name: 'Same Name')
+                    }
+                }
+
+                classification(name: 'Test 2') {
+                    dataElement (name: 'Test Element 2') {
+                        valueDomain(name: 'Same Name')
+                    }
+                }
+
+            }
+            watch.stop()
+
+            println "Init finished in ${new Date()}"
+            println watch.prettyPrint()
+        } catch (e) {
+            e.printStackTrace()
+        }
+    }
+
+    def setupSimpleCsvTransformation() {
+        MeasurementUnit c = MeasurementUnit.findByName("celsius")
+        MeasurementUnit f = MeasurementUnit.findByName("fahrenheit")
+
+        DataType doubleType = DataType.findByName("Double")
+
+        assert c
+        assert f
+        assert doubleType
+
+        ValueDomain temperatureUS = new ValueDomain(name: "temperature US", dataType: doubleType, unitOfMeasure: f, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
+        ValueDomain temperature   = new ValueDomain(name: "temperature",    dataType: doubleType, unitOfMeasure: c, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
+
+
+        assert mappingService.map(temperature, temperatureUS, "(x as Double) * 9 / 5 + 32")
+        assert mappingService.map(temperatureUS, temperature, "((x as Double) - 32) * 5 / 9")
+
+        DataElement patientTemperature   = new DataElement(name: "patient temperature",    valueDomain: temperature).save(failOnError: true)
+        DataElement patientTemperatureUS = new DataElement(name: "patient temperature US", valueDomain: temperatureUS).save(failOnError: true)
+
+
+        CsvTransformation transformation = new CsvTransformation(name: "UK to US records").save(failOnError: true)
+
+        new ColumnTransformationDefinition(transformation: transformation, source: DataElement.findByName("PERSON GIVEN NAME"), header: "FIRST NAME").save(failOnError: true)
+        new ColumnTransformationDefinition(transformation: transformation, source: DataElement.findByName("PERSON FAMILY NAME"), header: "SURNAME").save(failOnError: true)
+        new ColumnTransformationDefinition(transformation: transformation, source: patientTemperature, destination: patientTemperatureUS, header: "PATIENT TEMPERATURE").save(failOnError: true)
+    }
+
+    def destroy = {}
+
+
+    private static Requestmap createRequestmapIfMissing(String url, String configAttribute, HttpMethod method = null) {
+        Requestmap.findOrSaveByUrlAndConfigAttributeAndHttpMethod(url, configAttribute, method, [failOnError: true])
     }
 
 }

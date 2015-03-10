@@ -26,6 +26,7 @@ class XLSXRendererSpec extends Specification {
 
         XLSXRowWriter idNameDescWriter = renderer.registerRowWriter {
             headers 'ID', 'Name', 'Description'
+            append metadata
             when { ListWrapper container, RenderContext context ->
                 context.actionName in ['index', 'search'] && CatalogueElement.isAssignableFrom(container.itemType)
             } then { CatalogueElement element ->

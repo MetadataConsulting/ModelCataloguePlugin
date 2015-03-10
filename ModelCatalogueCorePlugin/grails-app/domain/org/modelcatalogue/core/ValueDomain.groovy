@@ -1,6 +1,11 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.SecuredRuleExecutor
+import org.modelcatalogue.core.util.ValueDomainRuleScript
 
 /*
 * subjects, isbn, rating
@@ -34,39 +39,27 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
  *
 */
 
-class ValueDomain extends ExtendibleElement  {
+class ValueDomain extends CatalogueElement {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
+    DataType dataType
+    MeasurementUnit unitOfMeasure
 
-    static searchable = {
-        name boost:5
-        dataType component:true
-        unitOfMeasure component:true
-        extensions component:true
-
-        except = ['incomingRelationships', 'outgoingRelationships']
-    }
-
-	MeasurementUnit unitOfMeasure
 	String rule
-    static belongsTo = [dataType: DataType]
-    static transients = ['regexDef']
+    Boolean multiple = Boolean.FALSE
+
+    static transients = ['regexDef', 'dataElements']
 
     static constraints = {
-		description nullable:true, maxSize: 2000
-		unitOfMeasure nullable:true, maxSize: 255
-		rule nullable:true, maxSize: 200, validator: { val,obj ->
+        description nullable: true, maxSize: 2000
+        unitOfMeasure nullable: true
+        dataType        nullable: true
+
+		rule nullable:true, maxSize: 10000, validator: { val,obj ->
             if(!val){return true}
-            SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(x: null, domain: obj).validate(val)
+            SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(ValueDomainRuleScript, new Binding(x: null, domain: obj)).validate(val)
             result ? true : ['wontCompile', result.compilationFailedMessage]
         }
     }
-
-
-    static relationships = [
-        incoming: [inclusion: 'includedIn', instantiation: 'instantiates', base: 'basedOn'],
-        outgoing: [base: 'isBaseFor']
-    ]
 
     void setRegexDef(String regex) {
         if (!regex) {
@@ -84,14 +77,95 @@ class ValueDomain extends ExtendibleElement  {
         null
     }
 
-    boolean validateRule(Object x) {
-        new SecuredRuleExecutor(x: x, domain: this).execute(rule)
+    boolean isEnumKey(Object x) {
+        if (!dataType?.instanceOf(EnumeratedType)) {
+            return true
+        }
+        if (!x) {
+            return true
+        }
+        Set<String> enums = new HashSet<String>(dataType.enumerations.keySet())
+        if (!enums.contains(x.toString())) {
+            return false
+        }
+        return true
+    }
+
+    /**
+     * Validates given value. Only boolean value true is considered as valid.
+     *
+     * As falsy method you can for example return boolean null, false, any String or any Exception.
+     *
+     * @param x
+     * @return
+     */
+    def validateRule(Object x) {
+        if (!isEnumKey(x)) {
+            return false
+        }
+
+        if (hasProperty('isBasedOn')) {
+            for (ValueDomain domain in isBasedOn) {
+                def result = domain.validateRule(x)
+                if (result != null && (!(result instanceof Boolean) || result.is(false))) {
+                    return result
+                }
+            }
+        }
+
+        if (rule) {
+            return new SecuredRuleExecutor(ValueDomainRuleScript, new Binding(x: x, domain: this)).execute(rule)
+        }
+        return true
     }
 
 
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}]"
+    List<DataElement> getDataElements() {
+        if (!readyForQueries) {
+            return []
+        }
+        if (archived) {
+            return DataElement.findAllByValueDomain(this)
+        }
+        return DataElement.findAllByValueDomainAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
     }
 
+    Long countDataElements() {
+        if (!readyForQueries) {
+            return 0
+        }
+        if (archived) {
+            return DataElement.countByValueDomain(this)
+        }
+        return DataElement.countByValueDomainAndStatusInList(this, [ElementStatus.FINALIZED, ElementStatus.DRAFT])
+    }
 
+    @Override
+    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
+        PublishingChain
+                .finalize(this)
+                .require(unitOfMeasure)
+                .add(dataType)
+                .run(publisher)
+    }
+
+    @Override
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
+        PublishingChain.createDraft(this, strategy)
+        .add(this.dataElements)
+        .add(this.classifications)
+        .run(publisher)
+    }
+
+    @Override
+    void afterMerge(CatalogueElement destination) {
+        if (!(destination.instanceOf(ValueDomain))) {
+            return
+        }
+        List<DataElement> dataElements = new ArrayList<DataElement>(dataElements)
+        for (DataElement element in dataElements) {
+            element.valueDomain = destination as ValueDomain
+            FriendlyErrors.failFriendlySave(element)
+        }
+    }
 }

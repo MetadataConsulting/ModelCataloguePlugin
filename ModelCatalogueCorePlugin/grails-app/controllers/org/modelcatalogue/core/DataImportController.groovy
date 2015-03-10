@@ -1,181 +1,340 @@
 package org.modelcatalogue.core
 
+
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
-import org.modelcatalogue.core.dataarchitect.DataImport
-import org.modelcatalogue.core.dataarchitect.ImportRow
-import org.modelcatalogue.core.util.ImportRows
+
+import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
+import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.xml.CatalogueXmlLoader
+import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
-class DataImportController extends AbstractRestfulController{
+class DataImportController  {
 
     def dataImportService
-    private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream']
+    def initCatalogueService
+    def XSDImportService
+    def OBOService
+    def umljService
+    def LoincImportService
+    def modelCatalogueSecurityService
+    def executorService
+    def elementService
+    def classificationService
+    def assetService
+
+
+    private static final CONTENT_TYPES = ['application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/octet-stream', 'application/xml', 'text/xml']
     static responseFormats = ['json']
     static allowedMethods = [upload: "POST"]
 
-    DataImportController() {
-        super(DataImport, false)
+    protected static getErrors(Map params, MultipartFile file) {
+        def errors = []
+        if (file && !params.name) {
+            params.name = file.originalFilename
+        }
+        if (!params?.name) errors.add("no import name")
+        if (!file) errors.add("no file")
+        return errors
     }
 
-    @Override
-    protected getBasePath() {
-        return "/dataArchitect/imports"
+    protected static trimString(string) {
+        string.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
+        return string
     }
+
+
 
     def upload(Integer max) {
-        def response
-        DataImport importer
-        handleParams(max)
-        if (!(request instanceof MultipartHttpServletRequest)) {
-            importer.errors.rejectValue('uploaded', 'import.uploadfailed', "No file")
-        }else {
-            String conceptualDomainName, conceptualDomainDescription, importName
-            MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request
-            MultipartFile file = multiRequest.getFile("file")
-            def params = multiRequest.getParameterMap()
-            if (!params?.conceptualDomain) {
-                response = ["errors": "No conceptual domain!"]
-            } else if (!params?.name) {
-                response = ["errors": "no import name"]
-            } else if (!file) {
-                response = ["errors": "No file"]
-            } else {
-                conceptualDomainName = params.conceptualDomain.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim()
-                if (params?.conceptualDomainDescription) conceptualDomainDescription = params.conceptualDomainDescription.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else conceptualDomainDescription = ""
-                if (params?.name) importName = params.name.toString().replaceAll('\\[', "").replaceAll('\\]', "").trim() else name = ""
-                def confType = file.getContentType()
-                if (CONTENT_TYPES.contains(confType) && file.size > 0) {
-                    ExcelLoader parser = new ExcelLoader(file.inputStream)
-                    def (headers, rows) = parser.parse()
-                    HeadersMap headersMap = populateHeaders()
-                    importer = dataImportService.importData(headers, rows, importName, conceptualDomainName, conceptualDomainDescription, headersMap)
-                    response = importer
+        if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
+            render status: HttpStatus.UNAUTHORIZED
+            return
+        }
 
-                } else {
-                    if (!CONTENT_TYPES.contains(confType)) {
-                        response = ["errors": "input should be an Excel file but uploaded content is ${confType}"]
-                    } else if (file.size <= 0){
-                        response = ["errors": "The uploaded file is empty"]
-                    }
+
+        if (!(request instanceof MultipartHttpServletRequest)) {
+            respond "errors": [message: 'No file selected']
+            return
+        }
+
+        def errors = [], response
+
+        String conceptualDomainName
+        MultipartFile file = request.getFile("file")
+        errors.addAll(getErrors(params, file))
+
+        if (errors) {
+            response = ["errors": errors]
+            respond response
+            return
+        }
+        conceptualDomainName = trimString(params.conceptualDomain)
+        def confType = file.getContentType()
+
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xls")) {
+            def asset = storeAsset(params, file, 'application/vnd.ms-excel')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+            HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
+            executorService.submit {
+                try {
+                    ExcelLoader parser = new ExcelLoader(inputStream)
+                    def (headers, rows) = parser.parse()
+                    Collection<CatalogueElement> catElements =  dataImportService.importData(headers, rows, headersMap)
+                    makeRelationships(catElements, finalizeAsset(id))
+                } catch (Exception e) {
+                    logError(id, e)
                 }
             }
+            redirectToAsset(id)
+            return
         }
 
-        reportCapableRespond response
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xml")) {
+            def asset = storeAsset(params, file, 'application/xml')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+            HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
+            executorService.submit {
+                try {
+                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
+                    Collection<CatalogueElement> catElements = loader.load(inputStream)
+                    makeRelationships(catElements, finalizeAsset(id))
+                } catch (Exception e) {
+                    logError(id, e)
+                }
+            }
+            redirectToAsset(id)
+            return
+        }
+
+        if (file.size > 0 && file.originalFilename.endsWith(".obo")) {
+            def asset = storeAsset(params, file, 'text/obo')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+            String name = params?.name
+            String idpattern = params.idpattern
+            executorService.submit {
+                try {
+                    Classification classification = OBOService.importOntology(inputStream, name, idpattern)
+                    Asset updated = finalizeAsset(id)
+                    classifyAsset(updated, classification)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
+            }
+            redirectToAsset(id)
+
+            return
+        }
+
+        if (file.size > 0 && file.originalFilename.endsWith("c.csv")) {
+            def asset = storeAsset(params, file, 'application/model-catalogue')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+
+            executorService.submit {
+                try {
+                    Set<CatalogueElement> created = LoincImportService.serviceMethod(inputStream)
+                    for (CatalogueElement element in created) {
+                        asset.addToRelatedTo(element)
+                    }
+                    Asset updated = finalizeAsset(id)
+                    Classification classification = created.find { it instanceof Classification } as Classification
+                    classifyAsset(updated, classification)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
+            }
+
+            redirectToAsset(id)
+            return
+        }
+
+        if (file.size > 0 && file.originalFilename.endsWith(".mc")) {
+            def asset = storeAsset(params, file, 'application/model-catalogue')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+
+            executorService.submit {
+                try {
+                    Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
+                    for (CatalogueElement element in created) {
+                        asset.addToRelatedTo(element)
+                    }
+                    Asset updated = finalizeAsset(id)
+                    Classification classification = created.find { it instanceof Classification } as Classification
+                    classifyAsset(updated, classification)
+                } catch (Exception e) {
+                    logError(id, e)
+                }
+            }
+
+            redirectToAsset(id)
+            return
+        }
+
+        if (file.size > 0 && file.originalFilename.endsWith(".umlj")) {
+            def asset = storeAsset(params, file, 'text/umlj')
+            def id = asset.id
+            InputStream inputStream = file.inputStream
+            String name = params?.name
+
+            executorService.submit {
+                try {
+                    Classification classification = Classification.findByName(name)
+                    if(!classification) classification =  new Classification(name: name).save(flush:true, failOnError:true)
+                    umljService.importUmlDiagram(inputStream, name, classification)
+                    Asset updated = Asset.get(id)
+                    updated.status = ElementStatus.FINALIZED
+                    updated.description = "Your import has finished."
+                    updated.save(flush: true, failOnError: true)
+                    updated.addToClassifications(classification)
+                    classification.addToClassifies(updated)
+                    if (classification) {
+                        updated.addToRelatedTo(classification)
+                    }
+                } catch (Exception e) {
+                    Asset updated = Asset.get(id)
+                    updated.refresh()
+                    updated.status = ElementStatus.FINALIZED
+                    updated.name = updated.name + " - Error during upload"
+                    updated.description = "Error importing umlj file: ${e}"
+                    updated.save(flush: true, failOnError: true)
+                }
+            }
+
+            webRequest.currentResponse.with {
+                //TODO: remove the base link
+                def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
+                status = 302
+                setHeader("Location", location.toString())
+                setHeader("X-Asset-ID", asset.id.toString())
+                outputStream.flush()
+            }
+            return
+
+        }
+
+
+        if (CONTENT_TYPES.contains(confType) && file.size > 0 && file.originalFilename.contains(".xsd")) {
+            Asset asset = renderImportAsAsset(params, file, conceptualDomainName)
+            redirectToAsset(asset.id)
+            return
+        }
+
+        if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
+        if (file.size <= 0) errors.add("The uploaded file is empty")
+        response = ["errors": errors]
+        respond response
     }
 
+    protected static makeRelationships(Collection<CatalogueElement> catElements, Asset asset){
+        catElements.each{
+            asset.addToRelatedTo(it)
+        }
+    }
 
-    def pendingAction(Integer max){
-        handleParams(max)
-        DataImport importer = queryForResource(params.id)
-        def total = (importer?.pendingAction)? importer?.pendingAction.size() : 0
-        def offset = 0
-        List<ImportRow> items = []
-        if (importer.pendingAction) items.addAll(importer?.pendingAction)
-        respondWithLinks ImportRow, new ImportRows(
-                base: "/dataArchitect/imports/${params.id}/pendingAction",
-                items: items.subList(offset, Math.min( offset + params.max, total )),
-                total: total
+    protected static classifyAsset(Asset asset, Classification classification){
+        if (classification) {
+            asset.addToClassifications(classification)
+            classification.addToClassifies(asset)
+            asset.addToRelatedTo(classification)
+        }
+    }
+
+    protected static Asset finalizeAsset(Long id){
+        Asset updated = Asset.get(id)
+        updated.status = ElementStatus.FINALIZED
+        updated.description = "Your import has finished."
+        updated.save(flush: true, failOnError: true)
+        updated
+    }
+    protected redirectToAsset(Long id){
+        webRequest.currentResponse.with {
+            def location = grailsApplication.config.grails.serverURL +  "/api/modelCatalogue/core/asset/" + id
+            status = 302
+            setHeader("Location", location.toString())
+            setHeader("X-Asset-ID",  id.toString())
+            outputStream.flush()
+        }
+    }
+
+    protected logError(Long id,Exception e){
+        log.error "Error importing Asset[$id]", e
+        Asset updated = Asset.get(id)
+        updated.refresh()
+        updated.status = ElementStatus.FINALIZED
+        updated.name = updated.name + " - Error during upload"
+        updated.description = "Error importing file: ${e}"
+        updated.save(flush: true, failOnError: true)
+    }
+    protected storeAsset(param, file, contentType = 'application/xslt'){
+
+        String theName = (param.name ?: param.action)
+
+        Asset asset = new Asset(
+                name: "Import for " + theName,
+                originalFileName: file.originalFilename,
+                description: "Your import will be available in this asset soon. Use Refresh action to reload.",
+                status: ElementStatus.PENDING,
+                contentType: contentType,
+                size: 0
         )
+        asset.save(flush: true, failOnError: true)
+        assetService.storeAssetFromFile(file, asset)
+        return asset
     }
 
-    def imported(Integer max){
-        handleParams(max)
-        DataImport importer = queryForResource(params.id)
-        def total = (importer?.imported)? importer?.imported.size() : 0
-        def offset = 0
-        List<ImportRow> items = []
-        if (importer.imported) items.addAll(importer?.imported)
+    protected renderImportAsAsset(param, file, conceptualDomainName){
 
-        respondWithLinks ImportRow, new ImportRows(
-                base: "/dataArchitect/imports/${params.id}/imported",
-                items: items.subList(offset, Math.min( offset + params.max, total )),
-                total: total
-        )
-    }
+        String uri = request.forwardURI + '?' + request.queryString
+        InputStream inputStream = file.inputStream
+        def asset = storeAsset(param, file)
+        Long id = asset.id
+        Boolean createModelsForElements = params.boolean('createModelsForElements')
 
-    def importQueue(Integer max){
-        handleParams(max)
-        DataImport importer = queryForResource(params.id)
-        def total = (importer?.importQueue)? importer?.importQueue.size() : 0
-        def offset = 0
-        List<ImportRow> items = []
-        if (importer.importQueue) items.addAll(importer?.importQueue)
-
-        respondWithLinks ImportRow, new ImportRows(
-                base: "/dataArchitect/imports/${params.id}/importQueue",
-                items: items.subList(offset, Math.min( offset + params.max, total )),
-                total: total
-        )
-    }
-
-    def resolveAllRowActions(Long id, Long rowId){
-        def response
-        DataImport importer = queryForResource(params.id)
-        ImportRow importRow = ImportRow.get(params.rowId)
-        if(importer && importRow){
-            dataImportService.resolveRow(importer, importRow)
-            response = importer
-        }else{
-            response = ["error": "import or import row not found"]
+        executorService.submit {
+            Asset updated = Asset.get(id)
+            try {
+                XsdLoader parserXSD = new XsdLoader(inputStream)
+                def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces) = parserXSD.parse()
+                def (classification, conceptualDomain) = XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
+                updated.status = ElementStatus.FINALIZED
+                updated.description = "Your export is ready. Use Download button to view it."
+                updated.ext['Original URL'] = uri
+                updated.save(flush: true, failOnError: true)
+                updated.addToRelatedTo(classification)
+                updated.addToRelatedTo(conceptualDomain)
+            } catch (e) {
+                log.error("Error importing schema", e)
+                updated.refresh()
+                updated.status = ElementStatus.FINALIZED
+                updated.name = updated.name + " - Error during upload"
+                updated.description = "Error importing file: please validate that the schema is valid xml and that any dependencies already exist in the catalogue"
+                updated.save(flush: true, failOnError: true)
+            }
         }
-        reportCapableRespond response
+        asset
     }
 
-    def ingestRow(Long id, Long rowId){
-        def response
-        DataImport importer = queryForResource(params.id)
-        ImportRow importRow = ImportRow.get(params.rowId)
-        if(importer && importRow){
-            dataImportService.ingestRow(importer, importRow)
-            dataImportService.actionPendingModels(importer)
-            response = importer
-        }else{
-            response = ["error": "import or import row not found"]
-        }
-        reportCapableRespond response
-    }
+    protected static HeadersMap populateHeaders(params){
 
-    def resolveAll(Long id){
-        def response
-        DataImport importer = queryForResource(params.id)
-        if(importer){
-            dataImportService.resolveAllPendingRows(importer)
-            response = importer
-        }else{
-            response = ["error": "import or import row not found"]
-        }
-        reportCapableRespond response
-    }
-
-    def ingestQueue(Long id){
-        def response
-        DataImport importer = queryForResource(params.id)
-        if(importer){
-            dataImportService.ingestImportQueue(importer)
-            response = importer
-        }else{
-            response = ["error": "import or import row not found"]
-        }
-        reportCapableRespond response
-    }
-
-
-
-    protected static HeadersMap populateHeaders(){
         HeadersMap headersMap = new HeadersMap()
-        headersMap.dataElementCodeRow = "Data Item Unique Code"
-        headersMap.dataElementNameRow = "Data Item Name"
-        headersMap.dataElementDescriptionRow = "Data Item Description"
-        headersMap.dataTypeRow = "Data type"
-        headersMap.parentModelNameRow = "Parent Model"
-        headersMap.parentModelCodeRow = "Parent Model Unique Code"
-        headersMap.containingModelNameRow = "Model"
-        headersMap.containingModelCodeRow = "Model Unique Code"
-        headersMap.measurementUnitNameRow = "Measurement Unit"
-        headersMap.metadataRow = "Metadata"
+        headersMap.dataElementCode = params.dataElementCode ?: "Data Item Unique Code"
+        headersMap.dataElementName = params.dataElementName ?: "Data Item Name"
+        headersMap.dataElementDescription = params.dataElementDescription ?: "Data Item Description"
+        headersMap.dataType = params.dataType ?: "Data type"
+        headersMap.parentModelName = params.parentModelName ?: "Parent Model"
+        headersMap.parentModelCode = params.parentModelCode ?: "Parent Model Unique Code"
+        headersMap.containingModelName = params.containingModelName ?: "Model"
+        headersMap.containingModelCode = params.containingModelCode ?: "Model Unique Code"
+        headersMap.measurementUnitName = params.measurementUnitName ?: "Measurement Unit"
+        headersMap.measurementSymbol = params.measurementSymbol ?: "Measurement Unit Symbol"
+        headersMap.classification = params.classification ?: "Classification"
+        headersMap.metadata = params.metadata ?: "Metadata"
         return headersMap
     }
 }

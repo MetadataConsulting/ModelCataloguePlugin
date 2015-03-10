@@ -7,6 +7,8 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
     size:       '@'
     iconOnly:   '@'
     noColors:   '@'
+    role:       '@?'
+    noActions:  '@?'
 
 
   templateUrl: 'modelcatalogue/util/ui/contextualActions.html'
@@ -17,12 +19,16 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
 
 
     updateActions = ->
+      hasActions = false
       $element.empty()
-      for action in actions.getActions($scope.scope ? $scope.$parent)
-
+      for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role)
+        hasActions = hasActions || true
         newScope = $scope.$new()
         newScope.action = action
         $element.append($compile(getTemplate(action))(newScope))
+
+      if not hasActions and $scope.noActions
+        $element.append("""<em>No Actions</em>""")
 
     updateActions()
 

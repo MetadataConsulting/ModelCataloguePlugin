@@ -7,7 +7,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 27/02/2014.
  */
-class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerIntegrationSpec {
+class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Unroll
     def "expect uploaded asset will have #expectedName if params are #params"() {
@@ -78,15 +78,15 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
 
         then:
         json
-        json.id                 == existing.id
+        json.id                 != existing.id
         asset
-        asset.id                == existing.id
+        asset.id                != existing.id
         asset.originalFileName  == 'readme.txt'
         asset.md5
 
         cleanup:
         if (existing) {
-            for (Asset a in Asset.findAllByModelCatalogueIdLike("${existing.bareModelCatalogueId}%")) {
+            for (Asset a in Asset.findAllByLatestVersionId(existing.latestVersionId ?: existing.id)) {
                 a.delete()
             }
         }
@@ -105,12 +105,6 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
     @Override
     Map getBadInstance(){
         [name: "t"*300, description: "asdf"]
-    }
-
-    @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.Asset] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] does not fall within the valid size range from [1] to [255]"
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
     }
 
     @Override
@@ -139,35 +133,9 @@ class AssetControllerIntegrationSpec extends AbstractPublishedElementControllerI
     }
 
     @Override
-    def xmlCustomPropertyCheck(xml, item){
-        super.xmlCustomPropertyCheck(xml, item)
-        checkProperty(xml.modelCatalogueId, item.modelCatalogueId, "modelCatalogueId")
-        checkProperty(xml.@status, item.status, "status")
-        checkProperty(xml.@versionNumber, item.versionNumber, "versionNumber")
-        def inputItem = item.getProperty("ext")
-        inputItem.each{ key, value ->
-            def extension = xml.depthFirst().find{it.name()=="extension" && it.@key == key}
-            checkProperty(value, extension.toString(), "extension")
-        }
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-        super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkProperty(xml.modelCatalogueId, inputItem.modelCatalogueId, "modelCatalogueId")
-        checkProperty(xml.@status, outputItem.status, "status")
-        checkProperty(xml.@versionNumber, outputItem.versionNumber, "versionNumber")
-        outputItem.getProperty("ext").each{ key, value ->
-            def extension = xml.depthFirst().find{it.name()=="extension" && it.@key == key}
-            checkProperty(value, extension.toString(), "extension")
-        }
-        return true
-    }
-
-    @Override
     def customJsonPropertyCheck(item, json){
         super.customJsonPropertyCheck(item, json)
+        assert item.versionCreated
         checkStringProperty(json.modelCatalogueId , item.modelCatalogueId, "modelCatalogueId")
         checkProperty(json.status , item.status, "status")
         checkProperty(json.ext, item.ext, "extension")

@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<xs:schema xmlns="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" xmlns:SACT="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all" version="2-0">
+    <xs:complexType name="TS.GB-en-NHS.Date">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of a date of the form: yyyy-mm-dd.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:restriction base="TS">
+                <xs:attribute name="value" use="required">
+                    <xs:simpleType>
+                        <xs:restriction base="ts">
+                            <xs:pattern value="(19|20)\d\d(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="TS">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of a timeStamp.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="QTY">
+                <xs:attribute name="value" type="ts" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:simpleType name="ts">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of a timestamp.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{1,8}|([0-9]{9,14}|[0-9]{14,14}\.[0-9]+)([+\-][0-9]{1,4})?"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="QTY" abstract="true">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of a quantity.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ANY"/>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="ANY" abstract="true">
+        <xs:annotation>
+            <xs:documentation>This data type represents an abstract type from which more specific data types are derived.</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="nullFlavor" type="cs_NullFlavor" use="optional"/>
+        <xs:attribute name="updateMode" type="cs_UpdateMode" use="optional"/>
+    </xs:complexType>
+
+    <xs:simpleType name="cs_NullFlavor">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of the null flavour used.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="cs">
+            <xs:enumeration value="NI"/>
+            <xs:enumeration value="NA"/>
+            <xs:enumeration value="UNK"/>
+            <xs:enumeration value="NASK"/>
+            <xs:enumeration value="ASKU"/>
+            <xs:enumeration value="NAV"/>
+            <xs:enumeration value="OTH"/>
+            <xs:enumeration value="PINF"/>
+            <xs:enumeration value="NINF"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="cs_UpdateMode">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of the update mode used for data.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="cs">
+            <xs:enumeration value="added"/>
+            <xs:enumeration value="altered"/>
+            <xs:enumeration value="removed"/>
+            <xs:enumeration value="unchanged"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="cs">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of a character string.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:token">
+            <xs:pattern value="[^\s]*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="CD">
+        <xs:annotation>
+            <xs:documentation>This data type supports the representation of a concept descriptor.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="ANY">
+                <xs:sequence>
+                    <xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="qualifier" type="CR" maxOccurs="unbounded"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="translation" type="CD" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute name="code" type="cs" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="CR">
+        <xs:annotation>
+            <xs:documentation/>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="CD">
+                <xs:sequence>
+                    <xs:element name="value" type="cs" minOccurs="0"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>

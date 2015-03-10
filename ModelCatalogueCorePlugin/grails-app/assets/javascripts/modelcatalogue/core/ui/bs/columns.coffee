@@ -1,22 +1,43 @@
 angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsProvider)->
-  nameAndDescription = -> [
-    {header: "Name",        value: 'name',        class: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
-    {header: "Description", value: 'description', class: 'col-md-6'}
-  ]
 
-  publishedElementColumns = -> [
-    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true }
-    { header: "Name", value: "name", classes: "col-md-3", show: true, sort: {property: 'name', type: 'alphabet'} }
+
+  idNameAndDescription = -> [
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-2", show: true, href: 'modelCatalogueId'}
+    { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
     { header: "Description", value: "description" }
   ]
 
+  getEnumerations = (enumeratedType) ->
+    return '' if not enumeratedType
+    return enumeratedType.description if not enumeratedType.enumerations
+    return enumeratedType.description if not enumeratedType.enumerations.values
+    enumerations = []
+    enumerations.push "#{enumeration.key}: #{enumeration.value}" for enumeration in enumeratedType.enumerations.values
+    enumerations.join('\n')
+
+  getStatusClass = (status) ->
+    return 'label-warning'  if status == 'DRAFT'
+    return 'label-info'     if status == 'PENDING'
+    return 'label-danger'   if status == 'DEPRECATED'
+    return 'label-primary'
+
+  getClassificationsForDataElement = (dataElement) ->
+    return '' if not dataElement?.classifications
+
+    classificationNames = for classification in dataElement.classifications
+      """<a class="label #{getStatusClass(classification.status)}"  href='#/catalogue/classification/#{classification.id}'><span class="#{classification.getIcon()}"></span> #{classification.name}</a>"""
+    classificationNames.join(' ')
+
   # default
-  columnsProvider.registerColumns 'org.modelcatalogue.core.ConceptualDomain', nameAndDescription()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', nameAndDescription()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.PublishedElement', publishedElementColumns()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.ExtendibleElement', publishedElementColumns()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', publishedElementColumns()
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', publishedElementColumns()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', idNameAndDescription()
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
+    { header: 'Classifications',  value: getClassificationsForDataElement,  classes: 'col-md-2'}
+    { header: "Model Catalogue ID", value: "modelCatalogueId", classes: "col-md-3", show: true, href: 'modelCatalogueId'}
+    { header: "Name", value: "name", classes: "col-md-3", show: true, href: 'href()', sort: {property: 'name', type: 'alpha'} }
+    { header: "Description", value: "description" , classes: "col-md-4"}
+  ]
+
 
   # special
 
@@ -29,47 +50,23 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     return "#{(asset.size / KILO).toFixed(2)} KB" if asset.size > KILO
     return "#{(asset.size)} B"
 
-  columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.ImportRow', [
-    {header: "Model Path",        value: " parentModelName + ' -> ' + containingModelName",              class: 'col-md-2', sort: {property: 'containingModelName', type: 'alphabet'}}
-    {header: "Data Element",        value: 'dataElementName',              class: 'col-md-2', sort: {property: 'dataElementName', type: 'alphabet'}}
-    {
-      header: "Data Type",
-      value: (row) -> if row.dataType then row.dataType.replace /\|/g , "\n"
-      class: 'col-md-2',
-      sort: {property: 'dataType', type: 'alphabet'}
-    }
-    {
-      header: "Row Actions"
-      value: (row) -> if row.actions then row.actions?.join('\n\n')
-      class: 'col-md-6'
-      sort: {property: 'actions', type: 'alphabet'}
-    }
-  ]
-
-  columnsProvider.registerColumns 'org.modelcatalogue.core.dataarchitect.DataImport', [
-    {header: "Name",        value: 'name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: true}
-    {header: "Rows Imported",    value: "imported.total",  class: 'col-md-3', sort: {property: "imported.total", type: 'alphabet'}}
-    {header: "Rows Pending",    value: 'pendingAction.total',  class: 'col-md-3', sort: {property: 'pendingAction.total', type: 'alphabet'}}
-    {header: "Rows Queue",    value: 'importQueue.total',  class: 'col-md-3', sort: {property: 'importQueue.total', type: 'alphabet'}}
-  ]
-
   columnsProvider.registerColumns 'org.modelcatalogue.core.Asset', [
-    {header: "Name",        value: 'name',              class: 'col-md-4', sort: {property: 'name', type: 'alphabet'}, show: true}
-    {header: "File Name",   value: 'originalFileName',  class: 'col-md-4', sort: {property: 'originalFileName', type: 'alphabet'}}
-    {header: "Size",        value: computeBytes,        class: 'col-md-2', sort: {property: 'size', type: 'order'}}
-    {header: "Mime Type",   value: 'contentType',       class: 'col-md-2', sort: {property: 'contentType', type: 'alphabet'}}
+    {header: "Last Updated",value: "lastUpdated | date:'short'",  classes: 'col-md-2', sort: {property: 'lastUpdated', type: 'numeric'}}
+    {header: "Name",        value: 'name',                        classes: 'col-md-3', sort: {property: 'name', type: 'alpha'}, show: true, href: 'href()'}
+    {header: "File Name",   value: 'originalFileName',            classes: 'col-md-3', sort: {property: 'originalFileName', type: 'alpha'}}
+    {header: "Size",        value: computeBytes,                  classes: 'col-md-2', sort: {property: 'size', type: 'numeric'}}
+    {header: "Mime Type",   value: 'contentType',                 classes: 'col-md-2', sort: {property: 'contentType', type: 'alpha'}}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Mapping', [
-    {header: 'Destination',     value: "destination.name",                                    classes: 'col-md-4', show: 'destination.show()', sort: {property: 'destination.name', type: 'alphabet'}}
-    {header: 'Mapping',         value: 'mapping',                                             classes: 'col-md-5'}
-    {header: 'Identification',  value: "destination.elementTypeName + ': ' + destination.id", classes: 'col-md-3', show: 'destination.show()'}
+    {header: 'Destination',         value: "destination.name",                 classes: 'col-md-4', show: 'destination.show()', href: 'destination.href()'}
+    {header: 'Mapping',             value: 'mapping',                          classes: 'col-md-6 preserve-all'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.MeasurementUnit', [
-    {header: "Symbol",      value: 'symbol',      class: 'col-md-1', show: true, sort: {property: 'symbol', type: 'alphabet'}}
-    {header: "Name",        value: 'name',        class: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
-    {header: "Description", value: 'description', class: 'col-md-6'}
+    {header: "Symbol",      value: 'symbol',      classes: 'col-md-2', show: true, href: 'href()', sort: {property: 'symbol', type: 'alpha'}}
+    {header: "Name",        value: 'name',        classes: 'col-md-4', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
+    {header: "Description", value: 'description', classes: 'col-md-6'}
   ]
 
   printMetadata = (relationship) ->
@@ -79,30 +76,58 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
       result += "#{key}: #{value ? ''}\n"
     result
 
+  relationTypeName = (relationship) ->
+    return '' unless relationship
+    return '' unless relationship.relation
+    return '' unless angular.isFunction(relationship.relation.getElementTypeName)
+    relationship.relation.getElementTypeName()
+
+
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.Relationship', [
     {header: 'Relation',        value: 'type[direction]',  classes: 'col-md-3'}
-    {header: 'Destination',     value: "relation.name",    classes: 'col-md-3', show: "relation.show()"}
-    {header: 'Metadata',        value:  printMetadata,     classes: 'col-md-5'}
+    {header: 'Destination',     value: "relation.classifiedName",    classes: 'col-md-3', show: "relation.show()", href: 'relation.href()'}
+    {header: 'Type',            value: relationTypeName,     classes: 'col-md-2'}
+    {header: 'Metadata',        value: printMetadata,     classes: 'col-md-3'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.RelationshipType', [
-    {header: 'Name', value: 'name', classes: 'col-md-2', show: true, sort: {property: 'name', type: 'alphabet'}}
-    {header: 'Source to Destination', value: 'sourceToDestination', classes: 'col-md-2', sort: {property: 'sourceToDestination', type: 'alphabet'}}
-    {header: 'Destination to Source', value: 'destinationToSource', classes: 'col-md-2', sort: {property: 'destinationToSource', type: 'alphabet'}}
-    {header: 'Source Class', value: 'sourceClass', classes: 'col-md-3', sort: {property: 'sourceClass', type: 'alphabet'}}
-    {header: 'Destination Class', value: 'destinationClass', classes: 'col-md-3', sort: {property: 'destinationClass', type: 'alphabet'}}
+    {header: 'Name', value: 'name', classes: 'col-md-2', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
+    {header: 'Source to Destination', value: 'sourceToDestination', classes: 'col-md-2', sort: {property: 'sourceToDestination', type: 'alpha'}}
+    {header: 'Destination to Source', value: 'destinationToSource', classes: 'col-md-2', sort: {property: 'destinationToSource', type: 'alpha'}}
+    {header: 'Source Class', value: 'sourceClass', classes: 'col-md-3', sort: {property: 'sourceClass', type: 'alpha'}}
+    {header: 'Destination Class', value: 'destinationClass', classes: 'col-md-3', sort: {property: 'destinationClass', type: 'alpha'}}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.ValueDomain', [
-    {header: 'Name',        value: 'name',          classes: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
-    {header: 'Unit',        value: 'unitOfMeasure.name', classes: 'col-md-4', show: 'unitOfMeasure.show()', sort: {property: 'unitOfMeasure.name', type: 'alphabet'}}
-    {header: 'Data Type',   value: 'dataType.name', classes: 'col-md-4', show: 'dataType.show()', sort: {property: 'dataType.name', type: 'alphabet'}}
+    {header: 'Classifications', value: getClassificationsForDataElement, classes: 'col-md-3'}
+    {header: 'Name',                value: 'name',                                classes: 'col-md-3', href: 'href()',                show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
+    {header: 'Unit',                value: 'unitOfMeasure.name',                  classes: 'col-md-3', href: 'unitOfMeasure.href()',  show: 'unitOfMeasure.show()'}
+    {header: 'Data Type',           value: 'dataType.name',                       classes: 'col-md-3', href: 'dataType.href()',       show: 'dataType.show()'}
   ]
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', [
-    {header: "Name",        value: 'name',        class: 'col-md-4', show: true, sort: {property: 'name', type: 'alphabet'}}
-    {header: "Enumerations", value: 'enumerations', class: 'col-md-6'}
+    {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
+    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6'}
+  ]
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', [
+    {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
+    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6'}
+  ]
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Batch', [
+    {header: "Last Updated", value: "lastUpdated | date:'short'"   , classes: 'col-md-2',                              sort: {property: 'lastUpdated', type: 'numeric'}}
+    {header: "Name"        , value: 'name'                         , classes: 'col-md-4', show: true, href: 'href()' , sort: {property: 'name', type: 'alpha'}}
+    {header: "Pending"     , value: "pending.total"                , classes: 'col-md-1'}
+    {header: "Running"     , value: "performing.total"             , classes: 'col-md-1'}
+    {header: "Performed"   , value: "performed.total"              , classes: 'col-md-1'}
+    {header: "Failed"      , value: "failed.total"                 , classes: 'col-md-1'}
+  ]
+
+  columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Action', [
+    {header: "Created"     , value: "dateCreated | date:'short'"   , classes: 'col-md-2', sort: {property: 'dateCreated', type: 'numeric'}}
+    {header: "Message"     , value: 'message'                      , classes: 'col-md-7' }
   ]
 
 

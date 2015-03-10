@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 
@@ -10,25 +11,23 @@ enum RelationshipDirection {
     INCOMING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element.archived) {
-                if (type) {
-                    return Relationship.where {
-                        destination == element && relationshipType == type
-                    }
-                }
-                return Relationship.where {
-                    destination == element
-                }
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
+            DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.eq('destination', element)
+            if (!element.archived && (!type || !type.versionSpecific)) {
+                criteria.eq('archived', false)
             }
             if (type) {
-                return Relationship.where {
-                    archived == false && destination == element && relationshipType == type
+                criteria.eq('relationshipType', type)
+            }
+            if (classifications) {
+                criteria.or {
+                    'in'('classification', classifications)
+                    isNull('classification')
                 }
             }
-            Relationship.where {
-                archived == false && destination == element
-            }
+
+            criteria
         }
 
         @Override
@@ -42,32 +41,62 @@ enum RelationshipDirection {
         }
 
         @Override
+        CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
+            relationship.destination
+        }
+
+        @Override
         String getActionName() {
             "incoming"
+        }
+
+        @Override
+        String getSortProperty() {
+            "incomingIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.incomingIndex
+        }
+
+        @Override
+        boolean isOwnedBy(CatalogueElement owner, Relationship relationship) {
+            relationship?.destination == owner
+        }
+
+        @Override
+        Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) {
+            Relationship.executeQuery("""
+                select min(r.incomingIndex) from Relationship r
+                where r.destination = :destination
+                and r.relationshipType = :type
+                and r.incomingIndex > :current
+            """, [destination: owner, type: relationshipType, current: current])[0] as Long
         }
     },
     OUTGOING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element.archived) {
-                if (type) {
-                    return Relationship.where {
-                        source == element && relationshipType == type
-                    }
-                }
-                return Relationship.where {
-                    source == element
-                }
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
+            DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.eq('source', element)
+            if (!element.archived && (!type || !type.versionSpecific)) {
+                criteria.eq('archived', false)
             }
             if (type) {
-                return Relationship.where {
-                    archived == false && source == element && relationshipType == type
+                criteria.eq('relationshipType', type)
+            }
+            if (classifications) {
+                criteria.or {
+                    'in'('classification', classifications)
+                    isNull('classification')
                 }
             }
-            Relationship.where {
-                archived == false && source == element
-            }
+
+            criteria.sort('outgoingIndex')
+
+            criteria
         }
 
         @Override
@@ -81,32 +110,62 @@ enum RelationshipDirection {
         }
 
         @Override
+        CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
+            relationship.source
+        }
+
+        @Override
         String getActionName() {
             "outgoing"
         }
 
+        @Override
+        String getSortProperty() {
+            "outgoingIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.outgoingIndex
+        }
+
+        @Override
+        boolean isOwnedBy(CatalogueElement owner, Relationship relationship) {
+            relationship?.source == owner
+        }
+
+        @Override
+        Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) {
+            Relationship.executeQuery("""
+                select min(r.outgoingIndex) from Relationship r
+                where r.source = :source
+                and r.relationshipType = :type
+                and r.outgoingIndex > :current
+            """, [source: owner, type: relationshipType, current: current])[0] as Long
+        }
     },
     BOTH {
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type) {
-            if (element.archived) {
-                if (type) {
-                    return Relationship.where {
-                        (source == element || destination == element) && relationshipType == type
-                    }
-                }
-                return Relationship.where {
-                    (source == element || destination == element)
-                }
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
+            DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.or {
+                eq('source', element)
+                eq('destination', element)
+            }
+            if (!element.archived && (!type || !type.versionSpecific)) {
+                criteria.eq('archived', false)
             }
             if (type) {
-                return Relationship.where {
-                    archived == false && (source == element || destination == element) && relationshipType == type
+                criteria.eq('relationshipType', type)
+            }
+            if (classifications) {
+                criteria.or {
+                    'in'('classification', classifications)
+                    isNull('classification')
                 }
             }
-            Relationship.where {
-                archived == false && (source == element || destination == element)
-            }
+
+            criteria
         }
 
         @Override
@@ -120,16 +179,55 @@ enum RelationshipDirection {
         }
 
         @Override
+        CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
+            owner == relationship.destination ? relationship.source : relationship.destination
+        }
+
+        @Override
         String getActionName() {
             "relationships"
         }
+
+        @Override
+        String getSortProperty() {
+            "combinedIndex"
+        }
+
+        @Override
+        Long getIndex(Relationship rel) {
+            return rel.combinedIndex
+        }
+
+        @Override
+        boolean isOwnedBy(CatalogueElement owner, Relationship relationship) {
+            relationship?.destination == owner || relationship?.source == owner
+        }
+
+
+        @Override
+        Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current) {
+            Relationship.executeQuery("""
+                select min(r.combinedIndex) from Relationship r
+                where (r.source = :owner or r.destination = :owner)
+                and r.relationshipType = :type
+                and r.combinedIndex > :current
+            """, [owner: owner, type: relationshipType, current: current])[0] as Long
+        }
     }
 
-    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type)
+    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications)
     abstract String getDirection(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
+    abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)
     abstract String getActionName()
+    abstract String getSortProperty()
+    abstract Long getIndex(Relationship rel)
+    abstract boolean isOwnedBy(CatalogueElement owner, Relationship relationship)
+    abstract Long getMinIndexAfter(CatalogueElement owner, RelationshipType relationshipType, Long current)
 
+    void setIndex(Relationship rel, Long value) {
+        rel.setProperty(sortProperty, value)
+    }
     static RelationshipDirection parse(String direction) {
         switch (direction) {
             case ['incoming', 'destinationToSource']: return INCOMING

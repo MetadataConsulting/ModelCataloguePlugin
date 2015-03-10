@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalConfirm', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
- messagesProvider.setConfirmFactory [ '$modal', '$q', ($modal, $q) ->
+ messagesProvider.setConfirmFactory [ '$modal', ($modal) ->
    (title, body) ->
       dialog = $modal.open {
         windowClass: 'messages-modal-confirm'
@@ -11,19 +11,15 @@ angular.module('mc.core.ui.bs.modalConfirm', ['mc.util.messages']).config ['mess
             ''' + body + '''
         </div>
         <div class="modal-footer">
+          <form role="form">
             <button class="btn btn-primary" ng-click="$close(true)">OK</button>
             <button class="btn btn-warning" ng-click="$dismiss(false)">Cancel</button>
+          </form>
         </div>
         '''
       }
 
 
-      deferred = $q.defer()
-      dialog.result.then () ->
-        deferred.resolve()
-      , () ->
-        deferred.reject()
-
-      deferred.promise
+      dialog.result
  ]
 ]

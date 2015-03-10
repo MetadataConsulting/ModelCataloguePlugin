@@ -37,4 +37,18 @@ class DataTypeSpec extends Specification{
 
     }
 
+
+    @Unroll
+    def "pick the suggestion #expected from #suggestions"() {
+        expect:
+        DataType.suggestName(suggestions as Set) == expected
+
+        where:
+        expected        | suggestions
+        null            | null
+        null            | []
+        "bla"           | ["bla"]
+        "Allred Score"  | ["EstrogenAllredScore", "ProgesteroneAllredScore"]
+    }
+
 }

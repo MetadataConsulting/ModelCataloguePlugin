@@ -26,9 +26,12 @@ module.exports = function(config) {
             'grails-app/assets/bower_components/angular/angular.js',
             'grails-app/assets/bower_components/angular-cookies/angular-cookies.js',
             'grails-app/assets/bower_components/angular-sanitize/angular-sanitize.js',
+            'grails-app/assets/bower_components/angular-animate/angular-animate.js',
             'grails-app/assets/bower_components/angular-http-auth/src/http-auth-interceptor.js',
             'grails-app/assets/bower_components/angular-ui-router/release/angular-ui-router.js',
             'grails-app/assets/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+
+            'grails-app/assets/jslibs/google-diff-match-patch/javascript/diff_match_patch.js',
 
             // App under test
             'grails-app/assets/javascripts/**/*.coffee',

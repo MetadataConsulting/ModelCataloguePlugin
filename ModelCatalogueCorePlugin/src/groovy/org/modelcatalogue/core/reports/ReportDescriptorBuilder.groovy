@@ -21,8 +21,8 @@ class ReportDescriptorBuilder {
     }
 
 
-    ReportDescriptorBuilder type(Class type) {
-        descriptor.conditions << { type.isAssignableFrom(it.class)} ; this
+    ReportDescriptorBuilder type(Class... types) {
+        descriptor.conditions << { types.any { type -> type.isAssignableFrom(it.class) }} ; this
     }
 
     ReportDescriptorBuilder item(Class item) {
@@ -48,7 +48,8 @@ class ReportDescriptorBuilder {
     }
 
     ReportDescriptorBuilder link(Map<String, Object> linkParams) {
-        descriptor.linkParams = { linkParams } ; this
+        def copy = new HashMap(linkParams)
+        descriptor.linkParams = { copy } ; this
     }
 
     ReportDescriptorBuilder link(Closure<Map<String, Object>> linkParams) {

@@ -4,9 +4,12 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
   beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
 
   it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->
+    $httpBackend.when('GET', '/api/modelCatalogue/core/dashboard').respond(fixtures.dashboard.index)
 
-    catEl = enhance angular.copy(fixtures.valueDomain.showOne.dataType)
+
+    catEl = enhance angular.copy(fixtures.dataType.showOne)
     catEl.description = "Hello World!"
+    catEl.valueDomains.total = 5
 
     $rootScope.element = catEl
     $rootScope.descend = ['valueDomains']
@@ -18,14 +21,13 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName').toLowerCase()).toBe('li')
-    expect(element.find('span.catalogue-element-treeview-name').text()).toBe(catEl.name)
+    expect(element.find('span.catalogue-element-treeview-name').text()).toBe("#{catEl.name}")
     expect(element.find('span.badge').text()).toBe("#{catEl.valueDomains.total}")
 
 
     valueDomains = angular.copy(fixtures.dataType.valueDomains1)
 
     $httpBackend.expect('GET', catEl.valueDomains.link).respond(valueDomains)
-    $httpBackend.expect('GET', /\/api\/modelCatalogue\/core\/dataType\/\d+/).respond({ok: true})
 
     element.find('a').click()
 

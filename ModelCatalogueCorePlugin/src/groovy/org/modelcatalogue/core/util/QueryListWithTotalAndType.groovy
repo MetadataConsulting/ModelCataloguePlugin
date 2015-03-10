@@ -26,7 +26,7 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
         if (!query.trim().startsWith(expectedStart)) {
             throw new IllegalArgumentException("Query must start with '$expectedStart' but was ${query.trim()}")
         }
-        new QueryListWithTotalAndType<T>(query, "select count($alias) $query", type, new HashMap(params), arguments)
+        new QueryListWithTotalAndType<T>("select $alias $query", "select count($alias) $query", type, new HashMap(params), arguments)
     }
 
     public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery){
@@ -34,7 +34,7 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     }
 
     public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery, Map<String, Object> arguments){
-        if (!countQuery.trim().startsWith("select count(")) {
+        if (!countQuery.trim().toLowerCase().startsWith("select count(")) {
             throw new IllegalArgumentException("Query must start with 'select count(<alias>)' but was ${countQuery.trim()}")
         }
         new QueryListWithTotalAndType<T>(listQuery, countQuery, type, new HashMap(params), arguments)
@@ -51,7 +51,7 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     @Override
     Long getTotal() {
         if (total == null) {
-            return total = type.executeQuery(countQuery, arguments, params)[0]
+            return total = type.executeQuery(countQuery, arguments)[0]
         }
         return total
     }

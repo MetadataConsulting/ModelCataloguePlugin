@@ -13,9 +13,12 @@ class XLSXRowWriterBuilder {
     private String name
     private String title
     private List<String> headers
-    private Closure condition   = {container, condition -> true}
-    private Closure writer      = {[]}
-    private Closure fileName    = { null }
+    private Closure condition           = {container, condition -> true}
+    private Closure writer              = {[]}
+    private Closure fileName            = { null }
+    private Boolean appendingMetadata   = Boolean.FALSE
+
+    static final Boolean metadata       = Boolean.TRUE
 
     /**
      * Creates new builder for writer of given name.
@@ -34,6 +37,16 @@ class XLSXRowWriterBuilder {
      */
     XLSXRowWriterBuilder when(Closure condition) {
         this.condition = condition
+        this
+    }
+
+    /**
+     * Allows to specify if the metadata should be appended to the predefined columns.
+     * @param metadata true if the metadata should be appended to the predefined columns.
+     * @return the builder with updated settings
+     */
+    XLSXRowWriterBuilder append(Boolean metadata) {
+        this.appendingMetadata = metadata
         this
     }
 
@@ -150,6 +163,11 @@ class XLSXRowWriterBuilder {
             @Override
             String getFileName(RenderContext context) {
                 return self.fileName(context)
+            }
+
+            @Override
+            boolean isAppendingMetadata() {
+                return self.appendingMetadata
             }
         }
     }

@@ -1,4 +1,11 @@
-angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot']).config [ 'enhanceProvider', (enhanceProvider) ->
+angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest', 'mc.util.enhance', 'mc.util.names' ,'mc.core.modelCatalogueApiRoot', 'mc.core.catalogue', 'mc.core.elementEnhancer']).config [ 'enhanceProvider', (enhanceProvider) ->
+  commaSeparatedList = (things)->
+    names = []
+    angular.forEach(things, (thing)->
+      names.push thing.name
+    )
+    names.join(', ')
+
   condition = (element) -> element.hasOwnProperty('elementType') and element.hasOwnProperty('link')
   factory   = [ 'modelCatalogueApiRoot', 'rest', '$rootScope', '$state', 'names', 'enhance', (modelCatalogueApiRoot, rest, $rootScope, $state, names, enhance) ->
     (element) ->
@@ -6,7 +13,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
         constructor: (element) ->
           angular.extend(@, element)
 
-          @defaultExcludes = ['id','elementTypeName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
+          @defaultExcludes = ['id','elementTypeName', 'classifiedName', 'elementType', 'incomingRelationships', 'outgoingRelationships', 'link', 'mappings']
           @getUpdatePayload = () ->
             payload = {}
             for name in @updatableProperties
@@ -15,8 +22,6 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
               if angular.isObject(value)
                 if value.hasOwnProperty('id')
                   value = {id: value.id}
-                else
-                  continue
               payload[name] = value
             payload
 
@@ -36,29 +41,46 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
 
           self.refresh        = () -> enhance rest method: 'GET', url: "#{modelCatalogueApiRoot}#{self.link}"
           self.validate       = () -> enhance rest method: 'POST', url: "#{modelCatalogueApiRoot}#{self.link}/validate", data: self.getUpdatePayload()
-          self.update         = () -> enhance rest method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload()
+          self.update         = () ->
+            enhance(rest(method: 'PUT', url: "#{modelCatalogueApiRoot}#{self.link}", data: self.getUpdatePayload())).then (result)->
+              $rootScope.$broadcast 'catalogueElementUpdated', result
+              result
           self.show           = () ->
-            if(self.elementTypeName=="Data Import")
+            if self.isInstanceOf "batch"
+              $state.go('mc.actions.show', {id: self.id}); self
+            else if self.isInstanceOf "dataImport"
               $state.go('mc.dataArchitect.imports.show', {id: self.id}); self
+            else if self.isInstanceOf "csvTransformation"
+              $state.go('mc.csvTransformations.show', {id: self.id}); self
             else
               $state.go('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id}); self
 
+          self.href           = () ->
+            if self.isInstanceOf "batch"
+              return $state.href('mc.actions.show', {id: self.id})
+            if self.isInstanceOf "dataImport"
+              return $state.href('mc.dataArchitect.imports.show', {id: self.id})
+            if self.isInstanceOf "csvTransformation"
+              return $state.href('mc.csvTransformations.show', {id: self.id})
 
-          self.isInstanceOf   = (type) ->
-            # TODO create hierarchy service
-            return false  if not type?
-            return false  if type.indexOf('org.modelcatalogue.core.') == -1
-            return false  if self.elementType is 'org.modelcatalogue.core.RelationshipType' and type isnt 'org.modelcatalogue.core.RelationshipType'
-            return false  if self.elementType is 'org.modelcatalogue.core.Relationship'     and type isnt 'org.modelcatalogue.core.Relationship'
-            return false  if self.elementType is 'org.modelcatalogue.core.Mapping'          and type isnt 'org.modelcatalogue.core.Mapping'
-            return true   if type is 'org.modelcatalogue.core.CatalogueElement'
-            return true   if type is 'org.modelcatalogue.core.ExtendibleElement'            and self.elementType is  'org.modelcatalogue.core.ValueDomain'
-            return true   if type in ['org.modelcatalogue.core.ExtendibleElement', 'org.modelcatalogue.core.PublishedElement'] and self.elementType in ['org.modelcatalogue.core.Asset', 'org.modelcatalogue.core.Model', 'org.modelcatalogue.core.DataElement']
-            return self.elementType == type
+            $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(self.elementType), id: self.id})
 
+          self.getLabel = ->
+              return @classifiedName if @classifiedName?
+              if @classifications? && @classifications.length > 0
+                classificationNames = commaSeparatedList(@classifications)
+                return "#{@name} (#{@getElementTypeName()} in #{classificationNames})"
+              else if @isInstanceOf('relationship')
+                return "#{@source.getLabel()} #{@type.sourceToDestination} {@destination.getLabel()}"
+              else if @isInstanceOf('mapping')
+                return "#{@source.getLabel()} #{@type.sourceToDestination} {@destination.getLabel()}"
+              else if (@elementType?)
+                return "#{@name} (#{@getElementTypeName()})"
+              else
+                return @name
 
+          self.getUpdatableProperties = -> angular.copy(@updatableProperties)
 
-        getUpdatableProperties: () -> angular.copy(@updatableProperties)
       # wrap original element
       new CatalogueElement(element)
   ]

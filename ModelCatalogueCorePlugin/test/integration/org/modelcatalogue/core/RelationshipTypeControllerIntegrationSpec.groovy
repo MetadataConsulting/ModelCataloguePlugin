@@ -10,7 +10,7 @@ import org.modelcatalogue.core.util.CatalogueElementFinder
 class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegrationSpec {
 
     def setupSpec() {
-        totalCount = 16
+        totalCount = RelationshipType.count()
     }
 
     def "return list of catalogue element classes in json"() {
@@ -25,21 +25,9 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     }
 
 
-    def "return list of catalogue element classes in xml"() {
-        controller.response.format = 'xml'
-
-        controller.elementClasses()
-        def xml = controller.response.xml
-
-        println controller.response.text
-
-        expect:
-        xml.string.size() == CatalogueElementFinder.catalogueElementClasses.size()
-
-    }
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", sourceClass: PublishedElement, destinationClass: PublishedElement]
+        [name: "changedName", sourceClass: CatalogueElement, destinationClass: CatalogueElement]
     }
 
     @Override
@@ -54,12 +42,6 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     @Override
     Map getBadInstance(){
         [name: "t"*300, sourceToDestination: "NewInstanceAntonymWith", destinationToSource: "NewInstanceAntonymWith", sourceClass: DataElement, destinationClass: DataElement]
-    }
-
-    @Override
-    String getBadXmlError(){
-        "ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttProperty [name] of class [class org.modelcatalogue.core.RelationshipType] with value [tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt] exceeds the maximum size of [255]"
-        //"Property [name] of class [class org.modelcatalogue.core.${resourceName.capitalize()}] cannot be null"
     }
 
     @Override
@@ -80,27 +62,6 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     @Override
     RelationshipType getLoadItem() {
         RelationshipType.findByName("Antonym")
-    }
-
-
-    @Override
-    def xmlCustomPropertyCheck(xml, item){
-    //    super.xmlCustomPropertyCheck(xml, item)
-        checkProperty(xml.sourceToDestination, item.sourceToDestination, "sourceToDestination")
-        checkProperty(xml.destinationToSource, item.destinationToSource, "destinationToSource")
-        checkProperty(xml.sourceClass, item.sourceClass.name, "destinationToSource")
-        checkProperty(xml.destinationClass, item.destinationClass.name, "destinationToSource")
-        return true
-    }
-
-    @Override
-    def xmlCustomPropertyCheck(inputItem, xml, outputItem){
-  //      super.xmlCustomPropertyCheck(inputItem, xml, outputItem)
-        checkProperty(xml.sourceToDestination, inputItem.sourceToDestination, "sourceToDestination")
-        checkProperty(xml.destinationToSource, inputItem.destinationToSource, "destinationToSource")
-        checkProperty(xml.sourceClass, inputItem.sourceClass.name, "destinationToSource")
-        checkProperty(xml.destinationClass, inputItem.destinationClass.name, "destinationToSource")
-        return true
     }
 
     @Override
@@ -126,18 +87,18 @@ class RelationshipTypeControllerIntegrationSpec extends AbstractControllerIntegr
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 10, 10, 0, 15, "${baseLink}?max=10&offset=10", ""],
-                [2, 5, 5, 0, 15, "${baseLink}?max=5&offset=5", ""],
-                [3, 5, 5, 5, 15, "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
-                [4, 4, 4, 8, 15, "${baseLink}?max=4&offset=12", "${baseLink}?max=4&offset=4"],
-                [5, 5, 10, 10, 15, "", "${baseLink}?max=10&offset=0"],
-                [6, 2, 2, 10, 15, "${baseLink}?max=2&offset=12", "${baseLink}?max=2&offset=8"]
+                [1, 10, 10, 0, RelationshipType.countBySystem(false), "${baseLink}?max=10&offset=10", ""],
+                [2, 5, 5, 0, RelationshipType.countBySystem(false), "${baseLink}?max=5&offset=5", ""],
+                [3, 5, 5, 5, RelationshipType.countBySystem(false), "${baseLink}?max=5&offset=10", "${baseLink}?max=5&offset=0"],
+                [4, 4, 4, 8, RelationshipType.countBySystem(false), "${baseLink}?max=4&offset=12", "${baseLink}?max=4&offset=4"],
+                [5, RelationshipType.countBySystem(false) - 10, 10, 10, RelationshipType.countBySystem(false), "", "${baseLink}?max=10&offset=0"],
+                [6, 2, 2, 10, RelationshipType.countBySystem(false), "${baseLink}?max=2&offset=12", "${baseLink}?max=2&offset=8"]
         ]
     }
 
 
     protected getTotalRowsExported() {
-        15
+        RelationshipType.countBySystem(false)
     }
 
 }

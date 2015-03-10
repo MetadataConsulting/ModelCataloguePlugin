@@ -1,4 +1,5 @@
 import grails.converters.JSON
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
 import javax.servlet.http.HttpServletResponse
 
@@ -127,8 +128,10 @@ class LoginController {
         render([
             success: true,
             username: springSecurityService.authentication.name,
-            roles: springSecurityService.authentication.authorities*.authority] as JSON
-        )
+            roles: springSecurityService.authentication.authorities*.authority,
+            id: springSecurityService.authentication.hasProperty('id') ? springSecurityService.authentication.id : null,
+            classifications: springSecurityService.authentication.hasProperty('id') ? springSecurityService.authentication.classifications?.collect{ CatalogueElementMarshallers.minimalCatalogueElementJSON(it) } : []
+        ] as JSON)
     }
 
     /**

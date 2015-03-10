@@ -1,27 +1,29 @@
 package org.modelcatalogue.core
 
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
+import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.publishing.Publisher
+import org.modelcatalogue.core.publishing.PublishingChain
 
-class Model extends PublishedElement  {
-
-
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        modelCatalogueId boost:10
-        name boost:5
-        extensions component:true
-        except = ['incomingRelationships', 'outgoingRelationships']
-    }
+class Model extends CatalogueElement {
 
     static relationships = [
-            incoming: [context: 'hasContextOf', hierarchy: 'childOf'],
+            incoming: [hierarchy: 'childOf'],
             outgoing: [containment: 'contains', hierarchy: 'parentOf']
     ]
 
-    String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, version: ${version}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
+    @Override
+    CatalogueElement publish(Publisher<CatalogueElement> publisher) {
+        PublishingChain.finalize(this)
+        .add(this.contains)
+        .add(this.parentOf)
+        .run(publisher)
     }
 
+    @Override
+    CatalogueElement createDraftVersion(Publisher<CatalogueElement> publisher, DraftContext strategy) {
+        PublishingChain.createDraft(this, strategy)
+        .add(this.childOf)
+        .add(this.classifications)
+        .run(publisher)
+    }
 }

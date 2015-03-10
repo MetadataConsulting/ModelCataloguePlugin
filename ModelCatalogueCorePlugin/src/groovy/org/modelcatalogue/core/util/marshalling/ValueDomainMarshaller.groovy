@@ -1,11 +1,11 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.converters.XML
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.ValueDomain
 
-class ValueDomainMarshaller extends ExtendibleElementMarshallers {
+class ValueDomainMarshaller extends CatalogueElementMarshallers {
 
     ValueDomainMarshaller() {
         super(ValueDomain)
@@ -14,23 +14,15 @@ class ValueDomainMarshaller extends ExtendibleElementMarshallers {
     protected Map<String, Object> prepareJsonMap(el) {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
-        ret.putAll unitOfMeasure: el.unitOfMeasure,
+
+        ret.putAll unitOfMeasure: minimalCatalogueElementJSON(el.unitOfMeasure),
                 rule: el.rule,
-                dataType: el.dataType,
-                mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"]
+                dataType: minimalCatalogueElementJSON(el.dataType),
+                multiple: el.multiple ?: false,
+                mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"],
+                dataElements: [count: el.countDataElements(), itemType: DataElement.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/dataElement"]
         ret
     }
-
-    protected void buildXml(el, XML xml) {
-        super.buildXml(el, xml)
-        xml.build {
-            unitOfMeasure el.unitOfMeasure
-            rule el.rule
-            dataType el.dataType
-            mappings count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"
-        }
-    }
-
 }
 
 

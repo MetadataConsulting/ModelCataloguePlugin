@@ -17,12 +17,12 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 
         expect:
         clazz.transients
-        clazz.transients == transients
+        clazz.transients as Set == transients as Set
 
         where:
         clazz                   | transients
-        TestCatalogueElement1   | ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'hasContextOf', 'parentOf', 'childOf', 'synonyms']
-        TestCatalogueElement2   | ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'hasContextOf', 'parentOf', 'childOf', 'synonyms', 'b', 'd']
+        TestCatalogueElement1 | [*new ArrayList<String>(CatalogueElement.transients), 'parentOf', 'childOf', 'synonyms']
+        TestCatalogueElement2 | [*new ArrayList<String>(CatalogueElement.transients), 'parentOf', 'childOf', 'synonyms', 'br', 'dr']
 
     }
 
@@ -38,20 +38,19 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         expect:
         instance.hasProperty(prop)
         instance[prop]                          == []
+        instance[prop + 'Relationships']        == []
         instance."count${prop.capitalize()}"()  == 0
 
 
         where:
         clazz                   | prop
-        TestCatalogueElement1   | 'hasContextOf'
         TestCatalogueElement1   | 'parentOf'
         TestCatalogueElement1   | 'synonyms'
         TestCatalogueElement1   | 'childOf'
-        TestCatalogueElement2   | 'hasContextOf'
         TestCatalogueElement2   | 'parentOf'
         TestCatalogueElement2   | 'childOf'
-        TestCatalogueElement2   | 'b'
-        TestCatalogueElement2   | 'd'
+        TestCatalogueElement2   | 'br'
+        TestCatalogueElement2   | 'dr'
 
     }
 
@@ -77,7 +76,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         second.save()
 
         when:
-        Relationship relationship = first.addToB(second)
+        Relationship relationship = first.addToBr(second)
 
         then:
         relationship
@@ -87,7 +86,7 @@ class CatalogueElementDynamicHelperSpec extends Specification {
         relationship.relationshipType   == type
 
         when:
-        Relationship relationship2 = first.removeFromB(second)
+        Relationship relationship2 = first.removeFromBr(second)
 
         then:
         relationship == relationship2 || !relationship2
@@ -99,9 +98,9 @@ class CatalogueElementDynamicHelperSpec extends Specification {
 class TestCatalogueElement1 extends CatalogueElement {
 
     static relationships = [
-        incoming:           [context: 'hasContextOf', hierarchy: 'parentOf'],
-        outgoing:           [hierarchy: 'childOf'],
-        bidirectional:      [synonym: 'synonyms']
+        incoming:       [hierarchy: 'parentOf'],
+        outgoing:       [hierarchy: 'childOf'],
+        bidirectional:  [synonym: 'synonyms']
     ]
 
 }
@@ -109,8 +108,8 @@ class TestCatalogueElement1 extends CatalogueElement {
 class TestCatalogueElement2 extends TestCatalogueElement1 {
 
     static relationships = [
-        incoming: [a: 'b'],
-        outgoing: [c: 'd']
+        incoming: [a: 'br'],
+        outgoing: [c: 'dr']
     ]
 
 }

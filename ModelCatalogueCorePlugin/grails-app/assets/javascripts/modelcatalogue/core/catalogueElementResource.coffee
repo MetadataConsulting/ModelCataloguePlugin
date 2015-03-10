@@ -22,8 +22,15 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
           result
 
       save: (data) ->
-        enhance(rest(method: 'POST', url: "#{@getIndexPath()}", data: data)).then (result)->
-          $rootScope.$broadcast 'catalogueElementCreated', result
+        url = "#{@getIndexPath()}"
+        thePathName = @pathName
+
+        creationChecker = (status) ->
+          if status == 200
+            $rootScope.$broadcast 'displayGlobalMessage', "#{names.getNaturalName(names.getPropertyNameFromType(thePathName))} not created", "Reused existing #{names.getNaturalName(names.getPropertyNameFromType(thePathName))} '#{data.name}' instead of creating new one.", 'warning', true
+
+        enhance(rest(method: 'POST', url: url, data: data, statusListener: creationChecker)).then (result)->
+          $rootScope.$broadcast 'catalogueElementCreated', result, url, data
           result
 
       update: (data, params) ->
@@ -31,7 +38,9 @@ angular.module('mc.core.catalogueElementResource', ['mc.core.modelCatalogueApiRo
           throw "Missing ID, use save instead"
         props = angular.copy(data)
         delete props.id
-        enhance rest method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, params: angular.extend({format: 'json'}, params)
+        enhance(rest(method: 'PUT', url: "#{@getIndexPath()}/#{data.id}", data: props, params: angular.extend({format: 'json'}, params))).then (result)->
+          $rootScope.$broadcast 'catalogueElementUpdated', result
+          result
 
       validate: (data) ->
         enhance rest method: 'POST', url: "#{@getIndexPath()}/validate", data: data

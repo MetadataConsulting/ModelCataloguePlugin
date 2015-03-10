@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 rel. 2 sp1 (http://www.altova.com) by karen (addenbrookes) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:UML="omg.org/UML1.3" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:xdt="http://www.w3.org/2005/xpath-datatypes" xmlns="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" xmlns:SACT="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" targetNamespace="http://www.datadictionary.nhs.uk/messages/SACT-v2-0" elementFormDefault="unqualified" attributeFormDefault="unqualified" blockDefault="#all" finalDefault="extension" version="2-0" id="SACTSACT_XMLSchema-v2-0">
+    <xs:include schemaLocation="SACT_XMLDataTypes-v2-0.xsd"/>
+    <xs:element name="SACT" type="SACTSACTType"/>
+    <xs:complexType name="SACTSACTType">
+        <xs:sequence>
+            <xs:element name="SACTRecord" type="SACTSACTRecordType" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SACTDemographicsAndConsultantType">
+        <xs:sequence>
+            <xs:element name="NHSNumber" type="ST.GB-en-NHS.StringType6" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>NHS NUMBER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="NHSNumberStatus" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>NHS NUMBER STATUS INDICATOR CODE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:enumeration value="01"/>
+                        <xs:enumeration value="02"/>
+                        <xs:enumeration value="03"/>
+                        <xs:enumeration value="04"/>
+                        <xs:enumeration value="05"/>
+                        <xs:enumeration value="06"/>
+                        <xs:enumeration value="07"/>
+                        <xs:enumeration value="08"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="PersonBirthDate" type="ST.GB-en-NHS.StringType1" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PERSON BIRTH DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="PersonGenderCode" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PERSON GENDER CODE CURRENT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:enumeration value="0"/>
+                        <xs:enumeration value="1"/>
+                        <xs:enumeration value="2"/>
+                        <xs:enumeration value="9"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="EthnicCategory" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>ETHNIC CATEGORY</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:enumeration value="A"/>
+                        <xs:enumeration value="B"/>
+                        <xs:enumeration value="C"/>
+                        <xs:enumeration value="D"/>
+                        <xs:enumeration value="E"/>
+                        <xs:enumeration value="F"/>
+                        <xs:enumeration value="G"/>
+                        <xs:enumeration value="H"/>
+                        <xs:enumeration value="J"/>
+                        <xs:enumeration value="K"/>
+                        <xs:enumeration value="L"/>
+                        <xs:enumeration value="M"/>
+                        <xs:enumeration value="N"/>
+                        <xs:enumeration value="P"/>
+                        <xs:enumeration value="R"/>
+                        <xs:enumeration value="S"/>
+                        <xs:enumeration value="Z"/>
+                        <xs:enumeration value="99"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="PostCode" type="postalcode" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>POSTCODE OF USUAL ADDRESS</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="GPPracticeCodeRegistration" type="ST.GB-en-NHS.StringType10" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>GENERAL MEDICAL PRACTICE CODE (PATIENT REGISTRATION)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="ConsultantCode" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>CONSULTANT CODE (INITIATED SYSTEMIC ANTI-CANCER THERAPY)</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:length value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="StartCareProfessionalMainSpecialityCode" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>CARE PROFESSIONAL MAIN SPECIALTY CODE (START SYSTEMIC ANTI-CANCER THERAPY)</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:length value="3"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="OrgCodeOfProvider" type="ST.GB-en-NHS.StringType10" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>ORGANISATION CODE (CODE OF PROVIDER)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SACTProgrammeAndRegimenType">
+        <xs:sequence>
+            <xs:element name="SACTProgrammeNumber" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>SYSTEMIC ANTI-CANCER THERAPY PROGRAMME NUMBER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="int">
+                        <xs:maxInclusive value="99"/>
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="ACRegimenNumber" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>ANTI-CANCER REGIMEN NUMBER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="int">
+                        <xs:maxInclusive value="99"/>
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="DrugTreatmentIntent" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>DRUG TREATMENT INTENT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:enumeration value="A"/>
+                        <xs:enumeration value="N"/>
+                        <xs:enumeration value="C"/>
+                        <xs:enumeration value="D"/>
+                        <xs:enumeration value="P"/>
+                        <xs:enumeration value="9"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="DrugRegimenAcronym" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>DRUG REGIMEN ACRONYM</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:maxLength value="35"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="PersonHeight" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PERSON HEIGHT IN METRES</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="real">
+                        <xs:pattern value="\d\.\d{1,2}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="PersonWeight" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PERSON WEIGHT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="real">
+                        <xs:pattern value="\d{1,3}\.\d{1,3}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element name="PerformanceStatusAdult" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>PERFORMANCE STATUS (ADULT)</xs:appinfo>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="st">
+                            <xs:enumeration value="0"/>
+                            <xs:enumeration value="1"/>
+                            <xs:enumeration value="2"/>
+                            <xs:enumeration value="3"/>
+                            <xs:enumeration value="4"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="PerformanceStatusChild" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>PERFORMANCE STATUS (YOUNG PERSON)</xs:appinfo>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="st">
+                            <xs:enumeration value="00"/>
+                            <xs:enumeration value="01"/>
+                            <xs:enumeration value="02"/>
+                            <xs:enumeration value="03"/>
+                            <xs:enumeration value="04"/>
+                            <xs:enumeration value="05"/>
+                            <xs:enumeration value="06"/>
+                            <xs:enumeration value="07"/>
+                            <xs:enumeration value="08"/>
+                            <xs:enumeration value="09"/>
+                            <xs:enumeration value="10"/>
+                            <xs:enumeration value="11"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+            </xs:choice>
+            <xs:element name="CoMorbidityAdjustmentIndicator" type="ST.GB-en-NHS.StringType2" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>CO-MORBIDITY ADJUSTMENT INDICATOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="DecisionToTreatDate" type="ST.GB-en-NHS.StringType1" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>DECISION TO TREAT DATE (ANTI-CANCER DRUG REGIMEN)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="StartDateACDrugRegimen" type="ST.GB-en-NHS.StringType1" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>START DATE (ANTI-CANCER DRUG REGIMEN)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="ClinicalTrialIndicator" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>CLINICAL TRIAL INDICATOR</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:enumeration value="01"/>
+                        <xs:enumeration value="02"/>
+                        <xs:enumeration value="99"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="ChemoRadiationIndicator" type="ST.GB-en-NHS.StringType2" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>CHEMO-RADIATION INDICATOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="NumberPlannedSACTCycles" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>NUMBER OF SYSTEMIC ANTI-CANCER THERAPY CYCLES PLANNED</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="int">
+                        <xs:maxInclusive value="99"/>
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="Cycle" type="SACTCycleType" maxOccurs="unbounded"/>
+            <xs:element name="Outcome" type="SACTOutcomeType" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SACTCycleType">
+        <xs:sequence>
+            <xs:element name="ACDrugCycleId" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>ANTI-CANCER DRUG CYCLE IDENTIFIER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="int">
+                        <xs:maxInclusive value="99"/>
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="CycleStartDate" type="ST.GB-en-NHS.StringType1" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>START DATE (SYSTEMIC ANTI-CANCER DRUG CYCLE)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="PersonWeight" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PERSON WEIGHT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="real">
+                        <xs:pattern value="\d{1,3}\.\d{1,3}"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:element name="PerformanceStatusAdult" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>PERFORMANCE STATUS (ADULT)</xs:appinfo>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="st">
+                            <xs:enumeration value="0"/>
+                            <xs:enumeration value="1"/>
+                            <xs:enumeration value="2"/>
+                            <xs:enumeration value="3"/>
+                            <xs:enumeration value="4"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="PerformanceStatusChild" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:appinfo>PERFORMANCE STATUS (YOUNG PERSON)</xs:appinfo>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="st">
+                            <xs:enumeration value="00"/>
+                            <xs:enumeration value="01"/>
+                            <xs:enumeration value="02"/>
+                            <xs:enumeration value="03"/>
+                            <xs:enumeration value="04"/>
+                            <xs:enumeration value="05"/>
+                            <xs:enumeration value="06"/>
+                            <xs:enumeration value="07"/>
+                            <xs:enumeration value="08"/>
+                            <xs:enumeration value="09"/>
+                            <xs:enumeration value="10"/>
+                            <xs:enumeration value="11"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+            </xs:choice>
+            <xs:element name="PrimaryProcedure" type="ST.GB-en-NHS.StringType12" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PRIMARY PROCEDURE (OPCS)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="DrugDetails" type="SACTDrugDetailsType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SACTClinicalStatusType">
+        <xs:sequence>
+            <xs:element name="StartPrimaryDiagnosis" type="ST.GB-en-NHS.StringType14" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PRIMARY DIAGNOSIS (ICD AT START SYSTEMIC ANTI-CANCER THERAPY)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="StartMorphology" type="ST.GB-en-NHS.StringType13" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>MORPHOLOGY (ICD-O AT START SYSTEMIC ANTI-CANCER THERAPY)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="FinalTNMCategory" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>TNM STAGE GROUPING (FINAL PRETREATMENT)</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:maxLength value="5"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SACTDrugDetailsType">
+        <xs:sequence>
+            <xs:element name="SACTDrugName" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>SYSTEMIC ANTI-CANCER DRUG NAME</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:maxLength value="35"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="ChemoActualDose" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>CHEMOTHERAPY ACTUAL DOSE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="int">
+                        <xs:maxInclusive value="9999999"/>
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="SACTDrugRouteOfAdmin" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>SYSTEMIC ANTI-CANCER THERAPY DRUG ROUTE OF ADMINISTRATION</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:enumeration value="01"/>
+                        <xs:enumeration value="02"/>
+                        <xs:enumeration value="03"/>
+                        <xs:enumeration value="04"/>
+                        <xs:enumeration value="05"/>
+                        <xs:enumeration value="06"/>
+                        <xs:enumeration value="07"/>
+                        <xs:enumeration value="08"/>
+                        <xs:enumeration value="09"/>
+                        <xs:enumeration value="10"/>
+                        <xs:enumeration value="11"/>
+                        <xs:enumeration value="12"/>
+                        <xs:enumeration value="99"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="SACTAdminDate" type="ST.GB-en-NHS.StringType1" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>SYSTEMIC ANTI-CANCER THERAPY ADMINISTRATION DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="OrgCodeOfProvider" type="ST.GB-en-NHS.StringType10" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>ORGANISATION CODE (CODE OF PROVIDER)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="PrimaryProcedure" type="ST.GB-en-NHS.StringType12" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PRIMARY PROCEDURE (OPCS)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SACTSACTRecordType">
+        <xs:sequence>
+            <xs:element name="DemographicsAndConsultant" type="SACTDemographicsAndConsultantType" minOccurs="1" maxOccurs="1"/>
+            <xs:element name="ProgrammeAndRegimen" type="SACTProgrammeAndRegimenType" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="ClinicalStatus" type="SACTClinicalStatusType" minOccurs="1" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SACTOutcomeType">
+        <xs:sequence>
+            <xs:element name="FinalSACTStartDate" type="ST.GB-en-NHS.StringType1" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>START DATE (FINAL SYSTEMIC ANTI-CANCER THERAPY)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="SACTRegimenModIndicatorDoseReduction" type="ST.GB-en-NHS.StringType2" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>SYSTEMIC ANTI-CANCER THERAPY REGIMEN MODIFICATION INDICATOR (DOSE REDUCTION)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="SACTRegimenModIndicatorTimeDelay" type="ST.GB-en-NHS.StringType2" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>SYSTEMIC ANTI-CANCER THERAPY REGIMEN MODIFICATION INDICATOR (TIME DELAY)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="SACTRegimenModIndicatorDaysReduced" type="ST.GB-en-NHS.StringType2" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>SYSTEMIC ANTI-CANCER THERAPY REGIMEN MODIFICATION INDICATOR (DAYS REDUCED)</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="PlannedTreatmentChangeReason" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PLANNED TREATMENT CHANGE REASON</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="st">
+                        <xs:enumeration value="0"/>
+                        <xs:enumeration value="1"/>
+                        <xs:enumeration value="2"/>
+                        <xs:enumeration value="3"/>
+                        <xs:enumeration value="4"/>
+                        <xs:enumeration value="5"/>
+                        <xs:enumeration value="9"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="PersonDeathDate" type="ST.GB-en-NHS.StringType1" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:appinfo>PERSON DEATH DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

@@ -1,28 +1,69 @@
 angular.module('mc.util.ui.actions', []).provider 'actions', ->
-  availableActionsById      = {}
-  actionsChildrenByParentId = {}
-  actionsProvider           = {}
 
-  registerActionInternal = (parentId, id, actionFactory) ->
+  actionsRolesById          = {}
+  actionsChildrenByParentId = {}
+  availableActionsById      = {}
+  actionsProvider           =
+    ROLE_NAVIGATION:              'navigation'
+    ROLE_NAVIGATION_BOTTOM_LEFT:  'navigation-bottom-left'
+    ROLE_NAVIGATION_BOTTOM_RIGHT: 'navigation-bottom-right'
+    ROLE_LIST_ACTION:             'list'
+    ROLE_ITEM_ACTION:             'item'
+    ROLE_MODAL_ACTION:            'modal'
+    ROLE_LIST_HEADER_ACTION:      'header'
+    ROLE_LIST_FOOTER_ACTION:      'footer'
+
+  getRoleAwareId = (role, id) -> "role_#{role}_#{id}"
+
+
+  registerActionInternal = (parentId, id, actionFactory, roles) ->
     throw {message: "Missing action id"} if not id
     throw {message: "id must be string", id: id} if not angular.isString(id)
     throw {message: "parent id must be string", parentId: parentId} if parentId and not angular.isString(parentId)
+
+    actionsRolesById[id] ?= roles
+
     if parentId
-      actionsChildrenByParentId[parentId] ?= {}
-      actionsChildrenByParentId[parentId][id] = actionFactory
+      roles = roles ? actionsRolesById[parentId]
+      if not roles
+        actionsChildrenByParentId[parentId] ?= {}
+        actionsChildrenByParentId[parentId][id] = actionFactory
+      else
+        angular.forEach roles, (role)->
+          actionsChildrenByParentId[getRoleAwareId(role, parentId)] ?= {}
+          actionsChildrenByParentId[getRoleAwareId(role, parentId)][id] = actionFactory
     else
-      availableActionsById[id] = actionFactory
+      if not roles
+        availableActionsById[id] = actionFactory
+      else
+        angular.forEach roles, (role)->
+          availableActionsById[getRoleAwareId(role, id)] = actionFactory
 
-  actionsProvider.registerAction = (id, actionFactory) ->
-    registerActionInternal(undefined, id, actionFactory)
+  actionsProvider.registerActionInRole  = (id, role, actionFactory) ->
+    registerActionInternal(undefined, id, actionFactory, [role])
 
-  actionsProvider.registerChildAction = (parentId, id, actionFactory) ->
-    registerActionInternal(parentId, id, actionFactory)
+  actionsProvider.registerActionInRoles = (id, roles, actionFactory) ->
+    registerActionInternal(undefined, id, actionFactory, roles)
 
-  actionsProvider.$get = [ '$injector', '$filter', '$rootScope', ($injector, $filter, $rootScope) ->
+  actionsProvider.registerAction = (id, actionFactory, roles = undefined) ->
+    registerActionInternal(undefined, id, actionFactory, roles)
+
+  actionsProvider.registerChildActionInRole = (parentId, id, role, actionFactory) ->
+    registerActionInternal(parentId, id, actionFactory, [role])
+
+  actionsProvider.registerChildActionInRoles = (parentId, id, roles, actionFactory) ->
+    registerActionInternal(parentId, id, actionFactory, roles)
+
+  actionsProvider.registerChildAction = (parentId, id, actionFactory, roles = undefined) ->
+    registerActionInternal(parentId, id, actionFactory, roles)
+
+  actionsProvider.$get = [ '$injector', '$filter', '$rootScope', '$q', '$log', ($injector, $filter, $rootScope, $q, $log) ->
 
     createAction = (parentId, id, actionFactory, actionsService, $scope) ->
-      action = $injector.invoke(actionFactory, undefined, {$scope: $scope, actions: actionsService})
+      try
+        action = $injector.invoke(actionFactory, undefined, {$scope: $scope, actions: actionsService})
+      catch e
+        $log.error e
 
       return if not action
 
@@ -32,11 +73,9 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       action.id       = id
 
       if action.action
-        unless action.disabled
-          action.run = ->
-            $rootScope.$broadcast "actionPerformed:#{action.id}", action.action()
-        else
-          action.run = ->
+        action.run = ->
+          unless action.disabled
+            $rootScope.$broadcast "actionPerformed", action.id, $q.when(action.action())
       else
         action.run = action.run ? ->
 
@@ -67,7 +106,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
                 createdAction.id          = createdAction.id ? "#{generatorAction.id}:#{i}"
                 createdAction.position    = generatorAction.position + (1 + i)
                 createdAction.run         = ->
-                  $rootScope.$broadcast "actionPerformed:#{generatorAction.id}", createdAction.action()
+                  $rootScope.$broadcast "createdAction:#{@id}", @action()
                 ret.push createdAction
 
               if createdActions?.length > 0
@@ -94,12 +133,23 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       return action
 
 
-    actions = {}
-    actions.getActions = ($scope) ->
+    actions =
+      ROLE_NAVIGATION:              actionsProvider.ROLE_NAVIGATION
+      ROLE_NAVIGATION_BOTTOM_LEFT:  actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT
+      ROLE_NAVIGATION_BOTTOM_RIGHT: actionsProvider.ROLE_NAVIGATION_BOTTOM_RIGHT
+      ROLE_LIST_ACTION:             actionsProvider.ROLE_LIST_ACTION
+      ROLE_ITEM_ACTION:             actionsProvider.ROLE_ITEM_ACTION
+      ROLE_MODAL_ACTION:            actionsProvider.ROLE_MODAL_ACTION
+      ROLE_LIST_HEADER_ACTION:      actionsProvider.ROLE_LIST_HEADER_ACTION
+      ROLE_LIST_FOOTER_ACTION:      actionsProvider.ROLE_LIST_FOOTER_ACTION
+
+    actions.getActions = ($scope, role = undefined) ->
       currentActions = []
       for id, actionConfig of availableActionsById
-        action = createAction(undefined, id, actionConfig, actions, $scope)
-        currentActions.push action if action
+        match = id.match(/^role_(.*)_(.*)$/)
+        if not role and not match or role and match and match[1] == role
+          action = createAction(undefined, id, actionConfig, actions, $scope)
+          currentActions.push action if action
 
       $filter('orderBy')(currentActions, 'position')
 
@@ -107,8 +157,11 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     ###
       Retrieves top-level action by it's id for the current scope. Mainly for the testing purposes.
     ###
-    actions.getActionById = (id, $scope) ->
-      createAction(undefined, id, availableActionsById[id], actions, $scope)
+    actions.getActionById = (id, $scope, role = undefined) ->
+      if role
+        createAction(undefined, id, availableActionsById[getRoleAwareId(role, id)], actions, $scope)
+      else
+        createAction(undefined, id, availableActionsById[id], actions, $scope)
 
     actions
   ]

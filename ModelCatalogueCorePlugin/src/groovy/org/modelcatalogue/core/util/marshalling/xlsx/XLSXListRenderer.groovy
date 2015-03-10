@@ -2,14 +2,13 @@ package org.modelcatalogue.core.util.marshalling.xlsx
 
 import grails.rest.render.AbstractRenderer
 import grails.rest.render.RenderContext
+import grails.util.GrailsWebUtil
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.codehaus.groovy.grails.web.mime.MimeType
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.plugins.web.rest.render.ServletRenderContext
-import org.modelcatalogue.core.Asset
-import org.modelcatalogue.core.AssetService
-import org.modelcatalogue.core.PublishedElementStatus
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,7 +16,6 @@ import org.springframework.web.context.request.RequestContextHolder
 import pl.touk.excel.export.WebXlsxExporter
 
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Future
 
 /**
  * Created by ladin on 07.04.14.
@@ -25,7 +23,7 @@ import java.util.concurrent.Future
 @Log4j
 class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
-	static String DEFAULT_LAYOUT_RESOURCENAME       = "/excelLayouts/defaultLayout.xlsx"
+	static String DEFAULT_LAYOUT_RESOURCENAME   = "/excelLayouts/defaultLayout.xlsx"
     static final MimeType XLSX                  = new MimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx')
     static final MimeType EXCEL                 = new MimeType('application/vnd.ms-excel', 'xlsx')
     static final XLSXRowWriter DEFAULT_WRITER   = XLSXRowWriterBuilder.writer().headers('EXPORT NOT CONFIGURED').build()
@@ -36,6 +34,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
     @Autowired ExecutorService executorService
     @Autowired LinkGenerator linkGenerator
     @Autowired AssetService assetService
+    @Autowired SecurityService modelCatalogueSecurityService
 
     XLSXListRenderer() {
         super(ListWrapper, [EXCEL, XLSX] as MimeType[])
@@ -50,27 +49,65 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
         XLSXRowWriter writer = findRowWriter(context.webRequest.params.report?.toString(), container, context)
 
- 		String layoutFileName = getLayoutResourceFileName()
+        if (modelCatalogueSecurityService.userLoggedIn) {
+            renderAsAsset(container, writer, context)
+        } else {
+            renderDirectly(container, writer, context)
+        }
+    }
 
-        String theName = writer.getFileName(context)
+    private void renderDirectly(container, XLSXRowWriter writer, ServletRenderContext context) {
+        context.setContentType(GrailsWebUtil.getContentType(XLSX.name, GrailsWebUtil.DEFAULT_ENCODING))
 
-        if (!theName && writer.title) theName = writer.title
-        if (!theName && writer.name) theName = writer.name
-        if (!theName) theName = context.controllerName ?: 'export'
+        String layoutFileName = getLayoutResourceFileName()
 
-        if (!theName.endsWith('.xlsx')) theName += '.xlsx'
+        WebXlsxExporter exporter
+        if(layoutFileName){
+            exporter = new WebXlsxExporter(layoutFileName)
+        }else{
+            exporter = new WebXlsxExporter()
+        }
+
+        //it should be set, before adding any row
+        exporter.setWorksheetName('Export')
+
+
+        exporter.setResponseHeaders(context.webRequest.currentResponse, extractName(writer, context))
+
+        int counter = 0
+
+        List<Object> headers = writer.getHeaders()
+
+        if (headers) {
+            exporter.fillRow(headers, counter++)
+        }
+
+        for(item in container.items) {
+            List<List<Object>> rows = writer.getRows(item)
+            for (List<Object> row in rows) {
+                exporter.fillRow(row, counter++)
+            }
+        }
+
+        exporter.save(context.webRequest.currentResponse.outputStream)
+    }
+
+    private void renderAsAsset(container, XLSXRowWriter writer, ServletRenderContext context) {
+        String layoutFileName = getLayoutResourceFileName()
+
+        String theName = extractName(writer, context)
 
         Asset asset = new Asset(
-            name: theName,
-            originalFileName: theName,
-            description: "Your export will be available in this asset soon. Use Refresh action to reload",
-            status: PublishedElementStatus.PENDING,
-            contentType: XLSX.name,
-            size: 0
+                name: theName,
+                originalFileName: theName,
+                description: "Your export will be available in this asset soon. Use Refresh action to reload",
+                status: ElementStatus.PENDING,
+                contentType: XLSX.name,
+                size: 0
         )
 
         asset.save(flush: true, failOnError: true)
-        
+
         Long id = asset.id
 
         executorService.submit {
@@ -88,17 +125,43 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
 
                 List<Object> headers = writer.getHeaders()
 
-                if (headers) {
-                    exporter.fillRow(headers, counter++)
-                }
+                if (writer.appendingMetadata) {
+                    Map<String, Integer> headers2index = [:]
+                    List<List<Object>> rowsToWrite = [headers]
+                    for (item in container.items) {
+                        List<List<Object>> rows = writer.getRows(item)
+                        for (List<Object> row in rows) {
+                            List<Object> extendibleRow = row.withDefault { "" }
+                            if (item instanceof Extendible) {
+                                item.listExtensions().each {
+                                    Integer index = headers2index[it.name]
+                                    if (index == null) {
+                                        index = headers.size()
+                                        headers.add(it.name)
+                                        headers2index.put(it.name, index)
+                                    }
+                                    extendibleRow[index] = it.extensionValue
+                                }
+                            }
+                            rowsToWrite << extendibleRow
+                        }
+                    }
 
-                for (item in container.items) {
-                    List<List<Object>> rows = writer.getRows(item)
-                    for (List<Object> row in rows) {
+                    for (row in rowsToWrite) {
                         exporter.fillRow(row, counter++)
                     }
-                }
+                } else {
+                    if (headers) {
+                        exporter.fillRow(headers, counter++)
+                    }
 
+                    for (item in container.items) {
+                        List<List<Object>> rows = writer.getRows(item)
+                        for (List<Object> row in rows) {
+                            exporter.fillRow(row, counter++)
+                        }
+                    }
+                }
 
                 Asset updated = Asset.get(id)
 
@@ -106,7 +169,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                     exporter.save(it)
                 }
 
-                updated.status = PublishedElementStatus.FINALIZED
+                updated.status = ElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.save(flush: true, failOnError: true)
             } catch (e) {
@@ -123,7 +186,17 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
             // outputStream << link
             outputStream.flush()
         }
+    }
 
+    private static String extractName(XLSXRowWriter writer, ServletRenderContext context) {
+        String theName = writer.getFileName(context)
+
+        if (!theName && writer.title) theName = writer.title
+        if (!theName && writer.name) theName = writer.name
+        if (!theName) theName = context.controllerName ?: 'export'
+
+        if (!theName.endsWith('.xlsx')) theName += '.xlsx'
+        theName
     }
 
 
@@ -176,12 +249,12 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
             title writer.title
             type ListWrapper
             when {
-                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes()
+                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes() as GrailsWebRequest
                 ServletRenderContext context = new ServletRenderContext(webRequest)
                 writer.isApplicableOn(it, context)
             }
             link {
-                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes()
+                GrailsWebRequest webRequest = RequestContextHolder.currentRequestAttributes() as GrailsWebRequest
                 Map params = [:]
                 params.putAll(webRequest.params)
                 params.format = 'xlsx'

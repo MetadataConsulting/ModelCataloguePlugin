@@ -63,5 +63,21 @@ class SecuredRuleExecutorSpec extends Specification {
         exp << INVALID_EXPRESSIONS
     }
 
+    def "cleaned up message"() {
+        String full = '''startup failed:
+General error during canonicalization: Expression [VariableExpression] is not allowed: y
+
+java.lang.SecurityException: Expression [VariableExpression] is not allowed: y
+\tat org.codehaus.groovy.control.customizers.SecureASTCustomizer$SecuringCodeVisitor.assertExpressionAuthorized(SecureASTCustomizer.java:690)'''
+
+        String brief = SecuredRuleExecutor.cleanUpMessage(full)
+
+        expect:
+        brief == 'variable is not allowed: y'
+
+
+
+    }
+
 
 }

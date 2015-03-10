@@ -14,6 +14,12 @@ interface XLSXRowWriter<T> {
     boolean isApplicableOn(ListWrapper<T> container, RenderContext context)
 
     /**
+     * Returns true if the export is extended with metadata values.
+     * @return true if the export is extended with metadata values
+     */
+    boolean isAppendingMetadata()
+
+    /**
      * Identifier of this row writer so it can be easily distinguish by name.
      * Can be <code>null</code> for the default row writer.
      * @return the name of this writer

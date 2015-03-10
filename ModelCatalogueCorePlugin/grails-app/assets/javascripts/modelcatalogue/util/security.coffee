@@ -30,11 +30,11 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
 
   # you need login to return
   securityProvider.springSecurity = (config = {}) ->
-    securityFactory = ['$http', '$rootScope',  ($http, $rootScope) ->
+    securityFactory = ['$http', '$rootScope', '$q',  ($http, $rootScope, $q) ->
       httpMethod    = config.httpMethod ? 'POST'
       loginUrl      = 'j_spring_security_check'
       logoutUrl     = 'logout'
-      userUrl       = 'login/ajaxSuccess'
+      userUrl       = 'user/current'
       usernameParam = config.username ? 'j_username'
       passwordParam = config.password ? 'j_password'
       rememberParam = config.rememberMe ? '_spring_security_remember_me'
@@ -58,16 +58,19 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
       currentUser = config.currentUser
 
       handleUserResponse = (result) ->
+        return result if not result.data.username
         if result.data.success
           currentUser = result.data
-          currentUser.displayName ?= currentUser.username
-          currentUser.roles       ?= []
+          currentUser.displayName     ?= currentUser.username
+          currentUser.roles           ?= []
+          currentUser.classifications ?= []
 
           for roleName, roleSynonyms of (config.roles ? [])
             for role in roleSynonyms
               if role in currentUser.roles
                 currentUser.roles.push roleName
-
+        else
+          currentUser = null
         result
 
       security =
@@ -94,6 +97,16 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
         logout: ->
           $http(method: httpMethod, url: logoutUrl).then ->
             currentUser = null
+        requireUser: ->
+          $http(method: 'GET', url: userUrl).then(handleUserResponse).then (result)->
+            if result.data?.success
+              return security.getCurrentUser()
+            $q.reject result
+        requireRole: (role) ->
+          security.requireUser().then ->
+            if security.hasRole(role)
+              return security.getCurrentUser()
+            $q.reject security.getCurrentUser()
 
       if currentUser
         currentUser.success = true
@@ -132,7 +145,10 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
       $q.when(loginFn(username, password, rememberMe)).then (user) ->
         if not user.errors
           $rootScope.$broadcast 'userLoggedIn', user
-        user
+          return user
+        else
+          $log.warn "login finished with errors", user.errors
+          return $q.reject user
 
     logoutFn        = security.logout
     security.logout = ->
@@ -152,14 +168,14 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
   $rootScope.$on 'event:auth-loginRequired', ->
     if security.mock
       messages.error('You are trying to access protected resource',
-        'The application will not work as expected. Please, set up the security properly.')
+        'The application will not work as expected. Please, set up the security properly.').noTimeout()
     else
       messages.prompt('Login', null, type: 'login').then (success)->
         authService.loginConfirmed(success)
         messages.clearAllMessages()
       , ->
         messages.warning('You are trying to access protected resource',
-          if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in')
+          if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in').noTimeout()
   $rootScope.$security = security
 
 ]

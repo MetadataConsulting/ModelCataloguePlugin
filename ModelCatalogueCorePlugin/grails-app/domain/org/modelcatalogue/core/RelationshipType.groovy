@@ -7,13 +7,6 @@ class RelationshipType {
 
     def relationshipTypeService
 
-    static searchable = {
-        name boost: 5
-        sourceClass converter: RelationshipTypeClassConverter
-        destinationClass converter: RelationshipTypeClassConverter
-        except = ['rule','sourceClass','destinationClass', 'defaultRelationshipTypesDefinitions']
-    }
-
     //name of the relationship type i.e. parentChild  or synonym
     String name
 
@@ -37,6 +30,9 @@ class RelationshipType {
 
     // if the direction of the relationship doesn't matter
     Boolean bidirectional = Boolean.FALSE
+
+    /** if relationships of this type shall not be carried over when new draft version is created */
+    Boolean versionSpecific = Boolean.FALSE
 
     /**
      * This is a script which will be evaluated with following binding:
@@ -85,6 +81,10 @@ class RelationshipType {
 
         if (rule && rule.trim()) {
             def result = validateRule(source, destination, ext)
+            if (result instanceof List && result.size() > 1 && result.first() instanceof String) {
+                return result
+            }
+
             if (result instanceof CharSequence) {
                 return result
             }
@@ -97,8 +97,8 @@ class RelationshipType {
             }
 
             if (result instanceof Throwable) {
-                log.info("Rule thrown an exception. This is slightly discouraged!", result)
-                return result.message
+                log.warn("Rule of $name thrown an exception for $source and $destination: $result", result)
+                return ['rule.did.not.pass.with.exception', result.message]
             }
 
             if (result) {
@@ -127,20 +127,24 @@ class RelationshipType {
         readByName("containment")
     }
 
-    static getContextType() {
-        readByName("context")
+    static getClassificationType() {
+        readByName("classification")
+    }
+
+    static getFavouriteType() {
+        readByName("favourite")
+    }
+
+    static getSynonymType() {
+        readByName("synonym")
+    }
+
+    static getRelatedToType() {
+        readByName("relatedTo")
     }
 
     static getHierarchyType() {
         readByName("hierarchy")
-    }
-
-    static getInclusionType() {
-        readByName("inclusion")
-    }
-
-    static getInstantiationType() {
-        readByName("instantiation")
     }
 
     static getSupersessionType() {

@@ -1,9 +1,10 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.converters.XML
+import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.ValueDomain
 
-class EnumeratedTypeMarshaller extends DataTypeMarshaller {
+class EnumeratedTypeMarshaller extends CatalogueElementMarshallers {
 
     EnumeratedTypeMarshaller() {
         super(EnumeratedType)
@@ -12,20 +13,9 @@ class EnumeratedTypeMarshaller extends DataTypeMarshaller {
     protected Map<String, Object> prepareJsonMap(element) {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
-        ret.putAll enumerations: element.enumerations
+        ret.putAll valueDomains: [count: element.relatedValueDomains?.size() ?: 0, itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/valueDomain"]
+        ret.putAll enumerations: [type: 'orderedMap', values: element.enumerations.collect { key, value -> [key: key, value: value]}]
         ret
-    }
-
-
-    protected void buildXml(element, XML xml) {
-        super.buildXml(element, xml)
-        xml.build {
-            enumerations {
-                for (e in element.enumerations) {
-                    enumeration key: e.key, e.value
-                }
-            }
-        }
     }
 
 }

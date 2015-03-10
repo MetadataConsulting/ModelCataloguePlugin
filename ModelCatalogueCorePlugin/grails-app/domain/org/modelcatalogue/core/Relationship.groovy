@@ -5,15 +5,13 @@ import org.modelcatalogue.core.util.ExtensionsWrapper
 /*
 * Users can create relationships between all catalogue elements. They include
 * DataType, ConceptualDomain, MeasurementUnit, Model, ValueDomain, DataElement
-* Relationshipss have a source element, a destination element and a relationship type.
+* Relationships have a source element, a destination element and a relationship type.
 * There are a number of different predefined relationship types that describe the ways catalogue
 * elements are related in the model catalogue
 
         * ----------------- ------------------ ------------- -----------------------  ----------------------
         | Source           | Relationship     | Destination | Source->Destination    |  Destination<-Source |
         | ---------------- | -----------------| ----------- | ---------------------- | -------------------- |
-        | ConceptualDomain |  [context]       |  Model      | "provides context for" | "has context of"     |
-        | ConceptualDomain | [inclusion]      | ValueDomain |  "includes"            | "included in"        |
         | Model            | [containment]    | DataElement |  "contains"            |  "contained in"      |
         | DataElement      | [instantiation]  | ValueDomain | "instantiated by"      | "instantiates"       |
         | Model            | [heirachical]    | Model       | "parentOf"             | "ChildOf"            |
@@ -26,24 +24,28 @@ import org.modelcatalogue.core.util.ExtensionsWrapper
 
 class Relationship implements Extendible {
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        extensions component:true
-        relationshipType component:true
-        source component: true
-        destination component: true
-    }
-
     CatalogueElement source
     CatalogueElement destination
 
     RelationshipType relationshipType
 
+    Classification classification
+
+    Long outgoingIndex = System.currentTimeMillis()
+    Long incomingIndex = System.currentTimeMillis()
+
+    /*
+     * Reordeing bidirectional relationships is not supported as the combined index is
+     * actually same for all group of related elements
+     * and change from the other side would change the view from the opposite side
+     */
+    @Deprecated
+    Long combinedIndex = System.currentTimeMillis()
+
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
 
-    Map<String, String> ext = new ExtensionsWrapper(this)
+    final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
         this.ext.clear()
@@ -63,13 +65,14 @@ class Relationship implements Extendible {
 
             if (!val) return true;
 
-            String errorMessage = val.validateSourceDestination(obj.source, obj.destination, obj.ext)
-            if (errorMessage) {
+            def errorMessage = val.validateSourceDestination(obj.source, obj.destination, obj.ext)
+            if (errorMessage instanceof String || (errorMessage instanceof List && errorMessage.size() > 1 && errorMessage.first() instanceof String)) {
                 return errorMessage;
             }
             return true;
 
         }
+        classification nullable: true
     }
 
     String toString() {
@@ -83,6 +86,12 @@ class Relationship implements Extendible {
         if(destination){
             destination?.removeFromIncomingRelationships(this)
         }
+    }
+
+    void resetIndexes() {
+        outgoingIndex = System.currentTimeMillis()
+        incomingIndex = System.currentTimeMillis()
+        combinedIndex = System.currentTimeMillis()
     }
 
     @Override

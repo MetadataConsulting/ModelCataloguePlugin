@@ -1,8 +1,4 @@
 package org.modelcatalogue.core
-
-import org.apache.commons.lang.builder.EqualsBuilder
-import org.apache.commons.lang.builder.HashCodeBuilder
-
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
@@ -37,15 +33,6 @@ class EnumeratedType extends DataType {
         }
     }
 
-    //WIP gormElasticSearch will support aliases in the future for now we will use searchable
-
-    static searchable = {
-        name boost:5
-        enumAsString converter: EnumAsStringConverter
-        except = ['relatedValueDomains', 'incomingRelationships', 'outgoingRelationships']
-    }
-
-
     /**
      * Sets the map containing the enum values.
      *
@@ -54,7 +41,19 @@ class EnumeratedType extends DataType {
      * @param map the map containing the enum values
      */
     void setEnumerations(Map<String, String> map) {
-        enumAsString = mapToString(map)
+        if (map.type == 'orderedMap') {
+            if (map.values instanceof List) {
+                Map<String, String> newVal = [:]
+                for (item in map.values) {
+                    newVal[item.key as String] = item.value as String
+                }
+                enumAsString = mapToString(newVal)
+            } else {
+                enumAsString = mapToString([:])
+            }
+        } else {
+            enumAsString = mapToString(map)
+        }
     }
 
     /**
@@ -69,7 +68,7 @@ class EnumeratedType extends DataType {
     }
 
     String toString() {
-        "${getClass().simpleName}[id: ${id}, name: ${name}, enumerations: ${enumerations}]"
+        "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, enumerations: ${enumerations}]"
     }
 
     /**
@@ -94,26 +93,30 @@ class EnumeratedType extends DataType {
         }
     }
 
-    private static String mapToString(Map<String, String> map) {
+    static String mapToString(Map<String, String> map) {
         if (map == null) return null
-        map.sort() collect { key, val ->
+        map.collect { key, val ->
             "${quote(key)}:${quote(val)}"
         }.join('|')
     }
 
-    private static Map<String, String> stringToMap(String s) {
+    static Map<String, String> stringToMap(String s) {
         if (s == null) return null
         Map<String, String> ret = [:]
         s.split(/\|/).each { String part ->
             if (!part) return
             String[] pair = part.split("(?<!\\\\):")
-            if (pair.length != 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
-            ret[unquote(pair[0])] = unquote(pair[1])
+            if (pair.length > 2) throw new IllegalArgumentException("Wrong enumerated value '$part' in encoded enumeration '$s'")
+            if (pair.length == 1) {
+                ret[unquote(pair[0])] = ''
+            } else {
+                ret[unquote(pair[0])] = unquote(pair[1])
+            }
         }
         return ret
     }
 
-    private static String quote(String s) {
+    static String quote(String s) {
         if (s == null) return null
         String ret = s
         QUOTED_CHARS.each { original, replacement ->
@@ -122,13 +125,17 @@ class EnumeratedType extends DataType {
         ret
     }
 
-    private static String unquote(String s) {
+    static String unquote(String s) {
         if (s == null) return null
         String ret = s
         QUOTED_CHARS.reverseEach { original, pattern ->
             ret = ret.replace(pattern, original)
         }
         ret
+    }
+
+    String prettyPrint() {
+        enumerations.collect { key, value -> "$key: $value" }.join('\n')
     }
 
 }

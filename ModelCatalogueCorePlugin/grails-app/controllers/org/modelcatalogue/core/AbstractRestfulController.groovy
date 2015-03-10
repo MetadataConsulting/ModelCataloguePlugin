@@ -1,26 +1,32 @@
 package org.modelcatalogue.core
 
-import grails.converters.XML
 import grails.rest.RestfulController
 import grails.transaction.Transactional
-import org.modelcatalogue.core.util.Lists
-import org.modelcatalogue.core.util.Elements
+import org.codehaus.groovy.grails.commons.GrailsDomainClass
+import org.codehaus.groovy.grails.commons.GrailsDomainClassProperty
+import org.hibernate.StaleStateException
+import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.ListWrapper
+import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.springframework.dao.ConcurrencyFailureException
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.validation.Errors
 
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.ExecutorService
 
-import static org.springframework.http.HttpStatus.NO_CONTENT
+import static org.springframework.http.HttpStatus.*
 
 abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
-    static responseFormats = ['json', 'xml', 'xlsx']
+    static responseFormats = ['json', 'xlsx']
 
     AssetService assetService
     SearchCatalogue modelCatalogueSearchService
+    SecurityService modelCatalogueSecurityService
     ExecutorService executorService
+    ElementService elementService
 
     XLSXListRenderer xlsxListRenderer
 
@@ -35,21 +41,14 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
 
     def search(Integer max){
         handleParams(max)
-        def results =  modelCatalogueSearchService.search(resource, params)
+        def results = modelCatalogueSearchService.search(resource, params)
 
         if(results.errors){
-            reportCapableRespond results
+            respond results
             return
         }
 
-        def total = (results.total)?results.total.intValue():0
-
-        Elements elements = new Elements(
-                base: "/${resourceName}/search",
-                total: total,
-                items: results.searchResults
-            )
-        respondWithLinks elements
+        respond Lists.lazy(params, resource, "/${resourceName}/search?search=${URLEncoder.encode(params.search, 'UTF-8')}", { results.searchResults }, { results.total })
     }
 
     protected handleParams(Integer max) {
@@ -71,33 +70,39 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     @Override
     def index(Integer max) {
         handleParams(max)
-        reportCapableRespond Lists.all(params, resource, basePath)
+        respond Lists.all(params, resource, basePath)
     }
 
 
     protected getBasePath()     { "/${resourceName}/" }
     protected getDefaultSort()  { null }
     protected getDefaultOrder() { null }
+    protected boolean hasUniqueName() { false }
 
 
     def validate() {
         if(handleReadOnly()) {
             return
         }
-        def instance = createResource(getParametersToBind())
+        def instance = createResource()
 
         instance.validate()
         if (instance.hasErrors()) {
-            reportCapableRespond instance.errors, view:'create' // STATUS CODE 422
+            respond instance.errors, view: 'create' // STATUS CODE 422
             return
         }
 
-        reportCapableRespond instance
+        respond instance
     }
 
     @Override
     @Transactional
     def delete() {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notAuthorized()
+            return
+        }
+
         if(handleReadOnly()) {
             return
         }
@@ -108,31 +113,169 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
             return
         }
 
+        clearAssociationsBeforeDelete(instance)
+        checkAssociationsBeforeDelete(instance)
+
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+
         try{
             instance.delete flush:true
         }catch (DataIntegrityViolationException ignored){
             response.status = HttpServletResponse.SC_CONFLICT
-            reportCapableRespond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"]) // STATUS CODE 409
+            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, ignored.message])
+            // STATUS CODE 409
             return
         } catch (Exception ignored){
             response.status = HttpServletResponse.SC_NOT_IMPLEMENTED
-            reportCapableRespond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])  // STATUS CODE 501
+            respond errors: message(code: "org.modelcatalogue.core.CatalogueElement.error.delete", args: [instance.name, "/${resourceName}/delete/${instance.id}"])
+            // STATUS CODE 501
             return
         }
 
         render status: NO_CONTENT // NO CONTENT STATUS CODE
     }
 
-
-    protected Map getParametersToBind() {
-        Map ret = params
-        if (response.format == 'json') {
-            ret = request.getJSON()
-        }
-        ret
+    /**
+     * Removes all the associations which can be removed before checking for their presence in
+     * checkAssociationsBeforeDelete method.
+     * @param instance
+     */
+    protected clearAssociationsBeforeDelete(T instance){
+        // do nothing by default
     }
 
+    protected checkAssociationsBeforeDelete(T instance) {
+        GrailsDomainClass domainClass = grailsApplication.getDomainClass(resource.name)
 
+        for (GrailsDomainClassProperty property in domainClass.persistentProperties) {
+            if ((property.oneToMany || property.manyToMany) && instance.hasProperty(property.name) ){
+                def value = instance[property.name]
+                if (value) {
+                    instance.errors.rejectValue property.name, "delete.association.before.delete.entity.${property.name}", "You must remove all ${property.naturalName.toLowerCase()} before you delete this element"
+                }
+            }
+        }
+    }
+
+    protected String getRoleForSaveAndEdit() {
+        'CURATOR'
+    }
+
+    /**
+     * Saves a resource
+     */
+    @Transactional
+    def save() {
+        if (!modelCatalogueSecurityService.hasRole(roleForSaveAndEdit)) {
+            notAuthorized()
+            return
+        }
+        if(handleReadOnly()) {
+            return
+        }
+        def instance = createResource()
+
+        instance.validate()
+        if (instance.hasErrors()) {
+            if (!hasUniqueName() || getObjectToBind().size() > 1 || !getObjectToBind().containsKey('name')) {
+                respond instance.errors
+                return
+            }
+
+            Errors errors = instance.errors
+
+            if (errors.getFieldError('name').any { it.code == 'unique' }) {
+                T found = resource.findByName(getObjectToBind().name, [sort: 'versionNumber', order: 'desc'])
+                if (found) {
+                    if (!found.instanceOf(CatalogueElement)) {
+                        respond found
+                        return
+                    }
+                    if (found.status != ElementStatus.DRAFT) {
+                        found = elementService.createDraftVersion(found, DraftContext.userFriendly())
+                    }
+                    respond found
+                    return
+                }
+            }
+
+            respond errors
+            return
+        }
+
+        cleanRelations(instance)
+
+        instance.save flush:true
+
+        bindRelations(instance, false)
+
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+
+
+        respond instance, [status: CREATED]
+    }
+
+    /**
+     * Updates a resource for the given id
+     * @param id
+     */
+    @Transactional
+    def update() {
+        if (!modelCatalogueSecurityService.hasRole(roleForSaveAndEdit)) {
+            notAuthorized()
+            return
+        }
+        if(handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+
+        bindData instance, getObjectToBind(), [include: includeFields]
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view:'edit' // STATUS CODE 422
+            return
+        }
+
+        cleanRelations(instance)
+
+        instance.save flush:true
+
+        bindRelations(instance, false)
+
+        if (instance.hasErrors()) {
+            respond instance.errors
+            return
+        }
+
+        respond instance, [status: OK]
+    }
+
+    /**
+     * Creates a new instance of the resource.  If the request
+     * contains a body the body will be parsed and used to
+     * initialize the new instance, otherwise request parameters
+     * will be used to initialized the new instance.
+     *
+     * @return The resource instance
+     */
+    protected T createResource() {
+        T instance = resource.newInstance()
+        bindData instance, getObjectToBind(), [include: includeFields]
+        instance
+    }
 
     /**
      * @deprecated use DetachedListWrapper instead where possible
@@ -142,9 +285,10 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         if (!listWrapper.itemType) {
             listWrapper.itemType = itemType
         }
-        reportCapableRespond withLinks(listWrapper)
+        respond withLinks(listWrapper)
     }
 
+    @Deprecated
     private <T> ListWrapper<T> withLinks(ListWrapper<T> listWrapper) {
         def links = Lists.nextAndPreviousLinks(params, listWrapper.base, listWrapper.total)
         listWrapper.previous = links.previous
@@ -172,70 +316,67 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
         return super.countResources()
     }
 
-    protected void reportCapableRespond(Map args, Object value) {
-        reportCapableRespond((Object)value, (Map) args)
+    protected void notAuthorized() {
+        render status: UNAUTHORIZED
     }
 
-    protected void reportCapableRespond(Object value) {
-        reportCapableRespond((Object)value, (Map)[:])
+    protected getIncludeFields(){
+        GrailsDomainClass clazz = grailsApplication.getDomainClass(resource.name)
+        def fields = clazz.persistentProperties.collect{it.name}
+        fields.removeAll(['dateCreated', 'classifiedName', 'lastUpdated','incomingMappings', 'incomingRelationships', 'outgoingMappings', 'outgoingRelationships'])
+        fields
     }
+
+    @Override
+    protected getObjectToBind(){
+        if(request.format=='json') return request.JSON
+        request
+    }
+
     /**
-     * Respond which is able to capture XML exports to asset if URL parameter is {@code asset=true}.
-     * @param param object to be rendered
+     * Clean the relations before persisting.
+     * @param instance the instance to persisted
      */
-    protected void reportCapableRespond(Object param, Map args) {
-        if (params.format == 'xml' && params.boolean('asset')) {
-            Asset asset = renderXMLAsAsset (param as XML)
+    protected cleanRelations(T instance) { }
 
-            webRequest.currentResponse.with {
-                def location = g.createLink(controller: 'asset', id: asset.id, action: 'show')
-                status = 302
-                setHeader("Location", location.toString())
-                setHeader("X-Asset-ID", asset.id.toString())
-                outputStream.flush()
-            }
-        } else {
-            respond((Object)param, (Map) args)
+    /**
+     * Bind the relations as soon as the instance is persisted.
+     * @param instance the persisted instance
+     */
+    protected final bindRelations(T instance, boolean newVersion) {
+        try {
+            bindRelations(instance, newVersion, objectToBind)
+        } catch (Exception e) {
+            instance.errors.reject 'error.binding.relations', e.toString()
         }
     }
 
-    protected Asset renderXMLAsAsset(XML xml) {
-        String theName = (params.name ?: params.action)
+    protected bindRelations(T instance, boolean newVersion, Object objectToBind) {}
 
-        String uri = request.forwardURI + '?' + request.queryString
+    private Random random = new Random()
 
-        Asset asset = new Asset(
-                name: theName,
-                originalFileName: theName,
-                description: "Your export will be available in this asset soon. Use Refresh action to reload.",
-                status: PublishedElementStatus.PENDING,
-                contentType: 'application/xml',
-                size: 0
-        )
+    protected <T> T withRetryingTransaction(Map<String, Integer> settings = [:], Closure<T> body) {
+        int MAX_ATTEMPTS = settings.attempts ?: 10
+        int MIN_BACK_OFF = settings.minBackOff ?: 50
+        int INITIAL_BACK_OFF = settings.backOff ?: 200
 
-        asset.save(flush: true, failOnError: true)
+        int backOff = random.nextInt(INITIAL_BACK_OFF - MIN_BACK_OFF) + MIN_BACK_OFF
+        int attempt = 0
 
-        Long id = asset.id
-
-        executorService.submit {
+        while (attempt < MAX_ATTEMPTS) {
+            attempt++
             try {
-                Asset updated = Asset.get(id)
-
-                assetService.storeAssetWithSteam(updated, 'application/xml') { OutputStream out ->
-                    xml.render(new OutputStreamWriter(out, 'UTF-8'))
+                return resource.withTransaction(body)
+            } catch (ConcurrencyFailureException | StaleStateException e) {
+                if (attempt >= MAX_ATTEMPTS) {
+                    throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${MAX_ATTEMPTS} attempts", e as Throwable)
                 }
-
-                updated.status = PublishedElementStatus.FINALIZED
-                updated.description = "Your export is ready. Use Download button to view it."
-                updated.save(flush: true, failOnError: true)
-                updated.ext['Original URL'] = uri
-            } catch (e) {
-                log.error "Exception of type ${e.class} exporting asset ${id}", e
-                throw e
+                log.warn "Exception executing action ${actionName} on ${resource} controller with parameters ${params} (#${attempt} attempt).", e as Throwable
+                Thread.sleep(backOff)
+                backOff = 2 * backOff
             }
         }
-
-        asset
+        throw new IllegalStateException("Couldn't execute action ${actionName} on ${resource} controller with parameters ${params} after ${attempt} attempts")
     }
 
 }

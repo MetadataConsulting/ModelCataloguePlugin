@@ -11,7 +11,4 @@ class ElementsMarshaller extends ListWrapperMarshaller {
         super(Elements)
     }
 
-    protected String getItemNodeName() {
-        "element"
-    }
 }

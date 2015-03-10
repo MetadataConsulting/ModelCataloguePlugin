@@ -1,25 +1,19 @@
 package uk.co.brc.modelcatalogue
 
+import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
-import spock.lang.Specification
 
 /**
  * Created by adammilward on 11/02/2014.
  */
-class ImportServiceSpec extends Specification {
-
-    def importService
-    def initCatalogueService
+class ImportServiceSpec extends IntegrationSpec {
 
 
     def
     "import nhic spreadsheet"() {
 
         when:
-        initCatalogueService.initDefaultRelationshipTypes()
-        importService.importData()
-
-        then:
+        expect:
         def models = Model.list()
         !models.isEmpty()
         def dataTypes = DataType.list()
@@ -32,7 +26,7 @@ class ImportServiceSpec extends Specification {
         when:
         def core = models.find { it.name == "MAIN" }
         def patientIdentity = models.find { it.name == "PATIENT IDENTITY DETAILS" }
-        def NHICConceptualDomain = ConceptualDomain.findByName("NHIC")
+        def NHICConceptualDomain = Classification.findByName("NHIC")
         def indicatorCode = dataTypes.find { it.name == "NHS_NUMBER_STATUS_INDICATOR_CODE" }
         def valueDomain = valueDomains.find { it.name == "NHS_NUMBER_STATUS_INDICATOR_CODE" }
         def dataElement = dataElements.find { it.name == "NHS NUMBER STATUS INDICATOR CODE" }
@@ -46,8 +40,8 @@ class ImportServiceSpec extends Specification {
         dataElement.id
         patientIdentity.childOf.contains(core)
         core.parentOf.contains(patientIdentity)
-        patientIdentity.hasContextOf.contains(NHICConceptualDomain)
-        core.hasContextOf.contains(NHICConceptualDomain)
+        patientIdentity.classifications.contains(NHICConceptualDomain)
+        core.classifications.contains(NHICConceptualDomain)
         HashMap<String, String> icodehash = new HashMap(
                 '01': 'Number present and verified',
                 '02': 'Number present but not traced',
@@ -61,8 +55,9 @@ class ImportServiceSpec extends Specification {
         def icodeEnumerations = new HashMap<String, String>(indicatorCode.enumerations)
         assert icodehash.entrySet().containsAll(icodeEnumerations.entrySet())
 
-        valueDomain.includedIn == [NHICConceptualDomain]
-        valueDomain.instantiates == [dataElement]
+        dataElement.valueDomain
+        valueDomain.dataElements as Set == [dataElement] as Set
+        valueDomain.classifications as Set == [NHICConceptualDomain] as Set
 
     }
 
