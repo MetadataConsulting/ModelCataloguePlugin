@@ -62,12 +62,12 @@ class AssetWizardSpec extends GebReportingSpec {
     def "Check the asset shows up with own detail page"(){
         when:
         waitFor {
-            infTableCell(1, 1, text: "Sample XSD").displayed
+            infTableCell(1, 2, text: "Sample XSD").displayed
         }
 
         then:
 
-        infTableCell(1, 1).find('a:not(.inf-cell-expand)').click()
+        infTableCell(1, 2).find('a:not(.inf-cell-expand)').click()
 
         waitFor(60) {
             subviewTitle.displayed

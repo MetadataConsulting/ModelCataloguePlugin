@@ -53,6 +53,11 @@ import org.modelcatalogue.core.*
     private boolean skipDrafts
 
     /**
+     * Closure for assigning ids based on their names
+     */
+    private Closure<String> idBuilder
+
+    /**
      * Creates new catalogue builder with given classification and element services.
      * @param classificationService classification service
      * @param elementService element service
@@ -104,6 +109,7 @@ import org.modelcatalogue.core.*
         context.withNewContext classification, c
 
         repository.unclassifiedQueriesFor = [MeasurementUnit]
+        idBuilder = null
 
         classification
     }
@@ -391,15 +397,7 @@ import org.modelcatalogue.core.*
      * @param idBuilder builder closure
      */
     void id(@DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options=['String,Class']) Closure<String> idBuilder) {
-        context.withContextElement(CatalogueElement) {
-            String name = it.getParameter('name')
-            if (!name) {
-                throw new IllegalStateException("Missing name of $it")
-            }
-            it.setId(idBuilder(name, it.domain))
-        } or {
-            throw new IllegalStateException("No element to set id on")
-        }
+        this.idBuilder = idBuilder
     }
 
     /**
@@ -660,6 +658,7 @@ import org.modelcatalogue.core.*
         repository.clear()
         createAutomatically.clear()
         created.clear()
+        idBuilder = null
     }
 
     /**
@@ -691,6 +690,8 @@ import org.modelcatalogue.core.*
 
         if (parameters.id) {
             element.setParameter('modelCatalogueId', parameters.id)
+        } else if(idBuilder != null) {
+            element.setParameter('modelCatalogueId', idBuilder(element.name, domain))
         }
 
         parameters.each { String key, Object value ->

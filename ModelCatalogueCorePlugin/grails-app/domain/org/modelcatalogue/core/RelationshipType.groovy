@@ -69,7 +69,7 @@ class RelationshipType {
         sort "name"
     }
 
-    String validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
+    def validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
 
         if (!sourceClass.isInstance(source)) {
             return 'source.not.instance.of'
@@ -149,6 +149,10 @@ class RelationshipType {
 
     static getSupersessionType() {
         readByName("supersession")
+    }
+
+    static getBaseType() {
+        readByName("base")
     }
 
     static readByName(String name) {
