@@ -76,19 +76,20 @@ open ModelCataloguePlugin/ModelCatalogueCorePluginTestApp/grails-app/conf/DataSo
 
 There are three default users available
 
-Username      | Password      | Description 
-------------- | ------------- | -------------  
-viewer        | viewer        | User with role `VIEWER` can only browse the catalogue without any   
-curator       | curator       | User with role `CURATOR` has most of the privileges except editing relationship types and user management
-admin         | admin         | User with role `ADMIN`  has all the privileges
+Username      | Description 
+------------- | -------------  
+viewer        | User with role `VIEWER` can only browse the catalogue without any   
+curator       | User with role `CURATOR` has most of the privileges except editing relationship types and user management
+admin         | User with role `ADMIN`  has all the privileges
 
-You should change the default passwords before deploying to public site:
+The users comes with passwords which are by default same as the username. You should change them in the `Bootstrap.groovy` file.
 
 ```
 open ModelCataloguePlugin/ModelCatalogueCorePluginTestApp/grails-app/conf/BootStrap.groovy
 ```
 
-And find the code where new users are crated and change the `password: 'xyz'` definitions.
+You find the code where new users are crated around line 40 so change the `password: 'xyz'` definitions to the more
+solid passwords.
 
 
 When everything set up you can run the application with `./grailsw prod run-app`. You can also create a WAR file running 
