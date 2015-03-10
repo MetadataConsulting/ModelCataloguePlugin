@@ -123,7 +123,6 @@
           <root url="jar://$MAVEN_REPOSITORY$/org/gebish/geb-core/0.9.3/geb-core-0.9.3.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/org/gebish/geb-spock/0.9.3/geb-spock-0.9.3.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/xmlunit/xmlunit/1.6/xmlunit-1.6.jar!/" />
-          <root url="jar://$MAVEN_REPOSITORY$/org/grails/grails-datastore-test-support/1.0-grails-2.4/grails-datastore-test-support-1.0-grails-2.4.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/jetty/jetty-http/8.1.15.v20140411/jetty-http-8.1.15.v20140411.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/jetty/jetty-io/8.1.15.v20140411/jetty-io-8.1.15.v20140411.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/org/eclipse/jetty/jetty-util/8.1.15.v20140411/jetty-util-8.1.15.v20140411.jar!/" />
@@ -185,11 +184,16 @@
           <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/embed/tomcat-embed-el/7.0.55/tomcat-embed-el-7.0.55.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/embed/tomcat-embed-jasper/7.0.55/tomcat-embed-jasper-7.0.55.jar!/" />
           <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/tomcat-catalina-ant/7.0.55/tomcat-catalina-ant-7.0.55.jar!/" />
+          <root url="jar://$MAVEN_REPOSITORY$/org/grails/grails-datastore-test-support/1.0.2-grails-2.4/grails-datastore-test-support-1.0.2-grails-2.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="ModelCatalogueCorePluginTestApp-grailsPlugins" />
+    <orderEntry type="module" module-name="ModelCatalogueSpringSecurity2xPlugin" exported="" />
+    <orderEntry type="module" module-name="modelCatalogueCore-inplacePlugin" exported="" />
   </component>
 </module>
+
