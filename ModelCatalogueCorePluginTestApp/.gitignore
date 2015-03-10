@@ -46,6 +46,7 @@ grails-app/assets/bower_components/*
 
 # "temporary" build files
 /target
+/target-eclipse
 
 # elasticsearch index
 /data
