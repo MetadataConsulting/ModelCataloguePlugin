@@ -54,8 +54,8 @@ modelcatalogue.defaults.relationshiptypes =  [
             String minOccursString = ext['Min Occurs']
             String maxOccursString = ext['Max Occurs']
 
-            Integer minOccurs = minOccursString in ['unbounded', 'null'] ? 0 : (minOccursString as Integer)
-            Integer maxOccurs = maxOccursString in ['unbounded', 'null'] ? Integer.MAX_VALUE : (maxOccursString as Integer)
+            Integer minOccurs = minOccursString in ['unbounded', 'null', null] ? 0 : (minOccursString as Integer)
+            Integer maxOccurs = maxOccursString in ['unbounded', 'null', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
 
             if (minOccurs != null) {
                 if (minOccurs < 0) {
