@@ -327,7 +327,7 @@ class DataImportController  {
         headersMap.dataElementCode = params.dataElementCode ?: "Data Item Unique Code"
         headersMap.dataElementName = params.dataElementName ?: "Data Item Name"
         headersMap.dataElementDescription = params.dataElementDescription ?: "Data Item Description"
-        headersMap.dataType = params.dataType ?: "Data type"
+        headersMap.dataType = params.dataType ?: "Data Type"
         headersMap.parentModelName = params.parentModelName ?: "Parent Model"
         headersMap.parentModelCode = params.parentModelCode ?: "Parent Model Unique Code"
         headersMap.containingModelName = params.containingModelName ?: "Model"

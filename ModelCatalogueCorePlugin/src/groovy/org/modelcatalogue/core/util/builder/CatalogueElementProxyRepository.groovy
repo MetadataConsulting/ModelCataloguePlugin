@@ -20,6 +20,8 @@ class CatalogueElementProxyRepository {
 
     private Set<CatalogueElementProxy> pendingProxies = []
 
+    private boolean copyRelationships = false
+
     CatalogueElementProxyRepository(ClassificationService classificationService, ElementService elementService) {
         this.classificationService = classificationService
         this.elementService = elementService
@@ -28,6 +30,11 @@ class CatalogueElementProxyRepository {
     public void clear() {
         unclassifiedQueriesFor.clear()
         pendingProxies.clear()
+        copyRelationships = false
+    }
+
+    public copyRelationships() {
+        this.copyRelationships = true
     }
 
     public boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
@@ -167,7 +174,7 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
-        elementService.createDraftVersion(element, DraftContext.importFriendly(), true )
+        elementService.createDraftVersion(element, copyRelationships ? DraftContext.userFriendly() : DraftContext.importFriendly(), !copyRelationships )
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {

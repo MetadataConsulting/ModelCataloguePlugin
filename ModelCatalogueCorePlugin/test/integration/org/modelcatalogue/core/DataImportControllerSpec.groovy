@@ -32,7 +32,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         headersMap.dataElementCode == "Data Item Unique Code"
         headersMap.dataElementName == "Data Item Name"
         headersMap.dataElementDescription == "Data Item Description"
-        headersMap.dataType == "Data type"
+        headersMap.dataType == "Data Type"
         headersMap.parentModelName == "Parent Model"
         headersMap.parentModelCode == "Parent Model Unique Code"
         headersMap.containingModelName == "Model"

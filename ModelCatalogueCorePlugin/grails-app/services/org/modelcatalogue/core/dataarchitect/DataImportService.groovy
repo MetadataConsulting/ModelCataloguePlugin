@@ -3,6 +3,7 @@ package org.modelcatalogue.core.dataarchitect
 import grails.transaction.Transactional
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 
 class DataImportService {
@@ -34,6 +35,7 @@ class DataImportService {
         //iterate through the rows and import each line
         CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
         builder.build {
+            copy relationships
             rows.eachWithIndex { def row, int i ->
                 classification(name: getRowValue(row,classificationsIndex)) {
                     globalSearchFor dataType
