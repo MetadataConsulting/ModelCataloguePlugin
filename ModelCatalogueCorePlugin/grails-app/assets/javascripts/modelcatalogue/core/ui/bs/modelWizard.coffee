@@ -297,16 +297,16 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             for action in $scope.pendingActions
              promise = promise.then(action).then decreasePendingActionsCount, (errorResponse) ->
 
-               if errorResponse.errors
-                for error in errorResponse.errors
+               if errorResponse.data.errors
+                for error in errorResponse.data.errors
                   messages.error(error.message)
-               else if errorResponse.error
-                 messages.error(errorResponse.error)
+               else if errorResponse.data.error
+                 messages.error(errorResponse.data.error)
                else
                  messages.error('Unknown expection happened while creating new model. See application logs for details.')
 
                $scope.finishInProgress = false
-               $q.reject errorResponse
+               $q.reject errorResponse.data
 
             promise.then (model) ->
               messages.success "Model #{model.name} created"
@@ -385,16 +385,15 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               $scope.metadata           = angular.copy model.ext
 
               angular.forEach model.classifications, (classification) ->
-                $scope.classifications.push classification
+                $scope.classifications.push {element: classification, name: classification.name}
 
               push = (container, property) ->
                 (result) ->
                   angular.forEach result.list, (relation) ->
                     $scope[property] = element: relation.relation, ext: relation.ext
                     $scope.push container, property
-                  $scope[property] {ext: {}}
+                  $scope[property] = {ext: {}}
 
-              promises.push model.childOf(null, max: 100).then push('parents', 'parent')
               promises.push model.parentOf(null, max: 100).then push('children', 'child')
               promises.push model.contains(null, max: 100).then push('dataElements', 'dataElement')
 
