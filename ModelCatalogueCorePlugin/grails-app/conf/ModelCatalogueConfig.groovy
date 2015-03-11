@@ -57,17 +57,14 @@ modelcatalogue.defaults.relationshiptypes =  [
             Integer minOccurs = minOccursString in ['unbounded', 'null', null] ? 0 : (minOccursString as Integer)
             Integer maxOccurs = maxOccursString in ['unbounded', 'null', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
 
-            if (minOccurs != null) {
-                if (minOccurs < 0) {
-                    return false
-                }
-                if (maxOccurs != null && maxOccurs < minOccurs) {
-                    return false
-                }
-            } else {
-                if (maxOccurs != null && maxOccurs < 1) {
-                    return false
-                }
+            if (minOccurs < 0) {
+                return ["relationshipType.containment.min.occurs.less.than.zero", "'Max Occurs' has to be greater than zero"]
+            }
+            if (maxOccurs < minOccurs) {
+                return ["relationshipType.containment.min.occurs.greater.than.max.occurs", "The metadata 'Min Occurs' cannot be greater than 'Min Occurs'"]
+            }
+            if (maxOccurs < 1) {
+                return ["relationshipType.containment.max.occurs.zero", "The metadata 'Max Occurs' must be greater than zero"]
             }
 
             return true
