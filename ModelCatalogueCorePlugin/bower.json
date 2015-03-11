@@ -1,12 +1,14 @@
 {
   "name": "model-catalogue",
   "version": "1.0.0",
-  "homepage": "https://github.com/amilward/MDR",
+  "homepage": "https://github.com/MetadataRegistry/ModelCataloguePlugin",
   "authors": [
-    "Ryan Brooks <ryanbrooksis@gmail.com>"
+    "Vladimír Oraný <vladimir@orany.cz>",
+    "Adam Milward <adam.milward@outlook.com>",
+    "David Milward <david@beenleigh.com>"
   ],
   "description": "Model Catalogue, including the metadata registry, forms generator and pathways tool",
-  "license": "MIT",
+  "license": "Apache",
   "private": true,
   "ignore": [
     "**/.*",
