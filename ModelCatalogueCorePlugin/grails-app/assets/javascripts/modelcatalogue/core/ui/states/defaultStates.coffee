@@ -713,16 +713,33 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
 				</p>
 			</div>
-
-		</div>
-        <div class="front-footer">
-           <footer>
-              <p>Kindly sponsored by the <a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC </a> <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;"><a href="http://www.nihr.ac.uk/about/nihr-hic.htm"> NHIC</a> <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;"> and <a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a><img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;"></a> &middot;  </p>
-              <p class="pull-right"><a href="#">Back to top</a></p>
-              <p>&copy; 2015 The Tumtumtree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
-          <p>&nbsp;</p>
-            </footer>
-      </div>
+    </div>
+		<div class="row">
+        <div class="col-lg-12 col-sm-12 col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                      <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sposored by</div>
+                      <div class="col-lg-4 col-sm-4 col-md-4">
+                        <p><a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC</a></p>
+                        <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;">
+                      </div>
+                      <div class="col-lg-4 col-sm-4 col-md-4">
+                        <p> <a href="http://www.nihr.ac.uk/about/nihr-hic.htm">NHIC</a></p>
+                        <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;">
+                      </div>
+                      <div class="col-lg-4 col-sm-4 col-md-4">
+                        <p><a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a></p>
+                        <img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;">
+                      </div>
+                      <div class="col-lg-12 col-sm-12 col-md-12">
+                        <p>&copy; 2015 The Tumtumtree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div show-if-logged-in>
@@ -952,19 +969,35 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
+                    <div class="col-lg-12 col-sm-12 col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                  <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sposored by</div>
+                                  <div class="col-lg-4 col-sm-4 col-md-4">
+                                    <p><a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC</a></p>
+                                    <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;">
+                                  </div>
+                                  <div class="col-lg-4 col-sm-4 col-md-4">
+                                    <p> <a href="http://www.nihr.ac.uk/about/nihr-hic.htm">NHIC</a></p>
+                                    <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;">
+                                  </div>
+                                  <div class="col-lg-4 col-sm-4 col-md-4">
+                                    <p><a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a></p>
+                                    <img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;">
+                                  </div>
+                                  <div class="col-lg-12 col-sm-12 col-md-12">
+                                    <p>&copy; 2015 The Tumtumtree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
 
       </div>
-<br>
-<br>
-<br>
-<br>
-<br>
      <div class="front-footer">
            <footer>
-              <p>Kindly sponsored by the <a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC </a> <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;"><a href="http://www.nihr.ac.uk/about/nihr-hic.htm"> NHIC</a> <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;"> and <a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a><img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;"></a> &middot;  </p>
-              <p class="pull-right"><a href="#">Back to top</a></p>
-              <p>&copy; 2015 The Tumtumtree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
-          <p>&nbsp;</p>
             </footer>
       </div>
 
