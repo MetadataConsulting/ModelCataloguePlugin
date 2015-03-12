@@ -996,11 +996,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
 
       </div>
-     <div class="front-footer">
-           <footer>
-            </footer>
-      </div>
-
     </div>
   '''
 
