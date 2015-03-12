@@ -46,6 +46,7 @@ grails-app/assets/bower_components/*
 
 # "temporary" build files
 /target
+/target-eclipse
 
 # elasticsearch index
 /data
@@ -58,4 +59,6 @@ grails-app/assets/bower_components/*
 **.gen.xml
 /plugin.xml
 /grails-model-catalogue-core-plugin-0.0.1/**
+
+/grails-app/views/_version.gsp
 

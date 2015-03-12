@@ -61,7 +61,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   ])
 
-.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', 'names' , ($scope, $stateParams, $state, element, $rootScope, names) ->
+.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope' , ($scope, $stateParams, $state, element, $rootScope) ->
     $scope.element = element
     $rootScope.elementToShow = element
   ])
@@ -97,7 +97,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
   ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope, catalogueElementResource) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope) ->
     if $stateParams.resource
       applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
@@ -676,7 +676,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     		<!-- Jumbotron -->
   <div hide-if-logged-in>
 		<div class="jumbotron">
-			<h1>Tumtumtree</h1>
+			<h1>Model Catalogue</h1>
+      <h2>The Tumtum Tree Project</h2>
 			<p class="lead">
 				<b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b>
 				and version new datasets <b><em>Generate</em></b> better
@@ -707,22 +708,22 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 			</div>
       <div class="col-sm-4">
 				<h2>Dataset Comparison</h2>
-				<p>Discover synonyms, hyponyms and duplicate data elements within datasets, and compare data elements from differing datasets.</p>
+				<p>Discover synonyms, homonyms, antonyms, hyponyms and duplicate data elements within datasets. Compare data elements from differing datasets.</p>
 				<p>
 
 				</p>
 			</div>
-
-		</div>
-        <div>
+    </div>
+      <div>
            <footer>
-              <p class="pull-right"><a href="#">Back to top</a></p>
-              <p>&copy; 2015 The Tumtumtree Project &middot; </p>
+
+              <p>&copy; 2015 The Tumtumtree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
               <p>Kindly sponsored by the <a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC </a> <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;"><a href="http://www.nihr.ac.uk/about/nihr-hic.htm"> NHIC</a> <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;"> and <a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a><img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;"></a> &middot;  </p>
 
           <p>&nbsp;</p>
             </footer>
       </div>
+
 </div>
 
 <div show-if-logged-in>
@@ -957,7 +958,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <div>
            <footer>
               <p class="pull-right"><a href="#">Back to top</a></p>
-              <p>&copy; 2015 The Tumtumtree Project &middot; </p>
+              <p>&copy; 2015 The Tumtumtree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
               <p>Kindly sponsored by the <a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC </a> <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;"><a href="http://www.nihr.ac.uk/about/nihr-hic.htm"> NHIC</a> <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;"> and <a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a><img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;"></a> &middot;  </p>
 
           <p>&nbsp;</p>

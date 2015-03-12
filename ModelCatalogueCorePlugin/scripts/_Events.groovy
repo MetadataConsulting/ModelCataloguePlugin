@@ -4,4 +4,4 @@ eventCleanStart = { args ->
         println "\nRemoving old test databases from previous runs\n"
         tmpFolder.deleteDir()
     }
-}
+}}

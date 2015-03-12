@@ -149,6 +149,9 @@
         <div class="container-fluid">
             <contextual-menu role="navigation-bottom-left"></contextual-menu>
             <contextual-menu role="navigation-bottom-right" right="true"></contextual-menu>
+            <div class="mc-version small">
+                <g:render template="/version"/>
+            </div>
             <g:if env="test">
                 <h4 style="float: right; color: red;">TEST ENVIRONMENT - WON'T PERSIST NEXT UPDATE</h4>
             </g:if>
