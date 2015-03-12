@@ -1,25 +1,16 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
-
 /**
  * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
  */
-@Mock(EnumeratedType)
-class EnumeratedTypeSpec extends Specification {
+class EnumeratedTypeSpec extends IntegrationSpec {
 
 
     @Unroll
     def "validates to #validates for #args.name "() {
-
-        expect:
-
-        EnumeratedType.list().isEmpty()
-
         when:
-
         EnumeratedType etype = new EnumeratedType(args)
 
         etype.save()

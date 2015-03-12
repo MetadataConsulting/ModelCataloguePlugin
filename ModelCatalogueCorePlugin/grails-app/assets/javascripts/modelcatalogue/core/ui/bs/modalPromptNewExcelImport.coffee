@@ -40,8 +40,8 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                       <input type="text" class="form-control" id="dataElementDescription" placeholder="Data Item Description" ng-model="headersMap.dataElementDescription">
                     </div>
                     <div class="form-group">
-                      <label for="dataType">Data type</label>
-                      <input type="text" class="form-control" id="dataType" placeholder="Data type" ng-model="headersMap.dataType">
+                      <label for="dataType">Data Type</label>
+                      <input type="text" class="form-control" id="dataType" placeholder="Data Type" ng-model="headersMap.dataType">
                     </div>
                     <div class="form-group">
                       <label for="parentModelName">Parent Model</label>

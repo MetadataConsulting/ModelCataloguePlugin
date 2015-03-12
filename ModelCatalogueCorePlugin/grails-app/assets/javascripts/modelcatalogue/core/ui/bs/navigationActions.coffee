@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
 
 
   angular.forEach RESOURCES, (resource, index) ->
-    actionsProvider.registerChildAction 'navbar-catalogue-elements', 'navbar-' + resource , ['$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($scope, $state, $stateParams, names, security, messages, catalogue) ->
+    goToResource = ['$scope', '$state', '$stateParams', 'names', 'security', 'messages', 'catalogue', ($scope, $state, $stateParams, names, security, messages, catalogue) ->
       return undefined if (resource == 'batch' or resource == 'relationshipType' or resource == 'csvTransformation') and not security.hasRole('CURATOR')
 
       label = names.getNaturalName(resource) + 's'
@@ -43,9 +43,31 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
         action.active = toParams.resource == resource
 
       action
-
-
     ]
+    actionsProvider.registerChildAction 'navbar-catalogue-elements', 'navbar-' + resource , goToResource
+    actionsProvider.registerActionInRole 'global-list-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, goToResource
+    unless resource == 'batch'
+      actionsProvider.registerActionInRole 'global-create-' + resource, actionsProvider.ROLE_GLOBAL_ACTION, ['$scope', 'names', 'security', 'messages', '$state', '$log', ($scope, names, security, messages, $state, $log) ->
+        return undefined if not security.hasRole('CURATOR')
+        return undefined if not messages.hasPromptFactory('create-' + resource) and not messages.hasPromptFactory('edit-' + resource)
+
+        {
+        label:      "New #{names.getNaturalName(resource)}"
+        icon:       'fa fa-plus'
+        type:       'success'
+        action:     ->
+          args      = {create: (resource)}
+          args.type = if messages.hasPromptFactory('create-' + resource) then "create-#{resource}" else "edit-#{resource}"
+
+          security.requireRole('CURATOR')
+          .then ->
+            messages.prompt('Create ' + names.getNaturalName(resource), '', args).then ->
+              $state.go 'mc.resource.list', {status: 'draft'}, {reload: true}
+          , (errors)->
+            $log.error errors
+            messages.error('You don\'t have rights to create new elements')
+        }
+      ]
 
 
   actionsProvider.registerActionInRole 'navbar-data-architect', actionsProvider.ROLE_NAVIGATION, ['security', (security) ->
@@ -59,7 +81,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     }
   ]
 
-  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-uninstantiated-elements', ['$scope', '$state', ($scope, $state) ->
+  uninstantiatedElements = ['$scope', '$state', ($scope, $state) ->
     action = {
       position:    200
       label:      'Uninstantiated Data Elements'
@@ -73,6 +95,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
 
     action
   ]
+  actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-uninstantiated-elements', uninstantiatedElements
+  actionsProvider.registerActionInRole 'global-uninstantiated-elements', actionsProvider.ROLE_GLOBAL_ACTION, uninstantiatedElements
 
   actionsProvider.registerChildAction 'navbar-data-architect', 'navbar-relations-by-metadata-key', ['$scope', '$state', ($scope, $state) ->
     action = {
@@ -105,7 +129,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
   ]
 
 
-  actionsProvider.registerActionInRole 'cart', actionsProvider.ROLE_NAVIGATION, ['security', '$state', (security, $state) ->
+  actionsProvider.registerActionInRoles 'cart', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTION], ['security', '$state', (security, $state) ->
     return undefined if not security.isUserLoggedIn()
 
     action = {
@@ -122,7 +146,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     action
   ]
 
-  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', '$rootScope', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams, $rootScope) ->
+  toggleClassification = (global) -> ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
     return undefined if not security.isUserLoggedIn()
 
     getLabel = (user) ->
@@ -134,7 +158,7 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
 
     action = {
       position:   2100
-      label:      getLabel(security.getCurrentUser())
+      label:      if global then 'Filter by Classification' else  getLabel(security.getCurrentUser())
       icon:       'fa fa-tags'
       action: -> messages.prompt('Select Classifications', 'Select which classifications should be visible to you', type: 'catalogue-elements', resource: 'classification', elements: security.getCurrentUser().classifications).then (elements) ->
         security.requireUser().then ->
@@ -145,8 +169,52 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     }
 
     action
-
-
   ]
+
+  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, toggleClassification(false)
+  actionsProvider.registerActionInRole 'global-classifications', actionsProvider.ROLE_GLOBAL_ACTION, toggleClassification(true)
+
+  actionsProvider.registerActionInRole 'global-draft', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
+    return undefined unless $state.current.name == 'mc.resource.list'
+    return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
+
+    {
+      icon: 'fa fa-pencil'
+      label: 'Switch to Drafts'
+      run: -> $state.go '.', {status: 'draft'}, {reload: true}
+    }
+  ]
+
+  actionsProvider.registerActionInRole 'global-pending', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
+    return undefined unless $state.current.name == 'mc.resource.list'
+    return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
+
+    {
+      icon: 'fa fa-clock-o'
+      label: 'Switch to Pending'
+      run: -> $state.go '.', {status: 'pending'}, {reload: true}
+    }
+  ]
+
+  actionsProvider.registerActionInRole 'global-finalized', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
+    return undefined unless $state.current.name == 'mc.resource.list'
+    return undefined unless catalogue.isInstanceOf($stateParams.resource, 'catalogueElement')
+
+    {
+      icon: 'fa fa-check'
+      label: 'Switch to Finalized'
+      run: -> $state.go '.', {status: undefined}, {reload: true}
+    }
+  ]
+
+  actionsProvider.registerActionInRole 'dashboard', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', ($state) ->
+    {
+      label:      'Dashboard'
+      icon:       'fa fa-tachometer'
+      action: -> $state.go 'dashboard'
+    }
+  ]
+
+
 
 ]

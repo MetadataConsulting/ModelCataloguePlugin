@@ -1,12 +1,10 @@
 package org.modelcatalogue.core.util
 
-import grails.test.mixin.Mock
+import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.DataElement
-import spock.lang.Specification
 import spock.lang.Unroll
 
-@Mock(DataElement)
-class DetachedListWrapperSpec extends Specification {
+class DetachedListWrapperSpec extends IntegrationSpec {
 
     @Unroll
     def "list wrapper backed by detached criteria, size is #size for max #max"() {

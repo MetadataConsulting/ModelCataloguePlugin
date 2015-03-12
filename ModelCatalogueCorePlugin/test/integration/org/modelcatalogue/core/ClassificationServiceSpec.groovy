@@ -3,15 +3,16 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.test.spock.IntegrationSpec
 
-/**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
- */
-class ClassificationServiceSpec extends AbstractIntegrationSpec {
+class ClassificationServiceSpec extends IntegrationSpec {
 
     def classificationService
+    def initCatalogueService
 
     def setup() {
-        loadFixtures()
+        initCatalogueService.initDefaultRelationshipTypes()
+        new Model(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
+        new Model(name: "Classified", status: ElementStatus.FINALIZED).save(failOnError: true).addToClassifications(new Classification(name: "Test Classification ${System.currentTimeMillis()}").save(failOnError: true))
+
     }
 
     def "all the models are returned if no classification is selected"(){

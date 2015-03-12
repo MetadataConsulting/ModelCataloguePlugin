@@ -13,6 +13,10 @@ class RelationshipMarshallers extends AbstractMarshallers {
 
     protected Map<String, Object> prepareJsonMap(rel) {
         if (!rel) return [:]
+        return getRelationshipAsMap(rel)
+    }
+
+    static Map<String, Object> getRelationshipAsMap(Relationship rel) {
         [
                 id: rel.id,
                 source: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.source),

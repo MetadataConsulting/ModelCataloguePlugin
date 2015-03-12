@@ -1,16 +1,14 @@
 package org.modelcatalogue.core.dataarchitect
 
+import groovy.json.JsonSlurper
+
 /**
  * James Welch, A.Milward
  */
-
-
-import groovy.json.JsonSlurper
 import groovy.json.internal.LazyMap
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.modelcatalogue.core.*
+import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
-
 
 class UmljService {
 

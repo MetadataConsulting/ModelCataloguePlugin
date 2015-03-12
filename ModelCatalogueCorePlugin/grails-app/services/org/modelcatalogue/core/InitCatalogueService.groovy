@@ -9,6 +9,7 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
+import org.modelcatalogue.core.util.test.TestDataHelper
 
 @Transactional
 class InitCatalogueService {
@@ -16,10 +17,18 @@ class InitCatalogueService {
     def grailsApplication
     def classificationService
     def elementService
+    def sessionFactory
 
-    def initCatalogue(boolean failOnError = false){
-        initDefaultRelationshipTypes()
-        initDefaultDataTypes(failOnError)
+    def initCatalogue(boolean test = false){
+        Closure init = {
+            initDefaultRelationshipTypes()
+            initDefaultDataTypes(test)
+        }
+        if (test) {
+            TestDataHelper.initFreshDb(sessionFactory, 'initCatalogue.sql', init)
+        } else {
+            init()
+        }
     }
 
     def initDefaultDataTypes(boolean failOnError = false) {

@@ -130,5 +130,4 @@ angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsP
     {header: "Message"     , value: 'message'                      , classes: 'col-md-7' }
   ]
 
-
 ]

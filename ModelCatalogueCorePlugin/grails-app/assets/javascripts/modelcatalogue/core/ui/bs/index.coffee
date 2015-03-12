@@ -39,6 +39,7 @@
 #= require modalPromptLogin
 #= require modalPromptForCatalogueElement
 #= require modalSearchForCatalogueElement
+#= require modalSearchForActions
 #= require modalPromptForCatalogueElements
 #= require modalPromptMeasurementUnitEdit
 #= require modalPromptActionParametersEdit
@@ -100,6 +101,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.modalPromptXmlValidate'
   'mc.core.ui.bs.modalPromptForCatalogueElement'
   'mc.core.ui.bs.modalSearchForCatalogueElement'
+  'mc.core.ui.bs.modalSearchForActions'
   'mc.core.ui.bs.modalPromptForCatalogueElements'
   'mc.core.ui.bs.simpleObjectEditor'
   'mc.core.ui.bs.modalPromptAssetEdit'
@@ -121,4 +123,17 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.elementsAsTags'
   'mc.core.ui.bs.diffTable'
   'mc.core.ui.bs.withClassificationCtrlMixin'
-])
+]).run ['messages', (messages) ->
+  if jQuery
+    jQuery(document).on 'keypress', (e) ->
+      # ctrl + space
+      if e.keyCode is 0 and e.ctrlKey
+        messages.prompt null, null, type: 'search-action'
+        e.preventDefault()
+        return
+      # shift + space
+      if e.shiftKey and e.which is 32
+        messages.prompt(null, null, type: 'search-catalogue-element').then (element) ->
+          element.show()
+        e.preventDefault()
+]

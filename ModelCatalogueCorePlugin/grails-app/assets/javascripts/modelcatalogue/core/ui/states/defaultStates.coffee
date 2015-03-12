@@ -61,23 +61,23 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   ])
 
-.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', 'names' , ($scope, $stateParams, $state, element, $rootScope, names) ->
+.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope' , ($scope, $stateParams, $state, element, $rootScope) ->
     $scope.element = element
     $rootScope.elementToShow = element
-])
+  ])
 
 .controller('mc.core.ui.states.DataImportCtrl', ['$scope', '$stateParams', '$state', 'element', ($scope, $stateParams, $state, element) ->
     $scope.element  = element
-])
+  ])
 
 .controller('mc.core.ui.states.BatchCtrl', ['$scope', '$stateParams', '$state', 'element', 'applicationTitle', ($scope, $stateParams, $state, element, applicationTitle) ->
     $scope.element  = element
     applicationTitle "Actions in batch #{element.name}"
-])
+  ])
 
 .controller('mc.core.ui.states.CsvTransformationCtrl', ['$scope', '$stateParams', '$state', 'element', ($scope, $stateParams, $state, element) ->
     $scope.element  = element
-])
+  ])
 
 .controller('mc.core.ui.states.FavoritesCtrl', ['$scope', 'modelCatalogueApiRoot', 'user', 'enhance', 'rest', 'columns', ($scope, modelCatalogueApiRoot, user, enhance, rest, columns) ->
     $scope.title = 'Favorites'
@@ -90,14 +90,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     enhance(rest(url: "#{modelCatalogueApiRoot}#{user.link}/outgoing/favourite")).then (list)->
       $scope.list = list
-])
+  ])
 
 .controller('mc.core.ui.states.DiffCtrl', ['$scope', '$stateParams', '$state', 'elements', 'applicationTitle', ($scope, $stateParams, $state, elements, applicationTitle) ->
     $scope.elements = elements
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
-])
+  ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope, catalogueElementResource) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope) ->
     if $stateParams.resource
       applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
@@ -142,9 +142,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   ])
 .config(['$stateProvider', 'catalogueProvider', ($stateProvider, catalogueProvider) ->
 
-  DEFAULT_ITEMS_PER_PAGE = 10
+    DEFAULT_ITEMS_PER_PAGE = 10
 
-  $stateProvider.state 'dashboard', {
+    $stateProvider.state 'dashboard', {
       url: ''
       templateUrl: 'modelcatalogue/core/ui/state/dashboard.html',
       controller: 'mc.core.ui.states.DashboardCtrl'
@@ -155,91 +155,91 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         statistics: ['catalogue', 'security', (catalogue, security) ->
           if security.getCurrentUser() then return catalogue.getStatistics() else return ''
         ]
-  }
+    }
 
-  $stateProvider.state 'mc', {
-    abstract: true
-    url: '/catalogue'
-    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-  }
+    $stateProvider.state 'mc', {
+      abstract: true
+      url: '/catalogue'
+      templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+    }
 
-  $stateProvider.state 'mc.favorites', {
-    url: '/favorites'
-    templateUrl: 'modelcatalogue/core/ui/state/favorites.html'
-    onEnter: ['applicationTitle', (applicationTitle) ->
-      applicationTitle "Favorites"
-    ]
-    resolve:
-      user: [ 'security', 'catalogueElementResource', '$q', (security, catalogueElementResource, $q) ->
-        userId = security.getCurrentUser()?.id
-        return $q.reject('Please, log in!') if not userId
-
-        catalogueElementResource('user').get(userId)
+    $stateProvider.state 'mc.favorites', {
+      url: '/favorites'
+      templateUrl: 'modelcatalogue/core/ui/state/favorites.html'
+      onEnter: ['applicationTitle', (applicationTitle) ->
+        applicationTitle "Favorites"
       ]
-    controller: 'mc.core.ui.states.FavoritesCtrl'
+      resolve:
+        user: [ 'security', 'catalogueElementResource', '$q', (security, catalogueElementResource, $q) ->
+          userId = security.getCurrentUser()?.id
+          return $q.reject('Please, log in!') if not userId
 
-  }
+          catalogueElementResource('user').get(userId)
+        ]
+      controller: 'mc.core.ui.states.FavoritesCtrl'
 
-
-  $stateProvider.state('mc.csvTransformations', {
-    abstract: true,
-    url: "/transformations/csv"
-    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-  })
-
-  $stateProvider.state 'mc.csvTransformations.show', {
-    url: '/{id:\\d+}'
-    templateUrl: 'modelcatalogue/core/ui/state/csvTransformation.html'
-    resolve:
-      element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
-        $stateParams.resource = "csvTransformation"
-        return catalogueElementResource('csvTransformation').get($stateParams.id)
-      ]
-
-    controller: 'mc.core.ui.states.CsvTransformationCtrl'
-  }
-
-  $stateProvider.state('mc.actions', {
-    abstract: true,
-    url: "/actions/batch"
-    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-  })
-
-  $stateProvider.state 'mc.actions.show', {
-    url: '/{id:\\d+}'
-    templateUrl: 'modelcatalogue/core/ui/state/batch.html'
-    resolve:
-      element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
-        $stateParams.resource = "batch"
-        return catalogueElementResource('batch').get($stateParams.id)
-      ]
-
-    controller: 'mc.core.ui.states.BatchCtrl'
-  }
-
-  $stateProvider.state 'mc.resource', {
-    abstract: true
-    url: '/:resource'
-    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-  }
+    }
 
 
-  $stateProvider.state 'mc.resource.diff', {
-    url: '/diff/{ids:(?:\\d+)(?:\\~\\d+)+}'
-    templateUrl: 'modelcatalogue/core/ui/state/diff.html'
-    resolve:
-      elements: ['$stateParams','catalogueElementResource', '$q', ($stateParams, catalogueElementResource, $q) ->
-        $q.all (catalogueElementResource($stateParams.resource).get(id) for id in $stateParams.ids.split('~'))
-      ]
-    controller: 'mc.core.ui.states.DiffCtrl'
-  }
+    $stateProvider.state('mc.csvTransformations', {
+      abstract: true,
+      url: "/transformations/csv"
+      templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+    })
 
-  $stateProvider.state 'mc.resource.list', {
-    url: '/all?page&order&sort&status&q&max&classification&display'
+    $stateProvider.state 'mc.csvTransformations.show', {
+      url: '/{id:\\d+}'
+      templateUrl: 'modelcatalogue/core/ui/state/csvTransformation.html'
+      resolve:
+        element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
+          $stateParams.resource = "csvTransformation"
+          return catalogueElementResource('csvTransformation').get($stateParams.id)
+        ]
 
-    templateUrl: 'modelcatalogue/core/ui/state/list.html'
+      controller: 'mc.core.ui.states.CsvTransformationCtrl'
+    }
 
-    resolve:
+    $stateProvider.state('mc.actions', {
+      abstract: true,
+      url: "/actions/batch"
+      templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+    })
+
+    $stateProvider.state 'mc.actions.show', {
+      url: '/{id:\\d+}'
+      templateUrl: 'modelcatalogue/core/ui/state/batch.html'
+      resolve:
+        element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
+          $stateParams.resource = "batch"
+          return catalogueElementResource('batch').get($stateParams.id)
+        ]
+
+      controller: 'mc.core.ui.states.BatchCtrl'
+    }
+
+    $stateProvider.state 'mc.resource', {
+      abstract: true
+      url: '/:resource'
+      templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+    }
+
+
+    $stateProvider.state 'mc.resource.diff', {
+      url: '/diff/{ids:(?:\\d+)(?:\\~\\d+)+}'
+      templateUrl: 'modelcatalogue/core/ui/state/diff.html'
+      resolve:
+        elements: ['$stateParams','catalogueElementResource', '$q', ($stateParams, catalogueElementResource, $q) ->
+          $q.all (catalogueElementResource($stateParams.resource).get(id) for id in $stateParams.ids.split('~'))
+        ]
+      controller: 'mc.core.ui.states.DiffCtrl'
+    }
+
+    $stateProvider.state 'mc.resource.list', {
+      url: '/all?page&order&sort&status&q&max&classification&display'
+
+      templateUrl: 'modelcatalogue/core/ui/state/list.html'
+
+      resolve:
         list: ['$stateParams','catalogueElementResource', ($stateParams,catalogueElementResource) ->
           page = parseInt($stateParams.page ? 1, 10)
           page = 1 if isNaN(page)
@@ -260,44 +260,44 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           catalogueElementResource($stateParams.resource).list(params)
         ]
 
-    controller: 'mc.core.ui.states.ListCtrl'
-  }
-  $stateProvider.state 'mc.resource.show', {
-    url: '/{id:\\d+}'
+      controller: 'mc.core.ui.states.ListCtrl'
+    }
+    $stateProvider.state 'mc.resource.show', {
+      url: '/{id:\\d+}'
 
-    templateUrl: 'modelcatalogue/core/ui/state/show.html'
+      templateUrl: 'modelcatalogue/core/ui/state/show.html'
 
-    resolve:
+      resolve:
         element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
           catalogueElementResource($stateParams.resource).get($stateParams.id)
         ]
-    onExit: ['$rootScope', ($rootScope) ->
-      $rootScope.elementToShow = null
-    ]
-
-    controller: 'mc.core.ui.states.ShowCtrl'
-  }
-
-  $stateProvider.state 'mc.resource.uuid', {
-    url: '/uuid/:uuid'
-
-    templateUrl: 'modelcatalogue/core/ui/state/show.html'
-
-    resolve:
-      element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
-        catalogueElementResource($stateParams.resource).getByUUID($stateParams.uuid)
+      onExit: ['$rootScope', ($rootScope) ->
+        $rootScope.elementToShow = null
       ]
 
-    onExit: ['$rootScope', ($rootScope) ->
-      $rootScope.elementToShow = null
-    ]
+      controller: 'mc.core.ui.states.ShowCtrl'
+    }
 
-    controller: 'mc.core.ui.states.ShowCtrl'
-  }
+    $stateProvider.state 'mc.resource.uuid', {
+      url: '/uuid/:uuid'
 
-  $stateProvider.state 'mc.resource.show.property', {url: '/:property?page&sort&order&max&q'}
+      templateUrl: 'modelcatalogue/core/ui/state/show.html'
 
-  $stateProvider.state('mc.search', {
+      resolve:
+        element: ['$stateParams','catalogueElementResource', ($stateParams, catalogueElementResource) ->
+          catalogueElementResource($stateParams.resource).getByUUID($stateParams.uuid)
+        ]
+
+      onExit: ['$rootScope', ($rootScope) ->
+        $rootScope.elementToShow = null
+      ]
+
+      controller: 'mc.core.ui.states.ShowCtrl'
+    }
+
+    $stateProvider.state 'mc.resource.show.property', {url: '/:property?page&sort&order&max&q'}
+
+    $stateProvider.state('mc.search', {
       url: "/search/{q}",
       templateUrl: 'modelcatalogue/core/ui/state/list.html'
       resolve: {
@@ -307,36 +307,36 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         ]
       },
       controller: 'mc.core.ui.states.ListCtrl'
-  })
+    })
 
 
-  $stateProvider.state('mc.dataArchitect', {
+    $stateProvider.state('mc.dataArchitect', {
       abstract: true,
       url: "/dataArchitect"
       templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-  })
+    })
 
-  $stateProvider.state 'mc.dataArchitect.uninstantiatedDataElements', {
-    url: "/uninstantiatedDataElements",
-    templateUrl: 'modelcatalogue/core/ui/state/list.html'
-    resolve:
-      list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        $stateParams.resource = "dataElement"
-        # it's safe to call top level for each controller, only model controller will respond on it
-        modelCatalogueDataArchitect.uninstantiatedDataElements()
-      ]
+    $stateProvider.state 'mc.dataArchitect.uninstantiatedDataElements', {
+      url: "/uninstantiatedDataElements",
+      templateUrl: 'modelcatalogue/core/ui/state/list.html'
+      resolve:
+        list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+          $stateParams.resource = "dataElement"
+          # it's safe to call top level for each controller, only model controller will respond on it
+          modelCatalogueDataArchitect.uninstantiatedDataElements()
+        ]
 
-    controller: 'mc.core.ui.states.ListCtrl'
-  }
+      controller: 'mc.core.ui.states.ListCtrl'
+    }
 
 
-  $stateProvider.state 'mc.dataArchitect.metadataKey', {
-    url: "/metadataKeyCheck",
-    templateUrl: 'modelcatalogue/core/ui/state/parent.html'
-    controller: ['$state','$modal',($state, $modal)->
-      dialog = $modal.open {
-        windowClass: 'messages-modal-prompt'
-        template: '''
+    $stateProvider.state 'mc.dataArchitect.metadataKey', {
+      url: "/metadataKeyCheck",
+      templateUrl: 'modelcatalogue/core/ui/state/parent.html'
+      controller: ['$state','$modal',($state, $modal)->
+        dialog = $modal.open {
+          windowClass: 'messages-modal-prompt'
+          template: '''
          <div class="modal-header">
             <h4>please enter metadata key</h4>
         </div>
@@ -352,33 +352,33 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-      }
-      dialog.result.then (result) ->
-        $state.go('mc.dataArchitect.metadataKeyCheck', {'metadata':result})
+        }
+        dialog.result.then (result) ->
+          $state.go('mc.dataArchitect.metadataKeyCheck', {'metadata':result})
 
-    ]
-  }
-
-  $stateProvider.state 'mc.dataArchitect.metadataKeyCheck', {
-    url: "/metadataKey/{metadata}",
-    templateUrl: 'modelcatalogue/core/ui/state/list.html'
-    resolve:
-      list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        $stateParams.resource = "dataElement"
-        # it's safe to call top level for each controller, only model controller will respond on it
-        return modelCatalogueDataArchitect.metadataKeyCheck($stateParams.metadata)
       ]
+    }
 
-    controller: 'mc.core.ui.states.ListCtrl'
-  }
+    $stateProvider.state 'mc.dataArchitect.metadataKeyCheck', {
+      url: "/metadataKey/{metadata}",
+      templateUrl: 'modelcatalogue/core/ui/state/list.html'
+      resolve:
+        list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+          $stateParams.resource = "dataElement"
+          # it's safe to call top level for each controller, only model controller will respond on it
+          return modelCatalogueDataArchitect.metadataKeyCheck($stateParams.metadata)
+        ]
 
-  $stateProvider.state 'mc.dataArchitect.findRelationsByMetadataKeys', {
-    url: "/findRelationsByMetadataKeys",
-    templateUrl: 'modelcatalogue/core/ui/state/parent.html',
-    controller: ['$scope','$state','$modal',($scope, $state, $modal)->
-      dialog = $modal.open {
-        windowClass: 'messages-modal-prompt'
-        template: '''
+      controller: 'mc.core.ui.states.ListCtrl'
+    }
+
+    $stateProvider.state 'mc.dataArchitect.findRelationsByMetadataKeys', {
+      url: "/findRelationsByMetadataKeys",
+      templateUrl: 'modelcatalogue/core/ui/state/parent.html',
+      controller: ['$scope','$state','$modal',($scope, $state, $modal)->
+        dialog = $modal.open {
+          windowClass: 'messages-modal-prompt'
+          template: '''
        <div class="modal-header">
           <h4>please enter metadata key</h4>
       </div>
@@ -396,26 +396,26 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
       </div>
       '''
-      }
+        }
 
-      dialog.result.then (result) ->
-        $state.go('mc.dataArchitect.showMetadataRelations', {'keyOne':result.keyOne, 'keyTwo':result.keyTwo})
-    ]
-  }
-
-  $stateProvider.state 'mc.dataArchitect.showMetadataRelations', {
-    url: "/showMetadataRelations/{keyOne}/{keyTwo}",
-    templateUrl: 'modelcatalogue/core/ui/state/list.html'
-    resolve:
-      list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
-        $stateParams.resource = "newRelationships"
-        # it's safe to call top level for each controller, only model controller will respond on it
-        return modelCatalogueDataArchitect.findRelationsByMetadataKeys($stateParams.keyOne, $stateParams.keyTwo)
+        dialog.result.then (result) ->
+          $state.go('mc.dataArchitect.showMetadataRelations', {'keyOne':result.keyOne, 'keyTwo':result.keyTwo})
       ]
+    }
 
-    controller: 'mc.core.ui.states.ListCtrl'
-  }
-])
+    $stateProvider.state 'mc.dataArchitect.showMetadataRelations', {
+      url: "/showMetadataRelations/{keyOne}/{keyTwo}",
+      templateUrl: 'modelcatalogue/core/ui/state/list.html'
+      resolve:
+        list: ['$stateParams', 'modelCatalogueDataArchitect', ($stateParams, modelCatalogueDataArchitect) ->
+          $stateParams.resource = "newRelationships"
+          # it's safe to call top level for each controller, only model controller will respond on it
+          return modelCatalogueDataArchitect.findRelationsByMetadataKeys($stateParams.keyOne, $stateParams.keyTwo)
+        ]
+
+      controller: 'mc.core.ui.states.ListCtrl'
+    }
+  ])
 
 .controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions'
     (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions)->
@@ -534,14 +534,14 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       $scope.$on '$stateChangeSuccess', (event, toState, toParams) ->
         $scope.searchSelect = toParams.q
 
-])
+  ])
 
 .controller('defaultStates.userCtrl', ['$scope', 'security', ($scope, security)->
-  $scope.logout = ->
-    security.logout()
-  $scope.login = ->
-    security.requireLogin()
-])
+    $scope.logout = ->
+      security.logout()
+    $scope.login = ->
+      security.requireLogin()
+  ])
 
 .run(['$rootScope', '$state', '$stateParams', 'messages', ($rootScope, $state, $stateParams, messages) ->
     # It's very handy to add references to $state and $stateParams to the $rootScope
@@ -556,11 +556,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     $rootScope.$on 'resourceNotFound', ->
       messages.error 'Selected resource cannot be found in the catalogue.'
-])
+  ])
 
 .run(['$templateCache', ($templateCache) ->
 
-  $templateCache.put 'modelcatalogue/core/ui/omnisearch.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/omnisearch.html', '''
     <form class="navbar-form navbar-right navbar-input-group search-form hidden-xs" role="search" autocomplete="off" ng-submit="search()" ng-controller="defaultStates.searchCtrl">
         <a ng-click="clearSelection()" ng-class="{'invisible': !$stateParams.q}" class="clear-selection btn btn-link"><span class="glyphicon glyphicon-remove"></span></a>
         <div class="form-group">
@@ -582,7 +582,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </form>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/omnisearchItem.html', '''
     <a>
         <span class="omnisearch-icon" ng-class="match.model.icon"></span>
         <span class="omnisearch-text" ng-if="!match.model.highlight" bind-html-unsafe="match.label" ng-class="{'text-warning': match.model.element.status == 'DRAFT', 'text-info': match.model.element.status == 'PENDING'}"></span>
@@ -590,11 +590,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     </a>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/state/parent.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/state/parent.html', '''
     <ui-view></ui-view>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/state/diff.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/state/diff.html', '''
     <span class="contextual-actions-right">
       <contextual-actions size="sm" no-colors="true" role="item"></contextual-actions>
     </span>
@@ -602,8 +602,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     <diff-table elements="elements"></diff-table>
   '''
 
-  #language=HTML
-  $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
+    #language=HTML
+    $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
     <div ng-if="resource != 'model' || $stateParams.display != undefined">
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
@@ -634,8 +634,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   '''
 
 
-  #language=HTML
-  $templateCache.put 'modelcatalogue/core/ui/state/favorites.html', '''
+    #language=HTML
+    $templateCache.put 'modelcatalogue/core/ui/state/favorites.html', '''
     <div>
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
@@ -647,79 +647,82 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
 
 
-  $templateCache.put 'modelcatalogue/core/ui/state/show.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/state/show.html', '''
     <div ng-show="element">
       <catalogue-element-view element="element"></catalogue-element-view>
     </div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/state/dataImport.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/state/dataImport.html', '''
     <div ng-show="element">
       <import-view element="element"></import-view>
     </div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/state/batch.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/state/batch.html', '''
     <div ng-show="element">
       <batch-view batch="element"></batch-view>
     </div>
   '''
 
-  $templateCache.put 'modelcatalogue/core/ui/state/csvTransformation.html', '''
+    $templateCache.put 'modelcatalogue/core/ui/state/csvTransformation.html', '''
     <div ng-show="element">
       <csv-transformation-view element="element"></csv-transformation-view>
     </div>
   '''
 
-  #language=HTML
-  $templateCache.put 'modelcatalogue/core/ui/state/dashboard.html', '''
+    #language=HTML
+    $templateCache.put 'modelcatalogue/core/ui/state/dashboard.html', '''
     		<!-- Jumbotron -->
   <div hide-if-logged-in>
 		<div class="jumbotron">
-			<h1>Model Catalogue</h1>
+			<h1>Tumtumtree</h1>
 			<p class="lead">
 				<b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b>
-				new pathways, forms, data storage, studies. <b><em>Generate</em></b> better
+				and version new datasets <b><em>Generate</em></b> better
 				software components
 			</p>
 
       <form ng-controller="defaultStates.userCtrl">
          <button ng-click="login()" class="btn btn-large btn-primary" type="submit">Login <i class="glyphicon glyphicon-log-in"></i></button>
-         <a href="" class="btn btn-large btn-primary" >Sign Up <i class="glyphicon glyphicon-pencil"></i></a>
+         <!--a href="" class="btn btn-large btn-primary" >Sign Up <i class="glyphicon glyphicon-pencil"></i></a-->
       </form>
     </div>
 
 		<!-- Example row of columns -->
 		<div id="info" class="row">
       <div class="col-sm-4">
-				<h2>Architecture</h2>
-				<p>Track your data elements from collection - model services,
-					databases and warehouses. Generate your own feeds, and generate
-					components for integration engines.</p>
+				<h2>Data Quality</h2>
+				<p>Build up datasets using existing data elements from existing datasets and add them to new data elements to compose new data models.</p>
 				<p>
-					<a href="#">More info&hellip;</a>
+
 				</p>
 			</div>
 			<div class="col-sm-4">
-				<h2>Forms</h2>
-				<p>Build forms from standard data elements in our friendly
-					drag-n-drop interface. Export your forms to your favourite tool.</p>
+				<h2>Dataset Curation</h2>
+				<p>Link and compose data-sets to create uniquely identified and versioned "metadata-sets", thus ensuring preservation of data semantics between applications</p>
 				<p>
-					<a href="#">Coming soon&hellip;</a>
+
 				</p>
 			</div>
       <div class="col-sm-4">
-				<h2>Pathways</h2>
-				<p>Design your workflows and visualise your patient pathways.
-					Annotate nodes with data elements, forms, and decisions.
-					Automatically build databases, dashboard interfaces and reporting
-					data.</p>
+				<h2>Dataset Comparison</h2>
+				<p>Discover synonyms, hyponyms and duplicate data elements within datasets, and compare data elements from differing datasets.</p>
 				<p>
-					<a href="#">Coming soon&hellip;</a>
+
 				</p>
 			</div>
 
 		</div>
+        <div>
+           <footer>
+              <p class="pull-right"><a href="#">Back to top</a></p>
+              <p>&copy; 2015 The Tumtumtree Project &middot; </p>
+              <p>Kindly sponsored by the <a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC </a> <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;"><a href="http://www.nihr.ac.uk/about/nihr-hic.htm"> NHIC</a> <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;"> and <a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a><img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;"></a> &middot;  </p>
+
+          <p>&nbsp;</p>
+            </footer>
+      </div>
 </div>
 
 <div show-if-logged-in>
@@ -951,10 +954,20 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                     </div>
 
       </div>
+      <div>
+           <footer>
+              <p class="pull-right"><a href="#">Back to top</a></p>
+              <p>&copy; 2015 The Tumtumtree Project &middot; </p>
+              <p>Kindly sponsored by the <a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC </a> <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;"><a href="http://www.nihr.ac.uk/about/nihr-hic.htm"> NHIC</a> <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;"> and <a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a><img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;"></a> &middot;  </p>
+
+          <p>&nbsp;</p>
+            </footer>
+      </div>
+
     </div>
   '''
 
-])
+  ])
 # debug states
 #.run(['$rootScope', '$log', ($rootScope, $log) ->
 #  $rootScope.$on '$stateChangeSuccess', (event, toState, toParams, fromState, fromParams) ->

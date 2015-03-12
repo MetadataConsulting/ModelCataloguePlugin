@@ -11,7 +11,7 @@ import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 
 class ModelCatalogueCoreGrailsPlugin {
     // the plugin version
-    def version = "0.9.2"
+    def version = "1.0.0"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4.3 > *"
     // resources that are excluded from plugin packaging
@@ -34,7 +34,7 @@ Model catalogue core plugin (metadata registry)
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-    def license = "MIT"
+    def license = "APACHE"
 
     // Details of company behind the plugin (if there is one)
 //    def organization = [ name: "My Company", url: "http://www.my-company.com/" ]

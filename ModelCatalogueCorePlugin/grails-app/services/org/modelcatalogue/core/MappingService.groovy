@@ -9,6 +9,9 @@ class MappingService {
         if (!source || !source.id || !destination || !destination.id || !mapping) return null
         Mapping existing = Mapping.findBySourceAndDestination(source, destination)
         if (existing) {
+            if (existing.mapping == mapping) {
+                return existing
+            }
             existing.mapping = mapping
             existing.validate()
 
@@ -26,8 +29,9 @@ class MappingService {
         }
 
         newOne.save()
-        source.addToOutgoingMappings(newOne)
-        destination.addToIncomingMappings(newOne)
+        source.addToOutgoingMappings(newOne).save()
+        destination.addToIncomingMappings(newOne).save()
+
         newOne
     }
 
@@ -39,8 +43,8 @@ class MappingService {
     Mapping unmap(CatalogueElement source, CatalogueElement destination) {
         Mapping old = Mapping.findBySourceAndDestination(source, destination)
         if (!old) return null
-        source.removeFromOutgoingMappings(old)
-        destination.removeFromIncomingMappings(old)
+        source.removeFromOutgoingMappings(old).save()
+        destination.removeFromIncomingMappings(old).save()
         old.delete(flush: true)
         old
     }

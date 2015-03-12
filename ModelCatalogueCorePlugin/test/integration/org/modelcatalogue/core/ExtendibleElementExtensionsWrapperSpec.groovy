@@ -1,17 +1,16 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
 
-@Mock([DataElement, ExtensionValue, Relationship, Model,  RelationshipType, RelationshipMetadata])
-class ExtendibleElementExtensionsWrapperSpec extends Specification {
+class ExtendibleElementExtensionsWrapperSpec extends IntegrationSpec {
 
+    def relationshipService
 
     @Unroll
     def "Extendible elements have live map to extension values for #extensionClass"() {
-        expect:
-        !extensionClass.count()
+
+        int initialSize = extensionClass.count()
 
         when:
         def element = newElementFactory.call().save(flush: true)
@@ -30,7 +29,7 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         then:
         element[extensionProperty]
         element[extensionProperty].size() == 1
-        extensionClass.count() == 1
+        extensionClass.count() == 1 + initialSize
         element.ext.keySet() == ['foo'] as Set
         element.ext.values()?.contains('bar')
         element.ext.entrySet() == [foo: 'bar'].entrySet()
@@ -105,7 +104,7 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
     }
 
     private DataElement createDataElement() {
-        new DataElement(name: "element")
+        new DataElement(name: "element").save()
     }
 
     private Relationship createRelationship() {
@@ -116,12 +115,10 @@ class ExtendibleElementExtensionsWrapperSpec extends Specification {
         assert target.save()
 
         RelationshipType type = new RelationshipType(sourceToDestination: "src to dest", destinationToSource: "dest to src", sourceClass: CatalogueElement, destinationClass: CatalogueElement, name: "type")
-        type.relationshipTypeService = new RelationshipTypeService()
         assert type.save()
 
-        RelationshipService relationshipService = new RelationshipService()
 
-        Relationship rel = relationshipService.link(source, target, type)
+        def rel = relationshipService.link(source, target, type)
 
         assert !rel.errors.hasErrors()
 

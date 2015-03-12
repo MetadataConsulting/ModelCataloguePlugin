@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.RelationshipDirection
-import spock.lang.Shared
 import spock.lang.Unroll
 
 /**
@@ -11,21 +10,36 @@ import spock.lang.Unroll
 
 class RelationshipISpec extends AbstractIntegrationSpec{
 
-    @Shared
-    def md1, de1, vd1, de2, reltype, dt, ms, relationshipService
+    def relationshipService
 
-    def setupSpec(){
-
+    def setup(){
         loadFixtures()
-
-        md1 = Model.findByName("book")
-        de1 = DataElement.findByName("auth5")
-        de2 = DataElement.findByName("title")
-        dt = DataType.findByName("string")
-        ms = MeasurementUnit.findByName("Miles per hour")
-        reltype = RelationshipType.findByName("relationship")
-        vd1 = ValueDomain.findByName("school subject")
     }
+
+    DataElement getDe1() {
+        DataElement.findByName("auth5")
+    }
+
+    DataElement getDe2() {
+        DataElement.findByName("title")
+    }
+
+    DataType getDt() {
+        DataType.findByName("string")
+    }
+
+    MeasurementUnit getMs() {
+        MeasurementUnit.findByName("Miles per hour")
+    }
+
+    RelationshipType getReltype() {
+        RelationshipType.findByName("relationship")
+    }
+
+    ValueDomain getVd1() {
+        ValueDomain.findByName("school subject")
+    }
+
 
     def "Fail to Create Relationship if the catalogue elements have not been persisted"()
     {
@@ -42,13 +56,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     def "Create Relationship if the catalogue elements have been persisted then delete relationship"()
     {
-
-
         when:
-
-        de1 = DataElement.get(de1.id)
-        de2 = DataElement.get(de2.id)
-
         Relationship rel =  relationshipService.link( de1, de2, reltype)
 
         then:
@@ -142,6 +150,10 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         22 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 6, 'Max Occurs': 5]]
         23 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Max Occurs': 0]]
 
+    }
+
+    Model getMd1() {
+        Model.findByName("book")
     }
 
 

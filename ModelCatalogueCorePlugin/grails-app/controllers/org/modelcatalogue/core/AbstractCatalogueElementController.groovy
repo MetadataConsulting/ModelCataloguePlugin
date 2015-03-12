@@ -441,12 +441,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             }
         }
 
-        if (ext) {
-            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
-        }
 
         bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
+
+        if (ext) {
+            instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
+        }
 
         bindRelations(instance, newVersion)
 
@@ -561,7 +562,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             notAuthorized()
             return
         }
-        handleParams(max)
+        params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
         if (!element) {
             notFound()
@@ -593,7 +594,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
         def classifications = objectToBind.classifications ?: []
-        for (classification in instance.classifications.findAll { !(it.id in classifications*.id) }) {
+        for (classification in instance.classifications.findAll { !(it.id in classifications.collect { it.id as Long } || it.latestVersionId in classifications.collect { it.id as Long })  }) {
             instance.removeFromClassifications classification
             classification.removeFromClassifies instance
         }
@@ -617,19 +618,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     @Override
     protected clearAssociationsBeforeDelete(T instance) {
         // it is safe to remove all classifications
-        for (Classification c in instance.classifications) {
-            instance.removeFromClassifications(c)
-        }
-
-        // it is safe to remove all versioning informations
-        for (CatalogueElement e in instance.supersededBy) {
-            instance.removeFromSupersededBy(e)
-        }
-        for (CatalogueElement e in instance.supersedes) {
-            instance.removeFromSupersedes(e)
-        }
-        for (User u in instance.isFavouriteOf) {
-            instance.removeFromIsFavouriteOf(u)
-        }
+        instance.clearAssociationsBeforeDelete()
     }
 }

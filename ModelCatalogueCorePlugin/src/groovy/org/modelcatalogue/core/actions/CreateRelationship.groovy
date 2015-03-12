@@ -2,7 +2,6 @@ package org.modelcatalogue.core.actions
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType

@@ -3,6 +3,7 @@ package org.modelcatalogue.core.actions
 import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 import org.springframework.beans.factory.annotation.Autowired
@@ -63,7 +64,7 @@ class ActionService {
 
         Long id = action.id
 
-        Callable<ActionResult> job = {
+        Closure<ActionResult> job = {
             try {
                 Action a = Action.get(id)
                 
@@ -228,10 +229,10 @@ class ActionService {
             Map<String, Action> deps = parameters.findAll{ key, value -> value instanceof Action }
             outer:
             for (Action old in existing.items) {
-                if (old.dependencies && old.dependencies.size() != deps.size()) {
+                if (!old.dependsOn && deps || old.dependsOn && old.dependsOn.size() != deps.size()) {
                     continue
                 }
-                for (ActionDependency dependency in old.dependencies) {
+                for (ActionDependency dependency in old.dependsOn) {
                     if (deps[dependency.role] != dependency.provider) {
                         continue outer
                     }
@@ -240,7 +241,7 @@ class ActionService {
             }
         }
 
-        created.save(failOnError: true, flush: true)
+        FriendlyErrors.failFriendlySave(created)
 
         if (parameters) {
             extensionParameters.each { key, value ->
@@ -249,12 +250,15 @@ class ActionService {
         }
 
         batch.addToActions(created)
+        FriendlyErrors.failFriendlySave(batch)
 
         parameters.findAll{ key, value -> value instanceof Action }.each { String role, Action action ->
             ActionDependency dependency = new ActionDependency(dependant: created, provider: action, role: role)
-            dependency.save(failOnError: true, flush: true)
+            FriendlyErrors.failFriendlySave(dependency)
             created.addToDependsOn(dependency)
+            FriendlyErrors.failFriendlySave(created)
             action.addToDependencies(dependency)
+            FriendlyErrors.failFriendlySave(action)
         }
 
         created

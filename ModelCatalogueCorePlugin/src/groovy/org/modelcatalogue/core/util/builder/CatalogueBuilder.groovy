@@ -508,6 +508,23 @@ import org.modelcatalogue.core.*
     }
 
     /**
+     * Sets the flag to copy relationships when draft element is created (e.g. there is an update for element).
+     *
+     * Normally the relationships are skipped when creating draft and the builder is supposed to rebuilt them
+     * (for example in XML or MC files) but sometimes the it's desired to copy the relationships as well (e.g.
+     * Excel import which usually provides incomplete data).
+     *
+     * @param relationships must be "relationships" string (#getRelationships() shortcut can be used)
+     */
+    void copy(String relationships) {
+        if (relationships == getRelationships()) {
+            repository.copyRelationships()
+            return
+        }
+        throw new IllegalArgumentException("Only 'relationships' is expected after 'copy' keyword")
+    }
+
+    /**
      * Shortcut for Classification type so it does not have to me imported into the DSL scripts.
      * @return Classification type
      */
@@ -560,6 +577,12 @@ import org.modelcatalogue.core.*
      * @return ElementStatus#DEPRECATED
      */
     static ElementStatus getFinalized() { ElementStatus.FINALIZED }
+
+    /**
+     * Keyword to be used with #copy(String) method.
+     * @return string "relationships"
+     */
+    static String getRelationships() { "relationships" }
 
     /**
      * Sets the flag to be able to search for elements having no classification at all even the classification is

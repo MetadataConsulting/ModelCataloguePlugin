@@ -54,20 +54,17 @@ modelcatalogue.defaults.relationshiptypes =  [
             String minOccursString = ext['Min Occurs']
             String maxOccursString = ext['Max Occurs']
 
-            Integer minOccurs = minOccursString in ['unbounded', 'null'] ? 0 : (minOccursString as Integer)
-            Integer maxOccurs = maxOccursString in ['unbounded', 'null'] ? Integer.MAX_VALUE : (maxOccursString as Integer)
+            Integer minOccurs = minOccursString in ['unbounded', 'null', null] ? 0 : (minOccursString as Integer)
+            Integer maxOccurs = maxOccursString in ['unbounded', 'null', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
 
-            if (minOccurs != null) {
-                if (minOccurs < 0) {
-                    return false
-                }
-                if (maxOccurs != null && maxOccurs < minOccurs) {
-                    return false
-                }
-            } else {
-                if (maxOccurs != null && maxOccurs < 1) {
-                    return false
-                }
+            if (minOccurs < 0) {
+                return ["relationshipType.containment.min.occurs.less.than.zero", "'Max Occurs' has to be greater than zero"]
+            }
+            if (maxOccurs < minOccurs) {
+                return ["relationshipType.containment.min.occurs.greater.than.max.occurs", "The metadata 'Min Occurs' cannot be greater than 'Min Occurs'"]
+            }
+            if (maxOccurs < 1) {
+                return ["relationshipType.containment.max.occurs.zero", "The metadata 'Max Occurs' must be greater than zero"]
             }
 
             return true
@@ -79,7 +76,7 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
         [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true, rule: "source.class == destination.class"],
         [name: "favourite", sourceToDestination: "favourites", destinationToSource: "is favourite of", sourceClass: User, destinationClass: CatalogueElement, system: true],
-        [name: "classification", sourceToDestination: "classifies", destinationToSource: "classifications", sourceClass: Classification, destinationClass: CatalogueElement, versionSpecific: true],
+        [name: "classification", sourceToDestination: "classifies", destinationToSource: "is classified by", sourceClass: Classification, destinationClass: CatalogueElement, versionSpecific: true],
         [name: "classificationFilter", sourceToDestination: "used as filter by", destinationToSource: "filtered by", sourceClass: Classification, destinationClass: User, system: true],
 ]
 

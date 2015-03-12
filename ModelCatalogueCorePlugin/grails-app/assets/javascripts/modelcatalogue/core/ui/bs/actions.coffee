@@ -66,45 +66,63 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       }
   ]
 
-  actionsProvider.registerChildAction 'new-import', 'import-loinc', ['$scope', 'messages', ($scope, messages) -> {
-  label:  "Import Loinc"
-  action: ->
-    messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
+  loincImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import Loinc"
+    action: ->
+      messages.prompt('Import Loinc File', '', type: 'new-loinc-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-loinc', loincImport
+  actionsProvider.registerActionInRole 'global-import-loinc', actionsProvider.ROLE_GLOBAL_ACTION, loincImport
 
-  actionsProvider.registerChildAction 'new-import', 'import-excel', ['$scope', 'messages', ($scope, messages) -> {
+  excelImport = ['$scope', 'messages', ($scope, messages) -> {
     label:  "Import Excel"
     action: ->
       messages.prompt('Import Excel File', '', type: 'new-excel-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-excel', excelImport
+  actionsProvider.registerActionInRole 'global-import-excel', actionsProvider.ROLE_GLOBAL_ACTION, excelImport
 
-  actionsProvider.registerChildAction 'new-import', 'import-obo', ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import OBO"
+  oboImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import OBO"
     action: ->
       messages.prompt('Import OBO File', '', type: 'new-obo-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-obo', oboImport
+  actionsProvider.registerActionInRole 'global-import-obo', actionsProvider.ROLE_GLOBAL_ACTION, oboImport
 
-  actionsProvider.registerChildAction 'new-import', 'import-xsd', ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import XSD"
+
+  xsdImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import XSD"
     action: ->
       messages.prompt('Import XSD File', '', type: 'new-xsd-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-xsd', xsdImport
+  actionsProvider.registerActionInRole 'global-import-xsd', actionsProvider.ROLE_GLOBAL_ACTION, xsdImport
 
-  actionsProvider.registerChildAction 'new-import', 'import-umlj', ['$scope', 'messages', ($scope, messages) -> {
-  label:  "Import Star Uml"
-  action: ->
-    messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
+  umlImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import Star Uml"
+    action: ->
+      messages.prompt('Import Star Uml File', '', type: 'new-umlj-import')
   }]
-  actionsProvider.registerChildAction 'new-import', 'import-mc', ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import MC"
+  actionsProvider.registerChildAction 'new-import', 'import-umlj', umlImport
+  actionsProvider.registerActionInRole 'global-import-uml', actionsProvider.ROLE_GLOBAL_ACTION, umlImport
+
+  mcImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import MC"
     action: ->
       messages.prompt('Import Model Catalogue DSL File', '', type: 'new-mc-import')
   }]
-  actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', ['$scope', 'messages', ($scope, messages) -> {
-    label:  "Import Catalogue XML"
+  actionsProvider.registerChildAction 'new-import', 'import-mc', mcImport
+  actionsProvider.registerActionInRole 'global-import-mc', actionsProvider.ROLE_GLOBAL_ACTION, mcImport
+
+
+  xmlImport = ['$scope', 'messages', ($scope, messages) -> {
+    label: "Import Catalogue XML"
     action: ->
       messages.prompt('Import Model Catalogue XML File', '', type: 'new-catalogue-xml-import')
   }]
+  actionsProvider.registerChildAction 'new-import', 'import-catalogue-xml', xmlImport
+  actionsProvider.registerActionInRole 'global-import-xml', actionsProvider.ROLE_GLOBAL_ACTION, xmlImport
 
 
 

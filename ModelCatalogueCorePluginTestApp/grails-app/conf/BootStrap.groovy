@@ -9,8 +9,8 @@ import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
-import org.springframework.util.StopWatch
 
 class BootStrap {
 
@@ -20,26 +20,32 @@ class BootStrap {
     def actionService
     def mappingService
     CatalogueBuilder catalogueBuilder
+    def sessionFactory
 
     XLSXListRenderer xlsxListRenderer
 
     def init = { servletContext ->
+        if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
+            TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
+                initCatalogueService.initCatalogue(true)
+                initSecurity()
+                setupStuff()
+            }
+        } else {
+            initCatalogueService.initDefaultRelationshipTypes()
+            initSecurity()
+        }
+    }
 
-        StopWatch watch = new StopWatch('bootstrap')
-
-        watch.start('init catalogue')
-        initCatalogueService.initCatalogue(Environment.current in [Environment.DEVELOPMENT, Environment.TEST])
-        watch.stop()
-
-        watch.start('init security')
+    private static void initSecurity() {
         def roleUser = Role.findByAuthority('ROLE_USER') ?: new Role(authority: 'ROLE_USER').save(failOnError: true)
         def roleAdmin = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         def metadataCurator = Role.findByAuthority('ROLE_METADATA_CURATOR') ?: new Role(authority: 'ROLE_METADATA_CURATOR').save(failOnError: true)
 
         // keep the passwords lame, they are only for dev/test or very first setup
         // sauce labs connector for some reason fails with the six in the input
-        def admin   = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
-        def viewer  = User.findByName('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
+        def admin = User.findByName('admin') ?: new User(name: 'admin', username: 'admin', enabled: true, password: 'admin').save(failOnError: true)
+        def viewer = User.findByName('viewer') ?: new User(name: 'viewer', username: 'viewer', enabled: true, password: 'viewer').save(failOnError: true)
         def curator = User.findByName('curator') ?: new User(name: 'curator', username: 'curator', enabled: true, password: 'creator').save(failOnError: true)
 
 
@@ -102,33 +108,17 @@ class BootStrap {
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataType/**', 'ROLE_USER')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/relationshipTypes/**', 'ROLE_ADMIN')
-
-
-        watch.stop()
-
-        environments {
-            development {
-                setupStuff(watch)
-
-            }
-            test {
-                setupStuff(watch)
-            }
-
-        }
     }
 
-    def setupStuff(StopWatch watch){
+    def setupStuff(){
         actionService.resetAllRunningActions()
         try {
+
             println 'Running post init job'
             println 'Importing data'
-            watch.start('import data')
             importService.importData()
-            watch.stop()
 
             println 'Finalizing all published elements'
-            watch.start('finalizing all elements')
             CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
                 if (it instanceof Model) {
                     elementService.finalizeElement(it)
@@ -137,11 +127,9 @@ class BootStrap {
                     it.save failOnError: true
                 }
             }
-            watch.stop()
 
 
             println "Creating some actions"
-            watch.start('test actions')
             Batch batch = new Batch(name: 'Test Batch').save(failOnError: true)
 
             15.times {
@@ -170,34 +158,26 @@ class BootStrap {
                 throw new AssertionError("Failed to create relationship actions!")
             }
 
-            watch.stop()
-
-            watch.start('setting up csv transformation')
             setupSimpleCsvTransformation()
-            watch.stop()
 
             // for generate suggestion test
-            watch.start('generating suggestions test data')
             catalogueBuilder.build {
                 automatic dataType
 
                 classification(name: 'Test 1') {
-                    dataElement (name: 'Test Element 1') {
+                    dataElement(name: 'Test Element 1') {
                         valueDomain(name: 'Same Name')
                     }
                 }
 
                 classification(name: 'Test 2') {
-                    dataElement (name: 'Test Element 2') {
+                    dataElement(name: 'Test Element 2') {
                         valueDomain(name: 'Same Name')
                     }
                 }
 
             }
-            watch.stop()
-
             println "Init finished in ${new Date()}"
-            println watch.prettyPrint()
         } catch (e) {
             e.printStackTrace()
         }

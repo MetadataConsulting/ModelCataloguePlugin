@@ -5,7 +5,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
-    def setupSpec() {
+    def setup() {
         loadFixtures()
     }
 
@@ -129,7 +129,6 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         archived.ext.something == 'anything'
 
-        !archived.valueDomain
         !(archived in domain.dataElements)
     }
 

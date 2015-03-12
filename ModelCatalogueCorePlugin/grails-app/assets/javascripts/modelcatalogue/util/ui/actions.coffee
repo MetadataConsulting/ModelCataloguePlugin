@@ -12,6 +12,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
     ROLE_MODAL_ACTION:            'modal'
     ROLE_LIST_HEADER_ACTION:      'header'
     ROLE_LIST_FOOTER_ACTION:      'footer'
+    ROLE_GLOBAL_ACTION:           'global-action'
 
   getRoleAwareId = (role, id) -> "role_#{role}_#{id}"
 
@@ -142,6 +143,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
       ROLE_MODAL_ACTION:            actionsProvider.ROLE_MODAL_ACTION
       ROLE_LIST_HEADER_ACTION:      actionsProvider.ROLE_LIST_HEADER_ACTION
       ROLE_LIST_FOOTER_ACTION:      actionsProvider.ROLE_LIST_FOOTER_ACTION
+      ROLE_GLOBAL_ACTION:           actionsProvider.ROLE_GLOBAL_ACTION
 
     actions.getActions = ($scope, role = undefined) ->
       currentActions = []
@@ -151,7 +153,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
           action = createAction(undefined, id, actionConfig, actions, $scope)
           currentActions.push action if action
 
-      $filter('orderBy')(currentActions, 'position')
+      $filter('orderBy')(currentActions, if role is actionsProvider.ROLE_GLOBAL_ACTION then 'label' else 'position')
 
 
     ###

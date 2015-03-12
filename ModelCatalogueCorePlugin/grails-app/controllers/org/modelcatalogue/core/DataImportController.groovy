@@ -1,9 +1,7 @@
 package org.modelcatalogue.core
 
-
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
-
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.xml.CatalogueXmlLoader
@@ -96,7 +94,7 @@ class DataImportController  {
             def asset = storeAsset(params, file, 'application/xml')
             def id = asset.id
             InputStream inputStream = file.inputStream
-            HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
+            populateHeaders(request.JSON.headersMap ?: [:])
             executorService.submit {
                 try {
                     CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
@@ -138,8 +136,9 @@ class DataImportController  {
             executorService.submit {
                 try {
                     Set<CatalogueElement> created = LoincImportService.serviceMethod(inputStream)
+                    Asset theAsset = Asset.get(id)
                     for (CatalogueElement element in created) {
-                        asset.addToRelatedTo(element)
+                        theAsset.addToRelatedTo(element)
                     }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
@@ -161,8 +160,9 @@ class DataImportController  {
             executorService.submit {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
+                    Asset theAsset = Asset.get(id)
                     for (CatalogueElement element in created) {
-                        asset.addToRelatedTo(element)
+                        theAsset.addToRelatedTo(element)
                     }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
@@ -326,7 +326,7 @@ class DataImportController  {
         headersMap.dataElementCode = params.dataElementCode ?: "Data Item Unique Code"
         headersMap.dataElementName = params.dataElementName ?: "Data Item Name"
         headersMap.dataElementDescription = params.dataElementDescription ?: "Data Item Description"
-        headersMap.dataType = params.dataType ?: "Data type"
+        headersMap.dataType = params.dataType ?: "Data Type"
         headersMap.parentModelName = params.parentModelName ?: "Parent Model"
         headersMap.parentModelCode = params.parentModelCode ?: "Parent Model Unique Code"
         headersMap.containingModelName = params.containingModelName ?: "Model"

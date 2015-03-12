@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
-import grails.test.mixin.Mock
-import spock.lang.Specification
+import grails.test.spock.IntegrationSpec
 import spock.lang.Unroll
 
 /**
@@ -27,15 +26,11 @@ import spock.lang.Unroll
  *
  *
  */
-@Mock([DataElement, ExtensionValue])
-class DataElementSpec extends Specification {
+class DataElementSpec extends IntegrationSpec {
 
     @Unroll
     def "#no create a new data element from #args validates to #validates"() {
-
-        expect:
-
-        DataElement.list().isEmpty()
+        int initialSize = DataElement.count()
 
         when:
 
@@ -48,7 +43,7 @@ class DataElementSpec extends Specification {
         dataElementInstance.id != null == validates
         (dataElementInstance.errors.errorCount == 0) == validates
         dataElementInstance.versionNumber == 1
-        DataElement.list().size() == size
+        DataElement.list().size() == size + initialSize
         dataElementInstance.modelCatalogueId == args.modelCatalogueId
 
 
@@ -63,15 +58,8 @@ class DataElementSpec extends Specification {
         6 | false     | 0    | [name: "result1", description: "this is the the result description", modelCatalogueId: "MC_12asd33_3"]
     }
 
-    @Unroll
     def "create a new data element and extend it to include additional metadata"() {
-
-        expect:
-
-        DataElement.list().isEmpty()
-
         when:
-
         def dataCollectionQualityExtension = ["oxford": "1", "cambridge": "3"]
 
         DataElement dataElementInstance = new DataElement(name: "result1", description: "this is the the result description")
