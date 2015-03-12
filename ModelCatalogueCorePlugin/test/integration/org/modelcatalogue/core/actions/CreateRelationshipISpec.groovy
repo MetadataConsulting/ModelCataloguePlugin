@@ -16,11 +16,14 @@ import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDesc
 
 class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
+    def relationshipTypeService
     def modelCatalogueSecurityService
+    def modelCatalogueSearchService
     def relationshipService
-
-    @Autowired
-    AutowireCapableBeanFactory autowireCapableBeanFactory
+    def elementService
+    def actionService
+    def classificationService
+    @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
     @Shared
     Model one, two
     @Shared
