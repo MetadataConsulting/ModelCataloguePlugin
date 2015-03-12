@@ -1,11 +1,8 @@
 package org.modelcatalogue.core.actions
 
 import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipService
 import org.modelcatalogue.core.RelationshipType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory
@@ -16,13 +13,9 @@ import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDesc
 
 class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
-    def relationshipTypeService
     def modelCatalogueSecurityService
-    def modelCatalogueSearchService
     def relationshipService
-    def elementService
-    def actionService
-    def classificationService
+
     @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
     @Shared
     Model one, two
