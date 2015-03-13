@@ -36,7 +36,8 @@ class ImportService {
                                         model(name:tokens[2]){
                                             dataElement(name:tokens[3], description:tokens[4]){
                                                 valueDomain(name:tokens[3].replaceAll("\\s", "_")){
-                                                    DataImportService.importDataTypes(catalogueBuilder, tokens[3], tokens[5], null, null)
+                                                    def enumerations = tokens[5] ? DataImportService.parseEnumeration(tokens[5].split("\\r?\\n")) : [:]
+                                                    DataImportService.importDataTypes(catalogueBuilder, tokens[3], enumerations ? tokens[5] : null, null, null)
                                                 }
                                                 ext "NHIC_Identifier:", tokens[0].take(2000)
                                                 ext "Link_to_existing definition:", tokens[6].take(2000)
