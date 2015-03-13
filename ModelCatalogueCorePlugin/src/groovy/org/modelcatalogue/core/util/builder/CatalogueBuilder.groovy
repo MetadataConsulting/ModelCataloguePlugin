@@ -698,11 +698,14 @@ import org.modelcatalogue.core.*
     protected <T extends CatalogueElement, A extends CatalogueElementProxy<T>> A createProxy(Class<T> domain, Map<String, Object> parameters, Class inheritFrom = null) {
         if (inheritFrom && domain in SUPPORTED_FOR_AUTO) {
             context.withContextElement(inheritFrom) {
-                if (!parameters.name && it.name) {
-                    parameters.name = it.name
-                }
-                if (!parameters.description && it.getParameter('description')) {
-                    parameters.description = it.getParameter('description')
+                if (!parameters.name) {
+                    if (it.name) {
+                        parameters.name = it.name
+                    }
+                    // description is only transffered for the elements created automatically
+                    if (!parameters.id && parameters.name && domain in createAutomatically && !parameters.description && it.getParameter('description')) {
+                        parameters.description = it.getParameter('description')
+                    }
                 }
             }
         }

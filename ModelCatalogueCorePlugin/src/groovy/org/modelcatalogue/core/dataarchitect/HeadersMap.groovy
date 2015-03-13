@@ -7,7 +7,12 @@ class HeadersMap {
     String dataElementCode
     String dataElementName
     String dataElementDescription
-    String dataType
+    String dataTypeClassification
+    String dataTypeCode
+    String dataTypeName
+    String valueDomainClassification
+    String valueDomainCode
+    String valueDomainName
     String parentModelName
     String parentModelCode
     String containingModelName
@@ -15,7 +20,5 @@ class HeadersMap {
     String measurementUnitName
     String measurementSymbol
     String metadata
-    String conceptualDomainName
-    String conceptualDomainDescription
     String classification
 }

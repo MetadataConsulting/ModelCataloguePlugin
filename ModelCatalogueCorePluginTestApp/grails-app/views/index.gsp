@@ -145,7 +145,7 @@
         </div>
     </div>
 
-    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation" show-if-logged-in>
         <div class="container-fluid">
             <contextual-menu role="navigation-bottom-left"></contextual-menu>
             <contextual-menu role="navigation-bottom-right" right="true"></contextual-menu>

@@ -3,7 +3,6 @@ package org.modelcatalogue.core.dataarchitect
 import grails.transaction.Transactional
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 
 class DataImportService {
@@ -27,11 +26,16 @@ class DataImportService {
         def unitsIndex = headers.indexOf(headersMap.measurementUnitName)
         def symbolsIndex = headers.indexOf(headersMap.measurementSymbol)
         def classificationsIndex = headers.indexOf(headersMap.classification)
-        def dataTypeIndex = headers.indexOf(headersMap.dataType)
+        def dataTypeNameIndex = headers.indexOf(headersMap.dataTypeName)
+        def dataTypeClassificationIndex = headers.indexOf(headersMap.dataTypeClassification)
+        def dataTypeCodeIndex = headers.indexOf(headersMap.dataTypeCode)
+        def valueDomainNameIndex = headers.indexOf(headersMap.valueDomainName)
+        def valueDomainClassificationIndex = headers.indexOf(headersMap.valueDomainClassification)
+        def valueDomainCodeIndex = headers.indexOf(headersMap.valueDomainCode)
         def metadataStartIndex = headers.indexOf(headersMap.metadata) + 1
         def metadataEndIndex = headers.size() - 1
 
-        if (dataItemNameIndex == -1) throw new Exception("Can not find 'Data Item Name' column")
+        if (dataItemNameIndex == -1) throw new Exception("Can not find '${headersMap.dataElementName}' column")
         //iterate through the rows and import each line
         CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
         builder.build {
@@ -44,12 +48,21 @@ class DataImportService {
                         def createDataElement = {
                             if(getRowValue(row,dataItemNameIndex)) {
                                 dataElement(name: getRowValue(row, dataItemNameIndex), description: getRowValue(row, dataItemDescriptionIndex), id: getRowValue(row, dataItemCodeIndex)) {
-                                    if (getRowValue(row, unitsIndex) || getRowValue(row, dataTypeIndex)) {
-                                        valueDomain(name: getRowValue(row, dataItemNameIndex)) {
-                                            if (getRowValue(row, dataTypeIndex))
-                                                importDataTypes(builder, getRowValue(row, dataItemNameIndex), getRowValue(row, dataTypeIndex))
+                                    if (getRowValue(row, unitsIndex) || getRowValue(row, dataTypeNameIndex)) {
+                                        def createDataTypeAndMeasurementUnits = {
+                                            if (getRowValue(row, dataTypeNameIndex))
+                                                importDataTypes(builder, getRowValue(row, dataItemNameIndex), getRowValue(row, dataTypeNameIndex), getRowValue(row, dataTypeCodeIndex), getRowValue(row, dataTypeClassificationIndex))
                                             if (getRowValue(row, unitsIndex))
                                                 measurementUnit(name: getRowValue(row, unitsIndex), symbol: getRowValue(row, symbolsIndex))
+                                        }
+                                        def valueDomainName = getRowValue(row, valueDomainNameIndex)
+                                        def valueDomainCode = getRowValue(row, valueDomainCodeIndex)
+                                        def valueDomainClassification = getRowValue(row, valueDomainClassificationIndex)
+
+                                        if (!(valueDomainNameIndex || valueDomainCode || valueDomainClassification)) {
+                                            valueDomain(name: getRowValue(row, dataItemNameIndex), classification: getRowValue(row, dataTypeClassificationIndex), createDataTypeAndMeasurementUnits)
+                                        } else {
+                                            valueDomain(name: valueDomainName, id: valueDomainCode, classification: valueDomainClassification, createDataTypeAndMeasurementUnits)
                                         }
                                     }
 
@@ -97,36 +110,35 @@ class DataImportService {
 
     /**
      *
-     * @param name data element/item name
-     * @param dataType - Column F - content of - either blank or an enumeration or a named datatype.
+     * @param dataElementName data element/item name
+     * @param dataTypeNameOrEnum - Column F - content of - either blank or an enumeration or a named datatype.
      * @return
      */
-     static importDataTypes(CatalogueBuilder catalogueBuilder, name, dataType) {
-
+     static importDataTypes(CatalogueBuilder catalogueBuilder, dataElementName, dataTypeNameOrEnum, dataTypeCode, dataTypeClassification) {
+         if (!dataTypeNameOrEnum) {
+             return catalogueBuilder.dataType(id: dataTypeCode, classification: dataTypeClassification, name: 'String')
+         }
         //default data type to return is the string data type
-        for (String line in dataType) {
-            String[] lines = line.split("\\r?\\n");
-            if (!(lines.size() > 0 && lines != null)) {
-                return catalogueBuilder.dataType(name: "String")
-            }
-
-            def enumerations = parseEnumeration(lines)
-
-            if(!enumerations){
-                return catalogueBuilder.dataType(name: name) ?: catalogueBuilder.dataType(name: "String")
-            }
-            String enumString = enumerations.sort() collect { key, val ->
-                "${quote(key)}:${quote(val)}"
-            }.join('|')
-
-            def dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
-
-            if (dataTypeReturn) {
-                return catalogueBuilder.dataType(name: dataTypeReturn.name)
-            }
-            return catalogueBuilder.dataType(name: name.replaceAll("\\s", "_"), enumerations: enumerations)
+        String[] lines = dataTypeNameOrEnum.split("\\r?\\n");
+        if (!(lines.size() > 0 && lines != null)) {
+            return catalogueBuilder.dataType(name: "String", classification: dataTypeClassification, id: dataTypeCode)
         }
-        catalogueBuilder.dataType(name: "String")
+
+        def enumerations = parseEnumeration(lines)
+
+        if(!enumerations){
+            return catalogueBuilder.dataType(name: dataTypeNameOrEnum, classification: dataTypeClassification, id: dataTypeCode)
+        }
+        String enumString = enumerations.sort().collect { key, val ->
+            "${quote(key)}:${quote(val)}"
+        }.join('|')
+
+        def dataTypeReturn = EnumeratedType.findWhere(enumAsString: enumString)
+
+        if (dataTypeReturn) {
+            return catalogueBuilder.dataType(name: dataTypeReturn.name, id: dataTypeReturn.modelCatalogueId ?: dataTypeReturn.getDefaultModelCatalogueId(true))
+        }
+        return catalogueBuilder.dataType(name: dataElementName.replaceAll("\\s", "_"), enumerations: enumerations, classification: dataTypeClassification, id: dataTypeCode)
     }
 
     static Map<String,String> parseEnumeration(String[] lines){
