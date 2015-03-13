@@ -719,7 +719,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
-                      <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sposored by</div>
+                      <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sponsored by</div>
                       <div class="col-lg-4 col-sm-4 col-md-4">
                         <p><a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC</a></p>
                         <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;">
@@ -973,7 +973,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                         <div class="panel panel-default">
                             <div class="panel-body">
                                 <div class="row">
-                                  <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sposored by</div>
+                                  <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sponsored by</div>
                                   <div class="col-lg-4 col-sm-4 col-md-4">
                                     <p><a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC</a></p>
                                     <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;">
