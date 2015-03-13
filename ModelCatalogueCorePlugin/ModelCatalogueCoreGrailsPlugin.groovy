@@ -225,18 +225,50 @@ Model catalogue core plugin (metadata registry)
         xlsxListRenderer.registerRowWriter('NHIC') {
             title "Data Elements to Excel"
             append metadata
-            headers "Classification", "Parent Model Unique Code",
-            "Parent Model", "Model Unique Code", "Model",
-            "Data Item Unique Code", "Data Item Name", "Data Item Description",
-            "Measurement Unit","Measurement Unit Symbol", "Data type", "Metadata"
+            headers "Classification",
+                    "Parent Model Unique Code",
+                    "Parent Model",
+                    "Model Unique Code",
+                    "Model",
+                    "Data Item Unique Code",
+                    "Data Item Name",
+                    "Data Item Description",
+                    "Value Domain Classification",
+                    "Value Domain Unique Code",
+                    "Value Domain",
+                    "Measurement Unit",
+                    "Measurement Unit Symbol",
+                    "Data Type Classification",
+                    "Data Type Unique Code",
+                    "Data Type",
+                    "Metadata"
 
             when { ListWrapper container, RenderContext context ->
                 container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
-                [[getClassificationString(element), getParentModel(element)?.modelCatalogueId,
-                  getParentModel(element)?.name, getContainingModel(element)?.modelCatalogueId, getContainingModel(element)?.name,
-                  element.modelCatalogueId, element.name, element.description,
-                  getUnitOfMeasure(element), getUnitOfMeasureSymbol(element) , getDataType(element), "-"]]
+                Model parent = getParentModel(element)
+                Model model = getContainingModel(element)
+                ValueDomain valueDomain = element.valueDomain
+                DataType dataType = valueDomain?.dataType
+                [[
+                         getClassificationString(element),
+                         parent?.modelCatalogueId ?: parent?.getDefaultModelCatalogueId(true),
+                         parent?.name,
+                         model?.modelCatalogueId  ?: model?.getDefaultModelCatalogueId(true),
+                         model?.name,
+                         element.modelCatalogueId ?: element.getDefaultModelCatalogueId(true),
+                         element.name,
+                         element.description,
+                         getClassificationString(valueDomain),
+                         valueDomain?.modelCatalogueId ?: valueDomain?.getDefaultModelCatalogueId(true),
+                         valueDomain?.name,
+                         getUnitOfMeasure(element),
+                         getUnitOfMeasureSymbol(element) ,
+                         getClassificationString(dataType),
+                         dataType?.modelCatalogueId ?: dataType?.getDefaultModelCatalogueId(true),
+                         getDataType(element),
+                         "-"
+                 ]]
             }
         }
 
@@ -348,7 +380,7 @@ Model catalogue core plugin (metadata registry)
                 return ''
             }
             if (dataType instanceof EnumeratedType) {
-                return dataType.enumAsString
+                return dataType.enumerations.collect { key, value -> "$key:$value"}.join('\n')
             }
             return dataType.name
         }
@@ -356,12 +388,10 @@ Model catalogue core plugin (metadata registry)
     }
 
     def static getClassificationString(CatalogueElement dataElement) {
-        String classifications = ""
-        dataElement.classifications.eachWithIndex{ def classification, Integer i ->
-            if (classifications != "") classifications += (stringSeparator + classification.name)
-            else classifications = classification.name
+        if (!dataElement?.classifications) {
+            return ""
         }
-        return classifications
+        dataElement.classifications.first().name
     }
 
     def static getValueDomainString(DataType dataType){
