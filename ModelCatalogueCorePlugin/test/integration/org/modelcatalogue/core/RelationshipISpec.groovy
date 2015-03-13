@@ -158,10 +158,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         Model.findByName("book")
     }
 
-    Model getMd1() {
-        Model.findByName("book")
-    }
-
 
     def "get classified name"() {
         expect:
