@@ -517,6 +517,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
           args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
           messages.prompt('Update Relationship', '', args).then (updated)->
             rel.ext = updated.ext
+            $state.go '.' if $state.current.name?.indexOf('mc.resource.show') > -1
     }
   ]
 
