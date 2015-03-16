@@ -135,6 +135,9 @@ class Relationship implements Extendible<RelationshipMetadata> {
 
     @Override
     RelationshipMetadata updateExtension(RelationshipMetadata old, String value) {
+        if (old.extensionValue == value) {
+            return
+        }
         old.extensionValue = value
         if (old.validate()) {
             auditService.logRelationshipMetadataUpdated(old)

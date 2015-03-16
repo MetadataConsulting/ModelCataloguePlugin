@@ -77,6 +77,9 @@ class Action implements Extendible<ActionParameter> {
 
     @Override
     ActionParameter updateExtension(ActionParameter old, String value) {
+        if (old.extensionValue == value) {
+            return
+        }
         old.extensionValue = value
         FriendlyErrors.failFriendlySaveWithoutFlush(old)
     }
