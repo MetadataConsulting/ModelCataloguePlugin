@@ -99,6 +99,8 @@ grails.project.dependency.resolution = {
         runtime ":jquery:1.11.1"
         compile ":spring-security-ui:1.0-RC2"
 
+        compile ":grails-melody:1.55.0"
+
         test ":geb:0.9.3"
 
         // Uncomment these (or add new ones) to enable additional resources capabilities
