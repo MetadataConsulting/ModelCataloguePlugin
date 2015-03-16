@@ -425,9 +425,7 @@ class DefaultAuditor implements Auditor {
             ]
         }
         if (object instanceof Relationship){
-            def ret = RelationshipMarshallers.getRelationshipAsMap(object)
-            ret.remove('ext')
-            return ret
+            return RelationshipMarshallers.getRelationshipAsMap(object)
         }
         if (object instanceof Enum) {
             return object.toString()

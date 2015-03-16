@@ -231,7 +231,11 @@ enum ChangeType {
             if (!newOne) {
                 return false
             }
-            return !newOne.hasErrors()
+            if (newOne.hasErrors()) {
+                return false
+            }
+            newOne.ext = rel.ext
+            return true
         }
     },
 
