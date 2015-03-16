@@ -180,7 +180,7 @@ enum RelationshipDirection {
 
         @Override
         CatalogueElement getElement(CatalogueElement owner, Relationship relationship) {
-            owner == relationship.destination ? relationship.source : relationship.destination
+            owner
         }
 
         @Override
