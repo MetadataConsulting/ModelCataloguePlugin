@@ -563,6 +563,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     $rootScope.$on 'resourceNotFound', ->
       messages.error 'Selected resource cannot be found in the catalogue.'
+      if $stateParams.resource
+        $state.go 'mc.resource.list', resource: $stateParams.resource
+      else
+        $state.go 'dashboard'
   ])
 
 .run(['$templateCache', ($templateCache) ->
