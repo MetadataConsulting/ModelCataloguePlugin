@@ -389,6 +389,9 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     ExtensionValue updateExtension(ExtensionValue old, String value) {
+        if (old.extensionValue == value) {
+            return
+        }
         old.extensionValue = value
         if (old.validate()) {
             auditService.logMetadataUpdated(old)

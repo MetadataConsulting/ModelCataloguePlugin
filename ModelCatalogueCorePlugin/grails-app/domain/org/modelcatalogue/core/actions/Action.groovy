@@ -44,7 +44,7 @@ class Action implements Extendible<ActionParameter> {
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     @Override
-    Set<Extension> listExtensions() {
+    Set<ActionParameter> listExtensions() {
         extensions
     }
 
