@@ -21,26 +21,17 @@
         <asset:stylesheet href="font-awesome/css/font-awesome"/>
         <asset:stylesheet href="modelcatalogue.css"/>
     </g:else>
-
 </head>
-<%
-    def valueDomains = new TreeSet<ValueDomain>([compare: { ValueDomain a, ValueDomain b ->
-        a?.name <=> b?.name
-    }] as Comparator<ValueDomain>)
-
-%>
 <body>
 <div>
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-
             </br>
             </br>
             </br>
-                <g:each status="i" in="${classification.classifies.findAll{it in Model}}" var="model">
+                <g:each status="i" in="${models}" var="model">
                     <g:if test="!${model.childOf}">
-
                         <g:render template="recModel" model="${[models: model, index:0, valueDomains: valueDomains]}" />
                     </g:if>
                 </g:each>

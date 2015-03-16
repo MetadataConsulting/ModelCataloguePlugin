@@ -55,6 +55,8 @@ class Relationship implements Extendible {
     Boolean archived = false
 
     static mapping = {
+		incomingIndex index:'Rlt_incomingIndex_idx' 
+		archived index:'Rlt_archived_idx' 
         extensions lazy: false
     }
 

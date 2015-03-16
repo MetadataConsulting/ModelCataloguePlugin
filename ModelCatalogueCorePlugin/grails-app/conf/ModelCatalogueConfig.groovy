@@ -80,3 +80,5 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "classificationFilter", sourceToDestination: "used as filter by", destinationToSource: "filtered by", sourceClass: Classification, destinationClass: User, system: true],
 ]
 
+jasper.dir.reports = 'jReports'
+

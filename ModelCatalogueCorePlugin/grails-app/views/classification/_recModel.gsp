@@ -1,3 +1,4 @@
+<%@page import="org.modelcatalogue.core.DataElement"%>
 <%@ page import="org.modelcatalogue.core.EnumeratedType" %>
 <g:if test="${models}">
     <g:each status="j" in="${models}" var="model">
@@ -25,7 +26,9 @@
                 </tr>
                 </thead>
                 <tbody>
-                <mc:relationships element="${model}" var="relationship" direction="outgoing" type="containment">
+                <g:each  in="${model.outgoingRelationships}" var="relationship" >
+                <g:if test="${relationship.destination instanceof DataElement }">
+               
                     <%
                         if (relationship.destination.valueDomain) {
                             valueDomains << relationship.destination.valueDomain
@@ -60,13 +63,13 @@
                         %{--<td width="30">${relationship.ext['Min Occurs']}</td>--}%
                         %{--<td width="30">${relationship.ext['Max Occurs']}</td>--}%
                     </tr>
-                </mc:relationships>
+             </g:if>
+               </g:each>
+                    
                 </tbody>
             </table>
-        </g:if>
+         </g:if>
         <p>&nbsp;</p>
-
-
-        <g:if test="${model?.parentOf}"> <g:render template="recModel" model="${[models: model.parentOf, index: index+1]}"/></g:if>
+        <g:if test="${model?.parentOf}"> <g:render template="recModel" model="${[models: model.parentOf, index: index+1,valueDomains:valueDomains]}"/></g:if>
     </g:each>
 </g:if>

@@ -39,6 +39,7 @@ grails.project.dependency.resolution = {
         mavenRepo 'http://jcenter.bintray.com'
         mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
         mavenRepo "http://dl.dropbox.com/u/326301/repository"
+		mavenRepo 'http://jasperreports.sourceforge.net/maven2'
 //        mavenRepo "http://www.biojava.org/download/maven/"
 
 
@@ -49,6 +50,15 @@ grails.project.dependency.resolution = {
         compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+		
+		//needed for newer  jasper 
+		compile ('net.sf.jasperreports:jasperreports:6.0.3'){
+            excludes 'antlr', 'commons-logging',
+                     'ant', 'mondrian', 'commons-javaflow','barbecue', 'xml-apis-ext','xml-apis', 'xalan', 'groovy-all', 'hibernate', 'saaj-api', 'servlet-api',
+                     'xercesImpl','xmlParserAPIs','spring-core','bsh', 'spring-beans', 'jaxen', 'barcode4j','batik-svg-dom','batik-xml','batik-awt-util','batik-dom',
+                     'batik-css','batik-gvt','batik-script', 'batik-svggen','batik-util','batik-bridge','persistence-api','jdtcore','bcmail-jdk16','bcprov-jdk16','bctsp-jdk16',
+                     'bcmail-jdk14','bcprov-jdk14','bctsp-jdk14','xmlbeans', 'olap4j'
+        }
     }
 
     plugins {
@@ -80,6 +90,8 @@ grails.project.dependency.resolution = {
         test ":code-coverage:1.2.7"
 
         build ":tomcat:7.0.55"
+		//jasper report generator see in dependencies
+		compile ":jasper:1.11.0"
 
     }
 }

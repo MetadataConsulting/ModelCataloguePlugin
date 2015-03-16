@@ -14,18 +14,18 @@
         </tr>
         </thead>
         <tbody>
-        <mc:relationships element="${model}" var="relationship" direction="outgoing" type="containment">
+        <g:each  in="${dataElements.get(model.id)}" var="relationship" >
             <tr >
                 <td width="200">${relationship.destination.name}</td>
                 <td width="400">${relationship.destination.description}</td>
                 <td width="400">${relationship.destination.id}</td>
             </tr>
-        </mc:relationships>
+  </g:each>
         </tbody>
     </table>
 
 
-    <mc:relationships element="${model}" var="relationship" direction="outgoing" type="containment">
+  <g:each  in="${dataElements.get(model.id)}" var="relationship" >
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title text-center"><span class="badge pull-left">${relationship?.destination?.id}</span>${relationship?.destination?.name} <small><span class="badge pull-right">v${model.versionNumber}</span><span class="label label-info pull-right">${model.status}</span></small></h3>
@@ -77,4 +77,4 @@
                 </g:if>
             </div>
         </div>
-    </mc:relationships>
+</g:each>

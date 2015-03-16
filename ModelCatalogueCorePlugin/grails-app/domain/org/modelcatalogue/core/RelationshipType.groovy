@@ -67,6 +67,8 @@ class RelationshipType {
         // this makes entities immutable
         // cache usage: 'read-only'
         sort "name"
+		name index: 'RelationType_name_idx'
+		destinationClass index: 'RelationType_destinationClass_idx'
     }
 
     def validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
