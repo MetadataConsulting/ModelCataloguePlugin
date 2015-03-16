@@ -101,6 +101,7 @@ class BootStrap {
         createRequestmapIfMissing('/securityInfo/**',              'ROLE_ADMIN')
         createRequestmapIfMissing('/console/**',                   'ROLE_ADMIN')
         createRequestmapIfMissing('/dbconsole/**',                 'ROLE_ADMIN')
+        createRequestmapIfMissing('/monitoring/**',                 'ROLE_ADMIN')
         createRequestmapIfMissing('/plugins/console-1.5.0/**',     'ROLE_ADMIN')
 
 //        createRequestmapIfMissing('/api/modelCatalogue/core/model/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
