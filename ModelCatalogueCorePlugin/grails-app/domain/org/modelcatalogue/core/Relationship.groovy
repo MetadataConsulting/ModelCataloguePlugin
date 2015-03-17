@@ -61,17 +61,6 @@ class Relationship implements Extendible {
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 
     static constraints = {
-        relationshipType unique: ['source', 'destination'], validator: { val, obj ->
-
-            if (!val) return true;
-
-            def errorMessage = val.validateSourceDestination(obj.source, obj.destination, obj.ext)
-            if (errorMessage instanceof String || (errorMessage instanceof List && errorMessage.size() > 1 && errorMessage.first() instanceof String)) {
-                return errorMessage;
-            }
-            return true;
-
-        }
         classification nullable: true
     }
 

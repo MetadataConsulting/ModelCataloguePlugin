@@ -34,6 +34,8 @@ class RelationshipType {
     /** if relationships of this type shall not be carried over when new draft version is created */
     Boolean versionSpecific = Boolean.FALSE
 
+    SecuredRuleExecutor.ReusableScript ruleScript
+
     /**
      * This is a script which will be evaluated with following binding:
      * source
@@ -62,11 +64,17 @@ class RelationshipType {
         rule nullable: true, maxSize: 10000
     }
 
+    static transients = ['ruleScript']
+
 
     static mapping = {
-        // this makes entities immutable
-        // cache usage: 'read-only'
+        cache 'nonstrict-read-write'
         sort "name"
+    }
+
+    void setRule(String rule) {
+        this.rule = rule
+        this.ruleScript = null
     }
 
     def validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
@@ -114,12 +122,21 @@ class RelationshipType {
             return true
         }
 
-        new SecuredRuleExecutor(
+        if (!ruleScript) {
+            ruleScript = new SecuredRuleExecutor(
                 source: source,
                 destination: destination,
                 type: this,
                 ext: ext
-        ).execute(rule)
+            ).reuse(rule)
+        }
+
+        ruleScript.execute(
+            source: source,
+            destination: destination,
+            type: this,
+            ext: ext
+        )
     }
 
 

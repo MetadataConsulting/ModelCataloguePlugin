@@ -22,11 +22,7 @@ class RelationshipService {
 
     Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false, boolean resetIndexes = false) {
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
-
-            if (!relationshipInstance && relationshipType.bidirectional) {
-                relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(destination, source, relationshipType, classification)
-            }
+            Relationship relationshipInstance = findExistingRelationship(source, destination, relationshipType, classification)
 
             if (relationshipInstance) {
                 if (!resetIndexes && relationshipInstance.archived == archived) {
@@ -62,10 +58,56 @@ class RelationshipService {
             return relationshipInstance
         }
 
+        def errorMessage = relationshipType.validateSourceDestination(source, destination, [:])
+        if (errorMessage instanceof String) {
+            relationshipInstance.errors.rejectValue('relationshipType', errorMessage)
+            return relationshipInstance
+        }
+        if (errorMessage instanceof List && errorMessage.size() > 1 && errorMessage.first() instanceof String) {
+            relationshipInstance.errors.rejectValue('relationshipType', *errorMessage)
+            return relationshipInstance
+        }
+
         relationshipInstance.save(flush: true)
         source?.addToOutgoingRelationships(relationshipInstance)?.save(flush: true)
         destination?.addToIncomingRelationships(relationshipInstance)?.save(flush: true)
         relationshipInstance
+    }
+
+    Relationship findExistingRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification) {
+        // language=HQL
+        String query = """
+            select rel from Relationship rel left join fetch rel.extensions left join fetch rel.relationshipType
+            where rel.source = :source
+            and rel.destination = :destination
+            and rel.relationshipType = :relationshipType
+            and rel.classification = :classification
+        """
+
+        Map<String, Object> params = [source: source, destination: destination, relationshipType: relationshipType, classification: classification]
+
+        if (!classification) {
+            query = """
+                select rel from Relationship rel left join fetch rel.extensions left join fetch rel.relationshipType
+                where rel.source = :source
+                and rel.destination = :destination
+                and rel.relationshipType = :relationshipType
+                and rel.classification is null
+            """
+            params.remove 'classification'
+        }
+
+        List<Relationship> relationships = Relationship.executeQuery(query, params, [cache: true])
+        if (relationships)  {
+            return relationships.first()
+        }
+        if (relationshipType.bidirectional) {
+            params.source = destination
+            params.destination = source
+            relationships = Relationship.executeQuery(query, params, [cache: true])
+            return relationships ? relationships.first() : null
+        }
+        return null
     }
 
 
@@ -80,7 +122,7 @@ class RelationshipService {
     Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean ignoreRules = false) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
+            Relationship relationshipInstance = findExistingRelationship(source, destination, relationshipType, classification)
 
             if(!ignoreRules) {
                 if (relationshipType.versionSpecific && !relationshipType.system && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
@@ -115,10 +157,10 @@ class RelationshipService {
         String classifications = Relationship.executeQuery("""
             select r.source.name
             from Relationship as r
-            where r.relationshipType = :classification
+            where r.relationshipType.id = :classification
             and r.destination.id = :elementId
             order by r.source.name
-        """, [classification: classification, elementId: element.id]).join(', ')
+        """, [classification: classification.id, elementId: element.id]).join(', ')
 
         if (classifications) {
             return "${element.name} (${classifications})"
@@ -141,10 +183,10 @@ class RelationshipService {
         Relationship.executeQuery("""
             select r.source.name, r.source.id, r.source.status
             from Relationship as r
-            where r.relationshipType = :classification
+            where r.relationshipType.id = :classification
             and r.destination.id = :elementId
             order by r.source.name
-        """, [classification: classification, elementId: element.id]).collect {
+        """, [classification: classification.id, elementId: element.id]).collect {
             [name: it[0], id: it[1], status: "${it[2]}", elementType: Classification.name, link:  "/classification/${it[1]}"]
         }
     }
@@ -158,16 +200,16 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.findByName('classification')
+        RelationshipType classification = RelationshipType.readByName('classification')
 
         Classification.executeQuery """
             select c
             from Classification as c
             join c.outgoingRelationships as rel
-            where rel.relationshipType = :classification
+            where rel.relationshipType.id = :classification
             and rel.destination.id = :elementId
             order by c.name
-        """, [classification: classification, elementId: element.id]
+        """, [classification: classification.id, elementId: element.id], [cache: true]
     }
 
     Relationship moveAfter(RelationshipDirection direction, CatalogueElement owner,  Relationship relationship, Relationship other) {
