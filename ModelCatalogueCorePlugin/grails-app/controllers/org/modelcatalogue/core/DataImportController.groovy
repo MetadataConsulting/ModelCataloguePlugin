@@ -64,8 +64,7 @@ class DataImportController  {
         errors.addAll(getErrors(params, file))
 
         if (errors) {
-            response = ["errors": errors]
-            respond response
+            respond("errors": errors)
             return
         }
         conceptualDomainName = trimString(params.conceptualDomain)
@@ -206,16 +205,8 @@ class DataImportController  {
                 }
             }
 
-            webRequest.currentResponse.with {
-                //TODO: remove the base link
-                def location = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/api/modelCatalogue/core/asset/" + asset.id
-                status = 302
-                setHeader("Location", location.toString())
-                setHeader("X-Asset-ID", asset.id.toString())
-                outputStream.flush()
-            }
+            redirectToAsset(id)
             return
-
         }
 
 
@@ -227,8 +218,7 @@ class DataImportController  {
 
         if (!CONTENT_TYPES.contains(confType)) errors.add("input should be an Excel file but uploaded content is ${confType}")
         if (file.size <= 0) errors.add("The uploaded file is empty")
-        response = ["errors": errors]
-        respond response
+        respond "errors": errors
     }
 
     protected static makeRelationships(Collection<CatalogueElement> catElements, Asset asset){
@@ -253,13 +243,8 @@ class DataImportController  {
         updated
     }
     protected redirectToAsset(Long id){
-        webRequest.currentResponse.with {
-            def location = grailsApplication.config.grails.serverURL +  "/api/modelCatalogue/core/asset/" + id
-            status = 302
-            setHeader("Location", location.toString())
-            setHeader("X-Asset-ID",  id.toString())
-            outputStream.flush()
-        }
+        response.setHeader("X-Asset-ID",  id.toString())
+        redirect url: grailsApplication.config.grails.serverURL +  "/api/modelCatalogue/core/asset/" + id
     }
 
     protected logError(Long id,Exception e){
