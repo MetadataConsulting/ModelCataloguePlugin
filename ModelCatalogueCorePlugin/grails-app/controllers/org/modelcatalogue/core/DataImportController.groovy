@@ -16,7 +16,7 @@ class DataImportController  {
     def XSDImportService
     def OBOService
     def umljService
-    def LoincImportService
+    def loincImportService
     def modelCatalogueSecurityService
     def executorService
     def elementService
@@ -134,7 +134,7 @@ class DataImportController  {
 
             executorService.submit {
                 try {
-                    Set<CatalogueElement> created = LoincImportService.serviceMethod(inputStream)
+                    Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
                     Asset theAsset = Asset.get(id)
                     for (CatalogueElement element in created) {
                         theAsset.addToRelatedTo(element)
