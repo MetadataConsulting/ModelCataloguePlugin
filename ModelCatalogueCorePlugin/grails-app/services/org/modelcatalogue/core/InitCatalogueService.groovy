@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.transaction.Transactional
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
@@ -11,8 +10,9 @@ import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
 import org.modelcatalogue.core.util.test.TestDataHelper
 
-@Transactional
 class InitCatalogueService {
+
+    static transactional = false
 
     def grailsApplication
     def classificationService

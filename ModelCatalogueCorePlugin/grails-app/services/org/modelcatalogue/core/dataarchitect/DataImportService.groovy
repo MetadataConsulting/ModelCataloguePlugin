@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.dataarchitect
 
-import grails.transaction.Transactional
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
@@ -13,7 +12,6 @@ class DataImportService {
 
     private static final QUOTED_CHARS = ["\\": "&#92;", ":" : "&#58;", "|" : "&#124;", "%" : "&#37;"]
 
-    @Transactional
     Collection<CatalogueElement> importData(ArrayList headers, ArrayList rows, HeadersMap headersMap) {
         //get indexes of the appropriate sections
         def dataItemNameIndex = headers.indexOf(headersMap.dataElementName)
