@@ -10,7 +10,6 @@ databaseChangeLog = {
             column(name: "destination_id")
             column(name: "source_id")
             column(name: "relationship_type_id")
-            column(name: "classification_id")
         }
     }
 
