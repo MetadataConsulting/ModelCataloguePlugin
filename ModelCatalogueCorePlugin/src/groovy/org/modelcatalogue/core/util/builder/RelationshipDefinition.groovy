@@ -39,15 +39,7 @@ class RelationshipDefinition {
     // processing flags
     boolean resetIndices
     boolean ignoreRules
-
-    /**
-     * If we expect the relationship not being present in the catalogue yet.
-     *
-     * Use this if at least one end of this relationship is newly created instance so there is no chance to created
-     * relationship exists (this for example applies on copying draft relationships or assigning classification
-     * to newly created element).
-     */
-    boolean newExpected
+    boolean skipUniqueChecking
 
     Relationship createRelationship() {
         new Relationship(

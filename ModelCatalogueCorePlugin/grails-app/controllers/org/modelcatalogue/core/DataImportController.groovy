@@ -230,7 +230,6 @@ class DataImportController  {
     protected static classifyAsset(Asset asset, Classification classification){
         if (classification) {
             asset.addToClassifications(classification, newExpected: true)
-            classification.addToClassifies(asset, newExpected: true)
             asset.addToRelatedTo(classification, newExpected: true)
         }
     }
