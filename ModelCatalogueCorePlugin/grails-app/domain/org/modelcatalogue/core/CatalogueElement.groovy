@@ -8,6 +8,7 @@ import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.builder.RelationshipDefinition
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -169,12 +170,12 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
 
-    Relationship createLinkTo(CatalogueElement destination, RelationshipType type, Boolean resetIndexes = false) {
-        relationshipService.link(this, destination, type, null,  false, false, resetIndexes)
+    Relationship createLinkTo(Map<String, Object> params = [:], CatalogueElement destination, RelationshipType type) {
+        relationshipService.link RelationshipDefinition.create(this, destination, type).withParams(params).definition
     }
 
-    Relationship createLinkFrom(CatalogueElement source, RelationshipType type, Boolean resetIndexes = false) {
-        relationshipService.link(source, this, type, null, false, false, resetIndexes)
+    Relationship createLinkFrom(Map<String, Object> params = [:], CatalogueElement source, RelationshipType type) {
+        relationshipService.link RelationshipDefinition.create(source, this, type).withParams(params).definition
     }
 
     Relationship removeLinkTo(CatalogueElement destination, RelationshipType type) {

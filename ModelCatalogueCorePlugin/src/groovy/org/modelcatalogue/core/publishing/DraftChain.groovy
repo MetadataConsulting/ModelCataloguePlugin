@@ -104,7 +104,7 @@ class DraftChain extends PublishingChain {
         restoreStatus()
 
 
-        draft.addToSupersedes(published)
+        draft.addToSupersedes(published, newExpected: true)
 
         strategy.delayRelationshipCopying(draft, published)
 

@@ -14,25 +14,13 @@ class SearchISpec extends AbstractIntegrationSpec{
  //runs ok in integration test (test-app :integration), fails as part of test-app (Grails Bug) - uncomment to run
 //RE: http://jira.grails.org/browse/GRAILS-11047?page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel
 
-    @Shared
     RelationshipService relationshipService
-    @Shared
-    def grailsApplication, de, vd, mod
+    def grailsApplication
 
 
-    def setupSpec(){
+    def setup(){
         loadFixtures()
-        de = DataElement.findByName("auth7")
-        vd = ValueDomain.findByName("value domain Celsius")
-        mod = Model.findByName("book")
-        relationshipService = new RelationshipService()
-
-        relationshipService.link(mod, de, RelationshipType.findByName("containment"))
     }
-
-    def cleanupSpec() {
-    }
-
 
     @Unroll
     def "#no - text search for #className "(){

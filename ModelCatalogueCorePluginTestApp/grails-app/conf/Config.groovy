@@ -117,9 +117,8 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'grails.app.services.org.modelcatalogue.core.ElementService'
-    debug 'grails.app.services.org.modelcatalogue.core.dataarchitect.OBOService'
-    debug 'grails.app.services.org.modelcatalogue.core.InitCatalogueService'
+    debug 'grails.app.services.org.modelcatalogue.core'
+
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 
     debug 'org.modelcatalogue.core.util.builder'
@@ -158,26 +157,26 @@ elasticSearch.datastoreImpl = 'hibernateDatastore'
 
 modelcatalogue.defaults.relationshiptypes =  [
         [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
-            String minOccursString = ext['Min Occurs']
-            String maxOccursString = ext['Max Occurs']
+String minOccursString = ext['Min Occurs']
+String maxOccursString = ext['Max Occurs']
 
-            Integer minOccurs = minOccursString in ['unbounded', 'null'] ? 0 : (minOccursString as Integer)
-            Integer maxOccurs = maxOccursString in ['unbounded', 'null'] ? Integer.MAX_VALUE : (maxOccursString as Integer)
+Integer minOccurs = minOccursString in ['unbounded', 'null', '*', null] ? 0 : (minOccursString as Integer)
+Integer maxOccurs = maxOccursString in ['unbounded', 'null', '*', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
 
-            if (minOccurs != null) {
-                if (minOccurs < 0) {
-                    return false
-                }
-                if (maxOccurs != null && maxOccurs < minOccurs) {
-                    return false
-                }
-            } else {
-                if (maxOccurs != null && maxOccurs < 1) {
-                    return false
-                }
-            }
+if (minOccurs != null) {
+    if (minOccurs < 0) {
+        return false
+    }
+    if (maxOccurs != null && maxOccurs < minOccurs) {
+        return false
+    }
+} else {
+    if (maxOccurs != null && maxOccurs < 1) {
+        return false
+    }
+}
 
-            return true
+return true
         ''', versionSpecific: true],
         [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"],
         [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],

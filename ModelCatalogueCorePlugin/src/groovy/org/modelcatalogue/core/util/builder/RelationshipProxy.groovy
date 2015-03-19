@@ -41,7 +41,7 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
             if (!destinationElement.readyForQueries) {
                 throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
             }
-            Relationship relationship = sourceElement.createLinkTo(destinationElement, type, true)
+            Relationship relationship = sourceElement.createLinkTo(destinationElement, type, resetIndices: true)
             if (relationship.hasErrors()) {
                 log.error(FriendlyErrors.printErrors("Cannot create relationship of type  $relationshipTypeName between $sourceElement and $destinationElement", relationship.errors))
                 throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement. Requested source was $source and destination $destination")

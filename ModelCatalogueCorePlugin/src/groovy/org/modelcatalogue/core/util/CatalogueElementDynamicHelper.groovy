@@ -33,7 +33,7 @@ class CatalogueElementDynamicHelper {
             transients << name
             if (!type.metaClass.hasProperty(name)) {
                 type.metaClass."get${name.capitalize()}" = {->
-                    RelationshipType relType = RelationshipType.findByName(relName)
+                    RelationshipType relType = RelationshipType.readByName(relName)
                     if (!relType) {
                         log.warning "querying for $name for $delegate.name but the relationship type $relName does not exist"
                         return []
@@ -45,7 +45,7 @@ class CatalogueElementDynamicHelper {
                     delegate."get${direction.capitalize()}RelationsByType"(relType)
                 }
                 type.metaClass."get${name.capitalize()}Relationships" = {->
-                    RelationshipType relType = RelationshipType.findByName(relName)
+                    RelationshipType relType = RelationshipType.readByName(relName)
                     if (!relType) {
                         log.warning "querying for $name for $delegate.name but the relationship type $relName does not exist"
                         return []
@@ -60,7 +60,7 @@ class CatalogueElementDynamicHelper {
             String countMethodName = "count${name.capitalize()}"
             if (!type.metaClass.metaMethods.any {it.name == countMethodName}) {
                 type.metaClass[countMethodName] = {->
-                    RelationshipType relType = RelationshipType.findByName(relName)
+                    RelationshipType relType = RelationshipType.readByName(relName)
                     if (!relType) {
                         log.warning "querying count of $name for $delegate.name but the relationship type $relName does not exist"
                         return 0
@@ -71,10 +71,10 @@ class CatalogueElementDynamicHelper {
 
             String addMethodName = "addTo${name.capitalize()}"
             if (!type.metaClass.metaMethods.any {it.name == addMethodName}) {
-                type.metaClass[addMethodName] = { other ->
-                    RelationshipType relType = RelationshipType.findByName(relName)
+                type.metaClass[addMethodName] = { Map<String, Object> params = [:], CatalogueElement other ->
+                    RelationshipType relType = RelationshipType.readByName(relName)
                     if (!relType) throw new IllegalArgumentException("Unknown relationship type $relName")
-                    Relationship rel = delegate."createLink${direction == 'incoming' ? 'From' : 'To'}"(other, relType)
+                    Relationship rel = delegate."createLink${direction == 'incoming' ? 'From' : 'To'}"(params, other, relType)
                     if (rel.hasErrors()) {
                         throw new IllegalArgumentException(FriendlyErrors.printErrors("Cannot add to $name $delegate value $other", rel.errors))
                     }
@@ -85,7 +85,7 @@ class CatalogueElementDynamicHelper {
             String removeMethodName = "removeFrom${name.capitalize()}"
             if (!type.metaClass.metaMethods.any {it.name == removeMethodName}) {
                 type.metaClass[removeMethodName] = {other ->
-                    RelationshipType relType = RelationshipType.findByName(relName)
+                    RelationshipType relType = RelationshipType.readByName(relName)
                     if (!relType) throw new IllegalArgumentException("Unknown relationship type $relType")
                     delegate."removeLink${direction == 'incoming' ? 'From' : 'To'}"(other, relType)
                 }

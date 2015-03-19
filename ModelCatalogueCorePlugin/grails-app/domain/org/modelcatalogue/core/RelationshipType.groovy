@@ -106,7 +106,7 @@ class RelationshipType {
 
             if (result instanceof Throwable) {
                 log.warn("Rule of $name thrown an exception for $source and $destination: $result", result)
-                return ['rule.did.not.pass.with.exception', result.message]
+                return ['rule.did.not.pass.with.exception', [result.toString()] as Object[], "Rule thrown an exception: $result.message"]
             }
 
             if (result) {

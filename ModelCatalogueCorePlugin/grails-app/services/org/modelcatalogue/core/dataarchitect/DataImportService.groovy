@@ -122,7 +122,7 @@ class DataImportService {
             return catalogueBuilder.dataType(name: "String", classification: dataTypeClassification, id: dataTypeCode)
         }
 
-        def enumerations = parseEnumeration(lines)
+        def enumerations = lines.size() == 1 ? [:] : parseEnumeration(lines)
 
         if(!enumerations){
             return catalogueBuilder.dataType(name: dataTypeNameOrEnum, classification: dataTypeClassification, id: dataTypeCode)
@@ -136,7 +136,7 @@ class DataImportService {
         if (dataTypeReturn) {
             return catalogueBuilder.dataType(name: dataTypeReturn.name, id: dataTypeReturn.modelCatalogueId ?: dataTypeReturn.getDefaultModelCatalogueId(true))
         }
-        return catalogueBuilder.dataType(name: dataElementName.replaceAll("\\s", "_"), enumerations: enumerations, classification: dataTypeClassification, id: dataTypeCode)
+        return catalogueBuilder.dataType(name: dataElementName, enumerations: enumerations, classification: dataTypeClassification, id: dataTypeCode)
     }
 
     static Map<String,String> parseEnumeration(String[] lines){

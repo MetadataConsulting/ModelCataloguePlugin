@@ -257,7 +257,7 @@ class ElementService implements Publisher<CatalogueElement> {
             archive source
         }
 
-        destination.addToSupersededBy(source)
+        destination.addToSupersededBy(source, newExpected: true)
 
         destination.status = originalStatus
 

@@ -89,7 +89,7 @@ class InitCatalogueService {
                 if (type.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Cannot create relationship type $definition.name", type.errors))
                 }
-            } else if (definition.rule && definition.rule.trim() != existing.rule?.trim()) {
+            } else if (definition.rule && definition.rule.replaceAll(/\s+/, ' ').trim() != existing.rule?.replaceAll(/\s+/, ' ')?.trim()) {
                 log.warn("""
                     Your current rule for relationship type '${existing.name}' is different than the one from configuration. This may cause unexpected behaviour:
                     ===EXPECTED'${existing.name}'===

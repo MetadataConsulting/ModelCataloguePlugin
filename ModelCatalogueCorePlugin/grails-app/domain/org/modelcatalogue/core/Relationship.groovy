@@ -45,17 +45,13 @@ class Relationship implements Extendible {
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
 
+    Boolean archived = false
+
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
         this.ext.clear()
         this.ext.putAll(ext)
-    }
-
-    Boolean archived = false
-
-    static mapping = {
-        extensions lazy: false
     }
 
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
