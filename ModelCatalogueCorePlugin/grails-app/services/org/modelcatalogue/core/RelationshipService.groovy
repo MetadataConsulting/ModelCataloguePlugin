@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
-import org.hibernate.exception.ConstraintViolationException
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
@@ -67,23 +66,8 @@ class RelationshipService {
     }
 
     Relationship link(RelationshipDefinition relationshipDefinition) {
-        try {
-            return linkInternal(relationshipDefinition)
-        } catch (ConstraintViolationException e) {
-            // duplicate entry
-            if (relationshipDefinition.newExpected) {
-                throw e
-            }
-            log.warn "constraint violation linking $relationshipDefinition", e
-            RelationshipDefinition pessimistic = relationshipDefinition.clone()
-            pessimistic.newExpected = false
-            return linkInternal(pessimistic)
-        }
-    }
-
-    private Relationship linkInternal(RelationshipDefinition relationshipDefinition) {
         if (relationshipDefinition.source?.id && relationshipDefinition.destination?.id && relationshipDefinition.relationshipType?.id) {
-            Relationship relationshipInstance = relationshipDefinition.newExpected ? null : findExistingRelationship(relationshipDefinition)
+            Relationship relationshipInstance = relationshipDefinition.skipUniqueChecking ? null : findExistingRelationship(relationshipDefinition)
 
             if (relationshipInstance) {
                 if (!relationshipDefinition.resetIndices && relationshipInstance.archived == relationshipDefinition.archived) {
@@ -175,7 +159,7 @@ class RelationshipService {
             relationships = Relationship.executeQuery(query, params)
             return relationships ? relationships.first() : null
         }
-        log.info "Relationship $definition checked for presence but not found. Finding relationship is slow, consider using 'newExpected' flag for optimistic relationship linking."
+        log.info "Relationship $definition checked for presence but not found. Finding relationship is slow, consider using 'skipUniqueChecking' flag for optimistic relationship linking."
         return null
     }
 

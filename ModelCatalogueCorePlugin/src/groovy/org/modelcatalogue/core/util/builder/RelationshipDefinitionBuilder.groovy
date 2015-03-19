@@ -38,8 +38,16 @@ class RelationshipDefinitionBuilder {
         this
     }
 
-    RelationshipDefinitionBuilder withNewExpected(boolean newExpected) {
-        definition.newExpected = newExpected
+    /**
+     * If we expect the relationship not being present in the catalogue yet. This will cause throwing an exception
+     * if the relationship already exists (or creating duplicate one if the constraint not present in database table).
+     *
+     * Use this if at least one end of this relationship is newly created instance so there is no chance to created
+     * relationship exists (this for example applies on copying draft relationships or assigning classification
+     * to newly created element).
+     */
+    RelationshipDefinitionBuilder withSkipUniqueChecking(boolean withSkipUniqueChecking) {
+        definition.skipUniqueChecking = withSkipUniqueChecking
         this
     }
 

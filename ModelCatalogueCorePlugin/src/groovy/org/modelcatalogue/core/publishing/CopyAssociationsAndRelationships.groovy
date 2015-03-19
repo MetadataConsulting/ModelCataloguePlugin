@@ -45,7 +45,7 @@ class CopyAssociationsAndRelationships {
                     .withOutgoingIndex(r.outgoingIndex)
                     .withCombinedIndex(r.combinedIndex)
                     .withMetadata(r.ext)
-                    .withNewExpected(true)
+                    .withSkipUniqueChecking(true)
 
             Relationship created = relationshipService.link definitionBuilder.definition
 
@@ -120,7 +120,7 @@ class CopyAssociationsAndRelationships {
                     .withOutgoingIndex(r.outgoingIndex)
                     .withCombinedIndex(r.combinedIndex)
                     .withMetadata(r.ext)
-                    .withNewExpected(true)
+                    .withSkipUniqueChecking(true)
 
             Relationship created = relationshipService.link definitionBuilder.definition
 
