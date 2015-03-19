@@ -2,6 +2,7 @@ package org.modelcatalogue.core.publishing
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.RelationshipType
 
 /**
  * Created by ladin on 09.01.15.
@@ -12,6 +13,7 @@ class DraftContext {
     private boolean forceNew
 
     private Set<CopyAssociationsAndRelationships> pendingRelationshipsTasks = new LinkedHashSet<CopyAssociationsAndRelationships>()
+    private Set<String> createdRelationshipHashes = []
 
     private DraftContext(boolean copyRelationships) {
         this.copyRelationships = copyRelationships
@@ -44,13 +46,13 @@ class DraftContext {
 
     void classifyDrafts() {
         pendingRelationshipsTasks.each {
-            it.copyClassifications()
+            it.copyClassifications(createdRelationshipHashes)
         }
     }
 
     void resolvePendingRelationships() {
         pendingRelationshipsTasks.each {
-            it.copyRelationships()
+            it.copyRelationships(createdRelationshipHashes)
         }
     }
 
@@ -70,5 +72,9 @@ class DraftContext {
         }
 
         return element
+    }
+
+    static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type) {
+        "$source.id:$type.id:$destination.id"
     }
 }

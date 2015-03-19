@@ -48,6 +48,8 @@ class Relationship implements Extendible<RelationshipMetadata> {
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
 
+    Boolean archived = false
+
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
@@ -57,26 +59,9 @@ class Relationship implements Extendible<RelationshipMetadata> {
         this.ext.putAll(ext)
     }
 
-    Boolean archived = false
-
-    static mapping = {
-        extensions lazy: false
-    }
-
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 
     static constraints = {
-        relationshipType unique: ['source', 'destination'], validator: { val, obj ->
-
-            if (!val) return true;
-
-            def errorMessage = val.validateSourceDestination(obj.source, obj.destination, obj.ext)
-            if (errorMessage instanceof String || (errorMessage instanceof List && errorMessage.size() > 1 && errorMessage.first() instanceof String)) {
-                return errorMessage;
-            }
-            return true;
-
-        }
         classification nullable: true
     }
 

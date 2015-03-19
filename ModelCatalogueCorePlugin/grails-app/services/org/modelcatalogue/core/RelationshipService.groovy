@@ -1,9 +1,13 @@
 package org.modelcatalogue.core
 
+import groovy.transform.stc.ClosureParams
+import groovy.transform.stc.FromString
+import org.hibernate.exception.ConstraintViolationException
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.builder.RelationshipDefinition
 
 class RelationshipService {
 
@@ -14,6 +18,34 @@ class RelationshipService {
     def modelCatalogueSecurityService
     def auditService
 
+    /**
+     * Executes the callback for each relationship found.
+     *
+     * This should be an cost effective alternative to fetching all relationships using CatalogueElement#incomingRelationships
+     * or CatalogueElement#outgoingRelationships methods or the relationships shortcuts as it only fetches the relationships
+     * in batches of 10.
+     *
+     * @param direction the direction of relationships to fetch
+     * @param element the element to be used as source or destination of the relationships
+     * @param type the type of relationship
+     * @param callback closure executed for each relationship
+     */
+    void eachRelationshipPartitioned(RelationshipDirection direction, CatalogueElement element, RelationshipType type = null, @ClosureParams(value=FromString, options=['org.modelcatalogue.core.Relationship']) callback) {
+        int offset = 0
+        int max = 10
+
+
+        List<Relationship> relationships = getRelationships(max: max, direction, element, type).items
+
+        while(relationships) {
+            for (Relationship rel in relationships) {
+                callback rel
+            }
+            offset += max
+            relationships = getRelationships(direction, element, type, offset: offset, max: max).items
+        }
+    }
+
     ListWithTotal<Relationship> getRelationships(Map params, RelationshipDirection direction, CatalogueElement element, RelationshipType type = null) {
         if (!params.sort) {
             params.sort = direction.sortProperty
@@ -21,37 +53,55 @@ class RelationshipService {
         Lists.fromCriteria(params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
     }
 
-    Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean archived = false, boolean ignoreRules = false, boolean resetIndexes = false) {
-        if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
+    /**
+     * @deprecated use #link(Closure)
+     */
+    @Deprecated
+    Relationship link(CatalogueElement theSource, CatalogueElement theDestination, RelationshipType type, Classification theClassification, boolean theArchived = false, boolean theIgnoreRules = false, boolean theResetIndices = false) {
+        link RelationshipDefinition.create(theSource, theDestination, type)
+                .withClassification(theClassification)
+                .withArchived(theArchived)
+                .withIgnoreRules(theIgnoreRules)
+                .withResetIndices(theResetIndices)
+                .definition
+    }
 
-            if (!relationshipInstance && relationshipType.bidirectional) {
-                relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(destination, source, relationshipType, classification)
+    Relationship link(RelationshipDefinition relationshipDefinition) {
+        try {
+            return linkInternal(relationshipDefinition)
+        } catch (ConstraintViolationException e) {
+            // duplicate entry
+            if (relationshipDefinition.newExpected) {
+                throw e
             }
+            log.warn "constraint violation linking $relationshipDefinition", e
+            RelationshipDefinition pessimistic = relationshipDefinition.clone()
+            pessimistic.newExpected = false
+            return linkInternal(pessimistic)
+        }
+    }
+
+    private Relationship linkInternal(RelationshipDefinition relationshipDefinition) {
+        if (relationshipDefinition.source?.id && relationshipDefinition.destination?.id && relationshipDefinition.relationshipType?.id) {
+            Relationship relationshipInstance = relationshipDefinition.newExpected ? null : findExistingRelationship(relationshipDefinition)
 
             if (relationshipInstance) {
-                if (!resetIndexes && relationshipInstance.archived == archived) {
+                if (!relationshipDefinition.resetIndices && relationshipInstance.archived == relationshipDefinition.archived) {
                     return relationshipInstance
                 }
-                if (resetIndexes) {
+                if (relationshipDefinition.resetIndices) {
                     relationshipInstance.resetIndexes()
                 }
-                relationshipInstance.archived = archived
-                return relationshipInstance.save(flush: true)
+                relationshipInstance.archived = relationshipDefinition.archived
+                return relationshipInstance
             }
         }
 
-        Relationship relationshipInstance = new Relationship(
-                source: source?.id ? source : null,
-                destination: destination?.id ? destination : null,
-                relationshipType: relationshipType?.id ? relationshipType : null,
-                classification: classification?.id ? classification : null,
-                archived: archived
-        )
+        Relationship relationshipInstance = relationshipDefinition.createRelationship()
 
-        if(!ignoreRules) {
-            if (relationshipType.versionSpecific && !relationshipType.system && !(source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [source.status.toString()] as Object[], "Cannot add new elements to {0}. Please create a new version before adding any additional elements")
+        if(!relationshipDefinition.ignoreRules) {
+            if (relationshipDefinition.relationshipType.versionSpecific && !relationshipDefinition.relationshipType.system && !(relationshipDefinition.source.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+                relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedModel.add', [relationshipDefinition.source.status.toString()] as Object[], "Cannot add new elements to {0}. Please create a new version before adding any additional elements")
                 return relationshipInstance
             }
 
@@ -63,14 +113,77 @@ class RelationshipService {
             return relationshipInstance
         }
 
-        relationshipInstance.save(flush: true)
-        source?.addToOutgoingRelationships(relationshipInstance)?.save(flush: true)
-        destination?.addToIncomingRelationships(relationshipInstance)?.save(flush: true)
+        def errorMessage = relationshipDefinition.relationshipType.validateSourceDestination(relationshipDefinition.source, relationshipDefinition.destination, relationshipDefinition.metadata)
+
+        if (errorMessage instanceof String) {
+            relationshipInstance.errors.rejectValue('relationshipType', errorMessage)
+            return relationshipInstance
+        }
+        if (errorMessage instanceof List && errorMessage.size() > 1 && errorMessage.first() instanceof String) {
+            if (errorMessage.size() == 2) {
+                relationshipInstance.errors.rejectValue('relationshipType', errorMessage[0]?.toString(), errorMessage[1]?.toString())
+            } else {
+                relationshipInstance.errors.rejectValue('relationshipType', errorMessage[0]?.toString(), errorMessage[1] as Object[], errorMessage[2]?.toString())
+            }
+            return relationshipInstance
+        }
+
+        relationshipInstance.save()
+
+        relationshipDefinition.source?.addToOutgoingRelationships(relationshipInstance)?.save()
+
+        relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save()
+        
         auditService.logNewRelation(relationshipInstance)
+
+        if (relationshipDefinition.metadata) {
+            relationshipInstance.ext = relationshipDefinition.metadata
+        }
+        
         relationshipInstance
     }
 
+    Relationship findExistingRelationship(RelationshipDefinition definition) {
+        // language=HQL
+        String query = """
+            select rel from Relationship rel left join fetch rel.extensions
+            where rel.source = :source
+            and rel.destination = :destination
+            and rel.relationshipType = :relationshipType
+            and rel.classification = :classification
+        """
 
+        Map<String, Object> params = [source: definition.source, destination: definition.destination, relationshipType: definition.relationshipType, classification: definition.classification]
+
+        if (!definition.classification) {
+            query = """
+                select rel from Relationship rel left join fetch rel.extensions
+                where rel.source = :source
+                and rel.destination = :destination
+                and rel.relationshipType = :relationshipType
+                and rel.classification is null
+            """
+            params.remove 'classification'
+        }
+        List<Relationship> relationships = Relationship.executeQuery(query, params)
+        if (relationships)  {
+            return relationships.first()
+        }
+        if (definition.relationshipType.bidirectional) {
+            params.source = definition.destination
+            params.destination = definition.source
+            relationships = Relationship.executeQuery(query, params)
+            return relationships ? relationships.first() : null
+        }
+        log.info "Relationship $definition checked for presence but not found. Finding relationship is slow, consider using 'newExpected' flag for optimistic relationship linking."
+        return null
+    }
+
+
+    /**
+     * @deprecated use #link(Closure)
+     */
+    @Deprecated
     Relationship link(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, boolean archived = false, boolean ignoreRules = false) {
         link source, destination, relationshipType, null, archived, ignoreRules
     }
@@ -82,7 +195,7 @@ class RelationshipService {
     Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean ignoreRules = false) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = Relationship.findBySourceAndDestinationAndRelationshipTypeAndClassification(source, destination, relationshipType, classification)
+            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withClassification(classification).definition)
 
             if(!ignoreRules) {
                 if (relationshipType.versionSpecific && !relationshipType.system && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
@@ -118,10 +231,10 @@ class RelationshipService {
         String classifications = Relationship.executeQuery("""
             select r.source.name
             from Relationship as r
-            where r.relationshipType = :classification
+            where r.relationshipType.id = :classification
             and r.destination.id = :elementId
             order by r.source.name
-        """, [classification: classification, elementId: element.id]).join(', ')
+        """, [classification: classification.id, elementId: element.id]).join(', ')
 
         if (classifications) {
             return "${element.name} (${classifications})"
@@ -144,10 +257,10 @@ class RelationshipService {
         Relationship.executeQuery("""
             select r.source.name, r.source.id, r.source.status
             from Relationship as r
-            where r.relationshipType = :classification
+            where r.relationshipType.id = :classification
             and r.destination.id = :elementId
             order by r.source.name
-        """, [classification: classification, elementId: element.id]).collect {
+        """, [classification: classification.id, elementId: element.id]).collect {
             [name: it[0], id: it[1], status: "${it[2]}", elementType: Classification.name, link:  "/classification/${it[1]}"]
         }
     }
@@ -161,16 +274,16 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.findByName('classification')
+        RelationshipType classification = RelationshipType.readByName('classification')
 
         Classification.executeQuery """
             select c
             from Classification as c
             join c.outgoingRelationships as rel
-            where rel.relationshipType = :classification
+            where rel.relationshipType.id = :classification
             and rel.destination.id = :elementId
             order by c.name
-        """, [classification: classification, elementId: element.id]
+        """, [classification: classification.id, elementId: element.id], [cache: true]
     }
 
     Relationship moveAfter(RelationshipDirection direction, CatalogueElement owner,  Relationship relationship, Relationship other) {
@@ -184,7 +297,7 @@ class RelationshipService {
 
         if (!other) {
             direction.setIndex(relationship, direction.getMinIndexAfter(owner, relationship.relationshipType, Long.MIN_VALUE) - INDEX_STEP)
-            return relationship.save(flush: true)
+            return relationship.save()
         }
 
         if (!direction.isOwnedBy(owner, relationship)) {
@@ -201,12 +314,12 @@ class RelationshipService {
 
         if (nextIndex == null) {
             direction.setIndex(relationship, direction.getIndex(other) + INDEX_STEP)
-            return relationship.save(flush: true)
+            return relationship.save()
         }
 
         if (nextIndex - direction.getIndex(other) > 1) {
             direction.setIndex(relationship, direction.getIndex(other) + Math.round((nextIndex.doubleValue() - direction.getIndex(other)) / 2))
-            return relationship.save(flush: true)
+            return relationship.save()
         }
 
         moveAfterWithRearrange(direction, owner, relationship, other)

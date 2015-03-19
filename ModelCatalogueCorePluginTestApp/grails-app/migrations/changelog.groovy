@@ -10,4 +10,5 @@ databaseChangeLog = {
     include file: 'changelog_008_relationship_ordering.groovy'
     include file: 'changelog_009_classificationFilteringChanges.groovy'
     include file: 'changelog_010_changes.groovy'
+    include file: 'changelog_011_relationshipOptimization.groovy'
 }
