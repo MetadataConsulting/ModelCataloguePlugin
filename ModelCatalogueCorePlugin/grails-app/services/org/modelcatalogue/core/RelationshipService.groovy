@@ -116,11 +116,15 @@ class RelationshipService {
         relationshipDefinition.source?.addToOutgoingRelationships(relationshipInstance)?.save()
 
         relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save()
+        
+        auditService.logNewRelation(relationshipInstance)
 
         if (relationshipDefinition.metadata) {
             relationshipInstance.ext = relationshipDefinition.metadata
         }
 
+        log.debug "Created $relationshipDefinition"
+        
         relationshipInstance
     }
 
@@ -186,6 +190,7 @@ class RelationshipService {
             }
 
             if (relationshipInstance && source && destination) {
+                auditService.logRelationRemoved(relationshipInstance)
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
                 relationshipInstance.classification = null

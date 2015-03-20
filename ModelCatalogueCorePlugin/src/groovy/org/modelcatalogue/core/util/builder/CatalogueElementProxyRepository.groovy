@@ -22,6 +22,8 @@ class CatalogueElementProxyRepository {
 
     private boolean copyRelationships = false
 
+    private final Map<String, Relationship> createdRelationships = [:]
+
     CatalogueElementProxyRepository(ClassificationService classificationService, ElementService elementService) {
         this.classificationService = classificationService
         this.elementService = elementService
@@ -29,6 +31,7 @@ class CatalogueElementProxyRepository {
 
     public void clear() {
         unclassifiedQueriesFor.clear()
+        createdRelationships.clear()
         pendingProxies.clear()
         copyRelationships = false
     }
@@ -294,6 +297,37 @@ class CatalogueElementProxyRepository {
             }
         }
         return null
+    }
+
+
+    public <T extends CatalogueElement,U extends CatalogueElement> Relationship resolveRelationship(RelationshipProxy<T,U> proxy) {
+        RelationshipType type = RelationshipType.readByName(proxy.relationshipTypeName)
+
+        T sourceElement = proxy.source.resolve()
+        U destinationElement = proxy.destination.resolve()
+
+        if (!sourceElement.readyForQueries) {
+            throw new IllegalStateException("Source element $sourceElement is not ready to be part of the relationship ${toString()}")
+        }
+
+        if (!destinationElement.readyForQueries) {
+            throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
+        }
+
+        String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type)
+
+
+        Relationship existing = createdRelationships[hash]
+
+        if (existing) {
+            return existing
+        }
+
+        Relationship relationship = sourceElement.createLinkTo(destinationElement, type, resetIndices: true, skipUniqueChecking: proxy.source.new || proxy.destination.new)
+
+        createdRelationships[hash] = relationship
+
+        return relationship
     }
 
 }

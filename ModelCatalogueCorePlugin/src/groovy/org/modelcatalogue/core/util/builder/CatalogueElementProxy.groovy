@@ -32,4 +32,6 @@ interface CatalogueElementProxy<T extends CatalogueElement> {
 
     void addToPendingRelationships(RelationshipProxy relationshipProxy)
 
+    boolean isNew()
+
 }

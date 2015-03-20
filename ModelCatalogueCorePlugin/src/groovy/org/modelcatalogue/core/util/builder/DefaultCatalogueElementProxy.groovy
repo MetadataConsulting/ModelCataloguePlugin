@@ -13,6 +13,8 @@ import org.modelcatalogue.core.*
     String name
     String classification
 
+    boolean newlyCreated
+
     protected CatalogueElementProxyRepository repository
 
     private final Map<String, Object> parameters = [:]
@@ -37,6 +39,13 @@ import org.modelcatalogue.core.*
         this.classification = classification
     }
 
+    boolean isNew() {
+        if (replacedBy) {
+            return replacedBy.isNew()
+        }
+        return newlyCreated
+    }
+
     @Override
     final T resolve() {
         try {
@@ -56,6 +65,7 @@ import org.modelcatalogue.core.*
 
             log.debug "$this not found, creating new one"
 
+            newlyCreated = true
             resolved = fill(domain.newInstance())
 
             return resolved
@@ -287,7 +297,7 @@ import org.modelcatalogue.core.*
     @Override
     Set<Relationship> resolveRelationships() {
         relationships.collect { RelationshipProxy it ->
-            it.resolve()
+            it.resolve(repository)
         }
     }
 
