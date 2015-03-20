@@ -137,7 +137,7 @@ class DataImportController  {
                     Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
                     Asset theAsset = Asset.get(id)
                     for (CatalogueElement element in created) {
-                        theAsset.addToRelatedTo(element, newExpected: true)
+                        theAsset.addToRelatedTo(element, skipUniqueChecking: true)
                     }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
@@ -161,7 +161,7 @@ class DataImportController  {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
                     Asset theAsset = Asset.get(id)
                     for (CatalogueElement element in created) {
-                        theAsset.addToRelatedTo(element, newExpected: true)
+                        theAsset.addToRelatedTo(element, skipUniqueChecking: true)
                     }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
@@ -190,10 +190,10 @@ class DataImportController  {
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your import has finished."
                     updated.save(flush: true, failOnError: true)
-                    updated.addToClassifications(classification, newExpected: true)
-                    classification.addToClassifies(updated, newExpected: true)
+                    updated.addToClassifications(classification, skipUniqueChecking: true)
+                    classification.addToClassifies(updated, skipUniqueChecking: true)
                     if (classification) {
-                        updated.addToRelatedTo(classification, newExpected: true)
+                        updated.addToRelatedTo(classification, skipUniqueChecking: true)
                     }
                 } catch (Exception e) {
                     Asset updated = Asset.get(id)
@@ -223,14 +223,14 @@ class DataImportController  {
 
     protected static makeRelationships(Collection<CatalogueElement> catElements, Asset asset){
         catElements.each{
-            asset.addToRelatedTo(it, newExpected: true)
+            asset.addToRelatedTo(it, skipUniqueChecking: true)
         }
     }
 
     protected static classifyAsset(Asset asset, Classification classification){
         if (classification) {
-            asset.addToClassifications(classification, newExpected: true)
-            asset.addToRelatedTo(classification, newExpected: true)
+            asset.addToClassifications(classification, skipUniqueChecking: true)
+            asset.addToRelatedTo(classification, skipUniqueChecking: true)
         }
     }
 
@@ -290,8 +290,8 @@ class DataImportController  {
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.ext['Original URL'] = uri
                 updated.save(flush: true, failOnError: true)
-                updated.addToRelatedTo(classification, newExpected: true)
-                updated.addToRelatedTo(conceptualDomain, newExpected: true)
+                updated.addToRelatedTo(classification, skipUniqueChecking: true)
+                updated.addToRelatedTo(conceptualDomain, skipUniqueChecking: true)
             } catch (e) {
                 log.error("Error importing schema", e)
                 updated.refresh()
