@@ -8,7 +8,7 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class RelationshipType {
 
-    private static Cache<String, RelationshipType> typesCache = CacheBuilder
+    private static Cache<String, Long> typesCache = CacheBuilder
             .newBuilder()
             .maximumSize(100)
             .build()
@@ -181,21 +181,23 @@ class RelationshipType {
     }
 
     static readByName(String name) {
-        RelationshipType ret
+        // we only cache the id, let the hibernate second level cache handle the proper fetching
+        Long id
+
         try {
-            ret = typesCache.get(name, {
+            id = typesCache.get(name, {
                 RelationshipType type = RelationshipType.findByName(name, [readOnly: true])
-                if (type) return type
+                if (type.getId()) return type.getId()
                 throw new IllegalArgumentException("Type '$name' does not exist")
             })
-        } catch (UncheckedExecutionException ignored) {
-            return null
+        } catch (UncheckedExecutionException e) {
+            if (e.cause instanceof IllegalArgumentException) {
+                return null
+            }
+            throw e
         }
 
-        if (!ret.attached) {
-            ret.attach()
-        }
-        return ret
+        return get(id)
     }
 
     String toString() {
