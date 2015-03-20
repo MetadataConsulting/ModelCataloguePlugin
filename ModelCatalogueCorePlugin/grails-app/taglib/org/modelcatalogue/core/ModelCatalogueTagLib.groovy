@@ -30,7 +30,7 @@ class ModelCatalogueTagLib {
         CatalogueElement element = attrs.element
         RelationshipType type = null
         if (attrs.type) {
-            type = RelationshipType.findByName(attrs.type.toString())
+            type = RelationshipType.readByName(attrs.type.toString())
             if (!type) {
                 throw new IllegalArgumentException("Relationship type of given name \"${attrs.type}\" does not exist")
             }

@@ -1,5 +1,9 @@
 package org.modelcatalogue.core
 
+import com.google.common.base.Function
+import com.google.common.collect.Collections2
+import com.google.common.collect.Iterables
+import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
@@ -52,7 +56,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     Set<Mapping> outgoingMappings = []
     Set<Mapping> incomingMappings = []
 
-    static transients = ['relations', 'info', 'archived', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications']
+    static transients = ['relations', 'info', 'archived', 'relations', 'incomingRelations', 'outgoingRelations', 'defaultModelCatalogueId', 'ext', 'classifications']
 
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
@@ -89,18 +93,23 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
      */
 
     List getRelations() {
-        return [
-                outgoingRelations,
-                incomingRelations
-        ].flatten()
+        CatalogueElement self = this
+        Lists.transform(relationshipService.getRelationships([:], RelationshipDirection.BOTH, this).items, {
+            if (it.source == self) return it.destination
+            it.source
+        } as Function<Relationship, CatalogueElement>)
     }
 
     List getIncomingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).items.collect { it.source }
+        Lists.transform(relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).items, {
+            it.source
+        } as Function<Relationship, CatalogueElement>)
     }
 
     List getOutgoingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).items.collect { it.destination }
+        Lists.transform(relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).items, {
+            it.destination
+        } as Function<Relationship, CatalogueElement>)
     }
 
     Long countIncomingRelations() {

@@ -456,9 +456,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         expect:
         ValueDomain.findByName('VDRel4')
-        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.findByName('synonym'))   == 2
-        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.findByName('base'))      == 1
-        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.findByName('relatedTo')) == 1
+        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.readByName('synonym'))   == 2
+        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.readByName('base'))      == 1
+        ValueDomain.findByName('VDRel4').countRelationsByType(RelationshipType.readByName('relatedTo')) == 1
     }
 
     def "creates new version of the element"() {

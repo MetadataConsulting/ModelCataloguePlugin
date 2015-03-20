@@ -228,8 +228,8 @@ class OBOService {
     }
 
     private void handleSynonym(Model model, Map<String, Model> models, Frame frame) {
-        RelationshipType synonym = RelationshipType.findByName('synonym')
-        RelationshipType relation = RelationshipType.findByName('relatedTo')
+        RelationshipType synonym = RelationshipType.readByName('synonym')
+        RelationshipType relation = RelationshipType.readByName('relatedTo')
 
         List<String> textual = []
 

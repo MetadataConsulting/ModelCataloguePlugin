@@ -173,7 +173,7 @@ class RelationshipType {
     }
 
     static readByName(String name) {
-        findByName(name, [readOnly: true])
+        RelationshipType.findByName(name, [cache: true, readOnly: true])
     }
 
     String toString() {

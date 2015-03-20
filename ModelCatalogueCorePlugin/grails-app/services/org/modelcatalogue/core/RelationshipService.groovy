@@ -210,7 +210,7 @@ class RelationshipService {
             return element.name
         }
 
-        RelationshipType classification = RelationshipType.findByName('classification')
+        RelationshipType classification = RelationshipType.readByName('classification')
 
         String classifications = Relationship.executeQuery("""
             select r.source.name
@@ -236,7 +236,7 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.findByName('classification')
+        RelationshipType classification = RelationshipType.readByName('classification')
 
         Relationship.executeQuery("""
             select r.source.name, r.source.id, r.source.status

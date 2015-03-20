@@ -34,7 +34,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
     }
 
     RelationshipType getReltype() {
-        RelationshipType.findByName("relationship")
+        RelationshipType.readByName("relationship")
     }
 
     ValueDomain getVd1() {
@@ -47,7 +47,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
 
         when:
-        RelationshipType hierarchy = RelationshipType.findByName("hierarchy")
+        RelationshipType hierarchy = RelationshipType.readByName("hierarchy")
         Relationship rel =  relationshipService.link( de1, de2, hierarchy)
 
         then:

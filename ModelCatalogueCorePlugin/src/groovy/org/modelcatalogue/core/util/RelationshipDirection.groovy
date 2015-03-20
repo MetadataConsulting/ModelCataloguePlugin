@@ -13,6 +13,7 @@ enum RelationshipDirection {
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.join 'source'
             criteria.eq('destination', element)
             if (!element.archived && (!type || !type.versionSpecific)) {
                 criteria.eq('archived', false)
@@ -80,6 +81,7 @@ enum RelationshipDirection {
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.join 'destination'
             criteria.eq('source', element)
             if (!element.archived && (!type || !type.versionSpecific)) {
                 criteria.eq('archived', false)
@@ -148,6 +150,8 @@ enum RelationshipDirection {
         @Override
         DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, List<Classification> classifications) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
+            criteria.join 'source'
+            criteria.join 'destination'
             criteria.or {
                 eq('source', element)
                 eq('destination', element)

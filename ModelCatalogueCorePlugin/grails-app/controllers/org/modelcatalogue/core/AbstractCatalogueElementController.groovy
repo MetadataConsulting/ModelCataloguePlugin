@@ -90,7 +90,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        if (!RelationshipType.findByName(type)) {
+        if (!RelationshipType.readByName(type)) {
             notFound()
             return
         }
@@ -137,7 +137,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 notFound()
                 return
             }
-            RelationshipType relationshipType = RelationshipType.findByName(otherSide.type ? otherSide.type.name : type)
+            RelationshipType relationshipType = RelationshipType.readByName(otherSide.type ? otherSide.type.name : type)
             if (!relationshipType) {
                 notFound()
                 return
@@ -186,7 +186,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 notFound()
                 return
             }
-            RelationshipType relationshipType = RelationshipType.findByName(type)
+            RelationshipType relationshipType = RelationshipType.readByName(type)
             if (!relationshipType) {
                 notFound()
                 return
@@ -252,7 +252,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        RelationshipType type = typeParam ? RelationshipType.findByName(typeParam) : null
+        RelationshipType type = typeParam ? RelationshipType.readByName(typeParam) : null
         if (typeParam && !type) {
             notFound()
             return
@@ -287,7 +287,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        RelationshipType relationshipType = RelationshipType.findByName(type)
+        RelationshipType relationshipType = RelationshipType.readByName(type)
 
         handleParams(max)
         def results =  modelCatalogueSearchService.search(element, relationshipType, direction, params)

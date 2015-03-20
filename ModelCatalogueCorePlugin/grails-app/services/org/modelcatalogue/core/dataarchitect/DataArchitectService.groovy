@@ -53,7 +53,7 @@ class DataArchitectService {
         def searchParams = getParams(params)
         List<Relationship> synonymDataElements = []
         //FIXME the relationship type should be configurable
-        def relType = RelationshipType.findByName("relatedTo")
+        def relType = RelationshipType.readByName("relatedTo")
 
         def key1Elements = DataElement.executeQuery("SELECT DISTINCT a FROM DataElement a " +
                 "inner join a.extensions e " +
@@ -417,7 +417,7 @@ class DataArchitectService {
         elementService.findDuplicateDataElementsSuggestions().each { destId, sources ->
             DataElement dataElement = DataElement.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Element '$dataElement.name'")
-            RelationshipType type = RelationshipType.findByName("synonym")
+            RelationshipType type = RelationshipType.readByName("synonym")
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataElement:$srcId", destination: "gorm://org.modelcatalogue.core.DataElement:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
@@ -444,7 +444,7 @@ class DataArchitectService {
         elementService.findDuplicateModelsSuggestions().each { destId, sources ->
             Model model = Model.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Model '$model.name'")
-            RelationshipType type = RelationshipType.findByName("synonym")
+            RelationshipType type = RelationshipType.readByName("synonym")
             sources.each { srcId ->
                 Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
