@@ -190,17 +190,14 @@ class RelationshipType {
 
     def beforeInsert() {
         relationshipTypeService.clearCache()
-        typesCache.invalidate(name)
     }
 
     def beforeUpdate() {
         relationshipTypeService.clearCache()
-        typesCache.invalidate(name)
     }
 
     def beforeDelete() {
         relationshipTypeService.clearCache()
-        typesCache.invalidate(name)
     }
 
 
