@@ -302,7 +302,7 @@ import org.modelcatalogue.core.*
     }
 
     String toString() {
-        "Proxy of $domain[id: $id, classification: $classification, name: $name]"
+        "Proxy of $domain.simpleName[id: $id, classification: $classification, name: $name]"
     }
 
     @Override
