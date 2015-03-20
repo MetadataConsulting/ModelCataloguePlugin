@@ -37,6 +37,7 @@ class ClassificationService {
     }
 
     public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, Collection<Classification> classifications = classificationsInUse) {
+        criteria.join 'extensions'
         if (criteria.persistentEntity.javaClass == Classification) {
             return criteria
         }
