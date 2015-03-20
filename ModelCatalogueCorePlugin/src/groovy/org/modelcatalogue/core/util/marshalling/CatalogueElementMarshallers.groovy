@@ -56,7 +56,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
         ret.classifications  = relationshipService.getClassificationsInfo(el)
 
         if (modelCatalogueSecurityService.currentUser) {
-            RelationshipType favorite = RelationshipType.findByName('favourite')
+            RelationshipType favorite = RelationshipType.readByName('favourite')
             if (favorite) {
                 Number count = Relationship.where {
                     relationshipType == favorite && destination == el && source == modelCatalogueSecurityService.currentUser

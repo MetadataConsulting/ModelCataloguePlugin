@@ -27,7 +27,7 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
 
         initCatalogueService.initCatalogue(true)
 
-        if (!RelationshipType.findByName('derivedFrom')) {
+        if (!RelationshipType.readByName('derivedFrom')) {
             new RelationshipType(
                     name: 'derivedFrom',
                     sourceClass: MeasurementUnit,

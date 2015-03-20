@@ -1,9 +1,17 @@
 package org.modelcatalogue.core
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.util.concurrent.UncheckedExecutionException
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class RelationshipType {
+
+    private static Cache<String, RelationshipType> typesCache = CacheBuilder
+            .newBuilder()
+            .maximumSize(100)
+            .build()
 
     def relationshipTypeService
 
@@ -173,7 +181,21 @@ class RelationshipType {
     }
 
     static readByName(String name) {
-        findByName(name, [readOnly: true])
+        RelationshipType ret
+        try {
+            ret = typesCache.get(name, {
+                RelationshipType type = RelationshipType.findByName(name, [readOnly: true])
+                if (type) return type
+                throw new IllegalArgumentException("Type '$name' does not exist")
+            })
+        } catch (UncheckedExecutionException ignored) {
+            return null
+        }
+
+        if (!ret.attached) {
+            ret.attach()
+        }
+        return ret
     }
 
     String toString() {
@@ -190,14 +212,17 @@ class RelationshipType {
 
     def beforeInsert() {
         relationshipTypeService.clearCache()
+        typesCache.invalidate(name)
     }
 
     def beforeUpdate() {
         relationshipTypeService.clearCache()
+        typesCache.invalidate(name)
     }
 
     def beforeDelete() {
         relationshipTypeService.clearCache()
+        typesCache.invalidate(name)
     }
 
 

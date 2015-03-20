@@ -1,5 +1,7 @@
 package org.modelcatalogue.core
 
+import com.google.common.base.Function
+import com.google.common.collect.Iterables
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.publishing.Published
@@ -87,18 +89,19 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
      */
 
     List getRelations() {
-        return [
-                outgoingRelations,
-                incomingRelations
-        ].flatten()
+        Iterables.concat(outgoingRelations, incomingRelations)
     }
 
     List getIncomingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).items.collect { it.source }
+        Iterables.transform(relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this).items, {
+            it.source
+        } as Function<Relationship, CatalogueElement>)
     }
 
     List getOutgoingRelations() {
-        relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).items.collect { it.destination }
+        Iterables.transform(relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this).items, {
+            it.source
+        } as Function<Relationship, CatalogueElement>)
     }
 
     Long countIncomingRelations() {

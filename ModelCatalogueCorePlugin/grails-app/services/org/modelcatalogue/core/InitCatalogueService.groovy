@@ -81,7 +81,7 @@ class InitCatalogueService {
         def defaultDataTypes = grailsApplication.config.modelcatalogue.defaults.relationshiptypes
 
         for (Map definition in defaultDataTypes) {
-            RelationshipType existing = RelationshipType.findByName(definition.name)
+            RelationshipType existing = RelationshipType.readByName(definition.name)
             if (!existing) {
                 RelationshipType type = new RelationshipType(definition)
                 type.save()
