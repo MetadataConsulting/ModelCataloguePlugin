@@ -1,17 +1,9 @@
 package org.modelcatalogue.core
 
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
-import com.google.common.util.concurrent.UncheckedExecutionException
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 class RelationshipType {
-
-    private static Cache<String, Long> typesCache = CacheBuilder
-            .newBuilder()
-            .maximumSize(100)
-            .build()
 
     def relationshipTypeService
 
@@ -181,23 +173,7 @@ class RelationshipType {
     }
 
     static readByName(String name) {
-        // we only cache the id, let the hibernate second level cache handle the proper fetching
-        Long id
-
-        try {
-            id = typesCache.get(name, {
-                RelationshipType type = RelationshipType.findByName(name, [readOnly: true])
-                if (type.getId()) return type.getId()
-                throw new IllegalArgumentException("Type '$name' does not exist")
-            })
-        } catch (UncheckedExecutionException e) {
-            if (e.cause instanceof IllegalArgumentException) {
-                return null
-            }
-            throw e
-        }
-
-        return get(id)
+        RelationshipType.findByName(name, [cache: true, readOnly: true])
     }
 
     String toString() {
