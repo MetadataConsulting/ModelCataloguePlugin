@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
 
@@ -40,7 +41,7 @@ class CatalogueElementProxyRepository {
         this.copyRelationships = true
     }
 
-    public boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
+    public static boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
         if (a == b) {
             return true
         }
@@ -207,7 +208,7 @@ class CatalogueElementProxyRepository {
         }
 
         if (classifications) {
-            T result = getLatestFromCriteria(classificationService.classified(criteria, classifications))
+            T result = getLatestFromCriteria(classificationService.classified(criteria, ClassificationFilter.includes(classifications)))
 
             if (result) {
                 if (!id || !result.modelCatalogueId) {
@@ -283,7 +284,7 @@ class CatalogueElementProxyRepository {
         return null
     }
 
-    private <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
+    private static <T extends CatalogueElement> T getLatestFromCriteria(DetachedCriteria<T> criteria, boolean unclassifiedOnly = false) {
         Map<String, Object> params = unclassifiedOnly ? LATEST - [max: 1] : LATEST
         List<T> elements = criteria.list(params)
         if (elements) {

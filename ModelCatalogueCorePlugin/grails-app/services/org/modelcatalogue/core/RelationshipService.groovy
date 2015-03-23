@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
@@ -48,7 +49,7 @@ class RelationshipService {
         if (!params.sort) {
             params.sort = direction.sortProperty
         }
-        Lists.fromCriteria(params, direction.composeWhere(element, type, getClassifications(modelCatalogueSecurityService.currentUser)))
+        Lists.fromCriteria(params, direction.composeWhere(element, type, ClassificationFilter.from(modelCatalogueSecurityService.currentUser)))
     }
 
     /**
@@ -308,7 +309,7 @@ class RelationshipService {
     }
 
     private static Relationship moveAfterWithRearrange(RelationshipDirection direction, CatalogueElement owner, Relationship relationship, Relationship other) {
-        List<Relationship> relationships = direction.composeWhere(owner, relationship.relationshipType, []).list([sort: direction.sortProperty])
+        List<Relationship> relationships = direction.composeWhere(owner, relationship.relationshipType, ClassificationFilter.NO_FILTER).list([sort: direction.sortProperty])
         int correction = 0
         relationships.eachWithIndex { Relationship entry, Integer i ->
             if (entry == relationship) {
