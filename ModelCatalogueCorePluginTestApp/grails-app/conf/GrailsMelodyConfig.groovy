@@ -24,7 +24,7 @@ javamelody.'http-transform-pattern' = '\\d+'  //filter out numbers from URI
 /*
 The parameter url-exclude-pattern is a regular expression to exclude some urls from monitoring as written above.
  */
-javamelody.'url-exclude-pattern' = '/assets/.*'
+javamelody.'url-exclude-pattern' = '/assets/.*|.*/download.*'
 
 /*
 Specify jndi name of datasource to monitor in production environment
