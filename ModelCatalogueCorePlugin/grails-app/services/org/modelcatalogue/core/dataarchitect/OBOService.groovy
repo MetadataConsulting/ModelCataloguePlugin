@@ -171,14 +171,15 @@ class OBOService {
         log.info "Building new models"
         builder.build {
 
-            for (Clause clause in document.headerFrame.getClauses('subsetdef')) {
-                namespacesToClassifications[clause.value.toString()] = clause.value2.toString()
-                classification(name: clause.value2.toString()) {
-                    ext 'namespace', clause.value.toString()
-                }
-            }
-
             classification(name: name) {
+
+                for (Clause clause in document.headerFrame.getClauses('subsetdef')) {
+                    namespacesToClassifications[clause.value.toString()] = clause.value2.toString()
+                    classification(name: clause.value2.toString()) {
+                        ext 'namespace', clause.value.toString()
+                    }
+                }
+
                 String defaultNamespace = document.headerFrame.getClause('default-namespace')?.value?.toString()
                 if (defaultNamespace) {
                     ext 'namespace', defaultNamespace
