@@ -40,7 +40,7 @@ class CatalogueElementProxyRepository {
         this.copyRelationships = true
     }
 
-    public boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
+    public static boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
         if (a == b) {
             return true
         }
@@ -68,29 +68,40 @@ class CatalogueElementProxyRepository {
         StopWatch watch =  new StopWatch('catalogue proxy repository')
         Set<CatalogueElement> created = []
 
-        Set<CatalogueElementProxy> toBeResolved     = []
+        Set<CatalogueElementProxy> elementProxiesToBeResolved     = []
         Map<String, CatalogueElementProxy> byID     = [:]
         Map<String, CatalogueElementProxy> byName   = [:]
 
         watch.start('merging proxies')
+        log.info "(1/5) merging proxies"
         for (CatalogueElementProxy proxy in pendingProxies) {
             if (proxy.id) {
                 CatalogueElementProxy existing = byID[proxy.id]
 
                 if (!existing) {
                     byID[proxy.id] = proxy
-                    toBeResolved << proxy
+                    elementProxiesToBeResolved << proxy
                 } else {
                     existing.merge(proxy)
                 }
             } else if (proxy.name) {
-                String fullName = "${proxy.domain}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+                String fullName = "${proxy.domain.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+                String genericName = "${CatalogueElement.simpleName}:${proxy.domain in HAS_UNIQUE_NAMES ? '*' : proxy.classification}:${proxy.name}"
+
                 CatalogueElementProxy existing = byName[fullName]
+
+                if (!existing && fullName != genericName) {
+                    existing = byName[genericName]
+                    if (existing && !existing.domain.isAssignableFrom(proxy.domain)) {
+                        existing = null
+                    }
+                }
 
                 if (!existing) {
                     byName[fullName] = proxy
+                    byName[genericName] = proxy
                     // it is a set, so if we add it twice it does not matter
-                    toBeResolved << proxy
+                    elementProxiesToBeResolved << proxy
                 } else {
                     // must survive double addition
                     existing.merge(proxy)
@@ -104,7 +115,8 @@ class CatalogueElementProxyRepository {
         if (!skipDirtyChecking) {
             // Step 1:check something changed this must run before any other resolution happens
             watch.start('dirty checking')
-            for (CatalogueElementProxy element in toBeResolved) {
+            log.info "(2/5) dirty checking"
+            for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 if (element.changed) {
                     element.requestDraft()
                 }
@@ -113,24 +125,33 @@ class CatalogueElementProxyRepository {
 
             // Step 2: if something changed, create new versions. if run in one step, it generates false changes
             watch.start('requesting drafts')
-            for (CatalogueElementProxy element in toBeResolved) {
+            log.info "(3/5) requesting drafts"
+            for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 element.createDraftIfRequested()
             }
             watch.stop()
         }
 
+        Set<RelationshipProxy> relationshipProxiesToBeResolved = []
 
         // Step 3: resolve elements (set properties, update metadata)
         watch.start('resolving elements')
-        for (CatalogueElementProxy element in toBeResolved) {
+        log.info "(4/5) resolving elements"
+        int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())) + 2
+        elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+            log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
             created << element.resolve()
+            relationshipProxiesToBeResolved.addAll element.pendingRelationships
         }
         watch.stop()
 
         // Step 4: resolve pending relationships
         watch.start('resolving relationships')
-        for (CatalogueElementProxy element in toBeResolved) {
-            element.resolveRelationships()
+        log.info "(5/5)resolving relationships"
+        int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())) + 2
+        relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
+            log.debug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
+            relationshipProxy.resolve(this)
         }
         watch.stop()
 

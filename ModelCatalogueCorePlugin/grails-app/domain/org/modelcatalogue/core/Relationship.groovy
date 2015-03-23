@@ -87,7 +87,7 @@ class Relationship implements Extendible {
     @Override
     Extension addExtension(String name, String value) {
         RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
-        newOne.save()
+        newOne.save(deepValidate: false)
         assert !newOne.errors.hasErrors()
         addToExtensions(newOne)
         newOne

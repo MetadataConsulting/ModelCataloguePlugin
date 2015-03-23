@@ -7,7 +7,7 @@ interface CatalogueElementProxy<T extends CatalogueElement> {
 
 
     T resolve()
-    Set<Relationship> resolveRelationships()
+    Set<RelationshipProxy> getPendingRelationships()
     CatalogueElementProxy<T> merge(CatalogueElementProxy<T> other)
 
     void requestDraft()

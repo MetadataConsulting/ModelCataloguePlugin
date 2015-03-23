@@ -19,7 +19,7 @@ import org.modelcatalogue.core.*
 
     private final Map<String, Object> parameters = [:]
     private final Map<String, String> extensions = [:]
-    private final Set<RelationshipProxy> relationships = []
+    final Set<RelationshipProxy> relationships = []
 
     private CatalogueElementProxy<T> replacedBy
     private T resolved
@@ -37,6 +37,10 @@ import org.modelcatalogue.core.*
         this.id = id
         this.name = name
         this.classification = classification
+    }
+
+    Set<RelationshipProxy> getPendingRelationships() {
+        relationships
     }
 
     boolean isNew() {
@@ -294,13 +298,6 @@ import org.modelcatalogue.core.*
         relationships << relationshipProxy
     }
 
-    @Override
-    Set<Relationship> resolveRelationships() {
-        relationships.collect { RelationshipProxy it ->
-            it.resolve(repository)
-        }
-    }
-
     String toString() {
         "Proxy of $domain.simpleName[id: $id, classification: $classification, name: $name]"
     }
@@ -334,6 +331,12 @@ import org.modelcatalogue.core.*
         }
 
         other.replacedBy = this
+
+        if (domain != other.domain) {
+            if (domain == CatalogueElement) {
+                domain = other.domain
+            }
+        }
 
         this
     }
