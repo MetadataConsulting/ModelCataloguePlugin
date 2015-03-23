@@ -157,15 +157,15 @@ class CatalogueElementProxyRepository {
     }
 
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id) {
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id) {
         return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name)
     }
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name) {
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name) {
         return new DefaultCatalogueElementProxy<T>(this, domain, null, classificationName, name)
     }
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name) {
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name) {
         return new DefaultCatalogueElementProxy<T>(this, domain, null, null, name)
     }
 

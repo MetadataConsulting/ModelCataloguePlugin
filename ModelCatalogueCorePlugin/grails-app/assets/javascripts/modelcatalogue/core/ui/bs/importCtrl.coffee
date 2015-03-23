@@ -55,5 +55,7 @@ angular.module('mc.core.ui.bs.importCtrl', ['mc.util.messages', 'angularFileUplo
         $scope.progress  = 0
         $modalInstance.close()
       )
+
+    $scope.purlPattern = "http://purl.obolibrary.org/obo/${id.replace(':', '_')}"
 ]
 
