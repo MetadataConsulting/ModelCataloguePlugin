@@ -27,14 +27,14 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
 
         initCatalogueService.initCatalogue(true)
 
-        if (!RelationshipType.readByName('derivedFrom')) {
+        if (!RelationshipType.findByName('derivedFrom')) {
             new RelationshipType(
                     name: 'derivedFrom',
                     sourceClass: MeasurementUnit,
                     sourceToDestination: 'is derived from',
                     destinationClass: MeasurementUnit,
                     destinationToSource: 'derives'
-            ).save(failOnError: true)
+            ).save(failOnError: true, flush: true)
         }
     }
 
