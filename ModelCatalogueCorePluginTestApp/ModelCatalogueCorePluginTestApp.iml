@@ -193,6 +193,7 @@
         <JAVADOC />
         <SOURCES>
           <root url="jar://$USER_HOME$/.ideaLibSources/guava-18.0-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.ideaLibSources/grails-datastore-core-3.1.3.RELEASE-sources.jar!/" />
         </SOURCES>
         <jarDirectory url="file://$MODULE_DIR$/lib" recursive="false" />
       </library>

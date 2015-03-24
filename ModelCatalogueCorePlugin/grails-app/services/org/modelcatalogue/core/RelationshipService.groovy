@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
+import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotal
@@ -49,7 +50,7 @@ class RelationshipService {
         if (!params.sort) {
             params.sort = direction.sortProperty
         }
-        Lists.fromCriteria(params, direction.composeWhere(element, type, ClassificationFilter.from(modelCatalogueSecurityService.currentUser)))
+        Lists.fromCriteria(params, direction.composeWhere(element, type, element.instanceOf(User) ? ClassificationFilter.NO_FILTER : ClassificationFilter.from(modelCatalogueSecurityService.currentUser)))
     }
 
     /**

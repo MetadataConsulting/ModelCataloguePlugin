@@ -47,10 +47,10 @@ class ClassificationService {
         }
 
         if (classificationsFilter.unclassifiedOnly) {
-            criteria.or {
-                isEmpty 'incomingRelationships'
-                incomingRelationships {
-                    ne 'relationshipType', RelationshipType.classificationType
+            criteria.not {
+                'in' 'id', new DetachedCriteria<Relationship>(Relationship).build {
+                    projections { property 'destination.id' }
+                    eq 'relationshipType', RelationshipType.classificationType
                 }
             }
             return criteria
