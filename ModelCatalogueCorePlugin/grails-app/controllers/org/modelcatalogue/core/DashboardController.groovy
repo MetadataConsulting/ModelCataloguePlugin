@@ -45,22 +45,6 @@ class DashboardController {
         }
 
         model.putAll([
-//            totalDataElementCount: countWithClassification(DataElement),
-//            draftDataElementCount: countWithClassificationAndStatus(DataElement, ElementStatus.DRAFT),
-//            finalizedDataElementCount: countWithClassificationAndStatus(DataElement, ElementStatus.FINALIZED),
-//            totalAssetCount: countWithClassification(Asset),
-//            draftAssetCount: countWithClassificationAndStatus(Asset, ElementStatus.DRAFT),
-//            finalizedAssetCount: countWithClassificationAndStatus(Asset, ElementStatus.FINALIZED),
-//            totalModelCount:countWithClassification(Model),
-//            draftModelCount: countWithClassificationAndStatus(Model, ElementStatus.DRAFT),
-//            finalizedModelCount: countWithClassificationAndStatus(Model, ElementStatus.FINALIZED),
-//            totalDataSetCount:countWithClassification(Classification),
-//            measurementUnitCount: countWithClassificationAndStatus(MeasurementUnit, ElementStatus.FINALIZED),
-//            dataTypeCount: countWithClassificationAndStatus(DataType, ElementStatus.FINALIZED),
-//            valueDomainCount:countWithClassification(ValueDomain),
-
-            pendingActionCount:Action.countByState(ActionState.PENDING),
-            failedActionCount:Action.countByState(ActionState.FAILED),
             activeBatchCount:Batch.countByArchived(false),
             archivedBatchCount:Batch.countByArchived(true),
             uninstantiatedDataElementCount: uninstantiatedDataElements.total,

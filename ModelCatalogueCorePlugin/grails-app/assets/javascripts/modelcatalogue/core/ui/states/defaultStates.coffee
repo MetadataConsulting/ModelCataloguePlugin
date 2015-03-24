@@ -957,8 +957,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     <div class="col-xs-9 text-right">
                                         <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}">Active Batches</a> {{activeBatchCount}}</div>
                                         <div><a id="archivedbatchesLink" ui-sref="mc.resource.list({resource: 'batch', status: 'archived'})" ui-sref-opts="{inherit: false}">Archived Batches</a> {{archivedBatchCount}}</div>
-                                        <!--<div><a>Pending Actions</a> {{pendingActionCount}} </div>-->
-                                        <!--<div><a>Failed Actions</a> {{failedActionCount}} </div>-->
                                     </div>
                                 </div>
                             </div>
