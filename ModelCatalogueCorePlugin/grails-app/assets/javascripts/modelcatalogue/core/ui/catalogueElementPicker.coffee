@@ -71,6 +71,7 @@ catalogueElementPicker.directive 'catalogueElementPicker',  ['$compile', 'modelC
     element.removeAttr('catalogueElementPicker')
     element.removeAttr('data-catalogue-element-picker')
     element.addClass('form-control')
+    element.attr('expect-catalogue-element', '')
 
     element.addClass('cep-' + attrs.status.toLowerCase()) if (attrs.status)
 
