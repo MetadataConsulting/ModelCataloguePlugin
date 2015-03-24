@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.Lists
 
 class ClassificationServiceSpec extends IntegrationSpec {
 
@@ -21,9 +22,9 @@ class ClassificationServiceSpec extends IntegrationSpec {
         classification2 = new Classification(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
         new Model(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
         model1 = new Model(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
-        model1.addToClassifications(classification1).save()
+        model1.addToClassifications(classification1)
         model2 = new Model(name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
-        model2.addToClassifications(classification2).save()
+        model2.addToClassifications(classification2)
 
     }
 
@@ -54,8 +55,19 @@ class ClassificationServiceSpec extends IntegrationSpec {
         DetachedCriteria<Model> criteria = classificationService.classified(Model, ClassificationFilter.create(true))
 
         expect:
-        all.count() == 3
-        criteria.count() == 1
+        all.count() == Model.count()
+        criteria.count() == Lists.fromCriteria([:], criteria).items.size()
+    }
+
+    def "does not fail when there are no results"() {
+        ValueDomain domain = new ValueDomain(name: "Test Domain").save(failOnError: true)
+        domain.addToClassifications classification1
+        DetachedCriteria<ValueDomain> criteria = classificationService.classified(ValueDomain, ClassificationFilter.create(true))
+
+        expect:
+        criteria.count() == ValueDomain.list().count { !it.classifications }
+
+        Lists.fromCriteria([:], criteria).items.size() == criteria.count()
     }
 
 

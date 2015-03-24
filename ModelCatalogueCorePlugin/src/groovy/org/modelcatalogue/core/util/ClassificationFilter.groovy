@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
 /**
  * Created by ladin on 23.03.15.
@@ -11,6 +12,8 @@ import org.modelcatalogue.core.security.User
 class ClassificationFilter {
 
     public static final ClassificationFilter NO_FILTER = new ClassificationFilter(false)
+    public static final String UNCLASSIFIED_ONLY_KEY = '$unclassifiedOnly'
+    public static final String EXCLUDE_KEY = '$exclude'
 
     private ClassificationFilter(ImmutableSet<Classification> includes, ImmutableSet<Classification> excludes) {
         this.includes = includes
@@ -40,11 +43,23 @@ class ClassificationFilter {
         new ClassificationFilter(ImmutableSet.copyOf(includes), ImmutableSet.copyOf(excludes))
     }
 
+    static ClassificationFilter from(Map<String, Object> json) {
+        if (json.unclassifiedOnly) {
+            return create(true)
+        }
+        return create((json.includes ?: []).collect { Classification.get(it.id) }, (json.excludes ?: []).collect { Classification.get(it.id) })
+    }
+
+    static ClassificationFilter from(Object other) {
+        return NO_FILTER
+    }
+
     static ClassificationFilter from(User user) {
         if (!user) {
             return NO_FILTER
         }
-        if (user.ext['$unclassifiedOnly']) {
+
+        if (user.ext[UNCLASSIFIED_ONLY_KEY]) {
             return new ClassificationFilter(true)
         }
 
@@ -56,7 +71,7 @@ class ClassificationFilter {
         ImmutableSet.Builder<Classification> excludes = ImmutableSet.builder()
 
         for (Relationship rel in user.filteredByRelationships) {
-            if (rel.ext['$exclude']) {
+            if (rel.ext[EXCLUDE_KEY]) {
                 excludes.add(rel.source)
             } else {
                 includes.add(rel.source)
@@ -77,4 +92,34 @@ class ClassificationFilter {
     boolean asBoolean() {
         unclassifiedOnly || !includes.empty || !excludes.empty
     }
+
+    void to(User user) {
+        if (unclassifiedOnly) {
+            user.ext[UNCLASSIFIED_ONLY_KEY] = 'true'
+        } else {
+            user.ext.remove(UNCLASSIFIED_ONLY_KEY)
+        }
+
+        user.filteredBy.each { Classification c ->
+            user.removeFromFilteredBy(c)
+        }
+
+        for (Classification classification in includes) {
+            user.addToFilteredBy classification
+        }
+
+        for (Classification classification in excludes) {
+            user.addToFilteredBy classification, metadata: [(EXCLUDE_KEY): 'true']
+        }
+    }
+
+    Map<String, Object> toMap() {
+        [
+                unclassifiedOnly: unclassifiedOnly,
+                includes: includes.collect { CatalogueElementMarshallers.minimalCatalogueElementJSON(it) },
+                excludes: excludes.collect { CatalogueElementMarshallers.minimalCatalogueElementJSON(it) }
+        ]
+    }
+
+
 }

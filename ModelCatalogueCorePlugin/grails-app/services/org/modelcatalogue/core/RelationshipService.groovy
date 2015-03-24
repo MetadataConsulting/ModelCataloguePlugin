@@ -310,7 +310,7 @@ class RelationshipService {
     private static Relationship moveAfterWithRearrange(RelationshipDirection direction, CatalogueElement owner, Relationship relationship, Relationship other) {
         List<Relationship> relationships = direction.composeWhere(owner, relationship.relationshipType, ClassificationFilter.NO_FILTER).list([sort: direction.sortProperty])
         int correction = 0
-        relationships.eachWithIndex { Relationship entry, Integer i ->
+        relationships.eachWithIndex { Relationship entry, i ->
             if (entry == relationship) {
                 correction = -1
                 return

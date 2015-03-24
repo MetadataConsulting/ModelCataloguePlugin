@@ -48,10 +48,12 @@ class ClassificationService {
 
         if (classificationsFilter.unclassifiedOnly) {
             criteria.not {
+                // this should work (better) without calling the .list()
+                // but at the moment we're getting ConverterNotFoundException
                 'in' 'id', new DetachedCriteria<Relationship>(Relationship).build {
                     projections { property 'destination.id' }
                     eq 'relationshipType', RelationshipType.classificationType
-                }
+                }.list()
             }
             return criteria
         }

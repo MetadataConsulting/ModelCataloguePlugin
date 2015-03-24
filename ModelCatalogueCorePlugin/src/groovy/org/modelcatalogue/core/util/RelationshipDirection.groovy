@@ -23,12 +23,12 @@ enum RelationshipDirection {
             }
             if (filter) {
                 if (filter.excludes) {
-                    not {
-                        'in' 'classification', filter.excludes
+                    criteria.not {
+                        criteria.'in' 'classification', filter.excludes
                     }
                 }
                 if (filter.includes) {
-                    'in'  'classification', filter.includes
+                    criteria.'in'  'classification', filter.includes
                 }
             }
 
@@ -95,12 +95,12 @@ enum RelationshipDirection {
             }
             if (filter) {
                 if (filter.excludes) {
-                    not {
-                        'in' 'classification', filter.excludes
+                    criteria.not {
+                        criteria.'in' 'classification', filter.excludes
                     }
                 }
                 if (filter.includes) {
-                    'in'  'classification', filter.includes
+                    criteria.'in'  'classification', filter.includes
                 }
             }
 
@@ -172,12 +172,12 @@ enum RelationshipDirection {
             }
             if (filter) {
                 if (filter.excludes) {
-                    not {
-                        'in' 'classification', filter.excludes
+                    criteria.not {
+                        criteria.'in' 'classification', filter.excludes
                     }
                 }
                 if (filter.includes) {
-                    'in'  'classification', filter.includes
+                    criteria.'in'  'classification', filter.includes
                 }
             }
 

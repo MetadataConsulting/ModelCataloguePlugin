@@ -97,7 +97,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 if (controllerName == 'user') {
                     "/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/$controllerName/classifications/$ids?"(controller: controllerName, action: 'classifications', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$controllerName/classifications"(controller: controllerName, action: 'classifications', method: HttpMethod.POST)
                 }
 
                 if (controllerName == 'asset') {
