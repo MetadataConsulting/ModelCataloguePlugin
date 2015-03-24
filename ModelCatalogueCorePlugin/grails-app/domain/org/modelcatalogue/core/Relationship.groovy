@@ -104,7 +104,7 @@ class Relationship implements Extendible<RelationshipMetadata> {
         if (getId() && isAttached()) {
             RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
             FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
-            addToExtensions(newOne).save()
+            addToExtensions(newOne).save(validate: false)
             auditService.logNewRelationshipMetadata(newOne)
             return newOne
         }

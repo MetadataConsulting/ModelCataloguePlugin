@@ -1,9 +1,17 @@
 package org.modelcatalogue.core
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
+import com.google.common.util.concurrent.UncheckedExecutionException
 import grails.util.GrailsNameUtils
+import org.apache.log4j.Logger
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
+import java.util.concurrent.Callable
+
 class RelationshipType {
+
+    private static final Cache<String, Long> typesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
     def relationshipTypeService
 
@@ -173,7 +181,23 @@ class RelationshipType {
     }
 
     static readByName(String name) {
-        RelationshipType.findByName(name, [cache: true, readOnly: true])
+        try {
+            Long id = typesCache.get(name, { ->
+                RelationshipType type = RelationshipType.findByName(name, [cache: true, readOnly: true])
+                if (!type) {
+                    throw new IllegalArgumentException("Type '$name' does not exist!")
+                }
+                return type.id
+            } as Callable<Long>)
+            RelationshipType.get(id)
+
+        } catch (UncheckedExecutionException e) {
+            if (e.cause instanceof IllegalArgumentException) {
+                Logger.getLogger(RelationshipType).warn "Type '$name' requested but not found!"
+            } else {
+                throw e
+            }
+        }
     }
 
     String toString() {
@@ -192,12 +216,22 @@ class RelationshipType {
         relationshipTypeService.clearCache()
     }
 
+    def afterInsert() {
+        typesCache.put name, getId()
+    }
+
     def beforeUpdate() {
         relationshipTypeService.clearCache()
+        typesCache.invalidate(name)
+    }
+
+    def afterUpdate() {
+        typesCache.put name, getId()
     }
 
     def beforeDelete() {
         relationshipTypeService.clearCache()
+        typesCache.invalidate(name)
     }
 
 

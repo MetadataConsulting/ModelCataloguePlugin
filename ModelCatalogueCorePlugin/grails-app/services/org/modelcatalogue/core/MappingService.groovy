@@ -22,7 +22,7 @@ class MappingService {
             }
 
             auditService.logMappingUpdated(existing)
-            existing.save()
+            existing.save(deepValidate: false)
             return existing
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
@@ -32,9 +32,9 @@ class MappingService {
             return newOne
         }
 
-        newOne.save()
-        source.addToOutgoingMappings(newOne).save()
-        destination.addToIncomingMappings(newOne).save()
+        newOne.save(validate: false)
+        source.addToOutgoingMappings(newOne).save(validate: false)
+        destination.addToIncomingMappings(newOne).save(validate: false)
 
         auditService.logMappingCreated(newOne)
 
@@ -52,8 +52,8 @@ class MappingService {
 
         auditService.logMappingDeleted(old)
 
-        source.removeFromOutgoingMappings(old).save()
-        destination.removeFromIncomingMappings(old).save()
+        source.removeFromOutgoingMappings(old).save(validate: false)
+        destination.removeFromIncomingMappings(old).save(validate: false)
         old.delete(flush: true)
         old
     }

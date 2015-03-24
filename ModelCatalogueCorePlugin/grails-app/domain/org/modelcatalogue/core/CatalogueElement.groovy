@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import com.google.common.base.Function
-import com.google.common.collect.Collections2
-import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.publishing.DraftContext
@@ -313,7 +311,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         if (getId() && isAttached()) {
             ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
             FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
-            addToExtensions(newOne).save()
+            addToExtensions(newOne).save(validate: false)
             auditService.logNewMetadata(newOne)
             return newOne
         }
@@ -324,7 +322,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     @Override
     void removeExtension(ExtensionValue extension) {
         auditService.logMetadataDeleted(extension)
-        removeFromExtensions(extension).save()
+        removeFromExtensions(extension).save(validate: false)
         extension.delete(flush: true)
     }
 

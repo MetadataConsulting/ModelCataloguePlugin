@@ -97,7 +97,7 @@ class DraftChain extends PublishingChain {
 
         draft.beforeDraftPersisted()
 
-        if (!draft.save(flush: true)) {
+        if (!draft.save(flush: true, deepValidate: false)) {
             return draft
         }
 
@@ -115,7 +115,7 @@ class DraftChain extends PublishingChain {
         }
 
         draft.status = ElementStatus.DRAFT
-        draft.save(flush: true)
+        draft.save(flush: true, deepValidate: false)
     }
 
 

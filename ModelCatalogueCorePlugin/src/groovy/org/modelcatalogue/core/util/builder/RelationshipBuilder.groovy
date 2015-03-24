@@ -55,7 +55,7 @@ class RelationshipBuilder {
      * @param extensions closure defining the metadata
      */
     void to(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
-        to repository.createAbstractionByClassificationAndName(getDestinationHintOrClass(), classification, name), extensions
+        to repository.createProxy(getDestinationHintOrClass(), [classification: classification, name: name]), extensions
     }
 
     /**
@@ -67,9 +67,9 @@ class RelationshipBuilder {
      */
     void to(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         context.withContextElement(Classification) {
-            to repository.createAbstractionByClassificationAndName(getDestinationHintOrClass(), it.name, name), extensions
+            to repository.createProxy(getDestinationHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
-            to repository.createAbstractionByName(getDestinationHintOrClass(), name), extensions
+            to repository.createProxy(getDestinationHintOrClass(), [name: name]), extensions
         }
     }
 
@@ -98,7 +98,7 @@ class RelationshipBuilder {
      * @param extensions closure defining the metadata
      */
     void from(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
-        from repository.createAbstractionByClassificationAndName(getSourceHintOrClass(), classification, name), extensions
+        from repository.createProxy(getSourceHintOrClass(), [classification: classification, name: name]), extensions
     }
 
     /**
@@ -111,9 +111,9 @@ class RelationshipBuilder {
      */
     void from(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
         context.withContextElement(Classification) {
-            from repository.createAbstractionByClassificationAndName(getSourceHintOrClass(), it.name, name), extensions
+            from repository.createProxy(getSourceHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
-            from repository.createAbstractionByName(getSourceHintOrClass(), name), extensions
+            from repository.createProxy(getSourceHintOrClass(), [name: name]), extensions
         }
     }
     /**
