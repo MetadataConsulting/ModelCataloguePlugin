@@ -103,7 +103,6 @@ class ElementService implements Publisher<CatalogueElement> {
                 }
                 finalized
             }
-            finalized
         }
     }
 
