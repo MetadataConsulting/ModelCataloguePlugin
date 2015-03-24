@@ -306,7 +306,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     @Override
     Extension addExtension(String name, String value) {
         ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
-        newOne.save()
+        newOne.save(deepValidate: false)
         assert !newOne.errors.hasErrors()
         addToExtensions(newOne)
         newOne

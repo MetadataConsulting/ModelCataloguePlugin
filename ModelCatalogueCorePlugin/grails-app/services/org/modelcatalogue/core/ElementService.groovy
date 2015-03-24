@@ -80,7 +80,7 @@ class ElementService implements Publisher<CatalogueElement> {
         modelCatalogueSearchService.unindex(archived)
 
         archived.status = ElementStatus.DEPRECATED
-        archived.save()
+        archived.save(validate: false)
         return archived
     }
 
@@ -163,7 +163,7 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         destination.status = ElementStatus.UPDATED
-        destination.save()
+        destination.save(deepValidate: false)
 
 
         for (Classification classification in new HashSet<Classification>(source.classifications)) {

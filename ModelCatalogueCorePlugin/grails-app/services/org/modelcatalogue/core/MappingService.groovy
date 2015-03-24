@@ -19,18 +19,18 @@ class MappingService {
                 return existing
             }
 
-            return existing.save()
+            return existing.save(deepValidate: false)
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
-        newOne.validate()
+        newOne.validate(deepValidate: false)
 
         if (newOne.hasErrors()) {
             return newOne
         }
 
-        newOne.save()
-        source.addToOutgoingMappings(newOne).save()
-        destination.addToIncomingMappings(newOne).save()
+        newOne.save(validate: false)
+        source.addToOutgoingMappings(newOne).save(validate: false)
+        destination.addToIncomingMappings(newOne).save(validate: false)
 
         newOne
     }
@@ -43,8 +43,8 @@ class MappingService {
     Mapping unmap(CatalogueElement source, CatalogueElement destination) {
         Mapping old = Mapping.findBySourceAndDestination(source, destination)
         if (!old) return null
-        source.removeFromOutgoingMappings(old).save()
-        destination.removeFromIncomingMappings(old).save()
+        source.removeFromOutgoingMappings(old).save(validate: false)
+        destination.removeFromIncomingMappings(old).save(validate: false)
         old.delete(flush: true)
         old
     }

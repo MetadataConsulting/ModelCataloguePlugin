@@ -49,7 +49,7 @@ class FinalizationChain extends PublishingChain {
 
     private CatalogueElement doPublish(Publisher<CatalogueElement> archiver) {
         published.status = ElementStatus.FINALIZED
-        published.save()
+        published.save(validate: false)
 
         if (published.latestVersionId) {
             List<CatalogueElement> previousFinalized = published.getClass().findAllByLatestVersionIdAndStatus(published.latestVersionId, ElementStatus.FINALIZED)
