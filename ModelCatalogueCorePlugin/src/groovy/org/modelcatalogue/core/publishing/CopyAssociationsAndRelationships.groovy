@@ -1,12 +1,16 @@
 package org.modelcatalogue.core.publishing
 
 import grails.util.Holders
+import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.builder.RelationshipDefinition
+import org.modelcatalogue.core.util.builder.RelationshipDefinitionBuilder
 
+@Log4j
 class CopyAssociationsAndRelationships {
 
     private final CatalogueElement draft
@@ -22,19 +26,44 @@ class CopyAssociationsAndRelationships {
     }
 
 
-    void copyClassifications() {
-        for (Classification classification in element.classifications) {
-            draft.addToClassifications(DraftContext.preferDraft(classification))
+    void copyClassifications(Set<String> createdRelationshipHashes) {
+        relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.classificationType) { Relationship r ->
+            CatalogueElement source = DraftContext.preferDraft(r.source)
+
+            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.classificationType)
+
+            if (hash in createdRelationshipHashes) {
+                return
+            }
+
+            RelationshipDefinitionBuilder definitionBuilder = RelationshipDefinition.create(source, draft, RelationshipType.classificationType)
+
+            definitionBuilder
+                    .withArchived(r.archived)
+                    .withClassification(r.classification)
+                    .withIncomingIndex(r.incomingIndex)
+                    .withOutgoingIndex(r.outgoingIndex)
+                    .withCombinedIndex(r.combinedIndex)
+                    .withMetadata(r.ext)
+                    .withSkipUniqueChecking(true)
+
+            Relationship created = relationshipService.link definitionBuilder.definition
+
+            if (created.hasErrors()) {
+                throw new IllegalStateException(FriendlyErrors.printErrors("Cannot transfer classification", created.errors))
+            }
+
+            createdRelationshipHashes << hash
         }
     }
 
-    void copyRelationships() {
+    void copyRelationships(Set<String> createdRelationshipHashes) {
         if (classificationOnly) {
             return
         }
 
-        copyRelationshipsInternal(RelationshipDirection.INCOMING)
-        copyRelationshipsInternal(RelationshipDirection.OUTGOING)
+        copyRelationshipsInternal(RelationshipDirection.INCOMING, createdRelationshipHashes)
+        copyRelationshipsInternal(RelationshipDirection.OUTGOING, createdRelationshipHashes)
 
         GrailsDomainClass domainClass = Holders.applicationContext.getBean(GrailsApplication).getDomainClass(draft.class.name) as GrailsDomainClass
 
@@ -49,39 +78,61 @@ class CopyAssociationsAndRelationships {
     }
 
 
-    void copyRelationshipsInternal(RelationshipDirection direction) {
+    void copyRelationshipsInternal(RelationshipDirection direction, Set<String> createdRelationshipHashes) {
         RelationshipType supersession =  RelationshipType.readByName('supersession')
 
         List<Relationship> toRemove = []
 
-        def relationships = direction == RelationshipDirection.INCOMING ? element.incomingRelationships : element.outgoingRelationships
-
-        for (Relationship r in relationships) {
+        relationshipService.eachRelationshipPartitioned(direction, element) { Relationship r ->
             if (r.relationshipType == supersession) {
-                continue
+                return
             }
 
-            Relationship created
+            CatalogueElement otherSide
+            String hash
+
+            if (direction == RelationshipDirection.INCOMING) {
+                otherSide = DraftContext.preferDraft(r.source)
+                hash = DraftContext.hashForRelationship(otherSide, draft, r.relationshipType)
+            } else {
+                otherSide = DraftContext.preferDraft(r.destination)
+                hash = DraftContext.hashForRelationship(draft, otherSide, r.relationshipType)
+            }
+
+            if (hash in createdRelationshipHashes) {
+                return
+            }
+
+
             if (direction == RelationshipDirection.INCOMING) {
                 if (r.archived && r.relationshipType.versionSpecific) {
                     // e.g. don't copy archived parents, but copy children (that's why this is in the incoming branch)
-                    continue
+                    return
                 }
-                created = relationshipService.link(DraftContext.preferDraft(r.source), draft, r.relationshipType, r.classification, r.archived)
-            } else {
-                created = relationshipService.link(draft, DraftContext.preferDraft(r.destination), r.relationshipType, r.classification, r.archived)
             }
+
+            RelationshipDefinitionBuilder definitionBuilder = direction == RelationshipDirection.INCOMING ? RelationshipDefinition.create(otherSide, draft, r.relationshipType) : RelationshipDefinition.create(draft, otherSide, r.relationshipType)
+
+            definitionBuilder
+                    .withArchived(r.archived)
+                    .withClassification(r.classification)
+                    .withIncomingIndex(r.incomingIndex)
+                    .withOutgoingIndex(r.outgoingIndex)
+                    .withCombinedIndex(r.combinedIndex)
+                    .withMetadata(r.ext)
+                    .withSkipUniqueChecking(true)
+
+            Relationship created = relationshipService.link definitionBuilder.definition
+
             if (created.hasErrors()) {
                 throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship contains errors", created.errors))
             }
-            created.ext = r.ext
+
             if (isOverriding(created, r)) {
                 toRemove << r
             }
-            created.incomingIndex = r.incomingIndex
-            created.outgoingIndex = r.outgoingIndex
-            created.combinedIndex = r.combinedIndex
-            created.save(flush: true)
+
+            createdRelationshipHashes << hash
         }
 
         for (Relationship r in toRemove) {
@@ -123,5 +174,10 @@ class CopyAssociationsAndRelationships {
         result = draft.hashCode()
         result = 31 * result + element.hashCode()
         return result
+    }
+
+    @Override
+    String toString() {
+        "Task Copy Relationships from $element to $draft"
     }
 }

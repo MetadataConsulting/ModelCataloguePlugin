@@ -184,7 +184,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
     @Unroll
     def "Link existing elements using add to #direction endpoint with failing constraint as JSON result"(){
         controller.request.method       = 'POST'
-        RelationshipType relationshipType = RelationshipType.findByName("falseRuleReturn")
+        RelationshipType relationshipType = RelationshipType.readByName("falseRuleReturn")
         controller.response.format = 'json'
         controller.request.json = anotherLoadItem as JSON
         controller."add${direction.capitalize()}"(loadItem.id, relationshipType.name)

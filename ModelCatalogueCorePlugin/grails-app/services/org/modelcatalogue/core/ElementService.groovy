@@ -80,7 +80,7 @@ class ElementService implements Publisher<CatalogueElement> {
         modelCatalogueSearchService.unindex(archived)
 
         archived.status = ElementStatus.DEPRECATED
-        archived.save()
+        archived.save(validate: false)
         return archived
     }
 
@@ -163,7 +163,7 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         destination.status = ElementStatus.UPDATED
-        destination.save()
+        destination.save(deepValidate: false)
 
 
         for (Classification classification in new HashSet<Classification>(source.classifications)) {
@@ -257,7 +257,7 @@ class ElementService implements Publisher<CatalogueElement> {
             archive source
         }
 
-        destination.addToSupersededBy(source)
+        destination.addToSupersededBy(source, skipUniqueChecking: true)
 
         destination.status = originalStatus
 
@@ -283,7 +283,7 @@ class ElementService implements Publisher<CatalogueElement> {
             group by m.name
             having sum(case when inc.relationshipType = :base then 1 else 0 end) = 1
             and sum(case when inc.relationshipType = :hierarchy then 1 else 0 end) = 2
-        """, [hierarchy: RelationshipType.hierarchyType, base: RelationshipType.findByName("base")])
+        """, [hierarchy: RelationshipType.hierarchyType, base: RelationshipType.readByName("base")])
 
         Map<Long, Long> ret = [:]
 
@@ -321,7 +321,7 @@ class ElementService implements Publisher<CatalogueElement> {
             and
                 (rel.relationshipType = :containment or rel.relationshipType = :hierarchy)
             order by m.name asc, m.dateCreated asc, rel.destination.name asc
-        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], containment: RelationshipType.findByName('containment'), hierarchy: RelationshipType.findByName('hierarchy')]
+        """, [states: [ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.FINALIZED], containment: RelationshipType.readByName('containment'), hierarchy: RelationshipType.readByName('hierarchy')]
 
 
         Map<Long, Map<String, Object>> models = new LinkedHashMap<Long, Map<String, Object>>().withDefault { [id: it, elementNames: new TreeSet<String>(), childrenNames: new TreeSet<String>()] }

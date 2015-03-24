@@ -1,22 +1,26 @@
 dataSource {
     pooled = true
-    driverClassName = "org.h2.Driver"
+    driverClassName = "com.mysql.jdbc.Driver"
     username = "sa"
     password = ""
+    logSql=false
 }
 hibernate {
     cache.use_second_level_cache    = true
     cache.use_query_cache           = false
     cache.region.factory_class = 'net.sf.ehcache.hibernate.EhCacheRegionFactory' // Hibernate 3
-//    cache.region.factory_class = 'org.hibernate.cache.ehcache.EhCacheRegionFactory' // Hibernate 4
+
 }
 
 // environment specific settings
 environments {
     development {
         dataSource {
-            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+        	dialect='org.hibernate.dialect.MySQLInnoDBDialect'
+			url =  "jdbc:mysql://localhost:3306/GE1?autoReconnect=true&useUnicode=yes"
+            username = 'root'		
+			password = ''
+            dbCreate = "update"
         }
     }
     test {
@@ -27,6 +31,7 @@ environments {
     }
     local {
         dataSource {
+        	dialect='org.hibernate.dialect.MySQLInnoDBDialect'
             dbCreate = "create"
             url = "jdbc:mysql://localhost:3306/${System.getProperty('mc.db.schema') ?: System.getenv('METADATA_DB_SCHEMA') ?: 'nhic'}?autoReconnect=true&useUnicode=yes"
             username = System.getenv('METADATA_DB_USERNAME')

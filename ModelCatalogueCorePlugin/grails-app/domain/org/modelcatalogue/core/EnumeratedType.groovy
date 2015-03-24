@@ -66,6 +66,25 @@ class EnumeratedType extends DataType {
     Map<String, String> getEnumerations() {
         stringToMap(enumAsString)
     }
+	
+	 class EnumBean{
+		String name
+		String code 
+	}
+	/**
+	 * This method could be optimized 
+	 * 
+	 * @return  a list with beans (name,code)
+	 */
+	List getEnumerationsAsBeans(){
+		def results=new ArrayList()
+		def map =stringToMap(enumAsString)
+		for (String key in map.keySet()) {
+			results << new EnumBean(name:map.get(key),code:key)
+		}
+		return results
+		
+	}
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, enumerations: ${enumerations}]"

@@ -30,10 +30,10 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
     def "init default relationship types"() {
 
         when:
-        RelationshipType dt1 = RelationshipType.findByName("containment")
-        RelationshipType dt2 = RelationshipType.findByName("classification")
-        RelationshipType dt3 = RelationshipType.findByName("supersession")
-        RelationshipType dt4 = RelationshipType.findByName("hierarchy")
+        RelationshipType dt1 = RelationshipType.readByName("containment")
+        RelationshipType dt2 = RelationshipType.readByName("classification")
+        RelationshipType dt3 = RelationshipType.readByName("supersession")
+        RelationshipType dt4 = RelationshipType.readByName("hierarchy")
 
         then:
         dt1

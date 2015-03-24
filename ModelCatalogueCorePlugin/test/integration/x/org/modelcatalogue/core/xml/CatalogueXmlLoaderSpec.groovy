@@ -18,7 +18,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
     def setupSpec() {
         initCatalogueService.initCatalogue(true)
 
-        if (!RelationshipType.findByName('derivedFrom')) {
+        if (!RelationshipType.readByName('derivedFrom')) {
             new RelationshipType(
                     name: 'derivedFrom',
                     sourceClass: MeasurementUnit,

@@ -29,7 +29,10 @@ class BootStrap {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(true)
                 initSecurity()
-                setupStuff()
+                //setupStuff()
+				def admin = User.findByName('admin')
+				admin.password= 'admin'
+				admin.save(failOnError: true)
             }
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
@@ -103,6 +106,7 @@ class BootStrap {
         createRequestmapIfMissing('/dbconsole/**',                 'ROLE_ADMIN')
         createRequestmapIfMissing('/monitoring/**',                 'ROLE_ADMIN')
         createRequestmapIfMissing('/plugins/console-1.5.0/**',     'ROLE_ADMIN')
+		createRequestmapIfMissing('/monitoring/**',     'ROLE_ADMIN')
 
 //        createRequestmapIfMissing('/api/modelCatalogue/core/model/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
@@ -153,7 +157,7 @@ class BootStrap {
             assert !actionService.create(batch, TestAction, test: actionService.create(batch, TestAction, fail: true, timeout: 3000)).hasErrors()
 
 
-            Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.findByName('relatedTo'))
+            Action createRelationshipAction = actionService.create(batch, CreateRelationship, source: MeasurementUnit.findByName("celsius"), destination: MeasurementUnit.findByName("fahrenheit"), type: RelationshipType.readByName('relatedTo'))
             if (createRelationshipAction.hasErrors()) {
                 println(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Failed to create relationship actions", createRelationshipAction.errors))
                 throw new AssertionError("Failed to create relationship actions!")

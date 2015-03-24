@@ -1,12 +1,14 @@
 package org.modelcatalogue.core.publishing
 
 import grails.util.Holders
+import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
+@Log4j
 class DraftChain extends PublishingChain {
 
     private final DraftContext strategy
@@ -55,6 +57,7 @@ class DraftChain extends PublishingChain {
                 processed << element.id
                 CatalogueElement draft = element.createDraftVersion(publisher, strategy)
                 if (draft.hasErrors()) {
+                    log.warn(FriendlyErrors.printErrors("Draft version $draft has errors", draft.errors))
                     return rejectDraftDependency(draft)
                 }
             }
@@ -94,14 +97,14 @@ class DraftChain extends PublishingChain {
 
         draft.beforeDraftPersisted()
 
-        if (!draft.save()) {
+        if (!draft.save(deepValidate: false)) {
             return draft
         }
 
         restoreStatus()
 
 
-        draft.addToSupersedes(published)
+        draft.addToSupersedes(published, skipUniqueChecking: true)
 
         strategy.delayRelationshipCopying(draft, published)
 
@@ -112,7 +115,7 @@ class DraftChain extends PublishingChain {
         }
 
         draft.status = ElementStatus.DRAFT
-        draft.save()
+        draft.save(validate: false)
     }
 
 

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.builder.RelationshipDefinition
 import spock.lang.Unroll
 
 /**
@@ -33,7 +34,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
     }
 
     RelationshipType getReltype() {
-        RelationshipType.findByName("relationship")
+        RelationshipType.readByName("relationship")
     }
 
     ValueDomain getVd1() {
@@ -46,7 +47,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
 
         when:
-        RelationshipType hierarchy = RelationshipType.findByName("hierarchy")
+        RelationshipType hierarchy = RelationshipType.readByName("hierarchy")
         Relationship rel =  relationshipService.link( de1, de2, hierarchy)
 
         then:
@@ -107,50 +108,6 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         de2.getIncomingRelations() == []
         de1.getOutgoingRelations() == []
-
-    }
-
-
-    @Unroll
-    def "testNumber #testNumber org.modelcatalogue.core.Relationship creation for #args results #validates"() {
-
-        when:
-        Map<String, String> ext = args.remove('ext')
-        Relationship rel = new Relationship(args);
-        rel.save()
-
-        if (ext) {
-            assert rel.errors.errorCount == 0
-            rel.ext = ext
-            rel.validate()
-        }
-
-        then:
-        (rel.errors.errorCount == 0) == validates
-
-
-        cleanup:
-        if (rel.id) rel.delete()
-
-        where:
-        testNumber | validates  | args
-        1  | false | [:]
-        2  | false | [source: new DataElement(name: 'element1'), destination: de1]
-        5  | false | [source: new DataElement(name: 'element1'), destination: de1, relationshipType: RelationshipType.containmentType]
-        6  | true  | [source: md1, destination: de1, relationshipType: RelationshipType.containmentType]
-        7  | false | [source: new DataElement(name: 'parentModel'), destination: md1, relationshipType: RelationshipType.hierarchyType]
-        8  | true  | [source: md1, destination: md1, relationshipType: RelationshipType.hierarchyType]
-        14 | true  | [source: de1, destination: de2, relationshipType: reltype]
-        16 | true  | [source: de1, destination: de2, relationshipType: RelationshipType.supersessionType]
-        17 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': -1]]
-        18 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Max Occurs': -1]]
-        19 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 0]]
-        20 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 3, 'Max Occurs': 5]]
-        21 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 5, 'Max Occurs': 5]]
-        22 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 6, 'Max Occurs': 5]]
-        23 | false | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Max Occurs': 0]]
-        24 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 1, 'Max Occurs': 'unbounded']]
-        25 | true  | [source: md1, destination: de2, relationshipType: RelationshipType.containmentType, ext: ['Min Occurs': 'unbounded', 'Max Occurs': 'unbounded']]
 
     }
 

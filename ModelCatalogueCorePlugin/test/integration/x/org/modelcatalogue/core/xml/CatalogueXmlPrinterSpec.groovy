@@ -34,7 +34,7 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
                     sourceToDestination: 'is derived from',
                     destinationClass: MeasurementUnit,
                     destinationToSource: 'derives'
-            ).save(failOnError: true)
+            ).save(failOnError: true, flush: true)
         }
     }
 

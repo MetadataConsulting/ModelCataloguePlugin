@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.transaction.Transactional
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
@@ -11,8 +10,9 @@ import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
 import org.modelcatalogue.core.util.test.TestDataHelper
 
-@Transactional
 class InitCatalogueService {
+
+    static transactional = false
 
     def grailsApplication
     def classificationService
@@ -81,7 +81,7 @@ class InitCatalogueService {
         def defaultDataTypes = grailsApplication.config.modelcatalogue.defaults.relationshiptypes
 
         for (Map definition in defaultDataTypes) {
-            RelationshipType existing = RelationshipType.findByName(definition.name)
+            RelationshipType existing = RelationshipType.readByName(definition.name)
             if (!existing) {
                 RelationshipType type = new RelationshipType(definition)
                 type.save()
@@ -89,7 +89,7 @@ class InitCatalogueService {
                 if (type.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Cannot create relationship type $definition.name", type.errors))
                 }
-            } else if (definition.rule && definition.rule.trim() != existing.rule?.trim()) {
+            } else if (definition.rule && definition.rule.replaceAll(/\s+/, ' ').trim() != existing.rule?.replaceAll(/\s+/, ' ')?.trim()) {
                 log.warn("""
                     Your current rule for relationship type '${existing.name}' is different than the one from configuration. This may cause unexpected behaviour:
                     ===EXPECTED'${existing.name}'===

@@ -179,12 +179,8 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
         }
 
         context.webRequest.currentResponse.with {
-            def link = linkGenerator.link(controller: 'asset', id: asset.id, action: 'show')
-            status = 302
-            setHeader("Location", link)
             setHeader("X-Asset-ID", asset.id.toString())
-            // outputStream << link
-            outputStream.flush()
+            sendRedirect(linkGenerator.link(controller: 'asset', id: asset.id, action: 'show'))
         }
     }
 

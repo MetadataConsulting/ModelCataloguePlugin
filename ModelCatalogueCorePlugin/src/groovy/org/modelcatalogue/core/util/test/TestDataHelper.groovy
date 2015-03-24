@@ -26,7 +26,7 @@ class TestDataHelper {
     }
 
     private static initDb(SessionFactory sessionFactory, boolean drop, String tempSqlFileName, Closure initCode) {
-        if (sessionFactory.currentSession.connection().metaData.databaseProductName != 'H2') {
+        if (isH2(sessionFactory)) {
             return initCode()
         }
 
@@ -57,5 +57,9 @@ class TestDataHelper {
         new Sql(sessionFactory.currentSession.connection()).execute("SCRIPT DROP TO ${scriptLocation}")
         println "Data script created in $scriptLocation"
         println "database created in ${System.currentTimeMillis() - start} ms"
+    }
+
+    static boolean isH2(SessionFactory sessionFactory) {
+        sessionFactory.currentSession.connection().metaData.databaseProductName != 'H2'
     }
 }

@@ -13,11 +13,13 @@ import org.modelcatalogue.core.*
     String name
     String classification
 
+    boolean newlyCreated
+
     protected CatalogueElementProxyRepository repository
 
     private final Map<String, Object> parameters = [:]
     private final Map<String, String> extensions = [:]
-    private final Set<RelationshipProxy> relationships = []
+    final Set<RelationshipProxy> relationships = []
 
     private CatalogueElementProxy<T> replacedBy
     private T resolved
@@ -35,6 +37,17 @@ import org.modelcatalogue.core.*
         this.id = id
         this.name = name
         this.classification = classification
+    }
+
+    Set<RelationshipProxy> getPendingRelationships() {
+        relationships
+    }
+
+    boolean isNew() {
+        if (replacedBy) {
+            return replacedBy.isNew()
+        }
+        return newlyCreated
     }
 
     @Override
@@ -56,6 +69,7 @@ import org.modelcatalogue.core.*
 
             log.debug "$this not found, creating new one"
 
+            newlyCreated = true
             resolved = fill(domain.newInstance())
 
             return resolved
@@ -284,15 +298,8 @@ import org.modelcatalogue.core.*
         relationships << relationshipProxy
     }
 
-    @Override
-    Set<Relationship> resolveRelationships() {
-        relationships.collect { RelationshipProxy it ->
-            it.resolve()
-        }
-    }
-
     String toString() {
-        "Proxy of $domain[id: $id, classification: $classification, name: $name]"
+        "Proxy of $domain.simpleName[id: $id, classification: $classification, name: $name]"
     }
 
     @Override
@@ -324,6 +331,12 @@ import org.modelcatalogue.core.*
         }
 
         other.replacedBy = this
+
+        if (domain != other.domain) {
+            if (domain == CatalogueElement) {
+                domain = other.domain
+            }
+        }
 
         this
     }
