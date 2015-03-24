@@ -752,7 +752,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                         <a ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"> Classifications</a> {{totalDataSetCount}} </div>
+                                        <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}">Finalized Classifications</a> {{finalizedClassificationCount}} </div>
+                                        <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Classifications</a> {{draftClassificationCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -821,7 +822,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                         <a ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cog fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{valueDomainCount}} <span ng-show="incompleteValueDomainsCount"> / <a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}">Incomplete </a> {{incompleteValueDomainsCount}}</span></div>
+                                        <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{finalizedValueDomainCount}} <span ng-show="incompleteValueDomainsCount"> / <a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}">Incomplete </a> {{incompleteValueDomainsCount}}</span></div>
                                         <div><a ng-click="validate()">Validate</a> / <a ng-click="convert()">Convert</a></div>
                                     </div>
                                 </div>
@@ -844,7 +845,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                         <a ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-th-large fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="dataTypesLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Data Types</a> {{dataTypeCount}} </div>
+                                        <div><a id="dataTypesLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Finalized Data Types</a> {{finalizedDataTypeCount}} </div>
+                                        <div><a id="draftDataTypesLink" ui-sref="mc.resource.list({resource: 'dataType', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Types</a> {{draftDataTypeCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -865,7 +867,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                         <a ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tachometer fa-5x fa-fw"></i></a>
                                     </div>
                                     <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Measurement Units</a> {{measurementUnitCount}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Finalized Measurement Units</a> {{finalizedMeasurementUnitCount}} </div>
+                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Measurement Units</a> {{draftMeasurementUnitCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -954,8 +957,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     <div class="col-xs-9 text-right">
                                         <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}">Active Batches</a> {{activeBatchCount}}</div>
                                         <div><a id="archivedbatchesLink" ui-sref="mc.resource.list({resource: 'batch', status: 'archived'})" ui-sref-opts="{inherit: false}">Archived Batches</a> {{archivedBatchCount}}</div>
-                                        <!--<div><a>Pending Actions</a> {{pendingActionCount}} </div>-->
-                                        <!--<div><a>Failed Actions</a> {{failedActionCount}} </div>-->
                                     </div>
                                 </div>
                             </div>

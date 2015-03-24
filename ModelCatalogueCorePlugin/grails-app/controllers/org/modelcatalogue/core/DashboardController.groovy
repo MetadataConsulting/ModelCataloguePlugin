@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
@@ -16,29 +17,41 @@ class DashboardController {
         response.addHeader('Expires', '-1')
         def uninstantiatedDataElements = dataArchitectService.uninstantiatedDataElements(params)
 
-        def model = [
-                totalDataElementCount: countWithClassification(DataElement),
-                draftDataElementCount: countWithClassificationAndStatus(DataElement, ElementStatus.DRAFT),
-                finalizedDataElementCount: countWithClassificationAndStatus(DataElement, ElementStatus.FINALIZED),
-                totalAssetCount: countWithClassification(Asset),
-                draftAssetCount: countWithClassificationAndStatus(Asset, ElementStatus.DRAFT),
-                finalizedAssetCount: countWithClassificationAndStatus(Asset, ElementStatus.FINALIZED),
-                totalModelCount:countWithClassification(Model),
-                draftModelCount: countWithClassificationAndStatus(Model, ElementStatus.DRAFT),
-                finalizedModelCount: countWithClassificationAndStatus(Model, ElementStatus.FINALIZED),
-                totalDataSetCount:countWithClassification(Classification),
-                pendingActionCount:Action.countByState(ActionState.PENDING),
-                failedActionCount:Action.countByState(ActionState.FAILED),
-                activeBatchCount:Batch.countByArchived(false),
-                archivedBatchCount:Batch.countByArchived(true),
-                uninstantiatedDataElementCount: uninstantiatedDataElements.total,
-                relationshipTypeCount:RelationshipType.count(),
-                measurementUnitCount: countWithClassificationAndStatus(MeasurementUnit, ElementStatus.FINALIZED),
-                dataTypeCount: countWithClassificationAndStatus(DataType, ElementStatus.FINALIZED),
-                valueDomainCount:countWithClassification(ValueDomain),
-                incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
-                transformationsCount:CsvTransformation.count()
-                ]
+        def model = [:]
+
+        List<Class> displayed = [Classification, Model, DataElement, ValueDomain, DataType, MeasurementUnit, Asset]
+
+        for (Class type in displayed) {
+            DetachedCriteria criteria = classificationService.classified(type)
+            criteria.projections {
+                property 'status'
+                property 'id'
+            }
+            criteria.inList('status', [ElementStatus.DRAFT, ElementStatus.FINALIZED])
+
+
+            int draft = 0
+            int finalized = 0
+
+            for (Object[] row in criteria.list()) {
+                ElementStatus status = row[0] as ElementStatus
+                if (status == ElementStatus.DRAFT) draft++
+                else if (status == ElementStatus.FINALIZED) finalized++
+            }
+
+            model["draft${type.simpleName}Count"]       = draft
+            model["finalized${type.simpleName}Count"]   = finalized
+            model["total${type.simpleName}Count"]       = draft + finalized
+        }
+
+        model.putAll([
+            activeBatchCount:Batch.countByArchived(false),
+            archivedBatchCount:Batch.countByArchived(true),
+            uninstantiatedDataElementCount: uninstantiatedDataElements.total,
+            relationshipTypeCount:RelationshipType.count(),
+            incompleteValueDomainsCount: dataArchitectService.incompleteValueDomains(params).total,
+            transformationsCount:CsvTransformation.count()
+        ])
         respond model
     }
 

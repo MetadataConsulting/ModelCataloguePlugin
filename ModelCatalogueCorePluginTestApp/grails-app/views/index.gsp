@@ -1,4 +1,4 @@
-<%@ page import="grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<%@ page import="org.modelcatalogue.core.util.ClassificationFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,7 +89,7 @@
                     roles: ${grails.plugin.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
                     username: '${sec.username()}',
                     id: ${sec.loggedInUserInfo(field:"id")},
-                    classifications: ${(org.modelcatalogue.core.security.User.get(sec.loggedInUserInfo(field:"id"))?.filteredBy?.collect({ org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers.minimalCatalogueElementJSON(it) }) ?: []).encodeAsJSON() }
+                    classifications: ${(org.modelcatalogue.core.util.ClassificationFilter.from(org.modelcatalogue.core.security.User.get(sec.loggedInUserInfo(field:"id"))).toMap()).encodeAsJSON() }
                 }
                 </sec:ifLoggedIn>
             })

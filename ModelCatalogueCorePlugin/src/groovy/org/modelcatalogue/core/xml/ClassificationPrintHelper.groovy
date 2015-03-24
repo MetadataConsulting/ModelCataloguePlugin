@@ -2,6 +2,7 @@ package org.modelcatalogue.core.xml
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.ClassificationFilter
 
 class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classification> {
 
@@ -35,6 +36,6 @@ class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classificati
                 'in'('id', context.idsOfPrinted)
             }
         }
-        context.classificationService.classified(criteria, [classification]).list()
+        context.classificationService.classified(criteria, ClassificationFilter.includes([classification])).list()
     }
 }
