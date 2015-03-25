@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.converters.JSON
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
 class UserController extends AbstractCatalogueElementController<User> {
@@ -20,7 +21,7 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
 
-        User user = modelCatalogueSecurityService.currentUser
+        ClassificationFilter.from(request.JSON).to(modelCatalogueSecurityService.currentUser)
 
         user.filteredBy.each { Classification c ->
             user.removeFromFilteredBy(c)
@@ -55,12 +56,14 @@ class UserController extends AbstractCatalogueElementController<User> {
             return
         }
 
+        ClassificationFilter filter = ClassificationFilter.from(modelCatalogueSecurityService.currentUser)
+
         render([
                 success: true,
                 username: modelCatalogueSecurityService.currentUser.username,
                 roles: modelCatalogueSecurityService.currentUser.authorities*.authority,
                 id: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.id : null,
-                classifications: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.filteredBy?.collect{ CatalogueElementMarshallers.minimalCatalogueElementJSON(it) } : []
+                classifications: filter.toMap()
         ] as JSON)
     }
 

@@ -3,6 +3,7 @@ package org.modelcatalogue.core.dataarchitect.xsd
 import groovy.util.logging.Log4j
 import groovy.xml.QName
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
 
@@ -253,7 +254,7 @@ class XSDImporter {
 
 
     List<Model> findModels(String modelName) {
-        classificationService.classified(Model.where { name == modelName }, classifications).list()
+        classificationService.classified(Model.where { name == modelName }, ClassificationFilter.includes(classifications)).list()
     }
 
     Model findModel(String name) {
@@ -583,11 +584,11 @@ class XSDImporter {
         if (domain) {
             elements = classificationService.classified(DataElement.where {
                 name == theName && valueDomain == domain
-            }, classifications).list()
+            }, ClassificationFilter.includes(classifications)).list()
         } else {
             elements = classificationService.classified(DataElement.where {
                 name == theName && valueDomain == null
-            }, classifications).list()
+            }, ClassificationFilter.includes(classifications)).list()
         }
 
         if (elements) {

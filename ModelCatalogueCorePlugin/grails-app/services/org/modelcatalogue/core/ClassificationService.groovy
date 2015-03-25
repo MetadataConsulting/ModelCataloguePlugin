@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.ListWithTotalAndTypeWrapper
@@ -12,13 +13,13 @@ class ClassificationService {
 
     def modelCatalogueSecurityService
 
-    public <T> ListWrapper<T> classified(ListWrapper<T> list, Collection<Classification> classifications = classificationsInUse) {
+    public <T> ListWrapper<T> classified(ListWrapper<T> list, ClassificationFilter classificationsFilter = classificationsInUse) {
         if (!(list instanceof ListWithTotalAndTypeWrapper)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only ListWithTotalAndTypeWrapper is currently supported")
         }
 
         if (list.list instanceof DetachedListWithTotalAndType) {
-            classified(list.list as DetachedListWithTotalAndType<T>, classifications)
+            classified(list.list as DetachedListWithTotalAndType<T>, classificationsFilter)
         } else {
             throw new IllegalArgumentException("Cannot classify list $list. Only wrappers of DetachedListWithTotalAndType are supported")
         }
@@ -26,55 +27,84 @@ class ClassificationService {
         return list
     }
 
-    public <T> ListWithTotalAndType<T> classified(ListWithTotalAndType<T> list, Collection<Classification> classifications = classificationsInUse) {
+    public <T> ListWithTotalAndType<T> classified(ListWithTotalAndType<T> list, ClassificationFilter classificationsFilter = classificationsInUse) {
         if (!(list instanceof DetachedListWithTotalAndType)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only DetachedListWithTotalAndType is currently supported")
         }
 
-        classified(list.criteria, classifications)
+        classified(list.criteria, classificationsFilter)
 
         return list
     }
 
-    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, Collection<Classification> classifications = classificationsInUse) {
+    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, ClassificationFilter classificationsFilter = classificationsInUse) {
         if (criteria.persistentEntity.javaClass == Classification) {
             return criteria
         }
 
-        if (!classifications) {
+        if (!classificationsFilter) {
+            return criteria
+        }
+
+        if (classificationsFilter.unclassifiedOnly) {
+            criteria.not {
+                // this should work (better) without calling the .list()
+                // but at the moment we're getting ConverterNotFoundException
+                'in' 'id', new DetachedCriteria<Relationship>(Relationship).build {
+                    projections { property 'destination.id' }
+                    eq 'relationshipType', RelationshipType.classificationType
+                }.list()
+            }
             return criteria
         }
 
         if (CatalogueElement.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.incomingRelationships {
                 'eq' 'relationshipType', RelationshipType.classificationType
-                'in' 'source', classifications
+                source {
+                    if (classificationsFilter.excludes) {
+                        not {
+                            'in' 'id', classificationsFilter.excludes
+                        }
+                    }
+                    if (classificationsFilter.includes) {
+                        'in'  'id', classificationsFilter.includes
+                    }
+                }
+
             }
         } else if (Relationship.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.or {
-                'in'('classification', classifications)
+                and {
+                    if (classificationsFilter.excludes) {
+                        not {
+                            'in' 'classification.id', classificationsFilter.excludes
+                        }
+                    }
+                    if (classificationsFilter.includes) {
+                        'in'  'classification.id', classificationsFilter.includes
+                    }
+                }
                 isNull('classification')
             }
         }
         criteria
     }
 
-    public <T> DetachedCriteria<T> classified(Class<T> resource, Collection<Classification> classifications = classificationsInUse) {
-        classified(new DetachedCriteria<T>(resource), classifications)
+    public <T> DetachedCriteria<T> classified(Class<T> resource, ClassificationFilter classificationsFilter = classificationsInUse) {
+        classified(new DetachedCriteria<T>(resource), classificationsFilter)
     }
 
-    public List<Classification> getClassificationsInUse() {
+    public ClassificationFilter getClassificationsInUse() {
         if (!modelCatalogueSecurityService.isUserLoggedIn()) {
-            return Collections.emptyList()
+            return ClassificationFilter.NO_FILTER
         }
 
         if (!modelCatalogueSecurityService.currentUser) {
-            return Collections.emptyList()
+            return ClassificationFilter.NO_FILTER
         }
 
-        if (!modelCatalogueSecurityService.currentUser.filteredBy) {
-            return Collections.emptyList()
-        }
-        modelCatalogueSecurityService.currentUser.filteredBy
+
+        ClassificationFilter.from(modelCatalogueSecurityService.currentUser)
     }
 }

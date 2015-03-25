@@ -15,6 +15,7 @@
 #= require propertiesPane
 #= require messagesPanel
 #= require columns
+#= require expectCatalogueElement
 #= require columnsConfiguration
 #= require simpleObjectEditor
 #= require elementsAsTags
@@ -36,6 +37,7 @@ angular.module('mc.core.ui', [
   'mc.core.ui.catalogueElementTreeview'
   'mc.core.ui.catalogueElementIcon'
   'mc.core.ui.catalogueElementPicker'
+  'mc.core.ui.expectCatalogueElement'
   'mc.core.ui.catalogueElementProperties'
   'mc.core.ui.propertiesPane'
   'mc.core.ui.messagesPanel'

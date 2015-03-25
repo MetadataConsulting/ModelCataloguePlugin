@@ -152,17 +152,26 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     getLabel = (user) ->
       if not user or not user.classifications
         return 'All Classifications'
-      if user.classifications.length == 0
-        return 'All Classifications'
-      return (classification.name for classification in user.classifications).join(', ')
+      if user.classifications.unclassifiedOnly
+        return 'Unclassified Only'
+
+      label = 'All Classifications'
+
+      if user.classifications.includes?.length > 0
+        label = (classification.name for classification in user.classifications.includes).join(', ')
+
+      if user.classifications.excludes?.length > 0
+        label += " except " + (classification.name for classification in user.classifications.excludes).join(', ')
+
+      return label
 
     action = {
       position:   2100
       label:      if global then 'Filter by Classification' else  getLabel(security.getCurrentUser())
       icon:       'fa fa-tags'
-      action: -> messages.prompt('Select Classifications', 'Select which classifications should be visible to you', type: 'catalogue-elements', resource: 'classification', elements: security.getCurrentUser().classifications).then (elements) ->
+      action: -> messages.prompt('Select Classifications', 'Select which classifications should be visible to you', type: 'classification-filter', filter: security.getCurrentUser().classifications).then (filter) ->
         security.requireUser().then ->
-          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications/#{(el.id for el in elements).join(',')}")).then (user)->
+          enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: filter)).then (user)->
             action.label = getLabel(user)
             security.getCurrentUser().classifications = user.classifications
             $state.go '.', $stateParams, reload: true
