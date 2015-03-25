@@ -7,9 +7,6 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.springframework.beans.factory.annotation.Autowired
 
-/**
- * Created by ladin on 14.02.14.
- */
 abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
     @Autowired ReportsRegistry reportsRegistry
@@ -75,6 +72,9 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 row[1]
             }
         }
+
+        ret.outgoingRelationships = [count: outgoingCounts.inject(0) { total, k, v -> total + v }, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing/search"]
+        ret.incomingRelationships = [count: incomingCounts.inject(0) { total, k, v -> total + v }, itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming/search"]
 
         relationships.incoming?.each        addRelationsJson('incoming', el, ret, types, incomingCounts, outgoingCounts)
         relationships.outgoing?.each        addRelationsJson('outgoing', el, ret, types, incomingCounts, outgoingCounts)
