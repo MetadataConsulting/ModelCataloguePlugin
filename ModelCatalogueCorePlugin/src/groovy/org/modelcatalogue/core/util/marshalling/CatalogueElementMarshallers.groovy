@@ -47,31 +47,34 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
         Map<String, RelationshipType> types = getRelationshipTypesFor(el.getClass())
 
-        DetachedCriteria<Relationship> incomingTypes = new DetachedCriteria<Relationship>(Relationship).build {
-            projections {
-                id()
-                property('relationshipType.id')
+        Map<Long, Integer> incomingCounts = [:]
+        Map<Long, Integer> outgoingCounts = [:]
+
+        if (el.readyForQueries) {
+            DetachedCriteria<Relationship> incomingTypes = new DetachedCriteria<Relationship>(Relationship).build {
+                projections {
+                    id()
+                    property('relationshipType.id')
+                }
+                eq 'destination', el
             }
-            eq 'destination', el
-        }
 
-        Map<Long, Integer> incomingCounts = classificationService.classified(incomingTypes).list().countBy { row ->
-            row[1]
-        }
-
-        DetachedCriteria<Relationship> outgoingTypes = new DetachedCriteria<Relationship>(Relationship).build {
-            projections {
-                id()
-                property('relationshipType.id')
+            incomingCounts.putAll classificationService.classified(incomingTypes).list().countBy { row ->
+                row[1]
             }
-            eq 'source', el
+
+            DetachedCriteria<Relationship> outgoingTypes = new DetachedCriteria<Relationship>(Relationship).build {
+                projections {
+                    id()
+                    property('relationshipType.id')
+                }
+                eq 'source', el
+            }
+
+            outgoingCounts.putAll classificationService.classified(outgoingTypes).list().countBy { row ->
+                row[1]
+            }
         }
-
-        Map<Long, Integer> outgoingCounts = classificationService.classified(outgoingTypes).list().countBy { row ->
-            row[1]
-        }
-
-
 
         relationships.incoming?.each        addRelationsJson('incoming', el, ret, types, incomingCounts, outgoingCounts)
         relationships.outgoing?.each        addRelationsJson('outgoing', el, ret, types, incomingCounts, outgoingCounts)

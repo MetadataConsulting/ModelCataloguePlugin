@@ -15,7 +15,7 @@ class DataElement extends CatalogueElement {
     ValueDomain valueDomain
 
     static constraints = {
-        valueDomain nullable: true
+        valueDomain nullable: true, fetch: 'join'
     }
 
     static relationships = [
