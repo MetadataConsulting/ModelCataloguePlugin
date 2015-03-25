@@ -109,7 +109,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             if (classifications) {
                 if (classifications.unclassifiedOnly) {
                     listQuery = """
-                    from ${resource.simpleName} ${alias} left join ${alias}.incomingRelationships as rel
+                    from ${resource.simpleName} ${alias}
                     where
                         ${alias}.status in :statuses
                         and (
@@ -118,15 +118,12 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                             or lower(${alias}.modelCatalogueId) like lower(:query)
                             or ${alias} in (select ev.element from ExtensionValue ev where lower(ev.extensionValue) like lower(:query))
                         )
-                        and (
-                            ${alias}.incomingRelationships is empty
-                            or not rel.relationshipType = :classificationType
-                        )
+                        and ${alias} not in (select rel.destination from Relationship rel where rel.relationshipType = :classificationType)
                     """
                     arguments.classificationType = RelationshipType.classificationType
                 } else {
                     listQuery = """
-                    from ${resource.simpleName} ${alias} join ${alias}.incomingRelationships as rel
+                    from ${resource.simpleName} ${alias} left join ${alias}.incomingRelationships as rel
                     where
                         ${alias}.status in :statuses
                         and (
