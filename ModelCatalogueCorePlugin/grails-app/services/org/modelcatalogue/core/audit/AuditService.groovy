@@ -114,13 +114,12 @@ class AuditService {
     }
 
     ListWithTotalAndType<Change> getChanges(Map params, CatalogueElement element) {
-        long latestId = element.latestVersionId ?: element.id
         if (!params.sort) {
             params.sort  = 'dateCreated'
             params.order = 'desc'
         }
         Lists.fromCriteria(params, Change) {
-            eq 'latestVersionId', latestId
+            eq 'changedId', element.id
             ne 'system', Boolean.TRUE
         }
     }
@@ -151,6 +150,7 @@ class AuditService {
         if (changeId) {
             Change change = Change.get(changeId)
             change.changedId = ce.id
+            change.dateCreated = new Date()
             FriendlyErrors.failFriendlySave(change)
         }
         ce

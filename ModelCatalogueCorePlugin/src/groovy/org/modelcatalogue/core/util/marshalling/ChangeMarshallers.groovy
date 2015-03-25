@@ -33,6 +33,7 @@ class ChangeMarshallers extends AbstractMarshallers {
                 newValue:       change.newValue != null ? JSON.parse(change.newValue as String) : null,
                 undone:         change.undone,
                 parent:         Change.get(change.parentId),
+                link:           "/change/$change.id",
                 changes:        [count: auditService.getSubChanges([:], change).total, itemType: Change.name, link: "/${GrailsNameUtils.getPropertyName(change.getClass())}/$change.id/changes"]
         ]
     }

@@ -10,7 +10,10 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementTreeview.html'
 
-    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', ($scope, enhance, $stateParams, $rootScope) ->
+    controller: ['$scope', 'enhance', '$stateParams', '$rootScope', '$element', '$attrs', ($scope, enhance, $stateParams, $rootScope, $element, $attrs) ->
+      if $attrs.hasOwnProperty('noResize')
+        $element.addClass('no-resize')
+
       setLastListToRootScope = (newList) ->
         return unless newList
         $rootScope.$$lastTreeLists ?= {}
