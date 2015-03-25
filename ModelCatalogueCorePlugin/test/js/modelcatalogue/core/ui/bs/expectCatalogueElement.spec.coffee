@@ -32,7 +32,6 @@ describe "mc.core.ui.expectCatalogueElement", ->
 
     expect(element.hasClass('has-feedback')).toBeTruthy()
     expect(element.hasClass('has-warning')).toBeTruthy()
-    expect(element.find('span.form-control-feedback').length).toBe(1)
 
   it "shows success if the model is element", inject ($compile, $rootScope, enhance) ->
     $rootScope.classification = enhance angular.copy(fixtures.valueDomain.showOne)
@@ -49,4 +48,3 @@ describe "mc.core.ui.expectCatalogueElement", ->
 
     expect(element.hasClass('has-feedback')).toBeTruthy()
     expect(element.hasClass('has-success')).toBeTruthy()
-    expect(element.find('span.form-control-feedback').length).toBe(1)
