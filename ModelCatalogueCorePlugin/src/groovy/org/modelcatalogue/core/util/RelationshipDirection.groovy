@@ -21,14 +21,20 @@ enum RelationshipDirection {
             if (type) {
                 criteria.eq('relationshipType', type)
             }
+
             if (filter) {
-                if (filter.excludes) {
-                    criteria.not {
-                        criteria.'in' 'classification.id', filter.excludes
+                criteria.or {
+                    isNull 'classification'
+                    and {
+                        if (filter.excludes) {
+                            criteria.not {
+                                criteria.'in' 'classification.id', filter.excludes
+                            }
+                        }
+                        if (filter.includes) {
+                            criteria.'in'  'classification.id', filter.includes
+                        }
                     }
-                }
-                if (filter.includes) {
-                    criteria.'in'  'classification.id', filter.includes
                 }
             }
 
@@ -93,14 +99,20 @@ enum RelationshipDirection {
             if (type) {
                 criteria.eq('relationshipType', type)
             }
+
             if (filter) {
-                if (filter.excludes) {
-                    criteria.not {
-                        criteria.'in' 'classification.id', filter.excludes
+                criteria.or {
+                    isNull 'classification'
+                    and {
+                        if (filter.excludes) {
+                            criteria.not {
+                                criteria.'in' 'classification.id', filter.excludes
+                            }
+                        }
+                        if (filter.includes) {
+                            criteria.'in'  'classification.id', filter.includes
+                        }
                     }
-                }
-                if (filter.includes) {
-                    criteria.'in'  'classification.id', filter.includes
                 }
             }
 
@@ -171,13 +183,18 @@ enum RelationshipDirection {
                 criteria.eq('relationshipType', type)
             }
             if (filter) {
-                if (filter.excludes) {
-                    criteria.not {
-                        criteria.'in' 'classification.id', filter.excludes
+                criteria.or {
+                    isNull 'classification'
+                    and {
+                        if (filter.excludes) {
+                            criteria.not {
+                                criteria.'in' 'classification.id', filter.excludes
+                            }
+                        }
+                        if (filter.includes) {
+                            criteria.'in'  'classification.id', filter.includes
+                        }
                     }
-                }
-                if (filter.includes) {
-                    criteria.'in'  'classification.id', filter.includes
                 }
             }
 
