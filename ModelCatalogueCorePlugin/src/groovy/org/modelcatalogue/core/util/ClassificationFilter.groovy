@@ -1,21 +1,30 @@
 package org.modelcatalogue.core.util
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableSet
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
-/**
- * Created by ladin on 23.03.15.
- */
+import java.util.concurrent.TimeUnit
+
 class ClassificationFilter {
 
     public static final ClassificationFilter NO_FILTER = new ClassificationFilter(false)
-    public static final String UNCLASSIFIED_ONLY_KEY = '$unclassifiedOnly'
-    public static final String EXCLUDE_KEY = '$exclude'
 
-    private ClassificationFilter(ImmutableSet<Classification> includes, ImmutableSet<Classification> excludes) {
+    private static final Cache<Long, ClassificationFilter> filtersCache = CacheBuilder
+            .newBuilder()
+            .initialCapacity(10)
+            .maximumSize(100)
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .build()
+
+    private static final String UNCLASSIFIED_ONLY_KEY = '$unclassifiedOnly'
+    private static final String EXCLUDE_KEY = '$exclude'
+
+    private ClassificationFilter(ImmutableSet<Long> includes, ImmutableSet<Long> excludes) {
         this.includes = includes
         this.excludes = excludes
         this.unclassifiedOnly = false
@@ -28,11 +37,11 @@ class ClassificationFilter {
     }
 
     static ClassificationFilter includes(Iterable<Classification> classifications) {
-        new ClassificationFilter(ImmutableSet.copyOf(classifications), ImmutableSet.of())
+        new ClassificationFilter(ImmutableSet.copyOf(classifications.collect { it.id }), ImmutableSet.of())
     }
 
     static ClassificationFilter excludes(Iterable<Classification> classifications) {
-        new ClassificationFilter(ImmutableSet.of(), ImmutableSet.copyOf(classifications))
+        new ClassificationFilter(ImmutableSet.of(), ImmutableSet.copyOf(classifications.collect { it.id }))
     }
 
     static ClassificationFilter create(boolean unclassifiedOnly) {
@@ -40,7 +49,7 @@ class ClassificationFilter {
     }
 
     static ClassificationFilter create(Iterable<Classification> includes, Iterable<Classification> excludes) {
-        new ClassificationFilter(ImmutableSet.copyOf(includes), ImmutableSet.copyOf(excludes))
+        new ClassificationFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect { it.id }))
     }
 
     static ClassificationFilter from(Map<String, Object> json) {
@@ -59,29 +68,31 @@ class ClassificationFilter {
             return NO_FILTER
         }
 
-        if (user.ext[UNCLASSIFIED_ONLY_KEY]) {
-            return new ClassificationFilter(true)
-        }
-
-        if (!user.filteredByRelationships) {
-            return NO_FILTER
-        }
-
-        ImmutableSet.Builder<Classification> includes = ImmutableSet.builder()
-        ImmutableSet.Builder<Classification> excludes = ImmutableSet.builder()
-
-        for (Relationship rel in user.filteredByRelationships) {
-            if (rel.ext[EXCLUDE_KEY]) {
-                excludes.add(rel.source)
-            } else {
-                includes.add(rel.source)
+        filtersCache.get(user.getId()) {
+            if (user.ext[UNCLASSIFIED_ONLY_KEY]) {
+                return new ClassificationFilter(true)
             }
+
+            if (!user.filteredByRelationships) {
+                return NO_FILTER
+            }
+
+            ImmutableSet.Builder<Long> includes = ImmutableSet.builder()
+            ImmutableSet.Builder<Long> excludes = ImmutableSet.builder()
+
+            for (Relationship rel in user.filteredByRelationships) {
+                if (rel.ext[EXCLUDE_KEY]) {
+                    excludes.add(rel.source.id)
+                } else {
+                    includes.add(rel.source.id)
+                }
+            }
+            return new ClassificationFilter(includes.build(), excludes.build())
         }
-        return new ClassificationFilter(includes.build(), excludes.build())
     }
 
-    final ImmutableSet<Classification> includes
-    final ImmutableSet<Classification> excludes
+    final ImmutableSet<Long> includes
+    final ImmutableSet<Long> excludes
 
     final boolean unclassifiedOnly
 
@@ -104,20 +115,22 @@ class ClassificationFilter {
             user.removeFromFilteredBy(c)
         }
 
-        for (Classification classification in includes) {
-            user.addToFilteredBy classification
+        for (Long id in includes) {
+            user.addToFilteredBy Classification.get(id)
         }
 
-        for (Classification classification in excludes) {
-            user.addToFilteredBy classification, metadata: [(EXCLUDE_KEY): 'true']
+        for (Long id in excludes) {
+            user.addToFilteredBy Classification.get(id), metadata: [(EXCLUDE_KEY): 'true']
         }
+
+        filtersCache.put(user.getId(), this)
     }
 
     Map<String, Object> toMap() {
         [
                 unclassifiedOnly: unclassifiedOnly,
-                includes: includes.collect { CatalogueElementMarshallers.minimalCatalogueElementJSON(it) },
-                excludes: excludes.collect { CatalogueElementMarshallers.minimalCatalogueElementJSON(it) }
+                includes: includes.collect { CatalogueElementMarshallers.minimalCatalogueElementJSON(Classification.get(it)) },
+                excludes: excludes.collect { CatalogueElementMarshallers.minimalCatalogueElementJSON(Classification.get(it)) }
         ]
     }
 

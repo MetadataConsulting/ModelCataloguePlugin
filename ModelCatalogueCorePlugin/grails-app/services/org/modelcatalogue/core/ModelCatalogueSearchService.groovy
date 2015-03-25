@@ -139,12 +139,12 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                     """
 
                     if (classifications.includes) {
-                        listQuery += " and rel.source in :includes "
+                        listQuery += " and rel.source.id in :includes "
                         arguments.includes = classifications.includes
                     }
 
                     if (classifications.excludes) {
-                        listQuery += " and rel.source not in :includes "
+                        listQuery += " and rel.source.id not in :excludes "
                         arguments.excludes = classifications.excludes
                     }
                     arguments.classificationType = RelationshipType.classificationType
