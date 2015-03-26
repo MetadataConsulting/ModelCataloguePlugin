@@ -37,10 +37,11 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
         mavenRepo 'http://jcenter.bintray.com'
-        mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
-        mavenRepo "http://dl.dropbox.com/u/326301/repository"
-		mavenRepo 'http://jasperreports.sourceforge.net/maven2'
-//        mavenRepo "http://www.biojava.org/download/maven/"
+		mavenRepo'http://dl.bintray.com/csfercoci/maven'
+		mavenRepo "http://dl.bintray.com/metadata/model-catalogue"
+        //mavenRepo "http://dl.dropbox.com/u/326301/repository"
+		mavenRepo 'http://jasperreports.sourceforge.net/maven2'		
+		//mavenRepo "http://www.biojava.org/download/maven/"
 
 
     }
@@ -52,10 +53,14 @@ grails.project.dependency.resolution = {
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 		
-		//needed for newer  jasper 
+		//----- Jasper Reports specific dependencies 
+		 //from the bintray
+		compile 'net.sf.jasperreports:jasperreports-javaflow:6.0.3'
+		compile 'commons-javaflow:commons-javaflow:20060411'
+		
 		compile ('net.sf.jasperreports:jasperreports:6.0.3'){
-            excludes 'antlr', 'commons-logging',
-                     'ant', 'mondrian', 'commons-javaflow','barbecue', 'xml-apis-ext','xml-apis', 'xalan', 'groovy-all', 'hibernate', 'saaj-api', 'servlet-api',
+            excludes 'antlr', 'commons-logging','jasperreports',
+                     'ant', 'mondrian' ,'barbecue', 'xml-apis-ext','xml-apis', 'xalan', 'groovy-all', 'hibernate', 'saaj-api', 'servlet-api',
                      'xercesImpl','xmlParserAPIs','spring-core','bsh', 'spring-beans', 'jaxen', 'barcode4j','batik-svg-dom','batik-xml','batik-awt-util','batik-dom',
                      'batik-css','batik-gvt','batik-script', 'batik-svggen','batik-util','batik-bridge','persistence-api','jdtcore','bcmail-jdk16','bcprov-jdk16','bctsp-jdk16',
                      'bcmail-jdk14','bcprov-jdk14','bctsp-jdk14','xmlbeans', 'olap4j'

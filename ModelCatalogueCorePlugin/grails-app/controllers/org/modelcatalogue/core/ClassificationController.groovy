@@ -1,32 +1,29 @@
-
-
 package org.modelcatalogue.core
-import org.springframework.core.io.Resource;
-import grails.converters.XML
-import grails.util.Holders;
-import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
+
+
+import net.sf.jasperreports.engine.JRExporter;
+import net.sf.jasperreports.engine.JasperFillManager
 import net.sf.jasperreports.engine.JasperPrint
 import net.sf.jasperreports.engine.JasperReport
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
-import net.sf.jasperreports.engine.design.JasperDesign
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.engine.export.JRPdfExporter
+import net.sf.jasperreports.engine.export.JRXlsExporter
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter
-import net.sf.jasperreports.engine.query.JRHibernateQueryExecuterFactory;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.engine.query.JRHibernateQueryExecuterFactory
+import net.sf.jasperreports.engine.util.JRLoader
+import net.sf.jasperreports.export.Exporter
+import net.sf.jasperreports.export.SimpleExporterInput
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput
 
-import org.apache.commons.io.FilenameUtils;
-import org.codehaus.groovy.grails.io.support.FileSystemResource
-
-import org.hibernate.FetchMode;
-import org.modelcatalogue.core.util.RelationshipDirection
+import org.apache.commons.io.FilenameUtils
+import org.hibernate.FetchMode
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
 
 
 class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
 	def sessionFactory
+
 	//def relationshipService
 
 	ClassificationController() {
@@ -62,59 +59,52 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
 		Classification classification = Classification.get(params.id)
 		def leafs = new ArrayList()
 		def models = getModelsForClassification(params.id as Long)
-
+		
 		if (!models) {
 			notFound()
 			return
 		}
-	/*	def fileFormat= JasperExportFormat.HTML_FORMAT
-		if (params.jasperFormat=="docx"){
-			fileFormat=JasperExportFormat.DOCX_FORMAT
-		}else if (params.jasperFormat=="pdf"){
-			fileFormat=JasperExportFormat.PDF_FORMAT
-		}*/
 
-		def reportsPath=new File(grailsApplication.config.jasper.dir.reports)
-		log.info "Reports path: "+reportsPath.absolutePath
-		if (!reportsPath.isDirectory()){
-			//means that is in the relative to web-app , or should be
-			reportsPath=new File(grailsApplication.mainContext.servletContext.getRealPath(grailsApplication.config.jasper.dir.reports))
+		
+		
+		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(getReport("ClassificationInventoryGe").inputStream)
+		Exporter exporter = new JRDocxExporter()
+		def fileExtension=".docx"
+		
+		if (params.jasperFormat=="pdf"){
+			exporter = new JRPdfExporter()
+			fileExtension=".pdf"
 		}
+
+		def reportFileName="${classification.name}-${classification.status}-${classification.version}${fileExtension}"
 
 		def valueDomains = new TreeSet<ValueDomain>([compare: { ValueDomain a, ValueDomain b ->
 				a?.name <=> b?.name
 			}] as Comparator<ValueDomain>)
 
 		//generate jasper report
-		Map parameters = new HashMap();
-		parameters.put(JRHibernateQueryExecuterFactory.PARAMETER_HIBERNATE_SESSION, sessionFactory.currentSession);
-		parameters.put("DOCUMENT_TITLE", classification.name);
-		parameters.put("DOCUMENT_VERSION", "DRAFT");
-		parameters.put("DOCUMENT_EXTENSION", "docx");
-		parameters.put("SUBREPORT_DATA_SOURCE", new JRBeanCollectionDataSource(models));
-		parameters.put("VALUE_DOMAINS", valueDomains);
-		parameters.put("DOCUMENT_EXTENSION", valueDomains);
+		Map parameters = new HashMap()
+		parameters.put("DOCUMENT_TITLE", classification.name)
+		parameters.put("DOCUMENT_FILENAME",reportFileName )
+		parameters.put("DOCUMENT_STATUS", classification.status)
+		parameters.put("SUBREPORT_DATA_SOURCE", new JRBeanCollectionDataSource(models))
+		parameters.put("VALUE_DOMAINS", valueDomains)
 
 
 		
-		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(getReport("ClassificationInventoryGe").inputStream);
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,new JRBeanCollectionDataSource([new Object()]))
 
-		JRDocxExporter exporter = new JRDocxExporter();
 
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream()
 
-		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+		exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos))
+		exporter.exportReport()
 
-		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, baos);
+		//we have the report into memory now
+		byte[]content = baos.toByteArray()
 
-		exporter.exportReport();
-
-		//we have the report into memory now 
-		byte[]content = baos.toByteArray();
-
-		response.addHeader("Content-disposition", "inline; filename="+"\"${classification.name}.docx\"")
-		//response.contentType = reportDef.fileFormat.mimeTyp
+		response.addHeader("Content-disposition", "inline; filename="+"\"${classification.name}${fileExtension}\"")
 		response.characterEncoding = "UTF-8"
 		response.setContentLength(content.length)
 		response.outputStream << content
@@ -137,21 +127,21 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
 		if (result.exists()) {
 			return result
 		}
-		
-		throw new Exception("No such report spec: ${path} (jasper or .jrxml)")
+
+		throw new Exception("No such report spec: ${path} (.jasper)")
 
 	}
 
 	private String getFilePath(String name) {
 
-		if (Holders.config.jasper.dir.reports) {
-			return Holders.config.jasper.dir.reports + File.separator + FilenameUtils.getPath(name) + FilenameUtils.getBaseName(name)
+		if (grailsApplication.config.jasper.dir.reports) {
+			return grailsApplication.config.jasper.dir.reports + File.separator + FilenameUtils.getPath(name) + FilenameUtils.getBaseName(name)
 		}
 		return "/JReports" + File.separator + FilenameUtils.getPath(name) + FilenameUtils.getBaseName(name)
 	}
 
 	private Collection getModelsForClassification(Long classificationId) {
-		def mapElements= new HashMap();
+		def mapElements= new HashMap()
 		def classificationType = RelationshipType.findByName('classification')
 		def results = Model.createCriteria().list {
 			fetchMode "extensions", FetchMode.JOIN
