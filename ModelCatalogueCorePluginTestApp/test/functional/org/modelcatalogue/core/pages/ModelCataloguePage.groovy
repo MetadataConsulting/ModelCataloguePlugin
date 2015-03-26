@@ -128,7 +128,11 @@ abstract class ModelCataloguePage extends Page {
     }
 
     void selectTab(String name) {
-        $("li[data-tab-name='$name'] a").click()
+        def selector = { $("li[data-tab-name='$name'] a") }
+        waitFor {
+            selector().displayed
+        }
+        selector().click()
     }
 
     boolean tabActive(String name) {

@@ -343,6 +343,9 @@
             waitFor {
                 tabActive('relatedTo')
             }
+            waitFor {
+                tableFooterAction.displayed
+            }
 
             when: "click the footer action"
             tableFooterAction.click()
