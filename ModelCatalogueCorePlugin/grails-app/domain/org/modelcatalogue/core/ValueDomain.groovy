@@ -48,6 +48,11 @@ class ValueDomain extends CatalogueElement {
 
     static transients = ['regexDef', 'dataElements']
 
+    static mapping = {
+        dataType fetch: 'join'
+        unitOfMeasure fetch: 'join'
+    }
+
     static constraints = {
         description nullable: true, maxSize: 2000
         unitOfMeasure nullable: true

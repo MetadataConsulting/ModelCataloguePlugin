@@ -18,8 +18,6 @@ describe "mc.core.listReferenceEnhancer", ->
   it "can deep enhance", ->
     enhanced = enhance angular.copy(fixtures.valueDomain.showOne)
 
-    expect(angular.isFunction(enhanced.outgoingRelationships)).toBeTruthy()
-    expect(angular.isFunction(enhanced.incomingRelationships)).toBeTruthy()
     expect(angular.isFunction(enhanced.mappings)).toBeTruthy()
 
   it "returns function which will call the link", ->

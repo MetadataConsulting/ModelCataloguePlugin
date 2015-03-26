@@ -61,25 +61,28 @@ class ClassificationService {
         if (CatalogueElement.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.incomingRelationships {
                 'eq' 'relationshipType', RelationshipType.classificationType
-                if (classificationsFilter.excludes) {
-                    not {
-                      'in' 'source', classificationsFilter.excludes
+                source {
+                    if (classificationsFilter.excludes) {
+                        not {
+                            'in' 'id', classificationsFilter.excludes
+                        }
+                    }
+                    if (classificationsFilter.includes) {
+                        'in'  'id', classificationsFilter.includes
                     }
                 }
-                if (classificationsFilter.includes) {
-                   'in'  'source', classificationsFilter.includes
-                }
+
             }
         } else if (Relationship.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.or {
                 and {
                     if (classificationsFilter.excludes) {
                         not {
-                            'in' 'classification', classificationsFilter.excludes
+                            'in' 'classification.id', classificationsFilter.excludes
                         }
                     }
                     if (classificationsFilter.includes) {
-                        'in'  'classification', classificationsFilter.includes
+                        'in'  'classification.id', classificationsFilter.includes
                     }
                 }
                 isNull('classification')

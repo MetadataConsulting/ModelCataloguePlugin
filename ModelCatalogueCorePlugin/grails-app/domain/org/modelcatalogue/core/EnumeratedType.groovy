@@ -1,4 +1,7 @@
 package org.modelcatalogue.core
+
+import org.modelcatalogue.core.util.OrderedMap
+
 /*
 * Enumerated Types are data types that contain a list of enumerated values
 * i.e. ['politics', 'history', 'science']
@@ -41,19 +44,7 @@ class EnumeratedType extends DataType {
      * @param map the map containing the enum values
      */
     void setEnumerations(Map<String, String> map) {
-        if (map.type == 'orderedMap') {
-            if (map.values instanceof List) {
-                Map<String, String> newVal = [:]
-                for (item in map.values) {
-                    newVal[item.key as String] = item.value as String
-                }
-                enumAsString = mapToString(newVal)
-            } else {
-                enumAsString = mapToString([:])
-            }
-        } else {
-            enumAsString = mapToString(map)
-        }
+        enumAsString = mapToString(OrderedMap.fromJsonMap(map))
     }
 
     /**

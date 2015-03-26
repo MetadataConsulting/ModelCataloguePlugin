@@ -15,7 +15,7 @@ class ModelWizardSpec extends GebReportingSpec {
         then:
         at ModalTreeViewPage
         waitFor(120) {
-            viewTitle.displayed
+            !$('#jserrors').displayed && viewTitle.displayed
         }
         waitFor {
             viewTitle.text()?.trim() == 'Models'
@@ -147,7 +147,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
 
         when:
-        $('#elements').value('xmlschema')
+        $('#includes').value('xmlschema')
         selectCepItemIfExists()
         modalPrimaryButton.click()
 

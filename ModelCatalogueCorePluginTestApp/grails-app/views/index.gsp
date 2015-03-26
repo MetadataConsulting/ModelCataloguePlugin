@@ -17,7 +17,7 @@
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
         <script type="text/javascript">
             window.pendingErrorsPres = [];
-            window.onerror = function(errorMsg, url, lineNumber) {
+            window.printErrorInPre = function(errorMsg, url, lineNumber) {
                 var message = document.createElement('div');
                 message.innerHTML = errorMsg + ' at ' + url + ' at ' + lineNumber;
                 message.className = 'pre-js-error well';
@@ -31,6 +31,9 @@
                         }
                     }
                 }
+            };
+            window.onerror = function(errorMsg, url, lineNumber) {
+                window.printErrorInPre(errorMsg, url, lineNumber)
             }
         </script>
     </g:if>
@@ -96,6 +99,17 @@
         }]);
         demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
     </script>
+    <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
+        <script type="text/javascript">
+            angular.module('demo.config').factory('$exceptionHandler', function($log) {
+                return function(exception, cause) {
+                    $log.error(exception, cause);
+                    window.printErrorInPre(exception.stack);
+                };
+            });
+
+        </script>
+    </g:if>
 
 </head>
 

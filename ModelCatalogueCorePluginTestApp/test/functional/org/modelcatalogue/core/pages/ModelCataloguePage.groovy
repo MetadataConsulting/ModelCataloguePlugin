@@ -2,6 +2,8 @@ package org.modelcatalogue.core.pages
 
 import geb.Page
 import geb.navigator.Navigator
+import geb.waiting.WaitTimeoutException
+import org.openqa.selenium.StaleElementReferenceException
 
 abstract class ModelCataloguePage extends Page {
 
@@ -128,8 +130,29 @@ abstract class ModelCataloguePage extends Page {
     }
 
     void selectTab(String name) {
-        $("li[data-tab-name='$name'] a").click()
+        noStale({ $("li[data-tab-name='$name'] a") }) {
+            it.click()
+        }
     }
+
+
+    public <R> R noStale(int maxAttempts = 10, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
+        int attempt = 0
+        while (attempt < maxAttempts) {
+            attempt++
+            try {
+                Navigator navigator = navigatorClosure()
+                waitFor {
+                    navigator.displayed
+                }
+                return resultClosure(navigator)
+            } catch (StaleElementReferenceException | WaitTimeoutException ignored) {
+                Thread.sleep(Math.round(Math.pow(2, attempt)))
+            }
+        }
+        throw new IllegalArgumentException("Cannot evaluate expression after $maxAttempts attempts")
+    }
+
 
     boolean tabActive(String name) {
         $("li[data-tab-name='$name'].active").displayed

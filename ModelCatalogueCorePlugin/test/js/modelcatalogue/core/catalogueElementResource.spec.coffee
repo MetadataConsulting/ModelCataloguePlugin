@@ -62,40 +62,21 @@ describe "mc.core.catalogueElementResource", ->
           describe "fetched instance is enhanced", ->
             it "outgoing and incoming relationships are functions", ->
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/incoming")
+              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/relationships/relatedTo")
               .respond(fixtures.valueDomain.incoming1)
 
-              expect(angular.isFunction(result.incomingRelationships)).toBeTruthy()
-              expect(result.incomingRelationships.total).toBe(0)
+              expect(angular.isFunction(result.isBaseFor)).toBeTruthy()
+              expect(result.isBaseFor.total).toBe(0)
 
               incoming = null
 
-              result.incomingRelationships().then((result) -> incoming = result)
+              result.relatedTo().then((result) -> incoming = result)
 
               expect(incoming).toBeNull()
 
               $httpBackend.flush()
 
               expect(incoming).toBeDefined()
-
-
-              $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/outgoing")
-              .respond(fixtures.valueDomain.outgoing1)
-
-              expect(angular.isFunction(result.outgoingRelationships)).toBeTruthy()
-
-              expect(result.outgoingRelationships.total).toBe(0)
-
-              outgoing = null
-
-              result.outgoingRelationships().then((result) -> outgoing = result)
-
-              expect(outgoing).toBeNull()
-
-              $httpBackend.flush()
-
-              expect(outgoing).toBeDefined()
 
 
               $httpBackend
