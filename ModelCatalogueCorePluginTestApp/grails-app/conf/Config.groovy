@@ -210,7 +210,7 @@ grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
 grails.assets.excludes =  [
         "bootstrap/**/*.*",
-        "bootstrap/**/*.*",
+        "jquery-ui/**/*.*",
         "font-awesome/**/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
@@ -245,7 +245,7 @@ grails.assets.excludes =  [
 
 grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "bootstrap/**/*.*",
-        "bootstrap/**/*.*",
+        "jquery-ui/**/*.*",
         "font-awesome/**/*.*",
         "jquery/**/*.*",
         "angular/**/*.*",
