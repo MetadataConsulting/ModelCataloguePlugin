@@ -147,7 +147,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
 
         when:
-        $('#elements').value('xmlschema')
+        $('#includes').value('xmlschema')
         selectCepItemIfExists()
         modalPrimaryButton.click()
 
