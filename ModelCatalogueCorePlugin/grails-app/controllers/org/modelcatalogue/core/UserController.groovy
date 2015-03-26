@@ -23,19 +23,6 @@ class UserController extends AbstractCatalogueElementController<User> {
 
         ClassificationFilter.from(request.JSON).to(modelCatalogueSecurityService.currentUser)
 
-        user.filteredBy.each { Classification c ->
-            user.removeFromFilteredBy(c)
-        }
-
-        if (!params.ids) {
-            user.save(flush: true)
-            redirect controller: 'user', action: 'current'
-            return
-        }
-        Set<Long> ids = params.ids.toString().split(/\s*,\s*/).toList().collect{ it as Long }.toSet()
-        ids.each { user.addToFilteredBy(Classification.get(it)) }
-        user.save(flush: true)
-
         redirect controller: 'user', action: 'current'
     }
 
