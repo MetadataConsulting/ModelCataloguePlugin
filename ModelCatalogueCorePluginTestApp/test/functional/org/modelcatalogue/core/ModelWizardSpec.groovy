@@ -128,7 +128,7 @@ class ModelWizardSpec extends GebReportingSpec {
 
         then:
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New").displayed
+            $('span.catalogue-element-treeview-name', text: "New 1").displayed
         }
 
         waitUntilModalClosed(30)
