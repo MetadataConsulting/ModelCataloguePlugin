@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import grails.converters.JSON
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ClassificationFilter
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 
 class UserController extends AbstractCatalogueElementController<User> {
 
