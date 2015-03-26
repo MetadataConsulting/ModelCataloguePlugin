@@ -1,6 +1,6 @@
 dataSource {
     pooled = true
-    driverClassName = "com.mysql.jdbc.Driver"
+    driverClassName = "org.h2.Driver"
     username = "sa"
     password = ""
     logSql=false
@@ -16,11 +16,8 @@ hibernate {
 environments {
     development {
         dataSource {
-        	dialect='org.hibernate.dialect.MySQLInnoDBDialect'
-			url =  "jdbc:mysql://localhost:3306/GE1?autoReconnect=true&useUnicode=yes"
-            username = 'root'		
-			password = ''
-            dbCreate = "update"
+            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     test {
@@ -41,6 +38,7 @@ environments {
     }
     cloudbees {
         dataSource {
+        	dialect='org.hibernate.dialect.MySQLInnoDBDialect'
             dbCreate = ""
             url = "jdbc:mysql://ec2-176-34-253-124.eu-west-1.compute.amazonaws.com:3306/modelcatalogue-core-testapp?autoReconnect=true&useUnicode=yes"
             username = System.getenv('METADATA_DB_USERNAME')
@@ -52,6 +50,7 @@ environments {
     production {
         dataSource {
             driverClassName = "com.mysql.jdbc.Driver"
+            dialect='org.hibernate.dialect.MySQLInnoDBDialect'
             url = System.getenv('METADATA_DB_NAME') ?: "jdbc:mysql://localhost:3306/${System.getProperty('mc.db.schema') ?: System.getenv('METADATA_DB_SCHEMA') ?: 'nhic'}?autoReconnect=true&useUnicode=yes"
             username = System.getenv('METADATA_DB_USERNAME')
             password = System.getenv('METADATA_DB_PASSWORD')
