@@ -18,6 +18,9 @@ plugins{
 }
 ```
 
+[Plugin Documentation](https://metadata.ci.cloudbees.com/job/ModelCatalogueCorePluginDevelop/javadoc/)
+
+
 ## Running the Standalone Application
 
 You can run the model catalogue application standalone either for development purposes or to setup your own metadata
@@ -29,7 +32,7 @@ To run application locally you need following installed on your machine
 
   * [Java](https://java.com/en/download/)
   * [NodeJS](https://nodejs.org/download/)
-  * [Git](http://git-scm.com/) (Alternatively you can download the latest snapshot [in ZIP archive](https://github.com/tumtumtree/tumtumtree/archive/develop.zip)) 
+  * [Git](http://git-scm.com/) (Alternatively you can download the latest snapshot [in ZIP archive](https://github.com/MetadataRegistry/ModelCataloguePlugin/archive/develop.zip)) 
   
 To verify you have these requirements installed try following commands in the terminal:
  
@@ -48,8 +51,8 @@ Model Catalogue provides rich web client which requires some other tools to be i
 You need to install required NodeJS tools and dependencies for the JavaScript frontend. 
 
 ```
-git clone https://github.com/tumtumtree/tumtumtree
-cd tumtumtree
+git clone https://github.com/MetadataRegistry/ModelCataloguePlugin.git
+cd ModelCataloguePlugin
 cd ModelCatalogueCorePlugin
 npm install
 bower install
@@ -68,7 +71,7 @@ This will launch the application in development mode with in memory database. If
 against persistent database, you need to override the configuration according to [Grails database configuration docs](http://grails.github.io/grails-doc/2.4.4/guide/conf.html#dataSource)
 
 ```
-open tumtumtree/ModelCatalogueCorePluginTestApp/grails-app/conf/DataSource.groovy
+open ModelCataloguePlugin/ModelCatalogueCorePluginTestApp/grails-app/conf/DataSource.groovy
 ```
 
 There are three default users available
@@ -82,7 +85,7 @@ admin         | User with role `ADMIN`  has all the privileges
 The users comes with passwords which are by default same as the username. You should change them in the `Bootstrap.groovy` file.
 
 ```
-open tumtumtree/ModelCatalogueCorePluginTestApp/grails-app/conf/BootStrap.groovy
+open ModelCataloguePlugin/ModelCatalogueCorePluginTestApp/grails-app/conf/BootStrap.groovy
 ```
 
 You find the code where new users are crated around line 40 so change the `password: 'xyz'` definitions to the more
