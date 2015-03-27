@@ -2,6 +2,8 @@ language: groovy
 cache:
   directories:
     - node_modules
+    - ModelCatalogueCorePlugin/target/work/plugins
+    - ModelCatalogueCorePluginTestApp/target/work/plugins
     - $HOME/.m2
     - $HOME/.grails/ivy-cache
     - $HOME/.grails/wrapper
