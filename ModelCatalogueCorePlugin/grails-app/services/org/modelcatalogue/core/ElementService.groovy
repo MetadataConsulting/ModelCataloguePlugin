@@ -16,6 +16,7 @@ class ElementService implements Publisher<CatalogueElement> {
     def relationshipService
     def modelCatalogueSearchService
     def messageSource
+    def auditService
 
     List<CatalogueElement> list(Map params = [:]) {
         CatalogueElement.findAllByStatus(getStatusFromParams(params), params)
@@ -36,16 +37,18 @@ class ElementService implements Publisher<CatalogueElement> {
 
     public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context, boolean skipRelationships = false) {
         Closure<E> code = { TransactionStatus status = null ->
-            E draft = element.createDraftVersion(this, context) as E
-            if (draft.hasErrors()) {
-                status?.setRollbackOnly()
-                return element
+            auditService.logNewVersionCreated(element) {
+                E draft = element.createDraftVersion(this, context) as E
+                if (draft.hasErrors()) {
+                    status?.setRollbackOnly()
+                    return element
+                }
+                context.classifyDrafts()
+                if (!skipRelationships) {
+                    context.resolvePendingRelationships()
+                }
+                return draft
             }
-            context.classifyDrafts()
-            if (!skipRelationships) {
-                context.resolvePendingRelationships()
-            }
-            return draft
         }
         if (skipRelationships) {
             return code()
@@ -61,37 +64,45 @@ class ElementService implements Publisher<CatalogueElement> {
             return archived
         }
 
-        archived.incomingRelationships.each {
-            if (it.relationshipType == RelationshipType.supersessionType) {
-                return
+        CatalogueElement.withTransaction { TransactionStatus status ->
+            auditService.logElementDeprecated(archived) {
+                archived.incomingRelationships.each {
+                    if (it.relationshipType == RelationshipType.supersessionType) {
+                        return
+                    }
+                    it.archived = true
+                    FriendlyErrors.failFriendlySave(it)
+                    auditService.logRelationArchived(it)
+                }
+
+                archived.outgoingRelationships.each {
+                    if (it.relationshipType == RelationshipType.supersessionType) {
+                        return
+                    }
+                    it.archived = true
+                    FriendlyErrors.failFriendlySave(it)
+                    auditService.logRelationArchived(it)
+                }
+
+                modelCatalogueSearchService.unindex(archived)
+
+                archived.status = ElementStatus.DEPRECATED
+                archived.save(flush: true, validate: false)
+                return archived
             }
-            it.archived = true
-            FriendlyErrors.failFriendlySave(it)
         }
-
-        archived.outgoingRelationships.each {
-            if (it.relationshipType == RelationshipType.supersessionType) {
-                return
-            }
-            it.archived = true
-            FriendlyErrors.failFriendlySave(it)
-        }
-
-        modelCatalogueSearchService.unindex(archived)
-
-        archived.status = ElementStatus.DEPRECATED
-        archived.save(validate: false)
-        return archived
     }
 
 
     public <E extends CatalogueElement> E finalizeElement(E draft) {
         CatalogueElement.withTransaction { TransactionStatus status ->
-            E finalized = draft.publish(this) as E
-            if (finalized.hasErrors()) {
-                status.setRollbackOnly()
+            auditService.logElementFinalized(draft) {
+                E finalized = draft.publish(this) as E
+                if (finalized.hasErrors()) {
+                    status.setRollbackOnly()
+                }
+                finalized
             }
-            finalized
         }
     }
 
@@ -163,7 +174,7 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         destination.status = ElementStatus.UPDATED
-        destination.save(deepValidate: false)
+        destination.save(flush: true, validate: false)
 
 
         for (Classification classification in new HashSet<Classification>(source.classifications)) {

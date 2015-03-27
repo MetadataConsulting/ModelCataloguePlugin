@@ -79,7 +79,9 @@ Model catalogue core plugin (metadata registry)
                     new BatchMarshaller(),
                     new ActionMarshaller(),
                     new CsvTransformationMarshaller(),
-                    new UserMarshaller()
+                    new UserMarshaller(),
+                    new ChangeMarshallers(),
+
             ]
         }
 

@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -12,6 +13,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
     @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
     @Autowired RelationshipService relationshipService
+    @Autowired AuditService auditService
     @Autowired ClassificationService classificationService
 
     CatalogueElementMarshallers(Class type) {
@@ -34,10 +36,14 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 classifiedName: relationshipService.getClassifiedName(el),
                 ext: el.ext,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
+                relationships: [count: el.countRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/relationships"],
+                outgoingRelationships: [count: el.countOutgoingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/outgoing/search"],
+                incomingRelationships: [count: el.countIncomingRelations(), itemType: Relationship.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming", search: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/incoming/search"],
                 versionNumber        : el.versionNumber,
                 status               : el.status.toString(),
                 versionCreated       : el.versionCreated,
-                history              : [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history"]
+                history              : [count: el.countVersions(), itemType: type.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history"],
+                changes              : [count: auditService.getChanges([:], el).total, itemType: org.modelcatalogue.core.audit.Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/changes"]
         ]
 
         Map<String, Map<String, String>> relationships = getRelationshipConfiguration(el.getClass())

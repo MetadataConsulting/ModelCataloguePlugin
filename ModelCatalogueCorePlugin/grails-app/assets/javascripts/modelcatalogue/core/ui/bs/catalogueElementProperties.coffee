@@ -170,6 +170,14 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     hidden: true
   }
 
+  catalogueElementPropertiesProvider.configureProperty 'changes',   {
+    hidden: true
+  }
+
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.audit.Change.changes',   {
+    hidden: false
+  }
+
   catalogueElementPropertiesProvider.configureProperty '$$metadata',   {
     hidden: true
   }

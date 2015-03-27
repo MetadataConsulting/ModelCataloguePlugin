@@ -76,7 +76,7 @@ class AssetService {
             asset = existing
         }
 
-        asset.save()
+        asset.save(flush: true)
 
 
         try {
@@ -98,7 +98,7 @@ class AssetService {
             modelCatalogueStorageService.store('assets', "${asset.id}", file.contentType, { OutputStream it -> it << countingInputStream })
             asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
             asset.size = countingInputStream.byteCount
-            asset.save()
+            asset.save(flush: true)
         } catch (Exception e) {
             log.error("Exception storing asset from file", e)
             throw e
@@ -116,7 +116,7 @@ class AssetService {
             modelCatalogueStorageService.store('assets', "${asset.id}", contentType, { OutputStream it -> it << countingInputStream })
             asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
             asset.size = countingInputStream.byteCount
-            asset.save()
+            asset.save(flush: true)
         } catch (Exception e) {
             log.error("Exception storing asset from file", e)
             throw e
@@ -145,7 +145,7 @@ class AssetService {
             }
         }
         asset.md5 = DigestUtils.md5DigestAsHex(md5.digest())
-        asset.save()
+        asset.save(flush: true)
     }
 
 }

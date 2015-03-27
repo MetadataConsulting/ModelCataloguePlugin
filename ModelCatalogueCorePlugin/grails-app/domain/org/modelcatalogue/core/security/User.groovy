@@ -41,6 +41,7 @@ class User extends CatalogueElement {
         if (isDirty('password') && !hasErrors()) {
             encodePassword()
         }
+        super.beforeUpdate()
     }
 
     protected void encodePassword() {

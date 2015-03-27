@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
@@ -15,6 +16,7 @@ import spock.util.mop.ConfineMetaClassChanges
 class ModelCatalogueTagLibSpec extends Specification {
 
     RelationshipService relationshipService
+    AuditService auditService
     RelationshipType type
 
     def setup(){
@@ -28,6 +30,8 @@ class ModelCatalogueTagLibSpec extends Specification {
         relationshipService = Mock(RelationshipService)
         relationshipService.modelCatalogueSecurityService = securityService
         tagLib.relationshipService = relationshipService
+
+        auditService = Mock(AuditService)
     }
 
 
@@ -63,6 +67,7 @@ class ModelCatalogueTagLibSpec extends Specification {
     private Model makeModel(Map params) {
         Model model = new Model(params)
         model.relationshipService = relationshipService
+        model.auditService = auditService
         model.save(failOnError: true)
     }
 

@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
@@ -19,6 +18,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     def relationshipService
     def mappingService
+    def auditService
 
 	def uuid(String uuid){
         respond resource.findByModelCatalogueId(uuid)
@@ -555,6 +555,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         respond instance, [status: OK]
+    }
+
+    def changes(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        CatalogueElement element = queryForResource(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond Lists.wrap(params, "/${resourceName}/${params.id}/changes", auditService.getChanges(params, element))
     }
 
     def history(Integer max) {

@@ -200,7 +200,8 @@
       </library>
     </orderEntry>
     <orderEntry type="module" module-name="ModelCatalogueCorePluginTestApp-grailsPlugins" />
-    <orderEntry type="module" module-name="ModelCatalogueCorePlugin" exported="" />
     <orderEntry type="module" module-name="ModelCatalogueSpringSecurity2xPlugin" exported="" />
+    <orderEntry type="module" module-name="modelCatalogueCore-inplacePlugin" exported="" />
+    <orderEntry type="module" module-name="ModelCatalogueCorePlugin" exported="" />
   </component>
 </module>

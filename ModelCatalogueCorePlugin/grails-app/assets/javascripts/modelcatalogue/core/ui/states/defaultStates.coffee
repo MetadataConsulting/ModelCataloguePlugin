@@ -111,9 +111,16 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     if $scope.resource == 'model'
       if $rootScope.$$lastModels and $rootScope.$$lastModels[getLastModelsKey()]
-        $scope.element                = $rootScope.$$lastModels[getLastModelsKey()]?.element
-        $scope.elementSelectedInTree  = $rootScope.$$lastModels[getLastModelsKey()]?.elementSelectedInTree
-        $scope.property               = $rootScope.$$lastModels[getLastModelsKey()]?.property
+        if $rootScope.$$lastModels[getLastModelsKey()].element
+          $rootScope.$$lastModels[getLastModelsKey()].element.refresh().then (element) ->
+            $scope.element                = element
+            $scope.elementSelectedInTree  = $rootScope.$$lastModels[getLastModelsKey()]?.elementSelectedInTree
+            $scope.property               = $rootScope.$$lastModels[getLastModelsKey()]?.property
+          , ->
+            $scope.element                = if list.size > 0 then list.list[0]
+            $scope.elementSelectedInTree  = false
+            $scope.property               = 'contains'
+
       else
         $rootScope.$$lastModels       = {}
         $scope.elementSelectedInTree  = false
@@ -556,6 +563,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     $rootScope.$on 'resourceNotFound', ->
       messages.error 'Selected resource cannot be found in the catalogue.'
+      if $stateParams.resource
+        $state.go 'mc.resource.list', resource: $stateParams.resource
+      else
+        $state.go 'dashboard'
   ])
 
 .run(['$templateCache', ($templateCache) ->
