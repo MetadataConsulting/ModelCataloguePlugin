@@ -3,6 +3,8 @@ package org.modelcatalogue.core
 
 class MappingService {
 
+    def auditService
+
     static transactional = true
 
     Mapping map(CatalogueElement source, CatalogueElement destination, String mapping) {
@@ -19,10 +21,12 @@ class MappingService {
                 return existing
             }
 
-            return existing.save(deepValidate: false)
+            auditService.logMappingUpdated(existing)
+            existing.save(deepValidate: false)
+            return existing
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
-        newOne.validate(deepValidate: false)
+        newOne.validate()
 
         if (newOne.hasErrors()) {
             return newOne
@@ -31,6 +35,8 @@ class MappingService {
         newOne.save(validate: false)
         source.addToOutgoingMappings(newOne).save(validate: false)
         destination.addToIncomingMappings(newOne).save(validate: false)
+
+        auditService.logMappingCreated(newOne)
 
         newOne
     }
@@ -43,6 +49,9 @@ class MappingService {
     Mapping unmap(CatalogueElement source, CatalogueElement destination) {
         Mapping old = Mapping.findBySourceAndDestination(source, destination)
         if (!old) return null
+
+        auditService.logMappingDeleted(old)
+
         source.removeFromOutgoingMappings(old).save(validate: false)
         destination.removeFromIncomingMappings(old).save(validate: false)
         old.delete(flush: true)

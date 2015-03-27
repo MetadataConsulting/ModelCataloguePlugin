@@ -1,3 +1,6 @@
+import grails.util.Environment
+import org.modelcatalogue.core.*
+
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -117,13 +120,17 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'grails.app.services.org.modelcatalogue.core'
 
-    debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
+    if (Environment.current == Environment.DEVELOPMENT || Environment.current == Environment.CUSTOM) {
+        debug 'grails.app.services.org.modelcatalogue.core'
 
-    debug 'org.modelcatalogue.core.util.builder'
-    debug 'org.modelcatalogue.core.publishing'
-    debug 'org.modelcatalogue.core.util.test'
+        debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
+
+        debug 'org.modelcatalogue.core.util.builder'
+        debug 'org.modelcatalogue.core.publishing'
+        debug 'org.modelcatalogue.core.util.test'
+        debug 'org.modelcatalogue.core.audit'
+    }
 
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
@@ -135,7 +142,7 @@ log4j = {
 //        debug 'org.hibernate.SQL'
 //    }
 
-    warn 'org.modelcatalogue.core'
+    info 'org.modelcatalogue.core'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP

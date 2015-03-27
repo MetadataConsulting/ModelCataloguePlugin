@@ -67,7 +67,7 @@ class CreateCatalogueElement extends AbstractActionRunner {
         properties.remove('type')
         CatalogueElement element = createCatalogueElement()
         element.properties = properties
-        if (element.save()) {
+        if (element.save(flush: true)) {
             if (element instanceof Extendible) {
                 properties.findAll {key, value -> key.startsWith('ext:')}.each { key, value ->
                     element.addExtension key.substring(4), value

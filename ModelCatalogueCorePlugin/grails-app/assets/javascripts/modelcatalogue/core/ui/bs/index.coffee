@@ -22,6 +22,7 @@
 #= require actions
 #= require navigationActions
 #= require columns
+#= require changelogColumns
 #= require catalogue
 #= require columnsConfiguration
 #= require messagesPanel
@@ -90,6 +91,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.actions'
   'mc.core.ui.bs.navigationActions'
   'mc.core.ui.bs.columns'
+  'mc.core.ui.bs.changelogColumns'
   'mc.core.ui.bs.catalogue'
   'mc.core.ui.bs.columnsConfiguration'
   'mc.core.ui.bs.messagesPanel'

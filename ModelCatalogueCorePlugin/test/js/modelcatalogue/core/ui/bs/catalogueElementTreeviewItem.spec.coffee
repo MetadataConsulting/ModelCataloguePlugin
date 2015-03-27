@@ -2,6 +2,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
 
   beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
+  beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
 
   it "element get compiled",  inject ($compile, $rootScope, enhance, modelCatalogueApiRoot, $httpBackend) ->
     $httpBackend.when('GET', '/api/modelCatalogue/core/dashboard').respond(fixtures.dashboard.index)
@@ -21,7 +22,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName').toLowerCase()).toBe('li')
-    expect(element.find('span.catalogue-element-treeview-name').text()).toBe("#{catEl.name}")
+    expect(element.find('span.catalogue-element-treeview-name').text()).toBe("#{catEl.name} #{catEl.versionNumber}")
     expect(element.find('span.badge').text()).toBe("#{catEl.valueDomains.total}")
 
 

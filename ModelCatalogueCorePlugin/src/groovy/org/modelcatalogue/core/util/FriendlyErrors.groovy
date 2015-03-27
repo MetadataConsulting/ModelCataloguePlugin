@@ -41,4 +41,15 @@ class FriendlyErrors {
             throw exceptionType.newInstance(printErrors(message, ve.errors))
         }
     }
+
+    static <T> T failFriendlySaveWithoutFlush(T object, String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException) {
+        try {
+            object.save(failOnError: true, deepValidate: false)
+        } catch(ValidationException ve) {
+            throw exceptionType.newInstance(printErrors(message, ve.errors))
+        }
+    }
+
+
+
 }

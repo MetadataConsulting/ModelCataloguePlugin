@@ -17,6 +17,7 @@ class RelationshipService {
     static transactional = true
 
     def modelCatalogueSecurityService
+    def auditService
 
     /**
      * Executes the callback for each relationship found.
@@ -115,7 +116,8 @@ class RelationshipService {
 
         relationshipInstance.save(validate: false)
         relationshipDefinition.source?.addToOutgoingRelationships(relationshipInstance)?.save(validate: false)
-        relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save(validate: false)
+        relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save(validate: false)        
+        auditService.logNewRelation(relationshipInstance)
         
         if (relationshipDefinition.metadata) {
             relationshipInstance.ext = relationshipDefinition.metadata
@@ -188,6 +190,7 @@ class RelationshipService {
             }
 
             if (relationshipInstance && source && destination) {
+                auditService.logRelationRemoved(relationshipInstance)
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
                 relationshipInstance.classification = null

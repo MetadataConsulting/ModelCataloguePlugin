@@ -18,7 +18,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
           original[newKey] = update[newKey]
         original
 
-      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'downloadUrl', 'archived', 'status', '__enhancedBy']
+      propExcludes     = ['version', 'name', 'classifiedName', 'description', 'incomingRelationships', 'outgoingRelationships', 'relationships', 'availableReports', 'downloadUrl', 'archived', 'status', '__enhancedBy', 'parent', 'oldValue', 'newValue']
       listEnhancer    = enhance.getEnhancer('list')
       getPropertyVal  = (propertyName) ->
         (element) -> element[propertyName]
@@ -224,7 +224,28 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         tabs = $filter('orderBy')(tabs, 'heading')
 
-        if enhance.isEnhancedBy(element, 'catalogueElement')
+        if enhance.isEnhancedBy(element, 'change')
+          tabDefinition =
+            heading:    'Properties'
+            name:       'properties'
+            value:      element
+            properties: [
+              {label: 'Parent Change', value: getPropertyVal('parent')}
+              {label: 'Change Type', value: getPropertyVal('type')}
+              {label: 'Changed Element', value: getPropertyVal('changed')}
+              {label: 'Root Element', value: getPropertyVal('latestVersion')}
+              {label: 'Author', value: getPropertyVal('author')}
+              {label: 'Undone', value: getPropertyVal('undone')}
+            ]
+            type:       'properties-pane'
+
+          if tabDefinition.name == $scope.property
+            tabDefinition.active = true
+            $scope.$broadcast 'infiniteTableRedraw'
+            activeTabSet = true
+
+          tabs.unshift tabDefinition
+        else if enhance.isEnhancedBy(element, 'catalogueElement')
           newProperties = []
           for prop in element.getUpdatableProperties()
             obj = element[prop]

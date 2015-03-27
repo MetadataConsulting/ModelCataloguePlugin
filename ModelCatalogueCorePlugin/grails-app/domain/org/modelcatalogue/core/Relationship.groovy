@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ExtensionsWrapper
+import org.modelcatalogue.core.util.FriendlyErrors
 
 /*
 * Users can create relationships between all catalogue elements. They include
@@ -22,7 +23,9 @@ import org.modelcatalogue.core.util.ExtensionsWrapper
 *
 */
 
-class Relationship implements Extendible {
+class Relationship implements Extendible<RelationshipMetadata> {
+
+    def auditService
 
     CatalogueElement source
     CatalogueElement destination
@@ -50,7 +53,9 @@ class Relationship implements Extendible {
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
-        this.ext.clear()
+        for (String key in this.ext.keySet() - ext.keySet()) {
+            this.ext.remove key
+        }
         this.ext.putAll(ext)
     }
 
@@ -80,27 +85,48 @@ class Relationship implements Extendible {
     }
 
     @Override
-    Set<Extension> listExtensions() {
+    Set<RelationshipMetadata> listExtensions() {
         extensions
     }
 
     @Override
-    Extension addExtension(String name, String value) {
-        RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
-        newOne.save(deepValidate: false)
-        assert !newOne.errors.hasErrors()
-        addToExtensions(newOne)
-        newOne
+    RelationshipMetadata findExtensionByName(String name) {
+        listExtensions()?.find { it.name == name }
     }
 
     @Override
-    void removeExtension(Extension extension) {
-        if (extension instanceof RelationshipMetadata) {
-            removeFromExtensions(extension)
-            extension.delete(flush: true)
-        } else {
-            throw new IllegalArgumentException("Only instances of RelationshipMetadata are supported")
-        }
+    int countExtensions() {
+        listExtensions()?.size() ?: 0
     }
 
+    @Override
+    RelationshipMetadata addExtension(String name, String value) {
+        if (getId() && isAttached()) {
+            RelationshipMetadata newOne = new RelationshipMetadata(name: name, extensionValue: value, relationship: this)
+            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
+            addToExtensions(newOne).save(validate: false)
+            auditService.logNewRelationshipMetadata(newOne)
+            return newOne
+        }
+        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
+    }
+
+    @Override
+    void removeExtension(RelationshipMetadata extension) {
+        auditService.logRelationshipMetadataDeleted(extension)
+        removeFromExtensions(extension).save()
+        extension.delete(flush: true)
+    }
+
+    @Override
+    RelationshipMetadata updateExtension(RelationshipMetadata old, String value) {
+        if (old.extensionValue == value) {
+            return
+        }
+        old.extensionValue = value
+        if (old.validate()) {
+            auditService.logRelationshipMetadataUpdated(old)
+        }
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
+    }
 }
