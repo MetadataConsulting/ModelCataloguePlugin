@@ -236,6 +236,8 @@ grails.assets.excludes =  [
         "**/python3/*.*",
 ]
 
+grails.assets.plugin.famfamfam.excludes = ['**/*.*']
+
 grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "bootstrap/**/*.*",
         "jquery-ui/**/*.*",

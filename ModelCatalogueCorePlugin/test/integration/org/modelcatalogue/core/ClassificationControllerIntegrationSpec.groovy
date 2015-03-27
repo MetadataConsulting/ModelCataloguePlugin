@@ -1,11 +1,7 @@
 package org.modelcatalogue.core
 
-import grails.converters.JSON
 import grails.util.GrailsNameUtils
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
@@ -47,20 +43,6 @@ class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementCo
     Classification getAnotherLoadItem() {
         Classification.findByName("data set 2")
     }
-
-    def testGeReport(){
-        when:
-        controller.params.id = loadItem.id
-        controller.response.format = "xml"
-        controller.gereport()
-        def xml = controller.response.xml
-
-        then:
-        assert  controller.response.status==200
-
-    }
-	
-
 
     def getPaginationClassifiesParameters(baseLink){
         [
