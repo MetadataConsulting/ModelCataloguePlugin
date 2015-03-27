@@ -3,7 +3,6 @@ env:
   - TEST_SUITE=core_unit
   - TEST_SUITE=core_integration
   - TEST_SUITE=core_integration_slow
-  - TEST_SUITE=core_karma
   - TEST_SUITE=app_integration
   - TEST_SUITE=app_functional
 jdk:

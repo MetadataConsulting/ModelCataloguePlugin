@@ -6,7 +6,7 @@ set -e
 cd ModelCatalogueCorePlugin
 
 # karma and functional tests needs to fetch the bower components
-if [ "$TEST_SUITE" = "core_karma" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
     npm install
     bower install
 fi
@@ -38,8 +38,8 @@ if [ "$TEST_SUITE" = "core_integration_slow" ] || [ "$TEST_SUITE" = "" ] ; then
     cp -Rf target/test-reports $HOME/reports/slow-integration-tests-reports
 fi
 
-# karma tests
-if [ "$TEST_SUITE" = "core_karma" ] || [ "$TEST_SUITE" = "" ] ; then
+# karma tests, part of the integration as they needs the fixtures generated from the integration tests
+if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./node_modules/karma/bin/karma start --single-run --browsers Firefox
 fi
 
