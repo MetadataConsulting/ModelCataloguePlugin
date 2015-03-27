@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
+<!-- 2015-03-25T15:25:05 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="_item_description" language="groovy" pageWidth="555" pageHeight="200" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e57f3b6b-4e58-43cb-bd9e-c2ac8f079484">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="net.sf.jasperreports.print.create.bookmarks" value="false"/>
+	<parameter name="REPORTS_PATH" class="java.lang.String"/>
+	<parameter name="VALUE_DOMAINS" class="java.util.TreeSet"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="currentObject" class="java.lang.Object">
+		<fieldDescription><![CDATA[_THIS]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="21" splitType="Prevent">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="100" height="21" forecolor="#29BDCA" backcolor="#F2F2F2" uuid="eda5364e-fc09-4d6e-aab7-4f9bdf3fd489">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" mode="Opaque" x="100" y="0" width="140" height="21" forecolor="#29BDCA" backcolor="#F2F2F2" uuid="d348c104-df46-4c64-806e-6fc252fdb34e">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" mode="Opaque" x="240" y="0" width="74" height="21" forecolor="#29BDCA" backcolor="#F2F2F2" uuid="326a1c17-a318-4e99-a2ca-2ce8a58f0f1c">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Multiplicity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" mode="Opaque" x="400" y="0" width="155" height="21" forecolor="#29BDCA" backcolor="#F2F2F2" uuid="7e0c7ee0-3e9c-46a5-be09-c37c9b198919">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Same as]]></text>
+			</staticText>
+			<staticText>
+				<reportElement stretchType="RelativeToBandHeight" mode="Opaque" x="314" y="0" width="86" height="21" forecolor="#29BDCA" backcolor="#F2F2F2" uuid="320aafc6-6eb2-4720-9f84-0562b0572d6c">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+				</reportElement>
+				<box topPadding="0" leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Data Type]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="21" splitType="Prevent">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="21" uuid="bde08c78-e7d2-4594-909e-27bfdf1cbdca">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box padding="3" topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentObject}.destination.name]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="100" y="0" width="140" height="21" uuid="6d006074-055f-4cd4-958b-1373b629e5a7">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<box padding="3" topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentObject}.destination.description]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="240" y="0" width="74" height="21" uuid="ff6cf63e-b5d2-43b7-ad10-2af2f1cbd553">
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<box padding="3" topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentObject}.ext.get("Min Occurs")+".."+$F{currentObject}.ext.get("Max Occurs")]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" hyperlinkType="Reference">
+				<reportElement stretchType="RelativeToBandHeight" x="314" y="0" width="86" height="21" uuid="22c1823e-b1e5-426b-81c4-0acf43aa71d9">
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<printWhenExpression><![CDATA[$P{VALUE_DOMAINS}.add($F{currentObject}.destination.valueDomain)|| Boolean.TRUE]]></printWhenExpression>
+				</reportElement>
+				<box padding="3" topPadding="2" leftPadding="3" bottomPadding="2" rightPadding="3">
+					<topPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineStyle="Solid" lineColor="#CCCCCC"/>
+				</box>
+				<textElement>
+					<font fontName="Calibri"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{currentObject}.destination.valueDomain?.name]]></textFieldExpression>
+				<hyperlinkReferenceExpression><![CDATA["#"+String.valueOf($F{currentObject}.destination.valueDomain.id)]]></hyperlinkReferenceExpression>
+				<hyperlinkWhenExpression><![CDATA[true]]></hyperlinkWhenExpression>
+				<hyperlinkAnchorExpression><![CDATA["#ANC_"+$F{currentObject}.destination.valueDomain?.name]]></hyperlinkAnchorExpression>
+			</textField>
+			<frame>
+				<reportElement stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="400" y="0" width="155" height="21" uuid="af082d1a-b36c-489a-afc5-6daeb51c8402">
+					<property name="local_mesure_unitheight" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<box padding="0">
+					<topPen lineWidth="0.1" lineColor="#CCCCCC"/>
+					<leftPen lineWidth="0.1" lineColor="#CCCCCC"/>
+					<bottomPen lineWidth="0.1" lineColor="#CCCCCC"/>
+					<rightPen lineWidth="0.1" lineColor="#CCCCCC"/>
+				</box>
+				<subreport>
+					<reportElement key="" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="0" y="0" width="155" height="21" uuid="f377d764-53e3-4b48-aced-039f6f605d36">
+						<property name="local_mesure_unitx" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.x" value="px"/>
+						<property name="local_mesure_unity" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.y" value="px"/>
+						<property name="local_mesure_unitheight" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.height" value="px"/>
+						<property name="local_mesure_unitwidth" value="pixel"/>
+						<property name="com.jaspersoft.studio.unit.width" value="px"/>
+					</reportElement>
+					<subreportParameter name="REPORTS_PATH">
+						<subreportParameterExpression><![CDATA[$P{REPORTS_PATH}]]></subreportParameterExpression>
+					</subreportParameter>
+					<subreportParameter name="VALUE_DOMAINS">
+						<subreportParameterExpression><![CDATA[$P{VALUE_DOMAINS}]]></subreportParameterExpression>
+					</subreportParameter>
+					<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{currentObject}.destination.isSynonymFor)]]></dataSourceExpression>
+					<subreportExpression><![CDATA[new File($P{REPORTS_PATH}+"/_cIGe_synonym.jasper")]]></subreportExpression>
+				</subreport>
+			</frame>
+		</band>
+	</detail>
+</jasperReport>

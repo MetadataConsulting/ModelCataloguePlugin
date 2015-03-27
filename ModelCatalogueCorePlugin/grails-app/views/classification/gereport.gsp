@@ -14,33 +14,23 @@
         <!-- CDNs -->
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
-
     </g:if>
     <g:else>
         <asset:stylesheet href="bootstrap/dist/css/bootstrap.css"/>
         <asset:stylesheet href="font-awesome/css/font-awesome"/>
         <asset:stylesheet href="modelcatalogue.css"/>
     </g:else>
-
 </head>
-<%
-    def valueDomains = new TreeSet<ValueDomain>([compare: { ValueDomain a, ValueDomain b ->
-        a?.name <=> b?.name
-    }] as Comparator<ValueDomain>)
-
-%>
 <body>
 <div>
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-
             </br>
             </br>
             </br>
-                <g:each status="i" in="${classification.classifies.findAll{it in Model}}" var="model">
+                <g:each status="i" in="${models}" var="model">
                     <g:if test="!${model.childOf}">
-
                         <g:render template="recModel" model="${[models: model, index:0, valueDomains: valueDomains]}" />
                     </g:if>
                 </g:each>

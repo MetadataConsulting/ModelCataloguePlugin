@@ -78,6 +78,8 @@ class RelationshipType {
     static mapping = {
         cache 'nonstrict-read-write'
         sort "name"
+		name index: 'RelationType_name_idx'
+		destinationClass index: 'RelationType_destinationClass_idx'
     }
 
     void setRule(String rule) {

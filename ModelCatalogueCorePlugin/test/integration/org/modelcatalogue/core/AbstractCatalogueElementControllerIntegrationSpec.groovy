@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Unroll
 
@@ -737,7 +738,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method       = 'PUT'
         controller.params.id            = another.id
         controller.params.newVersion    = true
-        controller.request.json         = [name: newName, ext: keyValue]
+        controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue)]
         controller.response.format      = "json"
 
         controller.update()
@@ -745,7 +746,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
         then:
         json.name                   == newName
-        json.ext == keyValue
+        OrderedMap.fromJsonMap(json.ext) == keyValue
 
     }
 

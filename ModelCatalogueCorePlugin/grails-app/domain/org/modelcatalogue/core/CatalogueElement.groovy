@@ -78,6 +78,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     static mapping = {
         tablePerHierarchy false
         sort "name"
+		name index :'CtlgElement_name_idx'
         description type: "text"
         extensions lazy: false, sort: 'index'
     }

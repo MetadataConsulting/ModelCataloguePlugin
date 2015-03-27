@@ -2,9 +2,6 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
@@ -46,7 +43,6 @@ class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementCo
     Classification getAnotherLoadItem() {
         Classification.findByName("data set 2")
     }
-
 
     def getPaginationClassifiesParameters(baseLink){
         [
