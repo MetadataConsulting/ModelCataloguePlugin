@@ -398,8 +398,10 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     ExtensionValue updateExtension(ExtensionValue old, String value) {
+        old.index = System.currentTimeMillis()
         if (old.extensionValue == value) {
-            return
+            FriendlyErrors.failFriendlySaveWithoutFlush(old)
+            return old
         }
         old.extensionValue = value
         if (old.validate()) {
