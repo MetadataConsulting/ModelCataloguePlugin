@@ -4,6 +4,7 @@ cache:
     - node_modules
     - $HOME/.m2
     - $HOME/.grails/ivy-cache
+    - $HOME/.grails/wrapper
 
 env:
   - TEST_SUITE=core_unit
