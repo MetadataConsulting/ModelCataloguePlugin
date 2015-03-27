@@ -11,6 +11,9 @@ class OrderedMap {
      * @return map ready for frontend
      */
     static Map<String, Object> toJsonMap(Map<String, String> map) {
+        if (!map) {
+            return [:]
+        }
         if (map.type == 'orderedMap') {
             return map
         }
@@ -19,6 +22,9 @@ class OrderedMap {
 
 
     static Map<String, String> fromJsonMap(Map<String, Object> jsonOrMap) {
+        if (!jsonOrMap) {
+            return [:]
+        }
         if (jsonOrMap.type == 'orderedMap') {
             if (jsonOrMap.values instanceof List) {
                 Map<String, String> newVal = [:]
