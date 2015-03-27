@@ -64,7 +64,7 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
 
 		byte[] content = getClassificationReportAsByte(classification,  models,params.jasperFormat)
 
-		response.addHeader("Content-disposition", "inline; filename="+"\"${classification.name}${params.jasperFormat}\"")
+		response.addHeader("Content-disposition", "inline; filename="+"\"${classification.name}.${params.jasperFormat}\"")
 		response.characterEncoding = "UTF-8"
 		response.setContentLength(content.length)
 		response.outputStream << content
