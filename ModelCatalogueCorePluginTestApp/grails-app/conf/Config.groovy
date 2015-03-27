@@ -288,5 +288,3 @@ grails.plugin.springsecurity.filterChain.chainMap = [
         '/catalogue/upload': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
 ]
-
-javamelody.disabled = true

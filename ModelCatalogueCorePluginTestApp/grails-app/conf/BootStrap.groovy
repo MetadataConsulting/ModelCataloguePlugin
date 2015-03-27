@@ -29,10 +29,7 @@ class BootStrap {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(true)
                 initSecurity()
-                //setupStuff()
-				def admin = User.findByName('admin')
-				admin.password= 'admin'
-				admin.save(failOnError: true)
+                setupStuff()
             }
         } else {
             initCatalogueService.initDefaultRelationshipTypes()
@@ -106,7 +103,6 @@ class BootStrap {
         createRequestmapIfMissing('/dbconsole/**',                 'ROLE_ADMIN')
         createRequestmapIfMissing('/monitoring/**',                 'ROLE_ADMIN')
         createRequestmapIfMissing('/plugins/console-1.5.0/**',     'ROLE_ADMIN')
-		createRequestmapIfMissing('/monitoring/**',     'ROLE_ADMIN')
 
 //        createRequestmapIfMissing('/api/modelCatalogue/core/model/**', 'IS_AUTHENTICATED_ANONYMOUSLY')
 //        createRequestmapIfMissing('/api/modelCatalogue/core/dataElement/**', 'ROLE_METADATA_CURATOR')
