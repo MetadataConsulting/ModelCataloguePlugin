@@ -79,7 +79,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         tablePerHierarchy false
         sort "name"
         description type: "text"
-        extensions lazy: false
+        extensions lazy: false, sort: 'index'
     }
 
     static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']

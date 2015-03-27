@@ -418,7 +418,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         def includeParams = includeFields
 
         if (!newVersion) newVersion = (request.JSON?.newVersion) ? request.JSON?.newVersion?.toBoolean() : false
-        if (!ext) ext = request.JSON?.ext
+        if (!ext) ext = OrderedMap.fromJsonMap(request.JSON?.ext)
 
 
         if (newVersion) includeParams.remove('status')

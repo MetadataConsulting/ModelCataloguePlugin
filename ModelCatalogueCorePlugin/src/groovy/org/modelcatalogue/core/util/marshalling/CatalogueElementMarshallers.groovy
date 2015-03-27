@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.springframework.beans.factory.annotation.Autowired
+import org.modelcatalogue.core.util.OrderedMap
 
 abstract class CatalogueElementMarshallers extends AbstractMarshallers {
 
@@ -32,7 +33,7 @@ abstract class CatalogueElementMarshallers extends AbstractMarshallers {
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
                 classifiedName: relationshipService.getClassifiedName(el),
-                ext: el.ext,
+                ext: OrderedMap.toJsonMap(el.ext),
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
                 versionNumber        : el.versionNumber,
                 status               : el.status.toString(),
