@@ -1,4 +1,10 @@
 language: groovy
+cache:
+  directories:
+    - node_modules
+    - $HOME/.m2
+    - $HOME/.grails/ivy-cache
+
 env:
   - TEST_SUITE=core_unit
   - TEST_SUITE=core_integration
