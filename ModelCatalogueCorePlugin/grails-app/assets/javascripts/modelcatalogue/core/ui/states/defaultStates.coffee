@@ -128,7 +128,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.property               =  'contains'
 
 
-      $scope.$on 'treeviewElementSelected', (event, element) ->
+      $scope.$on 'treeviewElementSelected', (event, element, id) ->
+        return unless id is 'model-treeview'
         $scope.element                  = element
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels ?= {}
@@ -634,7 +635,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           <h2>
             <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
           </h2>
-          <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
+          <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
         </div>
         <div class="col-md-8" ng-if="element">
           <catalogue-element-view element="element" property="property"></catalogue-element-view>

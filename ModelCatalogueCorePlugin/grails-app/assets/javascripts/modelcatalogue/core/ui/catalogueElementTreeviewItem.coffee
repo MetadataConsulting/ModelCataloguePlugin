@@ -56,8 +56,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         ->
           $scope.element.$$showingMore = true
           list.next().then (nextList) ->
-            for item in nextList.list when item.relation
-              $scope.element.$$children.push(angular.extend(item.relation, {$$metadata: item.ext, $$localName: getLocalName(item) }))
+            for item in nextList.list
+              it = if item.relation then item.relation else item
+              $scope.element.$$children.push(angular.extend(it, {$$metadata: item.ext, $$localName: getLocalName(item) }))
             $scope.element.$$showMore = createShowMore(nextList)
             loadMoreIfNeeded()
             $scope.element.$$showingMore = false
