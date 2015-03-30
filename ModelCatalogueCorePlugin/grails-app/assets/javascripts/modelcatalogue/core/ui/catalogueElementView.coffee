@@ -159,7 +159,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         for name, obj of element
           if name in propExcludes
             continue
-          unless angular.isObject(obj) and !angular.isArray(obj) and !enhance.isEnhanced(obj)
+          unless angular.isObject(obj) and !angular.isArray(obj) and (!enhance.isEnhanced(obj) or enhance.isEnhancedBy(obj, 'orderedMap'))
             continue
 
           propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{element.elementType}.#{name}")

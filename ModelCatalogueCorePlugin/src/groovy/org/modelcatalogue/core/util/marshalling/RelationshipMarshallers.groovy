@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.util.marshalling
 
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.util.OrderedMap
 
 /**
  * Created by ladin on 14.02.14.
@@ -23,7 +24,7 @@ class RelationshipMarshallers extends AbstractMarshallers {
                 destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.destination),
                 type: rel.relationshipType.info,
                 archived: rel.archived,
-                ext: rel.ext,
+                ext: OrderedMap.toJsonMap(rel.ext),
                 elementType: Relationship.name,
                 classification: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.classification)
         ]

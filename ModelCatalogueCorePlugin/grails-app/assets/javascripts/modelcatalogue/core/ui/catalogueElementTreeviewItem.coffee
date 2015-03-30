@@ -14,6 +14,13 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
     controller: ['$scope', '$rootScope', '$element', '$timeout', '$stateParams', ($scope, $rootScope, $element) ->
       endsWith = (text, suffix) -> text.indexOf(suffix, text.length - suffix.length) != -1
 
+      getLocalName = (item) ->
+        return undefined if not item
+        return undefined if not item.ext
+        return undefined if not angular.isFunction(item.ext.get)
+
+        return item.ext.get('name') ? item.ext.get('Name')
+
       handleDescendPaths = ->
         if angular.isArray($scope.descend)
           if $scope.descend.length == 0
@@ -50,7 +57,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.element.$$showingMore = true
           list.next().then (nextList) ->
             for item in nextList.list when item.relation
-              $scope.element.$$children.push(angular.extend(item.relation, {$$metadata: item.ext}))
+              $scope.element.$$children.push(angular.extend(item.relation, {$$metadata: item.ext, $$localName: getLocalName(item) }))
             $scope.element.$$showMore = createShowMore(nextList)
             loadMoreIfNeeded()
             $scope.element.$$showingMore = false
@@ -76,7 +83,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
             for key, prop of cachedChild
               if key.indexOf('$') == 0
                 objectToExtend[key] = prop
-          newChildren.push(angular.extend(objectToExtend, item.relation, {$$metadata: item.ext}))
+          newChildren.push(angular.extend(objectToExtend, item.relation, {$$metadata: item.ext, $$localName: getLocalName(item) }))
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false

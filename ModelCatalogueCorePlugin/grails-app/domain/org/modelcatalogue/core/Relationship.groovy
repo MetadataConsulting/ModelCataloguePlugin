@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ExtensionsWrapper
+import org.modelcatalogue.core.util.OrderedMap
 
 /*
 * Users can create relationships between all catalogue elements. They include
@@ -51,7 +52,7 @@ class Relationship implements Extendible {
 
     void setExt(Map<String, String> ext) {
         this.ext.clear()
-        this.ext.putAll(ext)
+        this.ext.putAll(OrderedMap.fromJsonMap(ext))
     }
 
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]

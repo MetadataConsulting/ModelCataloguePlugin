@@ -80,10 +80,10 @@ class ModelWizardSpec extends GebReportingSpec {
         and: 'the child is selected'
         $('.search-for-more-icon').click()
         $('.modal-body .input-group-lg input').value('patient')
-        waitFor {
-            $('.list-group-item.item-found').displayed
+
+        noStale({ $('.list-group-item.item-found') }) {
+            it.click()
         }
-        $('.list-group-item.item-found').click()
 
         and: 'create child from scratch and leave it filled in'
         name = 'This should create new child model'

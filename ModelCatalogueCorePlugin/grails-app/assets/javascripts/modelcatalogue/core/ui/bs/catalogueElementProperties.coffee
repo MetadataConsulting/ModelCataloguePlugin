@@ -2,7 +2,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
 
   localNameAndIdent = -> [
-    {header: 'Name', value: "ext.name || ext.Name || relation.name ", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()', href: 'relation.href()'}
+    {header: 'Name', value: "ext.get('name') || ext.get('Name') || relation.name ", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()', href: 'relation.href()'}
     {header: 'Identification',  value: "relation.getElementTypeName() + ': ' + relation.id", classes: 'col-md-5', show: "relation.show()", href: 'relation.href()'}
   ]
 

@@ -166,18 +166,20 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance) ->
           execAfter50 = delayedQueueExecutor(500)
+
+          orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
           $scope.reset = ->
             $scope.args = args
             $scope.model = {classifications: []}
-            $scope.metadata = {}
-            $scope.parent = {ext: {}}
+            $scope.metadata = orderedMapEnhancer.emptyOrderedMap()
+            $scope.parent = {ext: orderedMapEnhancer.emptyOrderedMap()}
             $scope.parents = []
-            $scope.child = {ext: {}}
+            $scope.child = {ext: orderedMapEnhancer.emptyOrderedMap()}
             $scope.children = []
-            $scope.dataElement = args.dataElement ? {ext: {}}
+            $scope.dataElement = args.dataElement ? {ext: orderedMapEnhancer.emptyOrderedMap()}
             $scope.dataElements = []
             $scope.classification = {}
             $scope.classifications = []
@@ -194,7 +196,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.classificationsVisited = false
 
             if args.parent
-              $scope.parents.push {element: args.parent, name: args.parent.name, metadata: {}}
+              $scope.parents.push {element: args.parent, name: args.parent.name, metadata: orderedMapEnhancer.emptyOrderedMap()}
 
           $scope.reset()
 
@@ -217,7 +219,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             else
               value.name = value.element.name
             $scope[arrayName].push value
-            $scope[propertyName] = {ext: {}}
+            $scope[propertyName] = {ext: orderedMapEnhancer.emptyOrderedMap()}
 
           $scope.openElementInNewWindow = (element) ->
             url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
@@ -392,7 +394,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   angular.forEach result.list, (relation) ->
                     $scope[property] = element: relation.relation, ext: relation.ext
                     $scope.push container, property
-                  $scope[property] = {ext: {}}
+                  $scope[property] = {ext: orderedMapEnhancer.emptyOrderedMap()}
 
               promises.push model.parentOf(null, max: 100).then push('children', 'child')
               promises.push model.contains(null, max: 100).then push('dataElements', 'dataElement')
@@ -400,9 +402,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               $q.all promises
 
           $scope.hasMetadata = ->
-            for ignored of $scope.metadata
-              return true
-            return false
+            return $scope.metadata.values.length > 0
 
 
           $scope.isModelCatalogueIdValid = ->

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', 'enhance', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, enhance) ->
   angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
 
   columnsDefined = $scope.columns?
@@ -43,8 +43,12 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         properties.push label: ''
         properties.push label: "#{element.getElementTypeName()} Metadata"
 
-        angular.forEach element.ext, (value, key) ->
-          properties.push label: names.getNaturalName(key), value: -> value
+        if enhance.isEnhancedBy(element.ext, 'orderedMap')
+          angular.forEach element.ext.values, (value) ->
+            properties.push label: names.getNaturalName(value.key), value: -> value.value
+        else
+          angular.forEach element.ext, (value, key) ->
+            properties.push label: names.getNaturalName(key), value: -> value
     properties
 
   getRowForElement = (element) ->
@@ -57,9 +61,13 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
           row.tail.push getCellForColumn(element, column)
 
     if element.relation and element.ext
-        row.properties.push label: ''
-        row.properties.push label: 'Relationship Metadata'
+      row.properties.push label: ''
+      row.properties.push label: 'Relationship Metadata'
 
+      if enhance.isEnhancedBy(element.ext, 'orderedMap')
+        angular.forEach element.ext.values, (value) ->
+          row.properties.push label: names.getNaturalName(value.key), value: -> value.value
+      else
         angular.forEach element.ext, (value, key) ->
           row.properties.push label: names.getNaturalName(key), value: -> value
 

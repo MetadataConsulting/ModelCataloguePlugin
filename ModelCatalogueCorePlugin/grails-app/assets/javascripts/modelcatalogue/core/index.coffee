@@ -13,6 +13,7 @@
 #= require actionableItemEnhancer
 #= require modelCatalogueSearch
 #= require modelCatalogueDataArchitect
+#= require orderedMapEnhancer
 
 
 angular.module 'mc.core', [
@@ -32,4 +33,5 @@ angular.module 'mc.core', [
   'mc.core.modelCatalogueDataArchitect'
   'mc.core.removableItemEnhancer'
   'mc.core.actionableItemEnhancer'
+  'mc.core.orderedMapEnhancer'
 ]

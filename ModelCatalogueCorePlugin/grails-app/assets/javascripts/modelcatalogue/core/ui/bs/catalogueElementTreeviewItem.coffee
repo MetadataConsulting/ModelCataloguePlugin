@@ -22,8 +22,8 @@ cetiModule.run [ '$templateCache', ($templateCache) ->
           <a ng-if="!currentDescend &amp;&amp; element.elementType" class="btn btn-link" ng-click="select(element)">
             <span ng-class="element.getIcon()"></span>
           </a>
-          <span class="catalogue-element-treeview-name" ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': element.status == 'DEPRECATED'}" ng-click="select(element)">{{element.metadata.name || element.metadata.Name || element.name}}<small class="text-muted" ng-if="element.metadata.name || element.metadata.Name &amp;&amp; ((element.metadata.name || element.metadata.Name) != element.name)"> {{element.name}}</small></span>
-          <small class="text-muted" ng-if="element.href"> <a class="catalogue-element-treeview-link" ng-href="{{element.href()}}" title="{{element.metadata.name || element.metadata.Name || element.name}}"><span class="fa fa-external-link"></span></a></small>
+          <span class="catalogue-element-treeview-name" ng-class="{'text-warning': element.status == 'DRAFT', 'text-info': element.status == 'PENDING', 'text-danger': element.status == 'DEPRECATED'}" ng-click="select(element)">{{element.$$localName || element.name}}<small class="text-muted" ng-if="element.$$localName"> {{element.name}}</small></span>
+          <small class="text-muted" ng-if="element.href"> <a class="catalogue-element-treeview-link" ng-href="{{element.href()}}" title="{{element.$$localName || element.name}}"><span class="fa fa-external-link"></span></a></small>
         </span>
       </div>
       <ul ng-if="element.$$children" ng-hide="element.$$collapsed" class="catalogue-element-treeview-list">
