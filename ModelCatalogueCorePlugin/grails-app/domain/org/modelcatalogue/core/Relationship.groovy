@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.OrderedMap
 
 /*
 * Users can create relationships between all catalogue elements. They include
@@ -56,7 +57,7 @@ class Relationship implements Extendible<RelationshipMetadata> {
         for (String key in this.ext.keySet() - ext.keySet()) {
             this.ext.remove key
         }
-        this.ext.putAll(ext)
+        this.ext.putAll(OrderedMap.fromJsonMap(ext))
     }
 
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
@@ -121,6 +122,8 @@ class Relationship implements Extendible<RelationshipMetadata> {
     @Override
     RelationshipMetadata updateExtension(RelationshipMetadata old, String value) {
         if (old.extensionValue == value) {
+            old.index = System.currentTimeMillis()
+            FriendlyErrors.failFriendlySaveWithoutFlush(old)
             return
         }
         old.extensionValue = value

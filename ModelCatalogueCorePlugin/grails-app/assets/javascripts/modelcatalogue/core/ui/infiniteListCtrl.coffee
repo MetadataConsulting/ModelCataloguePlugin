@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', 'security', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, security) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', 'security', 'enhance',($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, security, enhance) ->
   angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
 
   columnsDefined = $scope.columns?
@@ -43,16 +43,20 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
         properties.push label: ''
         properties.push label: "#{element.getElementTypeName()} Metadata"
 
-        angular.forEach element.ext, (value, key) ->
-          properties.push label: names.getNaturalName(key), value: -> value
-    if security.hasRole('ADMIN') and element and element.changed and element.latestVersion
-      properties.push label: 'Type', value: -> element.type
-      properties.push label: 'Changed Element', value: -> element.changed
-      properties.push label: 'Root Element', value: -> element.latestVersion
-      properties.push label: 'Author', value: -> element.author
-      properties.push label: 'Property', value: -> element.property
-      properties.push label: 'Old Value', value: -> if element.oldValue?.value then element.oldValue.value else element.oldValue
-      properties.push label: 'New Value', value: -> if element.newValue?.value then element.newValue.value else element.newValue
+        if enhance.isEnhancedBy(element.ext, 'orderedMap')
+          angular.forEach element.ext.values, (value) ->
+            properties.push label: names.getNaturalName(value.key), value: -> value.value
+        else
+          angular.forEach element.ext, (value, key) ->
+            properties.push label: names.getNaturalName(key), value: -> value
+      if security.hasRole('ADMIN') and element and element.changed and element.latestVersion
+        properties.push label: 'Type', value: -> element.type
+        properties.push label: 'Changed Element', value: -> element.changed
+        properties.push label: 'Root Element', value: -> element.latestVersion
+        properties.push label: 'Author', value: -> element.author
+        properties.push label: 'Property', value: -> element.property
+        properties.push label: 'Old Value', value: -> if element.oldValue?.value then element.oldValue.value else element.oldValue
+        properties.push label: 'New Value', value: -> if element.newValue?.value then element.newValue.value else element.newValue
     properties
 
   getRowForElement = (element) ->
@@ -65,9 +69,13 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
           row.tail.push getCellForColumn(element, column)
 
     if element.relation and element.ext
-        row.properties.push label: ''
-        row.properties.push label: 'Relationship Metadata'
+      row.properties.push label: ''
+      row.properties.push label: 'Relationship Metadata'
 
+      if enhance.isEnhancedBy(element.ext, 'orderedMap')
+        angular.forEach element.ext.values, (value) ->
+          row.properties.push label: names.getNaturalName(value.key), value: -> value.value
+      else
         angular.forEach element.ext, (value, key) ->
           row.properties.push label: names.getNaturalName(key), value: -> value
 

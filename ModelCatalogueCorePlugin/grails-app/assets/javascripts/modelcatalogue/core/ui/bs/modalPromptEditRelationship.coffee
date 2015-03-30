@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
-  messagesProvider.setPromptFactory 'update-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', ($modal, $q, messages, catalogueElementResource) ->
+  messagesProvider.setPromptFactory 'update-relationship', [ '$modal', '$q', 'messages', 'catalogueElementResource', 'enhance', ($modal, $q, messages, catalogueElementResource, enhance) ->
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create relationship dialog.', 'The element to be connected to is missing.')
@@ -111,7 +111,7 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
 
           $scope.messages = messages.createNewMessages()
 
-          $scope.metadata = args.metadata ? {}
+          $scope.metadata = args.metadata ? enhance.getEnhancer('orderedMap').emptyOrderedMap()
 
           $scope.createRelation = ->
             $scope.messages.clearAllMessages()

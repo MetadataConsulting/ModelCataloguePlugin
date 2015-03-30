@@ -110,6 +110,8 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
 
         for hint in currentHints by -1
           editableProperties.unshift key: hint
+          if isOrderedMap(object)
+            object.values.push key: hint
 
         editableProperties.push key: '' if editableProperties.length == 0
 
