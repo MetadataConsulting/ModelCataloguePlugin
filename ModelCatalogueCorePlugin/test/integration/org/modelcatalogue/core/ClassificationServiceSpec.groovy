@@ -3,16 +3,19 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 
 class ClassificationServiceSpec extends IntegrationSpec {
 
     def classificationService
     def initCatalogueService
+    def modelService
 
     Classification classification1
     Classification classification2
 
+    Model model0
     Model model1
     Model model2
 
@@ -20,7 +23,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
         initCatalogueService.initDefaultRelationshipTypes()
         classification1 = new Classification(name: "Test Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
         classification2 = new Classification(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
-        new Model(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
+        model0 = new Model(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
         model1 = new Model(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
         model1.addToClassifications(classification1)
         model2 = new Model(name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
@@ -87,6 +90,46 @@ class ClassificationServiceSpec extends IntegrationSpec {
         criteria.count() == 1
         model1 in criteria.list()
         !(model2 in criteria.list())
+    }
+
+    def "get unclassified top level models"() {
+        ListWithTotalAndType<Model> models = modelService.getTopLevelModels(ClassificationFilter.create(true), [:])
+
+        expect:
+        models.total >= 1
+        model0 in models.items
+        !(model1 in models.items)
+    }
+
+    def "get top level models with include classification filter"() {
+        ListWithTotalAndType<Model> models = modelService.getTopLevelModels(ClassificationFilter.create([classification1], []), [:])
+
+        expect:
+        models.total >= 1
+        !(model0 in models.items)
+        model1 in models.items
+        !(model2 in models.items)
+    }
+
+
+    def "get top level models with exclude classification filter"() {
+        ListWithTotalAndType<Model> models = modelService.getTopLevelModels(ClassificationFilter.create([], [classification2]), [:])
+
+        expect:
+        models.total >= 2
+        model0 in models.items
+        model1 in models.items
+        !(model2 in models.items)
+    }
+
+    def "get top level models with include and exclude classification filter"() {
+        ListWithTotalAndType<Model> models = modelService.getTopLevelModels(ClassificationFilter.create([classification1], [classification2]), [:])
+
+        expect:
+        models.total >= 1
+        !(model0 in models.items)
+        model1 in models.items
+        !(model2 in models.items)
     }
 
 
