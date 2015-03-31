@@ -15,7 +15,7 @@ class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classificati
     void processElements(Object theMkp, Classification element, PrintContext context, Relationship rel) {
         super.processElements(theMkp, element, context, rel)
 
-        for (CatalogueElement other in context.modelService.getTopLevelModels([element], [:]).items) {
+        for (CatalogueElement other in context.modelService.getTopLevelModels(ClassificationFilter.includes(element), [:]).items) {
                 printElement(theMkp, other, context, null)
         }
 

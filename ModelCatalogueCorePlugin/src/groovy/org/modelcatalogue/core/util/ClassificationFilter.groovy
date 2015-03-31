@@ -52,6 +52,14 @@ class ClassificationFilter {
         new ClassificationFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect { it.id }))
     }
 
+    static ClassificationFilter includes(Classification... includes) {
+        new ClassificationFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.of())
+    }
+
+    static ClassificationFilter excludes(Classification... excludes) {
+        new ClassificationFilter(ImmutableSet.of(), ImmutableSet.copyOf(excludes.collect { it.id }))
+    }
+
     static ClassificationFilter from(Map<String, Object> json) {
         if (json.unclassifiedOnly) {
             return create(true)
