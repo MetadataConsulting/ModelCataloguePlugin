@@ -167,6 +167,7 @@
         def "validate value"() {
             waitUntilModalClosed()
             when: "validate action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('validate-value').click()
 
 
@@ -207,6 +208,7 @@
         def "create new mapping"() {
             waitUntilModalClosed()
             when: "create new mapping action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('create-new-mapping').click()
 
 
@@ -235,6 +237,7 @@
         def "convert value"() {
             waitUntilModalClosed()
             when: "convert action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('convert').click()
 
             then: "modal is shown"
@@ -289,6 +292,7 @@
 
             when:
             toggleInfTableRow(1)
+            actionButton('catalogue-element').click()
             actionButton('edit-mapping').click()
 
             then:
@@ -310,6 +314,7 @@
         def "create relationship"() {
             waitUntilModalClosed()
             when: "create relationship action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('create-new-relationship').click()
 
             then: "modal is shown"
@@ -371,6 +376,7 @@
             waitUntilModalClosed()
             when:
             toggleInfTableRow(1)
+            actionButton('catalogue-element').click()
             actionButton('remove-relationship').click()
 
             then:
@@ -392,6 +398,7 @@
             when:
             selectTab('mappings')
             toggleInfTableRow(1)
+            actionButton('catalogue-element').click()
             actionButton('remove-mapping').click()
 
             then:
@@ -413,6 +420,7 @@
             selectTab('properties')
 
             when: "edit action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('edit-catalogue-element').click()
 
             then: "edit dialog is shown"
@@ -439,6 +447,7 @@
         def "finalize domain"() {
             waitUntilModalClosed()
             when: "finalize is clicked"
+            actionButton('change-element-state').click()
             actionButton('finalize').click()
 
             then: "modal prompt is displayed"
@@ -459,6 +468,7 @@
         def "create new version of the domain"() {
             waitUntilModalClosed()
             when: "new version is clicked"
+            actionButton('change-element-state').click()
             actionButton('create-new-version').click()
 
             then: "modal prompt is displayed"
@@ -482,6 +492,7 @@
         def "merge domain"() {
             waitUntilModalClosed()
             when:
+            actionButton('change-element-state').click()
             actionButton('merge').click()
 
             then:

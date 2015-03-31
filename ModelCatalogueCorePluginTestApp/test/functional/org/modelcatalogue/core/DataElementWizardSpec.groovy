@@ -87,6 +87,7 @@
         def "Edit the value domain"() {
             waitUntilModalClosed()
             when: "edit action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('edit-catalogue-element').click()
 
             then: "edit dialog is shown"
@@ -113,6 +114,7 @@
         def "Remove the value domain"() {
             waitUntilModalClosed()
             when: "edit action is clicked"
+            actionButton('catalogue-element').click()
             actionButton('edit-catalogue-element').click()
 
             then: "edit dialog is shown"
@@ -135,6 +137,7 @@
         def "finalize element"() {
             waitUntilModalClosed()
             when: "finalize is clicked"
+            actionButton('change-element-state').click()
             actionButton('finalize').click()
 
             then: "modal prompt is displayed"
@@ -155,6 +158,7 @@
         def "create new version of the element"() {
             waitUntilModalClosed()
             when: "new version is clicked"
+            actionButton('change-element-state').click()
             actionButton('create-new-version').click()
 
             then: "modal prompt is displayed"
@@ -175,6 +179,7 @@
         def "deprecate the element"() {
             waitUntilModalClosed()
             when: "depracete action is clicked"
+            actionButton('change-element-state').click()
             actionButton('archive').click()
 
             then: "modal prompt is displayed"
@@ -195,6 +200,7 @@
         def "hard delete the element"() {
             waitUntilModalClosed()
             when: "delete action is clicked"
+            actionButton('change-element-state').click()
             actionButton('delete').click()
 
             then: "modal prompt is displayed"

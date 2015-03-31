@@ -93,11 +93,11 @@ abstract class ModelCataloguePage extends Page {
     }
 
     Navigator actionButton(String id, String role = "item") {
-        $('#role_' + role + '_' + id + 'Btn')
+        $('#role_' + role + '_' + id + 'Btn, #' + id + 'Btn').last()
     }
 
     Navigator menuItem(String id, String role = "navigation") {
-        $('#role_' + role + '_' + id + '-menu-item-link')
+        $('#role_' + role + '_' + id + '-menu-item-link').last()
     }
 
     /**

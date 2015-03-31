@@ -262,6 +262,7 @@ class ModelWizardSpec extends GebReportingSpec {
     }
 
     def "edit child model"() {
+        actionButton('catalogue-element').click()
         expect:
         actionButton('edit-catalogue-element').displayed
 

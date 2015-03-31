@@ -79,6 +79,7 @@ class AssetWizardSpec extends GebReportingSpec {
 
     def "validate xml schema"() {
         when:
+        actionButton('catalogue-element').click()
         actionButton('validate-xsd-schema').click()
 
         then:

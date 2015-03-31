@@ -13,6 +13,8 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'batch',              "fa fa-fw fa-flash"
   catalogueProvider.setIcon 'user',               "fa fa-fw fa-user"
   catalogueProvider.setIcon 'csvTransformation',  "fa fa-fw fa-long-arrow-right"
+  catalogueProvider.setIcon 'relationship',       "fa fa-fw fa-link"
+  catalogueProvider.setIcon 'mapping',            "fa fa-fw fa-superscript"
 
   # this should be generated automatically in the future
 
