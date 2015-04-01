@@ -3,6 +3,7 @@ package org.modelcatalogue.core.audit
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
+import org.modelcatalogue.core.util.ClassificationFilter
 
 class AuditingIntegrationSpec extends IntegrationSpec {
 
@@ -10,6 +11,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def initCatalogueService
     def sessionFactory
     def mappingService
+    def auditService
 
     def "creation of new element is logged"() {
         when:
@@ -594,6 +596,13 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         then:
         type.outgoingMappings.size() == 1
         type.outgoingMappings[0].mapping == "x / 2"
+    }
+
+    def "some global changes are available"() {
+        new DataType(name: "DT4GF").save(failOnError: true)
+
+        expect:
+        auditService.getGlobalChanges([:], ClassificationFilter.NO_FILTER).total > 0
     }
 
 }

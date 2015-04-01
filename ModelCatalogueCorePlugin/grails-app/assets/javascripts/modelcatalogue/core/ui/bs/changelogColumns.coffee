@@ -76,8 +76,12 @@ angular.module('mc.core.ui.bs.changelogColumns', ['mc.util.names']).config ['col
 
       return """<a href=#{object.href()}><span class="#{object.getIcon()}"></span> #{object.name}</a>""" if object.isInstanceOf and object.isInstanceOf('catalogueElement')
 
+  dateCreated = (change, catalogueElementProperties) ->
+    catalogueElementProperties.filter('date')(change.dateCreated, 'short')
+
   columnsProvider.registerColumns 'org.modelcatalogue.core.audit.Change', [
     {header: "Type"       , value: getIcon                   , classes: 'col-md-1' }
+    {header: "Created"    , value: dateCreated               , classes: 'col-md-2' }
     {header: "Author"     , value: valueOrName('author')     , classes: 'col-md-2' }
     {header: "Change"     , value: getChangeDescription      , classes: 'col-md-9' }
   ]

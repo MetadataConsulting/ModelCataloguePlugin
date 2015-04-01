@@ -15,6 +15,7 @@ class ChangeController extends RestfulController<Change> {
     static responseFormats = ['json']
 
     def auditService
+    def classificationService
 
     def undo() {
         Change change = Change.get(params.id)
@@ -47,5 +48,16 @@ class ChangeController extends RestfulController<Change> {
 
         respond Lists.wrap(params, "/${resourceName}/${params.id}/changes", auditService.getSubChanges(params, change))
     }
+
+    def global() {
+        if (!params.max) {
+            params.max = 10
+        } else {
+            params.max = params.long('max')
+        }
+
+        respond Lists.wrap(params, "/change/", auditService.getGlobalChanges(params, classificationService.classificationsInUse))
+    }
+
 
 }

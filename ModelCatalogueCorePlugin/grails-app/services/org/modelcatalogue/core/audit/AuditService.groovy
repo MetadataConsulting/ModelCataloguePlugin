@@ -1,9 +1,11 @@
 package org.modelcatalogue.core.audit
 
+import grails.gorm.DetachedCriteria
 import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
@@ -13,6 +15,7 @@ class AuditService {
     static transactional = false
 
     def modelCatalogueSecurityService
+    def classificationService
 
     private static ThreadLocal<Auditor> auditor = new ThreadLocal<Auditor>() {
         protected Auditor initialValue() { return new DefaultAuditor(); }
@@ -111,6 +114,66 @@ class AuditService {
             ne 'otherSide', Boolean.TRUE
             ne 'system', Boolean.TRUE
         }
+    }
+
+    ListWithTotalAndType<Change> getGlobalChanges(Map params, ClassificationFilter classifications) {
+        if (!params.sort) {
+            params.sort  = 'dateCreated'
+            params.order = 'desc'
+        }
+
+        if (!classifications) {
+            return Lists.all(params, Change)
+        }
+
+
+        Map<String, Object> args = [:]
+        String subquery = getClassifiedElementsSubQuery(classifications, args)
+
+        //language=HQL
+        Lists.fromQuery params, Change, """
+            from Change c
+            where c.changedId in (""" + subquery + """)""", args
+    }
+
+    private static String getClassifiedElementsSubQuery(ClassificationFilter classifications, Map<String, Object> args) {
+        args.classificationType = RelationshipType.classificationType
+        if (classifications.unclassifiedOnly) {
+            // language=HQL
+            return """
+                select ce.id
+                from CatalogueElement ce
+                where ce not in (select r.destination from Relationship r where r.relationshipType = :classificationType)
+            """
+        }
+        if (classifications.excludes && !classifications.includes) {
+            args.excludes = classifications.excludes
+            // language=HQL
+            return """
+                select ce
+                from CatalogueElement ce
+                where ce.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes))
+            """
+        }
+        if (classifications.excludes && classifications.includes) {
+            args.excludes = classifications.excludes
+            args.includes = classifications.includes
+            // language=HQL
+            return """
+                select ce
+                from CatalogueElement ce
+                where ce.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes))
+                  and ce.id     in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes))
+            """
+        }
+        if (classifications.includes && !classifications.excludes) {
+            args.includes = classifications.includes
+            // language=HQL
+            return """
+                select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes)
+            """
+        }
+        throw new IllegalArgumentException("Classification fitler must be set")
     }
 
     ListWithTotalAndType<Change> getChanges(Map params, CatalogueElement element) {

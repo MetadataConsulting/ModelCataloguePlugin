@@ -9,6 +9,7 @@ class ModelCatalogueCorePluginUrlMappings {
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
         "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
 
+        "/api/modelCatalogue/core/change/" (controller: 'change', action: 'global', method: HttpMethod.GET)
         "/api/modelCatalogue/core/change/$id" (controller: 'change', action: 'show', method: HttpMethod.GET)
         "/api/modelCatalogue/core/change/$id/changes" (controller: 'change', action: 'changes', method: HttpMethod.GET)
         "/api/modelCatalogue/core/change/$id" (controller: 'change', action: 'undo', method: HttpMethod.DELETE)
