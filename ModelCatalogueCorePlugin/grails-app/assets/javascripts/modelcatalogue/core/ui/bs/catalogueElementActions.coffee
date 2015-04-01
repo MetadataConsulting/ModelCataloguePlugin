@@ -264,6 +264,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
         args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
         messages.prompt('Update Relationship', '', args).then (updated)->
           rel.ext = updated.ext
+          rel.classification = updated.classification
     }
   ]
 

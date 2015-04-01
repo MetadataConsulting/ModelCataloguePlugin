@@ -55,7 +55,7 @@ class RelationshipDefinition {
     }
 
     @Override String toString() {
-        "$source.name =[$relationshipType.sourceToDestination]=> $destination.name"
+        "$source.name =[$relationshipType.sourceToDestination${classification ? ('/' + classification.name) : ''}]=> $destination.name"
     }
 }
 

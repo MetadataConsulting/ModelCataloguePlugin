@@ -4,6 +4,8 @@ import grails.transaction.Transactional
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
+import org.modelcatalogue.core.util.builder.RelationshipDefinition
+import org.modelcatalogue.core.util.builder.RelationshipDefinitionBuilder
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.springframework.http.HttpStatus
@@ -172,7 +174,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
     }
 
-    private addRelation(Long id, String type, boolean outgoing) {
+    private void addRelation(Long id, String type, boolean outgoing) {
         withRetryingTransaction {
             if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
                 notAuthorized()
@@ -193,9 +195,16 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             }
 
-            Long classificationId = objectToBind.__classification?.id
+            def newClassification = objectToBind['__classification']
+            Long classificationId = newClassification instanceof Map ? newClassification.id : null
 
             Classification classification = classificationId ? Classification.get(classificationId) : null
+
+
+            def oldClassification = objectToBind['__oldClassification']
+            Long oldClassificationId = oldClassification instanceof Map ? oldClassification.id : null
+
+            Classification oldClassificationInstance = oldClassificationId ? Classification.get(oldClassificationId) : null
 
             if (classificationId && !classification) {
                 notFound()
@@ -215,23 +224,30 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 notFound()
                 return
             }
-            Relationship rel = outgoing ?  relationshipService.link(source, destination, relationshipType, classification) :  relationshipService.link(destination, source, relationshipType, classification)
+
+            if (oldClassificationInstance != classification) {
+                if (outgoing) {
+                    relationshipService.unlink(source, destination, relationshipType, oldClassificationInstance)
+                } else {
+                    relationshipService.unlink(destination, source, relationshipType, oldClassificationInstance)
+                }
+            }
+
+            RelationshipDefinitionBuilder definition = outgoing ? RelationshipDefinition.create(source, destination, relationshipType) : RelationshipDefinition.create(destination, source, relationshipType)
+
+            definition.withClassification(classification).withMetadata(objectToBind.metadata ?: [:])
+
+            Relationship rel = relationshipService.link(definition.definition)
 
             if (rel.hasErrors()) {
                 respond rel.errors
                 return
             }
 
-            def metadata = objectToBind.metadata
-
-            if (metadata != null) {
-                rel.setExt(metadata)
-            }
-
             response.status = HttpServletResponse.SC_CREATED
             RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
 
-            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name)
+            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.classification)
         }
     }
 
