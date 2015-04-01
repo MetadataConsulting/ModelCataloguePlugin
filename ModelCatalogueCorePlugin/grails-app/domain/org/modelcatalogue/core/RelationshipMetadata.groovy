@@ -5,17 +5,13 @@ class RelationshipMetadata implements Extension {
     String name
     String extensionValue
 
-    Long index = System.currentTimeMillis()
+    Long orderIndex = System.currentTimeMillis()
 
     static belongsTo = [relationship: Relationship]
 
     static constraints = {
         name size: 1..255
         extensionValue maxSize: 1000, nullable: true
-    }
-
-    static mapping = {
-        index name: '`index`'
     }
 
     @Override

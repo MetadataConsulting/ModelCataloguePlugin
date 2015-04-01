@@ -80,7 +80,7 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         sort "name"
 		name index :'CtlgElement_name_idx'
         description type: "text"
-        extensions lazy: false, sort: 'index'
+        extensions lazy: false, sort: 'orderIndex'
     }
 
     static mappedBy = [outgoingRelationships: 'source', incomingRelationships: 'destination', outgoingMappings: 'source', incomingMappings: 'destination']
