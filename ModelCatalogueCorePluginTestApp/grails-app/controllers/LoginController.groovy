@@ -66,11 +66,7 @@ class LoginController {
      * Show denied page.
      */
     def denied = {
-        if (springSecurityService.isLoggedIn() &&
-                authenticationTrustResolver.isRememberMe(SCH.context?.authentication)) {
-            // have cookie but the page is guarded with IS_AUTHENTICATED_FULLY
-            redirect action: 'full', params: params
-        }
+        response.sendError HttpServletResponse.SC_UNAUTHORIZED
     }
 
     /**
@@ -138,6 +134,7 @@ class LoginController {
      * The Ajax denied redirect url.
      */
     def ajaxDenied = {
+        response.sendError HttpServletResponse.SC_UNAUTHORIZED
         render([error: 'access denied'] as JSON)
     }
 }

@@ -30,7 +30,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
 
   # you need login to return
   securityProvider.springSecurity = (config = {}) ->
-    securityFactory = ['$http', '$rootScope', '$q',  ($http, $rootScope, $q) ->
+    securityFactory = ['$http', '$rootScope', '$q', '$state',  ($http, $rootScope, $q, $state) ->
       httpMethod    = config.httpMethod ? 'POST'
       loginUrl      = 'j_spring_security_check'
       logoutUrl     = 'logout'
@@ -97,6 +97,8 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
         logout: ->
           $http(method: httpMethod, url: logoutUrl).then ->
             currentUser = null
+            $state.go 'dashboard'
+
         requireUser: ->
           $http(method: 'GET', url: userUrl).then(handleUserResponse).then (result)->
             if result.data?.success
@@ -163,19 +165,26 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages']
   ]
 
   securityProvider
-]).run ['security', '$rootScope', 'messages', 'authService', (security, $rootScope, messages, authService) ->
+]).run ['security', '$rootScope', 'messages', 'authService', '$state', (security, $rootScope, messages, authService, $state) ->
   # installs the security listeners
+  loginShown = false
   $rootScope.$on 'event:auth-loginRequired', ->
     if security.mock
       messages.error('You are trying to access protected resource',
         'The application will not work as expected. Please, set up the security properly.').noTimeout()
     else
+      return if loginShown
+      loginShown = true
       messages.prompt('Login', null, type: 'login').then (success)->
+        loginShown = false
         authService.loginConfirmed(success)
         messages.clearAllMessages()
       , ->
-        messages.warning('You are trying to access protected resource',
-          if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in').noTimeout()
+        loginShown = false
+        messages.warning('You are trying to access protected resource', if security.isUserLoggedIn() then 'Please, sign in as different user' else 'Please, sign in').noTimeout()
+        $state.go 'dashboard'
+
+
   $rootScope.$security = security
 
 ]

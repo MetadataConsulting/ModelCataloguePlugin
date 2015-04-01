@@ -87,7 +87,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
 
         for existing in messagesStack
-          return msg if existing.type == msg.type and existing.title == msg.title and existing.body == msg.body
+          return existing if existing.type == msg.type and existing.title == msg.title and existing.body == msg.body
 
         messagesStack.push msg
 
