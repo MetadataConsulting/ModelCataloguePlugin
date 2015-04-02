@@ -6,6 +6,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
       hasRole: (role) -> true
       login: (username, password, rememberMe = false) -> security.getCurrentUser()
       logout: -> $log.info "Logout requested on default security service"
+      refreshUserData: ->
       mock: true
   ]
 
@@ -16,6 +17,7 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
       hasRole: (role) -> role == 'VIEWER'
       login: (username, password, rememberMe = false) -> security.getCurrentUser()
       logout: -> $log.info "Logout requested on read only security service"
+      refreshUserData: ->
       mock: true
   ]
 
