@@ -1,26 +1,25 @@
 package org.modelcatalogue.core.actions
 
-import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
+import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.pages.BatchActionsPage
 import org.modelcatalogue.core.pages.BatchListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class BatchAndActionsSpec extends GebReportingSpec {
+class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
 
     def "see test batch in action "() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/batch/all"
 
         then:
         at BatchListPage
 
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             linkToTestBatch.displayed
             actionButton('generate-merge-models', 'list').displayed

@@ -1,14 +1,15 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.DataTypeListPage
-import org.modelcatalogue.core.pages.MeasurementUnitListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class DataTypeWizardSpec extends GebReportingSpec {
+class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/dataType/all"
 
@@ -20,11 +21,6 @@ class DataTypeWizardSpec extends GebReportingSpec {
         waitFor {
             viewTitle.text().trim() == 'Data Type List'
         }
-
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }

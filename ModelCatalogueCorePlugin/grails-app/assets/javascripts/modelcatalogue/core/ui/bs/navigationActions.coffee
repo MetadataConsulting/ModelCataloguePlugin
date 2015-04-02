@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config ['actionsProvider', 'names', (actionsProvider, names)->
+angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
   RESOURCES = [
     'classification'

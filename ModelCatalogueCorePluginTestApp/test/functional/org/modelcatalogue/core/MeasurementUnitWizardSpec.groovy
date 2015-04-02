@@ -1,13 +1,15 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.MeasurementUnitListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class MeasurementUnitWizardSpec extends GebReportingSpec {
+class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/measurementUnit/all"
 
@@ -20,10 +22,6 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
             viewTitle.text().trim() == 'Measurement Unit List'
         }
 
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }

@@ -1,13 +1,12 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.core.pages.AssetListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class AssetWizardSpec extends GebReportingSpec {
+class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     private final String SAMPLE_XSD_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b4e21b12613f70fd7733428e7bbb8434faec4925/example.xsd"
     private final String SAMPLE_VALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/d8369d85bb6b09e06706a96973697acc1010c439/example.xml"
@@ -16,6 +15,9 @@ class AssetWizardSpec extends GebReportingSpec {
     @Rule TemporaryFolder tmp = new TemporaryFolder()
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/asset/all"
 
@@ -27,15 +29,9 @@ class AssetWizardSpec extends GebReportingSpec {
         waitFor {
             viewTitle.text().trim() == 'Asset List'
         }
-
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }
-
     }
 
     def "upload new asset"() {

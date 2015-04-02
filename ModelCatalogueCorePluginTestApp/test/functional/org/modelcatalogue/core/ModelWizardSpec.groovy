@@ -1,14 +1,16 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.ModalTreeViewPage
 import org.openqa.selenium.Keys
 import spock.lang.Stepwise
 
 @Stepwise
-class ModelWizardSpec extends GebReportingSpec {
+class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/model/all"
 
@@ -24,10 +26,6 @@ class ModelWizardSpec extends GebReportingSpec {
             subviewTitle.text()?.trim()  == 'NHIC Datasets FINALIZED'
         }
 
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             addModelButton.displayed
         }
