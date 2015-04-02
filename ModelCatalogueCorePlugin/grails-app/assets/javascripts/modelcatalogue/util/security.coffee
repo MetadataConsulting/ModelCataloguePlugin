@@ -1,23 +1,25 @@
 angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages', 'ui.router']).provider('security', [ ->
   noSecurityFactory = ['$log', ($log) ->
+    defaultUser = -> { displayName: 'Anonymous Curator', username: 'curator' }
     security =
       isUserLoggedIn: -> true
-      getCurrentUser: -> { displayName: 'Anonymous Curator' }
+      getCurrentUser: defaultUser
       hasRole: (role) -> true
       login: (username, password, rememberMe = false) -> security.getCurrentUser()
       logout: -> $log.info "Logout requested on default security service"
-      refreshUserData: ->
+      refreshUserData: defaultUser
       mock: true
   ]
 
   readOnlySecurityFactory = ['$log', ($log) ->
+    defaultUser = -> { displayName: 'Anonymous Viewer', username: 'viewer' }
     security =
       isUserLoggedIn: -> true
-      getCurrentUser: -> { displayName: 'Anonymous Viewer' }
+      getCurrentUser: defaultUser
       hasRole: (role) -> role == 'VIEWER'
       login: (username, password, rememberMe = false) -> security.getCurrentUser()
       logout: -> $log.info "Logout requested on read only security service"
-      refreshUserData: ->
+      refreshUserData: defaultUser
       mock: true
   ]
 
@@ -113,13 +115,13 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
             $q.reject security.getCurrentUser()
 
         refreshUserData: ->
-            currentUserPromise = $http(method: 'GET', url: userUrl)
+          currentUserPromise = $http(method: 'GET', url: userUrl)
 
-            currentUserPromise.then(handleUserResponse).then ->
-              if currentUser
-                $rootScope.$broadcast 'userLoggedIn', currentUser
-                return currentUser
-            return currentUserPromise
+          currentUserPromise.then(handleUserResponse).then ->
+            if currentUser
+              $rootScope.$broadcast 'userLoggedIn', currentUser
+              return currentUser
+          return currentUserPromise
 
       if currentUser
         currentUser.success = true
@@ -141,12 +143,15 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
 
     security = $injector.invoke securityFactory
 
-    throw "security service must not provide requireLogin() method" if angular.isFunction(security.requireLogin)
-    throw "security service must provide isUserLoggedIn() method" if not angular.isFunction(security.isUserLoggedIn)
-    throw "security service must provide getCurrentUser() method" if not angular.isFunction(security.getCurrentUser)
-    throw "security service must provide hasRole(role) method" if not angular.isFunction(security.hasRole)
-    throw "security service must provide login(username, password, rememberMe) method" if not angular.isFunction(security.login)
-    throw "security service must provide logout() method" if not angular.isFunction(security.logout)
+
+    throw new Error("Security service must not provide requireLogin() method. Factory: #{angular.toJson(securityFactory)}") if angular.isFunction(security.requireLogin)
+    throw new Error("Security service must provide isUserLoggedIn() method. Factory: #{angular.toJson(securityFactory)}") if not angular.isFunction(security.isUserLoggedIn)
+    throw new Error("Security service must provide getCurrentUser() method. Factory: #{angular.toJson(securityFactory)}") if not angular.isFunction(security.getCurrentUser)
+    throw new Error("Security service must provide hasRole(role) method. Factory: #{angular.toJson(securityFactory)}") if not angular.isFunction(security.hasRole)
+    throw new Error("Security service must provide login(username, password, rememberMe) method. Factory: #{angular.toJson(securityFactory)}") if not angular.isFunction(security.login)
+    throw new Error("Security service must provide logout() method. Factory: #{angular.toJson(securityFactory)}") if not angular.isFunction(security.logout)
+
+    security.refreshUserData = -> security.getCurrentUser() if not angular.isFunction(security.refreshUserData)
 
     # add event broadcast on login and logout
     loginFn         = security.login
@@ -170,7 +175,6 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
 
     security.requireLogin = ->
       $rootScope.$broadcast 'event:auth-loginRequired'
-
     security
   ]
 

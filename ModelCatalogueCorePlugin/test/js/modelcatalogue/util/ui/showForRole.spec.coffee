@@ -6,7 +6,7 @@ describe "mc.util.ui.showForRole", ->
     securityProvider.setup ['$log', ($log) ->
       security =
         isUserLoggedIn: -> loggedIn
-        getCurrentUser: -> if loggedIn then { displayName: 'Horrible Monster', hasRole: (role) -> role == 'VIEWER' } else undefined
+        getCurrentUser: -> if loggedIn then { displayName: 'Horrible Monster', username: 'hmonster', hasRole: (role) -> role == 'VIEWER' } else undefined
         hasRole: (role) -> loggedIn and role == 'VIEWER'
         login: (username, password, rememberMe = false) -> loggedIn = true ; security.getCurrentUser()
         logout: -> loggedIn = false ; $log.info "Logout requested on custom security service"
