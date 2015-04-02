@@ -161,8 +161,11 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
           if user.username
             $rootScope.$broadcast 'userLoggedIn', user
             return user
-          else
+          else if angular.isFunction(security.refreshUserData)
             return security.refreshUserData()
+          else
+            $log.warn "got wrong user object and don't know how to handle it", user
+            return $q.reject user
         else
           $log.warn "login finished with errors", user.errors
           return $q.reject user
