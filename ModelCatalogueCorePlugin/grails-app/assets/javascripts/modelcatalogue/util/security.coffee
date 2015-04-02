@@ -110,15 +110,20 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
               return security.getCurrentUser()
             $q.reject security.getCurrentUser()
 
+        refreshUserData: ->
+            currentUserPromise = $http(method: 'GET', url: userUrl)
+
+            currentUserPromise.then(handleUserResponse).then ->
+              if currentUser
+                $rootScope.$broadcast 'userLoggedIn', currentUser
+                return currentUser
+            return currentUserPromise
+
       if currentUser
         currentUser.success = true
         handleUserResponse data: currentUser
       else
-        currentUserPromise = $http(method: 'GET', url: userUrl)
-
-        currentUserPromise.then(handleUserResponse).then ->
-          if currentUser
-            $rootScope.$broadcast 'userLoggedIn', currentUser
+        security.refreshUserData()
 
       return security
     ]
@@ -146,8 +151,11 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
     security.login  = (username, password, rememberMe) ->
       $q.when(loginFn(username, password, rememberMe)).then (user) ->
         if not user.errors
-          $rootScope.$broadcast 'userLoggedIn', user
-          return user
+          if user.username
+            $rootScope.$broadcast 'userLoggedIn', user
+            return user
+          else
+            return security.refreshUserData()
         else
           $log.warn "login finished with errors", user.errors
           return $q.reject user
