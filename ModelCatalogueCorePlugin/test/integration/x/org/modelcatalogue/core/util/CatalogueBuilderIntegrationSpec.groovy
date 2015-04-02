@@ -4,6 +4,8 @@ import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import spock.lang.Ignore
+import spock.lang.Issue
 
 class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
@@ -658,6 +660,45 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         expect:
         model.modelCatalogueId == "http://www.example.com/classification/m/Model_ID"
+    }
+
+    @Ignore
+    @Issue("MET-587")
+    def "remove child model when missing"() {
+        when:
+        build {
+            classification(name: "C4RMC") {
+                model (name: 'C4RMC Parent') {
+                    model (name: 'C4RMC Child 1')
+                    model (name: 'C4RMC Child 2')
+                }
+            }
+        }
+
+        Classification c4rmc = Classification.findByName('C4RMC')
+        Model c4rmcParent = Model.findByName('C4RMC Parent')
+        then:
+        c4rmc
+        c4rmcParent
+        c4rmcParent.countParentOf() == 2
+
+        when:
+        elementService.finalizeElement(c4rmc)
+        c4rmc.status == ElementStatus.FINALIZED
+
+        build {
+            classification(name: "C4RMC") {
+                model (name: 'C4RMC Parent') {
+                    model (name: 'C4RMC Child 2')
+                }
+            }
+        }
+
+        Model draft = Model.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
+
+        then:
+        draft
+        draft.countParentOf() == 1
     }
 
 }
