@@ -27,8 +27,6 @@ class ClassificationWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "add new classification"() {
-        int initialSize = $('.inf-table tbody .inf-table-item-row').size()
-
         when:
         actionButton('create-catalogue-element', 'list').click()
 
@@ -81,7 +79,7 @@ class ClassificationWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == initialSize + 1
+            infTableCell(1, 2, text: 'New Classification').displayed
         }
 
     }

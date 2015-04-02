@@ -33,6 +33,10 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         $("div.modal").find("#username").value(user)
         $("div.modal").find("#password").value(pwd)
         $("div.modal").find("button.btn-success").click()
+
+        waitFor {
+            !$("div.login-modal-prompt").displayed
+        }
     }
 
     boolean waitUntilModalClosed(int timeout = 10) {

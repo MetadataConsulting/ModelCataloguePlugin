@@ -28,7 +28,6 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "create enum"() {
-        int initialSize = $('.inf-table tbody .inf-table-item-row').size()
 
         when:
         actionButton('create-catalogue-element', 'list').click()
@@ -53,12 +52,11 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == initialSize + 1
+            infTableCell(1, 1, text: 'New Enum Type').displayed
         }
     }
 
     def "create standard"() {
-        int initialSize = $('.inf-table tbody .inf-table-item-row').size()
 
         when:
         actionButton('create-catalogue-element', 'list').click()
@@ -75,7 +73,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == initialSize + 1
+            infTableCell(1, 1, text: 'New Data Type').displayed
         }
     }
 
