@@ -151,45 +151,6 @@ log4j = {
 }
 grails.views.gsp.encoding = "UTF-8"
 
-elasticSearch.client.mode = 'local'
-elasticSearch.index.store.type = 'memory' // store local node in memory and not on disk
-elasticSearch.datastoreImpl = 'hibernateDatastore'
-
-modelcatalogue.defaults.relationshiptypes =  [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
-String minOccursString = ext['Min Occurs']
-String maxOccursString = ext['Max Occurs']
-
-Integer minOccurs = minOccursString in ['unbounded', 'null', '*', null] ? 0 : (minOccursString as Integer)
-Integer maxOccurs = maxOccursString in ['unbounded', 'null', '*', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
-
-if (minOccurs != null) {
-    if (minOccurs < 0) {
-        return false
-    }
-    if (maxOccurs != null && maxOccurs < minOccurs) {
-        return false
-    }
-} else {
-    if (maxOccurs != null && maxOccurs < 1) {
-        return false
-    }
-}
-
-return true
-        ''', versionSpecific: true],
-        [name: 'base', sourceToDestination: 'is base for', destinationToSource: 'is based on', sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class"],
-        [name: "attachment", sourceToDestination: "has attachment of", destinationToSource: "is attached to", sourceClass: CatalogueElement, destinationClass: Asset],
-        [name: "hierarchy", sourceToDestination: "parent of", destinationToSource: "child of", sourceClass: Model, destinationClass: Model, versionSpecific: true],
-        [name: "supersession", sourceToDestination: "superseded by", destinationToSource: "supersedes", sourceClass: CatalogueElement, destinationClass: CatalogueElement, rule: "source.class == destination.class", system: true, versionSpecific: true],
-        [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true],
-        [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true, rule: "source.class == destination.class"],
-        [name: "favourite", sourceToDestination: "favourites", destinationToSource: "is favourite of", sourceClass: User, destinationClass: CatalogueElement, system: true],
-        [name: "classification", sourceToDestination: "classifies", destinationToSource: "classifications", sourceClass: Classification, destinationClass: CatalogueElement, versionSpecific: true],
-        [name: "classificationFilter", sourceToDestination: "used as filter by", destinationToSource: "filtered by", sourceClass: Classification, destinationClass: User, system: true],
-
-]
-
 // configure the default storage
 modelcatalogue.storage.directory = "/tmp/modelcatalogue/storage"
 modelcatalogue.storage.maxSize = 50 * 1024 * 1024

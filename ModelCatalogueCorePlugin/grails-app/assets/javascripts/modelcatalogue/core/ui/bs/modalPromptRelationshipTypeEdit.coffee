@@ -50,6 +50,14 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
                 </label>
               </div>
               <div class="form-group">
+                <label for="sourceToDestinationDescription">Source to Destination Description</label>
+                <textarea rows="10" ng-model="copy.sourceToDestinationDescription" placeholder="Source to Destination Description" class="form-control" id="sourceToDestinationDescription"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="destinationToSourceDescription">Destination to Source Description</label>
+                <textarea rows="10" ng-model="copy.destinationToSourceDescription" placeholder="Destination to Source Description" class="form-control" id="destinationToSourceDescription"></textarea>
+              </div>
+              <div class="form-group">
                 <label for="metadataHits" class="">Metadata Hints</label>
                 <input type="text" class="form-control" id="metadataHits" placeholder="Metadata hints separated by comma" ng-model="copy.metadataHints">
               </div>
