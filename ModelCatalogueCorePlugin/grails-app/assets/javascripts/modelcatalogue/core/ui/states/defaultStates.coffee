@@ -573,7 +573,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 .run(['$templateCache', ($templateCache) ->
 
     $templateCache.put 'modelcatalogue/core/ui/omnisearch.html', '''
-    <form class="navbar-form navbar-right navbar-input-group search-form hidden-xs" role="search" autocomplete="off" ng-submit="search()" ng-controller="defaultStates.searchCtrl">
+    <form show-if-logged-in class="navbar-form navbar-right navbar-input-group search-form hidden-xs" role="search" autocomplete="off" ng-submit="search()" ng-controller="defaultStates.searchCtrl">
         <a ng-click="clearSelection()" ng-class="{'invisible': !$stateParams.q}" class="clear-selection btn btn-link"><span class="glyphicon glyphicon-remove"></span></a>
         <div class="form-group">
             <input

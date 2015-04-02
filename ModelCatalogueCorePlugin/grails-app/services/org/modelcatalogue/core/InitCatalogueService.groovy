@@ -84,13 +84,14 @@ class InitCatalogueService {
             RelationshipType existing = RelationshipType.readByName(definition.name)
             if (!existing) {
                 RelationshipType type = new RelationshipType(definition)
-                type.save(flush: true)
+                type.save(failOnError: true, flush: true)
 
                 if (type.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Cannot create relationship type $definition.name", type.errors))
                 }
-            } else if (definition.rule && definition.rule.replaceAll(/\s+/, ' ').trim() != existing.rule?.replaceAll(/\s+/, ' ')?.trim()) {
-                log.warn("""
+            } else {
+                if (definition.rule && definition.rule.replaceAll(/\s+/, ' ').trim() != existing.rule?.replaceAll(/\s+/, ' ')?.trim()) {
+                    log.warn("""
                     Your current rule for relationship type '${existing.name}' is different than the one from configuration. This may cause unexpected behaviour:
                     ===EXPECTED'${existing.name}'===
                     ${definition.rule.trim()}
@@ -98,6 +99,15 @@ class InitCatalogueService {
                     ${existing.rule.trim()}
                 """.stripIndent())
 
+                }
+                if (!existing.sourceToDestinationDescription && definition.sourceToDestinationDescription) {
+                    existing.sourceToDestinationDescription = definition.sourceToDestinationDescription
+                    existing.save(failOnError: true)
+                }
+                if (!existing.destinationToSourceDescription && definition.destinationToSourceDescription) {
+                    existing.destinationToSourceDescription = definition.destinationToSourceDescription
+                    existing.save(failOnError: true)
+                }
             }
         }
     }

@@ -66,6 +66,10 @@ class Relationship implements Extendible<RelationshipMetadata> {
         classification nullable: true
     }
 
+    static mapping = {
+        extensions lazy: false, sort: 'orderIndex'
+    }
+
     String toString() {
         "${getClass().simpleName}[id: ${id}, source: ${source}, destination: ${destination}, type: ${relationshipType?.name}]"
     }

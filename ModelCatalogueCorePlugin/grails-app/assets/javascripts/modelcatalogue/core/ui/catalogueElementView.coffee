@@ -253,6 +253,8 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
               continue
             if enhance.isEnhancedBy(obj, 'listReference')
               continue
+            if enhance.isEnhancedBy(obj, 'orderedMap')
+              continue
             if (angular.isObject(obj) and !angular.isArray(obj) and !enhance.isEnhanced(obj))
               continue
             newProperties.push(label: names.getNaturalName(prop), value: getPropertyVal(prop))

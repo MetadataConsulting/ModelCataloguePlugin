@@ -70,7 +70,7 @@ describe "mc.util.security", ->
       securityProvider.setup ['$log', ($log) ->
         security =
           isUserLoggedIn: -> true
-          getCurrentUser: -> { displayName: 'Horrible Monster', hasRole: (role) -> role == 'BOO' }
+          getCurrentUser: -> { displayName: 'Horrible Monster', username: 'hmonster', hasRole: (role) -> role == 'BOO' }
           hasRole: (role) -> role == 'BOO'
           login: (username, password, rememberMe = false) -> security.getCurrentUser()
           logout: -> $log.info "Logout requested on custom security service"

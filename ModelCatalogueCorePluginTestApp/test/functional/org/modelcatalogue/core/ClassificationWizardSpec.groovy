@@ -1,13 +1,15 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.ClassificationListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class ClassificationWizardSpec extends GebReportingSpec {
+class ClassificationWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/classification/all"
 
@@ -19,20 +21,12 @@ class ClassificationWizardSpec extends GebReportingSpec {
         waitFor(120) {
             viewTitle.text().trim() == 'Classification List'
         }
-
-
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }
     }
 
     def "add new classification"() {
-        int initialSize = $('.inf-table tbody .inf-table-item-row').size()
-
         when:
         actionButton('create-catalogue-element', 'list').click()
 
@@ -85,7 +79,7 @@ class ClassificationWizardSpec extends GebReportingSpec {
 
         then:
         waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == initialSize + 1
+            infTableCell(1, 2, text: 'New Classification').displayed
         }
 
     }

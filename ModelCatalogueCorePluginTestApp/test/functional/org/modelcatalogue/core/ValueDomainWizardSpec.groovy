@@ -1,13 +1,15 @@
     package org.modelcatalogue.core
 
-    import geb.spock.GebReportingSpec
     import org.modelcatalogue.core.pages.ValueDomainPage
     import spock.lang.Stepwise
 
     @Stepwise
-    class ValueDomainWizardSpec extends GebReportingSpec  {
+    class ValueDomainWizardSpec extends AbstractModelCatalogueGebSpec  {
 
         def "login and select Value Domain"() {
+            go "#/"
+            loginAdmin()
+
             when:
             go "#/catalogue/valueDomain/all"
 
@@ -19,11 +21,6 @@
             waitFor {
                 viewTitle.text().trim() == 'Value Domain List'
             }
-
-            when:
-            loginAdmin()
-
-            then:
             waitFor {
                 actionButton('create-catalogue-element', 'list').displayed
             }

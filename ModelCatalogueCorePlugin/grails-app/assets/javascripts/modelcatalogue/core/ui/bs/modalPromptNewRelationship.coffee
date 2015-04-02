@@ -17,6 +17,7 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                 <select id="type" ng-model="relationshipTypeInfo" class="form-control" ng-options="rt as rt.value for rt in relationshipTypes" ng-change="updateInfo(relationshipTypeInfo)">
                   <option value="">-- choose relation --</option>
                 </select>
+                <p class="help-block" ng-if="relationshipTypeInfo.description">{{relationshipTypeInfo.description}}</p>
               </div>
               <div class="panel panel-default" ng-repeat="destination in destinations">
                 <div class="panel-heading">
@@ -117,8 +118,8 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
 
           appendToRelationshipTypes = (result) ->
             for type in result.list
-              outgoing = if args.element.isInstanceOf(type.sourceClass) then {type: type, value: type.sourceToDestination, relation: 'destination',  direction: 'outgoing'}
-              incoming = if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource then {type: type, value: type.destinationToSource, relation: 'source',       direction: 'incoming'}
+              outgoing = if args.element.isInstanceOf(type.sourceClass) then {type: type, value: type.sourceToDestination, relation: 'destination',  direction: 'outgoing', description: type.sourceToDestinationDescription}
+              incoming = if args.element.isInstanceOf(type.destinationClass) and type.sourceToDestination != type.destinationToSource then {type: type, value: type.destinationToSource, relation: 'source', direction: 'incoming', description: type.destinationToSourceDescription}
               $scope.relationshipTypes.push outgoing if outgoing
               $scope.relationshipTypes.push incoming if incoming
 

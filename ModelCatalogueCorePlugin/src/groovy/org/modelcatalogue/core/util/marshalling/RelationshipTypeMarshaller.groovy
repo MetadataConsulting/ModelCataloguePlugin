@@ -22,6 +22,8 @@ class RelationshipTypeMarshaller extends AbstractMarshallers {
                 destinationClass: el.destinationClass,
                 system: el.system,
                 versionSpecific: el.versionSpecific,
+                sourceToDestinationDescription: el.sourceToDestinationDescription,
+                destinationToSourceDescription: el.destinationToSourceDescription,
                 rule: el.rule,
                 bidirectional: el.bidirectional,
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",

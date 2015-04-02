@@ -82,6 +82,7 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
     row
 
   addElements = (elements) ->
+    return if not elements?.length
     $scope.elements ?= []
     $scope.rows     ?= []
 

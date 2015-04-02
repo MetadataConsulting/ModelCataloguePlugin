@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config ['actionsProvider', 'names', (actionsProvider, names)->
+angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
   RESOURCES = [
     'classification'
@@ -13,11 +13,14 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions']).config
     'batch'
   ]
 
-  actionsProvider.registerActionInRole 'navbar-catalogue-elements', actionsProvider.ROLE_NAVIGATION, -> {
-    position:   100
-    abstract:   true
-    label:      'Catalogue'
-  }
+  actionsProvider.registerActionInRole 'navbar-catalogue-elements', actionsProvider.ROLE_NAVIGATION, ['security', (security) ->
+    return undefined if not security.isUserLoggedIn()
+    {
+      position:   100
+      abstract:   true
+      label:      'Catalogue'
+    }
+  ]
 
 
   angular.forEach RESOURCES, (resource, index) ->

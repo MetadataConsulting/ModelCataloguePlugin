@@ -1,13 +1,15 @@
 package org.modelcatalogue.core
 
-import geb.spock.GebReportingSpec
 import org.modelcatalogue.core.pages.MeasurementUnitListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class MeasurementUnitWizardSpec extends GebReportingSpec {
+class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
+        go "#/"
+        loginAdmin()
+
         when:
         go "#/catalogue/measurementUnit/all"
 
@@ -20,10 +22,6 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
             viewTitle.text().trim() == 'Measurement Unit List'
         }
 
-        when:
-        loginAdmin()
-
-        then:
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }
@@ -31,7 +29,6 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
     }
 
     def "create new unit"() {
-        int initialSize = $('.inf-table tbody .inf-table-item-row').size()
 
         when:
         actionButton('create-catalogue-element', 'list').click()
@@ -49,7 +46,7 @@ class MeasurementUnitWizardSpec extends GebReportingSpec {
 
         then:
         waitFor {
-            $('.inf-table tbody .inf-table-item-row').size() == initialSize + 1
+            infTableCell(1, 2, text: 'Foos').displayed
         }
     }
 

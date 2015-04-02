@@ -130,6 +130,7 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
             # this is ignored by binding and handled separately
             $scope.relation.metadata = $scope.metadata
             $scope.relation.__classification = $scope.classification
+            $scope.relation.__oldClassification = args.classification
 
             args.element["#{$scope.direction}Relationships"].add($scope.relationshipType.name, $scope.relation, args.update).then (result) ->
               messages.success('Relationship Updated', "You have updated relationship #{$scope.element.name} #{$scope.relationshipTypeInfo.value} #{$scope.relation.name}.")
