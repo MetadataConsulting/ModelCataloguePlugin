@@ -151,8 +151,6 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
     throw new Error("Security service must provide login(username, password, rememberMe) method. Factory: #{angular.toJson(securityFactory)}") if not angular.isFunction(security.login)
     throw new Error("Security service must provide logout() method. Factory: #{angular.toJson(securityFactory)}") if not angular.isFunction(security.logout)
 
-    security.refreshUserData = -> security.getCurrentUser() if not angular.isFunction(security.refreshUserData)
-
     # add event broadcast on login and logout
     loginFn         = security.login
     security.login  = (username, password, rememberMe) ->
