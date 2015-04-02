@@ -126,9 +126,9 @@ class Relationship implements Extendible<RelationshipMetadata> {
     @Override
     RelationshipMetadata updateExtension(RelationshipMetadata old, String value) {
         if (old.extensionValue == value) {
-            old.index = System.currentTimeMillis()
+            old.orderIndex = System.currentTimeMillis()
             FriendlyErrors.failFriendlySaveWithoutFlush(old)
-            return
+            return old
         }
         old.extensionValue = value
         if (old.validate()) {

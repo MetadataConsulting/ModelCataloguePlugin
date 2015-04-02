@@ -11,16 +11,27 @@ import net.sf.jasperreports.export.SimpleExporterInput
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput
 
 import org.hibernate.FetchMode
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.Lists
 import org.springframework.core.io.Resource
 
 
 class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
-	def sessionFactory
-
-	//def relationshipService
 
 	ClassificationController() {
 		super(Classification, false)
+	}
+
+	def activity(Integer max) {
+		params.max = Math.min(max ?: 10, 100)
+		Classification element = queryForResource(params.id)
+		if (!element) {
+			notFound()
+			return
+		}
+
+		respond Lists.wrap(params, "/${resourceName}/${params.id}/activity", auditService.getGlobalChanges(params, ClassificationFilter.includes(element)))
 	}
 
 	def report() {
@@ -123,7 +134,6 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
 	}
 
 	private Collection getModelsForClassification(Long classificationId) {
-		def mapElements= new HashMap()
 		def classificationType = RelationshipType.findByName('classification')
 		def results = Model.createCriteria().list {
 			fetchMode "extensions", FetchMode.JOIN

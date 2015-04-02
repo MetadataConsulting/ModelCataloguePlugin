@@ -398,7 +398,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     ExtensionValue updateExtension(ExtensionValue old, String value) {
-        old.index = System.currentTimeMillis()
+        old.orderIndex = System.currentTimeMillis()
         if (old.extensionValue == value) {
             FriendlyErrors.failFriendlySaveWithoutFlush(old)
             return old
