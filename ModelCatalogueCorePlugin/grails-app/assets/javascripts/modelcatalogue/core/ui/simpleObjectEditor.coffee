@@ -98,7 +98,8 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
         currentHints       = angular.copy(hints ? [])
 
         if isOrderedMap(object)
-          for value in object.values when value.key and !(angular.isFunction(value.value) or angular.isObject(value.value))
+          object.values.push key: '' if object.values .length == 0
+          for value in object.values when !(angular.isFunction(value.value) or angular.isObject(value.value))
             editableProperties.push key: value.key, value: value.value, originalKey: value.key
             remove currentHints, value.key
           $scope.canReorder = true

@@ -72,6 +72,11 @@ class RelationshipService {
             Relationship relationshipInstance = relationshipDefinition.skipUniqueChecking ? null : findExistingRelationship(relationshipDefinition)
 
             if (relationshipInstance) {
+
+                if (relationshipDefinition.metadata) {
+                    relationshipInstance.ext = relationshipDefinition.metadata
+                }
+
                 if (!relationshipDefinition.resetIndices && relationshipInstance.archived == relationshipDefinition.archived) {
                     return relationshipInstance
                 }
