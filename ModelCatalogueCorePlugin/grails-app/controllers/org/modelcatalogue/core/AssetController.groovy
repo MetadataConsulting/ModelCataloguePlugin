@@ -81,6 +81,7 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
 
         if (servingUrl) {
             redirect servingUrl
+            return
         }
 
         Asset asset =  getAssetWithContent(currentAsset)
@@ -113,8 +114,8 @@ class AssetController extends AbstractCatalogueElementController<Asset> {
         }
 
         List<Asset> assets = Asset.where {
-            latestVersionId == currentAsset.latestVersionId && versionNumber < currentAsset.versionNumber
-        }.list()
+            latestVersionId == currentAsset.latestVersionId && versionNumber <= currentAsset.versionNumber
+        }.list(sort: 'versionNumber', order: 'desc')
 
         for (Asset asset in assets) {
             if (modelCatalogueStorageService.exists('assets', "${asset.id}")) {
