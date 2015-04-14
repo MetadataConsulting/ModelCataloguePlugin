@@ -5,6 +5,8 @@ import org.springframework.transaction.TransactionStatus
 
 class Change {
 
+    def auditService
+
     Long latestVersionId
     Long changedId
     Long authorId
@@ -64,7 +66,7 @@ class Change {
         }
 
         Change.withTransaction { TransactionStatus status ->
-            AuditService.mute {
+            auditService.mute {
                 if (type.undo(this)) {
                     undone = true
                     FriendlyErrors.failFriendlySave(this)

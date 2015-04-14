@@ -35,6 +35,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
     @Autowired ExecutorService executorService
     @Autowired LinkGenerator linkGenerator
     @Autowired AssetService assetService
+    @Autowired AuditService auditService
     @Autowired SecurityService modelCatalogueSecurityService
 
     XLSXListRenderer() {

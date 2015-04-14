@@ -22,6 +22,7 @@ class ActionService {
     ExecutorService executorService
     @Autowired AutowireCapableBeanFactory autowireBeanFactory
     @Autowired SecurityService modelCatalogueSecurityService
+    @Autowired AuditService auditService
 
 
     /**
@@ -131,7 +132,7 @@ class ActionService {
         }
         if (async) {
             Long authorId = modelCatalogueSecurityService.currentUser?.id
-            return executorService.submit({ AuditService.withDefaultAuthorId(authorId, job) } as Callable<ActionResult>)
+            return executorService.submit({ auditService.withDefaultAuthorId(authorId, job) } as Callable<ActionResult>)
         }
         FutureTask<ActionResult> task = new FutureTask(job)
         task.run()

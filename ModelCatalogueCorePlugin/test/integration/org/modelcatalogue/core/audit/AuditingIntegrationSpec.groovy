@@ -455,7 +455,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     }
 
     def "auditing can be disabled"() {
-        DataType type = AuditService.mute {
+        DataType type = auditService.mute {
              new DataType(name: 'DT4DIS', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
 
@@ -465,7 +465,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "you can set default author id"() {
         def defaultAuthorId = 1234567890
-        DataType type = AuditService.withDefaultAuthorId(defaultAuthorId) {
+        DataType type = auditService.withDefaultAuthorId(defaultAuthorId) {
             new DataType(name: 'DT4DA', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
 

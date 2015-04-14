@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.audit
 
-import grails.gorm.DetachedCriteria
 import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
@@ -28,7 +27,7 @@ class AuditService {
      * @param noAuditBlock code to be executed without logging the changes
      * @return the value returned from the noAuditBlock
      */
-    static <R> R mute(Closure<R> noAuditBlock) {
+    public <R> R mute(Closure<R> noAuditBlock) {
         SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
         Auditor auditor = auditor.get()
         Boolean currentSystem = auditor.system
@@ -48,7 +47,7 @@ class AuditService {
      * @param withDefaultAuthorBlock code to be executed with default author
      * @return the value returned from the withDefaultAuthor
      */
-    static <R> R withDefaultAuthorId(Long defaultAuthorId, Closure<R> withDefaultAuthorBlock) {
+    public <R> R withDefaultAuthorId(Long defaultAuthorId, Closure<R> withDefaultAuthorBlock) {
         SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
         Auditor auditor = auditor.get()
         Long currentDefault = auditor.defaultAuthorId
@@ -69,7 +68,7 @@ class AuditService {
      * @param withParentBlock code to be executed with given parent change
      * @return the value returned from the withDefaultAuthor
      */
-    static <R> R withParentId(Long parentId, Closure<R> withParentBlock) {
+    public <R> R withParentId(Long parentId, Closure<R> withParentBlock) {
         SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
         Auditor auditor = auditor.get()
         Long currentParent = auditor.parentChangeId
@@ -81,7 +80,7 @@ class AuditService {
         return result
     }
 
-    static <R> R withDefaultAuthorAndParentAction(Long defaultAuthorId, Long parentId, Closure<R> withDefaultAuthorBlock) {
+    public <R> R withDefaultAuthorAndParentAction(Long defaultAuthorId, Long parentId, Closure<R> withDefaultAuthorBlock) {
         SessionFactory sessionFactory = Holders.applicationContext.sessionFactory
         Auditor auditor = auditor.get()
 
