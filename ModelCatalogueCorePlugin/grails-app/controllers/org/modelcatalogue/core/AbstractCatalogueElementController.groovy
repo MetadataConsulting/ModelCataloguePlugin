@@ -235,7 +235,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             RelationshipDefinitionBuilder definition = outgoing ? RelationshipDefinition.create(source, destination, relationshipType) : RelationshipDefinition.create(destination, source, relationshipType)
 
-            definition.withClassification(classification).withMetadata(objectToBind.metadata ?: [:])
+            definition.withClassification(classification).withMetadata(OrderedMap.fromJsonMap(objectToBind.metadata ?: [:]))
 
             Relationship rel = relationshipService.link(definition.definition)
 
