@@ -30,8 +30,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
               <properties-pane id="{{tab.name}}-enums"    item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'enumerations'"                                      title="Value" value-title="Description"></properties-pane>
               <properties-pane id="{{tab.name}}-objects"  item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name != 'properties' &amp;&amp; tab.name != 'enumerations' " title="Key"   value-title="Value"></properties-pane>
               <properties-pane id="{{tab.name}}-props"    item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'properties'"></properties-pane>
-              <infinite-table  id="{{tab.name}}-changes"  list="tab.value" is-sortable="isTableSortable(tab)" reorder="reorder(tab, $row, $current)" columns="tab.columns" actions="tab.actions" ng-switch-when="decorated-list" ng-if="tab.name != 'history'"></infinite-table>
-              <catalogue-element-treeview  no-resize id="{{tab.name}}-table"    list="tab.value" descend="'changes'" ng-switch-when="decorated-list" ng-if="tab.name == 'history'" ></catalogue-element-treeview>
+              <infinite-table  id="{{tab.name}}-table"    list="tab.value" is-sortable="isTableSortable(tab)" reorder="reorder(tab, $row, $current)" columns="tab.columns" actions="tab.actions" ng-switch-when="decorated-list"></infinite-table>
             </div>
       </div>
     </div>
