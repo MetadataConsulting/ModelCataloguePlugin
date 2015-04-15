@@ -1,6 +1,8 @@
 package org.modelcatalogue.core
 
 import com.google.common.base.Function
+import com.google.common.collect.Collections2
+import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.publishing.DraftContext
