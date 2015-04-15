@@ -8,4 +8,20 @@
 #= require google-diff-match-patch/javascript/diff_match_patch
 #= require angular-diff-match-patch.js
 
+#= require_self
 #= require_full_tree .
+
+modules = [
+  'ui.bootstrap'
+  'angular-loading-bar'
+  'ngAnimate'
+]
+
+modelcatalogue =
+  # registers module which should be loaded with the application
+  registerModule: (extension) -> modules.push extension
+  # copy of the registered modules
+  getModules: -> angular.copy modules
+
+
+window.modelcatalogue = modelcatalogue

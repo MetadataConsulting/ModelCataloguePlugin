@@ -59,7 +59,7 @@
 
         <!-- code -->
         <asset:stylesheet href="modelcatalogue.css"/>
-        <asset:javascript src="modelcatalogue.js"/>
+        <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
     </g:if>
     <g:else>
         <asset:stylesheet href="bootstrap/dist/css/bootstrap.css"/>
@@ -75,7 +75,7 @@
         <asset:javascript src="angular-cookies/angular-cookies.js"/>
         <asset:javascript src="angular-sanitize/angular-sanitize.js"/>
         <asset:javascript src="angular-animate/angular-animate.js"/>
-        <asset:javascript src="modelcatalogue.js"/>
+        <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
     </g:else>
     <script type="text/javascript">
         var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security']);
@@ -97,7 +97,11 @@
                 </sec:ifLoggedIn>
             })
         }]);
-        demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core')
+        demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core');
+        modelcatalogue.registerModule('demo.config');
+
+        // create an app module based on registered modules
+        angular.module('metadataCurator', window.modelcatalogue.getModules())
     </script>
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
         <script type="text/javascript">

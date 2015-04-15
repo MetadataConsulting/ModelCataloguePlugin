@@ -79,3 +79,5 @@ angular.module('mc.core.ui.bs', [
           element.show()
         e.preventDefault()
 ]
+
+window.modelcatalogue.registerModule 'mc.core.ui.bs'
