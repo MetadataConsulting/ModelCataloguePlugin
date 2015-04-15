@@ -1,7 +1,3 @@
-#= require_self
-#= require defaultStates
-
-
 angular.module('mc.core.ui.states', [
   # depends on
   'mc.util'

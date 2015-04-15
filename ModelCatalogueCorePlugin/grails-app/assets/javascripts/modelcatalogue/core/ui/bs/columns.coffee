@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvider', 'names', (columnsProvider, names)->
+angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvider', (columnsProvider)->
 
 
   idNameAndDescription = -> [
@@ -72,6 +72,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   printMetadata = (relationship) ->
     result  = ''
     ext     = relationship?.ext ? {values: []}
+    ext.values = ext.values ? []
     for row in ext.values
       result += "#{row.key}: #{row.value ? ''}\n"
     result

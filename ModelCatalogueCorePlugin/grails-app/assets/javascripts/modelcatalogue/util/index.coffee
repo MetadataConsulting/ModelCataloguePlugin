@@ -1,12 +1,3 @@
-#= require_self
-#= require rest
-#= require enhance
-#= require delayedQueueExecutor
-#= require recursiveCompile
-#= require names
-#= require messages
-#= require security
-
 angular.module 'mc.util', [
   # list of modules
   'mc.util.enhance'

@@ -1,21 +1,3 @@
-#= require_self
-#= require modelcatalogue/util/index
-#= require catalogueElementEnhancer
-#= require catalogueElementResource
-#= require catalogue
-#= require listEnhancer
-#= require actionEnhancer
-#= require dateEnhancer
-#= require elementEnhancer
-#= require listReferenceEnhancer
-#= require modelCatalogueApiRoot
-#= require removableItemEnhancer
-#= require actionableItemEnhancer
-#= require modelCatalogueSearch
-#= require modelCatalogueDataArchitect
-#= require orderedMapEnhancer
-
-
 angular.module 'mc.core', [
   # depends on util
   'mc.util'

@@ -174,7 +174,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
             !modalDialog.find("#remove-tag-0").displayed
         }
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('All Classifications')
+            $('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('All Classifications')
         }
 
     }
