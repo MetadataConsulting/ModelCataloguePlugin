@@ -111,9 +111,16 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     if $scope.resource == 'model'
       if $rootScope.$$lastModels and $rootScope.$$lastModels[getLastModelsKey()]
-        $scope.element                = $rootScope.$$lastModels[getLastModelsKey()]?.element
-        $scope.elementSelectedInTree  = $rootScope.$$lastModels[getLastModelsKey()]?.elementSelectedInTree
-        $scope.property               = $rootScope.$$lastModels[getLastModelsKey()]?.property
+        if $rootScope.$$lastModels[getLastModelsKey()].element
+          $rootScope.$$lastModels[getLastModelsKey()].element.refresh().then (element) ->
+            $scope.element                = element
+            $scope.elementSelectedInTree  = $rootScope.$$lastModels[getLastModelsKey()]?.elementSelectedInTree
+            $scope.property               = $rootScope.$$lastModels[getLastModelsKey()]?.property
+          , ->
+            $scope.element                = if list.size > 0 then list.list[0]
+            $scope.elementSelectedInTree  = false
+            $scope.property               = 'contains'
+
       else
         $rootScope.$$lastModels       = {}
         $scope.elementSelectedInTree  = false
@@ -121,7 +128,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         $scope.property               =  'contains'
 
 
-      $scope.$on 'treeviewElementSelected', (event, element) ->
+      $scope.$on 'treeviewElementSelected', (event, element, id) ->
+        return unless id is 'model-treeview'
         $scope.element                  = element
         $scope.elementSelectedInTree    = true
         $rootScope.$$lastModels ?= {}
@@ -556,6 +564,10 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     $rootScope.$on 'resourceNotFound', ->
       messages.error 'Selected resource cannot be found in the catalogue.'
+      if $stateParams.resource
+        $state.go 'mc.resource.list', resource: $stateParams.resource
+      else
+        $state.go 'dashboard'
   ])
 
 .run(['$templateCache', ($templateCache) ->
@@ -623,7 +635,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
           <h2>
             <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
           </h2>
-          <catalogue-element-treeview list="list" descend="'parentOf'"></catalogue-element-treeview>
+          <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
         </div>
         <div class="col-md-8" ng-if="element">
           <catalogue-element-view element="element" property="property"></catalogue-element-view>

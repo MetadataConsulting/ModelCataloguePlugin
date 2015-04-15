@@ -6,7 +6,7 @@ angular.module('mc.core.elementEnhancer', ['mc.util.rest', 'mc.util.enhance']).c
         catalogue.isInstanceOf object.elementType, type
       object
 
-      object.getIcon = ->
+      object.getIcon ?= ->
         catalogue.getIcon(@elementType)
 
       object.getElementTypeName = ->

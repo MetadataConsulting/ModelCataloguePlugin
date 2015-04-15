@@ -19,8 +19,10 @@ angular.module('mc.core.ui.catalogueElementProperties', ['mc.util.names']).provi
     old = propertyConfigurationRegistry[name] ? {}
     propertyConfigurationRegistry[name] = angular.extend(angular.copy(old), config)
 
-  catalogueElementPropertiesProvider.$get = ['names', (names) ->
+  catalogueElementPropertiesProvider.$get = ['names', '$filter', (names, $filter) ->
     catalogueElementProperties = {}
+    # shortcut for $filter, especially for columns
+    catalogueElementProperties.filter = (name) -> $filter(name)
     catalogueElementProperties.getConfigurationFor = (name) ->
       propertyName          = names.getPropertyNameFromQualifier(name)
       defaultPropertyConfig = angular.extend({

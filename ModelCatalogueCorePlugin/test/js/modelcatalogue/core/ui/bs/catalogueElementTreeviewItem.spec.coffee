@@ -21,7 +21,7 @@ describe "mc.core.ui.catalogueElementTreeviewItem", ->
     $rootScope.$digest()
 
     expect(element.prop('tagName').toLowerCase()).toBe('li')
-    expect(element.find('span.catalogue-element-treeview-name').text()).toBe("#{catEl.name}")
+    expect(element.find('span.catalogue-element-treeview-name').text()).toBe("#{catEl.name} #{catEl.versionNumber}")
     expect(element.find('span.badge').text()).toBe("#{catEl.valueDomains.total}")
 
 

@@ -56,8 +56,9 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         ->
           $scope.element.$$showingMore = true
           list.next().then (nextList) ->
-            for item in nextList.list when item.relation
-              $scope.element.$$children.push(angular.extend(item.relation, {$$metadata: item.ext, $$localName: getLocalName(item) }))
+            for item in nextList.list
+              it = if item.relation then item.relation else item
+              $scope.element.$$children.push(angular.extend(it, {$$metadata: item.ext, $$localName: getLocalName(item) }))
             $scope.element.$$showMore = createShowMore(nextList)
             loadMoreIfNeeded()
             $scope.element.$$showingMore = false
@@ -69,21 +70,29 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           $scope.element.$$cachedChildren[child.latestVersionId] = child
 
         newChildren = []
-        for item in firstList.list when item.relation
-          cachedChild = $scope.element.$$cachedChildren[item.relation.latestVersionId] ? {}
-
-          if cachedChild.$$collapsed
-            cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
-          else
-            cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+        for item in firstList.list
+          it = if item.relation then item.relation else item
+          id = if it.latestVersionId then it.latestVersionId else it.id
           objectToExtend = {}
-          if cachedChild.id == item.relation.id
-            objectToExtend = cachedChild
-          else
-            for key, prop of cachedChild
-              if key.indexOf('$') == 0
-                objectToExtend[key] = prop
-          newChildren.push(angular.extend(objectToExtend, item.relation, {$$metadata: item.ext, $$localName: getLocalName(item) }))
+
+
+
+          if id
+            cachedChild = $scope.element.$$cachedChildren[id] ? {}
+
+            if cachedChild.$$collapsed
+              cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
+            else
+              cachedChild.$$loadChildren() if angular.isFunction(cachedChild.$$loadChildren)
+
+            if cachedChild.id == it.id
+              objectToExtend = cachedChild
+            else
+              for key, prop of cachedChild
+                if key.indexOf('$') == 0
+                  objectToExtend[key] = prop
+
+          newChildren.push(angular.extend(objectToExtend, it, {$$metadata: item.ext, $$localName: getLocalName(item) }))
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false

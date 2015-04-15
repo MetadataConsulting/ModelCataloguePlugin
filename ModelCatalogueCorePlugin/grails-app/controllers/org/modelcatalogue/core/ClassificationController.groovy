@@ -15,9 +15,6 @@ import org.springframework.core.io.Resource
 
 
 class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
-	def sessionFactory
-
-	//def relationshipService
 
 	ClassificationController() {
 		super(Classification, false)
@@ -123,7 +120,6 @@ class ClassificationController<T> extends AbstractCatalogueElementController<Cla
 	}
 
 	private Collection getModelsForClassification(Long classificationId) {
-		def mapElements= new HashMap()
 		def classificationType = RelationshipType.findByName('classification')
 		def results = Model.createCriteria().list {
 			fetchMode "extensions", FetchMode.JOIN

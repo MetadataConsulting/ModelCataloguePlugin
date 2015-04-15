@@ -84,7 +84,7 @@ class InitCatalogueService {
             RelationshipType existing = RelationshipType.readByName(definition.name)
             if (!existing) {
                 RelationshipType type = new RelationshipType(definition)
-                type.save(failOnError: true)
+                type.save(failOnError: true, flush: true)
 
                 if (type.hasErrors()) {
                     log.error(FriendlyErrors.printErrors("Cannot create relationship type $definition.name", type.errors))

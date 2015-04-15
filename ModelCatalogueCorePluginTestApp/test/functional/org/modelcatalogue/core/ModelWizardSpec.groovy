@@ -126,7 +126,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New").displayed
+            $('span.catalogue-element-treeview-name', text: "New 1").displayed
         }
 
         waitUntilModalClosed(30)
@@ -151,7 +151,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            !$('span.catalogue-element-treeview-name', text: "New").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
+            !$('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
         }
 
         when:
@@ -233,11 +233,11 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Another New").displayed
+            $('span.catalogue-element-treeview-name', text: "Another New 1").displayed
         }
 
         when: "click the footer action"
-        $('span.catalogue-element-treeview-name', text: "Another New").click()
+        $('span.catalogue-element-treeview-name', text: "Another New 1").click()
         tableFooterAction.click()
 
         then: "modal is shown"
@@ -254,7 +254,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then: 'the number of children of Another New must be 1'
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Another New").parent().parent().find('.badge').text() == '1'
+            $('span.catalogue-element-treeview-name', text: "Another New 1").parent().parent().find('.badge').text() == '1'
         }
 
     }
@@ -278,7 +278,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then: "same number of children are still shown"
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "Changed Name").parent().parent().find('.badge').text() == '1'
+            $('span.catalogue-element-treeview-name', text: "Changed Name 1").parent().parent().find('.badge').text() == '1'
         }
     }
 

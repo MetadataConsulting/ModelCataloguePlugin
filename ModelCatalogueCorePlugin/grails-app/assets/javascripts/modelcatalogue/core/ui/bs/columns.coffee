@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.bs.columns', []).config ['columnsProvider', (columnsProvider)->
+angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvider', 'names', (columnsProvider, names)->
 
 
   idNameAndDescription = -> [
