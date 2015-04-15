@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import com.google.common.base.Function
-import com.google.common.collect.Collections2
-import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.publishing.DraftContext
@@ -11,6 +9,7 @@ import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
 import org.modelcatalogue.core.util.builder.RelationshipDefinition
 
@@ -20,7 +19,7 @@ import org.modelcatalogue.core.util.builder.RelationshipDefinition
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class CatalogueElement implements Extendible, Published<CatalogueElement> {
+abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement> {
 
     def grailsLinkGenerator
     def relationshipService
@@ -291,7 +290,9 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
-        this.ext.clear()
+        for (String key in this.ext.keySet() - ext.keySet()) {
+            this.ext.remove key
+        }
         this.ext.putAll(ext)
     }
 
@@ -300,27 +301,31 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
     }
 
     @Override
-    Set<Extension> listExtensions() {
+    Set<ExtensionValue> listExtensions() {
         extensions
     }
 
     @Override
-    Extension addExtension(String name, String value) {
-        ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
-        newOne.save(deepValidate: false)
-        assert !newOne.errors.hasErrors()
-        addToExtensions(newOne)
-        newOne
+    ExtensionValue addExtension(String name, String value) {
+        if (getId() && isAttached()) {
+            ExtensionValue newOne = new ExtensionValue(name: name, extensionValue: value, element: this)
+            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
+            addToExtensions(newOne).save(validate: false)
+            return newOne
+        }
+
+        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
     }
 
     @Override
-    void removeExtension(Extension extension) {
-        if (extension instanceof ExtensionValue) {
-            removeFromExtensions(extension)
-            extension.delete(flush: true)
-        } else {
-            throw new IllegalArgumentException("Only instances of ExtensionValue are supported")
-        }
+    void removeExtension(ExtensionValue extension) {
+        removeFromExtensions(extension).save(validate: false)
+        extension.delete(flush: true)
+    }
+
+    @Override
+    ExtensionValue findExtensionByName(String name) {
+        listExtensions()?.find { it.name == name }
     }
 
     List<Classification> getClassifications() {
@@ -375,4 +380,18 @@ abstract class CatalogueElement implements Extendible, Published<CatalogueElemen
         }
     }
 
+    @Override
+    int countExtensions() {
+        listExtensions()?.size() ?: 0
+    }
+
+    ExtensionValue updateExtension(ExtensionValue old, String value) {
+        old.orderIndex = System.currentTimeMillis()
+        if (old.extensionValue == value) {
+            FriendlyErrors.failFriendlySaveWithoutFlush(old)
+            return old
+        }
+        old.extensionValue = value
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
+    }
 }

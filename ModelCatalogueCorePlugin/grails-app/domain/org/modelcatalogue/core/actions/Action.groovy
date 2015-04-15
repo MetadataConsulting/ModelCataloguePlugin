@@ -5,7 +5,7 @@ import org.modelcatalogue.core.Extension
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 
-class Action implements Extendible {
+class Action implements Extendible<ActionParameter> {
 
     Class<? extends ActionRunner> type
 
@@ -44,26 +44,43 @@ class Action implements Extendible {
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     @Override
-    Set<Extension> listExtensions() {
+    Set<ActionParameter> listExtensions() {
         extensions
     }
 
     @Override
-    Extension addExtension(String name, String value) {
-        ActionParameter newOne = new ActionParameter(name: name, extensionValue: value, action: this)
-        FriendlyErrors.failFriendlySave(newOne)
-        addToExtensions(newOne)
-        newOne
+    ActionParameter addExtension(String name, String value) {
+        if (getId() && isAttached()) {
+            ActionParameter newOne = new ActionParameter(name: name, extensionValue: value, action: this)
+            FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
+            addToExtensions(newOne)
+            return newOne
+        }
+        throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
     }
 
     @Override
-    void removeExtension(Extension extension) {
-        if (extension instanceof ActionParameter) {
-            removeFromExtensions(extension)
-            extension.delete(flush: true)
-        } else {
-            throw new IllegalArgumentException("Only instances of ActionParameter are supported")
-        }
+    void removeExtension(ActionParameter extension) {
+        removeFromExtensions(extension).save()
+        extension.delete(flush: true)
     }
 
+    @Override
+    ActionParameter findExtensionByName(String name) {
+        listExtensions()?.find { it.name == name }
+    }
+
+    @Override
+    int countExtensions() {
+        listExtensions()?.size() ?: 0
+    }
+
+    @Override
+    ActionParameter updateExtension(ActionParameter old, String value) {
+        if (old.extensionValue == value) {
+            return
+        }
+        old.extensionValue = value
+        FriendlyErrors.failFriendlySaveWithoutFlush(old)
+    }
 }

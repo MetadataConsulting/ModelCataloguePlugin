@@ -22,7 +22,7 @@ class MappingService {
             return existing.save(deepValidate: false)
         }
         Mapping newOne = new Mapping(source: source, destination: destination, mapping: mapping)
-        newOne.validate(deepValidate: false)
+        newOne.validate()
 
         if (newOne.hasErrors()) {
             return newOne
