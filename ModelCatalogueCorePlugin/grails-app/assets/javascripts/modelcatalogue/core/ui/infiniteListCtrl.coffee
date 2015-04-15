@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', 'enhance', ($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, enhance) ->
+angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controller 'infiniteListCtrl',  ['$scope', 'columns', '$timeout', '$element', 'modelCatalogueApiRoot', 'actions', '$controller', 'names', 'security', 'enhance',($scope, columns, $timeout, $element, modelCatalogueApiRoot, actions, $controller, names, security, enhance) ->
   angular.extend(this, $controller('columnsSupportCtrl', {$scope: $scope}))
 
   columnsDefined = $scope.columns?
