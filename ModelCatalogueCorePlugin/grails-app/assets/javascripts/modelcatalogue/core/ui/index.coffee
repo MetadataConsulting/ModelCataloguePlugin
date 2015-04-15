@@ -1,26 +1,3 @@
-#= require_self
-#= require modelcatalogue/core/index
-#= require infiniteList
-#= require infiniteTable
-#= require infiniteListCtrl
-#= require columnsSupportCtrl
-#= require catalogueElementView
-#= require csvTransformationView
-#= require batchView
-#= require catalogueElementTreeviewItem
-#= require catalogueElementTreeview
-#= require catalogueElementPicker
-#= require catalogueElementIcon
-#= require catalogueElementProperties
-#= require propertiesPane
-#= require messagesPanel
-#= require columns
-#= require expectCatalogueElement
-#= require columnsConfiguration
-#= require simpleObjectEditor
-#= require elementsAsTags
-#= require diffTable
-
 angular.module('mc.core.ui', [
   # depends on
   'ui.router',
