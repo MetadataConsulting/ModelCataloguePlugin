@@ -2,7 +2,6 @@ package org.modelcatalogue.core
 
 import grails.transaction.Transactional
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.builder.RelationshipDefinition
 import org.modelcatalogue.core.util.builder.RelationshipDefinitionBuilder

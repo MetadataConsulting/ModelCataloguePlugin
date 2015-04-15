@@ -75,7 +75,7 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
             HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
-            executorService.submit {
+            executeInBackground(id, "Imported from Excel") {
                 try {
                     ExcelLoader parser = new ExcelLoader(inputStream)
                     def (headers, rows) = parser.parse()
@@ -94,7 +94,7 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
             populateHeaders(request.JSON.headersMap ?: [:])
-            executorService.submit {
+            executeInBackground(id, "Imported from XML") {
                 try {
                     CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
                     Collection<CatalogueElement> catElements = loader.load(inputStream)
@@ -113,7 +113,7 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             String name = params?.name
             String idpattern = params.idpattern
-            executorService.submit {
+            executeInBackground(id, "Imported from OBO") {
                 try {
                     Classification classification = OBOService.importOntology(inputStream, name, idpattern)
                     Asset updated = finalizeAsset(id)
@@ -132,7 +132,7 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
 
-            executorService.submit {
+            executeInBackground(id, "Imported from LOINC")  {
                 try {
                     Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
                     Asset theAsset = Asset.get(id)
@@ -156,7 +156,7 @@ class DataImportController  {
             def id = asset.id
             InputStream inputStream = file.inputStream
 
-            executorService.submit {
+            executeInBackground(id, "Imported from Model Catalogue DSL")  {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
                     Asset theAsset = Asset.get(id)
@@ -181,7 +181,7 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             String name = params?.name
 
-            executorService.submit {
+            executeInBackground(id, "Imported from Style UML")  {
                 try {
                     Classification classification = Classification.findByName(name)
                     if(!classification) classification =  new Classification(name: name).save(flush:true, failOnError:true)
@@ -280,7 +280,7 @@ class DataImportController  {
         Long id = asset.id
         Boolean createModelsForElements = params.boolean('createModelsForElements')
 
-        executorService.submit {
+        executeInBackground(id, "Rendered Import as Asset") {
             Asset updated = Asset.get(id)
             try {
                 XsdLoader parserXSD = new XsdLoader(inputStream)
@@ -325,5 +325,9 @@ class DataImportController  {
         headersMap.classification = params.classification ?: "Classification"
         headersMap.metadata = params.metadata ?: "Metadata"
         return headersMap
+    }
+
+    protected executeInBackground(Long assetId, String message, Closure code) {
+        executorService.submit(code)
     }
 }
