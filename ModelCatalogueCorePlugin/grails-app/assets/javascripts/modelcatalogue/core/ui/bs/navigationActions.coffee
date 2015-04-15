@@ -149,20 +149,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     action
   ]
 
-
-  actionsProvider.registerActionInRoles 'feed', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTION], ['security', '$state', (security, $state) ->
-    return undefined if not security.isUserLoggedIn()
-
-    {
-      position:   1500
-      label:      'Changes'
-      icon:       'fa fa-rss'
-      action: ->
-        $state.go 'mc.resource.list', resource: 'change'
-
-    }
-  ]
-
   toggleClassification = (global) -> ['security', 'messages', '$scope', 'rest', 'enhance', 'modelCatalogueApiRoot', '$state', '$stateParams', (security, messages, $scope, rest, enhance, modelCatalogueApiRoot, $state, $stateParams) ->
     return undefined if not security.isUserLoggedIn()
 

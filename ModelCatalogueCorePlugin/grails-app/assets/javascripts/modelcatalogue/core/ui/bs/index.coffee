@@ -30,7 +30,6 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.statesActions'
   'mc.core.ui.bs.navigationActions'
   'mc.core.ui.bs.columns'
-  'mc.core.ui.bs.changelogColumns'
   'mc.core.ui.bs.catalogue'
   'mc.core.ui.bs.columnsConfiguration'
   'mc.core.ui.bs.messagesPanel'
