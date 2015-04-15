@@ -2,6 +2,8 @@ package org.modelcatalogue.core
 
 import grails.rest.RestfulController
 import org.modelcatalogue.core.audit.Change
+import org.modelcatalogue.core.security.User
+import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.Lists
 
 import static org.springframework.http.HttpStatus.*
@@ -58,6 +60,29 @@ class ChangeController extends RestfulController<Change> {
 
         respond Lists.wrap(params, "/change/", auditService.getGlobalChanges(params, classificationService.classificationsInUse))
     }
+
+    def classificationActivity(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        Classification element = Classification.get(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond Lists.wrap(params, "/classification/${params.id}/activity", auditService.getGlobalChanges(params, ClassificationFilter.includes(element)))
+    }
+
+    def userActivity(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        User element = User.get(params.id)
+        if (!element) {
+            notFound()
+            return
+        }
+
+        respond Lists.wrap(params, "/user/${params.id}/activity", auditService.getChangesForUser(params, element))
+    }
+
 
 
 }

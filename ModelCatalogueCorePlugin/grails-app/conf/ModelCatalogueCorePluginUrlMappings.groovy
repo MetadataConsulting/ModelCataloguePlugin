@@ -9,11 +9,6 @@ class ModelCatalogueCorePluginUrlMappings {
         "/catalogue/$resource/$id(.${version})?" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
         "/catalogue/$resource/$id(.${version})?/export" (controller: 'catalogue', action: 'xref', method: HttpMethod.GET)
 
-        "/api/modelCatalogue/core/change/" (controller: 'change', action: 'global', method: HttpMethod.GET)
-        "/api/modelCatalogue/core/change/$id" (controller: 'change', action: 'show', method: HttpMethod.GET)
-        "/api/modelCatalogue/core/change/$id/changes" (controller: 'change', action: 'changes', method: HttpMethod.GET)
-        "/api/modelCatalogue/core/change/$id" (controller: 'change', action: 'undo', method: HttpMethod.DELETE)
-
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
         def catalogueElements = ['asset', 'dataElement', 'model', 'catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
         def allElements       = catalogueElements + resources
@@ -74,7 +69,6 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$controllerName/$id/mapping" (controller: controllerName, action: 'mappings', method: HttpMethod.GET)
 
                 "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
-                "/api/modelCatalogue/core/$controllerName/$id/changes"(controller: controllerName, action: 'changes', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/finalize"(controller: controllerName, action: 'finalizeElement', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
@@ -89,7 +83,6 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$controllerName/$id/report"(controller: controllerName, action: 'report', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/$id/gereport"(controller: controllerName, action: 'gereport', method: HttpMethod.GET)
 					"/api/modelCatalogue/core/$controllerName/$id/gereportDoc"(controller: controllerName, action: 'gereportDoc', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/$controllerName/$id/activity"(controller: controllerName, action: 'activity', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'measurementUnit') {
@@ -106,7 +99,6 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/classifications"(controller: controllerName, action: 'classifications', method: HttpMethod.POST)
-                    "/api/modelCatalogue/core/$controllerName/$id/activity"(controller: controllerName, action: 'activity', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'asset') {
