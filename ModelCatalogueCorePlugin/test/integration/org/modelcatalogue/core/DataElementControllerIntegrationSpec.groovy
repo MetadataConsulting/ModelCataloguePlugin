@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.util.OrderedMap
 
 /**
  * Created by adammilward on 27/02/2014.
@@ -53,7 +54,7 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
         super.customJsonPropertyCheck(item, json)
         checkStringProperty(json.modelCatalogueId , item.modelCatalogueId, "modelCatalogueId")
         checkProperty(json.status , item.status, "status")
-        checkProperty(json.ext, item.ext, "extension")
+        checkProperty(OrderedMap.fromJsonMap(json.ext), item.ext, "extension")
         checkProperty(json.versionNumber , item.versionNumber, "versionNumber")
         return true
     }
@@ -62,7 +63,7 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
     def customJsonPropertyCheck(inputItem, json, outputItem){
         super.customJsonPropertyCheck(inputItem, json, outputItem)
         checkProperty(json.status , outputItem.status, "status")
-        checkMapProperty(json.ext , inputItem.ext, "extension")
+        checkMapProperty(OrderedMap.fromJsonMap(json.ext) , inputItem.ext, "extension")
         checkProperty(json.versionNumber , outputItem.versionNumber, "versionNumber")
         return true
     }
