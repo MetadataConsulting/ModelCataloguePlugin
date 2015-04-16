@@ -19,8 +19,8 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
                 <div class="row">
                   <div class="col-md-12">
                     <div class=" text-center">
-                      <button class="btn btn-primary update-object" ng-disabled="tab.isDirty()" ng-click="tab.update()"><span class="glyphicon glyphicon-ok"></span> Update</button>
-                      <button class="btn btn-default reset-object-changes" ng-disabled="tab.isDirty()" ng-click="tab.reset()"><span class="glyphicon glyphicon-remove"></span> Reset</button>
+                      <button class="btn btn-primary update-object" ng-disabled="!tab.isDirty()" ng-click="tab.update()"><span class="glyphicon glyphicon-ok"></span> Update</button>
+                      <button class="btn btn-default reset-object-changes" ng-disabled="!tab.isDirty()" ng-click="tab.reset()"><span class="glyphicon glyphicon-remove"></span> Reset</button>
                       <br/>
                       <hr/>
                     </div>

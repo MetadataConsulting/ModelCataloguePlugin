@@ -159,6 +159,34 @@
                 $('button.btn-primary.update-object').displayed && $('button.btn-primary.update-object').disabled
             }
 
+            when:
+            3.times {
+                noStale({$('a.soe-remove-row')}) {
+                    it.click()
+                }
+            }
+
+            then:
+            waitFor {
+                !$('button.btn-primary.update-object').disabled
+            }
+
+            when:
+            $('button.btn-primary.update-object').click()
+
+            then:
+            waitFor(30) {
+                $('button.btn-primary.update-object').displayed && $('button.btn-primary.update-object').disabled
+            }
+
+            when:
+            browser.driver.navigate().refresh()
+
+            then:
+            waitFor {
+                $('.soe-table-property-key input').value() == ''
+            }
+
         }
 
         def "validate value"() {

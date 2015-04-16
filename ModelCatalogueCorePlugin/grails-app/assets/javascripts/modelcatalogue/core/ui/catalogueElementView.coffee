@@ -174,7 +174,11 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             original:   angular.copy(obj ? {})
             properties: []
             type:       if security.hasRole('CURATOR') then 'simple-object-editor' else 'properties-pane'
-            isDirty:    -> angular.equals(@original, @value)
+            isDirty:    ->
+              if @value and enhance.isEnhancedBy(@value, 'orderedMap') and @original and enhance.isEnhancedBy(@original, 'orderedMap')
+                return false if angular.equals(@value.values, @original.values)
+                return false if @original.values.length == 0 and @value.values.length == 1 and not @value.values[0].value and not @value.values[0].key
+              !angular.equals(@original, @value)
             reset:      -> @value = angular.copy @original
             update:     ->
               if not resource

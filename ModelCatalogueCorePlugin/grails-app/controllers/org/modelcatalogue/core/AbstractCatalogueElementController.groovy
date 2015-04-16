@@ -460,7 +460,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         bindData(instance, getObjectToBind(), [include: includeParams])
         instance.save flush:true
 
-        if (ext) {
+        if (ext != null) {
             instance.setExt(ext.collectEntries { key, value -> [key, value?.toString() == "null" ? null : value]})
         }
 
