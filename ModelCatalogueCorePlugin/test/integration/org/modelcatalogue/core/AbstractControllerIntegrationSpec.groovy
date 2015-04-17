@@ -207,7 +207,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
         when:
         def loadItemInstance = resource.get(loadItem.id)
-        if(loadItemInstance.status != ElementStatus.DRAFT) {
+        if(loadItemInstance instanceof CatalogueElement && loadItemInstance.status != ElementStatus.DRAFT) {
             loadItemInstance.status = ElementStatus.DRAFT
             FriendlyErrors.failFriendlySave(loadItemInstance)
         }
@@ -238,7 +238,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         instance
 
         when:
-        if (instance.status != ElementStatus.DRAFT) {
+        if (instance instanceof CatalogueElement && instance.status != ElementStatus.DRAFT) {
             instance.status = ElementStatus.DRAFT
             FriendlyErrors.failFriendlySave(instance)
         }
