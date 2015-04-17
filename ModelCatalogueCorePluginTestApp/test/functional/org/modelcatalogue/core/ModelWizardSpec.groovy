@@ -260,7 +260,6 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     def "edit child model"() {
-        actionButton('catalogue-element').click()
         expect:
         actionButton('edit-catalogue-element').displayed
 

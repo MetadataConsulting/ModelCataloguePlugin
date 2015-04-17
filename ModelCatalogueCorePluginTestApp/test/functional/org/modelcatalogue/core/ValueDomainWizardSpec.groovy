@@ -317,7 +317,6 @@
 
             when:
             toggleInfTableRow(1)
-            actionButton('catalogue-element').click()
             actionButton('edit-mapping').click()
 
             then:
@@ -445,7 +444,6 @@
             selectTab('properties')
 
             when: "edit action is clicked"
-            actionButton('catalogue-element').click()
             actionButton('edit-catalogue-element').click()
 
             then: "edit dialog is shown"
