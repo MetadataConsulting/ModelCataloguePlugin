@@ -79,8 +79,7 @@ class DataImportController  {
                 try {
                     ExcelLoader parser = new ExcelLoader(inputStream)
                     def (headers, rows) = parser.parse()
-                    Collection<CatalogueElement> catElements =  dataImportService.importData(headers, rows, headersMap)
-                    makeRelationships(catElements, finalizeAsset(id))
+                    dataImportService.importData(headers, rows, headersMap)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -97,8 +96,7 @@ class DataImportController  {
             executeInBackground(id, "Imported from XML") {
                 try {
                     CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
-                    Collection<CatalogueElement> catElements = loader.load(inputStream)
-                    makeRelationships(catElements, finalizeAsset(id))
+                    loader.load(inputStream)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -135,10 +133,6 @@ class DataImportController  {
             executeInBackground(id, "Imported from LOINC")  {
                 try {
                     Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
-                    Asset theAsset = Asset.get(id)
-                    for (CatalogueElement element in created) {
-                        theAsset.addToRelatedTo(element, skipUniqueChecking: true)
-                    }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
                     classifyAsset(updated, classification)
@@ -221,16 +215,9 @@ class DataImportController  {
         respond "errors": errors
     }
 
-    protected static makeRelationships(Collection<CatalogueElement> catElements, Asset asset){
-        catElements.each{
-            asset.addToRelatedTo(it, skipUniqueChecking: true)
-        }
-    }
-
     protected static classifyAsset(Asset asset, Classification classification){
         if (classification) {
             asset.addToClassifications(classification, skipUniqueChecking: true)
-            asset.addToRelatedTo(classification, skipUniqueChecking: true)
         }
     }
 
@@ -285,13 +272,11 @@ class DataImportController  {
             try {
                 XsdLoader parserXSD = new XsdLoader(inputStream)
                 def (topLevelElements, simpleDataTypes, complexDataTypes, schema, namespaces) = parserXSD.parse()
-                def (classification, conceptualDomain) = XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
+                XSDImportService.createAll(simpleDataTypes, complexDataTypes, topLevelElements, conceptualDomainName, conceptualDomainName, schema, namespaces, createModelsForElements)
                 updated.status = ElementStatus.FINALIZED
                 updated.description = "Your export is ready. Use Download button to view it."
                 updated.ext['Original URL'] = uri
                 updated.save(flush: true, failOnError: true)
-                updated.addToRelatedTo(classification, skipUniqueChecking: true)
-                updated.addToRelatedTo(conceptualDomain, skipUniqueChecking: true)
             } catch (e) {
                 log.error("Error importing schema", e)
                 updated.refresh()
