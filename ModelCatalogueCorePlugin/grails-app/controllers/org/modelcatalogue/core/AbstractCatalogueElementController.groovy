@@ -157,7 +157,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 notFound()
                 return
             }
-            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType) :  relationshipService.unlink(destination, source, relationshipType)
+
+            Classification classification = otherSide.classification ? Classification.get(otherSide.classification.id) : null
+
+            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, classification) :  relationshipService.unlink(destination, source, relationshipType, classification)
             if (!old) {
                 notFound()
                 return

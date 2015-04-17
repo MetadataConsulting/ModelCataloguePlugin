@@ -400,7 +400,6 @@
             waitUntilModalClosed()
             when:
             toggleInfTableRow(1)
-            actionButton('catalogue-element').click()
             actionButton('remove-relationship').click()
 
             then:
@@ -422,7 +421,6 @@
             when:
             selectTab('mappings')
             toggleInfTableRow(1)
-            actionButton('catalogue-element').click()
             actionButton('remove-mapping').click()
 
             then:
