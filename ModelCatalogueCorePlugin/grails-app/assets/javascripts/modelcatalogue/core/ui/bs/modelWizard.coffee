@@ -402,7 +402,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               $q.all promises
 
           $scope.hasMetadata = ->
-            return $scope.metadata.values.length > 0
+            return $scope.metadata.values.length > 0 and $scope.metadata.values[0].key
 
 
           $scope.isModelCatalogueIdValid = ->

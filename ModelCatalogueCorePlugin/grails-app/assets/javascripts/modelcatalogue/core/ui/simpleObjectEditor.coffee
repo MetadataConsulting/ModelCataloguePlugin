@@ -98,7 +98,7 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
         currentHints       = angular.copy(hints ? [])
 
         if isOrderedMap(object)
-          object.values.push key: '' if object.values .length == 0
+          object.values.push key: '' if object.values .length == 0 and (not hints or hints.length == 0)
           for value in object.values when !(angular.isFunction(value.value) or angular.isObject(value.value))
             editableProperties.push key: value.key, value: value.value, originalKey: value.key
             remove currentHints, value.key
@@ -114,7 +114,7 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
           if isOrderedMap(object)
             object.values.push key: hint
 
-        editableProperties.push key: '' if editableProperties.length == 0
+        editableProperties.push key: '' if editableProperties.length == 0 and (not hints or hints.length == 0)
 
         $scope.editableProperties = editableProperties
 
