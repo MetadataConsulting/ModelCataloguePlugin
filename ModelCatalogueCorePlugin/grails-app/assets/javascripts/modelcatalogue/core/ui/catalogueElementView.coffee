@@ -173,7 +173,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             value:      obj ? {}
             original:   angular.copy(obj ? {})
             properties: []
-            type:       if security.hasRole('CURATOR') then 'simple-object-editor' else 'properties-pane'
+            type:       if security.hasRole('CURATOR') and element.status == 'DRAFT' then 'simple-object-editor' else 'properties-pane'
             isDirty:    ->
               if @value and enhance.isEnhancedBy(@value, 'orderedMap') and @original and enhance.isEnhancedBy(@original, 'orderedMap')
                 return false if angular.equals(@value.values, @original.values)

@@ -390,7 +390,6 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected getDefaultSort()  { actionName == 'index' ? 'name'  : null }
     protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
-    def relationshipTypeService
     def classificationService
 
     @Override
@@ -424,6 +423,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         }
 
         def newVersion = params.boolean('newVersion',false)
+
+        if (instance.status.ordinal() >= ElementStatus.FINALIZED.ordinal() && !newVersion) {
+            instance.errors.rejectValue 'status', 'cannot.modify.finalized.or.deprecated', 'Cannot modify element in finalized or deprecated state!'
+            respond instance.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+
         def ext = params?.ext
         def oldProps = new HashMap(instance.properties)
         oldProps.remove('modelCatalogueId')
