@@ -42,6 +42,12 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
   catalogueProvider.getIcon = (type) ->
     readMetadata type, 'icon'
 
+  catalogueProvider.setDeprecationWarning = (type, warningFunction) ->
+    writeMetadata type, 'deprecationWarning', warningFunction
+
+  catalogueProvider.getDeprecationWarning = (type) ->
+    readMetadata type, 'deprecationWarning'
+
   catalogueProvider.setInstanceOf = (type, supertype) ->
     supertypes = angular.copy(readMetadata(supertype, 'supertypes') ? [])
     supertypes.push supertype
@@ -65,6 +71,9 @@ catalogueModule.provider 'catalogue', ['names', (names) ->
 
     catalogue.getIcon = (type) ->
       catalogueProvider.getIcon(type)
+
+    catalogue.getDeprecationWarning = (type) ->
+      catalogueProvider.getDeprecationWarning(type) ? ->
 
     catalogue.isInstanceOf = (type, supertype) -> catalogueProvider.isInstanceOf(type, supertype)
 
