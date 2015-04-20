@@ -153,10 +153,6 @@ class DataImportController  {
             executeInBackground(id, "Imported from Model Catalogue DSL")  {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
-                    Asset theAsset = Asset.get(id)
-                    for (CatalogueElement element in created) {
-                        theAsset.addToRelatedTo(element, skipUniqueChecking: true)
-                    }
                     Asset updated = finalizeAsset(id)
                     Classification classification = created.find { it instanceof Classification } as Classification
                     classifyAsset(updated, classification)
@@ -186,9 +182,6 @@ class DataImportController  {
                     updated.save(flush: true, failOnError: true)
                     updated.addToClassifications(classification, skipUniqueChecking: true)
                     classification.addToClassifies(updated, skipUniqueChecking: true)
-                    if (classification) {
-                        updated.addToRelatedTo(classification, skipUniqueChecking: true)
-                    }
                 } catch (Exception e) {
                     Asset updated = Asset.get(id)
                     updated.refresh()
