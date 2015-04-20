@@ -6,6 +6,7 @@ import groovy.util.slurpersupport.GPathResult
 import org.codehaus.groovy.grails.web.json.JSONElement
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.util.DefaultResultRecorder
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ResultRecorder
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import spock.lang.Shared
@@ -205,6 +206,12 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         json
 
         when:
+        def loadItemInstance = resource.get(loadItem.id)
+        if(loadItemInstance instanceof CatalogueElement && loadItemInstance.status != ElementStatus.DRAFT) {
+            loadItemInstance.status = ElementStatus.DRAFT
+            FriendlyErrors.failFriendlySave(loadItemInstance)
+        }
+
         controller.response.format = "json"
         controller.params.id = loadItem.id
         controller.request.json = json
@@ -216,6 +223,7 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
 
         then:
         updated
+        !updated.errors
         customJsonPropertyCheck instance, updated, resource.get(updated.id)
         resourceCount == totalCount
 
@@ -230,6 +238,11 @@ abstract class AbstractControllerIntegrationSpec<T> extends AbstractIntegrationS
         instance
 
         when:
+        if (instance instanceof CatalogueElement && instance.status != ElementStatus.DRAFT) {
+            instance.status = ElementStatus.DRAFT
+            FriendlyErrors.failFriendlySave(instance)
+        }
+
         controller.request.method = 'PUT'
         controller.response.format = "json"
         controller.params.id = instance.id

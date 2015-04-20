@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
+import org.modelcatalogue.core.util.OrderedMap
 import spock.lang.Unroll
 
 /**
@@ -138,7 +139,7 @@ class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerI
         assert item.versionCreated
         checkStringProperty(json.modelCatalogueId , item.modelCatalogueId, "modelCatalogueId")
         checkProperty(json.status , item.status, "status")
-        checkProperty(json.ext, item.ext, "extension")
+        checkProperty(OrderedMap.fromJsonMap(json.ext), item.ext, "extension")
         checkProperty(json.versionNumber , item.versionNumber, "versionNumber")
         return true
     }
@@ -147,7 +148,7 @@ class AssetControllerIntegrationSpec extends AbstractCatalogueElementControllerI
     def customJsonPropertyCheck(inputItem, json, outputItem){
         super.customJsonPropertyCheck(inputItem, json, outputItem)
         checkProperty(json.status , outputItem.status, "status")
-        checkMapProperty(json.ext , inputItem.ext, "extension")
+        checkMapProperty(OrderedMap.fromJsonMap(json.ext) , inputItem.ext, "extension")
         checkProperty(json.versionNumber , outputItem.versionNumber, "versionNumber")
         return true
     }

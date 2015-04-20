@@ -12,7 +12,7 @@ class OrderedMap {
      */
     static Map<String, Object> toJsonMap(Map<String, String> map) {
         if (!map) {
-            return [:]
+            return [type: 'orderedMap', values: []]
         }
         if (map.type == 'orderedMap') {
             return map

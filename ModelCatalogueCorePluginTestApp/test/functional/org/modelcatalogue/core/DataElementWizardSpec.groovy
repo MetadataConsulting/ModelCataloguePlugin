@@ -85,7 +85,6 @@
         def "Edit the value domain"() {
             waitUntilModalClosed()
             when: "edit action is clicked"
-            actionButton('catalogue-element').click()
             actionButton('edit-catalogue-element').click()
 
             then: "edit dialog is shown"
@@ -112,7 +111,6 @@
         def "Remove the value domain"() {
             waitUntilModalClosed()
             when: "edit action is clicked"
-            actionButton('catalogue-element').click()
             actionButton('edit-catalogue-element').click()
 
             then: "edit dialog is shown"

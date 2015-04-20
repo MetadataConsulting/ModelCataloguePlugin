@@ -38,12 +38,15 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         icon:       catalogue.getIcon(resource)
         position:   index * 100
         label:      label
+        currentStatus: undefined
         action: ->
-          $state.go 'mc.resource.list', {resource: resource}, {inherit: false}
+
+          $state.go 'mc.resource.list', {resource: resource, status: @currentStatus}, {inherit: false}
       }
 
       $scope.$on '$stateChangeSuccess', (ignored, ignoredToState, toParams) ->
         action.active = toParams.resource == resource
+        action.currentStatus = toParams.status if toParams.hasOwnProperty('status')
 
       action
     ]

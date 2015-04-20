@@ -53,10 +53,6 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
              </tr>
              <tr class="actions-row active" ng-repeat-end="" ng-if="row.$$expanded && isNotFiltered(row)">
                 <td class="actions-cell col-md-12" colspan="{{columns.length}}">
-                  <blockquote ng-if="row.element.description || row.element.relation.description" class="preserve-new-lines" ng-bind-html="row.element.description || row.element.relation.description"></blockquote>
-                  <div class="infinite-row-additional-info">
-                    <properties-pane item="row.relation ? row.relation : row.element" properties="row.properties" ng-if="row.properties.length"></properties-pane>
-                  </div>
                   <div class="text-right" ng-if="row.element.relation" ng-init="element = row.element.relation">
                     <span class="pull-left text-muted"><em>Actions for {{row.element.relation.getElementTypeName()}}</em></span>
                     <contextual-actions size="sm" no-colors="true" role="item" no-actions="true"></contextual-actions>
@@ -64,6 +60,10 @@ angular.module('mc.core.ui.bs.infiniteTable', ['mc.core.ui.infiniteTable', 'ngSa
                   <div class="text-right" ng-init="element = row.element">
                     <span class="pull-left text-muted"><em>Actions for {{row.element.getElementTypeName()}}</em></span>
                     <contextual-actions size="sm" no-colors="true" role="item" no-actions="true"></contextual-actions>
+                  </div>
+                  <blockquote ng-if="row.element.description || row.element.relation.description" class="preserve-new-lines" ng-bind-html="row.element.description || row.element.relation.description"></blockquote>
+                  <div class="infinite-row-additional-info">
+                    <properties-pane item="row.relation ? row.relation : row.element" properties="row.properties" ng-if="row.properties.length"></properties-pane>
                   </div>
                 </td>
              </tr>

@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.columnsSupportCtrl', ['mc.core.ui.catalogueElementProperties']).controller 'columnsSupportCtrl',  ['$scope', 'catalogueElementProperties', ($scope, catalogueElementProperties) ->
+angular.module('mc.core.ui.columnsSupportCtrl', ['mc.core.ui.catalogueElementProperties']).controller 'columnsSupportCtrl',  ['$scope', 'catalogueElementProperties', 'catalogue', ($scope, catalogueElementProperties, catalogue) ->
    $scope.evaluateClasses = (classes, element) ->
      if angular.isFunction(classes) then classes(element, catalogueElementProperties) else classes
 
@@ -15,6 +15,7 @@ angular.module('mc.core.ui.columnsSupportCtrl', ['mc.core.ui.catalogueElementPro
 
    $scope.classesForStatus = (element) ->
      status = element?.status ? element?.relation?.status
-     {'warning': status == 'DRAFT', 'info': status == 'PENDING' or element?.parent, 'danger': status == 'DEPRECATED' or element?.undone }
+     target = element?.relation ? element
+     {'warning': status == 'DRAFT' , 'info': status == 'PENDING' or element?.parent, 'danger': status == 'DEPRECATED' or element?.undone, 'info': catalogue.getDeprecationWarning(target?.elementType)(target) }
 
 ]

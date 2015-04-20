@@ -8,7 +8,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
     templateUrl: 'modelcatalogue/core/ui/catalogueElementView.html'
 
-    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, $injector, applicationTitle) ->
+    controller: ['$scope', '$filter', '$q', '$state', 'enhance', 'names', 'columns', 'messages', '$rootScope', 'catalogueElementResource', 'security', 'catalogueElementProperties', '$injector', 'applicationTitle', 'catalogue', ($scope, $filter, $q, $state, enhance, names, columns, messages, $rootScope, catalogueElementResource, security, catalogueElementProperties, $injector, applicationTitle, catalogue) ->
       updateFrom = (original, update) ->
         for originalKey of original
           if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
@@ -173,8 +173,12 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
             value:      obj ? {}
             original:   angular.copy(obj ? {})
             properties: []
-            type:       if security.hasRole('CURATOR') then 'simple-object-editor' else 'properties-pane'
-            isDirty:    -> angular.equals(@original, @value)
+            type:       if security.hasRole('CURATOR') and element.status == 'DRAFT' then 'simple-object-editor' else 'properties-pane'
+            isDirty:    ->
+              if @value and enhance.isEnhancedBy(@value, 'orderedMap') and @original and enhance.isEnhancedBy(@original, 'orderedMap')
+                return false if angular.equals(@value.values, @original.values)
+                return false if @original.values.length == 0 and @value.values.length == 1 and not @value.values[0].value and not @value.values[0].key
+              !angular.equals(@original, @value)
             reset:      -> @value = angular.copy @original
             update:     ->
               if not resource
@@ -295,6 +299,9 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         $scope.tabs = tabs
         $scope.showTabs = showTabs
+
+      $scope.getDeprecationWarning = ->
+        return catalogue.getDeprecationWarning($scope.element.elementType)($scope.element) if $scope.element and $scope.element.elementType
 
       $scope.tabs   = []
       $scope.select = (tab) ->

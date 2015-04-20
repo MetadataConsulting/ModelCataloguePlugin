@@ -74,7 +74,7 @@ class CatalogueElementProxyRepository {
         Map<String, CatalogueElementProxy> byName   = [:]
 
         watch.start('merging proxies')
-        log.info "(1/5) merging proxies"
+        log.info "(1/6) merging proxies"
         for (CatalogueElementProxy proxy in pendingProxies) {
             if (proxy.id) {
                 CatalogueElementProxy existing = byID[proxy.id]
@@ -116,7 +116,7 @@ class CatalogueElementProxyRepository {
         if (!skipDirtyChecking) {
             // Step 1:check something changed this must run before any other resolution happens
             watch.start('dirty checking')
-            log.info "(2/5) dirty checking"
+            log.info "(2/6) dirty checking"
             for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 if (element.changed) {
                     element.requestDraft()
@@ -126,7 +126,7 @@ class CatalogueElementProxyRepository {
 
             // Step 2: if something changed, create new versions. if run in one step, it generates false changes
             watch.start('requesting drafts')
-            log.info "(3/5) requesting drafts"
+            log.info "(3/6) requesting drafts"
             for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 element.createDraftIfRequested()
             }
@@ -137,7 +137,7 @@ class CatalogueElementProxyRepository {
 
         // Step 3: resolve elements (set properties, update metadata)
         watch.start('resolving elements')
-        log.info "(4/5) resolving elements"
+        log.info "(4/6) resolving elements"
         int elNumberOfPositions = Math.floor(Math.log10(elementProxiesToBeResolved.size())) + 2
         elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
             log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving $element"
@@ -148,11 +148,32 @@ class CatalogueElementProxyRepository {
 
         // Step 4: resolve pending relationships
         watch.start('resolving relationships')
-        log.info "(5/5)resolving relationships"
+        log.info "(5/6) resolving relationships"
         int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())) + 2
         relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
             log.debug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
             relationshipProxy.resolve(this)
+        }
+        watch.stop()
+
+        // Step 4: resolve state changes
+        watch.start('resolving state changes')
+        log.info "(6/6) resolving state changes"
+        elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+            log.debug "[${(i + 1).toString().padLeft(elNumberOfPositions, '0')}/${elementProxiesToBeResolved.size().toString().padLeft(elNumberOfPositions, '0')}] Resolving status changes for $element"
+
+            ElementStatus status = element.getParameter('status') as ElementStatus
+            CatalogueElement catalogueElement = element.resolve()
+
+            if (status && catalogueElement.status != status) {
+                if (status == ElementStatus.FINALIZED) {
+                    elementService.finalizeElement(catalogueElement)
+                } else if (status == ElementStatus.DRAFT) {
+                    elementService.createDraftVersion(catalogueElement, DraftContext.userFriendly())
+                } else if (status == ElementStatus.DEPRECATED) {
+                    elementService.archive(catalogueElement)
+                }
+            }
         }
         watch.stop()
 

@@ -35,4 +35,23 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setDefaultSort 'asset',             sort: 'lastUpdated',  order: 'desc'
 
 
+  catalogueProvider.setDeprecationWarning 'valueDomain', (domain) ->
+    ret = []
+    ret.push 'Data Type'        if domain.dataType?.status == 'DEPRECATED'
+    ret.push 'Measurement Unit' if domain.unitOfMeasure?.status == 'DEPRECATED'
+
+    return undefined if ret.length == 0
+    return ret.join(' and ') + " Deprecated"
+
+  catalogueProvider.setDeprecationWarning 'dataElement', (dataElement) ->
+    if dataElement.valueDomain
+      return 'Value Domain Deprecated' if dataElement.valueDomain.status == 'DEPRECATED'
+      valueDomainDeprecation = catalogueProvider.getDeprecationWarning('valueDomain')(dataElement.valueDomain)
+      return "Value Domain uses deprecated #{valueDomainDeprecation}" if valueDomainDeprecation
+
+    return undefined
+
+
+
+
 ]
