@@ -26,7 +26,7 @@ if [ "$TEST_SUITE" = "app_functional" ] ; then
   cp -Rf $HOME/reports/* ./reports/latest/
 
   #add, commit and push files
-  git add -A
+  git add -A .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
 
