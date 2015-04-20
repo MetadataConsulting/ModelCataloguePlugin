@@ -701,4 +701,19 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         draft.countParentOf() == 1
     }
 
+    @Issue("MET-620")
+    def "finalizes model after creation"() {
+        when:
+        build {
+            model(name: 'Parent Model 4 Finalization') {
+                status finalized
+                model(name: 'Child Model 4 Finalization')
+            }
+        }
+        then:
+        noExceptionThrown()
+        Model.findByName('Parent Model 4 Finalization').status == ElementStatus.FINALIZED
+        Model.findByName('Child Model 4 Finalization').status == ElementStatus.FINALIZED
+    }
+
 }

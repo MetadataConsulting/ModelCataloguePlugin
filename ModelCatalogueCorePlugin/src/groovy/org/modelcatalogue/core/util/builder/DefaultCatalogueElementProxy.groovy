@@ -271,6 +271,7 @@ import org.modelcatalogue.core.*
             element.modelCatalogueId = id
         }
         parameters.each { String key, Object value ->
+            if (key == 'status') return
             if (value instanceof CatalogueElementProxy) {
                 element.setProperty(key, value.resolve())
                 return

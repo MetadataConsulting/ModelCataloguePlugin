@@ -34,8 +34,8 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
         try {
             Relationship relationship = repository.resolveRelationship(this)
             if (relationship.hasErrors()) {
-                log.error(FriendlyErrors.printErrors("Cannot create relationship of type  $relationshipTypeName between $sourceElement and $destinationElement", relationship.errors))
-                throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $sourceElement and $destinationElement. Requested source was $source and destination $destination")
+                log.error(FriendlyErrors.printErrors("Cannot create relationship of type  $relationshipTypeName between $source and $destination", relationship.errors))
+                throw new IllegalStateException("Cannot create relationship of type $relationshipTypeName between $source and $destination.")
             }
             if (extensions) {
                 relationship.ext.putAll(extensions)
