@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "$TEST_SUITE" = "app_functional" ] ; then
-  echo -e "Starting to update gh-pages\n"
+  echo "Starting to update gh-pages\n"
 
   #copy data we're interested in to other place
   mkdir -p $HOME/reports/last-tests-reports
@@ -26,9 +26,9 @@ if [ "$TEST_SUITE" = "app_functional" ] ; then
   cp -Rf $HOME/reports/* ./reports/latest/
 
   #add, commit and push files
-  git add -u -f .
+  git add -A .
   git commit -m "Travis build $TRAVIS_BUILD_NUMBER pushed to gh-pages"
   git push -fq origin gh-pages > /dev/null
 
-  echo -e "Done magic with reports\n"
+  echo "Done magic with reports\n"
 fi

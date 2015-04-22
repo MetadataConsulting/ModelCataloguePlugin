@@ -27,6 +27,9 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
             <br ng-show="action.outcome"/>
             <pre ng-show="action.outcome">{{action.outcome}}</pre>
           </alert>
+          <alert type="info" ng-if="loading">
+            <div class="text-center"><span class="fa fa-fw fa-spin fa-refresh"></span></div>
+          </alert>
         </div>
         <div class="col-md-6 performed-actions">
           <h4>Performed Actions</h4>
@@ -48,6 +51,9 @@ angular.module('mc.core.ui.bs.batchView', ['mc.core.ui.batchView',  'mc.core.ui.
             <br ng-show="action.outcome &amp;&amp; action.state == 'FAILED' &amp;&amp; action.message"/>
             <div class="preserve-new-lines" ng-show="action.outcome &amp;&amp; action.state == 'PERFORMED'" ng-bind-html="action.outcome"></div>
             <pre ng-show="action.outcome &amp;&amp; action.state == 'FAILED'">{{action.outcome}}</pre>
+          </alert>
+          <alert type="info" ng-if="loading">
+            <div class="text-center"><span class="fa fa-fw fa-spin fa-refresh"></span></div>
           </alert>
         </div>
       </div>
