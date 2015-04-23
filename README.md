@@ -46,6 +46,7 @@ git --version
 
 All tools should return their versions.
   
+
 ### Launching the application
 
 Model Catalogue provides rich web client which requires some other tools to be installed before launching the application.
