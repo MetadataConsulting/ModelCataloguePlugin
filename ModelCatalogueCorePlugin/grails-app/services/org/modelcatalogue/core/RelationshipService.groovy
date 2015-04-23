@@ -119,9 +119,9 @@ class RelationshipService {
             return relationshipInstance
         }
 
-        relationshipInstance.save(validate: false)
-        relationshipDefinition.source?.addToOutgoingRelationships(relationshipInstance)?.save(validate: false)
-        relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save(validate: false)        
+        relationshipInstance.save(validate: false, flush: true)
+        relationshipDefinition.source?.addToOutgoingRelationships(relationshipInstance)?.save(validate: false, flush: true)
+        relationshipDefinition.destination?.addToIncomingRelationships(relationshipInstance)?.save(validate: false, flush: true)
         auditService.logNewRelation(relationshipInstance)
         
         if (relationshipDefinition.metadata) {
@@ -287,7 +287,7 @@ class RelationshipService {
 
         if (!other) {
             direction.setIndex(relationship, direction.getMinIndexAfter(owner, relationship.relationshipType, Long.MIN_VALUE) - INDEX_STEP)
-            return relationship.save(deepValidate: false)
+            return relationship.save(deepValidate: false, flush: true)
         }
 
         if (!direction.isOwnedBy(owner, relationship)) {
@@ -304,12 +304,12 @@ class RelationshipService {
 
         if (nextIndex == null) {
             direction.setIndex(relationship, direction.getIndex(other) + INDEX_STEP)
-            return relationship.save(deepValidate: false)
+            return relationship.save(deepValidate: false, flush: true)
         }
 
         if (nextIndex - direction.getIndex(other) > 1) {
             direction.setIndex(relationship, direction.getIndex(other) + Math.round((nextIndex.doubleValue() - direction.getIndex(other)) / 2))
-            return relationship.save(deepValidate: false)
+            return relationship.save(deepValidate: false, flush: true)
         }
 
         moveAfterWithRearrange(direction, owner, relationship, other)
