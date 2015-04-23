@@ -26,6 +26,7 @@ plugins{
 You can run the model catalogue application standalone either for development purposes or to setup your own metadata
 registry.
 
+
 ### Requirements
 
 To run application locally you need following installed on your machine 
