@@ -40,6 +40,7 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
         enhancedBy.push(enhancer.name)
         result = enhancer.enhancer(result)
         result.__enhancedBy = enhancedBy
+        result.getEnhancedBy = -> result.__enhancedBy
 
       # and return enhanced value
       result
