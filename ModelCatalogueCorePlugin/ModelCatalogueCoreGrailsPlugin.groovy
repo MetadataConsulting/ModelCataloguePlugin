@@ -58,6 +58,7 @@ Model catalogue core plugin (metadata registry)
 
         xlsxListRenderer(XLSXListRenderer)
         reportsRegistry(ReportsRegistry)
+        jsonMarshallingCustomizerRegistry(JsonMarshallingCustomizerRegistry)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
@@ -67,13 +68,13 @@ Model catalogue core plugin (metadata registry)
                     new DataTypeMarshaller(),
                     new ElementsMarshaller(),
                     new EnumeratedTypeMarshaller(),
-                    new MeasurementUnitMarshallers(),
+                    new MeasurementUnitMarshaller(),
                     new ModelMarshaller(),
                     new RelationshipTypeMarshaller(),
                     new RelationshipMarshallers(),
                     new RelationshipsMarshaller(),
                     new ValueDomainMarshaller(),
-                    new MappingMarshallers(),
+                    new MappingMarshaller(),
                     new MappingsMarshaller(),
                     new ListWithTotalAndTypeWrapperMarshaller(),
                     new BatchMarshaller(),

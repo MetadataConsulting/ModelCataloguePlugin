@@ -8,14 +8,14 @@ import org.modelcatalogue.core.reports.ReportsRegistry
 import org.springframework.beans.factory.annotation.Autowired
 import org.modelcatalogue.core.util.OrderedMap
 
-abstract class CatalogueElementMarshallers extends AbstractMarshallers {
+abstract class CatalogueElementMarshaller extends AbstractMarshaller {
 
     @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
     @Autowired RelationshipService relationshipService
     @Autowired ClassificationService classificationService
 
-    CatalogueElementMarshallers(Class type) {
+    CatalogueElementMarshaller(Class type) {
         super(type)
     }
 

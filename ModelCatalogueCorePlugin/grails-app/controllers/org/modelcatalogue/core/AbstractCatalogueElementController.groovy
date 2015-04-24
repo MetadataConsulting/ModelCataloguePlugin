@@ -5,7 +5,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.*
 import org.modelcatalogue.core.util.builder.RelationshipDefinition
 import org.modelcatalogue.core.util.builder.RelationshipDefinitionBuilder
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.springframework.http.HttpStatus
 
@@ -249,7 +249,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             response.status = HttpServletResponse.SC_CREATED
             RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
 
-            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshallers.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.classification)
+            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.classification)
         }
     }
 

@@ -6,7 +6,7 @@ import org.modelcatalogue.core.util.OrderedMap
 /**
  * Created by ladin on 14.02.14.
  */
-class RelationshipMarshallers extends AbstractMarshallers {
+class RelationshipMarshallers extends AbstractMarshaller {
 
     RelationshipMarshallers() {
         super(Relationship)
@@ -20,13 +20,13 @@ class RelationshipMarshallers extends AbstractMarshallers {
     static Map<String, Object> getRelationshipAsMap(Relationship rel) {
         [
                 id: rel.id,
-                source: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.source),
-                destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.destination),
+                source: CatalogueElementMarshaller.minimalCatalogueElementJSON(rel.source),
+                destination: CatalogueElementMarshaller.minimalCatalogueElementJSON(rel.destination),
                 type: rel.relationshipType.info,
                 archived: rel.archived,
                 ext: OrderedMap.toJsonMap(rel.ext),
                 elementType: Relationship.name,
-                classification: CatalogueElementMarshallers.minimalCatalogueElementJSON(rel.classification)
+                classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(rel.classification)
         ]
     }
 }
