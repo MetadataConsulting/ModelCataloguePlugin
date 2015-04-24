@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 class JsonMarshallingCustomizerRegistry {
 
-    List<JsonMarshallingCustomizer> customizers
+    List<JsonMarshallingCustomizer> customizers = []
 
     def postProcessJson(element, json) {
         def result = json

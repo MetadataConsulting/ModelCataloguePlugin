@@ -8,11 +8,11 @@ import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.audit.ChangeType
 import org.springframework.beans.factory.annotation.Autowired
 
-class ChangeMarshallers extends AbstractMarshallers {
+class ChangeMarshaller extends AbstractMarshaller {
 
     @Autowired AuditService auditService
 
-    ChangeMarshallers() {
+    ChangeMarshaller() {
         super(Change)
     }
 
@@ -41,7 +41,7 @@ class ChangeMarshallers extends AbstractMarshallers {
     private static getPotentiallyDeletedInfo(Long id) {
         CatalogueElement existing = CatalogueElement.get(id)
         if (existing) {
-            return CatalogueElementMarshallers.minimalCatalogueElementJSON(existing)
+            return CatalogueElementMarshaller.minimalCatalogueElementJSON(existing)
         }
 
         Change change = Change.findByChangedIdAndType(id, ChangeType.ELEMENT_DELETED)

@@ -6,7 +6,7 @@ import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipMarshallers
 
 /**
@@ -407,12 +407,12 @@ class DefaultAuditor implements Auditor {
 
     private static objectToStore(Object object) {
         if (object instanceof CatalogueElement) {
-            return CatalogueElementMarshallers.minimalCatalogueElementJSON(object)
+            return CatalogueElementMarshaller.minimalCatalogueElementJSON(object)
         }
         if (object instanceof Mapping) {
             return [
-                    source : CatalogueElementMarshallers.minimalCatalogueElementJSON(object.source),
-                    destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(object.destination),
+                    source : CatalogueElementMarshaller.minimalCatalogueElementJSON(object.source),
+                    destination: CatalogueElementMarshaller.minimalCatalogueElementJSON(object.destination),
                     mapping: object.mapping,
                     id     : object.id
             ]

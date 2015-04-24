@@ -8,6 +8,7 @@ import org.modelcatalogue.core.util.ListWrapper
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
 
 class ModelCatalogueCoreGrailsPlugin {
     // the plugin version
@@ -59,6 +60,7 @@ Model catalogue core plugin (metadata registry)
         xlsxListRenderer(XLSXListRenderer)
         reportsRegistry(ReportsRegistry)
         jsonMarshallingCustomizerRegistry(JsonMarshallingCustomizerRegistry)
+        auditJsonMarshallingCustomizer(AuditJsonMarshallingCustomizer)
 
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
@@ -81,7 +83,7 @@ Model catalogue core plugin (metadata registry)
                     new ActionMarshaller(),
                     new CsvTransformationMarshaller(),
                     new UserMarshaller(),
-                    new ChangeMarshallers(),
+                    new ChangeMarshaller(),
 
             ]
         }

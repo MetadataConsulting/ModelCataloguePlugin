@@ -1,7 +1,5 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.util.GrailsNameUtils
-import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.security.User
 
 class UserMarshaller extends CatalogueElementMarshaller {
@@ -19,8 +17,7 @@ class UserMarshaller extends CatalogueElementMarshaller {
                 enabled: el.enabled,
                 accountExpired: el.accountExpired,
                 accountLocked: el.accountLocked,
-                passwordExpired: el.passwordExpired,
-                activity: [count: auditService.getChangesForUser([:], el).total, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/activity"]
+                passwordExpired: el.passwordExpired
 
         // rename the filteredBy to classifications
         ret.classifications = ret.remove('filteredBy')
