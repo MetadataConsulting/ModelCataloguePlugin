@@ -1,0 +1,156 @@
+package org.modelcatalogue.discourse
+
+import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.security.User
+
+
+class DiscourseService {
+
+    static transactional = false
+
+    def grailsApplication
+
+    String findOrCreateDiscourseCategoryName(Long classificationId) {
+        CategoriesForClassifications classification = CategoriesForClassifications.findByClassificationId(classificationId)
+
+        if (classification) {
+            return classification.discourseCategoryName
+        }
+
+        Classification classificationEntity = Classification.get(classificationId)
+        if (!classificationEntity) {
+            throw new IllegalArgumentException("Classification with ID $classificationId does not exist")
+        }
+
+        if (classificationEntity.latestVersionId) {
+            classification = CategoriesForClassifications.findByClassificationId(classificationEntity.latestVersionId)
+        }
+
+        if (classification) {
+            new CategoriesForClassifications(discourseCategoryName: classification.discourseCategoryName, classificationId: classificationId).save(flush: true)
+            return classification.discourseCategoryName
+        }
+
+        def newClassification = discourse.categories.createCategory(classificationEntity.name, '283890', 'FFFFFF', classificationEntity.description)
+
+        if (newClassification.status == 500) {
+            throw new IllegalArgumentException("Cannot create classification: Discourse Server Error")
+        }
+
+        if (newClassification.data.errors) {
+            if ("Category Name has already been taken" in newClassification.data.errors) {
+                newClassification = discourse.categories.getCategory(classificationEntity.name)
+                if (newClassification.status == 200) {
+                    return new CategoriesForClassifications(discourseCategoryName: classificationEntity.name, classificationId: classificationId).save(flush: true).discourseCategoryName
+                }
+            }
+            throw new IllegalArgumentException("Cannot create classification: ${newClassification.data.errors.join(', ')}")
+        }
+
+        String name = newClassification.data.category.name
+
+        if (!name) {
+            throw new IllegalArgumentException("Unable to get category name from $newClassification")
+        }
+
+        new CategoriesForClassifications(discourseCategoryName: name, classificationId: classificationId).save(flush: true).discourseCategoryName
+    }
+
+    Long findOrCreateDiscourseTopic(Long catalogueElementId) {
+        TopicsForElements topic = TopicsForElements.findByCatalogueElementId(catalogueElementId)
+
+        if (topic) {
+            return topic.topicId
+        }
+
+        CatalogueElement element = CatalogueElement.get(catalogueElementId)
+
+        if (!element) {
+            throw new IllegalArgumentException("Catalogue Elmement with ID $catalogueElementId does not exist")
+        }
+
+        if (element.latestVersionId) {
+            topic = TopicsForElements.findByCatalogueElementId(element.latestVersionId)
+        }
+
+        if (topic) {
+            new TopicsForElements(topicId: topic.topicId, catalogueElementId: catalogueElementId).save(flush: true)
+            return topic.topicId
+        }
+
+        String title = "${element.name} (${GrailsNameUtils.getNaturalName(element.getClass().simpleName)})"
+
+        String categoryName = element.classifications ? findOrCreateDiscourseCategoryName(element.classifications.first().id) : null
+
+        String link = "[Open in Model Catalogue](${element.getDefaultModelCatalogueId(true)} \"$title\")"
+        String description = element.description ? "$element.description\n\n$link" : link
+
+        def newTopic = discourse.topics.createTopic(title, description, categoryName, true)
+
+        if (newTopic.status == 500) {
+            throw new IllegalArgumentException("Cannot create classification: Discourse Server Error")
+        }
+
+        if (newTopic.data.errors) {
+            throw new IllegalArgumentException("Cannot create topic: ${newTopic.data.errors.join(', ')}")
+        }
+
+        Long newTopicId = newTopic.data.topic_id
+
+        if (!newTopicId) {
+            throw new IllegalArgumentException("Unable to get topic id from $newTopic")
+        }
+
+        new TopicsForElements(topicId: newTopicId, catalogueElementId: catalogueElementId).save(flush: true).topicId
+    }
+
+    String ensureUserExistsInDiscourse(User currentUser) {
+        def result = discourse.users.getUser(currentUser.username, [:])
+
+        if (result.status == 200) {
+            if (currentUser.email && result.data.email != currentUser.email) {
+                throw new IllegalArgumentException("Error verifying user: Found user with same username but different email!")
+            }
+            return currentUser.username
+        }
+
+        result = discourse.users.createUser(currentUser.username, currentUser.email ?: getFallbackEmail(currentUser.username), currentUser.username, 'notasecret', true)
+
+        if (result.status == 500) {
+            throw new IllegalArgumentException("Cannot create user: Discourse Server Error")
+        }
+
+        if (result.data.errors) {
+            throw new IllegalArgumentException("Cannot create user: ${result.data.errors.join(', ')}")
+        }
+
+        return currentUser.username
+    }
+
+    private String getFallbackEmail(String username) {
+        notNull(grailsApplication.config.discourse.users.fallbackEmail, "User $username does not have email address set and the fallback email is not set (discourse.users.fallbackEmail in Config.groovy)").replace(":username", username)
+    }
+
+    private String getDiscourseServerUrl() {
+        notNull grailsApplication.config.discourse.url, "Discourse URL not set (discourse.url in Config.groovy)"
+    }
+
+    private String getDiscourseApiUser() {
+        notNull grailsApplication.config.discourse.api.user, "Discourse API username not set (discourse.api.user in Config.groovy)"
+    }
+
+    private String getDiscourseApiKey() {
+        notNull grailsApplication.config.discourse.api.key, "Discourse API key not set (discourse.api.key in Config.groovy)"
+    }
+
+    private Discourse getDiscourse(String username = discourseApiUser) {
+        Discourse.create(discourseServerUrl, discourseApiKey, username)
+    }
+
+    private static String notNull(string, String message) {
+        if (!string) throw new IllegalStateException(message)
+        return string as String
+    }
+}
