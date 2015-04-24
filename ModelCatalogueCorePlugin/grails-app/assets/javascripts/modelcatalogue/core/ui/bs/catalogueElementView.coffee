@@ -1,4 +1,52 @@
 angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueElementView', 'mc.core.ui.propertiesPane', 'mc.core.ui.simpleObjectEditor', 'mc.util.ui.bs.contextualActions' , 'ui.bootstrap', 'ngSanitize']).run [ '$templateCache', ($templateCache) ->
+    $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/simple-object-editor.html', '''
+        <div>
+          <simple-object-editor object="tab.value" title="Key" value-title="Value"></simple-object-editor>
+          <div class="row">
+            <div class="col-md-12">
+              <div class=" text-center">
+                <button class="btn btn-primary update-object" ng-disabled="!tab.isDirty()" ng-click="tab.update()"><span class="glyphicon glyphicon-ok"></span> Update</button>
+                <button class="btn btn-default reset-object-changes" ng-disabled="!tab.isDirty()" ng-click="tab.reset()"><span class="glyphicon glyphicon-remove"></span> Reset</button>
+                <br/>
+                <hr/>
+              </div>
+            </div>
+          </div>
+        </div>
+    '''
+
+    $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/simple-object-editor-for-enumerations.html', '''
+        <div>
+          <simple-object-editor object="tab.value" title="Key" value-title="Value"></simple-object-editor>
+          <div class="row">
+            <div class="col-md-12">
+              <div class=" text-center">
+                <button class="btn btn-primary update-object" ng-disabled="!tab.isDirty()" ng-click="tab.update()"><span class="glyphicon glyphicon-ok"></span> Update</button>
+                <button class="btn btn-default reset-object-changes" ng-disabled="!tab.isDirty()" ng-click="tab.reset()"><span class="glyphicon glyphicon-remove"></span> Reset</button>
+                <br/>
+                <hr/>
+              </div>
+            </div>
+          </div>
+        </div>
+    '''
+
+    $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/properties-pane-for-enumerations.html', '''
+        <properties-pane id="{{tab.name}}-enums" item="tab.value" properties="tab.properties" title="Value" value-title="Description"></properties-pane>
+    '''
+
+    $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/properties-pane-for-properties.html', '''
+        <properties-pane id="{{tab.name}}-props" item="tab.value" properties="tab.properties"></properties-pane>
+    '''
+
+    $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/properties-pane.html', '''
+      <properties-pane id="{{tab.name}}-objects" item="tab.value" properties="tab.properties" title="Key" value-title="Value"></properties-pane>
+    '''
+
+    $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/decorated-list.html', '''
+     <infinite-table  id="{{tab.name}}-changes"  list="tab.value" is-sortable="isTableSortable(tab)" reorder="reorder(tab, $row, $current)" columns="tab.columns" actions="tab.actions"></infinite-table>
+    '''
+
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView.html', '''
     <div>
       <span class="contextual-actions-right">
@@ -12,27 +60,9 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
       </ul>
 
       <div ng-repeat="tab in tabs" class="tab-pane">
-            <div ng-switch="tab.type" id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
-              <div ng-switch-when="simple-object-editor">
-                <simple-object-editor ng-if="tab.name != 'enumerations'" object="tab.value" title="Key"   value-title="Value"></simple-object-editor>
-                <simple-object-editor ng-if="tab.name == 'enumerations'" object="tab.value" title="Value" value-title="Description" key-placeholder="Value" value-placeholder="Description"></simple-object-editor>
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class=" text-center">
-                      <button class="btn btn-primary update-object" ng-disabled="!tab.isDirty()" ng-click="tab.update()"><span class="glyphicon glyphicon-ok"></span> Update</button>
-                      <button class="btn btn-default reset-object-changes" ng-disabled="!tab.isDirty()" ng-click="tab.reset()"><span class="glyphicon glyphicon-remove"></span> Reset</button>
-                      <br/>
-                      <hr/>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <properties-pane id="{{tab.name}}-enums"    item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'enumerations'"                                      title="Value" value-title="Description"></properties-pane>
-              <properties-pane id="{{tab.name}}-objects"  item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name != 'properties' &amp;&amp; tab.name != 'enumerations' " title="Key"   value-title="Value"></properties-pane>
-              <properties-pane id="{{tab.name}}-props"    item="tab.value" properties="tab.properties" ng-switch-when="properties-pane" ng-if="tab.name == 'properties'"></properties-pane>
-              <infinite-table  id="{{tab.name}}-changes"  list="tab.value" is-sortable="isTableSortable(tab)" reorder="reorder(tab, $row, $current)" columns="tab.columns" actions="tab.actions" ng-switch-when="decorated-list" ng-if="tab.name != 'history'"></infinite-table>
-              <catalogue-element-treeview  no-resize id="{{tab.name}}-table"    list="tab.value" descend="'changes'" ng-switch-when="decorated-list" ng-if="tab.name == 'history'" ></catalogue-element-treeview>
-            </div>
+          <div  id="{{tab.name}}-tab" class="cev-tab-content" ng-if="tab.active">
+            <ng-include src="'modelcatalogue/core/ui/catalogueElementView/' + tab.type + '.html'"></ng-include>
+          </div>
       </div>
     </div>
     '''

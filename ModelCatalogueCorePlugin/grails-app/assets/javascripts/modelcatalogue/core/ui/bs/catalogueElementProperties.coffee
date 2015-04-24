@@ -304,7 +304,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
       value: $element
       disabled: getObjectSize(newProperties) == 0
       properties: newProperties
-      type: 'properties-pane'
+      type: 'properties-pane-for-properties'
     }
   ]
 
@@ -333,5 +333,12 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'parent', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'oldValue', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'newValue', hidden: true
+
+
+  catalogueElementPropertiesProvider.configureProperty 'enumerations', tabDefinition: ['$element', '$name', '$value', '$scope', 'catalogueElementProperties', '$injector', 'security', ($element, $name, $value, $scope, catalogueElementProperties, $injector, security) ->
+    definition = $injector.invoke(catalogueElementProperties.getConfigurationFor('type:object').tabDefinition, undefined, $element: $element, $name: $name, $value: $value, $scope: $scope)
+    definition.type = if security.hasRole('CURATOR') and $element.status == 'DRAFT' then 'simple-object-editor-for-enumerations' else 'properties-pane-for-enumerations'
+    definition
+  ]
 
 ]

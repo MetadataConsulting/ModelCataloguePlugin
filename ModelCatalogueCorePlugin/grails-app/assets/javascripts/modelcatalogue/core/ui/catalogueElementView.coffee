@@ -21,7 +21,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
         for possibility in possibilities
           factory = catalogueElementProperties.getConfigurationFor(possibility)?.tabDefinition
           continue unless factory
-          result = $injector.invoke(factory, undefined, $element: element, $name: name, $value: value)
+          result = $injector.invoke(factory, undefined, $element: element, $name: name, $value: value, $scope: $scope)
           return result if result
 
       updateFrom = (original, update) ->
