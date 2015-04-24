@@ -213,11 +213,31 @@ changes.config ['columnsProvider', 'names', (columnsProvider, names)->
 
 changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
-  catalogueElementPropertiesProvider.configureProperty 'changes',   {
-    hidden: true
-  }
+  catalogueElementPropertiesProvider.configureProperty 'changes', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'changed', tabDefinition: -> [hide: true]
+  catalogueElementPropertiesProvider.configureProperty 'latestVersion', tabDefinition: -> [hide: true]
 
-  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.audit.Change.changes',   {
-    hidden: false
-  }
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.audit.Change.changes', hidden: false
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.audit.Change.properties', tabDefinition: [ '$element', ($element) ->
+
+    getPropertyVal = (propertyName) ->
+      (element) -> element[propertyName]
+
+    {
+      heading:    'Properties'
+      name:       'properties'
+      value:      $element
+      properties: [
+        {label: 'Parent Change', value: getPropertyVal('parent')}
+        {label: 'Change Type', value: getPropertyVal('type')}
+        {label: 'Changed Element', value: getPropertyVal('changed')}
+        {label: 'Root Element', value: getPropertyVal('latestVersion')}
+        {label: 'Author', value: getPropertyVal('author')}
+        {label: 'Undone', value: getPropertyVal('undone')}
+      ]
+      type:       'properties-pane'
+    }
+  ]
+
+
 ]
