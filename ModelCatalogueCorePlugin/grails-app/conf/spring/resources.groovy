@@ -8,13 +8,13 @@ beans = {
                             new DataTypeMarshaller(),
                             new ElementsMarshaller(),
                             new EnumeratedTypeMarshaller(),
-                            new MeasurementUnitMarshallers(),
+                            new MeasurementUnitMarshaller(),
                             new ModelMarshaller(),
                             new RelationshipTypeMarshaller(),
                             new RelationshipMarshallers(),
                             new RelationshipsMarshaller(),
                             new ValueDomainMarshaller(),
-                            new MappingMarshallers(),
+                            new MappingMarshaller(),
                             new MappingsMarshaller()
                 ]
     }

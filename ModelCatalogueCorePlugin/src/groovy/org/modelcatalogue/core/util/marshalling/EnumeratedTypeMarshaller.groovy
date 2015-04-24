@@ -5,7 +5,7 @@ import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.OrderedMap
 
-class EnumeratedTypeMarshaller extends CatalogueElementMarshallers {
+class EnumeratedTypeMarshaller extends CatalogueElementMarshaller {
 
     EnumeratedTypeMarshaller() {
         super(EnumeratedType)

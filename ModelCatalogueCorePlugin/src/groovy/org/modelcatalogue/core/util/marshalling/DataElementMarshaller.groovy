@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import org.modelcatalogue.core.DataElement
 
-class DataElementMarshaller extends CatalogueElementMarshallers {
+class DataElementMarshaller extends CatalogueElementMarshaller {
 
     DataElementMarshaller() {
         super(DataElement)

@@ -10,7 +10,7 @@ import spock.lang.Specification
 class CatalogueElementMarshallersSpec extends Specification {
 
     def "getting relationship configuration also from superclasses"() {
-        CatalogueElementMarshallers marshallers = new CatalogueElementMarshallers(DataElement) {}
+        CatalogueElementMarshaller marshallers = new CatalogueElementMarshaller(DataElement) {}
         marshallers.relationshipTypeService = new RelationshipTypeService()
         def relationships = marshallers.getRelationshipConfiguration(DataElement)
 

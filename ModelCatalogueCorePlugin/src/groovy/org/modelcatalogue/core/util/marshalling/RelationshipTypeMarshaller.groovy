@@ -3,7 +3,7 @@ package org.modelcatalogue.core.util.marshalling
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.RelationshipType
 
-class RelationshipTypeMarshaller extends AbstractMarshallers {
+class RelationshipTypeMarshaller extends AbstractMarshaller {
 
     RelationshipTypeMarshaller() {
         super(RelationshipType)

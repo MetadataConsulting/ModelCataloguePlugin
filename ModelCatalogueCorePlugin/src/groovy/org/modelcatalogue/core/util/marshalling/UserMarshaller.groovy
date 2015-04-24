@@ -4,7 +4,7 @@ import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.security.User
 
-class UserMarshaller extends CatalogueElementMarshallers {
+class UserMarshaller extends CatalogueElementMarshaller {
 
     UserMarshaller() {
         super(User)

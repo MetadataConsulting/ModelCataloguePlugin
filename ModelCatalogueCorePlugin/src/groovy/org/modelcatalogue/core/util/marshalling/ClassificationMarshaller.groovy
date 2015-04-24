@@ -5,7 +5,7 @@ import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.audit.Change
 import org.modelcatalogue.core.util.ClassificationFilter
 
-class ClassificationMarshaller extends CatalogueElementMarshallers {
+class ClassificationMarshaller extends CatalogueElementMarshaller {
 
     ClassificationMarshaller() {
         super(Classification)

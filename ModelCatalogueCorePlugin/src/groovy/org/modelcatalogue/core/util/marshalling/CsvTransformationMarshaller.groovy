@@ -3,7 +3,7 @@ package org.modelcatalogue.core.util.marshalling
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 
-class CsvTransformationMarshaller extends AbstractMarshallers {
+class CsvTransformationMarshaller extends AbstractMarshaller {
 
     CsvTransformationMarshaller() {
         super(CsvTransformation)
@@ -22,7 +22,7 @@ class CsvTransformationMarshaller extends AbstractMarshallers {
                 description: el.description,
                 dateCreated: el.dateCreated,
                 lastUpdated: el.lastUpdated,
-                columns:  el.columnDefinitions.collect { [source: CatalogueElementMarshallers.minimalCatalogueElementJSON(it.source), destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(it.destination), header: it.header] },
+                columns:  el.columnDefinitions.collect { [source: CatalogueElementMarshaller.minimalCatalogueElementJSON(it.source), destination: CatalogueElementMarshaller.minimalCatalogueElementJSON(it.destination), header: it.header] },
                 link:  "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id",
         ]
     }
