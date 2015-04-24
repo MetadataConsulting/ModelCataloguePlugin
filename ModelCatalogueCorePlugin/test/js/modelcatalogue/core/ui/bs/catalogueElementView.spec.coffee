@@ -33,8 +33,6 @@ describe "mc.core.ui.catalogueElementView", ->
     expect(element.find('h3.ce-name').text().trim()).toBe("#{catEl.name} FINALIZED".trim())
     expect(element.find('blockquote.ce-description').text()).toBe(catEl.description)
 
-    console.log element.find('ul.nav.nav-tabs li')
-
     expect(element.find('ul.nav.nav-tabs li').length).toBe(numberOfTabs)
     expect(element.find('div.tab-pane').length).toBe(numberOfTabs)
 
