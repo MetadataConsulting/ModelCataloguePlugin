@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshallers
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 import java.util.concurrent.TimeUnit
 
@@ -137,8 +137,8 @@ class ClassificationFilter {
     Map<String, Object> toMap() {
         [
                 unclassifiedOnly: unclassifiedOnly,
-                includes: includes.collect { CatalogueElementMarshallers.minimalCatalogueElementJSON(Classification.get(it)) },
-                excludes: excludes.collect { CatalogueElementMarshallers.minimalCatalogueElementJSON(Classification.get(it)) }
+                includes: includes.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(Classification.get(it)) },
+                excludes: excludes.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(Classification.get(it)) }
         ]
     }
 

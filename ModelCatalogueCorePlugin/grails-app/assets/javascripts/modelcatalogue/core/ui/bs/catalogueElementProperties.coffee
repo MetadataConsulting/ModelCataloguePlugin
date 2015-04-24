@@ -313,6 +313,8 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'enhanced:orderedMap', tabDefinition: objectTabDefinition
   catalogueElementPropertiesProvider.configureProperty 'type:object', tabDefinition: objectTabDefinition
 
+  catalogueElementPropertiesProvider.configureProperty 'enhanced:catalogueElement', tabDefinition: hideTab
+
   catalogueElementPropertiesProvider.configureProperty 'type:array', tabDefinition: hideTab
   catalogueElementPropertiesProvider.configureProperty 'type:function', tabDefinition: hideTab
   catalogueElementPropertiesProvider.configureProperty 'type:date', tabDefinition: hideTab

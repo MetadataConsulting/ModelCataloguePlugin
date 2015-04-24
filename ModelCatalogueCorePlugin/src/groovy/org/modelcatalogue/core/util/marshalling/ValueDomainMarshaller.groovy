@@ -5,7 +5,7 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.ValueDomain
 
-class ValueDomainMarshaller extends CatalogueElementMarshallers {
+class ValueDomainMarshaller extends CatalogueElementMarshaller {
 
     ValueDomainMarshaller() {
         super(ValueDomain)

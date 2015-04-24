@@ -7,7 +7,7 @@ import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
 import org.springframework.beans.factory.annotation.Autowired
 
-class BatchMarshaller extends AbstractMarshallers {
+class BatchMarshaller extends AbstractMarshaller {
 
     @Autowired ActionService actionService
 

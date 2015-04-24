@@ -5,9 +5,9 @@ import org.modelcatalogue.core.Mapping
 /**
  * Created by ladin on 14.02.14.
  */
-class MappingMarshallers extends AbstractMarshallers {
+class MappingMarshaller extends AbstractMarshaller {
 
-    MappingMarshallers() {
+    MappingMarshaller() {
         super(Mapping)
     }
 
@@ -15,8 +15,8 @@ class MappingMarshallers extends AbstractMarshallers {
         if (!map) return [:]
         [
                 id: map.id,
-                source: CatalogueElementMarshallers.minimalCatalogueElementJSON(map.source),
-                destination: CatalogueElementMarshallers.minimalCatalogueElementJSON(map.destination),
+                source: CatalogueElementMarshaller.minimalCatalogueElementJSON(map.source),
+                destination: CatalogueElementMarshaller.minimalCatalogueElementJSON(map.destination),
                 mapping: map.mapping,
                 elementType: Mapping.name
         ]

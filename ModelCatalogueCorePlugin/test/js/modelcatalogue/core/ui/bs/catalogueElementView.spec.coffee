@@ -3,6 +3,7 @@ describe "mc.core.ui.catalogueElementView", ->
   beforeEach module 'mc.core.ui.states'
   beforeEach module 'mc.core.ui.bs.catalogueElementView'
   beforeEach module 'mc.core.ui.bs.catalogueElementTreeview'
+  beforeEach module 'mc.core.ui.bs.catalogueElementProperties'
   beforeEach module 'mc.core.ui.bs.catalogueElementTreeviewItem'
   beforeEach module 'mc.core.ui.bs.infiniteTable'
   beforeEach module 'mc.core.ui.bs.propertiesPane'

@@ -8,22 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired
 /**
  * Interface for the classes providing custom marshallers.
  * <p/>
- * The marshallers are registered in the {@link AbstractMarshallers#register()} method.
+ * The marshallers are registered in the {@link AbstractMarshaller#register()} method.
  */
-abstract class AbstractMarshallers {
+abstract class AbstractMarshaller {
 
     @Autowired SecurityService modelCatalogueSecurityService
+    @Autowired JsonMarshallingCustomizerRegistry jsonMarshallingCustomizerRegistry
 
     final Class type
 
-    AbstractMarshallers(Class type) {
+    AbstractMarshaller(Class type) {
         this.type = type
     }
 
     final void register() {
         JSON.registerObjectMarshaller(type) { el ->
             if (!el) return null
-            prepareJsonMap(el)
+            jsonMarshallingCustomizerRegistry.postProcessJson(el, prepareJsonMap(el))
         }
     }
 
