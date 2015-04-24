@@ -2,6 +2,12 @@ window.modelcatalogue.registerModule 'mc.core.changes'
 
 changes = angular.module('mc.core.changes', ['mc.core.ui.columns', 'mc.util.ui.actions', 'mc.core.catalogue','mc.util.rest', 'mc.util.enhance', 'mc.core.modelCatalogueApiRoot', 'mc.util.names', 'mc.core.ui.catalogueElementProperties'])
 
+changes.run ['$templateCache', ($templateCache) ->
+  $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/history-tab.html', '''
+     <catalogue-element-treeview  no-resize id="{{tab.name}}-table" list="tab.value" descend="'changes'"></catalogue-element-treeview>
+    '''
+]
+
 changes.config ['enhanceProvider', (enhanceProvider)->
   condition = (item) -> item.hasOwnProperty('elementType') and item.elementType is 'org.modelcatalogue.core.audit.Change'
   factory   = ['modelCatalogueApiRoot', 'rest', '$rootScope', 'enhance', 'catalogueElementProperties', '$state', (modelCatalogueApiRoot, rest, $rootScope, enhance, catalogueElementProperties, $state) ->
@@ -213,11 +219,36 @@ changes.config ['columnsProvider', 'names', (columnsProvider, names)->
 
 changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
-  catalogueElementPropertiesProvider.configureProperty 'changes',   {
-    hidden: true
-  }
+  catalogueElementPropertiesProvider.configureProperty 'changes', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'changed', tabDefinition: -> [hide: true]
+  catalogueElementPropertiesProvider.configureProperty 'latestVersion', tabDefinition: -> [hide: true]
 
-  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.audit.Change.changes',   {
-    hidden: false
-  }
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.audit.Change.changes', hidden: false
+  catalogueElementPropertiesProvider.configureProperty 'org.modelcatalogue.core.audit.Change.properties', tabDefinition: [ '$element', ($element) ->
+
+    getPropertyVal = (propertyName) ->
+      (element) -> element[propertyName]
+
+    {
+      heading:    'Properties'
+      name:       'properties'
+      value:      $element
+      properties: [
+        {label: 'Parent Change', value: getPropertyVal('parent')}
+        {label: 'Change Type', value: getPropertyVal('type')}
+        {label: 'Changed Element', value: getPropertyVal('changed')}
+        {label: 'Root Element', value: getPropertyVal('latestVersion')}
+        {label: 'Author', value: getPropertyVal('author')}
+        {label: 'Undone', value: getPropertyVal('undone')}
+      ]
+      type:       'properties-pane-for-properties'
+    }
+  ]
+
+  catalogueElementPropertiesProvider.configureProperty 'history', tabDefinition: ['$element', '$name', '$value', 'catalogueElementProperties', '$injector', ($element, $name, $value, catalogueElementProperties, $injector) ->
+    definition = $injector.invoke(catalogueElementProperties.getConfigurationFor('enhanced:listReference').tabDefinition, undefined, $element: $element, $name: $name, $value: $value)
+    definition.type = 'history-tab'
+    definition
+  ]
+
 ]
