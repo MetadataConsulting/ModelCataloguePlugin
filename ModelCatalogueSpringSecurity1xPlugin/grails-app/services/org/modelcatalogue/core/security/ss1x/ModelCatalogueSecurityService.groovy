@@ -2,10 +2,16 @@ package org.modelcatalogue.core.security.ss1x
 
 import grails.plugins.springsecurity.SpringSecurityService
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+import org.modelcatalogue.core.LogoutListeners
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.security.User
+import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.logout.LogoutHandler
 
-class ModelCatalogueSecurityService implements SecurityService {
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+
+class ModelCatalogueSecurityService implements SecurityService, LogoutListeners, LogoutHandler {
 
     static transactional = false
 
@@ -35,5 +41,13 @@ class ModelCatalogueSecurityService implements SecurityService {
 
     User getCurrentUser() {
         return springSecurityService.currentUser
+    }
+
+    @Override
+    void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
+        def id = authentication.principal.id
+        if (id) {
+            userLoggedOut(User.get(id as Long))
+        }
     }
 }

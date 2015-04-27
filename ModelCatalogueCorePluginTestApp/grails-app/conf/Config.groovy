@@ -251,3 +251,8 @@ grails.plugin.springsecurity.filterChain.chainMap = [
         '/catalogue/upload': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
 ]
+grails.plugin.springsecurity.logout.handlerNames = [
+        'rememberMeServices',
+        'securityContextLogoutHandler',
+        'modelCatalogueSecurityService' // both spring security services implements it
+]
