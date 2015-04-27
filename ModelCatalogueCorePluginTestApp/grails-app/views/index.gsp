@@ -77,7 +77,9 @@
         <asset:javascript src="angular-animate/angular-animate.js"/>
         <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
     </g:else>
+    <g:set var="configurationProvider" bean="frontendConfigurationProviderRegistry"/>
     <script type="text/javascript">
+        ${configurationProvider.frontendConfiguration}
         var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security']);
         demoConfig.config(['securityProvider', function (securityProvider) {
             securityProvider.springSecurity({
@@ -97,7 +99,6 @@
                 </sec:ifLoggedIn>
             })
         }]);
-        demoConfig.value('modelCatalogueApiRoot', '${request.contextPath ?: ''}/api/modelCatalogue/core');
         modelcatalogue.registerModule('demo.config');
 
         // create an app module based on registered modules
