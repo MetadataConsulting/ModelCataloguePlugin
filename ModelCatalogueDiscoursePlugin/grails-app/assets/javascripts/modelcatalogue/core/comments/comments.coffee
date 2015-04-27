@@ -2,7 +2,7 @@ window.modelcatalogue.registerModule 'mc.core.comments'
 
 changes = angular.module('mc.core.comments', ['mc.util.ui.actions', 'mc.core.ui.catalogueElementProperties', 'mc.core.modelCatalogueApiRoot', 'mc.util.enhance'])
 
-changes.value 'discourseUrl', 'http://192.168.1.114/'
+changes.value 'discourseUrl', undefined
 
 changes.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/comments-tab.html', '''
@@ -73,6 +73,7 @@ changes.config ['enhanceProvider', (enhanceProvider)->
 changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertiesProvider)->
 
   catalogueElementPropertiesProvider.configureProperty 'comments', tabDefinition: [ '$element', '$value', 'security', 'modelCatalogueApiRoot', '$http', 'discourseUrl', 'messages', ($element, $value, security, modelCatalogueApiRoot, $http, discourseUrl, messages) ->
+    return undefined unless discourseUrl
     tab = {
       discourseUrl:   discourseUrl
       heading:        'Comments'
@@ -114,7 +115,7 @@ changes.config ['actionsProvider', (actionsProvider)->
   ROLE_COMMENTS = "comments"
 
   actionsProvider.registerActionInRole 'open-in-discourse', ROLE_COMMENTS, ['$scope', 'discourseUrl', '$window', ($scope, discourseUrl, $window) ->
-
+    return undefined unless discourseUrl
     action = {
       position:   1000
       label:      'Open in Forum'
@@ -130,8 +131,8 @@ changes.config ['actionsProvider', (actionsProvider)->
     action
   ]
 
-  actionsProvider.registerActionInRole 'refresh-comments', ROLE_COMMENTS, ['$scope', ($scope) ->
-
+  actionsProvider.registerActionInRole 'refresh-comments', ROLE_COMMENTS, ['$scope', 'discourseUrl', ($scope, discourseUrl) ->
+    return undefined unless discourseUrl
     action = {
       position:   1500
       label:      'Refresh'
@@ -149,7 +150,7 @@ changes.config ['actionsProvider', (actionsProvider)->
 
 
   actionsProvider.registerActionInRoles 'open-discourse', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTIONS], ['discourseUrl', '$window', (discourseUrl, $window) ->
-
+    return undefined unless discourseUrl
     {
       position:   3000
       label:      'Forum'

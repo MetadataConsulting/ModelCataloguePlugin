@@ -1,4 +1,5 @@
 import org.modelcatalogue.discourse.CommentsJsonMarshallingCustomizer
+import org.modelcatalogue.discourse.DiscourseUrlFrontendConfigurationProvider
 
 class ModelCatalogueDiscoursePluginGrailsPlugin {
     // the plugin version
@@ -43,8 +44,8 @@ Comments with Discourse plugin for Model Catalogue
     }
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
         commentsJsonMarshallingCustomizer(CommentsJsonMarshallingCustomizer)
+        discourseUrlFrontendConfigurationProvider(DiscourseUrlFrontendConfigurationProvider)
     }
 
     def doWithDynamicMethods = { ctx ->

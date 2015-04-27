@@ -10,6 +10,7 @@ class CommentsJsonMarshallingCustomizer extends JsonMarshallingCustomizer {
     @Autowired DiscourseService discourseService
 
     def customize(el, json) {
+        if (!discourseService.discourseServerUrl) return json
         def result = json ?: [:]
         if (el instanceof CatalogueElement) {
             result.comments = [
