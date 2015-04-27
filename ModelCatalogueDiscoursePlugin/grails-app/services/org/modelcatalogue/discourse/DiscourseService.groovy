@@ -129,12 +129,12 @@ class DiscourseService {
         return currentUser.username
     }
 
-    private String getFallbackEmail(String username) {
-        notNull(grailsApplication.config.discourse.users.fallbackEmail, "User $username does not have email address set and the fallback email is not set (discourse.users.fallbackEmail in Config.groovy)").replace(":username", username)
+    String getDiscourseServerUrl() {
+        notNull grailsApplication.config.discourse.url, "Discourse URL not set (discourse.url in Config.groovy)"
     }
 
-    private String getDiscourseServerUrl() {
-        notNull grailsApplication.config.discourse.url, "Discourse URL not set (discourse.url in Config.groovy)"
+    private String getFallbackEmail(String username) {
+        notNull(grailsApplication.config.discourse.users.fallbackEmail, "User $username does not have email address set and the fallback email is not set (discourse.users.fallbackEmail in Config.groovy)").replace(":username", username)
     }
 
     private String getDiscourseApiUser() {

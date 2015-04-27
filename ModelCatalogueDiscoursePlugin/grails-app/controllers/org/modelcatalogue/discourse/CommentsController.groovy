@@ -9,6 +9,31 @@ class CommentsController {
     DiscourseService discourseService
     SecurityService modelCatalogueSecurityService
 
+    def discourseUser() {
+        if (!modelCatalogueSecurityService.userLoggedIn) {
+            return forbidden()
+        }
+        String username = discourseService.ensureUserExistsInDiscourse(modelCatalogueSecurityService.currentUser)
+        render discourseService.getDiscourse(username).users.getUser(username, [:]).data as JSON
+    }
+
+    def createComment() {
+        if (!modelCatalogueSecurityService.userLoggedIn) {
+            return forbidden()
+        }
+
+        Long id = params.long('id')
+        if (!id) {
+            return notFound()
+        }
+
+
+        String raw = request.JSON.raw
+
+        render discourseService.getDiscourse(modelCatalogueSecurityService.currentUser.username).posts.createPost(discourseService.findOrCreateDiscourseTopic(id), raw).data as JSON
+
+    }
+
     def comments() {
         if (!modelCatalogueSecurityService.userLoggedIn) {
             return forbidden()
@@ -29,7 +54,7 @@ class CommentsController {
 
 
 
-            topic = discourseService.discourse.topics.getTopic(topicId)
+            topic = discourseService.getDiscourse(modelCatalogueSecurityService.currentUser.username).topics.getTopic(topicId)
         } catch (e) {
             render([errors: [message: e.message]] as JSON)
             return
