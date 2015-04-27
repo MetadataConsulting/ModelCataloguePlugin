@@ -255,7 +255,7 @@ grails.plugin.springsecurity.filterChain.chainMap = [
 ]
 
 discourse {
-    url = "http://192.168.1.114/"
+    url = "http://192.168.1.123/"
     api {
         key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
         user = "discourse"
