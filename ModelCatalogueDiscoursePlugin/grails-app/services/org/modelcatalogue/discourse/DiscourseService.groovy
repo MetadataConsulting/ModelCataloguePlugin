@@ -3,10 +3,11 @@ package org.modelcatalogue.discourse
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.LogoutListener
 import org.modelcatalogue.core.security.User
 
 
-class DiscourseService {
+class DiscourseService implements LogoutListener {
 
     static transactional = false
 
@@ -141,6 +142,10 @@ class DiscourseService {
         notNull grailsApplication.config.discourse.url, "Discourse URL not set (discourse.url in Config.groovy)"
     }
 
+    boolean getDiscourseSSOEnabled() {
+        discourseSSOKey as Boolean
+    }
+
     private String getFallbackEmail(String username) {
         notNull(grailsApplication.config.discourse.users.fallbackEmail, "User $username does not have email address set and the fallback email is not set (discourse.users.fallbackEmail in Config.groovy)").replace(":username", username)
     }
@@ -168,5 +173,12 @@ class DiscourseService {
     private static String notNull(string, String message) {
         if (!string) throw new IllegalStateException(message)
         return string as String
+    }
+
+    @Override void userLoggedOut(User user) {
+        if (!discourseSSOKey) {
+            return
+        }
+        discourse.users.logOut(discourse.users.getUser(user.username).data.user.id)
     }
 }

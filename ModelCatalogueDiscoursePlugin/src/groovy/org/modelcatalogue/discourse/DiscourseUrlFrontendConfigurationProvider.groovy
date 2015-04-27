@@ -12,7 +12,7 @@ class DiscourseUrlFrontendConfigurationProvider extends  FrontendConfigurationPr
     String getJavascriptConfiguration() {
         //language=JavaScript
         """
-        angular.module('mc.core.comments.discourseUrl', ['mc.core.comments']).value('discourseUrl', '${discourseService.discourseServerUrl}');
+        angular.module('mc.core.comments.discourseUrl', ['mc.core.comments']).value('discourseUrl', '${discourseService.discourseServerUrl}').value('discourseSSOEnabled', ${discourseService.discourseSSOEnabled});
         modelcatalogue.registerModule('mc.core.comments.discourseUrl');
         """
     }

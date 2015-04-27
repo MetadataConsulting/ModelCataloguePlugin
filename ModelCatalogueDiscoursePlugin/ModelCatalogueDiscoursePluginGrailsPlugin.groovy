@@ -1,3 +1,4 @@
+import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.discourse.CommentsJsonMarshallingCustomizer
 import org.modelcatalogue.discourse.DiscourseUrlFrontendConfigurationProvider
 
@@ -54,6 +55,9 @@ Comments with Discourse plugin for Model Catalogue
 
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
+        SecurityService securityService = ctx.getBean('modelCatalogueSecurityService')
+        securityService.addLogoutListener ctx.getBean('discourseService')
+
     }
 
     def onChange = { event ->

@@ -253,6 +253,11 @@ grails.plugin.springsecurity.filterChain.chainMap = [
         '/catalogue/upload': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
 ]
+grails.plugin.springsecurity.logout.handlerNames = [
+        'rememberMeServices',
+        'securityContextLogoutHandler',
+        'modelCatalogueSecurityService' // both spring security services implements it
+]
 
 discourse {
     url = "http://192.168.1.123/"
@@ -267,8 +272,3 @@ discourse {
         key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
     }
 }
-grails.plugin.springsecurity.logout.handlerNames = [
-        'rememberMeServices',
-        'securityContextLogoutHandler',
-        'modelCatalogueSecurityService' // both spring security services implements it
-]

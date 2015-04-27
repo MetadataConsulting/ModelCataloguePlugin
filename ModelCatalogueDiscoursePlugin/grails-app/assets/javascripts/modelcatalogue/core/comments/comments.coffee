@@ -3,6 +3,7 @@ window.modelcatalogue.registerModule 'mc.core.comments'
 changes = angular.module('mc.core.comments', ['mc.util.ui.actions', 'mc.core.ui.catalogueElementProperties', 'mc.core.modelCatalogueApiRoot', 'mc.util.enhance'])
 
 changes.value 'discourseUrl', undefined
+changes.value 'discourseSSOEnabled', false
 
 changes.run ['$templateCache', ($templateCache) ->
   $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/comments-tab.html', '''
@@ -114,7 +115,7 @@ changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertie
 changes.config ['actionsProvider', (actionsProvider)->
   ROLE_COMMENTS = "comments"
 
-  actionsProvider.registerActionInRole 'open-in-discourse', ROLE_COMMENTS, ['$scope', 'discourseUrl', '$window', ($scope, discourseUrl, $window) ->
+  actionsProvider.registerActionInRole 'open-in-discourse', ROLE_COMMENTS, ['$scope', 'discourseUrl', 'discourseSSOEnabled', '$window', ($scope, discourseUrl, discourseSSOEnabled, $window) ->
     return undefined unless discourseUrl
     action = {
       position:   1000
@@ -122,7 +123,9 @@ changes.config ['actionsProvider', (actionsProvider)->
       icon:       'fa fa-comments-o'
       disabled:   not $scope.topic
       action: ->
-        $window.open("#{discourseUrl}t/#{$scope.tab.topic.id}", '_blank');
+        postUrl = "t/#{$scope.tab.topic.id}"
+        url = if discourseSSOEnabled then "#{discourseUrl}/session/sso?return_path=#{encodeURIComponent('/' + postUrl)}" else "#{discourseUrl}#{postUrl}"
+        $window.open(url, '_blank');
     }
 
     $scope.$watch 'tab.topic', (topic) ->
@@ -149,15 +152,18 @@ changes.config ['actionsProvider', (actionsProvider)->
   ]
 
 
-  actionsProvider.registerActionInRoles 'open-discourse', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTIONS], ['discourseUrl', '$window', 'security', (discourseUrl, $window, security) ->
+  actionsProvider.registerActionInRoles 'open-discourse', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTIONS], ['discourseUrl', 'discourseSSOEnabled', '$window', 'security', (discourseUrl, discourseSSOEnabled, $window, security) ->
     return undefined unless security.isUserLoggedIn()
     return undefined unless discourseUrl
+
+    forumUrl = if discourseSSOEnabled then "#{discourseUrl}/session/sso" else discourseUrl
+
     {
       position:   3000
       label:      'Forum'
       icon:       'fa fa-comments'
       action: ->
-        $window.open(discourseUrl, '_blank');
+        $window.open(forumUrl, '_blank');
     }
   ]
 ]
