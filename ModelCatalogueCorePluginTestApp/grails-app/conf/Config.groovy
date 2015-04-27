@@ -267,3 +267,8 @@ discourse {
         key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
     }
 }
+grails.plugin.springsecurity.logout.handlerNames = [
+        'rememberMeServices',
+        'securityContextLogoutHandler',
+        'modelCatalogueSecurityService' // both spring security services implements it
+]

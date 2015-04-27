@@ -39,4 +39,6 @@ public interface SecurityService {
      * @return currently logged in user or null
      */
     User getCurrentUser()
+
+    void addLogoutListener(LogoutListener listener)
 }
