@@ -263,4 +263,7 @@ discourse {
     users {
         fallbackEmail = 'vladimir.orany+:username@gmail.com'
     }
+    sso {
+        key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
+    }
 }

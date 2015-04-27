@@ -2,6 +2,7 @@ package org.modelcatalogue.discourse
 
 import grails.converters.JSON
 import org.modelcatalogue.core.SecurityService
+import org.modelcatalogue.discourse.sso.SingleSignOn
 import org.springframework.http.HttpStatus
 
 class CommentsController {
@@ -66,6 +67,15 @@ class CommentsController {
         }
 
         render topic.data as JSON
+    }
+
+    def sso() {
+        if (!modelCatalogueSecurityService.userLoggedIn) {
+            return forbidden()
+        }
+
+        SingleSignOn singleSignOn = discourseService.discourse.singleSignOn
+        redirect url: singleSignOn.getRedirectURL(singleSignOn.verifyParameters(params.sso as String, params.sig as String), discourseService.discourseUser)
     }
 
 

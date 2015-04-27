@@ -94,6 +94,8 @@ class BootStrap {
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.PUT)
         createRequestmapIfMissing('/api/modelCatalogue/core/*/**', 'ROLE_METADATA_CURATOR',         org.springframework.http.HttpMethod.DELETE)
 
+        createRequestmapIfMissing('/sso/*/**',                     'IS_AUTHENTICATED_REMEMBERED',   org.springframework.http.HttpMethod.GET)
+
         createRequestmapIfMissing('/role/**',                      'ROLE_ADMIN')
         createRequestmapIfMissing('/userAdmin/**',                 'ROLE_ADMIN')
         createRequestmapIfMissing('/requestMap/**',                'ROLE_ADMIN')

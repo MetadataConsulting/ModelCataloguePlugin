@@ -149,7 +149,8 @@ changes.config ['actionsProvider', (actionsProvider)->
   ]
 
 
-  actionsProvider.registerActionInRoles 'open-discourse', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTIONS], ['discourseUrl', '$window', (discourseUrl, $window) ->
+  actionsProvider.registerActionInRoles 'open-discourse', [actionsProvider.ROLE_NAVIGATION, actionsProvider.ROLE_GLOBAL_ACTIONS], ['discourseUrl', '$window', 'security', (discourseUrl, $window, security) ->
+    return undefined unless security.isUserLoggedIn()
     return undefined unless discourseUrl
     {
       position:   3000

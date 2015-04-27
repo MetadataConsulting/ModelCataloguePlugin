@@ -11,6 +11,7 @@ class DiscourseService {
     static transactional = false
 
     def grailsApplication
+    def modelCatalogueSecurityService
 
     String findOrCreateDiscourseCategoryName(Long classificationId) {
         CategoriesForClassifications classification = CategoriesForClassifications.findByClassificationId(classificationId)
@@ -116,7 +117,7 @@ class DiscourseService {
             return currentUser.username
         }
 
-        result = discourse.users.createUser(currentUser.username, currentUser.email ?: getFallbackEmail(currentUser.username), currentUser.username, 'notasecret', true)
+        result = discourse.users.createUser(currentUser.username, currentUser.email ?: getFallbackEmail(currentUser.username), currentUser.username, discourseSSOKey ? null : UUID.randomUUID().toString(), true)
 
         if (result.status == 500) {
             throw new IllegalArgumentException("Cannot create user: Discourse Server Error")
@@ -127,6 +128,13 @@ class DiscourseService {
         }
 
         return currentUser.username
+    }
+
+    org.modelcatalogue.discourse.sso.User getDiscourseUser() {
+        if (!modelCatalogueSecurityService.currentUser) {
+            return null
+        }
+        new org.modelcatalogue.discourse.sso.User(modelCatalogueSecurityService.currentUser.username, modelCatalogueSecurityService.currentUser.username, modelCatalogueSecurityService.currentUser.email ?: getFallbackEmail(modelCatalogueSecurityService.currentUser.username), modelCatalogueSecurityService.currentUser.id.toString())
     }
 
     String getDiscourseServerUrl() {
@@ -145,8 +153,16 @@ class DiscourseService {
         notNull grailsApplication.config.discourse.api.key, "Discourse API key not set (discourse.api.key in Config.groovy)"
     }
 
+    private String getDiscourseSSOKey() {
+        grailsApplication.config.discourse.sso.key
+    }
+
     private Discourse getDiscourse(String username = discourseApiUser) {
-        Discourse.create(discourseServerUrl, discourseApiKey, username)
+        if (discourseSSOKey) {
+            Discourse.create(discourseServerUrl, discourseApiKey, username, discourseSSOKey)
+        } else {
+            Discourse.create(discourseServerUrl, discourseApiKey, username)
+        }
     }
 
     private static String notNull(string, String message) {

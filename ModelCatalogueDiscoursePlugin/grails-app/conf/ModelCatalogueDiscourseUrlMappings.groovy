@@ -4,6 +4,7 @@ class ModelCatalogueDiscourseUrlMappings {
 
 
     static mappings = {
+        "/sso/discourse" (controller: 'comments', action: 'sso', method: HttpMethod.GET)
 
         def catalogueElements = ['asset', 'dataElement', 'model', 'catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
 
@@ -13,6 +14,7 @@ class ModelCatalogueDiscourseUrlMappings {
         }
 
         "/api/modelCatalogue/core/user/discourse" (controller: 'comments', action: 'discourseUser', method: HttpMethod.GET)
+
 
     }
 }
