@@ -29,7 +29,9 @@ class OrderedMap {
             if (jsonOrMap.values instanceof List) {
                 Map<String, String> newVal = [:]
                 for (Map<String, Object> item in (jsonOrMap.values as List<Map<String, Object>>)) {
-                    newVal[item.key as String] = item.value as String
+                    if (item.key) {
+                        newVal[item.key as String] = item.value as String
+                    }
                 }
                 return newVal
             }
