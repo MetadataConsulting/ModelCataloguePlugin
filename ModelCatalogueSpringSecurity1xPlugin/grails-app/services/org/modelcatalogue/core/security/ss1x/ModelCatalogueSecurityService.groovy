@@ -45,7 +45,7 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners,
 
     @Override
     void logout(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) {
-        def id = authentication.principal.id
+        def id = authentication?.principal?.id
         if (id) {
             userLoggedOut(User.get(id as Long))
         }
