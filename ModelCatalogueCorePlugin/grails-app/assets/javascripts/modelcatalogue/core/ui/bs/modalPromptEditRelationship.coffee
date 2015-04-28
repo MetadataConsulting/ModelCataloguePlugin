@@ -15,7 +15,7 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
               <messages-panel messages="messages"></messages-panel>
               <div class="form-group">
                 <label>Metadata</label>
-                <simple-object-editor object="metadata" hints="relationshipTypeInfo.type.metadataHints"></simple-object-editor>
+                <ordered-map-editor object="metadata" hints="relationshipTypeInfo.type.metadataHints"></ordered-map-editor>
                 <p class="help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
               </div>
               <div class="form-group">
@@ -58,7 +58,7 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
                 <input id="classification" placeholder="Classification (leave blank for inherited)" ng-model="classification" catalogue-element-picker="classification" label="el.name" class="input-sm" typeahead-on-select="updateClassification(classification)">
               </div>
               <div class="new-relationship-modal-prompt-metadata">
-                <simple-object-editor object="metadata" title="Metadata" hints="relationshipTypeInfo.type.metadataHints"></simple-object-editor>
+                <ordered-map-editor object="metadata" title="Metadata" hints="relationshipTypeInfo.type.metadataHints"></ordered-map-editor>
               </div>
             </form>
         </div>

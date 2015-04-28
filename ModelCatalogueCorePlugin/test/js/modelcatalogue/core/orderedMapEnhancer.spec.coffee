@@ -24,5 +24,7 @@ describe "mc.core.orderedMapEnhancer", ->
     expect(emptyMap).toBeObject()
     expect(emptyMap.type).toEqual('orderedMap')
     expect(emptyMap.values).toBeArray()
-    expect(emptyMap.values.length).toBe(0)
+    expect(emptyMap.values.length).toBe(1)
+    expect(emptyMap.values[0].key).toEqual('')
+    expect(emptyMap.values[0].value).toBeUndefined()
 
