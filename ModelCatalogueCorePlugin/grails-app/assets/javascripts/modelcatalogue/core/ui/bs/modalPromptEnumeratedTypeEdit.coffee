@@ -37,14 +37,16 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <input type="checkbox" ng-model="settings.enumerated" ng-disabled="!create" id="enumerated"> Enumerated
               </label>
             </div>
-            <div collapse="!settings.enumerated"><simple-object-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></simple-object-editor></div>
+            <div collapse="!settings.enumerated"><ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor></div>
         </div>
         <div class="modal-footer">
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', '$controller', '$modalInstance', ($scope, messages, $controller, $modalInstance) ->
-          $scope.newEntity = -> {enumerations: {}, classifications: []}
+        controller: ['$scope', 'messages', '$controller', '$modalInstance', 'enhance', ($scope, messages, $controller, $modalInstance, enhance) ->
+          orderedMapEnhancer = enhance.getEnhancer('orderedMap')
+
+          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(), classifications: []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.original = args.element ? $scope.newEntity()
           $scope.messages = messages.createNewMessages()

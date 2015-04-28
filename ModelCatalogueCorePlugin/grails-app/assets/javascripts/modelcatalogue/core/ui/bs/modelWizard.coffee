@@ -73,7 +73,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               <form ng-submit="select('parents')">
                 <div>
                   <h4>Metadata</h4>
-                  <simple-object-editor title="Key" value-title="Value" object="metadata"></simple-object-editor>
+                  <ordered-map-editor title="Key" value-title="Value" object="metadata"></ordered-map-editor>
                 </div>
               </form>
           </div>
@@ -91,7 +91,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   </div>
                   <p class="help-block">Parent model is source for the hierarchy relationship</p>
                 </div>
-                <simple-object-editor object="parent.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
+                <ordered-map-editor object="parent.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></ordered-map-editor>
               </form>
           </div>
           <div ng-switch-when="children" id="children">
@@ -113,7 +113,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child models from CSV file headers</a>.
                   </alert>
                 </div>
-                <simple-object-editor object="child.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
+                <ordered-map-editor object="child.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></ordered-map-editor>
               </form>
           </div>
           <div ng-switch-when="elements" id="elements">
@@ -135,7 +135,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
                   </alert>
                 </div>
-                <simple-object-editor object="dataElement.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></simple-object-editor>
+                <ordered-map-editor object="dataElement.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></ordered-map-editor>
               </form>
             </tab>
           </div>
@@ -224,7 +224,6 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           $scope.openElementInNewWindow = (element) ->
             url = $state.href('mc.resource.show', {resource: names.getPropertyNameFromType(element.elementType), id: element.id})
             $window.open(url,'_blank')
-            return
 
           $scope.finish = () ->
             return if $scope.finishInProgress
@@ -320,7 +319,6 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.classificationsVisited |= step == 'classifications'
             return if step != 'model' and not $scope.model.name
             $scope.step = step
-            return
 
           $scope.next = ->
             return if not $scope.model.name

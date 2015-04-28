@@ -23,4 +23,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.simpleObjectEditor'
   'mc.core.ui.elementsAsTags'
   'mc.core.ui.diffTable'
+  'mc.core.ui.orderedMapEditor'
 ])

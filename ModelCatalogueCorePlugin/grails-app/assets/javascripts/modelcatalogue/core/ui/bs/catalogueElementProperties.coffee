@@ -195,80 +195,81 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   getPropertyVal  = (propertyName) ->
     (element) -> element[propertyName]
 
-  objectTabDefinition = [ '$element', '$name', '$value', 'catalogueElementProperties', 'enhance', 'security', 'catalogueElementResource', 'messages', 'names', ($element, $name, $value, catalogueElementProperties, enhance, security, catalogueElementResource, messages, names) ->
+  objectTabDefinition = (editTabType) ->
+    [ '$element', '$name', '$value', 'catalogueElementProperties', 'enhance', 'security', 'catalogueElementResource', 'messages', 'names', ($element, $name, $value, catalogueElementProperties, enhance, security, catalogueElementResource, messages, names) ->
 
 
-    getSortedMapPropertyVal = (propertyName) ->
-      (element) ->
-        for value in element.values
-          if value.key == propertyName
-            return value.value
+      getSortedMapPropertyVal = (propertyName) ->
+        (element) ->
+          for value in element.values
+            if value.key == propertyName
+              return value.value
 
-    updateFrom = (original, update) ->
-      for originalKey of original
-        if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
-          delete original[originalKey]
+      updateFrom = (original, update) ->
+        for originalKey of original
+          if originalKey.indexOf('$') != 0 # keep the private fields such as number of children in tree view
+            delete original[originalKey]
 
-      for newKey of update
-        original[newKey] = update[newKey]
-      original
+        for newKey of update
+          original[newKey] = update[newKey]
+        original
 
-    resource = catalogueElementResource($element.elementType) if $element and $element.elementType
-    propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{$element.elementType}.#{$name}")
+      resource = catalogueElementResource($element.elementType) if $element and $element.elementType
+      propertyConfiguration = catalogueElementProperties.getConfigurationFor("#{$element.elementType}.#{$name}")
 
-    tabDefinition =
-      name:       $name
-      heading:    propertyConfiguration.label
-      value:      $value ? {}
-      original:   angular.copy($value ? {})
-      properties: []
-      type:       if security.hasRole('CURATOR') and $element.status == 'DRAFT' then 'simple-object-editor' else 'properties-pane'
-      isDirty:    ->
-        if @value and enhance.isEnhancedBy(@value, 'orderedMap') and @original and enhance.isEnhancedBy(@original, 'orderedMap')
-          return false if angular.equals(@value.values, @original.values)
-          return false if @original.values.length == 0 and @value.values.length == 1 and not @value.values[0].value and not @value.values[0].key
-        !angular.equals(@original, @value)
-      reset:      -> @value = angular.copy @original
-      update:     ->
-        if not resource
-          messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{$element.name}. See application logs for details.")
-          return
+      tabDefinition =
+        name:       $name
+        heading:    propertyConfiguration.label
+        value:      $value ? {}
+        original:   angular.copy($value ? {})
+        properties: []
+        type:       if security.hasRole('CURATOR') and $element.status == 'DRAFT' then editTabType else 'properties-pane'
+        isDirty:    ->
+          if @value and enhance.isEnhancedBy(@value, 'orderedMap') and @original and enhance.isEnhancedBy(@original, 'orderedMap')
+            return false if angular.equals(@value.values, @original.values)
+            return false if @original.values.length == 0 and @value.values.length == 1 and not @value.values[0].value and not @value.values[0].key
+          !angular.equals(@original, @value)
+        reset:      -> @value = angular.copy @original
+        update:     ->
+          if not resource
+            messages.error("Cannot update property #{names.getNaturalName(self.name)} of #{$element.name}. See application logs for details.")
+            return
 
-        payload = {
-          id: $element.id
-        }
-        payload[@name] = angular.copy(@value)
-        self = @
-        resource.update(payload).then (updated) ->
-          updateFrom($element, updated)
-          messages.success("Property #{if propertyConfiguration.label then propertyConfiguration.label else names.getNaturalName(self.name)} of #{$element.name} successfully updated")
-          updated
-        ,  (response) ->
-          if response.data.errors
-            if angular.isString response.data.errors
-              messages.error response.data.errors
+          payload = {
+            id: $element.id
+          }
+          payload[@name] = angular.copy(@value)
+          self = @
+          resource.update(payload).then (updated) ->
+            updateFrom($element, updated)
+            messages.success("Property #{if propertyConfiguration.label then propertyConfiguration.label else names.getNaturalName(self.name)} of #{$element.name} successfully updated")
+            updated
+          ,  (response) ->
+            if response.data.errors
+              if angular.isString response.data.errors
+                messages.error response.data.errors
+              else
+                for err in response.data.errors
+                  messages.error err.message
             else
-              for err in response.data.errors
-                messages.error err.message
-          else
-            messages.error("Cannot update property #{if propertyConfiguration.label then propertyConfiguration.label else names.getNaturalName(self.name)} of #{$element.name}. See application logs for details.")
+              messages.error("Cannot update property #{if propertyConfiguration.label then propertyConfiguration.label else names.getNaturalName(self.name)} of #{$element.name}. See application logs for details.")
 
 
-    if $value?.type == 'orderedMap'
-      for value in $value.values when not angular.isObject(value.value)
-        tabDefinition.properties.push {
-          label: value.key
-          value: getSortedMapPropertyVal(value.key)
-        }
-    else
-      for key, value of $value when not angular.isObject(value)
-        tabDefinition.properties.push {
-          label: key
-          value: getPropertyVal(key)
-        }
+      if $value?.type == 'orderedMap'
+        for value in $value.values when not angular.isObject(value.value)
+          tabDefinition.properties.push {
+            label: value.key
+            value: getSortedMapPropertyVal(value.key)
+          }
+      else
+        for key, value of $value when not angular.isObject(value)
+          tabDefinition.properties.push {
+            label: key
+            value: getPropertyVal(key)
+          }
 
-    tabDefinition
-  ]
+      tabDefinition
+    ]
 
   catalogueElementPropertiesProvider.configureProperty 'properties', tabDefinition: [ '$element', 'catalogueElementProperties', 'enhance', 'security', 'names', ($element, catalogueElementProperties, enhance, security, names) ->
 
@@ -310,8 +311,8 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   hideTab = -> [hide: true]
 
-  catalogueElementPropertiesProvider.configureProperty 'enhanced:orderedMap', tabDefinition: objectTabDefinition
-  catalogueElementPropertiesProvider.configureProperty 'type:object', tabDefinition: objectTabDefinition
+  catalogueElementPropertiesProvider.configureProperty 'enhanced:orderedMap', tabDefinition: objectTabDefinition('ordered-map-editor')
+  catalogueElementPropertiesProvider.configureProperty 'type:object', tabDefinition: objectTabDefinition('simple-object-editor')
 
   catalogueElementPropertiesProvider.configureProperty 'enhanced:catalogueElement', tabDefinition: hideTab
 
