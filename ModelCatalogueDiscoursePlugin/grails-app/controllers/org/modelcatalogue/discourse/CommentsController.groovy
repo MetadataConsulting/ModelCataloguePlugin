@@ -1,14 +1,18 @@
 package org.modelcatalogue.discourse
 
 import grails.converters.JSON
+import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.discourse.sso.SingleSignOn
 import org.springframework.http.HttpStatus
+
+import java.util.regex.Pattern
 
 class CommentsController {
 
     DiscourseService discourseService
     SecurityService modelCatalogueSecurityService
+    GrailsApplication grailsApplication
 
     def discourseUser() {
         if (!modelCatalogueSecurityService.userLoggedIn) {
@@ -30,6 +34,10 @@ class CommentsController {
 
 
         String raw = request.JSON.raw
+        String regex = /${Pattern.quote(grailsApplication.config.grails.serverURL)}\/#\/catalogue\/\w+\/(\d+)(\/.*)?/
+        raw = raw?.replaceAll(regex) { String matched, String urlId, String ignored ->
+            "${discourseService.discourseServerUrl}t/topic/${discourseService.findOrCreateDiscourseTopic(urlId as Long)}"
+        }
 
         render discourseService.getDiscourse(modelCatalogueSecurityService.currentUser.username).posts.createPost(discourseService.findOrCreateDiscourseTopic(id), raw).data as JSON
 

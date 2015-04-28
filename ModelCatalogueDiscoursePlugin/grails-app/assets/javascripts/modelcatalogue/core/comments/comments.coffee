@@ -25,7 +25,7 @@ changes.run ['$templateCache', ($templateCache) ->
                     </div>
                     <div class="media-body">
                         <h4 class="media-heading">{{post.display_username}}</h4>
-                        <div ng-bind-html="post.cooked"></div>
+                        <div ng-bind-html="post.cooked" class="cooked"></div>
                     </div>
                   </li>
                 </ul>
@@ -61,10 +61,17 @@ changes.run ['$templateCache', ($templateCache) ->
 
 changes.config ['enhanceProvider', (enhanceProvider)->
   condition = (item) -> item.hasOwnProperty('cooked') and item.cooked
-  factory   = ['discourseUrl', (discourseUrl) ->
+  factory   = ['discourseUrl', 'discourseSSOEnabled', '$sce', (discourseUrl, discourseSSOEnabled, $sce) ->
     (element) ->
-      element.cooked = element.cooked.replace(/href="\//g, "target=\"_blank\" href=\"#{discourseUrl}").replace(/src="\//g, "src=\"#{discourseUrl}")
-      element
+        element.cooked = element.cooked.replace /(href|src)="\/(.*?)"/g, (match, attr, originalUrl) ->
+          console.log arguments
+          return match if originalUrl.indexOf('/') == 0
+          if discourseSSOEnabled
+            return "#{if attr is 'href' then "target=\"_blank\"" else ""} #{attr}=\"#{discourseUrl}/session/sso?return_path=#{encodeURIComponent('/' + originalUrl)}\""
+          else
+            return "#{if attr is 'href' then "target=\"_blank\"" else ""} #{attr}=\"#{discourseUrl}\""
+        element.cooked = $sce.trustAsHtml(element.cooked)
+        element
   ]
 
   enhanceProvider.registerEnhancerFactory('change', condition, factory)
