@@ -11,6 +11,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     private final String SAMPLE_XSD_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b4e21b12613f70fd7733428e7bbb8434faec4925/example.xsd"
     private final String SAMPLE_VALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/d8369d85bb6b09e06706a96973697acc1010c439/example.xml"
     private final String SAMPLE_INVALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b8d405978d8c42ed6c2f80a080bbf56f03aaf7ae/example-invalid.xml"
+    private final String SAMPLE_MC_URL = 'https://gist.githubusercontent.com/musketyr/bd1bc8d83307fab6546a/raw/874b3bbebe1556d59214a401a776dde63dbd95a9/MET-523.mc'
 
     @Rule TemporaryFolder tmp = new TemporaryFolder()
 
@@ -109,12 +110,66 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
 
-    private File download(String name, String url) {
-        File sampleXsd = tmp.newFile(name)
-        def out = new BufferedOutputStream(new FileOutputStream(sampleXsd))
-        out << new URL(url).openStream()
-        out.close()
-        sampleXsd
+    def "upload mc file"() {
+        when:
+        go "#/catalogue/asset/all"
+
+        then:
+        at AssetListPage
+
+        when:
+        actionButton('new-import', 'list').click()
+        actionButton('import-mc').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        $('#asset').value(download('example.mc', SAMPLE_MC_URL).absolutePath)
+
+        then:
+        waitFor {
+            !modalSuccessButton.disabled
+        }
+
+        when:
+        modalSuccessButton.click()
+
+        then:
+        waitFor(60) {
+            subviewTitle.displayed
+        }
+        waitFor(60) {
+            subviewTitle.text().startsWith('Import for example.mc')
+        }
+
+        when:
+        10.times {
+            actionButton('refresh-asset').click()
+            try {
+                waitFor {
+                    subviewTitle.text() == 'Import for example.mc FINALIZED'
+                }
+            } catch (ignored) {}
+        }
+
+        then:
+        waitFor {
+            $('td', 'data-value-for': 'Classifications').text() == 'MET-523'
+        }
+
+        when:
+        noStale({$('td', 'data-value-for': 'Classifications').find('a')}) {
+            it.click()
+        }
+
+        then:
+        waitFor {
+            subviewTitle.text() == 'MET-523 DRAFT'
+        }
+        totalOf('classifies') == 44
     }
 
 }
