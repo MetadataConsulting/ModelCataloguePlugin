@@ -150,12 +150,24 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     }
 
 
-    protected File download(String name, String url) {
+    File download(String name, String url) {
         File sampleXsd = tmp.newFile(name)
         def out = new BufferedOutputStream(new FileOutputStream(sampleXsd))
         out << new URL(url).openStream()
         out.close()
         sampleXsd
+    }
+
+    void goToDetailUsingSearch(String name) {
+        noStale({ $('#search-term')}) { searchTerm ->
+            searchTerm.value(name)
+        }
+        waitFor {
+            $('span.omnisearch-text', text: name).displayed
+        }
+        noStale({ $('span.omnisearch-text', text: name).parent('a')}) { resultLink ->
+            resultLink.click()
+        }
     }
 
 }

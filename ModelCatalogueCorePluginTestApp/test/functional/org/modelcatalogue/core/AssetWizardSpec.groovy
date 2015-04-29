@@ -8,11 +8,6 @@ import spock.lang.Stepwise
 @Stepwise
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
-    private final String SAMPLE_XSD_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b4e21b12613f70fd7733428e7bbb8434faec4925/example.xsd"
-    private final String SAMPLE_VALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/d8369d85bb6b09e06706a96973697acc1010c439/example.xml"
-    private final String SAMPLE_INVALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b8d405978d8c42ed6c2f80a080bbf56f03aaf7ae/example-invalid.xml"
-    private final String SAMPLE_MC_URL = 'https://gist.githubusercontent.com/musketyr/bd1bc8d83307fab6546a/raw/874b3bbebe1556d59214a401a776dde63dbd95a9/MET-523.mc'
-
     @Rule TemporaryFolder tmp = new TemporaryFolder()
 
     def "go to login"() {
@@ -46,7 +41,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         $('#name').value('Sample XSD')
-        $('#asset').value(download('sample.xsd', SAMPLE_XSD_URL).absolutePath)
+        $('#asset').value(file('example.xsd'))
 
         modalDialog.find("button.btn-success").click()
 
@@ -85,7 +80,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        $('#xml').value(download('valid.xml', SAMPLE_VALID_XML_URL).absolutePath)
+        $('#xml').value(file('example.xml'))
 
         then:
         waitFor(60) {
@@ -93,7 +88,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        $('#xml').value(download('invalid.xml', SAMPLE_INVALID_XML_URL).absolutePath)
+        $('#xml').value(file('example-invalid.xml'))
 
         then:
         waitFor(60) {
@@ -127,7 +122,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        $('#asset').value(download('example.mc', SAMPLE_MC_URL).absolutePath)
+        $('#asset').value(file('MET-523.mc'))
 
         then:
         waitFor {
@@ -142,7 +137,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             subviewTitle.displayed
         }
         waitFor(60) {
-            subviewTitle.text().startsWith('Import for example.mc')
+            subviewTitle.text().startsWith('Import for MET-523.mc')
         }
 
         when:
@@ -150,7 +145,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             actionButton('refresh-asset').click()
             try {
                 waitFor {
-                    subviewTitle.text() == 'Import for example.mc FINALIZED'
+                    subviewTitle.text() == 'Import for MET-523.mc FINALIZED'
                 }
             } catch (ignored) {}
         }
@@ -170,6 +165,65 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             subviewTitle.text() == 'MET-523 DRAFT'
         }
         totalOf('classifies') == 44
+    }
+
+    def "upload excel file"() {
+        when:
+        go "#/catalogue/asset/all"
+
+        then:
+        at AssetListPage
+
+        when:
+        actionButton('new-import', 'list').click()
+        actionButton('import-excel').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        $('#asset').value(file('MET-522.xlsx'))
+
+        then:
+        waitFor {
+            !modalSuccessButton.disabled
+        }
+
+        when:
+        modalSuccessButton.click()
+
+        then:
+        waitFor(60) {
+            subviewTitle.displayed
+        }
+        waitFor(60) {
+            subviewTitle.text().startsWith('Import for MET-522.xlsx')
+        }
+
+        when:
+        10.times {
+            actionButton('refresh-asset').click()
+            try {
+                waitFor {
+                    subviewTitle.text() == 'Import for MET-522.xlsx FINALIZED'
+                }
+            } catch (ignored) {}
+        }
+
+        goToDetailUsingSearch('MET-522')
+
+        then:
+        waitFor(60) {
+            subviewTitle.text() == 'MET-522 DRAFT'
+        }
+        totalOf('classifies') == 43
+    }
+
+
+    String file(String name) {
+        new File(AssetWizardSpec.getResource(name).toURI()).absolutePath
     }
 
 }

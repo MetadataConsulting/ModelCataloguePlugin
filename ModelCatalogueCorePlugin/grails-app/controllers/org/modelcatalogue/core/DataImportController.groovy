@@ -80,6 +80,7 @@ class DataImportController  {
                     ExcelLoader parser = new ExcelLoader(inputStream)
                     def (headers, rows) = parser.parse()
                     dataImportService.importData(headers, rows, headersMap)
+                    finalizeAsset(id)
                 } catch (Exception e) {
                     logError(id, e)
                 }
@@ -97,6 +98,7 @@ class DataImportController  {
                 try {
                     CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
                     loader.load(inputStream)
+                    finalizeAsset(id)
                 } catch (Exception e) {
                     logError(id, e)
                 }
