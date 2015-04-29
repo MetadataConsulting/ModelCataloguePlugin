@@ -104,7 +104,7 @@ angular.module('mc.util.ui.actions', []).provider 'actions', ->
               createdActions = createActionsFunction(input) ? []
               for createdAction, i in createdActions
                 createdAction.generatedBy = generatorAction.id
-                createdAction.id          = createdAction.id ? "#{generatorAction.id}:#{i}"
+                createdAction.id          = createdAction.id ? "#{generatorAction.id}_#{i}"
                 createdAction.position    = generatorAction.position + (1 + i)
                 createdAction.run         = ->
                   $rootScope.$broadcast "createdAction:#{@id}", @action()

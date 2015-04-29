@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.pages.AssetListPage
 import spock.lang.Stepwise
 
@@ -203,14 +204,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        10.times {
-            actionButton('refresh-asset').click()
-            try {
-                waitFor {
-                    subviewTitle.text() == 'Import for MET-522.xlsx FINALIZED'
-                }
-            } catch (ignored) {}
-        }
+        waitUntilFinalized('Import for MET-522.xlsx')
 
         goToDetailUsingSearch('MET-522')
 
@@ -219,6 +213,57 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             subviewTitle.text() == 'MET-522 DRAFT'
         }
         totalOf('classifies') == 43
+
+        when:
+        goToDetailUsingSearch('MET-522.M1', 'MET-522')
+
+        then:
+        waitFor(60) {
+            subviewTitle.text() == 'MET-522.M1 DRAFT'
+        }
+
+        when:
+        actionButton('export').click()
+
+        noStale({ $('span', text: 'Export All Elements of MET-522.M1 to Excel XSLX').parent('a') }) { exportAll ->
+            if (exportAll.displayed) {
+                exportAll.click()
+            }
+        }
+
+        withWindow({
+            title != 'MET-522.M1 (MET-522)'
+        }) {
+            waitFor {
+                subviewTitle.text().startsWith 'Data Elements to Excel.xlsx'
+            }
+            waitUntilFinalized('Data Elements to Excel.xlsx')
+
+            ExcelLoader parser = new ExcelLoader(new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
+            def (headers, rows) = parser.parse()
+
+            assert headers.size() >= 17
+            assert rows.size() == 5
+        }
+
+        then:
+        true
+    }
+
+    void waitUntilFinalized(String expectedName) {
+        if (subviewTitle.text() == "${expectedName} PENDING") {
+            10.times {
+                actionButton('refresh-asset').click()
+                try {
+                    waitFor {
+                        subviewTitle.text() == "${expectedName} FINALIZED"
+                    }
+                } catch (e) {
+                    if (it == 9) throw e
+                }
+            }
+        }
+
     }
 
 

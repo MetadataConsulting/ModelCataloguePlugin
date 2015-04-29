@@ -158,16 +158,27 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
         sampleXsd
     }
 
-    void goToDetailUsingSearch(String name) {
+    void goToDetailUsingSearch(String name, String classification = null) {
+        String qualifiedName = classification ? "$name ($classification)" : name
+
         noStale({ $('#search-term')}) { searchTerm ->
             searchTerm.value(name)
         }
         waitFor {
-            $('span.omnisearch-text', text: name).displayed
+            $('span.omnisearch-text', text: qualifiedName).displayed
         }
-        noStale({ $('span.omnisearch-text', text: name).parent('a')}) { resultLink ->
+        noStale({ $('span.omnisearch-text', text: qualifiedName).parent('a')}) { resultLink ->
             resultLink.click()
         }
+    }
+
+    String getCurrentId() {
+        def matcher = currentUrl =~ /\/(\d+)(\/)?/
+
+        if (matcher) {
+            return matcher[0][1]
+        }
+        return null
     }
 
 }
