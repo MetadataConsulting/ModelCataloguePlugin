@@ -2,15 +2,12 @@ package org.modelcatalogue.core
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
+import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.pages.AssetListPage
 import spock.lang.Stepwise
 
 @Stepwise
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
-
-    private final String SAMPLE_XSD_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b4e21b12613f70fd7733428e7bbb8434faec4925/example.xsd"
-    private final String SAMPLE_VALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/d8369d85bb6b09e06706a96973697acc1010c439/example.xml"
-    private final String SAMPLE_INVALID_XML_URL = "https://gist.githubusercontent.com/musketyr/fdafc05a3383758b6475/raw/b8d405978d8c42ed6c2f80a080bbf56f03aaf7ae/example-invalid.xml"
 
     @Rule TemporaryFolder tmp = new TemporaryFolder()
 
@@ -45,7 +42,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         $('#name').value('Sample XSD')
-        $('#asset').value(download('sample.xsd', SAMPLE_XSD_URL).absolutePath)
+        $('#asset').value(file('example.xsd'))
 
         modalDialog.find("button.btn-success").click()
 
@@ -84,7 +81,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        $('#xml').value(download('valid.xml', SAMPLE_VALID_XML_URL).absolutePath)
+        $('#xml').value(file('example.xml'))
 
         then:
         waitFor(60) {
@@ -92,7 +89,7 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        $('#xml').value(download('invalid.xml', SAMPLE_INVALID_XML_URL).absolutePath)
+        $('#xml').value(file('example-invalid.xml'))
 
         then:
         waitFor(60) {
@@ -109,12 +106,169 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
 
-    private File download(String name, String url) {
-        File sampleXsd = tmp.newFile(name)
-        def out = new BufferedOutputStream(new FileOutputStream(sampleXsd))
-        out << new URL(url).openStream()
-        out.close()
-        sampleXsd
+    def "upload mc file"() {
+        when:
+        go "#/catalogue/asset/all"
+
+        then:
+        at AssetListPage
+
+        when:
+        actionButton('new-import', 'list').click()
+        actionButton('import-mc').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        $('#asset').value(file('MET-523.mc'))
+
+        then:
+        waitFor {
+            !modalSuccessButton.disabled
+        }
+
+        when:
+        modalSuccessButton.click()
+
+        then:
+        waitFor(60) {
+            subviewTitle.displayed
+        }
+        waitFor(60) {
+            subviewTitle.text().startsWith('Import for MET-523.mc')
+        }
+
+        when:
+        10.times {
+            actionButton('refresh-asset').click()
+            try {
+                waitFor {
+                    subviewTitle.text() == 'Import for MET-523.mc FINALIZED'
+                }
+            } catch (ignored) {}
+        }
+
+        then:
+        waitFor {
+            $('td', 'data-value-for': 'Classifications').text() == 'MET-523'
+        }
+
+        when:
+        noStale({$('td', 'data-value-for': 'Classifications').find('a')}) {
+            it.click()
+        }
+
+        then:
+        waitFor {
+            subviewTitle.text() == 'MET-523 DRAFT'
+        }
+        totalOf('classifies') == 44
+    }
+
+    def "upload excel file"() {
+        when:
+        go "#/catalogue/asset/all"
+
+        then:
+        at AssetListPage
+
+        when:
+        actionButton('new-import', 'list').click()
+        actionButton('import-excel').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        $('#asset').value(file('MET-522.xlsx'))
+
+        then:
+        waitFor {
+            !modalSuccessButton.disabled
+        }
+
+        when:
+        modalSuccessButton.click()
+
+        then:
+        waitFor(60) {
+            subviewTitle.displayed
+        }
+        waitFor(60) {
+            subviewTitle.text().startsWith('Import for MET-522.xlsx')
+        }
+
+        when:
+        waitUntilFinalized('Import for MET-522.xlsx')
+
+        goToDetailUsingSearch('MET-522')
+
+        then:
+        waitFor(60) {
+            subviewTitle.text() == 'MET-522 DRAFT'
+        }
+        totalOf('classifies') == 43
+
+        when:
+        goToDetailUsingSearch('MET-522.M1', 'MET-522')
+
+        then:
+        waitFor(60) {
+            subviewTitle.text() == 'MET-522.M1 DRAFT'
+        }
+
+        when:
+        actionButton('export').click()
+
+        noStale({ $('span', text: 'Export All Elements of MET-522.M1 to Excel XSLX').parent('a') }) { exportAll ->
+            if (exportAll.displayed) {
+                exportAll.click()
+            }
+        }
+
+        withWindow({
+            title != 'MET-522.M1 (MET-522)'
+        }) {
+            waitFor {
+                subviewTitle.text().startsWith 'Data Elements to Excel.xlsx'
+            }
+            waitUntilFinalized('Data Elements to Excel.xlsx')
+
+            ExcelLoader parser = new ExcelLoader(new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
+            def (headers, rows) = parser.parse()
+
+            assert headers.size() >= 17
+            assert rows.size() == 5
+        }
+
+        then:
+        true
+    }
+
+    void waitUntilFinalized(String expectedName) {
+        if (subviewTitle.text() == "${expectedName} PENDING") {
+            10.times {
+                actionButton('refresh-asset').click()
+                try {
+                    waitFor {
+                        subviewTitle.text() == "${expectedName} FINALIZED"
+                    }
+                } catch (e) {
+                    if (it == 9) throw e
+                }
+            }
+        }
+
+    }
+
+
+    String file(String name) {
+        new File(AssetWizardSpec.getResource(name).toURI()).absolutePath
     }
 
 }

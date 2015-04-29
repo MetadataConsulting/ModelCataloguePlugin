@@ -42,6 +42,9 @@ class InitCatalogueService {
 
         // first pass
         for (Resource resource in resolver.getResources('classpath*:**/*.mc')) {
+            if (resource.file.absolutePath.contains('/test/')) {
+                continue
+            }
             try {
                 readMCFile(resource, shell, builder, true)
             } catch (Exception e) {

@@ -23,6 +23,7 @@ abstract class ModelCataloguePage extends Page {
         modalDialog(OPT)        { $("div.modal") }
         modalHeader(OPT)        { $("div.modal-header h4") }
         modalPrimaryButton(OPT) { $("div.modal").find('button.btn-primary') }
+        modalSuccessButton(OPT) { $("div.modal").find('button.btn-success') }
         modalCloseButton(OPT)   { $("div.modal").find('button.close') }
 
         username                { $("div.modal").find("#username") }
