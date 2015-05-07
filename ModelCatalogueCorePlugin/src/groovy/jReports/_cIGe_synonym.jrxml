@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-03-25T15:25:25 -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="_cIGe_synonym" language="groovy" pageWidth="153" pageHeight="153" columnWidth="153" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f6456558-b312-4f1b-8f79-cfcf39c1375f">
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-05-07T20:34:21 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="_cIGe_synonym" language="groovy" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="f6456558-b312-4f1b-8f79-cfcf39c1375f">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<parameter name="VALUE_DOMAINS" class="java.util.TreeSet"/>
 	<queryString>
 		<![CDATA[]]>
@@ -12,21 +14,23 @@
 		<fieldDescription><![CDATA[_THIS]]></fieldDescription>
 	</field>
 	<detail>
-		<band height="19" splitType="Stretch">
+		<band height="18" splitType="Stretch">
 			<property name="local_mesure_unitheight" value="pixel"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<printWhenExpression><![CDATA[($F{currObj}.classifications[0].name!="Genomics England Forms" && $F{currObj}.classifications[0].name!="Rare Diseases" && $F{currObj}.classifications[0].name!="Cancer")]]></printWhenExpression>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="153" height="19" uuid="862a0b3e-347d-4d0d-8b11-b6a0c515a749">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="150" height="18" uuid="862a0b3e-347d-4d0d-8b11-b6a0c515a749">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="local_mesure_unitx" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="local_mesure_unity" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<property name="local_mesure_unitwidth" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<box padding="3" topPadding="2" leftPadding="2" bottomPadding="0" rightPadding="3">
+				<box topPadding="0" leftPadding="0" bottomPadding="0" rightPadding="0">
 					<topPen lineWidth="0.0"/>
 					<leftPen lineWidth="0.0"/>
 					<bottomPen lineWidth="0.0"/>

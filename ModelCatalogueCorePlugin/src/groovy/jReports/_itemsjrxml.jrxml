@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-03-25T15:04:39 -->
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-05-07T16:38:56 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="_itemsjrxml" language="groovy" pageWidth="555" pageHeight="842" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="20" whenResourceMissingType="Empty" uuid="57a9a8d8-2f95-48f3-b7df-71c6512c92cd">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="net.sf.jasperreports.print.create.bookmarks" value="true"/>
+	<style name="Heading 1" fill="Solid" fontName="Calibri" fontSize="20" isBold="true" isPdfEmbedded="false"/>
+	<style name="Heading 2" fontName="Calibri" fontSize="18" isBold="true"/>
+	<style name="Heading 3" fontName="Calibri" fontSize="16" isBold="true"/>
+	<style name="Heading 4" fontName="Calibri" fontSize="16" isBold="false"/>
+	<style name="Heading 5" fontName="Calibri" fontSize="16" isBold="false"/>
+	<style name="Heading 6" fontName="Calibri" fontSize="16" isBold="false"/>
 	<parameter name="REPORTS_PATH" class="java.lang.String"/>
 	<parameter name="VALUE_DOMAINS" class="java.util.TreeSet">
 		<parameterDescription><![CDATA[]]></parameterDescription>
 	</parameter>
+	<parameter name="LEVEL" class="java.lang.Integer">
+		<defaultValueExpression><![CDATA[1]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SHOW_DOMAIN_ID" class="java.lang.Boolean"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -28,7 +39,7 @@
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<printWhenExpression><![CDATA[$F{currentObject}.contains!=null]]></printWhenExpression>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="0" y="60" width="555" height="30" isRemoveLineWhenBlank="true" forecolor="#5C5C5C" uuid="46e17823-0a7e-447d-8b44-b1d8d907c317">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="60" width="555" height="30" isRemoveLineWhenBlank="true" isPrintWhenDetailOverflows="true" forecolor="#5C5C5C" uuid="46e17823-0a7e-447d-8b44-b1d8d907c317">
 					<property name="local_mesure_unity" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="local_mesure_unitwidth" value="pixel"/>
@@ -40,14 +51,73 @@
 				</textElement>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement x="0" y="20" width="555" height="30" uuid="451f0188-bf24-47cb-898d-54f57534079c">
-					<property name="net.sf.jasperreports.export.pdf.tag.h1" value="full"/>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" bookmarkLevel="1">
+				<reportElement style="Heading 1" x="0" y="20" width="555" height="30" isPrintWhenDetailOverflows="true" uuid="451f0188-bf24-47cb-898d-54f57534079c">
+					<printWhenExpression><![CDATA[$P{LEVEL}==1]]></printWhenExpression>
 				</reportElement>
-				<textElement>
-					<font fontName="Calibri" size="16" isBold="true"/>
-				</textElement>
+				<textElement markup="none"/>
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{name}]]></anchorNameExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" bookmarkLevel="1">
+				<reportElement style="Heading 2" x="0" y="20" width="555" height="30" isPrintWhenDetailOverflows="true" uuid="7952f4ad-769f-4d29-ae68-67ffd7515354">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[$P{LEVEL}==2]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{name}]]></anchorNameExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" bookmarkLevel="1">
+				<reportElement style="Heading 3" x="0" y="20" width="555" height="30" isPrintWhenDetailOverflows="true" uuid="71aa62c5-d8e3-4148-bc1f-89ead71be99f">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[$P{LEVEL}==3]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{name}]]></anchorNameExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" bookmarkLevel="1">
+				<reportElement style="Heading 4" x="0" y="20" width="555" height="30" isPrintWhenDetailOverflows="true" uuid="1492a001-8d57-48c2-9e16-628b5332f9f4">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[$P{LEVEL}==4]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{name}]]></anchorNameExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" bookmarkLevel="1">
+				<reportElement style="Heading 5" x="0" y="20" width="555" height="30" isPrintWhenDetailOverflows="true" uuid="b48412d8-ce99-4334-93db-a4a13d01db79">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[$P{LEVEL}==5]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{name}]]></anchorNameExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true" bookmarkLevel="1">
+				<reportElement style="Heading 6" x="0" y="20" width="555" height="30" isPrintWhenDetailOverflows="true" uuid="0b0e7f0a-8639-43e4-bfea-68059ae8537d">
+					<property name="local_mesure_unitx" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="local_mesure_unity" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+					<printWhenExpression><![CDATA[$P{LEVEL}>5]]></printWhenExpression>
+				</reportElement>
+				<textElement markup="none"/>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+				<anchorNameExpression><![CDATA[$F{name}]]></anchorNameExpression>
 			</textField>
 		</band>
 		<band height="50" splitType="Stretch">
@@ -69,6 +139,9 @@
 				<subreportParameter name="VALUE_DOMAINS">
 					<subreportParameterExpression><![CDATA[$P{VALUE_DOMAINS}]]></subreportParameterExpression>
 				</subreportParameter>
+				<subreportParameter name="SHOW_DOMAIN_ID">
+					<subreportParameterExpression><![CDATA[$P{SHOW_DOMAIN_ID}]]></subreportParameterExpression>
+				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{currentObject}.containsRelationships)]]></dataSourceExpression>
 				<subreportExpression><![CDATA[new File($P{REPORTS_PATH}+"/_item_description.jasper")]]></subreportExpression>
 			</subreport>
@@ -89,6 +162,12 @@
 				</subreportParameter>
 				<subreportParameter name="VALUE_DOMAINS">
 					<subreportParameterExpression><![CDATA[$P{VALUE_DOMAINS}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="LEVEL">
+					<subreportParameterExpression><![CDATA[$P{LEVEL}+1]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SHOW_DOMAIN_ID">
+					<subreportParameterExpression><![CDATA[$P{SHOW_DOMAIN_ID}]]></subreportParameterExpression>
 				</subreportParameter>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{currentObject}.parentOf)]]></dataSourceExpression>
 				<subreportExpression><![CDATA[new File($P{REPORTS_PATH}+"/_itemsjrxml.jasper")]]></subreportExpression>
