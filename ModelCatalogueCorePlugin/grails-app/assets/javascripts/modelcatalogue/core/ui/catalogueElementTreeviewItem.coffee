@@ -46,10 +46,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         return if showMore.hasClass '.hide'
         root = $element.closest('.catalogue-element-treeview-list-root')
         if showMore.offset()?.top < root.offset()?.top + 3 * root.height() and angular.isFunction($scope.element.$$showMore)
-          $scope.element.$$showMore().then ->
-            root.hide()
-            root.get(0).offsetHeight
-            root.show()
+          $scope.element.$$showMore()
 
       createShowMore  = (list) ->
         # function to load more items to existing $$children helper property
