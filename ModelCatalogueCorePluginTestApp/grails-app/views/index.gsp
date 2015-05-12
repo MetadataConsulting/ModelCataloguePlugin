@@ -110,6 +110,7 @@
                 return function(exception, cause) {
                     $log.error(exception, cause);
                     window.printErrorInPre(exception.stack);
+                    window.printErrorInPre(cause);
                 };
             });
 
