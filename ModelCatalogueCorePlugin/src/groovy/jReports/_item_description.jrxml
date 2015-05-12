@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-03-25T15:25:05 -->
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-05-07T20:36:19 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="_item_description" language="groovy" pageWidth="555" pageHeight="200" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e57f3b6b-4e58-43cb-bd9e-c2ac8f079484">
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<property name="net.sf.jasperreports.print.create.bookmarks" value="false"/>
+	<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 	<parameter name="REPORTS_PATH" class="java.lang.String"/>
 	<parameter name="VALUE_DOMAINS" class="java.util.TreeSet"/>
+	<parameter name="SHOW_DOMAIN_ID" class="java.lang.Boolean"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -120,11 +122,12 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="21" splitType="Prevent">
+		<band height="20" splitType="Prevent">
 			<property name="local_mesure_unitheight" value="pixel"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="21" uuid="bde08c78-e7d2-4594-909e-27bfdf1cbdca">
+				<reportElement key="z" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20" uuid="bde08c78-e7d2-4594-909e-27bfdf1cbdca">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="local_mesure_unity" value="pixel"/>
@@ -139,10 +142,11 @@
 				<textElement>
 					<font fontName="Calibri" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{currentObject}.destination.name]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{currentObject}.destination.name+($P{SHOW_DOMAIN_ID}==Boolean.TRUE?" ("+($F{currentObject}.destination.latestVersionId!=null?$F{currentObject}.destination.latestVersionId:$F{currentObject}.destination.id)+"."+$F{currentObject}.destination.versionNumber+')':''
+)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="100" y="0" width="140" height="21" uuid="6d006074-055f-4cd4-958b-1373b629e5a7">
+				<reportElement key="z" stretchType="RelativeToBandHeight" x="100" y="0" width="140" height="20" uuid="6d006074-055f-4cd4-958b-1373b629e5a7">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -159,7 +163,7 @@
 				<textFieldExpression><![CDATA[$F{currentObject}.destination.description]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="240" y="0" width="74" height="21" uuid="ff6cf63e-b5d2-43b7-ad10-2af2f1cbd553">
+				<reportElement key="z" stretchType="RelativeToBandHeight" x="240" y="0" width="74" height="20" uuid="ff6cf63e-b5d2-43b7-ad10-2af2f1cbd553">
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
@@ -175,7 +179,7 @@
 				<textFieldExpression><![CDATA[$F{currentObject}.ext.get("Min Occurs")+".."+$F{currentObject}.ext.get("Max Occurs")]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true" hyperlinkType="Reference">
-				<reportElement stretchType="RelativeToBandHeight" x="314" y="0" width="86" height="21" uuid="22c1823e-b1e5-426b-81c4-0acf43aa71d9">
+				<reportElement key="z" stretchType="RelativeToBandHeight" x="314" y="0" width="86" height="20" uuid="22c1823e-b1e5-426b-81c4-0acf43aa71d9">
 					<property name="local_mesure_unitwidth" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -196,22 +200,18 @@
 				<hyperlinkAnchorExpression><![CDATA["#ANC_"+$F{currentObject}.destination.valueDomain?.name]]></hyperlinkAnchorExpression>
 			</textField>
 			<frame>
-				<reportElement stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="400" y="0" width="155" height="21" uuid="af082d1a-b36c-489a-afc5-6daeb51c8402">
+				<reportElement stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="400" y="0" width="155" height="20" uuid="f5446fdd-4dd7-4a87-b47d-b5c430e94d00">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<property name="local_mesure_unitwidth" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="local_mesure_unity" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<box padding="0">
+				<box>
 					<topPen lineWidth="0.1" lineColor="#CCCCCC"/>
 					<leftPen lineWidth="0.1" lineColor="#CCCCCC"/>
 					<bottomPen lineWidth="0.1" lineColor="#CCCCCC"/>
 					<rightPen lineWidth="0.1" lineColor="#CCCCCC"/>
 				</box>
 				<subreport>
-					<reportElement key="" stretchType="RelativeToTallestObject" isPrintRepeatedValues="false" x="0" y="0" width="155" height="21" uuid="f377d764-53e3-4b48-aced-039f6f605d36">
+					<reportElement key="z" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="3" y="0" width="150" height="18" uuid="f377d764-53e3-4b48-aced-039f6f605d36">
 						<property name="local_mesure_unitx" value="pixel"/>
 						<property name="com.jaspersoft.studio.unit.x" value="px"/>
 						<property name="local_mesure_unity" value="pixel"/>
