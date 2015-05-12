@@ -39,7 +39,7 @@ class DiscourseService implements LogoutListener {
         String newName = classificationEntity.name
 
         if (newName.size() > 50) {
-            log.warn("Classification name too long, using only first 50 characters")
+            log.warn("Classification name $newName too long, using only first 50 characters")
             newName = newName.substring(0,50)
         }
 
