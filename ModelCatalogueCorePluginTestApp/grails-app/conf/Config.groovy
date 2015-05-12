@@ -117,13 +117,15 @@ log4j = {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'grails.app.services.org.modelcatalogue.core'
+    debug 'grails.app.services.org.modelcatalogue'
+    debug 'grails.app.controllers.org.modelcatalogue'
 
     debug 'org.modelcatalogue.core.dataarchitect.xsd.XSDImporter'
 
     debug 'org.modelcatalogue.core.util.builder'
     debug 'org.modelcatalogue.core.publishing'
     debug 'org.modelcatalogue.core.util.test'
+    debug 'org.modelcatalogue.discourse'
 
 //    debug 'org.codehaus.groovy.grails.web.mapping'
 //    debug 'org.springframework.security'
@@ -135,7 +137,7 @@ log4j = {
 //        debug 'org.hibernate.SQL'
 //    }
 
-    warn 'org.modelcatalogue.core'
+    warn 'org.modelcatalogue'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -256,3 +258,17 @@ grails.plugin.springsecurity.logout.handlerNames = [
         'securityContextLogoutHandler',
         'modelCatalogueSecurityService' // both spring security services implements it
 ]
+
+discourse {
+    url = "http://192.168.1.123/"
+    api {
+        key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
+        user = "discourse"
+    }
+    users {
+        fallbackEmail = 'vladimir.orany+:username@gmail.com'
+    }
+    sso {
+        key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
+    }
+}
