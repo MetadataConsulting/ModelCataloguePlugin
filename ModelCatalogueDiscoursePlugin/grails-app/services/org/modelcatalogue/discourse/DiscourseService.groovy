@@ -35,7 +35,15 @@ class DiscourseService implements LogoutListener {
             return classification.discourseCategoryName
         }
 
-        def newClassification = discourse.categories.createCategory(classificationEntity.name, '283890', 'FFFFFF', classificationEntity.description)
+
+        String newName = classificationEntity.name
+
+        if (newName.size() > 50) {
+            log.warn("Classification name $newName too long, using only first 50 characters")
+            newName = newName.substring(0,50)
+        }
+
+        def newClassification = discourse.categories.createCategory(newName, '283890', 'FFFFFF', classificationEntity.description)
 
         if (newClassification.status == 500) {
             throw new IllegalArgumentException("Cannot create classification: Discourse Server Error")
@@ -43,9 +51,9 @@ class DiscourseService implements LogoutListener {
 
         if (newClassification.data.errors) {
             if ("Category Name has already been taken" in newClassification.data.errors) {
-                newClassification = discourse.categories.getCategory(classificationEntity.name)
+                newClassification = discourse.categories.getCategory(newName)
                 if (newClassification.status == 200) {
-                    return new CategoriesForClassifications(discourseCategoryName: classificationEntity.name, classificationId: classificationId).save(flush: true).discourseCategoryName
+                    return new CategoriesForClassifications(discourseCategoryName: newName, classificationId: classificationId).save(flush: true).discourseCategoryName
                 }
             }
             throw new IllegalArgumentException("Cannot create classification: ${newClassification.data.errors.join(', ')}")
