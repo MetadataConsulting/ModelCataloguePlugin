@@ -115,7 +115,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
         Long authorId = modelCatalogueSecurityService.currentUser?.id
 
         executorService.submit {
-            AuditService.withDefaultAuthorId(authorId) {
+            auditService.withDefaultAuthorId(authorId) {
                 try {
                     WebXlsxExporter exporter
                     if (layoutFileName) {

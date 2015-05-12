@@ -251,19 +251,18 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
     void waitUntilFinalized(String expectedName) {
-        if (subviewTitle.text() == "${expectedName} PENDING") {
-            10.times {
+        10.times {
+            if (subviewTitle.text() == "${expectedName} PENDING") {
                 actionButton('refresh-asset').click()
                 try {
-                    waitFor {
+                    waitFor(10) {
                         subviewTitle.text() == "${expectedName} FINALIZED"
                     }
                 } catch (e) {
-                    if (it == 9) throw e
+                    if (it == 9) throw new RuntimeException("Waiting for element finalization. Expected '${expectedName} FINALIZED' got '${subviewTitle.text()}", e)
                 }
             }
         }
-
     }
 
 

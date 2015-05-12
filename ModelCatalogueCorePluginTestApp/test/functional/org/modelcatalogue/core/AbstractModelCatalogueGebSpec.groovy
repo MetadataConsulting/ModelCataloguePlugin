@@ -109,6 +109,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
     public <R> R noStale(int maxAttempts = 10, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
         int attempt = 0
+        Throwable error = null
         while (attempt < maxAttempts) {
             attempt++
             try {
@@ -117,11 +118,12 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                     navigator.displayed
                 }
                 return resultClosure(navigator)
-            } catch (StaleElementReferenceException | WaitTimeoutException ignored) {
+            } catch (StaleElementReferenceException | WaitTimeoutException e) {
                 Thread.sleep(Math.round(Math.pow(2, attempt)))
+                error = e
             }
         }
-        throw new IllegalArgumentException("Cannot evaluate expression after $maxAttempts attempts")
+        throw new IllegalArgumentException("Cannot evaluate expression after $maxAttempts attempts", error)
     }
 
 
