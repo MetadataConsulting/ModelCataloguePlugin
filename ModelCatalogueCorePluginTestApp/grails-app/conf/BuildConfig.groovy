@@ -23,7 +23,7 @@ grails.project.fork = [
 
 
 grails.plugin.location.'model-catalogue-core' = "../ModelCatalogueCorePlugin"
-grails.plugin.location.'model-catalogue-core' = "../ModelCatalogueDiscoursePlugin"
+grails.plugin.location.'model-catalogue-discourse' = "../ModelCatalogueDiscoursePlugin"
 grails.plugin.location.'model-catalogue-security-ss2' = "../ModelCatalogueSpringSecurity2xPlugin"
 
 grails.project.dependency.resolver = "maven" // or ivy
@@ -62,6 +62,8 @@ grails.project.dependency.resolution = {
         runtime "org.modelcatalogue:spring-security-ajax-aware:0.1.1"
         runtime 'mysql:mysql-connector-java:5.1.24'
 
+        runtime "org.apache.httpcomponents:httpclient:4.3.1"
+
         // Selenium WebDriver, for use in Geb
         def webDriverVersion =  System.getenv('WEB_DRIVER_VERSION') ?: "2.45.0"
 
@@ -73,7 +75,6 @@ grails.project.dependency.resolution = {
         test "org.seleniumhq.selenium:selenium-remote-driver:${webDriverVersion}"
 
         // Required because of bug in 2.37.0 of WebDriver:
-        test "org.apache.httpcomponents:httpclient:4.3.1"
         test("org.seleniumhq.selenium:selenium-htmlunit-driver:${webDriverVersion}") {
             exclude 'xml-apis'
         }
