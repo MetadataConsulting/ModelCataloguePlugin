@@ -2,14 +2,6 @@
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
 
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
-
-// if (System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
@@ -88,6 +80,19 @@ environments {
     development {
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        discourse {
+            url = "http://192.168.1.123/"
+            api {
+                key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
+                user = "discourse"
+            }
+            users {
+                fallbackEmail = 'vladimir.orany+:username@gmail.com'
+            }
+            sso {
+                key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
+            }
+        }
     }
     local {
         grails.logging.jul.usebridge = true
@@ -96,10 +101,29 @@ environments {
     test {
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        discourse {
+            url = "http://192.168.1.123/"
+            api {
+                key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
+                user = "discourse"
+            }
+            users {
+                fallbackEmail = 'vladimir.orany+:username@gmail.com'
+            }
+            sso {
+                key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
+            }
+        }
     }
     production {
-        grails.logging.jul.usebridge = false
-        grails.serverURL = System.getenv('METADATA_SERVER_URL') ?:  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
+        grails.config.locations = [ "classpath:mc-config.properties",
+                                    "classpath:mc-config.groovy",
+                                    "file:${userHome}/.grails/mc-config.properties",
+                                    "file:${userHome}/.grails/mc-config.groovy"]
+
+        if (System.properties["mc.config.location"]) {
+            grails.config.locations << "file:" + System.properties["mc.config.location"]
+        }
     }
 }
 
@@ -258,17 +282,3 @@ grails.plugin.springsecurity.logout.handlerNames = [
         'securityContextLogoutHandler',
         'modelCatalogueSecurityService' // both spring security services implements it
 ]
-
-discourse {
-    url = "http://192.168.1.123/"
-    api {
-        key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
-        user = "discourse"
-    }
-    users {
-        fallbackEmail = 'vladimir.orany+:username@gmail.com'
-    }
-    sso {
-        key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
-    }
-}
