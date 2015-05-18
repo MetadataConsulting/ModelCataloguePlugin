@@ -689,7 +689,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
   <div hide-if-logged-in>
 		<div class="jumbotron">
 			<h1>Model Catalogue</h1>
-      <h2>The Tumtum Tree Project</h2>
 			<p class="lead">
 				<b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b>
 				and version new datasets <b><em>Generate</em></b> better
@@ -734,18 +733,15 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                       <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sponsored by</div>
                       <div class="col-lg-4 col-sm-4 col-md-4">
                         <p><a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC</a></p>
-                        <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;">
                       </div>
                       <div class="col-lg-4 col-sm-4 col-md-4">
                         <p> <a href="http://www.nihr.ac.uk/about/nihr-hic.htm">NHIC</a></p>
-                        <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;">
                       </div>
                       <div class="col-lg-4 col-sm-4 col-md-4">
                         <p><a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a></p>
-                        <img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;">
                       </div>
                       <div class="col-lg-12 col-sm-12 col-md-12">
-                        <p>&copy; 2015 The Tumtumtree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
+                        <p>&copy; 2015 A Tum Tum Tree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
                       </div>
                     </div>
                 </div>
@@ -989,18 +985,15 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                   <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sponsored by</div>
                                   <div class="col-lg-4 col-sm-4 col-md-4">
                                     <p><a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC</a></p>
-                                    <img class="img-rectangle" src="images/OxBRClogo_tiny.png" style="width: 373px; height: 26px;">
                                   </div>
                                   <div class="col-lg-4 col-sm-4 col-md-4">
                                     <p> <a href="http://www.nihr.ac.uk/about/nihr-hic.htm">NHIC</a></p>
-                                    <img class="img-rectangle" src="images/nhic_small.png" style="width: 59px; height: 26px;">
                                   </div>
                                   <div class="col-lg-4 col-sm-4 col-md-4">
                                     <p><a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a></p>
-                                    <img class="img-rectangle" src="images/metadatalogo_small.png" style="width: 49px; height: 26px;">
                                   </div>
                                   <div class="col-lg-12 col-sm-12 col-md-12">
-                                    <p>&copy; 2015 The Tumtumtree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
+                                    <p>&copy; 2015 A Tum Tum Tree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
                                   </div>
                                 </div>
                             </div>
