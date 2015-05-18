@@ -1,7 +1,7 @@
 // config
 grails.logging.jul.usebridge = false
-grails.app.context = '/'
-grails.serverURL = System.getenv('METADATA_SERVER_URL') ?:  "http://localhost:${System.getProperty('server.port') ?: 8080}"
+// grails.app.context = '/'
+grails.serverURL = System.getenv('METADATA_SERVER_URL') ?:  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
 
 // datasource
 dataSource {
