@@ -101,19 +101,6 @@ environments {
     test {
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
-        discourse {
-            url = "http://192.168.1.123/"
-            api {
-                key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
-                user = "discourse"
-            }
-            users {
-                fallbackEmail = 'vladimir.orany+:username@gmail.com'
-            }
-            sso {
-                key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
-            }
-        }
     }
     production {
         grails.config.locations = [ "classpath:mc-config.properties",
