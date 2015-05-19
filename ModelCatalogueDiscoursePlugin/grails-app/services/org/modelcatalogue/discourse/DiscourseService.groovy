@@ -150,6 +150,10 @@ class DiscourseService implements LogoutListener {
         notNull grailsApplication.config.discourse.url, "Discourse URL not set (discourse.url in Config.groovy)"
     }
 
+    boolean getDiscourseEnabled() {
+        grailsApplication.config.discourse.url
+    }
+
     boolean getDiscourseSSOEnabled() {
         discourseSSOKey as Boolean
     }
