@@ -125,8 +125,8 @@ environments {
             grails.config.locations << "file:" + System.properties["mc.config.location"]
         }
 
-        if (System.properties['catalina.home']) {
-            def tomcatConfDir = new File("${System.properties['catalina.home']}/conf")
+        if (System.properties['catalina.base']) {
+            def tomcatConfDir = new File("${System.properties['catalina.base']}/conf")
             if (tomcatConfDir.isDirectory()) {
                 grails.config.locations << "file:${tomcatConfDir.canonicalPath}/mc-config.groovy"
             }
