@@ -340,7 +340,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
 
   catalogueElementPropertiesProvider.configureProperty 'enumerations', tabDefinition: ['$element', '$name', '$value', '$scope', 'catalogueElementProperties', '$injector', 'security', ($element, $name, $value, $scope, catalogueElementProperties, $injector, security) ->
     definition = $injector.invoke(catalogueElementProperties.getConfigurationFor('type:object').tabDefinition, undefined, $element: $element, $name: $name, $value: $value, $scope: $scope)
-    definition.type = if security.hasRole('CURATOR') and $element.status == 'DRAFT' then 'simple-object-editor-for-enumerations' else 'properties-pane-for-enumerations'
+    definition.type = if security.hasRole('CURATOR') and $element.status == 'DRAFT' then 'ordered-map-editor-for-enumerations' else 'properties-pane-for-enumerations'
     definition
   ]
 
