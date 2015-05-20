@@ -572,7 +572,8 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        instance = elementService.archive(instance)
+        // do not archive relationships as we need to transfer the deprecated elements to the new versions
+        instance = elementService.archive(instance, false)
 
         if (instance.hasErrors()) {
             respond instance.errors, view: 'edit' // STATUS CODE 422

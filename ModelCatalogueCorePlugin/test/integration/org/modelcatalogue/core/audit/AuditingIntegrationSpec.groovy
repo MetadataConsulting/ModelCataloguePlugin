@@ -68,7 +68,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         initCatalogueService.initDefaultRelationshipTypes()
         when:
         DataType vOne = new DataType(name: "DT4DEF").save(flush: true, failOnError: true)
-        vOne = elementService.archive(vOne)
+        vOne = elementService.archive(vOne, true)
         vOne.save(flush: true, failOnError: true)
 
         Change change = Change.findByChangedIdAndType(vOne.id, ChangeType.ELEMENT_DEPRECATED)

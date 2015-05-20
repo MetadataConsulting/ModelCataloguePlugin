@@ -171,7 +171,7 @@ class CatalogueElementProxyRepository {
                 } else if (status == ElementStatus.DRAFT) {
                     elementService.createDraftVersion(catalogueElement, DraftContext.userFriendly())
                 } else if (status == ElementStatus.DEPRECATED) {
-                    elementService.archive(catalogueElement)
+                    elementService.archive(catalogueElement, true)
                 }
             }
         }

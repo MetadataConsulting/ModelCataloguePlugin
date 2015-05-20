@@ -111,7 +111,7 @@ class DraftChain extends PublishingChain {
         published.afterDraftPersisted(draft)
 
         if (published.status == ElementStatus.DRAFT) {
-            archiver.archive(published)
+            archiver.archive(published, true)
         }
 
         draft.status = ElementStatus.DRAFT

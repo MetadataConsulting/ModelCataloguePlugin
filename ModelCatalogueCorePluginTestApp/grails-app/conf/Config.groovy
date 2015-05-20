@@ -80,19 +80,19 @@ environments {
     development {
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
-        discourse {
-            url = "http://192.168.1.123/"
-            api {
-                key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
-                user = "discourse"
-            }
-            users {
-                fallbackEmail = 'vladimir.orany+:username@gmail.com'
-            }
-            sso {
-                key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
-            }
-        }
+//        discourse {
+//            url = "http://192.168.1.123/"
+//            api {
+//                key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
+//                user = "discourse"
+//            }
+//            users {
+//                fallbackEmail = 'vladimir.orany+:username@gmail.com'
+//            }
+//            sso {
+//                key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
+//            }
+//        }
     }
     local {
         grails.logging.jul.usebridge = true

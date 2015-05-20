@@ -59,29 +59,31 @@ class ElementService implements Publisher<CatalogueElement> {
 
 
 
-    CatalogueElement archive(CatalogueElement archived) {
+    CatalogueElement archive(CatalogueElement archived, boolean archiveRelationships) {
         if (archived.archived) {
             return archived
         }
 
         CatalogueElement.withTransaction { TransactionStatus status ->
             auditService.logElementDeprecated(archived) {
-                archived.incomingRelationships.each {
-                    if (it.relationshipType == RelationshipType.supersessionType) {
-                        return
+                if (archiveRelationships) {
+                    archived.incomingRelationships.each {
+                        if (it.relationshipType == RelationshipType.supersessionType) {
+                            return
+                        }
+                        it.archived = true
+                        FriendlyErrors.failFriendlySave(it)
+                        auditService.logRelationArchived(it)
                     }
-                    it.archived = true
-                    FriendlyErrors.failFriendlySave(it)
-                    auditService.logRelationArchived(it)
-                }
 
-                archived.outgoingRelationships.each {
-                    if (it.relationshipType == RelationshipType.supersessionType) {
-                        return
+                    archived.outgoingRelationships.each {
+                        if (it.relationshipType == RelationshipType.supersessionType) {
+                            return
+                        }
+                        it.archived = true
+                        FriendlyErrors.failFriendlySave(it)
+                        auditService.logRelationArchived(it)
                     }
-                    it.archived = true
-                    FriendlyErrors.failFriendlySave(it)
-                    auditService.logRelationArchived(it)
                 }
 
                 modelCatalogueSearchService.unindex(archived)
@@ -265,7 +267,7 @@ class ElementService implements Publisher<CatalogueElement> {
         }
 
         if (!source.archived) {
-            archive source
+            archive source, true
         }
 
         destination.addToSupersededBy(source, skipUniqueChecking: true)
