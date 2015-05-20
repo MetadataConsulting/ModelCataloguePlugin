@@ -30,6 +30,10 @@
 				<td><g:message code='spring.security.ui.search.either'/></td>
 			</tr>
 			<tr>
+				<td><g:message code='user.email.label' default='Email'/>:</td>
+				<td colspan='3'><g:textField name='email' size='50' maxlength='255' autocomplete='off' value='${email}'/></td>
+			</tr>
+			<tr>
 				<td><g:message code='user.enabled.label' default='Enabled'/>:</td>
 				<g:radioGroup name='enabled' labels="['','','']" values="[1,-1,0]" value='${enabled}'>
 				<td><%=it.radio%></td>
@@ -74,6 +78,7 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 		<thead>
 		<tr>
 			<g:sortableColumn property="username" title="${message(code: 'user.username.label', default: 'Username')}" params="${queryParams}"/>
+			<g:sortableColumn property="email" title="${message(code: 'user.email.label', default: 'Email')}" params="${queryParams}"/>
 			<g:sortableColumn property="enabled" title="${message(code: 'user.enabled.label', default: 'Enabled')}" params="${queryParams}"/>
 			<g:sortableColumn property="accountExpired" title="${message(code: 'user.accountExpired.label', default: 'Account Expired')}" params="${queryParams}"/>
 			<g:sortableColumn property="accountLocked" title="${message(code: 'user.accountLocked.label', default: 'Account Locked')}" params="${queryParams}"/>
@@ -85,6 +90,7 @@ def queryParams = [username: username, enabled: enabled, accountExpired: account
 		<g:each in="${results}" status="i" var="user">
 		<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			<td><g:link action="edit" id="${user.id}">${fieldValue(bean: user, field: "username")}</g:link></td>
+			<td><g:link action="edit" id="${user.id}">${fieldValue(bean: user, field: "email")}</g:link></td>
 			<td><g:formatBoolean boolean="${user.enabled}"/></td>
 			<td><g:formatBoolean boolean="${user.accountExpired}"/></td>
 			<td><g:formatBoolean boolean="${user.accountLocked}"/></td>
