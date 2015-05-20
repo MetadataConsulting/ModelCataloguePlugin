@@ -58,6 +58,15 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                     property('relationshipType.id')
                 }
                 eq 'destination', el
+                if (!el.archived) {
+                    or {
+                        relationshipType {
+                            eq 'versionSpecific', true
+                        }
+                        eq('archived', false)
+                    }
+                }
+
             }
 
             incomingCounts.putAll classificationService.classified(incomingTypes).list().countBy { row ->
@@ -70,6 +79,14 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                     property('relationshipType.id')
                 }
                 eq 'source', el
+                if (!el.archived) {
+                    or {
+                        relationshipType {
+                            eq 'versionSpecific', true
+                        }
+                        eq('archived', false)
+                    }
+                }
             }
 
             outgoingCounts.putAll classificationService.classified(outgoingTypes).list().countBy { row ->
