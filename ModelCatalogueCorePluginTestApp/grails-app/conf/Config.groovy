@@ -100,13 +100,21 @@ environments {
     }
     test {
         // debugging failing functional tests on Travis CI
-        grails.assets.bundle=true
+        grails.assets.bundle=false
         grails.assets.minifyJs = false
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     production {
+        grails.assets.minifyOptions = [
+                strictSemicolons: false,
+                mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
+                genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
+        ]
+
+        grails.assets.minifyJs = true
+
         grails.config.locations = [ "classpath:mc-config.properties",
                                     "classpath:mc-config.groovy",
                                     "file:${userHome}/.grails/mc-config.properties",
@@ -258,16 +266,6 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = [
         "**/python2/*.*",
         "**/python3/*.*",
 ]
-
-grails.assets.minifyOptions = [
-        strictSemicolons: false,
-        mangleOptions: [mangle: false, toplevel: false, defines: null, except: null, no_functions:false],
-        genOptions: [indent_start:0, indent_level:4, quote_keys: false, space_colon: false, beautify: false, ascii_only: false, inline_script:false]
-]
-
-//grails.assets.bundle=false
-
-grails.assets.minifyJs = true
 
 
 grails.plugin.springsecurity.useBasicAuth = true
