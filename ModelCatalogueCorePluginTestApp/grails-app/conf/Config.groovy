@@ -99,9 +99,9 @@ environments {
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
     }
     test {
-        // debugging failing functional tests on Travis CI
-        grails.assets.bundle=false
-        grails.assets.minifyJs = false
+        // uncomment for debugging failing functional tests on Travis CI
+//        grails.assets.bundle=false
+//        grails.assets.minifyJs = false
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"

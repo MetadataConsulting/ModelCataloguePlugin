@@ -44,9 +44,7 @@
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome${minSuffix}.css">
 
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery${minSuffix}.js"></script>
-        %{--<script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui${minSuffix}.js"></script>--}%
-        %{--this is minimized jquery ui needed for ui-sortable plugin, if there is a need to add more functionality from jquery ui--}%
-        <script type="application/javascript" src="//cdn.jsdelivr.net/g/jquery.ui@1.10%28jquery.ui.core${minSuffix}.js+jquery.ui.widget${minSuffix}.js+jquery.ui.mouse${minSuffix}.js+jquery.ui.sortable${minSuffix}.js%29"></script>
+        <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.15/angular${minSuffix}.js"></script>
         <script type="application/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap-tpls${minSuffix}.js"></script>
