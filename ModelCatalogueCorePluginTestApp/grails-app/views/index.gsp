@@ -105,9 +105,10 @@
     </script>
     <g:if test="${Environment.current in [Environment.DEVELOPMENT, Environment.TEST, Environment.CUSTOM]}">
         <script type="text/javascript">
-            angular.module('demo.config').factory('$exceptionHandler', function($log) {
+            angular.module('demo.config').factory('$exceptionHandler', function($log, $window) {
                 return function(exception, cause) {
                     $log.error(exception, cause);
+                    window.printErrorInPre($window.location.href);
                     window.printErrorInPre(exception.stack);
                 };
             });

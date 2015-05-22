@@ -5,7 +5,7 @@ cetiModule.config ['$tooltipProvider', ($tooltipProvider) ->
 cetiModule.run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementTreeviewItem.html', '''
     <li class="catalogue-element-treeview-item">
-      <div class="catalogue-element-treeview-text-content" ng-class="{'active': element.$$active}">
+      <div class="catalogue-element-treeview-text-content" ng-class="{'active': element.$$active, 'archived': element.$$archived}">
         <span class="badge pull-right" ng-if="currentDescend &amp;&amp; element.$$numberOfChildren">{{element.$$numberOfChildren}}</span>
         <span
             class="catalogue-element-treeview-labels"

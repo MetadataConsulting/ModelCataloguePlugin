@@ -55,7 +55,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           list.next().then (nextList) ->
             for item in nextList.list
               it = if item.relation then item.relation else item
-              $scope.element.$$children.push(angular.extend(it, {$$metadata: item.ext, $$localName: getLocalName(item) }))
+              $scope.element.$$children.push(angular.extend(it, {$$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
             $scope.element.$$showMore = createShowMore(nextList)
             loadMoreIfNeeded()
             $scope.element.$$showingMore = false
@@ -89,7 +89,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
                 if key.indexOf('$') == 0
                   objectToExtend[key] = prop
 
-          newChildren.push(angular.extend(objectToExtend, it, {$$metadata: item.ext, $$localName: getLocalName(item) }))
+          newChildren.push(angular.extend(objectToExtend, it, {$$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false

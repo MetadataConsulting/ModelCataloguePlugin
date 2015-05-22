@@ -15,9 +15,6 @@ enum RelationshipDirection {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'source'
             criteria.eq('destination', element)
-            if (!element.archived && (!type || !type.versionSpecific)) {
-                criteria.eq('archived', false)
-            }
             if (type) {
                 criteria.eq('relationshipType', type)
             }
@@ -93,9 +90,6 @@ enum RelationshipDirection {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'destination'
             criteria.eq('source', element)
-            if (!element.archived && (!type || !type.versionSpecific)) {
-                criteria.eq('archived', false)
-            }
             if (type) {
                 criteria.eq('relationshipType', type)
             }
@@ -175,9 +169,6 @@ enum RelationshipDirection {
             criteria.or {
                 eq('source', element)
                 eq('destination', element)
-            }
-            if (!element.archived && (!type || !type.versionSpecific)) {
-                criteria.eq('archived', false)
             }
             if (type) {
                 criteria.eq('relationshipType', type)
