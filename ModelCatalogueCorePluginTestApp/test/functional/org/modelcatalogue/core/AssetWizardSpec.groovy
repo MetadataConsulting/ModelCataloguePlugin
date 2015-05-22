@@ -73,6 +73,13 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
     def "validate xml schema"() {
         when:
         actionButton('catalogue-element').click()
+
+        then:
+        waitFor {
+            actionButton('validate-xsd-schema')
+        }
+
+        when:
         actionButton('validate-xsd-schema').click()
 
         then:
@@ -115,6 +122,12 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         actionButton('new-import', 'list').click()
+        then:
+        waitFor {
+            actionButton('import-mc').displayed
+        }
+
+        when:
         actionButton('import-mc').click()
 
         then:
@@ -177,6 +190,12 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         actionButton('new-import', 'list').click()
+        then:
+        waitFor {
+            actionButton('import-excel').displayed
+        }
+
+        when:
         actionButton('import-excel').click()
 
         then:
