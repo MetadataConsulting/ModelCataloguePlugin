@@ -67,6 +67,10 @@ grails.project.dependency.resolution = {
         }
 
         compile ':spring-security-core:2.0-RC4'
+        compile ":spring-security-oauth:2.1.0-RC4"
+        compile ':spring-security-oauth-google:0.1'
+        compile ':spring-security-oauth-twitter:0.1'
+        compile ':spring-security-oauth-facebook:0.1'
         // compile ':model-catalogue-core:0.9.1'
     }
 }

@@ -77,11 +77,13 @@
         <asset:javascript src="modelcatalogue/modelcatalogue.js"/>
     </g:else>
     <g:set var="configurationProvider" bean="frontendConfigurationProviderRegistry"/>
+    <g:set var="oauthService" bean="oauthService"/>
     <script type="text/javascript">
         ${configurationProvider.frontendConfiguration}
         var demoConfig = angular.module('demo.config', ['mc.core.modelCatalogueApiRoot', 'mc.util.security']);
         demoConfig.config(['securityProvider', function (securityProvider) {
             securityProvider.springSecurity({
+                oauthProviders: ${oauthService.services.keySet().collect{"'$it'"}},
                 contextPath: '${request.contextPath ?: ''}',
                 roles: {
                     VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],

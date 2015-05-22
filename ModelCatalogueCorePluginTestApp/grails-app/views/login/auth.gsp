@@ -32,6 +32,7 @@
 </head>
 
 <body>
+<g:set var="oauth" bean="oauthService"/>
 <div id="metadataCurator" ng-app="metadataCurator">
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container-fluid">
@@ -44,16 +45,31 @@
 
     <div class="container-fluid container-main">
         <div class="row">
-            <div class="col-md-offset-3 col-md-6">
+            <g:if test="${oauth.services}">
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Login with Service Provider</h3>
+                        </div>
+                        <div class="panel-body">
+                            <g:each in="${oauth.services}" var="entry">
+                                <a class="btn btn-block btn-primary btn-lg" href="${createLink(controller: 'oauth', action: 'authenticate', params: [provider: entry.key])}"><span class="fa fa-fw fa-${entry.key}"></span> Login with ${entry.key.capitalize()} Account</a>
+
+                            </g:each>
+                        </div>
+                    </div>
+
+                </div>
+            </g:if>
+            <div class="${oauth.services ? '' : 'col-md-offset-3'} col-md-6">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title"><g:message code="springSecurity.login.header"/></h3>
+                        <h3 class="panel-title">Login with Username and Password</h3>
                     </div>
                     <div class="panel-body">
                         <g:if test='${flash.message}'>
                             <div class='alert alert-danger'>${flash.message}</div>
                         </g:if>
-
                         <form action='${postUrl}' method='POST' id='loginForm' class="form-horizontal" autocomplete='off'>
                             <div class="form-group">
                                 <label for='username' class="control-label col-sm-3"><g:message code="springSecurity.login.username.label"/>:</label>

@@ -4,7 +4,8 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
     security =
       isUserLoggedIn: -> true
       getCurrentUser: defaultUser
-      hasRole: (role) -> true
+      hasRole: -> true
+      hasRole: -> true
       login: (username, password, rememberMe = false) -> security.getCurrentUser()
       logout: -> $log.info "Logout requested on default security service"
       refreshUserData: defaultUser
@@ -78,6 +79,8 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
         result
 
       security =
+        oauthProviders: config.oauthProviders
+        contextPath: config.contextPath
         isUserLoggedIn: ->
           currentUser?
         getCurrentUser: ->

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core.security
 
 import org.apache.commons.lang.builder.HashCodeBuilder
+import org.modelcatalogue.core.util.FriendlyErrors
 
 class UserRole implements Serializable {
 
@@ -31,6 +32,17 @@ class UserRole implements Serializable {
     }
 
     static UserRole create(User user, Role role, boolean flush = false) {
+        if (!user.readyForQueries) {
+            if (!user.name) {
+                user.name = user.username
+            }
+            FriendlyErrors.failFriendlySave(user)
+        }
+        for (OAuthID authID in user.oAuthIDs) {
+            if (!authID.getId()) {
+                FriendlyErrors.failFriendlySave(authID)
+            }
+        }
         UserRole existing = findByUserAndRole(user, role)
         if (existing) {
             return existing

@@ -2,6 +2,8 @@
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
 
+// will be overriden by specific configuration but needs to exist at least as empty map
+oauth.providers = [:]
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
@@ -71,7 +73,7 @@ grails.spring.bean.packages = []
 grails.web.disable.multipart = false
 
 // request parameters to mask when logging exceptions
-grails.exceptionresolver.params.exclude = ['password']
+grails.exceptionresolver.params.exclude = ['password', 'password1', 'password2', 'client_secret']
 
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
@@ -93,6 +95,21 @@ environments {
 //                key = System.getenv('METADATA_DISCOURSE_SSO_KEY') ?: "notasecret"
 //            }
 //        }
+        oauth {
+            providers {
+                google {
+                    // this key is limited to localhost only so no need to hide it
+                    api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+                    key = '225917730237-0hg6u55rgnld9cbtm949ab9h9fk5onr3.apps.googleusercontent.com'
+                    secret = 'OG0JVVoy4bnGm48bneIS0haB'
+                    successUri = '/oauth/google/success'
+                    failureUri = '/oauth/google/error'
+                    callback = "${grails.serverURL}/oauth/google/callback"
+                    scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+                }
+            }
+        }
+        grails.mc.allow.signup = true
     }
     local {
         grails.logging.jul.usebridge = true
@@ -102,6 +119,21 @@ environments {
         // uncomment for debugging failing functional tests on Travis CI
         grails.assets.bundle=false
         grails.assets.minifyJs = false
+        oauth {
+            providers {
+                google {
+                    // this key is limited to localhost only so no need to hide it
+                    api = org.modelcatalogue.repack.org.scribe.builder.api.GoogleApi20
+                    key = '225917730237-0hg6u55rgnld9cbtm949ab9h9fk5onr3.apps.googleusercontent.com'
+                    secret = 'OG0JVVoy4bnGm48bneIS0haB'
+                    successUri = '/oauth/google/success'
+                    failureUri = '/oauth/google/error'
+                    callback = "${grails.serverURL}/oauth/google/callback"
+                    scope = 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+                }
+            }
+        }
+        grails.mc.allow.signup = true
 
         grails.plugin.console.enabled = true
         grails.serverURL =  "http://localhost:${System.getProperty('server.port') ?: 8080}/ModelCatalogueCorePluginTestApp"
@@ -279,3 +311,11 @@ grails.plugin.springsecurity.logout.handlerNames = [
         'securityContextLogoutHandler',
         'modelCatalogueSecurityService' // both spring security services implements it
 ]
+
+// Added by the Spring Security OAuth plugin:
+grails.plugin.springsecurity.oauth.domainClass = 'org.modelcatalogue.core.security.OAuthID'
+
+if (!grails.mc.allow.signup) {
+    // for safety reasons, override the default class
+    grails.plugin.springsecurity.oauth.registration.roleNames = ['ROLE_REGISTERED']
+}

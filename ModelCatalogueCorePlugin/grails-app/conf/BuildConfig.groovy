@@ -91,7 +91,7 @@ grails.project.dependency.resolution = {
         test ':fixtures:1.3'
 
         // codenarc static analysis
-        build ":codenarc:0.20"
+        build ":codenarc:0.21"
 
         // test coverage
         test ":code-coverage:1.2.7"

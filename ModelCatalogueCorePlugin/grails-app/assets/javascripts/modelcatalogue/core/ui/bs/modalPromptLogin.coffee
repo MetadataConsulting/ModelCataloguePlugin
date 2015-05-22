@@ -1,5 +1,5 @@
 angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies']).config ['messagesProvider', (messagesProvider)->
-  factory = [ '$modal', '$q', 'messages', 'security', ($modal, $q, messages, security) ->
+  factory = [ '$modal', 'messages', 'security', ($modal, messages, security) ->
     ->
       dialog = $modal.open {
         windowClass: 'login-modal-prompt'
@@ -9,6 +9,10 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
         </div>
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
+            <div ng-if="providers &amp;&amp; contextPath">
+              <a ng-repeat="provider in providers" ng-href="{{contextPath + '/oauth/' + provider + '/authenticate'}}" class="btn btn-primary btn-block"><span class="fa fa-fw" ng-class="'fa-' + provider"></span> Login with {{names.getNaturalName(provider)}}</a>
+              <hr/>
+            </div>
             <form role="form" ng-submit="login()">
               <div class="form-group">
                 <label for="username">Username</label>
@@ -31,11 +35,13 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', '$cookies', 'messages', 'security', '$modalInstance', '$log',
-          ($scope, $cookies, messages, security, $modalInstance) ->
+        controller: ['$scope', '$cookies', 'messages', 'security', '$modalInstance', 'names'
+          ($scope, $cookies, messages, security, $modalInstance, names) ->
             $scope.user = {rememberMe: $cookies.mc_remember_me == "true"}
             $scope.messages = messages.createNewMessages()
-
+            $scope.providers = security.oauthProviders
+            $scope.contextPath = security.contextPath
+            $scope.names = names
             $scope.login = ->
               security.login($scope.user.username, $scope.user.password, $scope.user.rememberMe).then (success)->
                 if success.data.error
