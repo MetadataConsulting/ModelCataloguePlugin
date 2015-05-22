@@ -22,8 +22,6 @@ class BootStrap {
     CatalogueBuilder catalogueBuilder
     def sessionFactory
 
-    XLSXListRenderer xlsxListRenderer
-
     def init = { servletContext ->
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
