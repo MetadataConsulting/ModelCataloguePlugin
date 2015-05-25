@@ -193,8 +193,13 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
         then:
         at AssetListPage
 
+        waitFor {
+            actionButton('new-import', 'list').displayed
+        }
+
         when:
         actionButton('new-import', 'list').click()
+
         then:
         waitFor {
             actionButton('import-excel').displayed
