@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# fail if any line fails
 set -e
 
 pwd
@@ -11,8 +10,9 @@ for file in */ .*/ ; do
         echo "found package.json in $file"
         cd "$file"
         echo "running npm install in $file"
-        exec npm install
-        cd ..
+        npm install
+       	echo "npm install successful"
+	cd ..
     fi
 done
 
@@ -24,7 +24,8 @@ for file in */ .*/ ; do
         echo "found bower.json in $file"
         cd "$file"
         echo "running bower install in $file"
-        exec bower install
+        bower install
+        echo "bower install successful"
         cd ..
     fi
 done
