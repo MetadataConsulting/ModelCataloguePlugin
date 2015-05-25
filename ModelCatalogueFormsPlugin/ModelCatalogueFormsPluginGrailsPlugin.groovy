@@ -1,9 +1,5 @@
-import org.modelcatalogue.core.SecurityService
-import org.modelcatalogue.discourse.CommentsJsonMarshallingCustomizer
-import org.modelcatalogue.discourse.DiscourseService
-import org.modelcatalogue.discourse.DiscourseUrlFrontendConfigurationProvider
 
-class ModelCatalogueDiscoursePluginGrailsPlugin {
+class ModelCatalogueFormsPluginGrailsPlugin {
     // the plugin version
     def version = "0.1"
     // the version or versions of Grails the plugin is designed for
