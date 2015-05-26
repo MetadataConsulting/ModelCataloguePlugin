@@ -15,3 +15,4 @@ out/**/*
 **/target-eclipse/**/*
 **/*.class
 **/*.gen.fixture.js
+**/build/**/*

@@ -4,6 +4,9 @@ import geb.navigator.Navigator
 import geb.spock.GebReportingSpec
 import geb.waiting.WaitTimeoutException
 import org.openqa.selenium.StaleElementReferenceException
+import org.openqa.selenium.logging.LogEntries
+import org.openqa.selenium.logging.LogEntry
+import org.openqa.selenium.logging.LogType
 
 abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
 
@@ -12,6 +15,13 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     def loginAdmin() { loginUser("admin", "admin") }
     def loginViewer() { loginUser("viewer", "viewer") }
     def loginCurator() { loginUser("curator", "creator") }
+
+    def cleanup() {
+        LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
+        for (LogEntry entry : logEntries) {
+            println "${new Date(entry.getTimestamp())} ${entry.getLevel()} ${entry.getMessage()}"
+        }
+    }
 
     def loginUser(String user, String pwd) {
         if (!$('.login-modal-prompt').displayed) {

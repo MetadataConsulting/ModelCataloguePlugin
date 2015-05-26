@@ -4,12 +4,15 @@
  */
 
 
-import org.openqa.selenium.Platform
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.logging.LogType
+import org.openqa.selenium.logging.LoggingPreferences
+import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.RemoteWebDriver
+
+import java.util.logging.Level
 
 reportsDir = new File("target/geb-reports")
 reportOnTestFailureOnly = false
@@ -54,7 +57,11 @@ environments {
     // See: http://code.google.com/p/selenium/wiki/FirefoxDriver
     firefox {
         driver = {
-            new FirefoxDriver()
+            DesiredCapabilities caps = DesiredCapabilities.firefox();
+            LoggingPreferences logPrefs = new LoggingPreferences();
+            logPrefs.enable(LogType.BROWSER, Level.ALL);
+            caps.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+            new FirefoxDriver(caps)
         }
     }
 
