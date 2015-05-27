@@ -14,6 +14,7 @@ env:
   - TEST_SUITE=core_integration_slow
   - TEST_SUITE=app_integration
   - TEST_SUITE=app_functional
+  - TEST_SUITE=forms_integration
 jdk:
   - oraclejdk7
 before_install:

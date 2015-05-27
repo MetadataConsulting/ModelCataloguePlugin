@@ -1,7 +1,11 @@
 package org.modelcatalogue.core.forms
 
+import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.GridGroup
 import org.modelcatalogue.crf.model.Group
+import org.modelcatalogue.crf.model.Item
+import org.modelcatalogue.crf.model.ResponseLayout
+import org.modelcatalogue.crf.model.ResponseType
 import org.modelcatalogue.crf.model.Section
 
 import static org.modelcatalogue.core.forms.ModelToFormExporterService.*
@@ -29,6 +33,17 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     public static final String TEST_GRID_MODEL_LABEL = "Test_Grid"
     public static final String TEST_GRID_REPEAT_NUM = '10'
     public static final String TEST_GRID_REPEAT_MAX = '200'
+    public static final String ITEM_FILE_NAME = "File Item"
+    public static final String ITEM_FILE_NAME_NORMALIZED = "Section_1_File_Name_Overriden"
+    public static final String ITEM_FILE_NAME_OVERRIDEN = "File Name Overriden"
+    public static final String ITEM_FILE_QUESTION = "Attachment"
+    public static final String ITEM_FILE_QUTESTION_NUMBER = "10"
+    public static final String ITEM_RADIO_NAME = "Radio Item"
+    public static final String ITEM_RADIO_NAME_NORMALIZED = "Section_1_Radio_Item"
+    public static final String ITEM_SINGLE_SELECT_NAME = "Single Select Name"
+    public static final String ITEM_SINGLE_SELECT_DEFAULT_VALUE = 'Please, select one!'
+    public static final String ITEM_TEXT_NAME = "Stuff with Units"
+    public static final String ITEM_TEXT_NAME_NORMALIZED = "Section_1_Stuff_with_Units"
 
 
     CatalogueBuilder catalogueBuilder
@@ -139,6 +154,116 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
         gridGroup.header == TEST_GRID_MODEL_NAME
         gridGroup.repeatNum == TEST_GRID_REPEAT_NUM as Integer
         gridGroup.repeatMax == TEST_GRID_REPEAT_MAX as Integer
+    }
+
+    def "various item types"(){
+        given:
+        Model formModel = build {
+            model(name: TEST_FORM_NAME) {
+                ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
+                ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
+                ext EXT_FORM_VERSION, TEST_FORM_VERSION
+
+                model(name: TEST_SECTION_NAME_1) {
+                    ext EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
+                    ext EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
+                    ext EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
+
+                    dataElement(name: ITEM_FILE_NAME) {
+                        valueDomain(name: 'File')
+
+                        relationship {
+                            ext EXT_NAME_LC, ITEM_FILE_NAME_OVERRIDEN
+                            ext EXT_ITEM_QUESTION, ITEM_FILE_QUESTION
+                            ext EXT_ITEM_QUESTION_NUMBER, ITEM_FILE_QUTESTION_NUMBER
+                        }
+                    }
+
+                    dataElement(name: ITEM_RADIO_NAME) {
+                        valueDomain(name: "Gender Domain") {
+                            dataType name: 'Gender', enumerations: [F: 'Female', M: 'Male']
+                        }
+
+                        relationship {
+                            ext EXT_ITEM_RESPONSE_TYPE, RESPONSE_TYPE_RADIO
+                            ext EXT_ITEM_LAYOUT, 'horizontal'
+                            ext EXT_MIN_OCCURS, '1'
+                        }
+                    }
+
+                    dataElement(name: ITEM_SINGLE_SELECT_NAME) {
+                        valueDomain(name: "Single Domain") {
+                            dataType name: 'Multi Type', enumerations: [A: 'Alpha', B: 'Beta', O: 'Omega']
+                        }
+
+                        relationship {
+                            ext EXT_ITEM_DEFAULT_VALUE, ITEM_SINGLE_SELECT_DEFAULT_VALUE
+                        }
+                    }
+
+                    dataElement(name: ITEM_TEXT_NAME) {
+                        ext EXT_ITEM_PHI, 'true'
+
+                        valueDomain(name: 'double') {
+                            ext EXT_ITEM_LENGTH, '10'
+                            ext EXT_ITEM_DIGITS, '2'
+                            measurementUnit(name: 'Nano Coins', symbol: 'NC')
+                        }
+                    }
+
+                }
+            }
+        }
+
+        when:
+        CaseReportForm form = modelToFormExporterService.convert(formModel)
+        Section section1 = form.section(TEST_SECTION_LABEL_1)
+
+        then:
+        section1
+
+        when:
+        println section1.items.keySet()
+
+        Item fileItem = section1.items[ITEM_FILE_NAME_NORMALIZED]
+
+        then:
+        fileItem
+        fileItem.responseType == ResponseType.FILE
+        fileItem.dataType == DataType.FILE
+        fileItem.questionNumber == ITEM_FILE_QUTESTION_NUMBER
+        fileItem.leftItemText == ITEM_FILE_QUESTION
+
+        when:
+        Item radioItem = section1.items[ITEM_RADIO_NAME_NORMALIZED]
+
+        then:
+        radioItem
+        radioItem.responseType == ResponseType.RADIO
+        radioItem.required == 1
+        radioItem.responseOptions.size() == 2
+        radioItem.responseOptions[0].value == 'F'
+        radioItem.responseOptions[0].text == 'Female'
+        radioItem.responseOptions[1].value == 'M'
+        radioItem.responseOptions[1].text == 'Male'
+        radioItem.responseLayout == ResponseLayout.HORIZONTAL
+
+        when:
+        Item singleSelectItem = section1.items["Section_1_Single_Select_Name"]
+
+        then:
+        singleSelectItem
+        singleSelectItem.defaultValue == ITEM_SINGLE_SELECT_DEFAULT_VALUE
+
+        when:
+        Item textItem = section1.items[ITEM_TEXT_NAME_NORMALIZED]
+
+        then:
+        textItem
+        textItem.widthDecimal == '10(2)'
+        textItem.dataType == DataType.REAL
+        textItem.units == 'NC'
+        textItem.phi == 1
     }
 
     // TODO: more tests

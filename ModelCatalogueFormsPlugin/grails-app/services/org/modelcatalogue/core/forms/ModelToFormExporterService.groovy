@@ -52,9 +52,7 @@ class ModelToFormExporterService {
     static final String EXT_ITEM_REGEXP_ERROR_MESSAGE = "http://forms.modelcatalogue.org/item#regexpErrorMessage"
 
     static final String RESPONSE_TYPE_FILE = "file"
-    static final String RESPONSE_TYPE_TEXT = "text"
     static final String RESPONSE_TYPE_TEXTAREA = "textarea"
-    static final String RESPONSE_TYPE_SINGLE_SELECT = "singleselect"
     static final String RESPONSE_TYPE_MULTI_SELECT = "multiselect"
     static final String RESPONSE_TYPE_RADIO = "radio"
     static final String RESPONSE_TYPE_CHECKBOX = "checkbox"
@@ -171,7 +169,8 @@ class ModelToFormExporterService {
 
 
                 // bit of heuristic
-                String itemName = alphaNumNoSpaces("${model.name}_${dataElement.name}")
+                String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
+                String itemName = alphaNumNoSpaces("${model.name}_${localName}")
                 if (candidates.any { it.name.toLowerCase() == 'file' } || candidates.any { normalizeResponseType(it.ext[EXT_ITEM_RESPONSE_TYPE]) == RESPONSE_TYPE_FILE }) {
                     file(itemName)
                 } else if (dataType && dataType.instanceOf(EnumeratedType)) {
@@ -218,7 +217,7 @@ class ModelToFormExporterService {
                         regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, "Value must match /$regexpDef/")
                     }
                     description fromCandidates(rel, candidates, EXT_ITEM_DESCRIPTION, dataElement.description)
-                    question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, dataElement.name)
+                    question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, localName)
                     questionNumber fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
                     instructions fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS)
                     phi(fromCandidates(rel, candidates, EXT_ITEM_PHI) == 'true')
@@ -234,17 +233,17 @@ class ModelToFormExporterService {
                         first = false
                     }
                     if (last.responseType != ResponseType.FILE) {
-                        Integer length = fromCandidates(rel, candidates, EXT_ITEM_LENGTH)
-                        Integer digits = fromCandidates(rel, candidates, EXT_ITEM_DIGITS)
+                        Integer aLength = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_LENGTH), EXT_ITEM_LENGTH, rel)
+                        Integer aDigits = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_DIGITS), EXT_ITEM_DIGITS, rel)
 
-                        if (length) {
-                            if (digits) {
-                                digits length, digits
+                        if (aLength) {
+                            if (aDigits) {
+                                digits aLength, aDigits
                             } else {
-                                length length
+                                length aLength
                             }
-                        } else if (digits) {
-                            digits digits
+                        } else if (aDigits) {
+                            digits aDigits
                         }
 
                         last.dataType(guessDataType(candidates, fromCandidates(rel, candidates, EXT_ITEM_DATA_TYPE)))
