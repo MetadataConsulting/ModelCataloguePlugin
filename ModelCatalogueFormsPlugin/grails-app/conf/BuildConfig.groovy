@@ -37,8 +37,8 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
-        compile ('org.modelcatalogue:crf-builder-serializer:3.1.3-rc1')
-        compile ('org.modelcatalogue:crf-builder-builder:3.1.3-rc1')
+        compile ('org.modelcatalogue:crf-builder-serializer:3.1.3-rc2')
+        compile ('org.modelcatalogue:crf-builder-builder:3.1.3-rc2')
     }
 
     plugins {

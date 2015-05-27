@@ -3,10 +3,10 @@ databaseChangeLog = {
     changeSet(author: "Vladimir Orany", id: "1412847974092-01") {
         preConditions (onFail: 'MARK_RAN') {
             not {
-                tableExists tableName: "change"
+                tableExists tableName: "`change`"
             }
         }
-        createTable(tableName: "change") {
+        createTable(tableName: "`change`") {
             column(autoIncrement: "true", name: "id", type: "BIGINT") {
                 constraints(nullable: "false", primaryKey: "true")
             }
@@ -63,7 +63,7 @@ databaseChangeLog = {
     changeSet(author: "Vladimir Orany", id: "1412847974092-03") {
         preConditions (onFail: 'MARK_RAN') {
             not {
-                columnExists tableName: "change", columnName: "undone"
+                columnExists tableName: "`change`", columnName: "undone"
             }
         }
         addColumn(tableName: 'change') {

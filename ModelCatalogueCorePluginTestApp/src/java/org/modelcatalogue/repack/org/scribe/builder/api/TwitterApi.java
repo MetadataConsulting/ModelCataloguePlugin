@@ -1,5 +1,6 @@
-package org.scribe.builder.api;
+package org.modelcatalogue.repack.org.scribe.builder.api;
 
+import org.scribe.builder.api.DefaultApi10a;
 import org.scribe.model.Token;
 
 public class TwitterApi extends DefaultApi10a

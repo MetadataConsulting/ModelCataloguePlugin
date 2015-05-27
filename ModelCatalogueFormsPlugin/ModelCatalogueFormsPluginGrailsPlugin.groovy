@@ -1,3 +1,5 @@
+import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.reports.ReportsRegistry
 
 class ModelCatalogueFormsPluginGrailsPlugin {
     // the plugin version
@@ -51,6 +53,14 @@ Forms generator plugin for Model Catalogue
 
     def doWithApplicationContext = { ctx ->
         // TODO Implement post initialization spring config (optional)
+        ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
+
+        reportsRegistry.register {
+            creates asset
+            type Model
+            title { "Generate Case Report From" }
+            link controller: 'formGenerator', action: 'generateForm', id: true
+        }
 
     }
 

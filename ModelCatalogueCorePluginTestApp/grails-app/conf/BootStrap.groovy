@@ -8,7 +8,7 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.testapp.Requestmap
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
+import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
 
@@ -23,6 +23,8 @@ class BootStrap {
     def sessionFactory
 
     def init = { servletContext ->
+        ExtensionModulesLoader.addExtensionModules()
+
         if (Environment.current in [Environment.DEVELOPMENT, Environment.TEST]) {
             TestDataHelper.initFreshDb(sessionFactory, 'initTestDatabase.sql') {
                 initCatalogueService.initCatalogue(true)

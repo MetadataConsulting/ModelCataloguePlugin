@@ -15,8 +15,6 @@
  */
 package org.modelcatalogue.core.security
 
-import org.modelcatalogue.core.security.User
-
 /**
  * Simple domain class that records the identities of users authenticating via
  * an OAuth provider. Each identity consists of the OAuth account name and the

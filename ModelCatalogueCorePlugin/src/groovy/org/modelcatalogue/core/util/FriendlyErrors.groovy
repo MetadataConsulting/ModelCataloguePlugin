@@ -4,6 +4,7 @@ import grails.util.Holders
 import grails.validation.ValidationException
 import org.springframework.context.MessageSource
 import org.springframework.validation.Errors
+import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
 /**
@@ -18,7 +19,11 @@ class FriendlyErrors {
         builder << ':\n'
         Set<String> messages = []
         for (ObjectError error in errors.allErrors) {
-            messages << messageSource.getMessage(error, locale)
+            if (error instanceof FieldError) {
+                messages << "${messageSource.getMessage(error, locale)} (${error.field})"
+            } else {
+                messages << "${messageSource.getMessage(error, locale)}"
+            }
         }
         for (String msg in messages) {
             builder << '    ' << msg << '\n'

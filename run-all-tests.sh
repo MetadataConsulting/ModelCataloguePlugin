@@ -5,7 +5,7 @@ set -e
 
 
 # karma and functional tests needs to fetch the bower components
-if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
+if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./setup-frontend.sh
 fi
 
@@ -43,10 +43,17 @@ if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./node_modules/karma/bin/karma start --single-run --browsers Firefox
 fi
 
+cd ..
+
+cd ModelCatalogueFormsPlugin
+if [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw test-app integration:
+fi
+cd ..
+
+cd ModelCatalogueCorePluginTestApp
 # if we're running app tests
 if [ "$TEST_SUITE" = "app_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
-    cd ..
-    cd ModelCatalogueCorePluginTestApp
 
     # local builds needs to run in clean environment
     if [ -z "$TEST_SUITE" ]; then
