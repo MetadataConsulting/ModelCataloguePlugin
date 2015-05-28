@@ -32,7 +32,7 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
     '''
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/ordered-map-editor.html', '''
         <div>
-          <ordered-map-editor object="tab.value" title="Key" value-title="Value"></ordered-map-editor>
+          <ordered-map-editor object="tab.value" title="Key" value-title="Value" owner="element"></ordered-map-editor>
           <div class="row">
             <div class="col-md-12">
               <div class=" text-center">

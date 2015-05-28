@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.orderedMapEditor', []).directive 'orderedMapEditor',  [-> {
+angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).directive 'orderedMapEditor',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -8,14 +8,16 @@ angular.module('mc.core.ui.orderedMapEditor', []).directive 'orderedMapEditor', 
       valueTitle:         '@?'
       keyPlaceholder:     '@?'
       valuePlaceholder:   '@?'
+      owner:              '=?' # required for metadata editors
     templateUrl: 'modelcatalogue/core/ui/orderedMapEditor.html'
 
-    controller: ['$scope', 'enhance', '$log', ($scope, enhance, $log) ->
+    controller: ['$scope', 'enhance', '$log', 'metadataEditors', ($scope, enhance, $log, metadataEditors) ->
       isOrderedMap = (object)->
         enhance.isEnhancedBy(object, 'orderedMap')
       
       # default values
       $scope.lastAddedRow = 0
+      $scope.availableEditors = []
 
       $scope.removeProperty = (index) ->
           $scope.object.values.splice(index, 1)
@@ -39,6 +41,23 @@ angular.module('mc.core.ui.orderedMapEditor', []).directive 'orderedMapEditor', 
         return true
 
       remove = (arr, item) -> arr.splice($.inArray(item, arr), 1)
+
+      onOwnerChanged = (owner) ->
+        if owner
+          $scope.availableEditors = metadataEditors.getAvailableEditors(owner)
+          $scope.handledKeys = []
+
+          for editor in $scope.availableEditors
+            for key in editor.getKeys()
+              $scope.handledKeys.push(key)
+              unless $scope.object.get(key)?
+                $scope.object.values.push(key: key, value: '')
+
+          $scope.object.access('').remove() if $scope.handledKeys.length
+
+        else
+          $scope.availableEditors = []
+          $scope.handledKeys = []
 
       onObjectOrHintsChanged = (object, hints) ->
         if object and not isOrderedMap(object)
@@ -88,6 +107,8 @@ angular.module('mc.core.ui.orderedMapEditor', []).directive 'orderedMapEditor', 
       $scope.$watch 'hints', (newHints) ->
         onObjectOrHintsChanged($scope.object, newHints)
 
+
+      $scope.$watch 'owner', onOwnerChanged
     ]
 
   }

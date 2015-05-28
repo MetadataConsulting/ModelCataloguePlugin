@@ -3,12 +3,33 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
   factory   = [ 'enhance', (enhance)->
     orderedMapEnhancer = (orderedMap) ->
 
-      map = {}
+      orderedMap.get = (key) -> @access(key)()
+      orderedMap.access = (key) ->
+        getterSetter = (newValue) ->
+          if arguments.length
+            for value in orderedMap.values
+              if value.key == key
+                value.value = newValue
+                return newValue
+            orderedMap.values.push(key: key, value: newValue)
+            return newValue
+          for value in orderedMap.values
+            if value.key == key
+              return value.value
+          return undefined
 
-      for value in orderedMap.values
-        map[value.key] = value.value
+        getterSetter.get = -> getterSetter()
+        getterSetter.set = (newValue) -> getterSetter(newValue)
+        getterSetter.remove = ->
+          result = undefined
+          for value, i in orderedMap.values.reverse()
+            if value.key == key
+              result = value.value
+              orderedMap.values.splice(i, 1)
+          result
 
-      orderedMap.get = (key) -> map[key]
+        getterSetter
+
 
       orderedMap.clearIfOnlyContainsPlaceholder = ->
         if orderedMap.values.length == 1 and not orderedMap.values[0].value

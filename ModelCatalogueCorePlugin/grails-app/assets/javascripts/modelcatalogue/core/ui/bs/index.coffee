@@ -66,6 +66,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.diffTable'
   'mc.core.ui.bs.withClassificationCtrlMixin'
   'mc.core.ui.bs.orderedMapEditor'
+  'mc.core.ui.bs.metadataEditors'
 ]).run ['messages', (messages) ->
   if jQuery
     jQuery(document).on 'keypress', (e) ->
