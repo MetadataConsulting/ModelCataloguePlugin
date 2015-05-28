@@ -344,4 +344,10 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
     definition
   ]
 
+  catalogueElementPropertiesProvider.configureProperty 'ext', tabDefinition: ['$element', '$name', '$value', '$scope', 'catalogueElementProperties', '$injector', 'security', ($element, $name, $value, $scope, catalogueElementProperties, $injector, security) ->
+    definition = $injector.invoke(catalogueElementProperties.getConfigurationFor('type:object').tabDefinition, undefined, $element: $element, $name: $name, $value: $value, $scope: $scope)
+    definition.type = if security.hasRole('CURATOR') and $element.status == 'DRAFT' then 'metadata-editor' else 'properties-pane-for-enumerations'
+    definition
+  ]
+
 ]

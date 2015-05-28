@@ -53,12 +53,13 @@ describe "mc.core.ui.metadataEditors", ->
       elementType: 'org.modelcatalogue.core.Relationship'
       type:
         name: type
-      source:
+      element:
         elementType: "org.modelcatalogue.core.#{source}"
-      destination:
+      relation:
         elementType: "org.modelcatalogue.core.#{destination}"
       ext:
         [type: 'orderedMap']
+      direction: "sourceToDestination"
     }
 
   el = (type) ->

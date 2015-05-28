@@ -58,10 +58,6 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
                 <textarea rows="10" ng-model="copy.destinationToSourceDescription" placeholder="Destination to Source Description" class="form-control" id="destinationToSourceDescription"></textarea>
               </div>
               <div class="form-group">
-                <label for="metadataHits" class="">Metadata Hints</label>
-                <input type="text" class="form-control" id="metadataHits" placeholder="Metadata hints separated by comma" ng-model="copy.metadataHints">
-              </div>
-              <div class="form-group">
                 <label for="rule" ng-click="ruleCollapsed = !ruleCollapsed">Rule <span class="glyphicon" ng-class="{'glyphicon-collapse-down': ruleCollapsed, 'glyphicon-collapse-up': !ruleCollapsed}"></span></label>
                 <textarea collapse="ruleCollapsed" rows="10" ng-model="copy.rule" placeholder="Rule" class="form-control" id="rule"></textarea>
               </div>
@@ -88,13 +84,11 @@ angular.module('mc.core.ui.bs.modalPromptRelationshipTypeEdit', ['mc.util.messag
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
           $scope.hasChanged   = ->
-            $scope.copy.metadataHints = ($scope.copy.metadataHints ? '').split(/\s*,\s*/) ? [] if angular.isString($scope.copy.metadataHints)
-            for prop in ['name', 'sourceToDestination', 'destinationToSource', 'sourceClass', 'destinationClass', 'system', 'bidirectional', 'rule', 'metadataHints']
+            for prop in ['name', 'sourceToDestination', 'destinationToSource', 'sourceClass', 'destinationClass', 'system', 'bidirectional', 'rule']
               return true if !angular.equals($scope.copy[prop], $scope.original[prop])
             return false
 
           $scope.beforeSave = ->
-            $scope.copy.metadataHints = $scope.copy.metadataHints.join(',') if angular.isArray($scope.copy.metadataHints)
 
           $scope.validate = ->
             if not $scope.copy.name

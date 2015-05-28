@@ -3,41 +3,54 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
   factory   = [ 'enhance', (enhance)->
     orderedMapEnhancer = (orderedMap) ->
 
-      orderedMap.get = (key) -> @access(key)()
+      orderedMap.get = (key) -> @access(key).get()
       orderedMap.access = (key) ->
-        getterSetter = (newValue) ->
-          if arguments.length
-            for value in orderedMap.values
-              if value.key == key
-                value.value = newValue
-                return newValue
-            orderedMap.values.push(key: key, value: newValue)
-            return newValue
-          for value in orderedMap.values
+        self = @
+        set = (newValue) ->
+          for value in self.values
+            if value.key == key
+              value.value = newValue
+              return newValue
+          self.values.push(key: key, value: newValue)
+          return newValue
+        get =  ->
+          for value in self.values
             if value.key == key
               return value.value
           return undefined
 
-        getterSetter.get = -> getterSetter()
-        getterSetter.set = (newValue) -> getterSetter(newValue)
+        getterSetter = (newValue) ->
+          if arguments.length
+            set(newValue)
+          else
+            get()
+
+        getterSetter.get = -> get()
+        getterSetter.set = (newValue) -> set(newValue)
         getterSetter.remove = ->
           result = undefined
-          for value, i in orderedMap.values.reverse()
+          for value, i in self.values.reverse()
             if value.key == key
               result = value.value
-              orderedMap.values.splice(i, 1)
+              self.values.splice(i, 1)
           result
+
+        getterSetter.asInt = (newValue) ->
+          if arguments.length
+            set(if newValue then  parseInt(newValue, 10) else undefined)
+          else
+            parseInt(get(), 10)
 
         getterSetter
 
 
       orderedMap.clearIfOnlyContainsPlaceholder = ->
-        if orderedMap.values.length == 1 and not orderedMap.values[0].value
-          orderedMap.values = []
+        if @values.length == 1 and not @values[0].value
+          @values = []
 
       orderedMap.addPlaceholderIfEmpty = ->
-        if orderedMap.values.length == 0
-          orderedMap.values = [{key: ''}]
+        if @values.length == 0
+          @values = [{key: ''}]
       orderedMap
 
 

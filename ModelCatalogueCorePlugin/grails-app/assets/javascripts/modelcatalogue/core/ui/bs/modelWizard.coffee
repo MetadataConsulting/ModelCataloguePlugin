@@ -91,7 +91,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   </div>
                   <p class="help-block">Parent model is source for the hierarchy relationship</p>
                 </div>
-                <ordered-map-editor object="parent.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></ordered-map-editor>
+                <ordered-map-editor object="parent.ext" title="Relationship Metadata"></ordered-map-editor>
               </form>
           </div>
           <div ng-switch-when="children" id="children">
@@ -113,7 +113,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child models from CSV file headers</a>.
                   </alert>
                 </div>
-                <ordered-map-editor object="child.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></ordered-map-editor>
+                <ordered-map-editor object="child.ext" title="Relationship Metadata"></ordered-map-editor>
               </form>
           </div>
           <div ng-switch-when="elements" id="elements">
@@ -135,7 +135,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
                   </alert>
                 </div>
-                <ordered-map-editor object="dataElement.ext" title="Relationship Metadata" hints="['Min Occurs', 'Max Occurs']"></ordered-map-editor>
+                <ordered-map-editor object="dataElement.ext" title="Relationship Metadata"></ordered-map-editor>
               </form>
             </tab>
           </div>
@@ -321,7 +321,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.step = step
 
           $scope.next = ->
-            return if not $scope.model.name
+            return undefined if not $scope.model.name
             for step, i in $scope.steps
               if step == $scope.step and i < $scope.steps.length - 1
                 nextStep = $scope.steps[i + 1]
@@ -332,7 +332,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   break
 
           $scope.previous = ->
-            return if not $scope.model.name
+            return undefined if not $scope.model.name
             for step, i in $scope.steps
               if step == $scope.step and i != 0
                 $scope.step = $scope.steps[i - 1]

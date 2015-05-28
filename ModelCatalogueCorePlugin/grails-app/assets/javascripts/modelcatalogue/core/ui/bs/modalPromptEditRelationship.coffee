@@ -10,60 +10,25 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
         size: 'lg'
         template: '''
         <div class="modal-body">
-            <form role="form" ng-submit="createRelation()">
-              <h4>{{element.name}} <code>{{relationshipTypeInfo.value}}</code> {{relation.name}} <span ng-show="classification"> in classification {{classification.name}}</h4>
-              <messages-panel messages="messages"></messages-panel>
-              <div class="form-group">
-                <label>Metadata</label>
-                <ordered-map-editor object="metadata" hints="relationshipTypeInfo.type.metadataHints"></ordered-map-editor>
-                <p class="help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
-              </div>
-              <div class="form-group">
-                <label for="classification" >Classification</label>
-                <input id="classification" ng-model="classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="updateClassification(classification)">
-                <p class="help-block">Select a classification only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard dataset</p>
-              </div>
-            </form>
+            <div class="panel-body">
+              <form role="form" ng-submit="createRelation()">
+                <h4>{{element.name}} <code>{{relationshipTypeInfo.value}}</code> {{relation.name}} <span ng-show="classification"> in classification {{classification.name}}</h4>
+                <messages-panel messages="messages"></messages-panel>
+                <div class="form-group">
+                  <label for="classification">Classification</label>
+                  <input id="classification" ng-model="classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="updateClassification(classification)">
+                  <p class="help-block">Select a classification only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard dataset</p>
+                </div>
+                <div class="form-group">
+                  <label>Metadata</label>
+                  <p class="help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
+                  <metadata-editor object="metadata" owner="metadataOwner"></metadata-editor>
+                </div>
+              </form>
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-primary" ng-click="createRelation()" type="submit"><span class="glyphicon glyphicon-edit"></span> Update Relationship</button>
-            <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
-        </div>
-        '''
-        templateOld: '''
-         <div class="modal-header">
-            <h4>''' + title + '''</h4>
-        </div>
-        <div class="modal-body">
-            <messages-panel messages="messages"></messages-panel>
-            <form role="form" ng-submit="createRelation()">
-              <table ng-hide="update">
-                <tbody>
-                  <tr>
-                    <td class="col-md-4 small">
-                      {{element.name}}
-                    </td>
-                    <td class="col-md-4">
-                      <select id="type" class="form-control input-sm" ng-model="relationshipTypeInfo" ng-options="rt as rt.value for rt in relationshipTypes" ng-change="updateInfo(relationshipTypeInfo)"></select>
-                    </td>
-                    <td class="col-md-4">
-                      <input id="element" type="text" placeholder="... element" class="form-control input-sm" ng-model="relation" catalogue-element-picker resource="relationType" typeahead-on-select="updateRelation(relation)" ng-disabled="!relationshipTypeInfo.type">
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <p ng-show="update">{{element.name}} <code>{{relationshipTypeInfo.value}}</code> {{relation.name}} <span ng-show="classification"> in classification {{classification.name}}</span></p>
-              <div class="form-group">
-                <label for="classification" class="small">Classification</label>
-                <input id="classification" placeholder="Classification (leave blank for inherited)" ng-model="classification" catalogue-element-picker="classification" label="el.name" class="input-sm" typeahead-on-select="updateClassification(classification)">
-              </div>
-              <div class="new-relationship-modal-prompt-metadata">
-                <ordered-map-editor object="metadata" title="Metadata" hints="relationshipTypeInfo.type.metadataHints"></ordered-map-editor>
-              </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-primary" ng-click="createRelation()" type="submit"><span class="glyphicon" ng-class="{'glyphicon-link' : !update, 'glyphicon-edit': update}"></span> {{update ? 'Update' : 'Create'}} Relationship</button>
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
@@ -103,6 +68,14 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
 
           $scope.updateRelation = (relation) ->
             $scope.relation = relation
+
+            $scope.metadataOwner =
+              type: $scope.relationshipTypeInfo?.type
+              element: $scope.element
+              relation: if relation then relation else {elementType: $scope.relationType}
+              direction: if $scope.direction == 'outgoing' then 'sourceToDestination' else 'destinationToSource'
+              ext: $scope.metadata
+              elementType: 'relationship'
 
           $scope.updateClassification = (classification) ->
             $scope.classification = classification
@@ -154,7 +127,8 @@ angular.module('mc.core.ui.bs.modalPromptEditRelationship', ['mc.util.messages']
 
             $scope.updateInfo info
 
-          catalogueElementResource('relationshipType').list(max: 100).then(appendToRelationshipTypes)
+          catalogueElementResource('relationshipType').list(max: 100).then(appendToRelationshipTypes).then ->
+            $scope.updateRelation($scope.relation)
 
         ]
 

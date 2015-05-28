@@ -40,7 +40,10 @@ class RelationshipType {
     Class destinationClass
 
     // comma separated list of metadata hints
-    String metadataHints
+    /**
+     * @deprecated use angular metadataEditors instead
+     */
+    @Deprecated String metadataHints
 
     // if the direction of the relationship doesn't matter
     Boolean bidirectional = Boolean.FALSE

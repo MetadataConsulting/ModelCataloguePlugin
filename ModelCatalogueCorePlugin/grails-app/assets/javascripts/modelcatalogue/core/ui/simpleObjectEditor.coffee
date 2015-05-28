@@ -3,7 +3,6 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
     replace: true
     scope:
       object:             '='
-      hints:              '=?'
       title:              '@?'
       valueTitle:         '@?'
       keyPlaceholder:     '@?'
@@ -56,35 +55,24 @@ angular.module('mc.core.ui.simpleObjectEditor', []).directive 'simpleObjectEdito
             firstFound = true
         return true
 
-      remove = (arr, item) ->
-        arr.splice($.inArray(item, arr), 1 )
-
-      onObjectOrHintsChanged = (object, hints) ->
+      onObjectChanged = (object) ->
         editableProperties = []
-        currentHints = angular.copy(hints ? [])
 
         for key, value of object when key and !(angular.isFunction(value) or angular.isObject(value))
           editableProperties.push key: key, value: value, originalKey: key
-          remove currentHints, key
 
-        for hint in currentHints by -1
-          editableProperties.unshift key: hint
-
-        editableProperties.push key: '' if editableProperties.length == 0 and (not hints or hints.length == 0)
+        editableProperties.push key: '' if editableProperties.length == 0
 
         $scope.editableProperties = editableProperties
 
 
-      onObjectOrHintsChanged($scope.object, $scope.hints ? [])
+      onObjectChanged($scope.object)
 
       $scope.addNewRowOnTab = ($event, index, last)->
         $scope.addProperty(index, {key: '', value: ''}) if $event.keyCode == 9 and last
 
       $scope.$watch 'object', (newObject) ->
-        onObjectOrHintsChanged(newObject, $scope.hints ? [])
-
-      $scope.$watch 'hints', (newHints) ->
-        onObjectOrHintsChanged($scope.object, newHints)
+        onObjectChanged(newObject)
 
     ]
 

@@ -26,7 +26,7 @@ $scope.hints = ['four', 'five']
 
 And following HTML snippet in your page:
 {code}
-<simple-object-editor object="object" hints="hints"></simple-object-editor>
+<simple-object-editor object="object"></simple-object-editor>
 {code}
 
 Than the table with five editable rows will be rendered. If any of values is changed, the value in original

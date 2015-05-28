@@ -1,4 +1,4 @@
-angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).directive 'orderedMapEditor',  [-> {
+angular.module('mc.core.ui.metadataEditor', ['mc.core.ui.metadataEditors']).directive 'metadataEditor',  [-> {
     restrict: 'E'
     replace: true
     scope:
@@ -7,19 +7,25 @@ angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).di
       valueTitle:         '@?'
       keyPlaceholder:     '@?'
       valuePlaceholder:   '@?'
-    templateUrl: 'modelcatalogue/core/ui/orderedMapEditor.html'
+      owner:              '=?' # required for metadata editors
+    templateUrl: 'modelcatalogue/core/ui/metadataEditor.html'
 
-    controller: ['$scope', 'enhance', '$log', ($scope, enhance, $log) ->
+    controller: ['$scope', 'enhance', '$log', 'metadataEditors', ($scope, enhance, $log, metadataEditors) ->
       isOrderedMap = (object)->
         enhance.isEnhancedBy(object, 'orderedMap')
       
       # default values
       $scope.lastAddedRow = 0
+      $scope.availableEditors = []
+      $scope.selectedEditor = '__ALL__'
 
       $scope.removeProperty = (index) ->
           $scope.object.values.splice(index, 1)
           $scope.object.addPlaceholderIfEmpty()
 
+      $scope.selectEditor = (editorTitle) ->
+        $scope.selectedEditor = editorTitle
+        return undefined
 
       $scope.addProperty = (index, property = {key: '', value: ''}) ->
         newProperty = angular.copy(property)
@@ -36,6 +42,23 @@ angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).di
             return false if firstFound
             firstFound = true
         return true
+
+      onOwnerChanged = (owner) ->
+        if owner
+          $scope.availableEditors = metadataEditors.getAvailableEditors(owner)
+          $scope.handledKeys = []
+
+          for editor in $scope.availableEditors
+            for key in editor.getKeys()
+              $scope.handledKeys.push(key)
+              unless $scope.object.get(key)?
+                $scope.object.access(key).set('')
+
+          $scope.object.access('').remove() if $scope.handledKeys.length
+
+        else
+          $scope.availableEditors = []
+          $scope.handledKeys = []
 
       onObjectChanged = (object) ->
         if object and not isOrderedMap(object)
@@ -72,6 +95,8 @@ angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).di
 
       $scope.$watch 'object', (newObject) ->
         onObjectChanged(newObject)
+
+      $scope.$watch 'owner', onOwnerChanged
     ]
 
   }

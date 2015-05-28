@@ -25,4 +25,5 @@ angular.module('mc.core.ui', [
   'mc.core.ui.diffTable'
   'mc.core.ui.orderedMapEditor'
   'mc.core.ui.metadataEditors'
+  'mc.core.ui.metadataEditor'
 ])

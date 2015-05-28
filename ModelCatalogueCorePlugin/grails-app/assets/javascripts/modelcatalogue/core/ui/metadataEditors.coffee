@@ -4,9 +4,13 @@ angular.module('mc.core.ui.metadataEditors', ['mc.core.catalogue']).provider 'me
     source = match[1]
     type = match[2]
     destination = match[3]
-    return false if source and not catalogueProvider.isInstanceOf(owner.source.elementType, source)
-    return false if type and owner.type.name != type
-    return false if destination and not catalogueProvider.isInstanceOf(owner.destination.elementType, destination)
+
+    sourceElement = if owner.direction == 'sourceToDestination' then owner.element else owner.relation
+    destinationElement = if owner.direction == 'sourceToDestination' then owner.relation else owner.element
+
+    return false if source and not catalogueProvider.isInstanceOf(sourceElement?.elementType, source)
+    return false if type and owner.type?.name != type
+    return false if destination and not catalogueProvider.isInstanceOf(destinationElement?.elementType, destination)
     return true
 
   editors = []

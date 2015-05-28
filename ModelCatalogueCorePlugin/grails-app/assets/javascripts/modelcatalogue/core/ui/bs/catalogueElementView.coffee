@@ -32,7 +32,23 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
     '''
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/ordered-map-editor.html', '''
         <div>
-          <ordered-map-editor object="tab.value" title="Key" value-title="Value" owner="element"></ordered-map-editor>
+          <ordered-map-editor object="tab.value" title="Key" value-title="Value"></ordered-map-editor>
+          <div class="row">
+            <div class="col-md-12">
+              <div class=" text-center">
+                <button class="btn btn-primary update-object" ng-disabled="!tab.isDirty()" ng-click="tab.update()"><span class="glyphicon glyphicon-ok"></span> Update</button>
+                <button class="btn btn-default reset-object-changes" ng-disabled="!tab.isDirty()" ng-click="tab.reset()"><span class="glyphicon glyphicon-remove"></span> Reset</button>
+                <br/>
+                <hr/>
+              </div>
+            </div>
+          </div>
+        </div>
+    '''
+
+    $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/metadata-editor.html', '''
+        <div>
+          <metadata-editor object="tab.value" title="Key" value-title="Value" owner="element"></metadata-editor>
           <div class="row">
             <div class="col-md-12">
               <div class=" text-center">

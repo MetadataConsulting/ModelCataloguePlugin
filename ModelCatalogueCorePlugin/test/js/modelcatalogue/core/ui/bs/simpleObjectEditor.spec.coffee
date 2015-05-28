@@ -18,7 +18,7 @@ describe "mc.core.ui.simpleObjectEditor", ->
 
 
     element = $compile('''
-    <simple-object-editor object="object" hints="hints" title="Metadata"></simple-object-editor>
+    <simple-object-editor object="object"></simple-object-editor>
     ''')($rootScope)
 
     $rootScope.$digest()

@@ -50,7 +50,7 @@ grails.doc.footer = ''// The footer to use
 grails.assets.minifyJs = false
 
 modelcatalogue.defaults.relationshiptypes =  [
-        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, metadataHints: "Min Occurs, Max Occurs", rule: '''
+        [name: "containment", sourceToDestination: "contains", destinationToSource: "contained in", sourceClass: Model, destinationClass: DataElement, rule: '''
             String minOccursString = ext['Min Occurs']
             String maxOccursString = ext['Max Occurs']
 
