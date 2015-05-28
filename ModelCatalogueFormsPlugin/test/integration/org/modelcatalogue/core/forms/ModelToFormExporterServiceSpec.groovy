@@ -193,7 +193,11 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
                     dataElement(name: ITEM_SINGLE_SELECT_NAME) {
                         valueDomain(name: "Single Domain") {
-                            dataType name: 'Multi Type', enumerations: [A: 'Alpha', B: 'Beta', O: 'Omega']
+                            dataType(name: 'Multi Type', enumerations: [A: 'Alpha', B: 'Beta', O: 'Omega']) {
+                                ext EXT_ITEM_INSTRUCTIONS, '''
+                                    <span class="MT"></span> Multi Type
+                                '''
+                            }
                         }
 
                         relationship {
@@ -253,6 +257,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
         then:
         singleSelectItem
+        singleSelectItem.rightItemText == '<span class="MT"></span> Multi Type'
         singleSelectItem.defaultValue == ITEM_SINGLE_SELECT_DEFAULT_VALUE
 
         when:
