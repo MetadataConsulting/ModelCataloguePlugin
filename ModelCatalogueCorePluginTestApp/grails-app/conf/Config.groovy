@@ -319,3 +319,7 @@ if (!grails.mc.allow.signup) {
     // for safety reasons, override the default class
     grails.plugin.springsecurity.oauth.registration.roleNames = ['ROLE_REGISTERED']
 }
+
+grails.plugin.springsecurity.ajaxCheckClosure = { request ->
+    request.getHeader('accept')?.startsWith('application/json')
+}
