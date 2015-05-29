@@ -69,22 +69,23 @@ class ModelToFormExporterService {
 
 
     CaseReportForm convert(Model formModel) {
-        CaseReportForm.build(formModel.ext[EXT_FORM_NAME] ?:formModel.name) {
+        String formName = formModel.ext[EXT_FORM_NAME] ?:formModel.name
+        CaseReportForm.build(formName) {
             version formModel.ext[EXT_FORM_VERSION] ?: formModel.versionNumber.toString()
             versionDescription formModel.ext[EXT_FORM_VERSION_DESCRIPTION] ?: formModel.description ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
             revisionNotes formModel.ext[EXT_FORM_REVISION_NOTES] ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
 
             if (formModel.countParentOf()) {
                 for (Relationship sectionRel in formModel.parentOfRelationships) {
-                    handleSectionModel(delegate as CaseReportForm, sectionRel)
+                    handleSectionModel(formName, delegate as CaseReportForm, sectionRel)
                 }
             }
-            handleSectionModel(delegate as CaseReportForm, new Relationship(destination: formModel), true)
+            handleSectionModel('', delegate as CaseReportForm, new Relationship(destination: formModel), true)
         }
 
     }
 
-    private void handleSectionModel(CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
+    private static void handleSectionModel(String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
         Model sectionModel = sectionRel.destination as Model
         String sectionName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
 
@@ -95,18 +96,18 @@ class ModelToFormExporterService {
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
 
-                generateItems(delegate as ItemContainer, sectionModel, null, null)
+                generateItems(prefix, delegate as ItemContainer, sectionModel, null, null)
 
                 if (dataElementsOnly) {
                     return
                 }
 
-                handleGroupOrVirtualSection(delegate, sectionModel.parentOfRelationships, true)
+                handleGroupOrVirtualSection(prefix, delegate, sectionModel.parentOfRelationships, true)
             }
         }
     }
 
-    private static void handleGroupOrVirtualSection(Section section, List<Relationship> relationships, boolean nameAsHeader) {
+    private static void handleGroupOrVirtualSection(String prefix, Section section, List<Relationship> relationships, boolean nameAsHeader) {
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
             Model itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as Model
             String itemsWithHeaderOrGridName = fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_CAP, fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_LC, itemsWithHeaderOrGrid.name))
@@ -115,7 +116,7 @@ class ModelToFormExporterService {
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) {
                     header itemsWithHeaderOrGridName
 
-                    generateItems(section, itemsWithHeaderOrGrid)
+                    generateItems(prefix, section, itemsWithHeaderOrGrid)
 
                     Integer repeatNum = safeInteger(fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_REPEAT_NUM), EXT_GROUP_REPEAT_NUM, itemsWithHeaderOrGridRel.destination)
                     if (repeatNum) {
@@ -129,12 +130,12 @@ class ModelToFormExporterService {
                 }
             } else {
                 if (nameAsHeader) {
-                    generateItems(section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
+                    generateItems(prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
                 } else {
-                    generateItems(section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
+                    generateItems(prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
                 }
             }
-            handleGroupOrVirtualSection(section, itemsWithHeaderOrGrid.parentOfRelationships, false)
+            handleGroupOrVirtualSection(prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
         }
     }
 
@@ -152,7 +153,7 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private static void generateItems(ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
+    private static void generateItems(String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
         container.with {
 
             boolean first = true
@@ -171,7 +172,7 @@ class ModelToFormExporterService {
 
                 // bit of heuristic
                 String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
-                String itemName = alphaNumNoSpaces("${model.name}_${localName}")
+                String itemName = alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}")
                 if (candidates.any { it.name.toLowerCase() == 'file' } || candidates.any { normalizeResponseType(it.ext[EXT_ITEM_RESPONSE_TYPE]) == RESPONSE_TYPE_FILE }) {
                     file(itemName)
                 } else if (dataType && dataType.instanceOf(EnumeratedType)) {

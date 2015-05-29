@@ -1,14 +1,14 @@
 angular.module('mc.core.ui.bs.metadataEditor', ['mc.core.ui.metadataEditor']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/metadataEditor.html', '''
       <div class="ordered-map-container panel-body">
-        <div class="col-sm-3 col-md-2 col-lg-1 pill">
+        <div class="col-sm-3 col-md-3 col-lg-3 pill">
           <ul class="nav nav-pills nav-stacked" role="tablist">
             <li role="presentation" ng-class="{'active': selectedEditor == '__ALL__'}"><a ng-click="selectEditor('__ALL__')">Raw</a></li>
             <li role="presentation" ng-class="{'active': selectedEditor == editor.getTitle()}" ng-repeat="editor in availableEditors"><a ng-click="selectEditor(editor.getTitle())">{{editor.getTitle()}}</a></li>
           </ul>
         </div>
 
-        <div class="col-sm-9 col-md-10 col-lg-10 editor">
+        <div class="col-sm-9 col-md-9 col-lg-9 editor">
           <div ng-repeat="editor in availableEditors">
             <div ng-include="editor.getTemplate()" ng-if="selectedEditor == editor.getTitle()"></div>
           </div>
