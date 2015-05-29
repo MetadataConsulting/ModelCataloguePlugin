@@ -11,7 +11,8 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
             if value.key == key
               value.value = newValue
               return newValue
-          self.values.push(key: key, value: newValue)
+          # only push if the value is defined
+          self.values.push(key: key, value: newValue) if newValue or not key
           return newValue
         get =  ->
           for value in self.values

@@ -28,6 +28,7 @@ class ModelToFormExporterService {
     static final String EXT_FORM_VERSION = "http://forms.modelcatalogue.org/form#version"
     static final String EXT_FORM_VERSION_DESCRIPTION = "http://forms.modelcatalogue.org/form#versionDescription"
     static final String EXT_FORM_REVISION_NOTES = "http://forms.modelcatalogue.org/form#revisionNotes"
+    static final String EXT_SECTION_TITLE = "http://forms.modelcatalogue.org/section#title"
     static final String EXT_SECTION_SUBTITLE = "http://forms.modelcatalogue.org/section#subtitle"
     static final String EXT_SECTION_INSTRUCTIONS = "http://forms.modelcatalogue.org/section#instructions"
     static final String EXT_SECTION_PAGE_NUMBER = "http://forms.modelcatalogue.org/section#pageNumber"
@@ -89,7 +90,7 @@ class ModelToFormExporterService {
 
         if (dataElementsOnly && sectionModel.countContains() || !dataElementsOnly) {
             form.section(alphaNumNoSpaces(sectionName)) {
-                title sectionName
+                title fromDestination(sectionRel, EXT_SECTION_TITLE, sectionName)
                 subtitle fromDestination(sectionRel, EXT_SECTION_SUBTITLE)
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
