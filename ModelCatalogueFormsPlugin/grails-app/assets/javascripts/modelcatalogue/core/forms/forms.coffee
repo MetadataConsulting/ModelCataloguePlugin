@@ -2,6 +2,8 @@ window.modelcatalogue.registerModule 'mc.core.forms'
 
 forms = angular.module('mc.core.forms', ['mc.core.ui.metadataEditors'])
 
+# TODO: inline help
+
 forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   metadataEditorsProvider.register {
     title: 'Form (Metadata)'
@@ -40,6 +42,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     ]
     keys: [
       "http://forms.modelcatalogue.org/group#grid"
+      "http://forms.modelcatalogue.org/group#header"
       "http://forms.modelcatalogue.org/group#repeatNum"
       "http://forms.modelcatalogue.org/group#repeatMax"
     ]
@@ -64,18 +67,6 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     ]
 
     keys: [
-#      "http://forms.modelcatalogue.org/item#layout"
-#      "http://forms.modelcatalogue.org/item#columnNumber"
-#      "http://forms.modelcatalogue.org/item#required"
-#      "http://forms.modelcatalogue.org/item#questionNumber"
-#
-#      "http://forms.modelcatalogue.org/item#phi"
-#      "http://forms.modelcatalogue.org/item#description"
-#      "http://forms.modelcatalogue.org/item#question"
-#      "http://forms.modelcatalogue.org/item#instructions"
-#      "http://forms.modelcatalogue.org/item#defaultValue"
-#
-
       "http://forms.modelcatalogue.org/item#responseType"
       "http://forms.modelcatalogue.org/item#units"
       "http://forms.modelcatalogue.org/item#digits"
@@ -125,18 +116,58 @@ forms.run ['$templateCache', ($templateCache) ->
       <div class="form-group">
         <label for="form-name" class="control-label">Name</label>
         <input maxlength="255" type="text" class="form-control" id="form-name" ng-model="object.access('http://forms.modelcatalogue.org/form#name')" ng-model-options="{ getterSetter: true }">
+        <p class="help-block">
+            Defines the name of the CRF as it will be displayed in the OpenClinica user interface. Defaults to model's name.
+            When a user is assigning CRFs to an event definition, they will be viewing this name. A user performing data
+            entry will identify the form by this name. Can contain upto 255 alphanumeric characters.
+        </p>
       </div>
       <div class="form-group">
         <label for="form-version" class="control-label">Version</label>
         <input maxlength="255" type="text" class="form-control" id="form-version" ng-model="object.access('http://forms.modelcatalogue.org/form#version')" ng-model-options="{ getterSetter: true }">
+        <p class="help-block">
+            Defines the version of the CRF as it will be displayed in the OpenClinica user interface. Defaults to model version number.<br/>
+
+            You cannot provide a value that has already been used in the OpenClinica instance unless it has not been assigned
+            to an event definition yet.  If a particular CRF version has not been used in an event definition, you may
+            overwrite it.<br/>
+
+            If this is a new version of a CRF that already exists, the CRF_NAME field must match the value of the form
+            already in OpenClinica.<br/>
+
+            A new version of a CRF would be needed due to a protocol change, adding or removing an item from a CRF, or
+            changing some of the questions.<br/>
+
+            Can contain upto 255 alphanumeric characters.
+        </p>
       </div>
       <div class="form-group">
         <label for="form-version-description" class="control-label">Version Description</label>
         <textarea maxlength="4000" rows="5" class="form-control" id="form-version-description" ng-model="object.access('http://forms.modelcatalogue.org/form#versionDescription')" ng-model-options="{ getterSetter: true }"></textarea>
+        <p class="help-block">
+            This field is used for informational purposes to keep track of what this version of the CRF was created for. Defaults to Model description or <code>Generated from Model_Name</code>.<br/>
+
+            This information appears as part of the CRF Metadata when the user clicks on View (original). This information
+            is not displayed during data entry.<br/>
+
+            Can contain upto 4000 alphanumeric characters.
+        </p>
       </div>
       <div class="form-group">
         <label for="form-revision-notes" class="control-label">Revision Notes</label>
         <textarea maxlength="255" rows="5" class="form-control" id="form-revision-notes" ng-model="object.access('http://forms.modelcatalogue.org/form#revisionNotes')" ng-model-options="{ getterSetter: true }"></textarea>
+        <p class="help-block">
+           This field is used to keep track of the revisions you made to this particular CRF. Defaults to <code>Generated from Model_Name</code><br/>
+
+           This information appears as part of the CRF Metadata when the user clicks on View (original). This information is
+           not displayed during data entry.<br/>
+
+           If this is the first version of the CRF, you can simply state this is a brand new form.  Going forward, as you
+           make changes and update the versions you can provide information on what is different between the first version
+           and each subsequent version.<br/>
+
+           Can contain upto 255 alphanumeric characters.
+        </p>
       </div>
 
     </form>
@@ -147,18 +178,56 @@ forms.run ['$templateCache', ($templateCache) ->
       <div class="form-group">
         <label for="section-title" class="control-label">Title</label>
         <textarea maxlength="2000" rows="5" class="form-control" id="section-title" ng-model="object.access('http://forms.modelcatalogue.org/section#title')" ng-model-options="{ getterSetter: true }"></textarea>
+        <p class="help-block">
+          The value in this field will be displayed at the top of each page when a user is performing data entry, as well
+          as in the tabs and drop down list used to navigate between sections in a CRF. It does not have to be unique but
+          should be a readable value that makes sense to people entering data.  An example would be 'Inclusion Criteria'.<br/>
+
+          Defaults to model's name.<br/>
+
+          Long section titles may not display well.<br/>
+
+          Can contain upto 2000  characters.
+        </p>
       </div>
       <div class="form-group">
         <label for="section-subtitle" class="control-label">Subtitle</label>
         <textarea maxlength="2000" rows="5" class="form-control" id="section-subtitle" ng-model="object.access('http://forms.modelcatalogue.org/section#subtitle')" ng-model-options="{ getterSetter: true }"></textarea>
+        <p class="help-block">
+          A sub-title shown under the section title.<br/>
+
+          HTML elements are supported for this field.<br/>
+
+          Can contain upto 2000 characters.
+        </p>
       </div>
       <div class="form-group">
         <label for="section-instructions" class="control-label">Instructions</label>
         <textarea maxlength="2000" rows="5" class="form-control" id="section-instructions" ng-model="object.access('http://forms.modelcatalogue.org/section#instructions')" ng-model-options="{ getterSetter: true }"></textarea>
+        <p class="help-block">
+          Instructions at the top of the section (under the subtitle) that explains to the data entry person what to do on
+          this section of the form.<br/>
+
+          HTML elements are supported for this field.<br/>
+
+          This field should be used if there are particular data entry instructions that should be conveyed or followed
+          to users.<br/>
+
+          Can contain upto 2000 characters.
+        </p>
       </div>
       <div class="form-group">
         <label for="form-page-number" class="control-label">Page Number</label>
         <input maxlength="5" type="text" class="form-control" id="form-page-number" ng-model="object.access('http://forms.modelcatalogue.org/section#pageNumber')" ng-model-options="{ getterSetter: true }">
+        <p class="help-block">
+          The page number on which the section begins. If using paper source documents and have a multi-page CRF,
+          put in the printed page number.<br/>
+
+          For the most part, this field is only used in studies collecting data on multi-page paper forms and then having
+          the data keyed in at a central location performing double data entry.<br/>
+
+          Can contain upto 5 characters.
+        </p>
       </div>
     </form>
   '''
@@ -170,6 +239,10 @@ forms.run ['$templateCache', ($templateCache) ->
           <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/group#grid')" ng-model-options="{ getterSetter: true }">
           Grid
         </label>
+      </div>
+      <div class="form-group">
+        <label for="group-header" class="control-label">Header</label>
+        <input maxlength="64" type="text" class="form-control" id="group-header" ng-model="object.access('http://forms.modelcatalogue.org/group#header')" ng-model-options="{ getterSetter: true }" ng-disabled="!object.get('http://forms.modelcatalogue.org/group#grid')>
       </div>
       <div class="form-group">
         <label for="repeat-num" class="control-label">Initial Number of Rows (default 1)</label>

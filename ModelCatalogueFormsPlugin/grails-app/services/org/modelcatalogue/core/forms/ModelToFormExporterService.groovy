@@ -33,6 +33,7 @@ class ModelToFormExporterService {
     static final String EXT_SECTION_INSTRUCTIONS = "http://forms.modelcatalogue.org/section#instructions"
     static final String EXT_SECTION_PAGE_NUMBER = "http://forms.modelcatalogue.org/section#pageNumber"
     static final String EXT_GROUP_GRID = "http://forms.modelcatalogue.org/group#grid"
+    static final String EXT_GROUP_HEADER = "http://forms.modelcatalogue.org/group#header"
     static final String EXT_GROUP_REPEAT_NUM = "http://forms.modelcatalogue.org/group#repeatNum"
     static final String EXT_GROUP_REPEAT_MAX = "http://forms.modelcatalogue.org/group#repeatMax"
     static final String EXT_ITEM_RESPONSE_TYPE = "http://forms.modelcatalogue.org/item#responseType"
@@ -114,7 +115,7 @@ class ModelToFormExporterService {
             if (fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_GRID) == 'true') {
 
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) {
-                    header itemsWithHeaderOrGridName
+                    header fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_HEADER, itemsWithHeaderOrGridName)
 
                     generateItems(prefix, section, itemsWithHeaderOrGrid)
 
