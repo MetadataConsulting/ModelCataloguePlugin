@@ -10,7 +10,7 @@ angular.module('mc.core.ui.bs.orderedMapEditor', ['mc.core.ui.orderedMapEditor']
         </div>
         <h4 class="text-center" ng-if="availableEditors.length">General</h4>
         <hr ng-if="availableEditors.length"/>
-        <table class="soe-table table">
+        <table class="soe-table table" title="{{title}}">
           <thead ng-if="title || valueTitle">
             <th></th>
             <th class="col-md-6 col-sm-5 soe-table-property-key">{{title}}</th>

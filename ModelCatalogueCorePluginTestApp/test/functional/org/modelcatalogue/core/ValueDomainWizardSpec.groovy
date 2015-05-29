@@ -142,8 +142,15 @@
             waitFor {
                 $('button.btn-primary.update-object').disabled
             }
+            waitFor {
+                $('.btn.add-metadata').displayed
+            }
 
             when:
+            noStale({$('.btn.add-metadata')}) {
+                it.click()
+            }
+
             fillMetadata(foo: 'bar', one: 'two', free: 'for')
 
             then:
@@ -155,8 +162,11 @@
             $('button.btn-primary.update-object').click()
 
             then:
+            waitFor {
+                $('button.btn-primary.update-object').displayed
+            }
             waitFor(30) {
-                $('button.btn-primary.update-object').displayed && $('button.btn-primary.update-object').disabled
+                $('button.btn-primary.update-object').disabled
             }
 
             when:
@@ -184,7 +194,7 @@
 
             then:
             waitFor {
-                $('.soe-table-property-key input').value() == ''
+                $('.btn.add-metadata').displayed
             }
 
         }

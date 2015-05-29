@@ -1,14 +1,14 @@
 angular.module('mc.core.ui.bs.metadataEditor', ['mc.core.ui.metadataEditor']).run [ '$templateCache', ($templateCache) ->
     $templateCache.put 'modelcatalogue/core/ui/metadataEditor.html', '''
       <div class="ordered-map-container panel-body">
-        <div class="col-md-1 col-sm-1 col-lg-2 pill">
+        <div class="col-sm-3 col-md-2 col-lg-1 pill">
           <ul class="nav nav-pills nav-stacked" role="tablist">
             <li role="presentation" ng-class="{'active': selectedEditor == '__ALL__'}"><a ng-click="selectEditor('__ALL__')">Raw</a></li>
             <li role="presentation" ng-class="{'active': selectedEditor == editor.getTitle()}" ng-repeat="editor in availableEditors"><a ng-click="selectEditor(editor.getTitle())">{{editor.getTitle()}}</a></li>
           </ul>
         </div>
 
-        <div class="col-md-11 col-sm-11 col-lg-10 editor">
+        <div class="col-sm-9 col-md-10 col-lg-10 editor">
           <div ng-repeat="editor in availableEditors">
             <div ng-include="editor.getTemplate()" ng-if="selectedEditor == editor.getTitle()"></div>
           </div>
@@ -39,7 +39,7 @@ angular.module('mc.core.ui.bs.metadataEditor', ['mc.core.ui.metadataEditor']).ru
                 </tr>
               </tbody>
             </table>
-            <a ng-if="object.values.length == 0" class="btn btn-success btn-block" ng-click="addProperty(0)"><span class="glyphicon glyphicon-plus"></span> Add Metadata</a>
+            <a ng-if="object.values.length == 0" class="btn btn-success btn-block add-metadata" ng-click="addProperty(0)"><span class="glyphicon glyphicon-plus"></span> Add Metadata</a>
           </div>
         </div>
       </div>

@@ -3,6 +3,9 @@
 # fail if any line fails
 set -e
 
+if [[ "$1" != "" ]]; then
+    TEST_SUITE="$1"
+fi
 
 # karma and functional tests needs to fetch the bower components
 if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then

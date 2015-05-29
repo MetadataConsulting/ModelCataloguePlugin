@@ -30,7 +30,7 @@ angular.module('mc.core.orderedMapEnhancer', ['mc.util.enhance']).config ['enhan
         getterSetter.set = (newValue) -> set(newValue)
         getterSetter.remove = ->
           result = undefined
-          for value, i in self.values.reverse()
+          for value, i in self.values[..].reverse()
             if value.key == key
               result = value.value
               self.values.splice(i, 1)

@@ -11,12 +11,6 @@ describe "mc.core.ui.simpleObjectEditor", ->
       func:   ->
       nested: { prop: "val" }
 
-    $rootScope.hints = [
-      'x'
-      'y'
-    ]
-
-
     element = $compile('''
     <simple-object-editor object="object"></simple-object-editor>
     ''')($rootScope)
@@ -28,13 +22,13 @@ describe "mc.core.ui.simpleObjectEditor", ->
     expect(element.hasClass('soe-table')).toBeTruthy()
 
     # having only table body
-    expect(element.find('thead').length).toBe(1)
+    expect(element.find('thead').length).toBe(0)
     expect(element.find('tbody').length).toBe(1)
     expect(element.find('tfoot').length).toBe(0)
 
     # appropriate rows and cells count with expected classes
     expect(element.find('tr.soe-table-property-row').length).toBe(3)
-    expect(element.find('th.soe-table-property-key').length).toBe(4)
+    expect(element.find('th.soe-table-property-key').length).toBe(3)
     expect(element.find('td.soe-table-property-value').length).toBe(3)
 
     # appropriate rows and cells count with expected classes
@@ -63,4 +57,4 @@ describe "mc.core.ui.simpleObjectEditor", ->
 
     $rootScope.$digest()
 
-    expect(element.find('tr.soe-table-property-row').length).toBe(2)
+    expect(element.find('tr.soe-table-property-row').length).toBe(1)
