@@ -261,7 +261,7 @@ class ModelService {
 
 	protected printXSDFriendlyString(String text){
 		if (text==null) return "null"
-		return text.replaceAll(" ", "-").replaceAll("\\(", "").replaceAll("\\)", "").toLowerCase()
+		return text.replaceAll(" ", "-").replaceAll("\\(", "").replaceAll("\\)", "").replaceAll("/", "-").toLowerCase()
 	}
 
 	protected defaultMinOccurs(String min){
