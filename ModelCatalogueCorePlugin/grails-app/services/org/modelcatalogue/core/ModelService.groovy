@@ -447,7 +447,7 @@ class ModelService {
 	}
 
 	protected printDataElementSchemaType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
-		return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
+		return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type:dataElement.valueDomain.dataType.name, minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
 			'xs:annotation'{
 				'xs:documentation'{
 					'xs:description' {
