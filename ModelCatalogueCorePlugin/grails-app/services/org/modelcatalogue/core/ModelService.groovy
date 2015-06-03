@@ -281,9 +281,11 @@ class ModelService {
 	}
 
 	/**
-	 * Print basic model and 
+	 * Print xsd model with additional metadatada element. The current target model should contains at least 2 metadata fields 
+	 * with corespondence for schema-name, schema-version,schema-versionDescription
 	 * @param targetModel
-	 * @return
+	 * @return an String with formed xml 
+	 * @throw Exception with text error messages corresponding for missing fields
 	 */
 	def printXSDModel(Model targetModel) {
 		def valueDomains = new TreeSet({ k1, k2 -> k1.name+k1.id <=> k2.name+k1.id } as Comparator)
@@ -304,6 +306,21 @@ class ModelService {
 					'p'("Description:"+targetModel.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION))
 					'p'("Generated: "+new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZ"))		
 				}
+			}
+
+			'xs:element'(name:printXSDFriendlyString(targetModel.name)){
+					'xs:complexType'{
+						'xs:sequence'{
+							'xs:element'(name:'metadata',type:'metadata',minOccurs:'1',maxOccurs:'1')
+							 targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship r ->
+								'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination.name),
+									minOccurs:defaultMinOccurs(r.destination.ext.get("Min Occurs")),
+									maxOccurs:defaultMinOccurs(r.destination.ext.get("Max Occurs")))
+									
+							}
+							
+						}
+					}
 			}
 			'xs:complexType'(name:'metadata'){
 				'xs:sequence'{
@@ -336,11 +353,13 @@ class ModelService {
 						}
 					}
 				}
-			}
+				
+		  }
+			
+			
 			subModels.each { Model model ->
 				printComplexType(xml, model,valueDomains,xmlSchema)
 			}
-			
 			valueDomains.each { ValueDomain valueDomain ->
 				printSimpleType(xml, valueDomain)
 			}
@@ -377,25 +396,22 @@ class ModelService {
 	 * Check if it's a built in type and have no restrictions and it;s a basic type 
 	 * @return
 	 */
-	protected def isXsdBasicDataType(ValueDomain valueDomain){
-		def result=false;				
-		if (XSD_BUILTIN_DATA_TYPES.find{it==valueDomain.dataType?.name}!=null && (!valueDomain.ext.keySet().any {idx->(idx in XSD_RESTRICTION_LIST)})) 
-		{
-			result= true
-		}
-		return result
+	protected def isXsdBasicDataType(ValueDomain valueDomain){		
+		return  (XSD_BUILTIN_DATA_TYPES.find{it==valueDomain.dataType?.name}!=null && (!valueDomain.ext.keySet().any {idx->(idx in XSD_RESTRICTION_LIST)}&&(!valueDomain.regexDef))) 
+		
 	}
 
 	
 	/**
-	 * Check specific GEL  elements for metadata required for forms
+	 * Check specific GEL  elements for metadata section
 	 * @param xml
 	 * @param model
 	 * @param valueDomains
 	 * @param xmlSchema
-	 * @return
+	 * @return void
+	 * @throw Exception with a text message for missing fields
 	 */
-	protected validateGelXsdFormMetadata (Model model){
+	protected void validateGelXsdFormMetadata (Model model){
 		String exceptionMessages="";
 		if (!model.ext.get(XSD_SCHEMA_NAME)){
 			exceptionMessages+="missing required field for xsd form 'schema-name',"
@@ -429,13 +445,12 @@ class ModelService {
 			     //copy all ext entries from dataElemnt to value domain 
 				valueDomain.ext.putAll(dataElement.ext)
 				
-				valueDomains.add(valueDomain)
 				
 				def  dataType=null;
-				 if (isXsdBasicDataType(valueDomain)){
-					 valueDomains.add(valueDomain)
+				 if (isXsdBasicDataType(valueDomain)){	
 					 dataType=valueDomain.dataType.name
 				 }else{
+				 valueDomains.add(valueDomain)
 				 	dataType=valueDomain.name+valueDomain.id
 				 }
 				
