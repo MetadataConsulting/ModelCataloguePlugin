@@ -292,7 +292,20 @@ Model catalogue core plugin (metadata registry)
             type Model
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
+		
+		reportsRegistry.register {
+			creates asset
+			title { "Export  XML Schema Definition " }
+			type Model
+			link controller: 'dataArchitect', action: 'printXSDModel', params: [format: 'xsd'], id: true
+		}
 
+		reportsRegistry.register {
+			creates asset
+			title { "Export  XML XDCT Model" }
+			type Model
+			link controller: 'dataArchitect', action: 'gelXmlModelShredder', params: [format: 'xml'], id: true
+		}
         reportsRegistry.register {
             creates link
             title { "Inventory Report" }

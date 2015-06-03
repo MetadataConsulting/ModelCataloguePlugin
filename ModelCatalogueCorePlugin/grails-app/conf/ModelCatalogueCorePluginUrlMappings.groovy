@@ -126,7 +126,8 @@ class ModelCatalogueCorePluginUrlMappings {
             "/findRelationsByMetadataKeys/$key?" (controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)
             "/elementsFromCSV" (controller: "dataArchitect", action: "elementsFromCSV", method: HttpMethod.POST)
             "/modelsFromCSV" (controller: "dataArchitect", action: "modelsFromCSV", method: HttpMethod.POST)
-            "/generateSuggestions" (controller: "dataArchitect", action: "generateSuggestions", method: HttpMethod.POST)
+			"/printXSDModel/$modelId?" (controller: "dataArchitect", action: "printXSDModel", method: HttpMethod.GET)
+			"/gelXmlModelShredder/$modelId" (controller: "dataArchitect", action: "gelXmlModelShredder", method: HttpMethod.GET)
             "/imports/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
         }
 

@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile
 
 class DataArchitectController extends AbstractRestfulController<CatalogueElement> {
 
-    static responseFormats = ['json', 'xlsx']
+    static responseFormats = ['json', 'xlsx','xml','xsd']
 
     def dataArchitectService
     def modelService
@@ -118,6 +118,44 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
             respond status: HttpStatus.BAD_REQUEST
         }
     }
+	
+	def gelCreateFormXML() {
+		try {
+			Model model=Model.get(params.id) 
+			respond Lists.wrap(params,"/dataArchitect/gelXmlModelShredder/${params.id}",modelService.gelXmlModelShredder(model))
+		
+			
+		} catch (e) {
+			log.error("Error generating xmlmodel", e)
+			respond status: HttpStatus.BAD_REQUEST
+		}
+	}
+	
+	/**
+	 * Return XSD file for 
+	 * @return
+	 */
+	def printXSDModel(){
+		def model=Model.get(params.id)
+		def result= modelService.printXSDModel(Model.get(params.id))
+		try {
+			
+			//response.addHeader("Content-disposition", "inline; filename="+"\"${model.name}.xml\"")
+			//response.outputStream << result
+			//response.outputStream.flush()
+			//response.flushBuffer()
+			respond Lists.wrap(params, DataElement, "/dataArchitect/printXSDModel/${params.id}",result)
+			//render (status: HttpStatus.OK,text:result)
+		}catch(e){
+			respond status: HttpStatus.BAD_REQUEST
+		}
+		
+		//response.addHeader("Content-disposition", "inline; filename="+"\"${model.name}.xml\"")
+		//response.outputStream << result
+		//response.outputStream.flush()
+		//response.flushBuffer()
+
+	}
 
 
 }
