@@ -374,7 +374,7 @@ class ModelService {
 	
 	protected printComplexType(MarkupBuilder xml, Model model,def valueDomains,def xmlSchema){
 			def sectionType='xs:sequence'
-			if (model.ext.get(XSD_SCHEMA_SECTION_TYPE)?.compareToIgnoreCase("choice")){
+			if (model.ext.get(XSD_SCHEMA_SECTION_TYPE)?.compareToIgnoreCase("choice")==0){
 				sectionType='xs:choice'
 			}
 			return xml.'xs:complexType'(name: printXSDFriendlyString(model.name)){
