@@ -179,9 +179,9 @@ class ModelService {
     }
 
     /**
-     * Specific  model file xml generator for schema specific for XML Shredder used by GEL
+     * Return  xml  for schema specific for XML Shredder used by GEL.
      * @param model
-     * @return
+     * @return a string with xml formed
      */
     def gelXmlModelShredder(Model model) {
         def writer = new StringWriter()
@@ -207,16 +207,10 @@ class ModelService {
                 //these are actually CRFs
                 model.outgoingRelationships.sort({ it.ext?.order }).each { Relationship rel ->
                     if (rel.relationshipType == RelationshipType.containmentType) {
-                        this.printQuestion(rel.destination, rel.ext, builder)
+                        printQuestion(rel.destination, rel.ext, builder)
                     }
-
-                    if (rel.relationshipType == RelationshipType.hierarchyType &&
-                    rel.source.status != ElementStatus.DEPRECATED &&
-                    rel.destination.status != ElementStatus.DEPRECATED) {
-                        this.printSection(rel.destination, rel.ext, builder)
-
-                        //create Form xml
-                        gelXmlModelShredder(rel.destination)
+                    if (rel.relationshipType == RelationshipType.hierarchyType) {
+                        printSection(rel.destination, rel.ext, builder)
                     }
                 }
             }
@@ -355,7 +349,7 @@ class ModelService {
         def subModels = listChildren(targetModel)
 
         //check if it's a good candidate for xsd schema
-        validateGelXsdFormMetadata(targetModel)
+        validateGelXsdFormMetadata(targetModel,subModels)
 
         xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema', 'xmlns:vc': 'http://www.w3.org/2007/XMLSchema-versioning', 'xmlns:gel': 'https://genomicsengland.co.uk/xsd/', 'vc:minVersion': '1.1') {
             'xs:annotation'{
@@ -375,7 +369,6 @@ class ModelService {
                                 'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination.name),
                                     minOccurs:defaultMinOccurs(r.destination.ext.get("Min Occurs")),
                                     maxOccurs:defaultMinOccurs(r.destination.ext.get("Max Occurs")))
-
                             }
 
                         }
@@ -476,7 +469,7 @@ class ModelService {
      * @return void
      * @throw Exception with a text message for missing fields
      */
-    protected void validateGelXsdFormMetadata (Model model){
+    protected void validateGelXsdFormMetadata (Model model,List subModels){
         String exceptionMessages="";
         if (!model.ext.get(XSD_SCHEMA_NAME)){
             exceptionMessages+="missing required field for xsd form 'schema-name',"
@@ -488,9 +481,12 @@ class ModelService {
         if (!model.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION)){
             exceptionMessages+="missing required field for xsd form 'schema-name',"
         }
-        if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
+        if (subModels.findAll{it.name=="metadata"}) exceptionMessages+="duplicate 'metadata' element"
+        
+        if (!exceptionMessages.empty) throw new Exception(exceptionMessages)       
 
     }
+    
 
     protected printModelElements(MarkupBuilder xml, Model model, String minOccurs, String maxOccurs){
         return xml.'xs:element'(name: printXSDFriendlyString(model.name), type: printXSDFriendlyString(model.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){

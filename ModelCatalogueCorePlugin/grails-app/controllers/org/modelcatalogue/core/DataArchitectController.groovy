@@ -136,7 +136,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
                 originalFileName: "${model.name}-gel-xml-shredder.xml",
                 description: "Your XML will be available in this asset soon. Use Refresh action to reload",
                 status: ElementStatus.PENDING,
-                contentType: "text.xml",
+                contentType: "application/octet-stream",
                 size: 0
         )
     
@@ -145,14 +145,17 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
         Long id = asset.id
     
         Long authorId = modelCatalogueSecurityService.currentUser?.id
-    
+        
+        String result= modelService.gelXmlModelShredder(model)
+
         executorService.submit {
             auditService.withDefaultAuthorId(authorId) {
                 Asset updated = Asset.get(id)
                 try {
+      
+                    //String result= modelService.gelXmlModelShredder(model)
+                    assetService.storeAssetFromInputStream( new ByteArrayInputStream(result.bytes), "application/octet-stream", updated)                   
                     
-                    String result= modelService.gelXmlModelShredder(model)
-                    assetService.storeAssetFromInputStream( new ByteArrayInputStream(result.bytes), "text/xml", updated)
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your Xml model  is ready. Use Download button to download it."
                     updated.save(flush: true, failOnError: true)
@@ -167,9 +170,10 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
                 }
             }
         }
+        
     
-        response.setHeader("X-Asset-ID", asset.id.toString())    
-        redirect
+        response.setHeader("X-Asset-ID", asset.id.toString())
+        redirect controller: 'asset', id: asset.id, action: 'show'
 
 }
 
