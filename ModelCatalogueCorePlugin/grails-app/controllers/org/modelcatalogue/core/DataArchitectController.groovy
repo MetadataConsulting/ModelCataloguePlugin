@@ -1,20 +1,24 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.dataarchitect.CSVService
-import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
+import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 
 class DataArchitectController extends AbstractRestfulController<CatalogueElement> {
 
-    static responseFormats = ['json', 'xlsx','xml','xsd']
+    static responseFormats = ['json', 'xlsx']
 
     def dataArchitectService
     def modelService
+    def executorService
+    @Autowired AuditService auditService
+    @Autowired AssetService assetService
     @Autowired CSVService csvService
 
     DataArchitectController() {
@@ -118,44 +122,117 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
             respond status: HttpStatus.BAD_REQUEST
         }
     }
-	
-	def gelCreateFormXML() {
-		try {
-			Model model=Model.get(params.id) 
-			respond Lists.wrap(params,"/dataArchitect/gelXmlModelShredder/${params.id}",modelService.gelXmlModelShredder(model))
-		
-			
-		} catch (e) {
-			log.error("Error generating xmlmodel", e)
-			respond status: HttpStatus.BAD_REQUEST
-		}
-	}
-	
-	/**
-	 * Return XSD file for 
-	 * @return
-	 */
-	def printXSDModel(){
-		def model=Model.get(params.id)
-		def result= modelService.printXSDModel(Model.get(params.id))
-		try {
-			
-			//response.addHeader("Content-disposition", "inline; filename="+"\"${model.name}.xml\"")
-			//response.outputStream << result
-			//response.outputStream.flush()
-			//response.flushBuffer()
-			respond Lists.wrap(params, DataElement, "/dataArchitect/printXSDModel/${params.id}",result)
-			//render (status: HttpStatus.OK,text:result)
-		}catch(e){
-			respond status: HttpStatus.BAD_REQUEST
-		}
-		
-		//response.addHeader("Content-disposition", "inline; filename="+"\"${model.name}.xml\"")
-		//response.outputStream << result
-		//response.outputStream.flush()
-		//response.flushBuffer()
 
-	}
+    def gelXmlShredderModel() {
+        Model model=Model.get(params.id)
+
+        if (!model) {
+            render status: HttpStatus.NOT_FOUND
+            return
+        }
+    
+        Asset asset = new Asset(
+                name: "$model.name Model for XML Shredder",
+                originalFileName: "${model.name}-gel-xml-shredder.xml",
+                description: "Your XML will be available in this asset soon. Use Refresh action to reload",
+                status: ElementStatus.PENDING,
+                contentType: "text.xml",
+                size: 0
+        )
+    
+        asset.save(flush: true, failOnError: true)
+    
+        Long id = asset.id
+    
+        Long authorId = modelCatalogueSecurityService.currentUser?.id
+    
+        executorService.submit {
+            auditService.withDefaultAuthorId(authorId) {
+                Asset updated = Asset.get(id)
+                try {
+                    
+                    String result= modelService.gelXmlModelShredder(model)
+                    assetService.storeAssetFromInputStream( new ByteArrayInputStream(result.bytes), "text/xml", updated)
+                    updated.status = ElementStatus.FINALIZED
+                    updated.description = "Your Xml model  is ready. Use Download button to download it."
+                    updated.save(flush: true, failOnError: true)
+                } catch (e) {
+                    log.error "Exception of type ${e.class} xml model ${id}", e
+    
+                    updated.refresh()
+                    updated.status = ElementStatus.FINALIZED
+                    updated.name = updated.name + " - Error during generation"
+                    updated.description = "Error generating xml model for shredder: ${e}"
+                    updated.save(flush: true, failOnError: true)
+                }
+            }
+        }
+    
+        response.setHeader("X-Asset-ID", asset.id.toString())    
+        redirect
+
+}
+
+
+/**
+ * Generate xsd schema as an asset
+ * @return redirect to asset controller 
+ */
+def modelsToXSD(){
+    def model=Model.get(params.id)
+    
+    
+    if (!model) {
+        render status: HttpStatus.NOT_FOUND
+        return
+    }
+
+    Asset asset = new Asset(
+            name: "$model.name XML Schema(XSD)",
+            originalFileName: model.ext.get(ModelService.XSD_SCHEMA_NAME)?model.ext.get(ModelService.XSD_SCHEMA_NAME)+"v${model.ext.get(ModelService.XSD_SCHEMA_VERSION)}.xsd"
+            :"${model.name}.xsd",
+            description: "Your XSD will be available in this asset soon. Use Refresh action to reload",
+            status: ElementStatus.PENDING,
+            contentType: "application/xsd",
+            size: 0
+    )
+
+    asset.save(flush: true, failOnError: true)
+
+    Long id = asset.id
+
+    Long authorId = modelCatalogueSecurityService.currentUser?.id
+
+    executorService.submit {
+        auditService.withDefaultAuthorId(authorId) {
+            Asset updated = Asset.get(id)
+            try {
+                
+                String result= modelService.printXSDModel(model)
+
+                assetService.storeAssetFromInputStream( new ByteArrayInputStream(result.bytes), "application/xsd", updated)
+                updated.originalFileName="${model.ext.get(ModelService.XSD_SCHEMA_NAME)}-v${model.ext.get(ModelService.XSD_SCHEMA_VERSION)}.xsd"
+                updated.status = ElementStatus.FINALIZED
+                updated.description = "Your XSD  is ready. Use Download button to download it."
+                updated.save(flush: true, failOnError: true)
+            } catch (e) {
+                log.error "Exception of type ${e.class} xsd schema ${id}", e
+
+                updated.refresh()
+                updated.status = ElementStatus.FINALIZED
+                updated.name = updated.name + " - Error during generation"
+                updated.description = "Error generating xsd: ${e}"
+                updated.save(flush: true, failOnError: true)
+            }
+        }
+    }
+
+    response.setHeader("X-Asset-ID", asset.id.toString())
+
+    redirect controller: 'asset', id: asset.id, action: 'show'
+    
+
+}
 
 
 }
