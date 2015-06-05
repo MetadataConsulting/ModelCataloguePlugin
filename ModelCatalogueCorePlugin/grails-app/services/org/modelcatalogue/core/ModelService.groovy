@@ -362,17 +362,23 @@ class ModelService {
             }
 
             'xs:element'(name:printXSDFriendlyString(targetModel.name)){
-                    'xs:complexType'{
-                        'xs:sequence'{
-                            'xs:element'(name:'metadata',type:'metadata',minOccurs:'1',maxOccurs:'1')
-                             targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship r ->
-                                'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination.name),
-                                    minOccurs:defaultMinOccurs(r.destination.ext.get("Min Occurs")),
-                                    maxOccurs:defaultMinOccurs(r.destination.ext.get("Max Occurs")))
-                            }
-
+                if(targetModel.description){
+                    'xs:annotation'{
+                        'xs:documentation'{
+                            'p'(targetModel.description)
                         }
                     }
+                }
+                'xs:complexType'{
+                    'xs:sequence'{
+                        'xs:element'(name:'metadata',type:'metadata',minOccurs:'1',maxOccurs:'1')
+                        targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship r ->
+                            'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination.name),
+                            minOccurs:defaultMinOccurs(r.destination.ext.get("Min Occurs")),
+                            maxOccurs:defaultMinOccurs(r.destination.ext.get("Max Occurs")))
+                        }
+                    }
+                }
             }
             //print metadata as a standard required option
             printSchemaMetadata(xml,targetModel)
@@ -431,23 +437,21 @@ class ModelService {
 
 
     protected printComplexType(MarkupBuilder xml, Model model,def valueDomains,def xmlSchema){
-            def sectionType='xs:sequence'
-            if (model.ext.get(XSD_SCHEMA_SECTION_TYPE)?.compareToIgnoreCase("choice")==0){
-                sectionType='xs:choice'
-            }
-            return xml.'xs:complexType'(name: printXSDFriendlyString(model.name)){
-                "${sectionType}"{
-                    model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
-                        printDataElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"),valueDomains,xmlSchema)
-                    }
-
-                    model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship relationship ->
-                        printModelElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"))
-                    }
+        def sectionType='xs:sequence'
+        if (model.ext.get(XSD_SCHEMA_SECTION_TYPE)?.compareToIgnoreCase("choice")==0){
+            sectionType='xs:choice'
+        }
+        return xml.'xs:complexType'(name: printXSDFriendlyString(model.name)){
+            "${sectionType}"{
+                model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
+                    printDataElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"),valueDomains,xmlSchema)
                 }
 
-
-    }
+                model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship relationship ->
+                    printModelElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"))
+                }
+            }
+        }
     }
 
     /**
@@ -490,7 +494,7 @@ class ModelService {
 
     protected printModelElements(MarkupBuilder xml, Model model, String minOccurs, String maxOccurs){
         return xml.'xs:element'(name: printXSDFriendlyString(model.name), type: printXSDFriendlyString(model.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
-        }
+            }
 
     }
 
@@ -524,10 +528,10 @@ class ModelService {
 
     protected printDataElementSchemaType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
         return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type:dataElement.valueDomain.dataType.name, minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
-            'xs:annotation'{
-                'xs:documentation'{
-                    'xs:description' {
-                        dataElement.description
+            if (dataElement?.description){
+                'xs:annotation'{
+                    'xs:documentation'{
+                        'p'(dataElement?.description)
                     }
                 }
             }
@@ -538,7 +542,15 @@ class ModelService {
 
 
     protected printDataElementSimpleType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
-        return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type: printXSDFriendlyString(type), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs))
+        return xml.'xs:element'(name: printXSDFriendlyString(dataElement.name), type: printXSDFriendlyString(type), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
+            if (dataElement?.description){
+                'xs:annotation'{
+                    'xs:documentation'{
+                        'p'(dataElement?.description)
+                    }
+                }
+            }
+        }
     }
 
 
