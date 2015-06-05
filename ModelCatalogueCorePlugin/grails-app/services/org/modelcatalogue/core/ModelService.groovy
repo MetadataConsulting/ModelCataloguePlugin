@@ -506,9 +506,9 @@ class ModelService {
             if(valueDomain.classifications.contains(xmlSchema)){
                 return printDataElementSchemaType(xml, dataElement, valueDomain?.name, minOccurs, maxOccurs)
             }else{
-                //copy all ext entries from dataElemnt to value domain
+                //copy or overwrite all ext entries from dataElemnt to value domain
                 valueDomain.ext.putAll(dataElement.ext.subMap(XSD_RESTRICTION_LIST))
-                //copy and overide all ext entries from relationship to value domain
+                //copy or overwrite   all ext entries from relationship to value domain
                 valueDomain.ext.putAll(relationshipMetadata.subMap(XSD_RESTRICTION_LIST))
                 def  dataType=null;
                 if (isXsdBasicDataType(valueDomain)){
@@ -612,13 +612,16 @@ class ModelService {
             xml.'xs:maxExclusive'(value:valueDomain.ext.get(XSD_RESTRICTION_MAX_EXCLUSIVE))
         }
 
-        if (valueDomain.ext.get(XSD_RESTRICTION_MAX_EXCLUSIVE)){
-            xml.'xs:maxExclusive'(value:valueDomain.ext.get(XSD_RESTRICTION_MAX_EXCLUSIVE))
+        if (valueDomain.ext.get(XSD_RESTRICTION_TOTAL_DIGITS)){
+            xml.'xs:totalDigits'(value:valueDomain.ext.get(XSD_RESTRICTION_TOTAL_DIGITS))
+        }
+        
+        if (valueDomain.ext.get(XSD_RESTRICTION_FRACTION_DIGITS)){
+            xml.'xs:fractionDigits'(value:valueDomain.ext.get(XSD_RESTRICTION_FRACTION_DIGITS))
         }
 
         if (valueDomain.ext.get(XSD_RESTRICTION_PATTERN)|| valueDomain?.regexDef){
             xml.'xs:pattern'(value:valueDomain.ext.get(XSD_RESTRICTION_PATTERN)?valueDomain.ext.get(XSD_RESTRICTION_PATTERN):valueDomain?.regexDef)
         }
     }
-
 }

@@ -48,29 +48,29 @@ xsd.run ['$templateCache', ($templateCache) ->
   <div class="alert alert-warning">This XSD metadata only applies on the root model of the Xml Schema.Every GEL Schema should have included these mandatory fields</div>
   <form class="form">
       <div class="form-group">
-          <label for="form-name" class="control-label">XML Schema Name</label>
+          <label for="schema-name" class="control-label">XML Schema Name</label>
           <input maxlength="50" type="text" class="form-control" id="schema-name" ng-model="object.access('http://xsd.modelcatalogue.org/metadata#schemaName')" ng-model-options="{ getterSetter: true }">
               <p class="help-block">
                   XML Schema Name. Limit to maximum 50 chars. Attention! use lower case without without spaces or unaccepted chars for an xsd element name 
               </p>
       </div>
       <div class="form-group">
-          <label for="form-version" class="control-label">Version</label>
+          <label for="schema-version" class="control-label">Version</label>
           <input maxlength="20" type="text" class="form-control" id="schema-version" ng-model="object.access('http://xsd.modelcatalogue.org/metadata#schemaVersion')" ng-model-options="{ getterSetter: true }">
               <p class="help-block">
                   This define the schema version.Must be a number in format X.X.X 
               </p>
       </div>
       <div class="form-group">
-          <label for="form-version-description" class="control-label">Version Description</label>
+          <label for="schema-version-description" class="control-label">Version Description</label>
           <textarea maxlength="4000" rows="5" class="form-control" id="schema-version-description" ng-model="object.access('http://xsd.modelcatalogue.org/metadata#schemaVersionDescription')" ng-model-options="{ getterSetter: true }"></textarea>
           <p class="help-block">
              A specific xsd version description with most important changes. max 4000 chars.
           </p>
       </div> 
       <div class="form-group">
-          <label for="form-version-description" class="control-label">Section type</label>
-          <input type="text" maxlength="10" rows="5" class="form-control" id="form-version-description" ng-model="object.access('http://xsd.modelcatalogue.org/section#type')" ng-model-options="{ getterSetter: true }">
+          <label for="section-type" class="control-label">Section type</label>
+          <input type="text" maxlength="10" rows="5" class="form-control" id="section-type" ng-model="object.access('http://xsd.modelcatalogue.org/section#type')" ng-model-options="{ getterSetter: true }">
           </choice>
           <p class="help-block">
              Accepted values:'choice' Whether a section should be  sequence or a choice in a ComplexType. For the moment only word 'choice' it's recognized. Totally optional default will be sequence. 
@@ -132,6 +132,20 @@ xsd.run ['$templateCache', ($templateCache) ->
     <div class="form-group">
     <label for="xsd-restriction-minExclusive" class="control-label">Min Exclusive</label>
     <input maxlength="40" type="text" class="form-control" id="xsd-restriction-minExclusive" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#minExclusive')" ng-model-options="{ getterSetter: true }">
+    <p class="help-block">
+        Specifies the lower bounds for numeric values (the value must be greater than this value)
+    <p>
+    </div>
+    <div class="form-group">
+    <label for="xsd-restriction-totalDigits" class="control-label">Total digits</label>
+    <input maxlength="40" type="text" class="form-control" id="xsd-restriction-totalDigits" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#totalDigits')" ng-model-options="{ getterSetter: true }">
+    <p class="help-block">
+        Specifies the exact number of digits allowed. Must be greater than zero
+    <p>
+    </div>
+    <div class="form-group">
+    <label for="xsd-restriction-fractionDigits" class="control-label">Min Exclusive</label>
+    <input maxlength="40" type="text" class="form-control" id="xsd-restriction-fractionDigits" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#fractionDigits')" ng-model-options="{ getterSetter: true }">
     <p class="help-block">
         Specifies the lower bounds for numeric values (the value must be greater than this value)
     <p>
