@@ -82,56 +82,56 @@ xsd.run ['$templateCache', ($templateCache) ->
       <form class="form">
         <div class="form-group">
           <label for="xsd-restriction-pattern" class="control-label">Pattern (Valid XML Regex)</label>
-          <input maxlength="500" type="text" class="form-control" id="xsd-restriction-pattern" ng-model="object.access('http://http://xsd.modelcatalogue.org/restrictions#pattern')" ng-model-options="{ getterSetter: true }">
+          <input maxlength="500" type="text" class="form-control" id="xsd-restriction-pattern" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#pattern')" ng-model-options="{ getterSetter: true }">
           <p class="help-block">
              Defines the exact sequence of characters that are acceptable
           </p>
         </div>
         <div class="form-group">
         <label for="xsd-restriction-length" class="control-label">Length</label>
-        <input maxlength="100" type="text" class="form-control" id="xsd-restriction-length" ng-model="object.access('http://http://xsd.modelcatalogue.org/restrictions#length')" ng-model-options="{ getterSetter: true }">
+        <input maxlength="100" type="text" class="form-control" id="xsd-restriction-length" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#length')" ng-model-options="{ getterSetter: true }">
         <p class="help-block">
             Specifies the exact number of characters or list items allowed. Must be equal to or greater than zero
         </p>
       </div> 
       <div class="form-group">
       <label for="xsd-restriction-maxlength" class="control-label">Max Length</label>
-      <input maxlength="1000" type="text" class="form-control" id="xsd-restriction-maxlength" ng-model="object.access('http://http://xsd.modelcatalogue.org/restrictions#maxLength')" ng-model-options="{ getterSetter: true }">
+      <input maxlength="1000" type="text" class="form-control" id="xsd-restriction-maxlength" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#maxLength')" ng-model-options="{ getterSetter: true }">
       <p class="help-block">
          Specifies the maximum number of characters or list items allowed. Must be equal to or greater than zero
       </p>
      </div>
      <div class="form-group">
      <label for="xsd-restriction-minlength" class="control-label">Min Length</label>
-     <input maxlength="1000" type="text" class="form-control" id="xsd-restriction-minlength" ng-model="object.access('http://http://xsd.modelcatalogue.org/restrictions#minLength')" ng-model-options="{ getterSetter: true }">
+     <input maxlength="1000" type="text" class="form-control" id="xsd-restriction-minlength" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#minLength')" ng-model-options="{ getterSetter: true }">
      <p class="help-block">
         Specifies the minimum number of characters or list items allowed. Must be equal to or greater than zero
      </p>
     </div>
     <div class="form-group">
     <label for="xsd-restriction-maxInclusive" class="control-label">Max Inclusive</label>
-    <input maxlength="40" type="text" class="form-control" id="xsd-restriction-maxInclusive" ng-model="object.access('http://http://xsd.modelcatalogue.org/restrictions#maxInclusive')" ng-model-options="{ getterSetter: true }">
+    <input maxlength="40" type="text" class="form-control" id="xsd-restriction-maxInclusive" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#maxInclusive')" ng-model-options="{ getterSetter: true }">
     <p class="help-block">
         Specifies the upper bounds for numeric values (the value must be less than or equal to this value)
     </p>
    </div>
    <div class="form-group">
    <label for="xsd-restriction-minInclusive" class="control-label">Min Inclusive</label>
-   <input maxlength="40" type="text" class="form-control" id="xsd-restriction-minInclusive" ng-model="object.access('http://http://xsd.modelcatalogue.org/restrictions#minInclusive')" ng-model-options="{ getterSetter: true }">
+   <input maxlength="40" type="text" class="form-control" id="xsd-restriction-minInclusive" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#minInclusive')" ng-model-options="{ getterSetter: true }">
    <p class="help-block">
        Specifies the lower bounds for numeric values (the value must be greater than or equal to this value)
    </p>
    </div>
    <div class="form-group">
        <label for="xsd-restriction-maxExclusive" class="control-label">Max Exclusive</label>
-       <input maxlength="40" type="text" class="form-control" id="xsd-restriction-maxExclusive" ng-model="object.access('http://http://xsd.modelcatalogue.org/restrictions#maxExclusive')" ng-model-options="{ getterSetter: true }">
+       <input maxlength="40" type="text" class="form-control" id="xsd-restriction-maxExclusive" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#maxExclusive')" ng-model-options="{ getterSetter: true }">
        <p class="help-block">
           Specifies the upper bounds for numeric values (the value must be less than this value)
        <p>
     </div>
     <div class="form-group">
     <label for="xsd-restriction-minExclusive" class="control-label">Min Exclusive</label>
-    <input maxlength="40" type="text" class="form-control" id="xsd-restriction-minExclusive" ng-model="object.access('http://http://xsd.modelcatalogue.org/restrictions#minExclusive')" ng-model-options="{ getterSetter: true }">
+    <input maxlength="40" type="text" class="form-control" id="xsd-restriction-minExclusive" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#minExclusive')" ng-model-options="{ getterSetter: true }">
     <p class="help-block">
         Specifies the lower bounds for numeric values (the value must be greater than this value)
     <p>

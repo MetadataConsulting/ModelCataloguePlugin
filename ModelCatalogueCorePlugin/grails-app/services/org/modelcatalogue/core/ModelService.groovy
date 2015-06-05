@@ -444,7 +444,7 @@ class ModelService {
         return xml.'xs:complexType'(name: printXSDFriendlyString(model.name)){
             "${sectionType}"{
                 model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
-                    printDataElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"),valueDomains,xmlSchema)
+                    printDataElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"),valueDomains,xmlSchema,relationship.ext)
                 }
 
                 model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship relationship ->
@@ -498,7 +498,7 @@ class ModelService {
 
     }
 
-    protected printDataElements(MarkupBuilder xml, DataElement dataElement, String minOccurs, String maxOccurs,def valueDomains,def xmlSchema){
+    protected printDataElements(MarkupBuilder xml, DataElement dataElement, String minOccurs, String maxOccurs,def valueDomains,def xmlSchema,Map relationshipMetadata){
         def valueDomain = dataElement?.valueDomain
         if(!valueDomain){
             return printDataElementSchemaType(xml, dataElement, "xs:string", minOccurs, maxOccurs)
@@ -506,24 +506,20 @@ class ModelService {
             if(valueDomain.classifications.contains(xmlSchema)){
                 return printDataElementSchemaType(xml, dataElement, valueDomain?.name, minOccurs, maxOccurs)
             }else{
-
-                 //copy all ext entries from dataElemnt to value domain
-                valueDomain.ext.putAll(dataElement.ext)
-
-
+                //copy all ext entries from dataElemnt to value domain
+                valueDomain.ext.putAll(dataElement.ext.subMap(XSD_RESTRICTION_LIST))
+                //copy and overide all ext entries from relationship to value domain
+                valueDomain.ext.putAll(relationshipMetadata.subMap(XSD_RESTRICTION_LIST))
                 def  dataType=null;
-                 if (isXsdBasicDataType(valueDomain)){
-                     dataType=valueDomain.dataType.name
-                 }else{
-                 valueDomains.add(valueDomain)
-                     dataType=valueDomain.name+valueDomain.id
-                 }
-
+                if (isXsdBasicDataType(valueDomain)){
+                    dataType=valueDomain.dataType.name
+                }else{
+                    valueDomains.add(valueDomain)
+                    dataType=valueDomain.name+valueDomain.id
+                }
                 return printDataElementSimpleType(xml, dataElement, dataType, minOccurs, maxOccurs)
             }
         }
-
-
     }
 
     protected printDataElementSchemaType(MarkupBuilder xml, DataElement dataElement, String type, String minOccurs = "0", String maxOccurs = "unbounded"){
