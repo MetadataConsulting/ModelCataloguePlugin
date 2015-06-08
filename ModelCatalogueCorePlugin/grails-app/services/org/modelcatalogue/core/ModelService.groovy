@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import groovy.xml.MarkupBuilder
+import groovy.xml.XmlUtil;
 
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.ListCountAndType
@@ -153,11 +154,6 @@ class ModelService {
         """, [type: hierarchy, status: status]
     }
 
-    ListWithTotalAndType<Model> getSubModels(Model model) {
-        List<Model> models = listChildren(model)
-        new ListCountAndType<Model>(count: models.size(), list: models, itemType: Model)
-
-    }
 
     ListWithTotalAndType<DataElement> getDataElementsFromModels(List<Model> models) {
         def results = []
@@ -168,11 +164,14 @@ class ModelService {
     }
 
 
-    protected List<Model> listChildren(Model model, results = []) {
+    protected List<Model> listChildren(Model model,results = [],Boolean isRoot=true) {
         if (model && !results.contains(model)) {
-            results += model
+           //if we send root model as parameter means that this is a child and we have to add in the list 
+           if (isRoot==false){
+             results += model
+           }
             model.parentOf?.each { child ->
-                results += listChildren(child, results)
+                results += listChildren(child,results,false)
             }
         }
         results.unique()
@@ -215,7 +214,6 @@ class ModelService {
                 }
             }
         }
-
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + writer.toString()
     }
 
@@ -355,8 +353,8 @@ class ModelService {
             'xs:annotation'{
                 'xs:documentation'{
                     'h1'("Title:"+targetModel.ext.get(XSD_SCHEMA_NAME)? targetModel.ext.get(XSD_SCHEMA_NAME):targetModel.name)
-                    'p'("Version:"+targetModel.ext.get(XSD_SCHEMA_VERSION))
-                    'p'("Description:"+targetModel.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION))
+                    'p'("Version:"+XmlUtil.escapeXml(targetModel.ext.get(XSD_SCHEMA_VERSION)))
+                    'p'("Description:"+XmlUtil.escapeXml(targetModel.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION)))
                     'p'("Generated: "+new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZ"))
                 }
             }
@@ -365,7 +363,7 @@ class ModelService {
                 if(targetModel.description){
                     'xs:annotation'{
                         'xs:documentation'{
-                            'p'(targetModel.description)
+                            'p'(XmlUtil.escapeXml(targetModel.description))
                         }
                     }
                 }
@@ -527,7 +525,7 @@ class ModelService {
             if (dataElement?.description){
                 'xs:annotation'{
                     'xs:documentation'{
-                        'p'(dataElement?.description)
+                        'p'(XmlUtil.escapeXml(dataElement?.description))
                     }
                 }
             }
@@ -542,7 +540,7 @@ class ModelService {
             if (dataElement?.description){
                 'xs:annotation'{
                     'xs:documentation'{
-                        'p'(dataElement?.description)
+                        'p'(XmlUtil.escapeXml(dataElement?.description))
                     }
                 }
             }

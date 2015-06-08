@@ -147,7 +147,7 @@ xsd.run ['$templateCache', ($templateCache) ->
     <label for="xsd-restriction-fractionDigits" class="control-label">Min Exclusive</label>
     <input maxlength="40" type="text" class="form-control" id="xsd-restriction-fractionDigits" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#fractionDigits')" ng-model-options="{ getterSetter: true }">
     <p class="help-block">
-        Specifies the lower bounds for numeric values (the value must be greater than this value)
+          Specifies the maximum number of decimal places allowed. Must be equal to or greater than zero
     <p>
     </div>
     
