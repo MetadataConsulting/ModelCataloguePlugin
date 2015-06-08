@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ListWithTotal
-
 class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     Model parent1
@@ -75,6 +74,16 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         subModels.count ==3
+    }
+    
+    def  "test printXsdSchema"(){
+         when : 
+         def result=modelService.printXSDModel(parent1)
+         then :
+         assert result!=null
+         assert result.contains(parent1.name)
+         assert result.contains(child1.name)
+         assert result.contains(grandChild.name)
     }
 
 }

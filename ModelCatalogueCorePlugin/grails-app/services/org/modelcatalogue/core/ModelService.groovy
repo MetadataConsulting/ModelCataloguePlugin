@@ -154,6 +154,11 @@ class ModelService {
         """, [type: hierarchy, status: status]
     }
 
+    ListWithTotalAndType<Model> getSubModels(Model model) {
+        List<Model> models = listChildren(model)
+        new ListCountAndType<Model>(count: models.size(), list: models, itemType: Model)
+
+    }
 
     ListWithTotalAndType<DataElement> getDataElementsFromModels(List<Model> models) {
         def results = []
