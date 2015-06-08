@@ -190,8 +190,10 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
 
     static Map<String, Object> minimumDataType(DataType element) {
         if (!element) return null
-        if (element instanceof EnumeratedType) [name: element.name, id: element.id, enumerations: element.enumerations,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
-        else [name: element.name, id: element.id,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
+        if (element instanceof EnumeratedType) {
+            return [name: element.name, id: element.id, enumerations: OrderedMap.toJsonMap(element.enumerations),  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
+        }
+        return [name: element.name, id: element.id,  elementType: element.getClass().name, link:  "/${CatalogueElement.fixResourceName(GrailsNameUtils.getPropertyName(element.getClass()))}/$element.id", status: "${element.status}", latestVersionId: element.latestVersionId ?: element.id]
     }
 
 

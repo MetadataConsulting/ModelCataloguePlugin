@@ -13,6 +13,10 @@ angular.module('mc.core.ui.bs.propertiesPane', ['mc.core.ui.propertiesPane', 'ng
               <div ng-show="theValue.enumerations" class="preserve-new-lines"><strong>Enumerations</strong>
                 {{getEnumerations(theValue)}}
               </div>
+              <div ng-if="theValue.dataType"><span class="text-muted"><catalogue-element-icon type="'dataType'"></catalogue-element-icon></span> <a ng-href="{{theValue.dataType.href()}}">{{theValue.dataType.name}}</a></div>
+              <div ng-show="theValue.dataType.enumerations" class="preserve-new-lines"><strong>Enumerations</strong>
+                {{getEnumerations(theValue.dataType)}}
+              </div>
             </div></td>
             <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-when="date">{{theValue | date:'short'}}</td>
             <td class="pp-table-property-value col-md-8 pp-table-property-element-value" data-value-for="{{property.label}}" ng-switch-when="elementArray"><span ng-repeat="element in theValue"><a class="label with-pointer" ng-class="{'label-warning': element.status == 'DRAFT', 'label-info': element.status == 'PENDING', 'label-primary': element.status == 'FINALIZED', 'label-danger': element.status == 'DEPRECATED'}" ng-href="{{element.href()}}"><span ng-class="element.getIcon()"></span> {{element.name}}</a> </span></td>
