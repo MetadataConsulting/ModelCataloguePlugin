@@ -73,7 +73,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
               <form ng-submit="select('parents')">
                 <div>
                   <h4>Metadata</h4>
-                  <ordered-map-editor title="Key" value-title="Value" object="metadata"></ordered-map-editor>
+                  <metadata-editor title="Key" value-title="Value" object="metadata" owner="owners.model"></metadata-editor>
                 </div>
               </form>
           </div>
@@ -91,7 +91,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   </div>
                   <p class="help-block">Parent model is source for the hierarchy relationship</p>
                 </div>
-                <ordered-map-editor object="parent.ext" title="Relationship Metadata"></ordered-map-editor>
+                <metadata-editor object="parent.ext" title="Relationship Metadata" owner="owners.parents"></metadata-editor>
               </form>
           </div>
           <div ng-switch-when="children" id="children">
@@ -113,7 +113,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import child models from CSV file headers</a>.
                   </alert>
                 </div>
-                <ordered-map-editor object="child.ext" title="Relationship Metadata"></ordered-map-editor>
+                <metadata-editor object="child.ext" title="Relationship Metadata" owner="owners.children"></metadata-editor>
               </form>
           </div>
           <div ng-switch-when="elements" id="elements">
@@ -135,7 +135,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                     <strong>Hint:</strong> If you have CSV file with sample data you can <a class="alert-link"><span class="fa fa-magic"></span> import data elements from CSV file headers</a>.
                   </alert>
                 </div>
-                <ordered-map-editor object="dataElement.ext" title="Relationship Metadata"></ordered-map-editor>
+                <metadata-editor object="dataElement.ext" title="Relationship Metadata" owner="owners.contains"></metadata-editor>
               </form>
             </tab>
           </div>
@@ -166,7 +166,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           <button ng-disabled="!finished" class="btn btn-default"  ng-click="$close(model)" id="exit-wizard"><span class="glyphicon glyphicon-remove"></span> Close</button>
         </div>
         '''
-        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance) ->
+        controller: ['$scope', '$state', '$window', 'messages', 'names', 'catalogueElementResource', '$modalInstance', '$timeout', 'args', 'delayedQueueExecutor', '$q', '$log', 'enhance', 'metadataEditors', ($scope, $state, $window, messages, names, catalogueElementResource, $modalInstance, $timeout, args, delayedQueueExecutor, $q, $log, enhance, metadataEditors) ->
           execAfter50 = delayedQueueExecutor(500)
 
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
@@ -406,6 +406,12 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
           $scope.isModelCatalogueIdValid = ->
             return true if not $scope.model.modelCatalogueId
             return new RegExp(/(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/).test($scope.model.modelCatalogueId)
+
+          $scope.owners =
+            model: metadataEditors.createFakeOwner('model')
+            parents: metadataEditors.createFakeOwner('=[hierarchy]=>model')
+            children: metadataEditors.createFakeOwner('model=[hierarchy]=>')
+            contains: metadataEditors.createFakeOwner('model=[containment]=>')
         ]
 
       }

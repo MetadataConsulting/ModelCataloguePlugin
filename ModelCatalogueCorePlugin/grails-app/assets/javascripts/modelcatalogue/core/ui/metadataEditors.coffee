@@ -13,6 +13,40 @@ angular.module('mc.core.ui.metadataEditors', ['mc.core.catalogue']).provider 'me
     return false if destination and not catalogueProvider.isInstanceOf(destinationElement?.elementType, destination)
     return true
 
+  fakeOwners = {}
+
+  createFakeOwner = (criteria) ->
+    fakeOwner = fakeOwners[criteria]
+
+    return fakeOwner if fakeOwner
+
+    fakeOwner =
+      ext:
+        type: 'orderedMap'
+
+    match = criteria.match(/(\w+)?(?:=\[(\w+)\])?=>(\w+)?/)
+
+    unless match
+      fakeOwner.elementType = criteria
+      fakeOwners[criteria] = fakeOwner
+      return fakeOwner
+
+    fakeOwner.elementType = 'relationship'
+    fakeOwner.direction = 'sourceToDestination'
+
+
+    source = match[1]
+    type = match[2]
+    destination = match[3]
+
+    fakeOwner.type = {name: type}
+    fakeOwner.element = {elementType: source}
+    fakeOwner.relation = {elementType: destination}
+
+    fakeOwners[criteria] = fakeOwner
+
+    return fakeOwner
+
   editors = []
 
   metadataEditorsProvider = {}
@@ -56,6 +90,8 @@ angular.module('mc.core.ui.metadataEditors', ['mc.core.catalogue']).provider 'me
       getKeys: -> angular.copy configuration.keys
     }
 
+  metadataEditorsProvider.createFakeOwner = (criteria) -> createFakeOwner(criteria)
+
   metadataEditorsProvider.$get = [ ->
     metadataEditors =
       getEnabledEditors: (owner, orderedMap) ->
@@ -67,6 +103,8 @@ angular.module('mc.core.ui.metadataEditors', ['mc.core.catalogue']).provider 'me
         available = []
         available.push(editor) for editor in editors when editor.isAvailableFor(owner)
         available
+
+      createFakeOwner: (criteria) -> createFakeOwner(criteria)
 
     metadataEditors
   ]
