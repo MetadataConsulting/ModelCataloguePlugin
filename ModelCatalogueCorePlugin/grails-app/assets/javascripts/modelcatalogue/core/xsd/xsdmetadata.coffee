@@ -70,10 +70,9 @@ xsd.run ['$templateCache', ($templateCache) ->
       </div> 
       <div class="form-group">
           <label for="section-type" class="control-label">Section type</label>
-          <input type="text" maxlength="10" rows="5" class="form-control" id="section-type" ng-model="object.access('http://xsd.modelcatalogue.org/section#type')" ng-model-options="{ getterSetter: true }">
-          </choice>
+          <select id="section-type" class="form-control" ng-options="key for (key, value) in {'Sequence':'sequence', 'Choice': 'choice',}" ng-model="object.access('http://xsd.modelcatalogue.org/section#type')" ng-model-options="{ getterSetter: true }"></select>
           <p class="help-block">
-             Accepted values:'choice' Whether a section should be  sequence or a choice in a ComplexType. For the moment only word 'choice' it's recognized. Totally optional default will be sequence. 
+             Whether a section should be  sequence or a choice in a ComplexType.Totally optional default will be sequence. 
           </p>
       </div> 
       </form> 

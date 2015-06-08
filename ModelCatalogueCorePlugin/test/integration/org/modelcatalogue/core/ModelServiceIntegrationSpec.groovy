@@ -15,6 +15,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup(){
         loadFixtures()
+
         parent1 = new Model(name: 'book').save(failOnError: true)
         parent2 = new Model(name: 'chapter1').save(failOnError: true)
         child1 = new Model(name: 'chapter2').save(failOnError: true)
@@ -26,6 +27,10 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         de1 = DataElement.findByName("DE_author1")
         de2 = DataElement.findByName("AUTHOR")
         de3 = DataElement.findByName("auth")
+        
+        parent1.ext.putAt(ModelService.XSD_SCHEMA_NAME,  "Xsd-Schema-Name")
+        parent1.ext.putAt(ModelService.XSD_SCHEMA_VERSION,  "1.0.0")
+        parent1.ext.putAt(ModelService.XSD_SCHEMA_VERSION_DESCRIPTION,  "Simple description")
     }
 
     def "get top level elements"() {
@@ -81,9 +86,12 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
          def result=modelService.printXSDModel(parent1)
          then :
          assert result!=null
-         assert result.contains(parent1.name)
-         assert result.contains(child1.name)
-         assert result.contains(grandChild.name)
+         assert result.contains("<xs:complexType name='${child1.name.toLowerCase()}'")
+         assert result.contains("<xs:complexType name='${grandChild.name.toLowerCase()}'")
+         
+         assert result.contains("<xs:element name='${parent1.name.toLowerCase()}'")
+         assert result.contains("<xs:element name='${child1.name.toLowerCase()}'")
+         assert result.contains("<xs:element name='${grandChild.name.toLowerCase()}'")
     }
 
 }

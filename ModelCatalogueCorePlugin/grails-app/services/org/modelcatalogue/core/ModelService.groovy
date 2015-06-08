@@ -169,8 +169,8 @@ class ModelService {
     }
 
 
-    protected List<Model> listChildren(Model model,results = [],Boolean isRoot=true) {
-        if (model && !results.contains(model)) {
+    protected List<Model> listChildren(Model model,List results = [],Boolean isRoot=false) {
+        if (model && !results.contains(model)){
            //if we send root model as parameter means that this is a child and we have to add in the list 
            if (isRoot==false){
              results += model
@@ -349,7 +349,7 @@ class ModelService {
         def xmlSchema = Classification.findByName("XMLSchema")
         def xml = new MarkupBuilder(writer)
         def childRelations = targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
-        def subModels = listChildren(targetModel)
+        def subModels = listChildren(targetModel,[],true)
 
         //check if it's a good candidate for xsd schema
         validateGelXsdFormMetadata(targetModel,subModels)
@@ -585,10 +585,10 @@ class ModelService {
 
 /**
  * Standard restrictions + GEL restrictions for the forms
- * check this link for viewing how to form xml restricitons http://www.xml.dvint.com/docs/SchemaDataTypesQR-2.pdf
+ * check this link for viewing how to form xml restrictions http://www.xml.dvint.com/docs/SchemaDataTypesQR-2.pdf
  * @param xml
  * @param valueDomain
- * @return
+ * @return MarkupBuilder completed
  */
    def printXsdDataTypeRestrictions(MarkupBuilder xml,ValueDomain valueDomain){
         if (valueDomain.ext.get(XSD_RESTRICTION_MAX_LENGTH)){

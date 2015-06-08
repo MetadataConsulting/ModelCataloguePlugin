@@ -297,14 +297,14 @@ Model catalogue core plugin (metadata registry)
 			creates asset
 			title { "Export  XML Schema Definition " }
 			type Model
-			link controller: 'dataArchitect', action: 'modelsToXSD', params: [format: 'xsd'], id: true
+			link controller: 'gelXml', action: 'modelsToXSD',id: true
 		}
 
 		reportsRegistry.register {
 			creates asset
 			title { "Export  XML XDCT Model" }
 			type Model
-			link controller: 'dataArchitect', action: 'gelXmlShredderModel', params: [format: 'xml'], id: true
+			link controller: 'gelXml', action: 'gelXmlShredderModel',id: true
 		}
         reportsRegistry.register {
             creates link
