@@ -80,18 +80,5 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         then:
         subModels.count ==3
     }
-    
-    def  "test printXsdSchema"(){
-         when : 
-         def result=modelService.printXSDModel(parent1)
-         then :
-         assert result!=null
-         assert result.contains("<xs:complexType name='${child1.name.toLowerCase()}'")
-         assert result.contains("<xs:complexType name='${grandChild.name.toLowerCase()}'")
-         
-         assert result.contains("<xs:element name='${parent1.name.toLowerCase()}'")
-         assert result.contains("<xs:element name='${child1.name.toLowerCase()}'")
-         assert result.contains("<xs:element name='${grandChild.name.toLowerCase()}'")
-    }
 
 }

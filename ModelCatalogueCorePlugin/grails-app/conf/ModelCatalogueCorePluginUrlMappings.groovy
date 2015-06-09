@@ -119,11 +119,7 @@ class ModelCatalogueCorePluginUrlMappings {
             }
         }
         
-    
-      
-            "/api/modelCatalogue/core/gelXml/gelXmlShredderModel/$id"(controller: "gelXml", action: "gelXmlShredderModel", method: HttpMethod.GET)
-            "/api/modelCatalogue/core/gelXml/modelsToXSD/$id"(controller: "gelXml", action: "modelsToXSD", method: HttpMethod.GET)
-            
+               
         group "/api/modelCatalogue/core/dataArchitect", {
             "/uninstantiatedDataElements" (controller: "dataArchitect", action: 'uninstantiatedDataElements', method: HttpMethod.GET)
             "/metadataKeyCheck/$key?" (controller: "dataArchitect", action: 'metadataKeyCheck', method: HttpMethod.GET)
