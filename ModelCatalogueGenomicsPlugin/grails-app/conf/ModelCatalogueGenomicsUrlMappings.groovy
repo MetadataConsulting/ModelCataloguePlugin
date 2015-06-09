@@ -1,0 +1,8 @@
+
+class ModelCatalogueGenomicsUrlMappings {
+
+    static mappings = {
+
+    }
+
+}
