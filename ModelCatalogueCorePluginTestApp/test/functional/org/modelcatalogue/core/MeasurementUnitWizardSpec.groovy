@@ -81,4 +81,67 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         }
     }
 
+    def "finalize element"() {
+        waitUntilModalClosed()
+        when: "finalize is clicked"
+        actionButton('change-element-state').click()
+        actionButton('finalize').click()
+
+        then: "modal prompt is displayed"
+        waitFor {
+            confirmDialog.displayed
+        }
+
+        when: "ok is clicked"
+        confirmOk.click()
+
+        then: "the element is finalized"
+        waitFor(120) {
+            subviewStatus.text() == 'FINALIZED'
+        }
+
+    }
+
+    def "deprecate the element"() {
+        waitUntilModalClosed()
+        when: "depracete action is clicked"
+        actionButton('change-element-state').click()
+        actionButton('archive').click()
+
+        then: "modal prompt is displayed"
+        waitFor {
+            confirmDialog.displayed
+        }
+
+        when: "ok is clicked"
+        confirmOk.click()
+
+        then: "the element is now deprecated"
+        waitFor {
+            subviewStatus.text() == 'DEPRECATED'
+        }
+
+    }
+
+    def "restore the element"() {
+        waitUntilModalClosed()
+        when: "restore action is clicked"
+        actionButton('change-element-state').click()
+        actionButton('archive').click()
+
+        then: "modal prompt is displayed"
+        waitFor {
+            confirmDialog.displayed
+        }
+
+        when: "ok is clicked"
+        confirmOk.click()
+
+        then: "the element is now finalized"
+        waitFor {
+            subviewStatus.text() == 'FINALIZED'
+        }
+
+    }
+
 }
