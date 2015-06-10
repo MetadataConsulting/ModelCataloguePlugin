@@ -62,9 +62,10 @@ class XmlService {
      */
     def printXmlModelShredder(Model model) {
         def subModels = listChildren(model,[],true)
+        def childsRelationship=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
         //validate to see if have the element schema metadata
         validateFormMetadata(model, subModels)
-        validateMetadataOccurs(subModels)
+        validateMetadataOccurs(childsRelationship)
         validateModelsNameLength(subModels)
             
         String[] versionNumber=model.ext.get(XSD_SCHEMA_VERSION).split("\\.")
@@ -232,7 +233,7 @@ class XmlService {
         //check if it's a good candidate for xsd schema
         validateFormMetadata(targetModel,subModels)
         //check if the metadata occurs it's already filled in for models
-        validateMetadataOccurs(subModels)
+        validateMetadataOccurs(childRelations)
 
         xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema', 'xmlns:vc': 'http://www.w3.org/2007/XMLSchema-versioning', 'xmlns:gel': 'https://genomicsengland.co.uk/xsd/', 'vc:minVersion': '1.1') {
             'xs:annotation'{
@@ -257,8 +258,8 @@ class XmlService {
                         'xs:element'(name:'metadata',type:'metadata',minOccurs:'1',maxOccurs:'1')
                         targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship r ->
                             'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination.name),
-                            minOccurs:defaultMinOccurs(r.destination.ext.get("Min Occurs")),
-                            maxOccurs:defaultMinOccurs(r.destination.ext.get("Max Occurs")))
+                            minOccurs:defaultMinOccurs(r.ext.get("Min Occurs")),
+                            maxOccurs:defaultMinOccurs(r.ext.get("Max Occurs")))
                         }
                     }
                 }
@@ -327,10 +328,10 @@ class XmlService {
         
         //validate for required metadata occurs
         validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
-        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
+        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.containmentType).collect{it.destination})
         
         validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
-        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).collect{it.destination})
         
         return xml.'xs:complexType'(name: printXSDFriendlyString(model.name)){
             "${sectionType}"{
@@ -391,7 +392,7 @@ class XmlService {
     
     protected void validateModelsNameLength(List subModels){
         String exceptionMessages="";
-        for (Model model in subModels) {
+        for (def model in subModels) {
             if (model.name.length()>MAX_COLUMN_NAME_64){
                 exceptionMessages+="element '${model.name}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_64}\n,";
             }
@@ -399,21 +400,23 @@ class XmlService {
         if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
     }
     
-    protected void validateMetadataOccurs(List subModels){
+    protected void validateMetadataOccurs(List rels){
         String exceptionMessages="";
-        for (Model model in subModels) {
-            if (!model.ext.get('Min Occurs')){
-                exceptionMessages+="metadata 'Min Occurs' for model '${model.name}'  is missing, ";
+        for (Relationship rel in rels) {
+            if (!rel.ext.get('Min Occurs')){
+                exceptionMessages+="metadata 'Min Occurs' for model '${rel.destination.name}'  is missing, "
             }else{
-                if (!model.ext.get('Min Occurs').isLong()){
-                    exceptionMessages+="metadata 'Min Occurs' for model '${model.name}'  is not a number, ";
+                if ((!rel.ext.get('Min Occurs').isLong())){
+                    exceptionMessages+="metadata 'Min Occurs' for model '${rel.destination.name}'  is not a number, "
                 }
             }
-            if (!model.ext.get('Max Occurs')){
-                exceptionMessages+="metadata 'Max Occurs' for model '${model.name}'  is missing, ";
+            if (!rel.ext.get('Max Occurs')){
+                exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is missing, ";
             }else{
-                if (!model.ext.get('Max Occurs').isLong()){
-                    exceptionMessages+="metadata 'Max Occurs' for model '${model.name}'  is not a number, ";
+                if (rel.ext.get('Max Occurs').isLong()==false){
+                    if(rel.ext.get('Max Occurs')!='unbounded'){
+                        exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is not a number, "
+                    }
                 }
             }
             if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
