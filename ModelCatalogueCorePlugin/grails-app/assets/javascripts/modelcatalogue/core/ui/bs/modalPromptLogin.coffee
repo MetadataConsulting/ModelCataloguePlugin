@@ -69,7 +69,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
 
 
 
-              helperPromise = $interval closeWindowWhenLoggedIn, 200
+              helperPromise = $interval closeWindowWhenLoggedIn, 100
 
         ]
 
