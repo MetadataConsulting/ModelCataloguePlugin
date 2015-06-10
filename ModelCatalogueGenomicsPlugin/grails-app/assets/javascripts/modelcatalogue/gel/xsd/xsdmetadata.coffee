@@ -171,17 +171,17 @@ xsd.run ['$templateCache', ($templateCache) ->
     <div class="alert alert-warning">Metadata occurences </div>
     <form class="form">
         <div class="form-group">
-            <label for="minOccurence" class="control-label">Min Occurnce</label>
+            <label for="minOccurence" class="control-label">Min Occurs</label>
             <input maxlength="50" type="text" class="form-control" id="minOccurence" ng-model="object.access('Min Occurs')" ng-model-options="{ getterSetter: true }">
                 <p class="help-block">
                     Min occurence of the current element within the block. A number between 0 and infinite number. Must be a number otherwise deleted.
                 </p>
         </div>
         <div class="form-group">
-            <label for="maxOccurence" class="control-label">Version</label>
+            <label for="maxOccurence" class="control-label">Max Occurse</label>
             <input maxlength="20" type="text" class="form-control" id="maxOccurence" ng-model="object.access('Max Occurs')" ng-model-options="{ getterSetter: true }">
                 <p class="help-block">
-                Min occurence of the current element within the block. A number between 0 and infinite number. Must be a number otherwise deleted.
+                Max occurence of the current element within the block. A number between 0 and infinite number. Must be a number otherwise deleted.
                 </p>
         </div>
         </form> 
