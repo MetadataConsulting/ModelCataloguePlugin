@@ -42,6 +42,20 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
         printer = new CatalogueXmlPrinter(classificationService, modelService)
     }
 
+
+    def "replace special chars"() {
+        Writable writable = printer.bind(new ValueDomain(name: 'Test', description: "diagnosis.ƒ‚ƒ‚ƒ‚'‚“ e").save())
+        StringWriter writer = new StringWriter()
+        writable.writeTo(writer)
+        expect:
+        writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.0/metadataregistry.xsd">
+  <valueDomain name="Test" id="http://localhost/catalogue/valueDomain/125" status="DRAFT">
+    <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
+  </valueDomain>
+</catalogue>'''
+    }
+
+
     def "write simple measurement unit"() {
         expect:
         similar newton, 'newton.catalogue.xml'
