@@ -112,23 +112,40 @@ angular.module('mc.core.ui.bs.statesActions', ['mc.util.ui.actions']).config ['a
 
     action = {
       position:   400
-      label:      'Mark as Deprecated'
-      icon:       'fa fa-fw fa-ban'
-      type:       'danger'
       action:     ->
-        messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
-          enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
-            updateFrom $scope.element, archived
-            $rootScope.$broadcast 'catalogueElementUpdated', archived
-          , showErrorsUsingMessages(messages)
+        if $scope.element.archived
+          if security.hasRole('ADMIN')
+            messages.confirm("Do you want to restore #{$scope.element.getElementTypeName()} #{$scope.element.name} as finalized?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will no longer be deprecated").then ->
+              enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/restore", method: 'POST')).then (restored) ->
+                updateFrom $scope.element, restored
+                $rootScope.$broadcast 'catalogueElementUpdated', restored
+              , showErrorsUsingMessages(messages)
+        else
+          messages.confirm("Do you want to mark #{$scope.element.getElementTypeName()} #{$scope.element.name} as deprecated?", "The #{$scope.element.getElementTypeName()} #{$scope.element.name} will be marked as deprecated").then ->
+            enhance(rest(url: "#{modelCatalogueApiRoot}#{$scope.element.link}/archive", method: 'POST')).then (archived) ->
+              updateFrom $scope.element, archived
+              $rootScope.$broadcast 'catalogueElementUpdated', archived
+            , showErrorsUsingMessages(messages)
     }
 
     updateAction = ->
-      action.disabled = $scope.element.archived
+      if $scope.element.archived
+        if not security.hasRole('ADMIN')
+          action.disabled = true
+        else
+          action.label = 'Restore'
+          action.icon = 'fa fa-fw fa-repeat'
+          action.type = 'primary'
+      else
+        action.label = 'Mark as Deprecated'
+        action.icon = 'fa fa-fw fa-ban'
+        action.type = 'danger'
 
     $scope.$watch 'element.status', updateAction
     $scope.$watch 'element.archived', updateAction
     $scope.$on 'newVersionCreated', updateAction
+
+    updateAction()
 
     action
   ]

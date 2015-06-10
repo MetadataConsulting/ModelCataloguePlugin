@@ -70,6 +70,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 "/api/modelCatalogue/core/$controllerName/$id/history"(controller: controllerName, action: 'history', method: HttpMethod.GET)
                 "/api/modelCatalogue/core/$controllerName/$id/archive"(controller: controllerName, action: 'archive', method: HttpMethod.POST)
+                "/api/modelCatalogue/core/$controllerName/$id/restore"(controller: controllerName, action: 'restore', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$id/finalize"(controller: controllerName, action: 'finalizeElement', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$controllerName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
 

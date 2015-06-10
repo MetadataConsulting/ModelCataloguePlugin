@@ -583,6 +583,39 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         respond instance, [status: OK]
     }
 
+    /**
+     * Archive element
+     * @param id
+     */
+    @Transactional
+    def restore() {
+
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notAuthorized()
+            return
+        }
+
+        if (handleReadOnly()) {
+            return
+        }
+
+        T instance = queryForResource(params.id)
+        if (instance == null) {
+            notFound()
+            return
+        }
+
+        // do not archive relationships as we need to transfer the deprecated elements to the new versions
+        instance = elementService.restore(instance)
+
+        if (instance.hasErrors()) {
+            respond instance.errors, view: 'edit' // STATUS CODE 422
+            return
+        }
+
+        respond instance, [status: OK]
+    }
+
     def changes(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         CatalogueElement element = queryForResource(params.id)
