@@ -1,7 +1,6 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ListWithTotal
-
 class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     Model parent1
@@ -16,6 +15,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup(){
         loadFixtures()
+
         parent1 = new Model(name: 'book').save(failOnError: true)
         parent2 = new Model(name: 'chapter1').save(failOnError: true)
         child1 = new Model(name: 'chapter2').save(failOnError: true)
@@ -27,6 +27,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         de1 = DataElement.findByName("DE_author1")
         de2 = DataElement.findByName("AUTHOR")
         de3 = DataElement.findByName("auth")
+        
     }
 
     def "get top level elements"() {

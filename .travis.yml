@@ -15,6 +15,7 @@ env:
   - TEST_SUITE=app_integration
   - TEST_SUITE=app_functional
   - TEST_SUITE=forms_integration
+  - TEST_SUITE=gel_integration
 jdk:
   - oraclejdk7
 before_install:

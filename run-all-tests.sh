@@ -40,17 +40,24 @@ if [ "$TEST_SUITE" = "core_integration_slow" ] || [ "$TEST_SUITE" = "" ] ; then
     mkdir -p $HOME/reports/slow-integration-tests-reports
     cp -Rf target/test-reports $HOME/reports/slow-integration-tests-reports
 fi
-
-# karma tests, part of the integration as they needs the fixtures generated from the integration tests
-if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then
-    ./node_modules/karma/bin/karma start --single-run --browsers Firefox
-fi
-
 cd ..
 
 cd ModelCatalogueFormsPlugin
 if [ "$TEST_SUITE" = "forms_integration" ] || [ "$TEST_SUITE" = "" ] ; then
     ./grailsw test-app integration:
+fi
+cd ..
+
+cd ModelCatalogueGenomicsPlugin
+if [ "$TEST_SUITE" = "gel_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw test-app integration:
+fi
+cd ..
+
+cd ModelCatalogueCorePlugin
+# karma tests, part of the integration as they needs the fixtures generated from the integration tests
+if [ "$TEST_SUITE" = "core_integration" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./node_modules/karma/bin/karma start --single-run --browsers Firefox
 fi
 cd ..
 
