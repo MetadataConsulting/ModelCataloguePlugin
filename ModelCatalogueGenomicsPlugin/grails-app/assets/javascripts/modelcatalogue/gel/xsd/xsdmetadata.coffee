@@ -178,7 +178,7 @@ xsd.run ['$templateCache', ($templateCache) ->
                 </p>
         </div>
         <div class="form-group">
-            <label for="maxOccurence" class="control-label">Max Occurse</label>
+            <label for="maxOccurence" class="control-label">Max Occurs</label>
             <input maxlength="20" type="text" class="form-control" id="maxOccurence" ng-model="object.access('Max Occurs')" ng-model-options="{ getterSetter: true }">
                 <p class="help-block">
                 Max occurence of the current element within the block. A number between 0 and infinite number. Must be a number otherwise deleted.
