@@ -10,6 +10,9 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         go "#/"
         loginAdmin()
 
+        // poor man's fix
+        browser.driver.navigate().refresh()
+
         when:
         go "#/catalogue/measurementUnit/all"
 
