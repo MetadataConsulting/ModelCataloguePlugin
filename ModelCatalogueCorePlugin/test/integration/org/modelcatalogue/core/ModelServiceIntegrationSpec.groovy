@@ -28,9 +28,6 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         de2 = DataElement.findByName("AUTHOR")
         de3 = DataElement.findByName("auth")
         
-        parent1.ext.putAt(ModelService.XSD_SCHEMA_NAME,  "Xsd-Schema-Name")
-        parent1.ext.putAt(ModelService.XSD_SCHEMA_VERSION,  "1.0.0")
-        parent1.ext.putAt(ModelService.XSD_SCHEMA_VERSION_DESCRIPTION,  "Simple description")
     }
 
     def "get top level elements"() {

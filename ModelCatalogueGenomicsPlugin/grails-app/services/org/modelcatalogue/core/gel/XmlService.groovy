@@ -64,6 +64,9 @@ class XmlService {
         def subModels = listChildren(model,[],true)
         //validate to see if have the element schema metadata
         validateFormMetadata(model, subModels)
+        validateMetadataOccurs(subModels)
+        validateModelsNameLength(subModels)
+            
         String[] versionNumber=model.ext.get(XSD_SCHEMA_VERSION).split("\\.")
         println versionNumber
         def writer = new StringWriter()
@@ -228,6 +231,8 @@ class XmlService {
 
         //check if it's a good candidate for xsd schema
         validateFormMetadata(targetModel,subModels)
+        //check if the metadata occurs it's already filled in for models
+        validateMetadataOccurs(subModels)
 
         xml.'xs:schema'('xmlns:xs': 'http://www.w3.org/2001/XMLSchema', 'xmlns:vc': 'http://www.w3.org/2007/XMLSchema-versioning', 'xmlns:gel': 'https://genomicsengland.co.uk/xsd/', 'vc:minVersion': '1.1') {
             'xs:annotation'{
@@ -319,8 +324,18 @@ class XmlService {
         if (model.ext.get(XSD_SCHEMA_SECTION_TYPE)?.compareToIgnoreCase("choice")==0){
             sectionType='xs:choice'
         }
+        
+        //validate for required metadata occurs
+        validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
+        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
+        
+        validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+        validateModelsNameLength(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+        
         return xml.'xs:complexType'(name: printXSDFriendlyString(model.name)){
             "${sectionType}"{
+             
+                
                 model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
                     printDataElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"),valueDomains,xmlSchema,relationship.ext)
                 }
@@ -384,6 +399,26 @@ class XmlService {
         if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
     }
     
+    protected void validateMetadataOccurs(List subModels){
+        String exceptionMessages="";
+        for (Model model in subModels) {
+            if (!model.ext.get('Min Occurs')){
+                exceptionMessages+="metadata 'Min Occurs' for model '${model.name}'  is missing, ";
+            }else{
+                if (!model.ext.get('Min Occurs').isLong()){
+                    exceptionMessages+="metadata 'Min Occurs' for model '${model.name}'  is not a number, ";
+                }
+            }
+            if (!model.ext.get('Max Occurs')){
+                exceptionMessages+="metadata 'Max Occurs' for model '${model.name}'  is missing, ";
+            }else{
+                if (!model.ext.get('Max Occurs').isLong()){
+                    exceptionMessages+="metadata 'Max Occurs' for model '${model.name}'  is not a number, ";
+                }
+            }
+            if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
+        }
+    }
 
     protected printModelElements(MarkupBuilder xml, Model model, String minOccurs, String maxOccurs){
         return xml.'xs:element'(name: printXSDFriendlyString(model.name), type: printXSDFriendlyString(model.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
@@ -459,12 +494,17 @@ class XmlService {
                         }
                 }
             }
-
-
         }else{
             return xml.'xs:simpleType'(name: printXSDFriendlyString(valueDomain.name+valueDomain.id), final: 'restriction'){
                 'xs:simpleContent'
-                'xs:restriction'(base: XSD_BUILTIN_DATA_TYPES.find{it==valueDomain.dataType?.name}?valueDomain.dataType.name: 'xs:string') {
+                    def dataType='xs:string'
+                    if (valueDomain.ext.get(XSD_RESTRICTION_PATTERN)|| valueDomain?.regexDef){
+                        //we force to token all regular expressions
+                        dataType='xs:token'
+                    }else if (XSD_BUILTIN_DATA_TYPES.contains(valueDomain.dataType?.name)){
+                        dataType=valueDomain.dataType.name
+                    }
+                'xs:restriction'(base: dataType ) {
                     printXsdDataTypeRestrictions(xml,valueDomain)
                 }
             }
