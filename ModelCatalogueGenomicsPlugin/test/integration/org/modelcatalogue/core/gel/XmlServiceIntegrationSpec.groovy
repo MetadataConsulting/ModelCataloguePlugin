@@ -7,6 +7,10 @@ import org.codehaus.groovy.grails.web.context.ServletContextHolder
 //import org.modelcatalogue.core.AbstractIntegrationSpec;
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.RelationshipService;
+import org.modelcatalogue.core.RelationshipType;
+import org.modelcatalogue.core.util.builder.RelationshipDefinition;
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.web.context.support.WebApplicationContextUtils
 
@@ -19,6 +23,7 @@ class XmlServiceIntegrationSpec extends IntegrationSpec {
     Model child2
     Model grandChild
     XmlService xmlService
+    RelationshipService relationshipService
     DataElement de1
     DataElement de2
     DataElement de3
@@ -37,7 +42,17 @@ class XmlServiceIntegrationSpec extends IntegrationSpec {
         de1 = DataElement.findByName("DE_author1")
         de2 = DataElement.findByName("AUTHOR")
         de3 = DataElement.findByName("auth")
-
+        
+        
+        def ext=['Min Occurs':1,'Max Occurs':1]
+        
+        def rel=relationshipService.link(parent1,child1,RelationshipType.hierarchyType )
+        rel.ext=ext;
+        rel=relationshipService.link(child1,grandChild,RelationshipType.hierarchyType )
+        rel.ext=ext;
+        
+        RelationshipDefinition.create(parent1, child1, RelationshipType.hierarchyType)
+        
         parent1.ext.putAt(XmlService.XSD_SCHEMA_NAME,  "Xsd-Schema-Name")
         parent1.ext.putAt(XmlService.XSD_SCHEMA_VERSION,  "1.0.0")
         parent1.ext.putAt(XmlService.XSD_SCHEMA_VERSION_DESCRIPTION,  "Simple description")
