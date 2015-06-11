@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.xml
 
+import groovy.xml.MarkupBuilder
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
 import org.modelcatalogue.core.CatalogueElement
@@ -21,15 +22,18 @@ class CatalogueXmlPrinter {
     Writable bind(CatalogueElement element, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
         PrintContext context = new PrintContext(classificationService, modelService)
         context.with contextConfigurer
-        StreamingMarkupBuilder builder = new StreamingMarkupBuilder()
+
+
         return { Writer writer ->
-            def printer = new XmlNodePrinter(new PrintWriter(writer))
-            printer.preserveWhitespace = true
-            printer.print(new XmlParser().parseText(XmlUtil.serialize(builder.bind {
-            catalogue ('xmlns' : NAMESPACE_URL) { doc ->
-                CatalogueElementPrintHelper.printElement(doc, element, context, null)
+            EscapeSpecialWriter escapeSpecialWriter = new EscapeSpecialWriter(writer)
+            MarkupBuilder builder = new MarkupBuilder(escapeSpecialWriter)
+            builder.doubleQuotes = true
+            builder.catalogue ('xmlns' : NAMESPACE_URL) {
+                CatalogueElementPrintHelper.printElement(builder, element, context, null)
             }
-        })))} as Writable
+
+            writer
+        } as Writable
     }
 
 }

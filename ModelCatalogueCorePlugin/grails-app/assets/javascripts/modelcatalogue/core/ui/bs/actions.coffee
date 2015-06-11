@@ -338,8 +338,9 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
         {
           label:  report.title
           url:    report.url
+          type:   report.type
           action: ->
-            if report.type == 'LINK'
+            if @type == 'LINK'
               $window.open(@url, '_blank')
             else enhance(rest(method: 'GET', url: @url)).then (result) ->
               result.show()

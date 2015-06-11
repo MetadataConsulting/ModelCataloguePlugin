@@ -10,7 +10,7 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
         <div class="modal-body">
             <messages-panel messages="messages"></messages-panel>
             <div ng-if="providers &amp;&amp; contextPath">
-              <a ng-repeat="provider in providers" ng-href="{{contextPath + '/oauth/' + provider + '/authenticate'}}" class="btn btn-primary btn-block"><span class="fa fa-fw" ng-class="'fa-' + provider"></span> Login with {{names.getNaturalName(provider)}}</a>
+              <a ng-repeat="provider in providers" ng-click="loginExternal(provider)" class="btn btn-primary btn-block"><span class="fa fa-fw" ng-class="'fa-' + provider"></span> Login with {{names.getNaturalName(provider)}}</a>
               <hr/>
             </div>
             <form role="form" ng-submit="login()">
@@ -35,13 +35,13 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
             <button class="btn btn-warning" ng-click="$dismiss()">Cancel</button>
         </div>
         '''
-        controller: ['$scope', '$cookies', 'messages', 'security', '$modalInstance', 'names'
-          ($scope, $cookies, messages, security, $modalInstance, names) ->
+        controller: ['$scope', '$cookies', 'messages', 'security', '$modalInstance', 'names', '$window', '$interval', '$rootScope',
+          ($scope, $cookies, messages, security, $modalInstance, names, $window, $interval, $rootScope) ->
             $scope.user = {rememberMe: $cookies.mc_remember_me == "true"}
             $scope.messages = messages.createNewMessages()
             $scope.providers = security.oauthProviders
-            $scope.contextPath = security.contextPath
             $scope.names = names
+            $scope.contextPath = security.contextPath
             $scope.login = ->
               security.login($scope.user.username, $scope.user.password, $scope.user.rememberMe).then (success)->
                 if success.data.error
@@ -53,6 +53,23 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
                   $cookies.mc_remember_me = $scope.user.rememberMe
                   $modalInstance.close success
 
+            $scope.loginExternal = (provider) ->
+              url = security.contextPath  + '/oauth/' + provider + '/authenticate'
+              externalLoginWindow = $window.open(url, 'mc_external_login', 'menubar=no,status=no,titlebar=no,toolbar=no')
+
+              helperPromise = null
+
+              closeWindowWhenLoggedIn = ->
+                if $window.location.host is externalLoginWindow.location.host and (externalLoginWindow.location.pathname == security.contextPath or externalLoginWindow.location.pathname == "#{security.contextPath}/")
+                  externalLoginWindow.close()
+                  $interval.cancel(helperPromise)
+                  security.requireUser().then (success)->
+                    $rootScope.$broadcast 'userLoggedIn', success
+                    $modalInstance.close success
+
+
+
+              helperPromise = $interval closeWindowWhenLoggedIn, 100
 
         ]
 

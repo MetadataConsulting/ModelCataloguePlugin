@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.RelationshipDirection
+import spock.lang.Issue
 
 class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
@@ -381,6 +382,21 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         d1draft.outgoingMappings.size() == 1
         d1draft.outgoingMappings[0].destination == d2
 
+    }
+
+    @Issue("https://metadata.atlassian.net/browse/MET-732")
+    def "can un-deprecate element if conditions are met"() {
+        ValueDomain vd = new ValueDomain(name: 'VD4MET-732').save(failOnError: true, flush: true)
+
+        vd = elementService.createDraftVersion(vd, DraftContext.importFriendly(), false) as ValueDomain
+        vd = elementService.finalizeElement(vd)
+        vd = elementService.archive(vd, false)
+
+        when:
+        elementService.restore(vd)
+
+        then:
+        vd.status == ElementStatus.FINALIZED
     }
 
 }

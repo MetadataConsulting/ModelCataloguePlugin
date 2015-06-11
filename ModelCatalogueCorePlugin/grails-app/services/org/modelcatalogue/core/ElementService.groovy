@@ -447,4 +447,27 @@ class ElementService implements Publisher<CatalogueElement> {
         elements
     }
 
+    public <E extends CatalogueElement> E restore(E element) {
+        if (!element) {
+            return element
+        }
+
+        if (!element) {
+            element.errors.rejectValue('status', 'element.restore.not.deprecated', 'Unable to restore element. Element is not deprecated.')
+            return element
+        }
+
+        if (element.latestVersionId) {
+            CatalogueElement finalized = CatalogueElement.findByLatestVersionIdAndStatus(element.latestVersionId, ElementStatus.FINALIZED)
+            if (finalized) {
+                element.errors.rejectValue('status', 'element.restore.finalized.exists', 'Unable to restore element. There is already a finalized version of this element.')
+                return element
+            }
+        }
+
+        element.status = ElementStatus.FINALIZED
+        element.save(flush: true)
+        return element
+    }
+
 }
