@@ -13,21 +13,31 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
     final CatalogueElementProxy<T> source
     final CatalogueElementProxy<U> destination
     final Map<String, String> extensions = [:]
+    final boolean archived
 
-    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination, @DelegatesTo(ExtensionAwareBuilder) Closure extensions) {
+    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions) {
         this.relationshipTypeName = relationshipTypeName
         this.source = source
         this.destination = destination
-        this.with extensions
+
+        RelationshipProxyConfiguration configuration = new RelationshipProxyConfiguration()
+        configuration.with extensions
+
+        if (configuration.extensions) {
+            this.extensions.putAll(configuration.extensions)
+        }
+
+        this.archived = configuration.archived
     }
 
-    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination, Map<String, String> extensions) {
+    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination, Map<String, String> extensions, boolean archived = false) {
         this.relationshipTypeName = relationshipTypeName
         this.source = source
         this.destination = destination
         if (extensions) {
             this.extensions.putAll(extensions)
         }
+        this.archived = archived
     }
 
     Relationship resolve(CatalogueElementProxyRepository repository) {

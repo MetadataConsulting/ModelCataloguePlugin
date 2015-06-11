@@ -74,7 +74,7 @@ class DraftContext {
         return element
     }
 
-    static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type) {
-        "$source.id:$type.id:$destination.id"
+    static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type, boolean archived) {
+        "$source.id:$type.id:$destination.id:$archived"
     }
 }

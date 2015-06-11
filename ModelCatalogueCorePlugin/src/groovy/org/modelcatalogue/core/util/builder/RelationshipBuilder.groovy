@@ -54,7 +54,7 @@ class RelationshipBuilder {
      * @param name name of the destination
      * @param extensions closure defining the metadata
      */
-    void to(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void to(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         to repository.createProxy(getDestinationHintOrClass(), [classification: classification, name: name]), extensions
     }
 
@@ -65,7 +65,7 @@ class RelationshipBuilder {
      * @param name name of the destination
      * @param extensions closure defining the metadata
      */
-    void to(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void to(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         context.withContextElement(Classification) {
             to repository.createProxy(getDestinationHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
@@ -81,7 +81,7 @@ class RelationshipBuilder {
      * @param proxy proxy of the destination
      * @param extensions closure defining the metadata
      */
-    public <T extends CatalogueElement> void to(CatalogueElementProxy<T> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    public <T extends CatalogueElement> void to(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         context.withContextElement(getSourceHintOrClass()) {
             return it.addToPendingRelationships(new RelationshipProxy(type.name, it, element, extensions))
         } or {
@@ -97,7 +97,7 @@ class RelationshipBuilder {
      * @param name name of the source
      * @param extensions closure defining the metadata
      */
-    void from(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void from(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         from repository.createProxy(getSourceHintOrClass(), [classification: classification, name: name]), extensions
     }
 
@@ -109,7 +109,7 @@ class RelationshipBuilder {
      * @param name name of the source
      * @param extensions closure defining the metadata
      */
-    void from(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void from(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         context.withContextElement(Classification) {
             from repository.createProxy(getSourceHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
@@ -123,7 +123,7 @@ class RelationshipBuilder {
      * @param proxy proxy of the source
      * @param extensions closure defining the metadata
      */
-    public <T extends CatalogueElement> void from(CatalogueElementProxy<T> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    public <T extends CatalogueElement> void from(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         context.withContextElement(getDestinationHintOrClass()) {
             return it.addToPendingRelationships(new RelationshipProxy(type.name, element, it, extensions))
         } or {
@@ -161,7 +161,7 @@ class RelationshipBuilder {
      * @param name name of the source or destination
      * @param extensions closure defining the metadata
      */
-    void called(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void called(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         if (sourceClassHint) {
             from name, extensions
         } else if (destinationClassHint) {
@@ -179,7 +179,7 @@ class RelationshipBuilder {
      * @param name name of the source or destination
      * @param extensions closure defining the metadata
      */
-    void called(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void called(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         if (sourceClassHint) {
             from classification, name, extensions
         } else if (destinationClassHint) {

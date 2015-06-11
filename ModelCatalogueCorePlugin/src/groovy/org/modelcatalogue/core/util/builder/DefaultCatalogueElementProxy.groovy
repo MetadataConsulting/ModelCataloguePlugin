@@ -133,15 +133,18 @@ import org.modelcatalogue.core.*
 
     private boolean isParametersChanged(T element) {
         parameters.any { String key, Object value ->
+            if (key in [CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG, CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG]) {
+                return false
+            }
             def currentValue = element.getProperty(key)
             if (value instanceof CatalogueElementProxy) {
                 def realValue = value.findExisting()
                 if (realValue?.latestVersionId && realValue?.latestVersionId != currentValue?.latestVersionId) {
-                    log.debug "$this has changed at least one property - property $key\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
+                    log.debug "$this has changed at least one property - property $key (different latest version id)\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
                     return true
                 }
                 if (realValue?.id != currentValue?.id) {
-                    log.debug "$this has changed at least one property - property $key\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
+                    log.debug "$this has changed at least one property - property $key (different id)\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
                     return true
                 }
                 return false
@@ -150,7 +153,15 @@ import org.modelcatalogue.core.*
                 if (key == 'modelCatalogueId' && value?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
                     return false
                 }
-                log.debug "$this has changed at least one property - property $key\n\n===NEW===\n${normalizeWhitespace(value)}\n===OLD===\n${normalizeWhitespace(currentValue)}\n========="
+                if (key == 'name' && parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] && element.name) {
+                    // automatic name can't replace one already set
+                    return false
+                }
+                if (key == 'description' && parameters[CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG] && element.description) {
+                    // automatic description can't replace one already set
+                    return false
+                }
+                log.debug "$this has changed at least one property - property $key (different value)\n\n===NEW===\n${normalizeWhitespace(value)}\n===OLD===\n${normalizeWhitespace(currentValue)}\n========="
                 return true
             }
             return false
@@ -272,6 +283,10 @@ import org.modelcatalogue.core.*
         }
         parameters.each { String key, Object value ->
             if (key == 'status') return
+            if (key == CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG) return
+            if (key == CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG) return
+            if (key == 'name' && parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] && element.name) return
+            if (key == 'description' && parameters[CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG] && element.description) return
             if (value instanceof CatalogueElementProxy) {
                 element.setProperty(key, value.resolve())
                 return
@@ -345,6 +360,9 @@ import org.modelcatalogue.core.*
     static normalizeWhitespace(Object o) {
         if (o instanceof CharSequence) {
             return o.toString().replaceAll(/(?m)\s+/, ' ').trim()
+        }
+        if (o instanceof Enum) {
+            return o.toString()
         }
         if (!o) {
             return ''

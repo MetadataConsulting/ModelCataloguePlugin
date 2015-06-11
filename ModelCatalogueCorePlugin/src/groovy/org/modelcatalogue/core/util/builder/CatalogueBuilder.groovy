@@ -249,9 +249,9 @@ import org.modelcatalogue.core.*
      * Primary use case for this method call is to configure the relationship metadata such as "Min. Occurs".
      *
      * @param relationshipExtensionsConfiguration DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      */
-    void relationship(@DelegatesTo(ExtensionAwareBuilder) Closure relationshipExtensionsConfiguration) {
+    void relationship(@DelegatesTo(RelationshipProxyConfiguration) Closure relationshipExtensionsConfiguration) {
         context.configureCurrentRelationship(relationshipExtensionsConfiguration)
     }
 
@@ -263,9 +263,9 @@ import org.modelcatalogue.core.*
      * @param classification classification of the child model
      * @param name name of the child model
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      */
-    void child(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void child(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         rel "hierarchy" to classification, name, extensions
     }
 
@@ -277,10 +277,10 @@ import org.modelcatalogue.core.*
      *
      * @param name name of the child model
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void child(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void child(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         rel "hierarchy" to name, extensions
     }
 
@@ -291,10 +291,10 @@ import org.modelcatalogue.core.*
      *
      * @param model proxy of the child model
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void child(CatalogueElementProxy<Model> model, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void child(CatalogueElementProxy<Model> model, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         rel "hierarchy" to model, extensions
     }
 
@@ -306,9 +306,9 @@ import org.modelcatalogue.core.*
      * @param classification classification of the contained data element
      * @param name name of the contained data element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      */
-    void contains(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void contains(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         rel "containment" to classification, name, extensions
     }
 
@@ -320,10 +320,10 @@ import org.modelcatalogue.core.*
      *
      * @param name name of the contained data element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void contains(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void contains(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         rel "containment" to name, extensions
     }
 
@@ -334,10 +334,10 @@ import org.modelcatalogue.core.*
      *
      * @param model proxy of the contained data element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         rel "containment" to element, extensions
     }
 
@@ -349,9 +349,9 @@ import org.modelcatalogue.core.*
      * @param classification classification of the base element
      * @param name name of the base element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      */
-    void basedOn(String classification, String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void basedOn(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
             rel "base" from it.domain called classification, name, extensions
         }
@@ -365,10 +365,10 @@ import org.modelcatalogue.core.*
      *
      * @param name name of the base element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void basedOn(String name, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void basedOn(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
             rel "base" from it.domain called name, extensions
         }
@@ -381,10 +381,10 @@ import org.modelcatalogue.core.*
      *
      * @param model proxy of the base element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see ExtensionAwareBuilder
+     * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(ExtensionAwareBuilder) Closure extensions = {}) {
+    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
         rel "base" from element, extensions
     }
 
@@ -701,9 +701,11 @@ import org.modelcatalogue.core.*
                 if (!parameters.name) {
                     if (it.name) {
                         parameters.name = it.name
+                        parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] = true
                     }
                     // description is only transffered for the elements created automatically
                     if (!parameters.id && parameters.name && domain in createAutomatically && !parameters.description && it.getParameter('description')) {
+                        parameters[CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG] = true
                         parameters.description = it.getParameter('description')
                     }
                 }

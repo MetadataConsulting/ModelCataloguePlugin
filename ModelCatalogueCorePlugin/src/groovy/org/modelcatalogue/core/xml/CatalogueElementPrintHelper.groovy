@@ -3,9 +3,6 @@ package org.modelcatalogue.core.xml
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
 
-/**
- * Created by ladin on 15.01.15.
- */
 abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
 
     private static <E extends CatalogueElement> CatalogueElementPrintHelper<E> get(Class<E> type) {
@@ -151,6 +148,9 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
                     extension(key: entry.key, entry.value)
                 }
             }
+        }
+        if (rel?.archived) {
+            theMkp.archived true
         }
     }
 

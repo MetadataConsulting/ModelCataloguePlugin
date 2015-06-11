@@ -716,4 +716,31 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         Model.findByName('Child Model 4 Finalization').status == ElementStatus.FINALIZED
     }
 
+    def "can call relationship closure more than once"() {
+        String name = 'Model for Double Relationship Call'
+        when:
+        build {
+            model(name: name) {
+                model(name: "$name Child") {
+                    relationship {
+                        ext 'one', '1'
+                    }
+                    relationship {
+                        archived = true
+                    }
+                }
+            }
+        }
+
+        Model parent = created.find { it.name == name }
+
+        then:
+        parent
+        parent.parentOfRelationships
+        parent.parentOfRelationships.size() == 1
+        parent.parentOfRelationships[0].archived
+        parent.parentOfRelationships[0].ext['one'] == '1'
+
+    }
+
 }

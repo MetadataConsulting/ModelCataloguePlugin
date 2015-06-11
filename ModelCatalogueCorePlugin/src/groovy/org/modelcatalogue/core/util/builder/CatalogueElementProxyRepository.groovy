@@ -12,6 +12,8 @@ import org.springframework.util.StopWatch
 class CatalogueElementProxyRepository {
 
     static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, Classification]
+    static final String AUTOMATIC_NAME_FLAG = '__automatic_name__'
+    static final String AUTOMATIC_DESCRIPTION_FLAG = '__automatic_description__'
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
 
     private final ClassificationService classificationService
@@ -357,7 +359,7 @@ class CatalogueElementProxyRepository {
             throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
         }
 
-        String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type)
+        String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type, proxy.archived)
 
 
         Relationship existing = createdRelationships[hash]
@@ -366,7 +368,7 @@ class CatalogueElementProxyRepository {
             return existing
         }
 
-        Relationship relationship = sourceElement.createLinkTo(destinationElement, type, resetIndices: true, skipUniqueChecking: proxy.source.new || proxy.destination.new)
+        Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived, resetIndices: true, skipUniqueChecking: proxy.source.new || proxy.destination.new)
 
         createdRelationships[hash] = relationship
 

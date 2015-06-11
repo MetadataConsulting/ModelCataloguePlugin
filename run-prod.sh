@@ -6,5 +6,10 @@ set -e
 ./setup-frontend.sh
 
 cd ModelCatalogueCorePluginTestApp
-./grailsw prod run-app
+if [[ "$1" == "debug" ]]; then
+    ./grailsw prod run-app --debug-fork
+else
+    ./grailsw prod run-app
+fi
+
 

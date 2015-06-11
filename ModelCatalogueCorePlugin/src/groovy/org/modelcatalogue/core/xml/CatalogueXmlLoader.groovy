@@ -68,6 +68,7 @@ class CatalogueXmlLoader {
             case 'relationships': handleChildren(element) ; break
             case 'enumerations': break // handled by data type
             case 'metadata': handleMetadata(element) ; break
+            case 'archived': handleArchived(element) ; break
             case 'extension': handleExtension(element) ; break
             case 'relatedTo': handleRelationship(element, true, 'relatedTo') ; break
             case 'synonym': handleRelationship(element, true, 'synonym') ; break
@@ -84,11 +85,19 @@ class CatalogueXmlLoader {
         builder.ext(element.@key.text() ?: '', element.text() ?: '')
     }
 
+    private void handleArchived(NodeChild element) {
+        if (element.parent()?.name() in CATALOGUE_ELEMENT_ELEMENTS) {
+            builder.relationship {
+                archived(element.text() == 'true')
+            }
+        }
+    }
+
     private void handleMetadata(NodeChild element) {
         if (element.parent()?.name() in CATALOGUE_ELEMENT_ELEMENTS) {
             builder.relationship {
                 element.extension.each {
-                    ext(it.@key.text() ?: '', element.text() ?: '')
+                    ext(it.@key.text() ?: '', it.text() ?: '')
                 }
             }
         }
@@ -98,8 +107,9 @@ class CatalogueXmlLoader {
         if (element.attributes().containsKey('ref')) {
             builder.rel(relType)."${outgoing ? 'to' : 'from'}"(builder.ref(element.attributes()['ref'].toString())) {
                 element.metadata.extension.each() {
-                    ext(it.@key.text() ?: '', element.text() ?: '')
+                    ext(it.@key.text() ?: '', it.text() ?: '')
                 }
+                archived(element.archived.text() == 'true')
             }
             return
         }
@@ -110,15 +120,17 @@ class CatalogueXmlLoader {
         if (element.attributes().containsKey('classification')) {
             builder.rel(relType)."${outgoing ? 'to' : 'from'}"(element.attributes()['classification'].toString(), element.attributes()['name'].toString()) {
                 element.metadata.extension.each() {
-                    ext(it.@key.text() ?: '', element.text() ?: '')
+                    ext(it.@key.text() ?: '', it.text() ?: '')
                 }
+                archived(element.archived.text() == 'true')
             }
             return
         }
         builder.rel(relType)."${outgoing ? 'to' : 'from'}"(element.attributes()['name'].toString()) {
             element.metadata.extension.each() {
-                ext(it.@key.text() ?: '', element.text() ?: '')
+                ext(it.@key.text() ?: '', it.text() ?: '')
             }
+            archived(element.archived.text() == 'true')
         }
     }
 

@@ -30,7 +30,7 @@ class CopyAssociationsAndRelationships {
         relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.classificationType) { Relationship r ->
             CatalogueElement source = DraftContext.preferDraft(r.source)
 
-            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.classificationType)
+            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.classificationType, r.archived)
 
             if (hash in createdRelationshipHashes) {
                 return
@@ -93,10 +93,10 @@ class CopyAssociationsAndRelationships {
 
             if (direction == RelationshipDirection.INCOMING) {
                 otherSide = DraftContext.preferDraft(r.source)
-                hash = DraftContext.hashForRelationship(otherSide, draft, r.relationshipType)
+                hash = DraftContext.hashForRelationship(otherSide, draft, r.relationshipType, r.archived)
             } else {
                 otherSide = DraftContext.preferDraft(r.destination)
-                hash = DraftContext.hashForRelationship(draft, otherSide, r.relationshipType)
+                hash = DraftContext.hashForRelationship(draft, otherSide, r.relationshipType, r.archived)
             }
 
             if (hash in createdRelationshipHashes) {

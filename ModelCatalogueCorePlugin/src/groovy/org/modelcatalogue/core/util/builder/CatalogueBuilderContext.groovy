@@ -1,6 +1,5 @@
 package org.modelcatalogue.core.util.builder
 
-import com.google.common.escape.CharEscaperBuilder
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import org.modelcatalogue.core.CatalogueElement
@@ -11,9 +10,6 @@ import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ValueDomain
 
-/**
- * Created by ladin on 19.12.14.
- */
 class CatalogueBuilderContext {
 
     private static Set<Class> SUPPORTED_AS_CONTEXT  = [CatalogueElement, Classification, ValueDomain, DataType, Model, MeasurementUnit, DataElement]
@@ -57,10 +53,14 @@ class CatalogueBuilderContext {
         new DefaultWithOptionalOrClause(builder)
     }
 
-    void configureCurrentRelationship(@DelegatesTo(ExtensionAwareBuilder) Closure relationshipExtensionsConfiguration) {
+    void configureCurrentRelationship(@DelegatesTo(RelationshipProxyConfiguration) Closure relationshipExtensionsConfiguration) {
         ContextItem item = getContextElement(CatalogueElement, 1)
         if (item) {
-            item.relationshipConfiguration = relationshipExtensionsConfiguration
+            if (item.relationshipConfiguration) {
+                item.relationshipConfiguration = item.relationshipConfiguration << relationshipExtensionsConfiguration
+            } else {
+                item.relationshipConfiguration = relationshipExtensionsConfiguration
+            }
         }
     }
 
