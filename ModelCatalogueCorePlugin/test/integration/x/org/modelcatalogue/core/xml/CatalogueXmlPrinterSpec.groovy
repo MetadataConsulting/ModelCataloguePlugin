@@ -44,12 +44,14 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
 
 
     def "replace special chars"() {
-        Writable writable = printer.bind(new ValueDomain(name: 'Test', description: "diagnosis.ƒ‚ƒ‚ƒ‚'‚“ e").save())
+        Writable writable = printer.bind(new ValueDomain(name: 'Test', description: "diagnosis.ƒ‚ƒ‚ƒ‚'‚“ e", modelCatalogueId: 'http://example.com/specialchars').save()) {
+            noHref = true
+        }
         StringWriter writer = new StringWriter()
         writable.writeTo(writer)
         expect:
         writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.0/metadataregistry.xsd">
-  <valueDomain name="Test" id="http://localhost/catalogue/valueDomain/125" status="DRAFT">
+  <valueDomain name="Test" id="http://example.com/specialchars" status="DRAFT">
     <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
   </valueDomain>
 </catalogue>'''
