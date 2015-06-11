@@ -1,14 +1,25 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.gel
 
-import org.modelcatalogue.core.audit.AuditService;
-import org.modelcatalogue.core.dataarchitect.CSVService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.modelcatalogue.core.Asset
+import org.modelcatalogue.core.AssetService
+import org.modelcatalogue.core.ElementService
+import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.SecurityService
+import org.modelcatalogue.core.audit.AuditService
+import org.springframework.http.HttpStatus
 
-class GelXmlController {
+
+/**
+ * Different actions related to generate xml catalogs
+ * 
+ * @author csfercoci
+ *
+ */
+class XmlController {
 
     def dataArchitectService
-    def modelService
+    def xmlService
     def executorService
     AuditService auditService
     AssetService assetService
@@ -18,8 +29,11 @@ class GelXmlController {
 
     def index() { }
 
-
-    def gelXmlShredderModel() {
+    /**
+     * Generate xml model for xml shredder, it is stored as an asset 
+     * @return redirection to asset controller
+     */
+    def generateXmlShredderModel() {
         Model model=Model.get(params.id)
 
         if (!model) {
@@ -34,7 +48,7 @@ class GelXmlController {
         def assetMimeType="application/octet-stream"
         
         //TODO pass this operation inside of closure
-        def result=modelService.gelXmlModelShredder(model)
+        def result=xmlService.printXmlModelShredder(model)
         
         Closure closure={return result}
 
@@ -50,7 +64,7 @@ class GelXmlController {
      * Generate xsd schema as an asset
      * @return redirect to asset controller
      */
-    def modelsToXSD(){
+    def generateXSD(){
         def model=Model.get(params.id)
 
 
@@ -60,14 +74,14 @@ class GelXmlController {
         }
 
         def assetName="$model.name XML Schema(XSD)"
-        def assetFileName=model.ext.get(ModelService.XSD_SCHEMA_NAME)?model.ext.get(ModelService.XSD_SCHEMA_NAME)+"v${model.ext.get(ModelService.XSD_SCHEMA_VERSION)}.xsd":" Invalid Asset $model.name XML Schema(XSD).xsd"
+        def assetFileName=model.ext.get(XmlService.XSD_SCHEMA_NAME)?model.ext.get(XmlService.XSD_SCHEMA_NAME)+"-v${model.ext.get(XmlService.XSD_SCHEMA_VERSION)}.xsd":" Invalid Asset $model.name XML Schema(XSD).xsd"
 
 
         def assetPendingDesc="Your XSD  will be available in this asset soon. Use Refresh action to reload"
         def assetFinalizedDesc="Your XSD is ready. Use Download button to download it."
         def assetErrorDesc="Error generating xsd"
         def assetMimeType="application/xsd"
-        Closure closure={return modelService.printXSDModel(model)}
+        Closure closure={return xmlService.printXSDModel(model)}
 
         def assetId=storeAssetFromString(model,closure,assetName,assetMimeType,assetPendingDesc,assetFinalizedDesc,assetErrorDesc,assetFileName)
 
@@ -102,7 +116,7 @@ class GelXmlController {
             auditService.withDefaultAuthorId(authorId) {
                 Asset updated = Asset.get(id)
                 try {
-                    //String result= modelService.gelXmlModelShredder(model)
+                    //String result= XmlService.gelXmlModelShredder(model)
                     assetService.storeAssetFromInputStream( new ByteArrayInputStream(closure.call().bytes),mimeType, updated)
 
                     updated.status = ElementStatus.FINALIZED

@@ -1,11 +1,10 @@
 package org.modelcatalogue.core
 
-import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.dataarchitect.CSVService
+import org.modelcatalogue.core.util.Elements
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
-import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
@@ -16,9 +15,6 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     def dataArchitectService
     def modelService
-    def executorService
-    @Autowired AuditService auditService
-    @Autowired AssetService assetService
     @Autowired CSVService csvService
 
     DataArchitectController() {
@@ -122,4 +118,6 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
             respond status: HttpStatus.BAD_REQUEST
         }
     }
+
+
 }

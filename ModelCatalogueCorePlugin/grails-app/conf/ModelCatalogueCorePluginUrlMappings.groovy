@@ -120,11 +120,6 @@ class ModelCatalogueCorePluginUrlMappings {
             }
         }
         
-    
-      
-            "/api/modelCatalogue/core/gelXml/gelXmlShredderModel/$id"(controller: "gelXml", action: "gelXmlShredderModel", method: HttpMethod.GET)
-            "/api/modelCatalogue/core/gelXml/modelsToXSD/$id"(controller: "gelXml", action: "modelsToXSD", method: HttpMethod.GET)
-            
         group "/api/modelCatalogue/core/dataArchitect", {
             "/uninstantiatedDataElements" (controller: "dataArchitect", action: 'uninstantiatedDataElements', method: HttpMethod.GET)
             "/metadataKeyCheck/$key?" (controller: "dataArchitect", action: 'metadataKeyCheck', method: HttpMethod.GET)
@@ -132,6 +127,7 @@ class ModelCatalogueCorePluginUrlMappings {
             "/findRelationsByMetadataKeys/$key?" (controller: "dataArchitect", action: 'findRelationsByMetadataKeys', method: HttpMethod.GET)
             "/elementsFromCSV" (controller: "dataArchitect", action: "elementsFromCSV", method: HttpMethod.POST)
             "/modelsFromCSV" (controller: "dataArchitect", action: "modelsFromCSV", method: HttpMethod.POST)
+            "/generateSuggestions" (controller: "dataArchitect", action: "generateSuggestions", method: HttpMethod.POST)
             "/imports/upload" (controller: "dataImport", action: 'upload', method: HttpMethod.POST)
         }
 

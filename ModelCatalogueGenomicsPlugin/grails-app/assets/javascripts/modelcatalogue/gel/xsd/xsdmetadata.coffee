@@ -41,6 +41,22 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     ]
     template: 'modelcatalogue/core/ui/metadataEditors/xsdItemValueDomainRestriction.html'
   }
+  metadataEditorsProvider.register {
+    title: 'Occurences(Metadata)'
+    types: [
+          'dataElement'   
+          'valueDomain'
+          '=[containment]=>'
+          'model'
+          '=[hierarchy]=>'
+        ]
+
+    keys: [
+               "Min Occurs"
+               "Max Occurs"
+    ]
+    template: 'modelcatalogue/core/ui/metadataEditors/metadataOccurence.html'
+  }
 ]
 
 xsd.run ['$templateCache', ($templateCache) ->
@@ -149,7 +165,25 @@ xsd.run ['$templateCache', ($templateCache) ->
           Specifies the maximum number of decimal places allowed. Must be equal to or greater than zero
     <p>
     </div>
-    
     </form>
     '''
+ $templateCache.put 'modelcatalogue/core/ui/metadataEditors/metadataOccurence.html', '''
+    <div class="alert alert-warning">Metadata occurences </div>
+    <form class="form">
+        <div class="form-group">
+            <label for="minOccurence" class="control-label">Min Occurs</label>
+            <input maxlength="50" type="text" class="form-control" id="minOccurence" ng-model="object.access('Min Occurs')" ng-model-options="{ getterSetter: true }">
+                <p class="help-block">
+                    Min occurence of the current element within the block. A number between 0 and infinite number. Must be a number otherwise deleted.
+                </p>
+        </div>
+        <div class="form-group">
+            <label for="maxOccurence" class="control-label">Max Occurs</label>
+            <input maxlength="20" type="text" class="form-control" id="maxOccurence" ng-model="object.access('Max Occurs')" ng-model-options="{ getterSetter: true }">
+                <p class="help-block">
+                Max occurence of the current element within the block. A number between 0 and infinite number. Must be a number otherwise deleted.
+                </p>
+        </div>
+        </form> 
+    '''    
 ]

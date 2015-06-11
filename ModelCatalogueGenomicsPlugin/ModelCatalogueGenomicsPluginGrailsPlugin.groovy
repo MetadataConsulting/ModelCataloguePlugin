@@ -14,7 +14,7 @@ class ModelCatalogueGenomicsPluginGrailsPlugin {
     // TODO Fill in these fields
     def title = "Model Catalogue Genomics Plugin" // Headline display name of the plugin
     def author = "Cristian Sfercoci"
-    def authorEmail = "cristian.sfercoci@genomicsengland.co.uk"
+    def authorEmail = "cristian.sfercoci@wellsoft.co.uk"
     def description = '''\
 Genomics England Custom Additions to Model Catalogue
 '''
@@ -55,12 +55,19 @@ Genomics England Custom Additions to Model Catalogue
         // TODO Implement post initialization spring config (optional)
         ReportsRegistry reportsRegistry = ctx.getBean(ReportsRegistry)
 
-//        reportsRegistry.register {
-//            creates asset
-//            type Model
-//            title { "Generate Case Report From" }
-//            link controller: 'formGenerator', action: 'generateForm', id: true
-//        }
+        reportsRegistry.register {
+            creates asset
+            title { "Export  XML Schema Definition(XSD) " }
+            type Model
+            link controller: 'xml', action: 'generateXSD',id: true
+        }
+
+        reportsRegistry.register {
+            creates asset
+            title { "Export  XML Shredder Model" }
+            type Model
+            link controller: 'xml', action: 'generateXmlShredderModel',id: true
+        }
 
     }
 
