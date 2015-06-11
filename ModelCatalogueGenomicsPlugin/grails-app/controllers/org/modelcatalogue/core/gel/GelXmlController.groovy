@@ -2,7 +2,6 @@ package org.modelcatalogue.core.gel
 
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetService
-import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.SecurityService
@@ -16,16 +15,14 @@ import org.springframework.http.HttpStatus
  * @author csfercoci
  *
  */
-class XmlController {
+class GelXmlController {
 
-    def dataArchitectService
-    def xmlService
+    def gelXmlService
     def executorService
     AuditService auditService
     AssetService assetService
 
     SecurityService modelCatalogueSecurityService
-    ElementService elementService
 
     def index() { }
 
@@ -48,7 +45,7 @@ class XmlController {
         def assetMimeType="application/octet-stream"
         
         //TODO pass this operation inside of closure
-        def result=xmlService.printXmlModelShredder(model)
+        def result=gelXmlService.printXmlModelShredder(model)
         
         Closure closure={return result}
 
@@ -74,14 +71,14 @@ class XmlController {
         }
 
         def assetName="$model.name XML Schema(XSD)"
-        def assetFileName=model.ext.get(XmlService.XSD_SCHEMA_NAME)?model.ext.get(XmlService.XSD_SCHEMA_NAME)+"-v${model.ext.get(XmlService.XSD_SCHEMA_VERSION)}.xsd":" Invalid Asset $model.name XML Schema(XSD).xsd"
+        def assetFileName=model.ext.get(GelXmlService.XSD_SCHEMA_NAME)?model.ext.get(GelXmlService.XSD_SCHEMA_NAME)+"-v${model.ext.get(GelXmlService.XSD_SCHEMA_VERSION)}.xsd":" Invalid Asset $model.name XML Schema(XSD).xsd"
 
 
         def assetPendingDesc="Your XSD  will be available in this asset soon. Use Refresh action to reload"
         def assetFinalizedDesc="Your XSD is ready. Use Download button to download it."
         def assetErrorDesc="Error generating xsd"
         def assetMimeType="application/xsd"
-        Closure closure={return xmlService.printXSDModel(model)}
+        Closure closure={return gelXmlService.printXSDModel(model)}
 
         def assetId=storeAssetFromString(model,closure,assetName,assetMimeType,assetPendingDesc,assetFinalizedDesc,assetErrorDesc,assetFileName)
 

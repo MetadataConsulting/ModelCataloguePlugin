@@ -13,7 +13,7 @@ import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
 
 @Transactional
-class XmlService {
+class GelXmlService {
     
     static final String XSD_SCHEMA_NAME = "http://xsd.modelcatalogue.org/metadata#schemaName"
     static final String XSD_SCHEMA_VERSION = "http://xsd.modelcatalogue.org/metadata#schemaVersion"

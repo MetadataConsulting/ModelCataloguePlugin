@@ -1,28 +1,23 @@
 package org.modelcatalogue.core.gel
 
 
-import grails.test.spock.IntegrationSpec;
+import grails.test.spock.IntegrationSpec
 
-import org.codehaus.groovy.grails.web.context.ServletContextHolder
 //import org.modelcatalogue.core.AbstractIntegrationSpec;
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipService;
 import org.modelcatalogue.core.RelationshipType;
-import org.modelcatalogue.core.util.builder.RelationshipDefinition;
-import org.modelcatalogue.core.util.test.TestDataHelper
-import org.springframework.web.context.support.WebApplicationContextUtils
+import org.modelcatalogue.core.util.builder.RelationshipDefinition
 
-
-class XmlServiceIntegrationSpec extends IntegrationSpec {
+class GelXmlServiceIntegrationSpec extends IntegrationSpec {
     
     Model parent1
     Model parent2
     Model child1
     Model child2
     Model grandChild
-    XmlService xmlService
+    GelXmlService gelXmlService
     RelationshipService relationshipService
     DataElement de1
     DataElement de2
@@ -53,16 +48,16 @@ class XmlServiceIntegrationSpec extends IntegrationSpec {
         
         RelationshipDefinition.create(parent1, child1, RelationshipType.hierarchyType)
         
-        parent1.ext.putAt(XmlService.XSD_SCHEMA_NAME,  "Xsd-Schema-Name")
-        parent1.ext.putAt(XmlService.XSD_SCHEMA_VERSION,  "1.0.0")
-        parent1.ext.putAt(XmlService.XSD_SCHEMA_VERSION_DESCRIPTION,  "Simple description")
+        parent1.ext.putAt(GelXmlService.XSD_SCHEMA_NAME,  "Xsd-Schema-Name")
+        parent1.ext.putAt(GelXmlService.XSD_SCHEMA_VERSION,  "1.0.0")
+        parent1.ext.putAt(GelXmlService.XSD_SCHEMA_VERSION_DESCRIPTION,  "Simple description")
     }
 
 
 
     def  "test printXsdSchema"(){
         when :
-        def result=xmlService.printXSDModel(parent1)
+        def result=gelXmlService.printXSDModel(parent1)
         then :
         assert result!=null
         assert result.contains("<xs:complexType name='${child1.name.toLowerCase()}'")
@@ -76,7 +71,7 @@ class XmlServiceIntegrationSpec extends IntegrationSpec {
 
     def  "test print xml Shredder"(){
         when :
-        def result=xmlService.printXmlModelShredder(parent1)
+        def result=gelXmlService.printXmlModelShredder(parent1)
         then :
         assert result!=null
     }
