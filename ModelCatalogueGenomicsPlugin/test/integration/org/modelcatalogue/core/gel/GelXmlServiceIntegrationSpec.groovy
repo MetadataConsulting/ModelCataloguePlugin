@@ -25,7 +25,6 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
 
     def setup(){
         //loadFixtures()
-
         parent1 = new Model(name: 'book').save(failOnError: true)
         parent2 = new Model(name: 'chapter1').save(failOnError: true)
         child1 = new Model(name: 'chapter2').save(failOnError: true)
@@ -66,6 +65,18 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
         assert result.contains("<xs:element name='${parent1.name.toLowerCase()}'")
         assert result.contains("<xs:element name='${child1.name.toLowerCase()}'")
         assert result.contains("<xs:element name='${grandChild.name.toLowerCase()}'")
+        
+        when :
+        def metadata=parent1.ext
+        result=null
+        try{
+            parent1.ext=[:]
+            result=gelXmlService.printXSDModel(parent1)
+        }catch(e){
+             
+        }
+        then :
+        assert result==null
     }
 
 
