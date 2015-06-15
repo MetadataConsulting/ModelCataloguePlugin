@@ -59,14 +59,14 @@ Genomics England Custom Additions to Model Catalogue
             creates asset
             title { "Export  XML Schema Definition(XSD) " }
             type Model
-            link controller: 'xml', action: 'generateXSD',id: true
+            link controller: 'gelXml', action: 'generateXSD',id: true
         }
 
         reportsRegistry.register {
             creates asset
             title { "Export  XML Shredder Model" }
             type Model
-            link controller: 'xml', action: 'generateXmlShredderModel',id: true
+            link controller: 'gelXml', action: 'generateXmlShredderModel',id: true
         }
 
     }

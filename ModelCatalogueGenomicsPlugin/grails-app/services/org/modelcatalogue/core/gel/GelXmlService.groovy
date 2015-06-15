@@ -30,6 +30,8 @@ class GelXmlService {
     static final String XSD_RESTRICTION_TOTAL_DIGITS="http://xsd.modelcatalogue.org/restrictions#totalDigits"
     static final String XSD_RESTRICTION_FRACTION_DIGITS="http://xsd.modelcatalogue.org/restrictions#fractionDigits"
     static final String XSD_RESTRICTION_PATTERN="http://xsd.modelcatalogue.org/restrictions#pattern"
+    static final String METADATA_MIN_OCCURS="Min Occurs"
+    static final String METADATA_MAX_OCCURS="Max Occurs"
 
     static final def XSD_RESTRICTION_LIST=[XSD_RESTRICTION_LENGTH,XSD_RESTRICTION_MIN_LENGTH,XSD_RESTRICTION_MAX_LENGTH,XSD_RESTRICTION_MAX_INCLUSIVE,
         XSD_RESTRICTION_MIN_INCLUSIVE,XSD_RESTRICTION_MAX_EXCLUSIVE,XSD_RESTRICTION_MIN_EXCLUSIVE,XSD_RESTRICTION_TOTAL_DIGITS,XSD_RESTRICTION_FRACTION_DIGITS,XSD_RESTRICTION_PATTERN]
@@ -39,7 +41,7 @@ class GelXmlService {
         "xs:gYearMonth","xs:gYear","xs:duration","xs:gMonthDay","xs:gDay","xs:gMonth","xs:string","xs:normalizedString","xs:token","xs:language","xs:NMTOKEN","xs:NMTOKENS",
         "xs:Name","xs:NCName","xs:ID","xs:IDREFS","xs:ENTITY","xs:ENTITIES","xs:QName","xs:boolean","xs:hexBinary","xs:base64Binary","xs:anyURI","xs:notation"]
 
-    private static final int MAX_COLUMN_NAME_64 = 64
+    private static final int MAX_COLUMN_NAME_63 = 63
 
     protected List<Model> listChildren(Model model,List results = [],Boolean isRoot=false) {
         if (model && !results.contains(model)){
@@ -67,29 +69,25 @@ class GelXmlService {
         validateFormMetadata(model, subModels)
         validateMetadataOccurs(childsRelationship)
         validateModelsNameLength(subModels)
-            
-        String[] versionNumber=model.ext.get(XSD_SCHEMA_VERSION).split("\\.")
-        println versionNumber
+
         def writer = new StringWriter()
         def builder = new MarkupBuilder(writer)
         builder.context('xmlns:xsi': "http://www.w3.org/2001/XMLSchema-instance") {
             setOmitEmptyAttributes(true)
             setOmitNullAttributes(true)
-            form(id: "${printXSDFriendlyString("Master")}") {
+            form(id: printXSDFriendlyString(model.name)) {
                 name model.ext.get(XSD_SCHEMA_NAME)
                 instructions model?.ext?.instructions
                 version {
-                    major versionNumber[0]
-                    minor versionNumber[1]
-                    patch versionNumber[2]
+                    model.ext.get(XSD_SCHEMA_VERSION)
                 }
                 versionDescription model.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION)
- 
-
                 //order all elements based on their ext.order
                 //these are actually CRFs
-                model.outgoingRelationships.sort({ it.ext?.order }).each { Relationship rel ->
+                subModels[0].outgoingRelationships.sort({ it.ext?.order }).each { Relationship rel ->
+                    
                     if (rel.relationshipType == RelationshipType.containmentType) {
+                        
                         printQuestion(rel.destination, rel.ext, builder)
                     }
                     if (rel.relationshipType == RelationshipType.hierarchyType) {
@@ -103,25 +101,31 @@ class GelXmlService {
 
     def printSection(Model model, Map ext, MarkupBuilder builder){
         if(model.ext.repeating=='true') {
-
-            return builder.repeatingGroup(id: printXSDFriendlyString(model.name), minRepeat: defaultMinOccurs(ext.get("Min Occurs")), maxRepeat: defaultMaxOccurs(ext.get("Max Occurs"))) {
+            return builder.repeatingGroup(id: printXSDFriendlyString(model.name), minRepeat: defaultMinOccurs(ext.get(METADATA_MIN_OCCURS)), maxRepeat: defaultMaxOccurs(ext.get(METADATA_MAX_OCCURS))) {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
-
+                
+                //validate occurs
+                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
+                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+                //recursive printing 
                 model.outgoingRelationships.each { Relationship rel ->
                     if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel.destination, rel.ext, builder)
                     if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel.destination, rel.ext, builder)
                 }
             }
-
         }else{
-            return builder.section(id: model.name, minRepeat: ext.get("Min Occurs"), maxRepeat: ext.get("Max Occurs")) {
+            return builder.section(id: model.name, minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get("Max Occurs")) {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
                 instructions model.ext.instructions
-
+                
+                //validate occurs
+                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
+                validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType))
+                
                 model.outgoingRelationships.each { Relationship rel ->
                     if (rel.relationshipType == RelationshipType.containmentType) this.printQuestion(rel.destination, rel.ext, builder)
                     if (rel.relationshipType == RelationshipType.hierarchyType) this.printSection(rel.destination, rel.ext, builder)
@@ -132,19 +136,13 @@ class GelXmlService {
     }
 
     def printQuestion(DataElement dataElement, Map ext, MarkupBuilder builder){
-        return builder.question(id: "R_${dataElement.id}", minRepeat: ext.get("Min Occurs"), maxRepeat: ext.get("Max Occurs")){
+        return builder.question(id: "R_${dataElement.id}", minRepeat: ext.get(METADATA_MIN_OCCURS), maxRepeat: ext.get(METADATA_MAX_OCCURS)){
             setOmitEmptyAttributes(true)
             setOmitNullAttributes(true)
             name dataElement.name
             text dataElement.ext.text
             instructions dataElement.description
-
-            if(dataElement.ext.serviceLookupName){
-                'service-lookup'(id: dataElement.ext.serviceLookupId, style: dataElement.ext.serviceLookupStyle){
-                    name dataElement.ext.serviceLookupName
-                }
-            }
-
+            
             if(dataElement?.valueDomain?.dataType instanceof EnumeratedType) {
 
                 enumeration(id:printXSDFriendlyString(dataElement.valueDomain.name), style:dataElement.ext.style){
@@ -258,8 +256,8 @@ class GelXmlService {
                         'xs:element'(name:'metadata',type:'metadata',minOccurs:'1',maxOccurs:'1')
                         targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship r ->
                             'xs:element'(name:printXSDFriendlyString(r.destination.name),type:printXSDFriendlyString(r.destination.name),
-                            minOccurs:defaultMinOccurs(r.ext.get("Min Occurs")),
-                            maxOccurs:defaultMinOccurs(r.ext.get("Max Occurs")))
+                            minOccurs:defaultMinOccurs(r.ext.get(METADATA_MIN_OCCURS)),
+                            maxOccurs:defaultMinOccurs(r.ext.get(METADATA_MAX_OCCURS)))
                         }
                     }
                 }
@@ -315,7 +313,6 @@ class GelXmlService {
                         }
                     }
                 }
-
           }
     }
 
@@ -338,11 +335,11 @@ class GelXmlService {
              
                 
                 model.getOutgoingRelationshipsByType(RelationshipType.containmentType).each { Relationship relationship ->
-                    printDataElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"),valueDomains,xmlSchema,relationship.ext)
+                    printDataElements(xml, relationship.destination, relationship.ext.get(METADATA_MIN_OCCURS), relationship.ext.get(METADATA_MAX_OCCURS),valueDomains,xmlSchema,relationship.ext)
                 }
 
                 model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).each { Relationship relationship ->
-                    printModelElements(xml, relationship.destination, relationship.ext.get("Min Occurs"), relationship.ext.get("Max Occurs"))
+                    printModelElements(xml, relationship.destination, relationship.ext.get(METADATA_MIN_OCCURS), relationship.ext.get(METADATA_MAX_OCCURS))
                 }
             }
         }
@@ -370,10 +367,10 @@ class GelXmlService {
     protected void validateFormMetadata (Model model,List subModels){
         String exceptionMessages="";
         if (!model.ext.get(XSD_SCHEMA_NAME)){
-            exceptionMessages+="missing required field for xsd form 'schema-name',"
+            exceptionMessages+="missing required field for xsd form 'schema-name', "
         }
         if (!model.ext.get(XSD_SCHEMA_VERSION)){
-            exceptionMessages+="missing required field for xsd form 'schema-version',"
+            exceptionMessages+="missing required field for xsd form 'schema-version', "
             
         }else{
             if (model.ext.get(XSD_SCHEMA_VERSION).split("\\.").length!=3){
@@ -382,19 +379,22 @@ class GelXmlService {
         }
 
         if (!model.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION)){
-            exceptionMessages+="missing required field for xsd form 'schema-name',"
+            exceptionMessages+="missing required field for xsd form 'schema-name', "
         }
-        if (subModels.findAll{it.name=="metadata"}) exceptionMessages+="duplicate 'metadata' element"
+        if (subModels.findAll{it.name=="metadata"}) exceptionMessages+="duplicate 'metadata' element, "
+        
+        if (model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType).size()>1) exceptionMessages+="no root element.below the chosen model you need to have exactly one submodel model,"
         
         if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
+        
 
     }
     
     protected void validateModelsNameLength(List subModels){
         String exceptionMessages="";
         for (def model in subModels) {
-            if (model.name.length()>MAX_COLUMN_NAME_64){
-                exceptionMessages+="element '${model.name}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_64}\n,";
+            if (model.name.length()>MAX_COLUMN_NAME_63){
+                exceptionMessages+="element '${model.name}' exceded in maximum allowed name size of ${MAX_COLUMN_NAME_63}\n,";
             }
         }
         if (!exceptionMessages.empty) throw new Exception(exceptionMessages)
@@ -403,18 +403,18 @@ class GelXmlService {
     protected void validateMetadataOccurs(List rels){
         String exceptionMessages="";
         for (Relationship rel in rels) {
-            if (!rel.ext.get('Min Occurs')){
+            if (!rel.ext.get(METADATA_MIN_OCCURS)){
                 exceptionMessages+="metadata 'Min Occurs' for model '${rel.destination.name}'  is missing, "
             }else{
-                if ((!rel.ext.get('Min Occurs').isLong())){
+                if ((!rel.ext.get(METADATA_MIN_OCCURS).isLong())){
                     exceptionMessages+="metadata 'Min Occurs' for model '${rel.destination.name}'  is not a number, "
                 }
             }
-            if (!rel.ext.get('Max Occurs')){
+            if (!rel.ext.get(METADATA_MAX_OCCURS)){
                 exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is missing, ";
             }else{
-                if (rel.ext.get('Max Occurs').isLong()==false){
-                    if(rel.ext.get('Max Occurs')!='unbounded'){
+                if (rel.ext.get(METADATA_MAX_OCCURS).isLong()==false){
+                    if(rel.ext.get(METADATA_MAX_OCCURS)!='unbounded'){
                         exceptionMessages+="metadata 'Max Occurs' for model '${rel.destination.name}'  is not a number, "
                     }
                 }
