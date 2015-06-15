@@ -23,6 +23,8 @@ class CatalogueElementProxyRepository {
 
     private Set<CatalogueElementProxy> pendingProxies = []
 
+    private Set<Long> elementsUnderControl = []
+
     private boolean copyRelationships = false
 
     private final Map<String, Relationship> createdRelationships = [:]
@@ -36,6 +38,7 @@ class CatalogueElementProxyRepository {
         unclassifiedQueriesFor.clear()
         createdRelationships.clear()
         pendingProxies.clear()
+        elementsUnderControl.clear()
         copyRelationships = false
     }
 
@@ -129,6 +132,22 @@ class CatalogueElementProxyRepository {
             // Step 2: if something changed, create new versions. if run in one step, it generates false changes
             watch.start('requesting drafts')
             log.info "(3/6) requesting drafts"
+
+            elementProxiesToBeResolved.each {
+                if (!it.underControl) {
+                    return
+                }
+                CatalogueElement e = it.findExisting()
+
+                if (e) {
+                    if (e.getLatestVersionId()) {
+                        elementsUnderControl << e.getLatestVersionId()
+                    } else {
+                        elementsUnderControl << e.getId()
+                    }
+                }
+            }
+
             for (CatalogueElementProxy element in elementProxiesToBeResolved) {
                 element.createDraftIfRequested()
             }
@@ -184,34 +203,34 @@ class CatalogueElementProxyRepository {
         created
     }
 
-    public <T extends CatalogueElement> CatalogueElementProxy<T> createProxy(Class<T> domain, Map<String, Object> parameters) {
-        CatalogueElementProxy<T> proxy = createAbstractionInternal(domain, parameters)
+    public <T extends CatalogueElement> CatalogueElementProxy<T> createProxy(Class<T> domain, Map<String, Object> parameters, boolean underControl = false) {
+        CatalogueElementProxy<T> proxy = createAbstractionInternal(domain, parameters, underControl)
         pendingProxies << proxy
         proxy
     }
 
-    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionInternal(Class<T> domain, Map<String, Object> parameters) {
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionInternal(Class<T> domain, Map<String, Object> parameters, boolean underControl = false) {
         if (parameters.id) {
-            return createAbstractionById(domain, parameters.name?.toString(), parameters.id?.toString())
+            return createAbstractionById(domain, parameters.name?.toString(), parameters.id?.toString(), underControl)
         } else if (parameters.classification) {
-            return createAbstractionByClassificationAndName(domain, parameters.classification?.toString(), parameters.name?.toString())
+            return createAbstractionByClassificationAndName(domain, parameters.classification?.toString(), parameters.name?.toString(), underControl)
         } else if (parameters.name) {
-            return createAbstractionByName(domain, parameters.name?.toString())
+            return createAbstractionByName(domain, parameters.name?.toString(), underControl)
         }
         throw new IllegalArgumentException("Cannot create element abstraction from $parameters")
     }
 
 
-    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id) {
-        return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name)
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id, boolean underControl) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name, underControl)
     }
 
-    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name) {
-        return new DefaultCatalogueElementProxy<T>(this, domain, null, classificationName, name)
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByClassificationAndName(Class<T> domain, String classificationName, String name, boolean underControl) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, null, classificationName, name, underControl)
     }
 
-    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name) {
-        return new DefaultCatalogueElementProxy<T>(this, domain, null, null, name)
+    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionByName(Class<T> domain, String name, boolean underControl) {
+        return new DefaultCatalogueElementProxy<T>(this, domain, null, null, name, underControl)
     }
 
 
@@ -222,7 +241,7 @@ class CatalogueElementProxyRepository {
     }
 
     public <T extends CatalogueElement> T createDraftVersion(T element) {
-        elementService.createDraftVersion(element, copyRelationships ? DraftContext.userFriendly() : DraftContext.importFriendly(), !copyRelationships )
+        elementService.createDraftVersion(element, copyRelationships ? DraftContext.userFriendly() : DraftContext.importFriendly(elementsUnderControl))
     }
 
     protected  <T extends CatalogueElement> T tryFind(Class<T> type, Object classificationName, Object name, Object id) {
@@ -351,12 +370,19 @@ class CatalogueElementProxyRepository {
         T sourceElement = proxy.source.resolve()
         U destinationElement = proxy.destination.resolve()
 
+        if (sourceElement.hasErrors()) {
+            throw new IllegalStateException(FriendlyErrors.printErrors("Source element $sourceElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", sourceElement.errors))
+        }
+
         if (!sourceElement.readyForQueries) {
-            throw new IllegalStateException("Source element $sourceElement is not ready to be part of the relationship ${toString()}")
+            throw new IllegalStateException("Source element $sourceElement is not ready to be part of the relationship ${proxy.toString()}")
+        }
+        if (destinationElement.hasErrors()) {
+            throw new IllegalStateException(FriendlyErrors.printErrors("Destination element $destinationElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", destinationElement.errors))
         }
 
         if (!destinationElement.readyForQueries) {
-            throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
+            throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${proxy.toString()}")
         }
 
         String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type)

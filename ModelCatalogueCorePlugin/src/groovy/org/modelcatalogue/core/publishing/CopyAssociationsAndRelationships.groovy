@@ -15,13 +15,15 @@ class CopyAssociationsAndRelationships {
 
     private final CatalogueElement draft
     private final CatalogueElement element
-    private final boolean classificationOnly
+    private final DraftContext context
+
     private RelationshipService relationshipService
 
-    CopyAssociationsAndRelationships(CatalogueElement draft, CatalogueElement element, boolean classificationOnly) {
+
+    CopyAssociationsAndRelationships(CatalogueElement draft, CatalogueElement element, DraftContext context) {
         this.draft = draft
         this.element = element
-        this.classificationOnly = classificationOnly
+        this.context = context
         relationshipService = Holders.applicationContext.getBean(RelationshipService)
     }
 
@@ -58,7 +60,7 @@ class CopyAssociationsAndRelationships {
     }
 
     void copyRelationships(Set<String> createdRelationshipHashes) {
-        if (classificationOnly) {
+        if (context.importFriendly && context.isUnderControl(draft)) {
             return
         }
 

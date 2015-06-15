@@ -7,9 +7,6 @@ import org.springframework.validation.Errors
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 
-/**
- * Created by ladin on 05.02.15.
- */
 class FriendlyErrors {
 
     static String printErrors(String message, Errors errors) {
@@ -31,9 +28,9 @@ class FriendlyErrors {
         builder.toString()
     }
 
-    static withFriendlyFailure(String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException, Closure closure) {
+    static <T> T withFriendlyFailure(String message = "Exception while saving element", Class<? extends RuntimeException> exceptionType = IllegalStateException, Closure<T> closure) {
         try {
-            closure()
+            return closure()
         } catch(ValidationException ve) {
             throw exceptionType.newInstance(printErrors(message, ve.errors))
         }

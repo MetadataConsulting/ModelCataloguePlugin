@@ -35,7 +35,7 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context, boolean skipRelationships = false) {
+    public <E extends CatalogueElement> E createDraftVersion(E element, DraftContext context) {
         Closure<E> code = { TransactionStatus status = null ->
             auditService.logNewVersionCreated(element) {
                 E draft = element.createDraftVersion(this, context) as E
@@ -44,13 +44,11 @@ class ElementService implements Publisher<CatalogueElement> {
                     return element
                 }
                 context.classifyDrafts()
-                if (!skipRelationships) {
-                    context.resolvePendingRelationships()
-                }
+                context.resolvePendingRelationships()
                 return draft
             }
         }
-        if (skipRelationships) {
+        if (context.importFriendly) {
             return code()
         } else {
             return CatalogueElement.withTransaction(code)

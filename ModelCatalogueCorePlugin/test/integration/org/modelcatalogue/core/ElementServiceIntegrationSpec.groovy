@@ -388,7 +388,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "can un-deprecate element if conditions are met"() {
         ValueDomain vd = new ValueDomain(name: 'VD4MET-732').save(failOnError: true, flush: true)
 
-        vd = elementService.createDraftVersion(vd, DraftContext.importFriendly(), false) as ValueDomain
+        vd = elementService.createDraftVersion(vd, DraftContext.importFriendly([] as Set)) as ValueDomain
         vd = elementService.finalizeElement(vd)
         vd = elementService.archive(vd, false)
 

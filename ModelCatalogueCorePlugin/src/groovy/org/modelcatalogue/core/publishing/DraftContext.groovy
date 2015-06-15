@@ -9,22 +9,25 @@ class DraftContext {
     private boolean copyRelationships
     private boolean forceNew
 
+    private Set<Long> elementsUnderControl
+
     private Set<CopyAssociationsAndRelationships> pendingRelationshipsTasks = new LinkedHashSet<CopyAssociationsAndRelationships>()
     private Set<String> createdRelationshipHashes = []
 
-    private DraftContext(boolean copyRelationships) {
+    private DraftContext(boolean copyRelationships, Set<Long> elementsUnderControl) {
         this.copyRelationships = copyRelationships
+        this.elementsUnderControl = Collections.unmodifiableSet(elementsUnderControl)
     }
     static DraftContext userFriendly() {
-        new DraftContext(true)
+        new DraftContext(true, [] as Set)
     }
 
-    static DraftContext importFriendly() {
-        new DraftContext(false)
+    static DraftContext importFriendly(Set<Long> elementsUnderControl) {
+        new DraftContext(false, elementsUnderControl)
     }
 
     static DraftContext forceNew() {
-        DraftContext context = new DraftContext(true)
+        DraftContext context = new DraftContext(true, [] as Set)
         context.forceNew = true
         context
     }
@@ -33,12 +36,23 @@ class DraftContext {
         return forceNew
     }
 
+    boolean isImportFriendly() {
+        return !copyRelationships
+    }
+
+    boolean isUnderControl(CatalogueElement element) {
+        if (element.getLatestVersionId()) {
+            return element.getLatestVersionId() in elementsUnderControl
+        }
+        return element.getId() in elementsUnderControl
+    }
+
     void stopForcingNew() {
         forceNew = false
     }
 
     void delayRelationshipCopying(CatalogueElement draft, CatalogueElement oldVersion) {
-        pendingRelationshipsTasks << new CopyAssociationsAndRelationships(draft, oldVersion, !copyRelationships)
+        pendingRelationshipsTasks << new CopyAssociationsAndRelationships(draft, oldVersion, this)
     }
 
     void classifyDrafts() {

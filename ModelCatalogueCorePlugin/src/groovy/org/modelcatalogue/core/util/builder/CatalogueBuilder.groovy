@@ -104,7 +104,7 @@ import org.modelcatalogue.core.*
      * @return proxy to classification specified by the parameters map and the DSL closure
      */
     CatalogueElementProxy<Classification> classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<Classification> classification = createProxy(Classification, parameters)
+        CatalogueElementProxy<Classification> classification = createProxy(Classification, parameters, null, true)
 
         context.withNewContext classification, c
 
@@ -126,7 +126,7 @@ import org.modelcatalogue.core.*
      * @return proxy to model specified by the parameters map and the DSL closure
      */
     CatalogueElementProxy<Model> model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification)
+        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, true)
 
         context.withNewContext model, c
         context.withContextElement(Model) { ignored, Closure relConf ->
@@ -150,7 +150,7 @@ import org.modelcatalogue.core.*
      * @return proxy to data element specified by the parameters map and the DSL closure
      */
     CatalogueElementProxy<DataElement> dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model)
+        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model, true)
 
         context.withNewContext element, c
 
@@ -182,7 +182,7 @@ import org.modelcatalogue.core.*
      * @return proxy to value domain specified by the parameters map and the DSL closure
      */
     CatalogueElementProxy<ValueDomain> valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<ValueDomain> domain = createProxy(ValueDomain, parameters, DataElement)
+        CatalogueElementProxy<ValueDomain> domain = createProxy(ValueDomain, parameters, DataElement, true)
 
         context.withNewContext domain, c
 
@@ -211,7 +211,7 @@ import org.modelcatalogue.core.*
         if (parameters.containsKey('enumerations') && !parameters.enumerations) {
             parameters.remove('enumerations')
         }
-        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain)
+        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain, true)
 
         context.withNewContext dataType, c
 
@@ -231,7 +231,7 @@ import org.modelcatalogue.core.*
      * @return proxy to measurement unit specified by the parameters map and the DSL closure
      */
     CatalogueElementProxy<MeasurementUnit> measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<MeasurementUnit> unit = createProxy(MeasurementUnit, parameters)
+        CatalogueElementProxy<MeasurementUnit> unit = createProxy(MeasurementUnit, parameters, null, true)
 
         context.withNewContext unit, c
 
@@ -406,7 +406,7 @@ import org.modelcatalogue.core.*
      * @return proxy specified by given ID
      */
     CatalogueElementProxy<? extends CatalogueElement> ref(String id) {
-        repository.createAbstractionById(CatalogueElement, null, id)
+        repository.createAbstractionById(CatalogueElement, null, id, false)
     }
 
     /**
@@ -695,7 +695,7 @@ import org.modelcatalogue.core.*
      * @param inheritFrom class from which the name and description should be inherited
      * @return proxy for given configuration.
      */
-    protected <T extends CatalogueElement, A extends CatalogueElementProxy<T>> A createProxy(Class<T> domain, Map<String, Object> parameters, Class inheritFrom = null) {
+    protected <T extends CatalogueElement, A extends CatalogueElementProxy<T>> A createProxy(Class<T> domain, Map<String, Object> parameters, Class inheritFrom = null, boolean underControl = false) {
         if (inheritFrom && domain in SUPPORTED_FOR_AUTO) {
             context.withContextElement(inheritFrom) {
                 if (!parameters.name) {
@@ -712,7 +712,7 @@ import org.modelcatalogue.core.*
             }
         }
 
-        A element = repository.createProxy(domain, parameters) as A
+        A element = repository.createProxy(domain, parameters, underControl) as A
 
         element.setParameter('name', parameters.name)
 

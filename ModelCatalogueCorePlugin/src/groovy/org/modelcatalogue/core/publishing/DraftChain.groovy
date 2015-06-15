@@ -57,8 +57,9 @@ class DraftChain extends PublishingChain {
                 processed << element.id
                 CatalogueElement draft = element.createDraftVersion(publisher, strategy)
                 if (draft.hasErrors()) {
-                    log.warn(FriendlyErrors.printErrors("Draft version $draft has errors", draft.errors))
-                    return rejectDraftDependency(draft)
+                    String message = FriendlyErrors.printErrors("Draft version $draft has errors", draft.errors)
+                    log.warn(message)
+                    return rejectDraftDependency(draft, message)
                 }
             }
         }
@@ -119,9 +120,9 @@ class DraftChain extends PublishingChain {
     }
 
 
-    private CatalogueElement rejectDraftDependency(CatalogueElement element) {
+    private CatalogueElement rejectDraftDependency(CatalogueElement element, String message) {
         restoreStatus()
-        published.errors.reject('org.modelcatalogue.core.CatalogueElement.cannot.create.draft.dependency', "Cannot create draft of dependency ${element}, please, resolve the issue first. You'll see more details when you try to create draft manualy")
+        published.errors.reject('org.modelcatalogue.core.CatalogueElement.cannot.create.draft.dependency', "Cannot create draft of dependency ${element}, please, resolve the issue first. You'll see more details when you try to create draft manualy\n\n$message")
         published
     }
 

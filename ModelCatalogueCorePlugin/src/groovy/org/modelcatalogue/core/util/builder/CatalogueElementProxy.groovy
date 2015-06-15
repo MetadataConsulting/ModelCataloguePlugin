@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Relationship
 
 interface CatalogueElementProxy<T extends CatalogueElement> {
 
@@ -33,5 +32,11 @@ interface CatalogueElementProxy<T extends CatalogueElement> {
     void addToPendingRelationships(RelationshipProxy relationshipProxy)
 
     boolean isNew()
+
+    /**
+     * @return <code>false</code> if the proxy is only referenced from the builder and very likely it hasn't been
+     * created by the builder
+     */
+    boolean isUnderControl()
 
 }

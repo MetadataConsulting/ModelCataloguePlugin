@@ -14,6 +14,7 @@ import org.modelcatalogue.core.*
     String classification
 
     boolean newlyCreated
+    boolean underControl
 
     protected CatalogueElementProxyRepository repository
 
@@ -26,7 +27,7 @@ import org.modelcatalogue.core.*
     private String draftRequest
     private String changed
 
-    DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name) {
+    DefaultCatalogueElementProxy(CatalogueElementProxyRepository repository, Class<T> domain, String id, String classification, String name, boolean underControl) {
         if (!(domain in KNOWN_DOMAIN_CLASSES)) {
             throw new IllegalArgumentException("Only domain classes of $KNOWN_DOMAIN_CLASSES are supported as proxies")
         }
@@ -37,6 +38,8 @@ import org.modelcatalogue.core.*
         this.id = id
         this.name = name
         this.classification = classification
+
+        this.underControl = underControl
     }
 
     Set<RelationshipProxy> getPendingRelationships() {
@@ -353,6 +356,8 @@ import org.modelcatalogue.core.*
                 domain = other.domain
             }
         }
+
+        this.underControl = this.underControl || other.underControl
 
         this
     }
