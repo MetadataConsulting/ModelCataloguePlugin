@@ -740,7 +740,46 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         parent.parentOfRelationships.size() == 1
         parent.parentOfRelationships[0].archived
         parent.parentOfRelationships[0].ext['one'] == '1'
+    }
 
+    def "don't get misconfigured from other relationship calls"() {
+        String name = 'Model for Misconfigured Relationship Call'
+        String ch1Name = "$name Child 1"
+        String ch2Name = "$name Child 2"
+        when:
+        build {
+            model(name: name) {
+                model(name: ch1Name) {
+                    relationship {
+                        ext 'one', '1'
+                        ext 'two', '2'
+                    }
+                }
+
+                model(name: ch2Name) {
+                    relationship {
+                        ext 'two', 'II'
+                        ext 'three', 'III'
+                    }
+                }
+            }
+        }
+        Model parent = created.find { it.name == name } as Model
+
+        then:
+        parent
+
+        when:
+        Relationship ch1 = parent.outgoingRelationships.find { it.destination.name == ch1Name }
+        Relationship ch2 = parent.outgoingRelationships.find { it.destination.name == ch2Name }
+
+        then:
+        ch1
+        ch1.ext.one == '1'
+        ch1.ext.two == '2'
+        ch2
+        ch2.ext.two == 'II'
+        ch2.ext.three == 'III'
     }
 
 }

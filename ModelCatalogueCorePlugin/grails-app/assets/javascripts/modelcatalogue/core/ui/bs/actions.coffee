@@ -316,7 +316,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   ]
 
   actionsProvider.registerActionInRoles 'export', [actionsProvider.ROLE_LIST_ACTION, actionsProvider.ROLE_ITEM_ACTION, actionsProvider.ROLE_LIST_HEADER_ACTION], ['$scope', 'security', ($scope, security)->
-    return undefined unless security.isUserLoggedIn()
+    return undefined unless security.hasRole('VIEWER')
     return undefined unless $scope.list or $scope.element
     if $scope.list
       return undefined if $scope.resource == 'import'
