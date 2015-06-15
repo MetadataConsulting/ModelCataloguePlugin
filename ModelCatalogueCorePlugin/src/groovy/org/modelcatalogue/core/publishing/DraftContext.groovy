@@ -4,9 +4,6 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.ElementStatus
 import org.modelcatalogue.core.RelationshipType
 
-/**
- * Created by ladin on 09.01.15.
- */
 class DraftContext {
 
     private boolean copyRelationships
@@ -74,7 +71,7 @@ class DraftContext {
         return element
     }
 
-    static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type, boolean archived) {
-        "$source.id:$type.id:$destination.id:$archived"
+    static String hashForRelationship(CatalogueElement source, CatalogueElement destination, RelationshipType type) {
+        "$source.id:$type.id:$destination.id"
     }
 }

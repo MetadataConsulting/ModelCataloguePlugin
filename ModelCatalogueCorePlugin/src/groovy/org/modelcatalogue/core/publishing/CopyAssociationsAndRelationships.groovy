@@ -30,7 +30,7 @@ class CopyAssociationsAndRelationships {
         relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.classificationType) { Relationship r ->
             CatalogueElement source = DraftContext.preferDraft(r.source)
 
-            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.classificationType, r.archived)
+            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.classificationType)
 
             if (hash in createdRelationshipHashes) {
                 return
@@ -93,10 +93,10 @@ class CopyAssociationsAndRelationships {
 
             if (direction == RelationshipDirection.INCOMING) {
                 otherSide = DraftContext.preferDraft(r.source)
-                hash = DraftContext.hashForRelationship(otherSide, draft, r.relationshipType, r.archived)
+                hash = DraftContext.hashForRelationship(otherSide, draft, r.relationshipType)
             } else {
                 otherSide = DraftContext.preferDraft(r.destination)
-                hash = DraftContext.hashForRelationship(draft, otherSide, r.relationshipType, r.archived)
+                hash = DraftContext.hashForRelationship(draft, otherSide, r.relationshipType)
             }
 
             if (hash in createdRelationshipHashes) {
@@ -125,7 +125,7 @@ class CopyAssociationsAndRelationships {
             Relationship created = relationshipService.link definitionBuilder.definition
 
             if (created.hasErrors()) {
-                throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship contains errors", created.errors))
+                throw new IllegalStateException(FriendlyErrors.printErrors("Migrated relationship ${created} contains errors", created.errors))
             }
 
             if (isOverriding(created, r)) {

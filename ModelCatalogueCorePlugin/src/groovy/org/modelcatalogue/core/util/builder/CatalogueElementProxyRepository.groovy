@@ -359,7 +359,7 @@ class CatalogueElementProxyRepository {
             throw new IllegalStateException("Destination element $destinationElement is not ready to be part of the relationship ${toString()}")
         }
 
-        String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type, proxy.archived)
+        String hash = DraftContext.hashForRelationship(sourceElement, destinationElement, type)
 
 
         Relationship existing = createdRelationships[hash]
