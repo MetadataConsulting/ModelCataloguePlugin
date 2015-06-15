@@ -59,7 +59,7 @@ Comments with Discourse plugin for Model Catalogue
         SecurityService securityService = ctx.getBean('modelCatalogueSecurityService')
         DiscourseService discourseService = ctx.getBean('discourseService')
         if (discourseService.discourseEnabled) {
-            securityService.addLogoutListener
+            securityService.addLogoutListener(discourseService)
         }
 
     }
