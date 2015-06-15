@@ -27,6 +27,10 @@ class ValueDomainController extends AbstractCatalogueElementController<ValueDoma
             respond Lists.wrap(params, resource, basePath, dataArchitectService.unusedValueDomains(params))
             return
         }
+        if(params.status && params.status.toLowerCase() != 'finalized' && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+            notAuthorized()
+            return
+        }
         super.index(max)
     }
 

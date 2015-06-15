@@ -15,6 +15,10 @@ class ModelController extends AbstractCatalogueElementController<Model> {
         if (!params.boolean("toplevel")) {
             return super.index(max)
         }
+        if(params.status && params.status.toLowerCase() != 'finalized' && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+            notAuthorized()
+            return
+        }
         handleParams(max)
 
         respond Lists.wrap(params, "/${resourceName}/", modelService.getTopLevelModels(params))

@@ -400,9 +400,35 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     def index(Integer max) {
         handleParams(max)
 
+        if(params.status && params.status.toLowerCase() != 'finalized' && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+            notAuthorized()
+            return
+        }
+
         respond classificationService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', ElementService.getStatusFromParams(params)
         })
+    }
+
+    /**
+     * Shows a single resource
+     * @param id The id of the resource
+     * @return The rendered resource or a 404 if it doesn't exist
+     */
+    def show() {
+        T element = queryForResource(params.id)
+
+        if (!element) {
+            notFound()
+            return
+        }
+
+        if (!modelCatalogueSecurityService.hasRole('VIEWER') && element.status != ElementStatus.FINALIZED) {
+            notAuthorized()
+            return
+        }
+
+        respond element
     }
 
     /**
