@@ -12,6 +12,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 class ModelCatalogueSearchService implements SearchCatalogue {
 
     def classificationService
+    def modelCatalogueSecurityService
 
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
@@ -63,6 +64,12 @@ class ModelCatalogueSearchService implements SearchCatalogue {
         if (!params.search) {
             return [errors: "No query string to search on"]
         }
+
+        // if the user doesn't have at least VIEWER role, don't return other elements than finalized
+        if (!params.status && !modelCatalogueSecurityService.hasRole('VIEWER')) {
+            params.status = 'FINALIZED'
+        }
+
         def searchResults = [:]
 
         String query = "%$params.search%"

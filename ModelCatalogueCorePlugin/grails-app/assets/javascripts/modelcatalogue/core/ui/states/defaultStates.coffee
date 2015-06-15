@@ -61,7 +61,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
   ])
 
-.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', 'names' , ($scope, $stateParams, $state, element, $rootScope, names) ->
+.controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', 'names' , ($scope, $stateParams, $state, element, $rootScope) ->
     $scope.element = element
     $rootScope.elementToShow = element
   ])
@@ -97,7 +97,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     applicationTitle "Comparison of #{((element.getLabel?.apply(element) ? element.name) for element in elements).join(' and ')}"
   ])
 
-.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope, catalogueElementResource) ->
+.controller('mc.core.ui.states.ListCtrl', ['$scope', '$stateParams', '$state', 'list', 'names', 'enhance', 'applicationTitle', '$rootScope', 'catalogueElementResource', ($scope, $stateParams, $state, list, names, enhance, applicationTitle, $rootScope) ->
     if $stateParams.resource
       applicationTitle  "#{names.getNaturalName($stateParams.resource)}s"
 
@@ -761,7 +761,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}">Finalized Classifications</a> {{finalizedClassificationCount}} </div>
-                                        <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Classifications</a> {{draftClassificationCount}} </div>
+                                        <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Classifications</a> {{draftClassificationCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -784,7 +784,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Finalized Models</a> {{finalizedModelCount}} </div>
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Models</a> {{draftModelCount}}</div>
+                                        <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Models</a> {{draftModelCount}}</div>
 
                                     </div>
                                 </div>
@@ -807,7 +807,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
+                                        <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'uninstantiated'})" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElementCount}}</div>
                                     </div>
                                 </div>
@@ -854,7 +854,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="dataTypesLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Finalized Data Types</a> {{finalizedDataTypeCount}} </div>
-                                        <div><a id="draftDataTypesLink" ui-sref="mc.resource.list({resource: 'dataType', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Types</a> {{draftDataTypeCount}} </div>
+                                        <div show-for-role="VIEWER"><a id="draftDataTypesLink" ui-sref="mc.resource.list({resource: 'dataType', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Types</a> {{draftDataTypeCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -876,7 +876,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Finalized Measurement Units</a> {{finalizedMeasurementUnitCount}} </div>
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Measurement Units</a> {{draftMeasurementUnitCount}} </div>
+                                        <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Measurement Units</a> {{draftMeasurementUnitCount}} </div>
                                     </div>
                                 </div>
                             </div>
@@ -898,7 +898,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                                     </div>
                                     <div class="col-xs-9 text-right">
                                         <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftAssetCount}}</div>
+                                        <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftAssetCount}}</div>
 
                                     </div>
                                 </div>
