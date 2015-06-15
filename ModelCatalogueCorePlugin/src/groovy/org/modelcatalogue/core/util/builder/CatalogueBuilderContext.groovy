@@ -45,9 +45,12 @@ class CatalogueBuilderContext {
             closure.delegate = builder
             if (closure.maximumNumberOfParameters == 2) {
                 closure(contextElement.element, contextElement.relationshipConfiguration)
+                // relationship configuration can only be used one
+                contextElement.relationshipConfiguration = null
             } else {
                 closure(contextElement.element)
             }
+
             return WithOptionalOrClause.NOOP
         }
         new DefaultWithOptionalOrClause(builder)
