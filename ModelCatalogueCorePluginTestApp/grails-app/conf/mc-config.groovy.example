@@ -25,6 +25,7 @@ dataSource {
 }
 
 //discourse {
+//    // do not forget to setup a firewall rule to access this server
 //    url = "http://192.168.1.123/"
 //    api {
 //        key = "af9402ba45b8f4aff5a84bcdf6da85fc7548db746026c5095ed652d0f83fcd8b"
