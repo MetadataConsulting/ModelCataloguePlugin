@@ -35,7 +35,9 @@ angular.module('mc.util.enhance', []).provider 'enhance', [ ->
 
       # enhance current object
       for enhancer in enhancers when enhancer.condition(result)
-        enhancedBy = result.__enhancedBy ? []
+        enhancedBy = result.__enhancedBy
+        enhancedBy = [] unless enhancedBy and angular.isArray(enhancedBy)
+
         continue if enhancer.name in enhancedBy
         enhancedBy.push(enhancer.name)
         result = enhancer.enhancer(result)
