@@ -26,6 +26,7 @@ class ChangeMarshaller extends AbstractMarshaller {
                 type:           change.type.toString(),
                 undoSupported:  change.type.undoSupported,
                 otherSide:      change.otherSide,
+                system:         change.system,
                 author:         getPotentiallyDeletedInfo(change.authorId),
                 dateCreated:    change.dateCreated,
                 property:       change.property,

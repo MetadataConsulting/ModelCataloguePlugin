@@ -332,7 +332,7 @@ class DefaultAuditor implements Auditor {
                 newValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_CREATED,
                 otherSide: true,
-                system: relationship.relationshipType.system
+                system: relationship.relationshipType.system || relationship.relationshipType == RelationshipType.classificationType || system
         )
         logChange(relationship.source,
                 changedId: relationship.source.id,
@@ -342,7 +342,7 @@ class DefaultAuditor implements Auditor {
                 property: relationship.relationshipType.sourceToDestination,
                 newValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_CREATED,
-                system: relationship.relationshipType.system
+                system: relationship.relationshipType.system || relationship.relationshipType == RelationshipType.classificationType || system
         )
     }
 
@@ -356,7 +356,7 @@ class DefaultAuditor implements Auditor {
                 oldValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_DELETED,
                 otherSide: true,
-                system: relationship.relationshipType.system
+                system: relationship.relationshipType.system || relationship.relationshipType == RelationshipType.classificationType || system
         )
         logChange(relationship.source,
                 changedId: relationship.source.id,
@@ -366,7 +366,7 @@ class DefaultAuditor implements Auditor {
                 property: relationship.relationshipType.sourceToDestination,
                 oldValue: storeValue(relationship),
                 type: ChangeType.RELATIONSHIP_DELETED,
-                system: relationship.relationshipType.system
+                system: relationship.relationshipType.system || relationship.relationshipType == RelationshipType.classificationType || system
         )
     }
 

@@ -1,10 +1,5 @@
 package org.modelcatalogue.core.util
 
-import grails.gorm.DetachedCriteria
-
-/**
- * Created by ladin on 14.07.14.
- */
 class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
 
     final String listQuery
@@ -26,7 +21,7 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
         if (!query.trim().startsWith(expectedStart)) {
             throw new IllegalArgumentException("Query must start with '$expectedStart' but was ${query.trim()}")
         }
-        new QueryListWithTotalAndType<T>("select $alias $query", "select count($alias) $query", type, new HashMap(params), arguments)
+        create(params, type, "select $alias $query", "select count($alias) $query", arguments)
     }
 
     public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery){
@@ -36,6 +31,18 @@ class QueryListWithTotalAndType<T> implements ListWithTotalAndType<T> {
     public static <T> ListWithTotalAndType<T> create(Map params, Class<T> type, String listQuery, String countQuery, Map<String, Object> arguments){
         if (!countQuery.trim().toLowerCase().startsWith("select count(")) {
             throw new IllegalArgumentException("Query must start with 'select count(<alias>)' but was ${countQuery.trim()}")
+        }
+        if (params.sort && listQuery && !listQuery.contains('order by')) {
+            def alias = type.simpleName[0].toLowerCase()
+            String expectedStart = "select ${alias} from ${type.simpleName} ${alias}"
+            if (!listQuery.trim().replaceAll(/\s+/,' ').startsWith(expectedStart)) {
+                throw new IllegalArgumentException("If you want to use sort and order parameters the query must start with '$expectedStart' but was '${listQuery.trim()}'")
+            }
+            if (params.order == 'desc') {
+                listQuery = "${listQuery} order by ${alias}.${params.sort} desc"
+            } else {
+                listQuery = "${listQuery} order by ${alias}.${params.sort}"
+            }
         }
         new QueryListWithTotalAndType<T>(listQuery, countQuery, type, new HashMap(params), arguments)
     }

@@ -30,14 +30,18 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                     <input id="element" type="text" class="form-control" ng-model="destination.relation" catalogue-element-picker resource="relationType" typeahead-on-select="destination.updateRelation(destination.relation)" ng-disabled="!relationshipTypeInfo.type">
                   </div>
                   <div class="form-group">
-                    <label for="classification" >Classification</label>
-                    <input id="classification" ng-model="destination.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="destination.updateClassification(destination.classification)">
-                    <p class="help-block">Select a classification only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard dataset</p>
+                    <label for="classification" ng-click="destination.classificationExpanded = ! destination.classificationExpanded">Classification <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.classificationExpanded, 'fa-toggle-down': !destination.classificationExpanded}"></span></label>
+                    <div collapse="!destination.classificationExpanded">
+                      <input id="classification" ng-model="destination.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="destination.updateClassification(destination.classification)">
+                      <p class="help-block">Select a classification only if the relationship applies for given classification only. This usually happens when you are reusing catalogue elements form some standard dataset</p>
+                    </div>
                   </div>
                   <div class="form-group">
-                    <label>Metadata</label>
-                    <p class="help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
-                    <metadata-editor owner="destination.metadataOwner" object="destination.metadata"></metadata-editor>
+                    <label ng-click="destination.metadataExpanded = ! destination.metadataExpanded">Metadata <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.metadataExpanded, 'fa-toggle-down': !destination.metadataExpanded}"></label>
+                    <div collapse="!destination.metadataExpanded">
+                      <p class="help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
+                      <metadata-editor owner="destination.metadataOwner" object="destination.metadata"></metadata-editor>
+                    </div>
                   </div>
                 </div>
               </div>

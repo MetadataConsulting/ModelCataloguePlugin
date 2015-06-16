@@ -132,7 +132,7 @@ class AuditService {
         //language=HQL
         Lists.fromQuery params, Change, """
             from Change c
-            where c.changedId in (""" + subquery + """)""", args
+            where c.system != true and c.otherSide != true and c.changedId in (""" + subquery + """)""", args
     }
 
     private static String getClassifiedElementsSubQuery(ClassificationFilter classifications, Map<String, Object> args) {
@@ -151,7 +151,8 @@ class AuditService {
             return """
                 select ce
                 from CatalogueElement ce
-                where ce.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes))
+                where
+                    ce.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes)) or ce.id not in (:excludes)
             """
         }
         if (classifications.excludes && classifications.includes) {
@@ -161,15 +162,16 @@ class AuditService {
             return """
                 select ce
                 from CatalogueElement ce
-                where ce.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes))
-                  and ce.id     in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes))
+                where (ce.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes)) or ce.id not in (:excludes))
+                  and (ce.id     in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes)) or ce.id     in (:includes))
             """
         }
         if (classifications.includes && !classifications.excludes) {
             args.includes = classifications.includes
             // language=HQL
             return """
-                select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes)
+                select ce from CatalogueElement ce
+                where ce.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes)) or ce.id in (:includes)
             """
         }
         throw new IllegalArgumentException("Classification fitler must be set")

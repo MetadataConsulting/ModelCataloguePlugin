@@ -240,6 +240,7 @@ changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertie
         {label: 'Root Element', value: getPropertyVal('latestVersion')}
         {label: 'Author', value: getPropertyVal('author')}
         {label: 'Undone', value: getPropertyVal('undone')}
+        {label: 'System', value: getPropertyVal('system')}
       ]
       type:       'properties-pane-for-properties'
     }
