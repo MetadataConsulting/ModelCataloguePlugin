@@ -121,7 +121,7 @@ class DiscourseService implements LogoutListener {
 
         if (result.status == 200) {
             if (currentUser.email && result.data.email != currentUser.email) {
-                throw new IllegalArgumentException("Error verifying user: Found user with same username but different email!")
+                throw new IllegalArgumentException("Error verifying user ${currentUser.username}: Found user with same username but different email! MC: ${currentUser.email}, Discourse: ${result.data.email}")
             }
             return currentUser.username
         }
