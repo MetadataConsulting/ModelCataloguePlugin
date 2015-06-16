@@ -7,10 +7,6 @@ import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListWithTotal
 
-/**
- * Created by adammilward on 05/02/2014.
- */
-
 class DataArchitectServiceSpec extends AbstractIntegrationSpec {
 
     def dataArchitectService, relationshipService, de1, de2, de3, de4, de5, vd, md
@@ -115,6 +111,22 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         firstDataRow[newHeaders.indexOf("speed of Vauxhall")] == "74.56454304"
         firstDataRow[newHeaders.indexOf("patient temperature us")] == "101.3"
         firstDataRow[newHeaders.indexOf("co-author")] == "ABC"
+    }
+
+    def "can add suggestion"() {
+        boolean test = false
+        dataArchitectService.addSuggestion('TEST') {
+            test = true
+        }
+
+        expect:
+        !test
+
+        when:
+        dataArchitectService.generateSuggestions()
+
+        then:
+        test
     }
 
 }
