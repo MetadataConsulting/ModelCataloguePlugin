@@ -63,9 +63,9 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     boolean selectCepItemIfExists(long waitTime = 3) {
         try {
             waitFor(waitTime) {
-                $('.cep-item').displayed
+                $('.cep-item, .item-found').displayed
             }
-            $('.cep-item').click()
+            $('.cep-item, .item-found').click()
             return true
         } catch (ignored) {
             return false
@@ -120,10 +120,11 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
     public <R> R noStale(int maxAttempts = 10, Closure<Navigator> navigatorClosure, Closure<R> resultClosure) {
         int attempt = 0
         Throwable error = null
+        Navigator navigator = null
         while (attempt < maxAttempts) {
             attempt++
             try {
-                Navigator navigator = navigatorClosure()
+                navigator = navigatorClosure()
                 waitFor {
                     navigator.displayed
                 }
@@ -133,7 +134,7 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
                 error = e
             }
         }
-        throw new IllegalArgumentException("Cannot evaluate expression after $maxAttempts attempts", error)
+        throw new IllegalArgumentException("Cannot evaluate expression $navigator after $maxAttempts attempts", error)
     }
 
 
@@ -191,6 +192,23 @@ abstract class AbstractModelCatalogueGebSpec extends GebReportingSpec {
             return matcher[0][1]
         }
         return null
+    }
+
+    void fastAction(String name) {
+        js.exec('''
+            var press = jQuery.Event("keypress");
+            press.ctrlKey = true;
+            press.which = 0;
+            $(document).trigger(press);
+        ''')
+
+        noStale({ $('#value')}) { Navigator value ->
+            value.value(name)
+        }
+
+        noStale({$('a.item-found h4', text: name)}) { Navigator item ->
+            item.parent().click()
+        }
     }
 
 }

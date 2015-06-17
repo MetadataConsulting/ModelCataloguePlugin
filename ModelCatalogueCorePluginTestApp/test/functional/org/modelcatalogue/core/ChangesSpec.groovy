@@ -2,6 +2,8 @@ package org.modelcatalogue.core
 
 import geb.navigator.Navigator
 import org.modelcatalogue.core.pages.GlobalChangesPage
+import org.modelcatalogue.core.pages.MeasurementUnitListPage
+import org.modelcatalogue.core.pages.ValueDomainPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -10,6 +12,26 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
     def "go to login"() {
         go "#/"
         loginAdmin()
+
+        go "#/catalogue/valueDomain/all"
+        at ValueDomainPage
+
+        waitFor(120) {
+            viewTitle.displayed
+        }
+        waitFor {
+            viewTitle.text().trim().endsWith 'Value Domain List'
+        }
+
+        fastAction 'New Value Domain'
+
+        noStale({$('input[id=name]')}) {
+            it.value("Value Domain ${System.nanoTime()}")
+        }
+
+        actionButton('modal-save-element', 'modal').click()
+
+        fastAction 'Switch to Finalized'
 
         when:
         go "#/catalogue/change/all"
