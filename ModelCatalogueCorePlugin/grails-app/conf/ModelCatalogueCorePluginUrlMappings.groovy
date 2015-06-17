@@ -135,5 +135,7 @@ class ModelCatalogueCorePluginUrlMappings {
         "/"(view:"index")
         "/api/modelCatalogue/core/dashboard" (controller:"dashboard", action : 'index', method: HttpMethod.GET)
         "/api/modelCatalogue/core/search/$search?" (controller:"search", action : 'index', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/relationship/$id/restore" (controller:"relationship", action : 'restore', method: HttpMethod.POST)
+
 	}
 }
