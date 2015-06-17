@@ -37,9 +37,9 @@ angular.module('mc.core.ui.bs.modalPromptNewRelationship', ['mc.util.messages'])
                     </div>
                   </div>
                   <div class="form-group">
-                    <label ng-click="destination.metadataExpanded = ! destination.metadataExpanded">Metadata <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.metadataExpanded, 'fa-toggle-down': !destination.metadataExpanded}"></label>
+                    <label ng-click="destination.metadataExpanded = ! destination.metadataExpanded" class="expand-metadata"">Metadata <span class="fa fa-fw" ng-class="{'fa-toggle-up': destination.metadataExpanded, 'fa-toggle-down': !destination.metadataExpanded}"></label>
                     <div collapse="!destination.metadataExpanded">
-                      <p class="help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
+                      <p class="help-block metadata-help-block">Metadata specific to this relationship. For example <code>contains</code> and <code>parent of</code> relationship types supports <code>Name</code> metadata as an alias of nested model or data element.</p>
                       <metadata-editor owner="destination.metadataOwner" object="destination.metadata"></metadata-editor>
                     </div>
                   </div>

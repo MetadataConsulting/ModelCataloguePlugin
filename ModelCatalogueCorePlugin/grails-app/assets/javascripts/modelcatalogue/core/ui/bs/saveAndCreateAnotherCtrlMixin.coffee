@@ -7,8 +7,10 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
           $scope.copy = $scope.newEntity() ? {}
 
   $scope.saveElement ?= (newVersion) ->
-     $scope.save(newVersion).then (result)->
+     closeModal = (result)->
        $modalInstance.close(result)
+     promise = $scope.save(newVersion)
+     promise.then closeModal
 
   $scope.hasChanged ?= ->
     not angular.equals $scope.copy, $scope.original

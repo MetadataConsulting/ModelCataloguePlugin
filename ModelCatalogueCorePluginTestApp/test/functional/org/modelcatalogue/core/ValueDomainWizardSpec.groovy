@@ -361,6 +361,17 @@
             element = 'xs:boolean'
             selectCepItemIfExists()
 
+
+            noStale({ $('.expand-metadata') })  {
+                it.click()
+            }
+
+            then:
+            waitFor {
+                $('.metadata-help-block').displayed
+            }
+
+            when:
             fillMetadata(modalDialog, foo: 'bar', one: 'two')
 
             modalPrimaryButton.click()

@@ -15,7 +15,7 @@ changes.run ['$templateCache', ($templateCache) ->
           <a class="btn btn-default btn-block text-center" ng-if="!tab.topic"><span class="fa fa-fw fa-spin fa-refresh"></span></a>
           <div class="row">
              <div class="col-md-12">
-                <ul class="media-list"ng-repeat="post in tab.topic.post_stream.posts">
+                <ul class="media-list" ng-repeat="post in tab.topic.post_stream.posts">
                   <!-- first item is the summary which is same as description -->
                   <li class="media" ng-if="!$first">
                     <div class="media-left pull-left">
@@ -64,7 +64,6 @@ changes.config ['enhanceProvider', (enhanceProvider)->
   factory   = ['discourseUrl', 'discourseSSOEnabled', '$sce', (discourseUrl, discourseSSOEnabled, $sce) ->
     (element) ->
         element.cooked = element.cooked.replace /(href|src)="\/(.*?)"/g, (match, attr, originalUrl) ->
-          console.log arguments
           return match if originalUrl.indexOf('/') == 0
           if discourseSSOEnabled
             return "#{if attr is 'href' then "target=\"_blank\"" else ""} #{attr}=\"#{discourseUrl}/session/sso?return_path=#{encodeURIComponent('/' + originalUrl)}\""

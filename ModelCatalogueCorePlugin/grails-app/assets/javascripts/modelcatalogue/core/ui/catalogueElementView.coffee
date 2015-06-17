@@ -119,7 +119,7 @@ angular.module('mc.core.ui.catalogueElementView', ['mc.core.catalogueElementEnha
 
         return if angular.equals element, oldEl
 
-        applicationTitle "#{element.getLabel()}"
+        applicationTitle "#{element.getLabel()}" if angular.isFunction(element?.getLabel)
 
         activeTabSet = false
         tabs = []
