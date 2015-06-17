@@ -33,13 +33,15 @@ class BatchAndActionsSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            confirmDialog.displayed
+            modalDialog.displayed
         }
         when:
-        confirmOk.click()
+        modalPrimaryButton.click()
 
         then:
         waitFor(120) {
+            actionButton('refresh-batches', 'list').click()
+            Thread.sleep(100)
             linkToRename.displayed
         }
     }

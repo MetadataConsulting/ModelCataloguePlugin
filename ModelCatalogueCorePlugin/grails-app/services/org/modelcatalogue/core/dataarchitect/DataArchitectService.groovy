@@ -402,7 +402,10 @@ class DataArchitectService {
     private void generateDeepClassifyModels() {
         Batch.findAllByNameIlike("Deep Classify '%'").each reset
 
-        def modelsAndDataElementsResult = Relationship.executeQuery '''
+        List<ElementStatus> statuses = [ElementStatus.FINALIZED, ElementStatus.DRAFT]
+
+        log.info "Generating deep classification suggestions for models => models/data elements"
+        generateDeepClassification(Relationship.executeQuery('''
             select rel.source, destination
             from Relationship rel
             join rel.destination source
@@ -421,13 +424,58 @@ class DataArchitectService {
         ''', [
             classificationType: RelationshipType.classificationType,
             inheriting: [RelationshipType.hierarchyType, RelationshipType.containmentType],
-            statuses: [ElementStatus.FINALIZED, ElementStatus.DRAFT]
-        ]
+            statuses: statuses
+        ]))
 
 
-        for (Object[] row in modelsAndDataElementsResult) {
+        log.info "Generating deep classification suggestions for data elements => value domains"
+        //language=HQL
+        generateDeepClassification(Relationship.executeQuery('''
+            select rel.source, destination
+            from DataElement source
+            join source.incomingRelationships rel
+            join source.valueDomain destination
+            where rel.relationshipType = :classificationType
+            and source.status in :statuses
+            and destination.status in :statuses
+            and destination not in (
+                select rel2.destination
+                from Relationship rel2
+                where rel2.relationshipType = :classificationType
+                and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
+            )
+        ''', [
+                classificationType: RelationshipType.classificationType,
+                statuses: statuses
+        ]))
+
+        log.info "Generating deep classification suggestions for value domains => data types"
+        //language=HQL
+        generateDeepClassification(Relationship.executeQuery('''
+            select rel.source, destination
+            from ValueDomain source
+            join source.incomingRelationships rel
+            join source.dataType destination
+            where rel.relationshipType = :classificationType
+            and source.status in :statuses
+            and destination.status in :statuses
+            and destination not in (
+                select rel2.destination
+                from Relationship rel2
+                where rel2.relationshipType = :classificationType
+                and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
+            )
+        ''', [
+                classificationType: RelationshipType.classificationType,
+                statuses: statuses
+        ]))
+    }
+
+    private void generateDeepClassification(result) {
+        for (Object[] row in result) {
             Classification classification = row[0] as Classification
             CatalogueElement element = row[1] as CatalogueElement
+
             Batch batch = Batch.findOrSaveByName("Deep Classify '$classification.name'")
 
             Action action = actionService.create batch, CreateRelationship, source: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(classification)), destination: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(element)), type: "gorm://org.modelcatalogue.core.RelationshipType:${RelationshipType.classificationType.id}"
@@ -438,9 +486,6 @@ class DataArchitectService {
             batch.archived = false
             batch.save(flush: true)
         }
-
-        // TODO: classified data elements => value domains
-        // TODO: classified value domains => data types
     }
 
     private void generateInlineModel() {
