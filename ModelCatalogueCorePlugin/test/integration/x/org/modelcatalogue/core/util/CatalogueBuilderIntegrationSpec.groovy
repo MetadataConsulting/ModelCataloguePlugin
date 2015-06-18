@@ -671,6 +671,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
                 model (name: 'C4RMC Parent') {
                     model (name: 'C4RMC Child 1')
                     model (name: 'C4RMC Child 2')
+                    model (name: 'C4RMC Child 3')
                 }
             }
         }
@@ -680,9 +681,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         then:
         c4rmc
         c4rmcParent
-        c4rmcParent.countParentOf() == 2
+        c4rmcParent.countParentOf() == 3
 
-        when:
+        when: "model is removed from finalized element"
         elementService.finalizeElement(c4rmc)
         c4rmc.status == ElementStatus.FINALIZED
 
@@ -690,13 +691,32 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             classification(name: "C4RMC") {
                 model (name: 'C4RMC Parent') {
                     model (name: 'C4RMC Child 2')
+                    model (name: 'C4RMC Child 3')
                 }
             }
         }
 
         Model draft = Model.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
 
-        then:
+        then: "creation of draft should be triggered for finalized element"
+        draft
+        draft.countParentOf() == 2
+
+        when: "model is removed from draft element"
+        elementService.finalizeElement(c4rmc)
+        c4rmc.status == ElementStatus.FINALIZED
+
+        build {
+            classification(name: "C4RMC") {
+                model (name: 'C4RMC Parent') {
+                    model (name: 'C4RMC Child 3')
+                }
+            }
+        }
+
+        draft = Model.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
+
+        then: "the relationship should be removed from the element"
         draft
         draft.countParentOf() == 1
     }

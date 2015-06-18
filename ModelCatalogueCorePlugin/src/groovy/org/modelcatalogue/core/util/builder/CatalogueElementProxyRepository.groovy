@@ -46,6 +46,10 @@ class CatalogueElementProxyRepository {
         this.copyRelationships = true
     }
 
+    public isCopyRelationship() {
+        this.copyRelationships
+    }
+
     public static boolean equals(CatalogueElementProxy a, CatalogueElementProxy b) {
         if (a == b) {
             return true
@@ -175,6 +179,10 @@ class CatalogueElementProxyRepository {
             log.debug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
             relationshipProxy.resolve(this)
         }
+
+        // TODO: collect the ids of relationships resolved and than do the same comparison like in the is relationship
+        // changed
+
         watch.stop()
 
         // Step 4: resolve state changes

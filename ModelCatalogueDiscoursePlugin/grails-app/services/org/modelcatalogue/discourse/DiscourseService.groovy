@@ -133,7 +133,7 @@ class DiscourseService implements LogoutListener {
         }
 
         if (result.data.errors) {
-            throw new IllegalArgumentException("Cannot create user: ${result.data.errors.join(', ')}")
+            throw new IllegalArgumentException("Cannot create user: ${result.data.errors}")
         }
 
         return currentUser.username
