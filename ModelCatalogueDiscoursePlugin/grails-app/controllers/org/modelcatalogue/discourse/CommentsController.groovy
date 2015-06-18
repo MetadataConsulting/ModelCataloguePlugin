@@ -39,6 +39,10 @@ class CommentsController {
             "${discourseService.discourseServerUrl}t/topic/${discourseService.findOrCreateDiscourseTopic(urlId as Long)}"
         }
 
+        if (discourseService.discourseServerUrl != discourseService.discourseServerEndpoint) {
+            raw = raw.replace(discourseService.discourseServerEndpoint, discourseService.discourseServerUrl)
+        }
+
         render discourseService.getDiscourse(modelCatalogueSecurityService.currentUser.username).posts.createPost(discourseService.findOrCreateDiscourseTopic(id), raw).data as JSON
 
     }

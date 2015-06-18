@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.util.ClassificationFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<%@ page import="org.modelcatalogue.core.util.CDN; grails.plugin.springsecurity.SpringSecurityUtils; org.modelcatalogue.core.security.User; grails.util.BuildScope; org.modelcatalogue.core.util.ClassificationFilter; grails.util.Environment" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,7 +37,7 @@
             }
         </script>
     </g:if>
-    <g:if test="${Environment.current in [Environment.PRODUCTION, Environment.TEST, Environment.CUSTOM] || System.getProperty('mc.offline')}">
+    <g:if test="${CDN.preferred}">
         <g:set var="minSuffix" value="${Environment.current == Environment.TEST ? '' : '.min'}"/>
         <!-- CDNs -->
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap${minSuffix}.css">
@@ -92,10 +92,10 @@
                 },
                 <sec:ifLoggedIn>
                 currentUser: {
-                    roles: ${grails.plugin.springsecurity.SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
+                    roles: ${SpringSecurityUtils.getPrincipalAuthorities()*.authority.encodeAsJSON()},
                     username: '${sec.username()}',
                     id: ${sec.loggedInUserInfo(field:"id")},
-                    classifications: ${(org.modelcatalogue.core.util.ClassificationFilter.from(org.modelcatalogue.core.security.User.get(sec.loggedInUserInfo(field:"id"))).toMap()).encodeAsJSON() }
+                    classifications: ${(ClassificationFilter.from(User.get(sec.loggedInUserInfo(field:"id"))).toMap()).encodeAsJSON() }
                 }
                 </sec:ifLoggedIn>
             })

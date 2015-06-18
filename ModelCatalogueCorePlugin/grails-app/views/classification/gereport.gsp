@@ -5,12 +5,12 @@
   Time: 13:13
 --%>
 
-<%@ page import="org.modelcatalogue.core.EnumeratedType; org.modelcatalogue.core.DataType; org.modelcatalogue.core.MeasurementUnit; org.modelcatalogue.core.ValueDomain; org.modelcatalogue.core.DataElement; org.modelcatalogue.core.Model; grails.util.Environment;grails.util.GrailsNameUtils" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+<%@ page import="org.modelcatalogue.core.util.CDN; grails.util.BuildScope; org.modelcatalogue.core.EnumeratedType; org.modelcatalogue.core.DataType; org.modelcatalogue.core.MeasurementUnit; org.modelcatalogue.core.ValueDomain; org.modelcatalogue.core.DataElement; org.modelcatalogue.core.Model; grails.util.Environment;grails.util.GrailsNameUtils" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Classification Summary Report</title>
-    <g:if test="${Environment.current in [Environment.PRODUCTION, Environment.TEST, Environment.CUSTOM]}">
+    <g:if test="${CDN.preferred}}">
         <!-- CDNs -->
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">
@@ -26,9 +26,9 @@
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-            </br>
-            </br>
-            </br>
+            <br/>
+            <br/>
+            <br/>
                 <g:each status="i" in="${models}" var="model">
                     <g:if test="!${model.childOf}">
                         <g:render template="recModel" model="${[models: model, index:0, valueDomains: valueDomains]}" />
@@ -41,9 +41,9 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="panel-heading"><h1>VALUE DOMAINS DETAIL</h1></div>
-            </br>
-            </br>
-            </br>
+            <br/>
+            <br/>
+            <br/>
                 <g:each status="i" in="${valueDomains}" var="valueDomain">
                     <div>
                         <g:if test="${valueDomain.classifications[0]}"> <span class="pull-right">${valueDomain.classifications[0].name}</span></g:if>
@@ -75,7 +75,6 @@
             </div>
         </div>
     </div>
-</div>
 </div>
 %{--<script type="application/javascript">--}%
 %{--window.print()--}%

@@ -1,4 +1,4 @@
-<%@ page import="org.modelcatalogue.core.EnumeratedType" %>
+*<%@ page import="org.modelcatalogue.core.EnumeratedType" %>
 
     <h4>Data Elements</h4>
     <table class="table table-striped">
@@ -42,7 +42,7 @@
                                 - ${relationship?.destination?.valueDomain?.description}
                             </g:if>
                         </p>
-                        <g:if test="${relationship.destination?.valueDomain.dataType instanceof EnumeratedType}">
+                        <g:if test="${relationship.destination?.valueDomain?.dataType instanceof EnumeratedType}">
                         %{--<p>${relationship.destination.valueDomain.dataType.prettyPrint()}</p>--}%
                             <table class="table table-striped">
                                 <thead>

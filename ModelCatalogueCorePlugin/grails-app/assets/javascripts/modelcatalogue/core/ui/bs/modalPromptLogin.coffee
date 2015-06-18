@@ -59,15 +59,20 @@ angular.module('mc.core.ui.bs.modalPromptLogin', ['mc.util.messages', 'ngCookies
 
               helperPromise = null
 
+
               closeWindowWhenLoggedIn = ->
-                if $window.location.host is externalLoginWindow.location.host and (externalLoginWindow.location.pathname == security.contextPath or externalLoginWindow.location.pathname == "#{security.contextPath}/")
-                  externalLoginWindow.close()
+                if externalLoginWindow.closed
+                  $modalInstance.dismiss()
                   $interval.cancel(helperPromise)
-                  security.requireUser().then (success)->
-                    $rootScope.$broadcast 'userLoggedIn', success
-                    $modalInstance.close success
-
-
+                  $modalInstance.dismiss()
+                  return
+                try # mute cross origin errors when redirected login page
+                  if $window.location.host is externalLoginWindow.location.host and (externalLoginWindow.location.pathname == security.contextPath or externalLoginWindow.location.pathname == "#{security.contextPath}/")
+                    $interval.cancel(helperPromise)
+                    externalLoginWindow.close()
+                    security.requireUser().then (success)->
+                      $rootScope.$broadcast 'userLoggedIn', success
+                      $modalInstance.close success
 
               helperPromise = $interval closeWindowWhenLoggedIn, 100
 

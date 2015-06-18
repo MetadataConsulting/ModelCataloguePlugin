@@ -146,8 +146,18 @@ class DiscourseService implements LogoutListener {
         new org.modelcatalogue.discourse.sso.User(modelCatalogueSecurityService.currentUser.username, modelCatalogueSecurityService.currentUser.username, modelCatalogueSecurityService.currentUser.email ?: getFallbackEmail(modelCatalogueSecurityService.currentUser.username), modelCatalogueSecurityService.currentUser.id.toString())
     }
 
+    /**
+     * @return URL for the end users (for redirects and links)
+     */
     String getDiscourseServerUrl() {
         notNull grailsApplication.config.discourse.url, "Discourse URL not set (discourse.url in Config.groovy)"
+    }
+
+    /**
+     * @return URL for the API calls, defaults to #getDiscourseServerUrl()
+     */
+    String getDiscourseServerEndpoint() {
+        notNull((grailsApplication.config.discourse.endpoint ?: grailsApplication.config.discourse.url), "Discourse API endpoint not set (discourse.endpoint or discourse.url in Config.groovy)")
     }
 
     boolean getDiscourseEnabled() {
@@ -176,9 +186,9 @@ class DiscourseService implements LogoutListener {
 
     private Discourse getDiscourse(String username = discourseApiUser) {
         if (discourseSSOKey) {
-            Discourse.create(discourseServerUrl, discourseApiKey, username, discourseSSOKey)
+            Discourse.create(discourseServerEndpoint, discourseApiKey, username, discourseSSOKey)
         } else {
-            Discourse.create(discourseServerUrl, discourseApiKey, username)
+            Discourse.create(discourseServerEndpoint, discourseApiKey, username)
         }
     }
 
