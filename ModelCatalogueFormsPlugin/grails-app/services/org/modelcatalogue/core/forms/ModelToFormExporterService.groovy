@@ -86,9 +86,11 @@ class ModelToFormExporterService {
 
     }
 
-    private static void handleSectionModel(String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
+    private void handleSectionModel(String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
         Model sectionModel = sectionRel.destination as Model
         String sectionName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
+
+        log.info "Creating section $sectionName for model $sectionModel"
 
         if (dataElementsOnly && sectionModel.countContains() || !dataElementsOnly) {
             form.section(alphaNumNoSpaces(sectionName)) {
@@ -108,9 +110,12 @@ class ModelToFormExporterService {
         }
     }
 
-    private static void handleGroupOrVirtualSection(String prefix, Section section, List<Relationship> relationships, boolean nameAsHeader) {
+    private void handleGroupOrVirtualSection(String prefix, Section section, List<Relationship> relationships, boolean nameAsHeader) {
+
+
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
             Model itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as Model
+            log.info "Creating group or section for model $itemsWithHeaderOrGrid"
             String itemsWithHeaderOrGridName = fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_CAP, fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_LC, itemsWithHeaderOrGrid.name))
             if (fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_GRID) == 'true') {
 
@@ -154,7 +159,7 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private static void generateItems(String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
+    private void generateItems(String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
         container.with {
 
             boolean first = true
@@ -163,6 +168,8 @@ class ModelToFormExporterService {
                 DataElement dataElement = rel.destination as DataElement
                 ValueDomain valueDomain = dataElement.valueDomain
                 DataType dataType = valueDomain?.dataType
+
+                log.info "Generating items from data element $dataElement"
 
                 List<CatalogueElement> candidates = [dataElement, valueDomain, dataType].grep()
 
