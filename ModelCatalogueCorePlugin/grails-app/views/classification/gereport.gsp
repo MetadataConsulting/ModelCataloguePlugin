@@ -10,7 +10,7 @@
 <html lang="en">
 <head>
     <title>Classification Summary Report</title>
-    <g:if test="${CDN.preferred}}">
+    <g:if test="${CDN.preferred}">
         <!-- CDNs -->
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css">

@@ -14,7 +14,7 @@
     <asset:javascript src="ng-file-upload-shim/angular-file-upload-shim.min.js"/>
 
     <title><g:message code="springSecurity.denied.title"/></title>
-    <g:if test="${CDN.preferred}}">
+    <g:if test="${CDN.preferred}">
         <!-- CDNs -->
         <link rel="stylesheet" type="text/css"
               href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap${minSuffix}.css">
