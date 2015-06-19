@@ -173,15 +173,33 @@ class CatalogueElementProxyRepository {
 
         // Step 4: resolve pending relationships
         watch.start('resolving relationships')
+        Set<Long> resolvedRelationships = []
         log.info "(5/6) resolving relationships"
         int relNumberOfPositions = Math.floor(Math.log10(relationshipProxiesToBeResolved.size())) + 2
         relationshipProxiesToBeResolved.eachWithIndex { RelationshipProxy relationshipProxy, i ->
             log.debug "[${(i + 1).toString().padLeft(relNumberOfPositions, '0')}/${relationshipProxiesToBeResolved.size().toString().padLeft(relNumberOfPositions, '0')}] Resolving $relationshipProxy"
-            relationshipProxy.resolve(this)
+            resolvedRelationships << relationshipProxy.resolve(this)?.getId()
         }
 
         // TODO: collect the ids of relationships resolved and than do the same comparison like in the is relationship
         // changed
+        if (!copyRelationships) {
+            elementProxiesToBeResolved.eachWithIndex { CatalogueElementProxy element, i ->
+                if (!element.underControl) {
+                    return
+                }
+                CatalogueElement catalogueElement = element.resolve()
+                Set<Long> relations = []
+                relations.addAll catalogueElement.incomingRelationships*.getId()
+                relations.addAll catalogueElement.outgoingRelationships*.getId()
+
+                relations.removeAll resolvedRelationships
+
+                relations.collect { Relationship.get(it) } each {
+                    elementService.relationshipService.unlink(it.source, it.destination, it.relationshipType, it.classification, it.archived)
+                }
+            }
+        }
 
         watch.stop()
 

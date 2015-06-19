@@ -662,7 +662,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         model.modelCatalogueId == "http://www.example.com/classification/m/Model_ID"
     }
 
-    @Ignore
+    // @Ignore
     @Issue("MET-587")
     def "remove child model when missing"() {
         when:
