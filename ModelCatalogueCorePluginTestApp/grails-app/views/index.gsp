@@ -102,6 +102,10 @@
         }]);
         modelcatalogue.registerModule('demo.config');
 
+        modelcatalogue.welcome = {};
+        modelcatalogue.welcome.jumbo = "${grailsApplication.config.mc.welcome.jumbo.encodeAsJSON()}";
+        modelcatalogue.welcome.info = "${grailsApplication.config.mc.welcome.info.encodeAsJSON()}";
+
         // create an app module based on registered modules
         angular.module('metadataCurator', window.modelcatalogue.getModules())
     </script>

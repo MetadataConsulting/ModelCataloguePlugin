@@ -323,3 +323,33 @@ if (!grails.mc.allow.signup) {
 grails.plugin.springsecurity.ajaxCheckClosure = { request ->
     request.getHeader('accept')?.startsWith('application/json')
 }
+
+//language=HTML
+mc.welcome.jumbo = """
+<h1>Model Catalogue</h1>
+<p class="lead">
+    <b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b> and version new datasets <b><em>Generate</em></b> better software components
+</p>
+"""
+
+mc.welcome.info = """
+<div class="col-sm-4">
+<h2>Data Quality</h2>
+<p>Build up datasets using existing data elements from existing datasets and add them to new data elements to compose new data models.</p>
+<p>
+
+</p>
+</div>
+<div class="col-sm-4">
+<h2>Dataset Curation</h2>
+<p>Link and compose data-sets to create uniquely identified and versioned "metadata-sets", thus ensuring preservation of data semantics between applications</p>
+<p>
+
+</p>
+</div>
+      <div class="col-sm-4">
+<h2>Dataset Comparison</h2>
+<p>Discover synonyms, hyponyms and duplicate data elements within datasets, and compare data elements from differing datasets.</p>
+<p></p>
+</div>
+"""

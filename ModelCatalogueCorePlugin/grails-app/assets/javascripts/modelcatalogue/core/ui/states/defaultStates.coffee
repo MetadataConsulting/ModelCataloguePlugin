@@ -58,6 +58,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       $scope.draftAssetCount = ''
       $scope.finalizedAssetCount = ''
 
+    $scope.welcome = modelcatalogue.welcome
 
   ])
 
@@ -705,60 +706,30 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     		<!-- Jumbotron -->
   <div hide-if-logged-in>
 		<div class="jumbotron">
-			<h1>Model Catalogue</h1>
-			<p class="lead">
-				<b><em>Model</em></b> existing business processes and context. <b><em>Design</em></b>
-				and version new datasets <b><em>Generate</em></b> better
-				software components
-			</p>
-
+      <!-- from config mc.welcome.jumbo -->
+      <div ng-bind-html="welcome.jumbo"></div>
       <form ng-controller="defaultStates.userCtrl">
          <button ng-click="login()" class="btn btn-large btn-primary" type="submit">Login <i class="glyphicon glyphicon-log-in"></i></button>
          <!--a href="" class="btn btn-large btn-primary" >Sign Up <i class="glyphicon glyphicon-pencil"></i></a-->
       </form>
     </div>
 
-		<!-- Example row of columns -->
-		<div id="info" class="row">
-      <div class="col-sm-4">
-				<h2>Data Quality</h2>
-				<p>Build up datasets using existing data elements from existing datasets and add them to new data elements to compose new data models.</p>
-				<p>
-
-				</p>
-			</div>
-			<div class="col-sm-4">
-				<h2>Dataset Curation</h2>
-				<p>Link and compose data-sets to create uniquely identified and versioned "metadata-sets", thus ensuring preservation of data semantics between applications</p>
-				<p>
-
-				</p>
-			</div>
-      <div class="col-sm-4">
-				<h2>Dataset Comparison</h2>
-				<p>Discover synonyms, hyponyms and duplicate data elements within datasets, and compare data elements from differing datasets.</p>
-				<p>
-
-				</p>
-			</div>
-    </div>
+		<!-- from config mc.welcome.info -->
+		<div id="info" class="row" ng-bind-html="welcome.info"></div>
 		<div class="row">
         <div class="col-lg-12 col-sm-12 col-md-12">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
-                      <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sponsored by</div>
-                      <div class="col-lg-4 col-sm-4 col-md-4">
-                        <p><a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC</a></p>
+                      <div class="col-lg-6 col-sm-3 col-md-12"><p>This site is built using the model catalogue toolkit and released under an <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a>.</p><p>The model catalogue toolkit is kindly sponsored by:</p></div>
+                      <div class="col-lg-2 col-sm-3 col-md-3">
+                        <p><a href="http://www.genomicsengland.co.uk/"><img src="http://www.genomicsengland.co.uk/wp-content/uploads/2013/07/Genomics-England-logo21.jpg" class="img-thumbnail" alt="Genomics England" width="60%" height="60%"></a></p>
                       </div>
-                      <div class="col-lg-4 col-sm-4 col-md-4">
-                        <p> <a href="http://www.nihr.ac.uk/about/nihr-hic.htm">NHIC</a></p>
+                      <div class="col-lg-2 col-sm-3 col-md-3">
+                        <p><a href="http://www.nihr.ac.uk/"><img src="http://www.nihr.ac.uk/2014-layout/img/logo.png" class="img-thumbnail" alt="NIHR" width="60%" height="60%"></a></p>
                       </div>
-                      <div class="col-lg-4 col-sm-4 col-md-4">
-                        <p><a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a></p>
-                      </div>
-                      <div class="col-lg-12 col-sm-12 col-md-12">
-                        <p>&copy; 2015 A Tum Tum Tree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
+                      <div class="col-lg-2 col-sm-3 col-md-3">
+                        <p><a href="http://www.metadataconsusting.co.uk"><img src="http://www.metadataconsulting.co.uk/wp-content/themes/metadata/library/images/smallforweb.png" class="img-thumbnail" alt="Metadata Consulting Ltd" width="50%" height="50%"></a></p>
                       </div>
                     </div>
                 </div>
@@ -995,23 +966,22 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             </a>
                         </div>
                     </div>
-                    <div class="col-lg-12 col-sm-12 col-md-12">
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div class="row">
-                                  <div class="col-lg-12 col-sm-12 col-md-12 center-block">Kindy sponsored by</div>
-                                  <div class="col-lg-4 col-sm-4 col-md-4">
-                                    <p><a href="http://oxfordbrc.nihr.ac.uk/">Oxford BRC</a></p>
-                                  </div>
-                                  <div class="col-lg-4 col-sm-4 col-md-4">
-                                    <p> <a href="http://www.nihr.ac.uk/about/nihr-hic.htm">NHIC</a></p>
-                                  </div>
-                                  <div class="col-lg-4 col-sm-4 col-md-4">
-                                    <p><a href="http://www.metadataconsulting.co.uk">Metadata Consulting Limited </a></p>
-                                  </div>
-                                  <div class="col-lg-12 col-sm-12 col-md-12">
-                                    <p>&copy; 2015 A Tum Tum Tree Project &middot; Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a></p>
-                                  </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-sm-12 col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="row">
+                                      <div class="col-lg-6 col-sm-3 col-md-12"><p>This site is built using the model catalogue toolkit and released under an <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a>.</p><p>The model catalogue toolkit is kindly sponsored by:</p></div>
+                                      <div class="col-lg-2 col-sm-3 col-md-3">
+                                        <p><a href="http://www.genomicsengland.co.uk/"><img src="http://www.genomicsengland.co.uk/wp-content/uploads/2013/07/Genomics-England-logo21.jpg" class="img-thumbnail" alt="Genomics England" width="60%" height="60%"></a></p>
+                                      </div>
+                                      <div class="col-lg-2 col-sm-3 col-md-3">
+                                        <p><a href="http://www.nihr.ac.uk/"><img src="http://www.nihr.ac.uk/2014-layout/img/logo.png" class="img-thumbnail" alt="NIHR" width="60%" height="60%"></a></p>
+                                      </div>
+                                      <div class="col-lg-2 col-sm-3 col-md-3">
+                                        <p><a href="http://www.metadataconsusting.co.uk"><img src="http://www.metadataconsulting.co.uk/wp-content/themes/metadata/library/images/smallforweb.png" class="img-thumbnail" alt="Metadata Consulting Ltd" width="50%" height="50%"></a></p>
+                                      </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
