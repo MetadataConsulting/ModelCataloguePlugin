@@ -18,8 +18,15 @@ class CommentsController {
         if (!modelCatalogueSecurityService.userLoggedIn) {
             return forbidden()
         }
-        String username = discourseService.ensureUserExistsInDiscourse(modelCatalogueSecurityService.currentUser)
-        render discourseService.getDiscourse(username).users.getUser(username, [:]).data as JSON
+        try {
+            String username = discourseService.ensureUserExistsInDiscourse(modelCatalogueSecurityService.currentUser)
+            render discourseService.getDiscourse(username).users.getUser(username, [:]).data as JSON
+            return null
+        } catch (e) {
+            log.warn "Exception fetching discourse user", e
+            render(status: HttpStatus.NOT_ACCEPTABLE, [error: e.message] as JSON)
+            return null
+        }
     }
 
     def createComment() {

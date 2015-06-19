@@ -128,14 +128,14 @@ class DiscourseService implements LogoutListener {
             return username
         }
 
-        result = discourse.users.createUser(username, currentUser.email ?: getFallbackEmail(currentUser.username), username, discourseSSOKey ? null : UUID.randomUUID().toString(), true)
+        result = discourse.users.createUser(username, currentUser.email ?: getFallbackEmail(currentUser.username), username, UUID.randomUUID().toString(), true)
 
         if (result.status == 500) {
-            throw new IllegalArgumentException("Cannot create user: Discourse Server Error")
+            throw new IllegalArgumentException("Cannot create user for ${currentUser.username} ($currentUser.email)): Discourse Server Error")
         }
 
         if (result.data.errors) {
-            throw new IllegalArgumentException("Cannot create user: ${result.data.errors}")
+            throw new IllegalArgumentException("Cannot create user ${currentUser.username} ($currentUser.email): ${result.data.errors}")
         }
 
         if (currentUser.authorities.any { it.authority == 'ROLE_ADMIN'}) {

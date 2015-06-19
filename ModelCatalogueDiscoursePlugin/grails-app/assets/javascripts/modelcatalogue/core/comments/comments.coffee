@@ -46,7 +46,7 @@ changes.run ['$templateCache', ($templateCache) ->
                             <textarea ng-model="tab.raw" class="form-control" placeholder="Write new comment (you can use MarkDown)"></textarea>
                           </div>
                           <div class="form-group">
-                            <button type="submit" class="btn btn-success btn-block" ng-disabled="!tab.raw" ng-submit="tab.submitPost()"><span class="fa fa-fw fa-comment"></span> Submit New Comment</a>
+                            <button type="submit" class="btn btn-success btn-block" ng-disabled="!tab.raw || !tab.user" ng-submit="tab.submitPost()"><span class="fa fa-fw fa-comment"></span> Submit New Comment</a>
                           </div>
                         </form>
                     </div>
@@ -112,6 +112,10 @@ changes.config ['catalogueElementPropertiesProvider', (catalogueElementPropertie
 
     $http.get("#{modelCatalogueApiRoot}/user/discourse").then (response) ->
       tab.user = response.data.user
+    , (response) ->
+      tab.user = undefined
+      if response.data?.error
+        messages.error("Failed to integrate your account with discourse: #{response.data.error}. Please contact catalogue administrator with this message.").noTimeout()
 
     tab
   ]
