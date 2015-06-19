@@ -58,7 +58,7 @@ Forms generator plugin for Model Catalogue
         reportsRegistry.register {
             creates asset
             type Model
-            title { "Generate Case Report From" }
+            title { "Export as Case Report From" }
             link controller: 'formGenerator', action: 'generateForm', id: true
         }
 

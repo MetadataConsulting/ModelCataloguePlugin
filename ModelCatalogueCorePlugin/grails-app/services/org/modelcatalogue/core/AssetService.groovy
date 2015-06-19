@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import groovy.transform.CompileStatic
 import org.apache.commons.io.input.CountingInputStream
 import org.apache.commons.io.output.CountingOutputStream
+import org.codehaus.groovy.runtime.InvokerInvocationException
 import org.modelcatalogue.core.publishing.DraftContext
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
@@ -136,7 +137,11 @@ class AssetService {
                 cos = new CountingOutputStream(dos)
                 withOutputStream(cos)
                 asset.size = cos.byteCount
-            } catch (Exception e) {
+            } catch (InvokerInvocationException e) {
+                // sadly this sometimes happens
+                log.error("Exception storing asset with output stream", e.cause)
+                throw e.cause
+            }  catch (Exception e) {
                 log.error("Exception storing asset with output stream", e)
                 throw e
             } finally {

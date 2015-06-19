@@ -45,9 +45,13 @@ class FormGeneratorController {
         executorService.submit {
             auditService.withDefaultAuthorId(authorId) {
                 try {
-                    CaseReportForm form = modelToFormExporterService.convert(Model.get(modelId))
+
+                    Model theModel = Model.get(modelId)
+                    log.info "Generating form for $theModel"
+                    CaseReportForm form = modelToFormExporterService.convert(theModel)
                     Asset updated = Asset.get(id)
 
+                    log.info "Validating form for $theModel"
                     Errors errors = modelToFormExporterService.validate(form)
 
                     if (errors.hasErrors()) {
@@ -58,11 +62,13 @@ class FormGeneratorController {
                         return
                     }
 
+                    log.info "Storing form for $theModel"
                     assetService.storeAssetWithSteam(updated, XLSXListRenderer.EXCEL.name) {
                         CaseReportFormSerializer serializer = new CaseReportFormSerializer(form)
                         serializer.write(it)
                     }
 
+                    log.info "Form for $theModel finished"
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your form is ready. Use Download button to download it."
                     updated.save(flush: true, failOnError: true)

@@ -109,7 +109,7 @@ class ModelToFormExporterService {
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
 
-                generateItems(processed, prefix, delegate as ItemContainer, sectionModel, null, null)
+                generateItems(prefix, delegate as ItemContainer, sectionModel, null, null)
 
                 if (dataElementsOnly) {
                     return
@@ -140,7 +140,7 @@ class ModelToFormExporterService {
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) {
                     header fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_HEADER, itemsWithHeaderOrGridName)
 
-                    generateItems(processed, prefix, section, itemsWithHeaderOrGrid)
+                    generateItems(prefix, section, itemsWithHeaderOrGrid)
 
                     Integer repeatNum = safeInteger(fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_REPEAT_NUM), EXT_GROUP_REPEAT_NUM, itemsWithHeaderOrGridRel.destination)
                     if (repeatNum) {
@@ -154,9 +154,9 @@ class ModelToFormExporterService {
                 }
             } else {
                 if (nameAsHeader) {
-                    generateItems(processed, prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
+                    generateItems(prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
                 } else {
-                    generateItems(processed, prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
+                    generateItems(prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
                 }
             }
             handleGroupOrVirtualSection(processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
@@ -177,7 +177,7 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private void generateItems(Set<Long> processed, String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
+    private void generateItems(String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
         container.with {
 
             boolean first = true
@@ -186,12 +186,6 @@ class ModelToFormExporterService {
                 DataElement dataElement = rel.destination as DataElement
                 ValueDomain valueDomain = dataElement.valueDomain
                 DataType dataType = valueDomain?.dataType
-
-                if (dataElement.getId() in processed) {
-                    return
-                }
-
-                processed << dataElement.getId()
 
                 log.info "Generating items from data element $dataElement"
 
