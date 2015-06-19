@@ -11,11 +11,9 @@ beans = {
         portResolver = ref('portResolver')
     }
 
-    // TODO: re-enable concurrency as soon as the actions are safe to be run from multiple threads
     executorService(PersistenceContextExecutorWrapper ) { bean->
         bean.destroyMethod = 'destroy'
         persistenceInterceptor = ref("persistenceInterceptor")
-        // only want to run things async, don't really need any concurrency
-        executor = Executors.newSingleThreadExecutor()
+        executor = Executors.newCachedThreadPool()
     }
 }

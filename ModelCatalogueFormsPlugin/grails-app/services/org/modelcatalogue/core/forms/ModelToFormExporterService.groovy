@@ -70,6 +70,7 @@ class ModelToFormExporterService {
 
 
     CaseReportForm convert(Model formModel) {
+        Set<Long> processed = []
         String formName = formModel.ext[EXT_FORM_NAME] ?:formModel.name
         CaseReportForm.build(formName) {
             version formModel.ext[EXT_FORM_VERSION] ?: formModel.versionNumber.toString()
@@ -77,17 +78,26 @@ class ModelToFormExporterService {
             revisionNotes formModel.ext[EXT_FORM_REVISION_NOTES] ?: "Generated from ${alphaNumNoSpaces(formModel.name)}"
 
             if (formModel.countParentOf()) {
+                processed << formModel.getId()
                 for (Relationship sectionRel in formModel.parentOfRelationships) {
-                    handleSectionModel(formName, delegate as CaseReportForm, sectionRel)
+                    handleSectionModel(processed, formName, delegate as CaseReportForm, sectionRel)
                 }
+            } else {
+                handleSectionModel(processed, '', delegate as CaseReportForm, new Relationship(destination: formModel), true)
             }
-            handleSectionModel('', delegate as CaseReportForm, new Relationship(destination: formModel), true)
         }
 
     }
 
-    private void handleSectionModel(String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
+    private void handleSectionModel(Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
         Model sectionModel = sectionRel.destination as Model
+
+        if (sectionModel.getId() in processed) {
+            return
+        }
+
+        processed << sectionModel.getId()
+
         String sectionName = fromDestination(sectionRel, EXT_NAME_CAP, fromDestination(sectionRel, EXT_NAME_LC, sectionModel.name))
 
         log.info "Creating section $sectionName for model $sectionModel"
@@ -99,22 +109,30 @@ class ModelToFormExporterService {
                 instructions fromDestination(sectionRel, EXT_SECTION_INSTRUCTIONS, sectionModel.description)
                 pageNumber fromDestination(sectionRel, EXT_SECTION_PAGE_NUMBER)
 
-                generateItems(prefix, delegate as ItemContainer, sectionModel, null, null)
+                generateItems(processed, prefix, delegate as ItemContainer, sectionModel, null, null)
 
                 if (dataElementsOnly) {
                     return
                 }
 
-                handleGroupOrVirtualSection(prefix, delegate, sectionModel.parentOfRelationships, true)
+                handleGroupOrVirtualSection(processed, prefix, delegate, sectionModel.parentOfRelationships, true)
             }
         }
     }
 
-    private void handleGroupOrVirtualSection(String prefix, Section section, List<Relationship> relationships, boolean nameAsHeader) {
+    private void handleGroupOrVirtualSection(Set<Long> processed, String prefix, Section section, List<Relationship> relationships, boolean nameAsHeader) {
 
 
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
             Model itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as Model
+
+            if (itemsWithHeaderOrGridRel.getId() in processed) {
+                return
+            }
+
+            processed << itemsWithHeaderOrGridRel.getId()
+
+
             log.info "Creating group or section for model $itemsWithHeaderOrGrid"
             String itemsWithHeaderOrGridName = fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_CAP, fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_LC, itemsWithHeaderOrGrid.name))
             if (fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_GRID) == 'true') {
@@ -122,7 +140,7 @@ class ModelToFormExporterService {
                 section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) {
                     header fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_HEADER, itemsWithHeaderOrGridName)
 
-                    generateItems(prefix, section, itemsWithHeaderOrGrid)
+                    generateItems(processed, prefix, section, itemsWithHeaderOrGrid)
 
                     Integer repeatNum = safeInteger(fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_REPEAT_NUM), EXT_GROUP_REPEAT_NUM, itemsWithHeaderOrGridRel.destination)
                     if (repeatNum) {
@@ -136,12 +154,12 @@ class ModelToFormExporterService {
                 }
             } else {
                 if (nameAsHeader) {
-                    generateItems(prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
+                    generateItems(processed, prefix, section, itemsWithHeaderOrGrid, itemsWithHeaderOrGridName)
                 } else {
-                    generateItems(prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
+                    generateItems(processed, prefix, section, itemsWithHeaderOrGrid, null, itemsWithHeaderOrGridName)
                 }
             }
-            handleGroupOrVirtualSection(prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
+            handleGroupOrVirtualSection(processed, prefix, section, itemsWithHeaderOrGrid.parentOfRelationships, false)
         }
     }
 
@@ -159,7 +177,7 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private void generateItems(String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
+    private void generateItems(Set<Long> processed, String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
         container.with {
 
             boolean first = true
@@ -168,6 +186,12 @@ class ModelToFormExporterService {
                 DataElement dataElement = rel.destination as DataElement
                 ValueDomain valueDomain = dataElement.valueDomain
                 DataType dataType = valueDomain?.dataType
+
+                if (dataElement.getId() in processed) {
+                    return
+                }
+
+                processed << dataElement.getId()
 
                 log.info "Generating items from data element $dataElement"
 
