@@ -425,8 +425,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     }
   ])
 
-.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions'
-    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions)->
+.controller('defaultStates.searchCtrl', ['catalogueElementResource', 'modelCatalogueSearch', '$scope', '$rootScope', '$q', '$state', 'names', 'messages', 'actions', 'modelCatalogueApiRoot', '$http', 'enhance'
+    (catalogueElementResource, modelCatalogueSearch, $scope, $rootScope, $q, $state, names, messages, actions, modelCatalogueApiRoot, $http, enhance)->
       actions = []
 
       $scope.search = (item, model, label) ->
@@ -520,7 +520,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         deferred.notify results
 
         if term
-          modelCatalogueSearch(term).then (searchResults)->
+          p1 = modelCatalogueSearch(term).then (searchResults)->
             for searchResult in searchResults.list
               results.push {
                 label:      if searchResult.getLabel then searchResult.getLabel() else searchResult.name
@@ -531,6 +531,23 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 element:    searchResult
               }
 
+          p2 = $q.when true
+
+          if term.match(/^\d+$/)
+            p2 = $http.get("#{modelCatalogueApiRoot}/catalogueElement/#{term}").then (result) ->
+              return unless result.data?.elementType
+              searchResult = enhance result.data
+              results.push {
+                label:      if searchResult.getLabel then searchResult.getLabel() else searchResult.name
+                action:     searchResult.show
+                icon:       if searchResult.getIcon  then searchResult.getIcon()  else 'glyphicon glyphicon-file'
+                term:       term
+                highlight:  true
+                element:    searchResult
+              }
+            , -> true
+
+          $q.all([p1, p2]).then ->
             deferred.resolve results
         else
           deferred.resolve results

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.0.1/metadataregistry.xsd">
+<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.0.1/metadataregistry.xsd">
     <valueDomain name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
         <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
         <relatedTo ref="http://www.example.com/domains/Pressure">
@@ -10,13 +9,9 @@
         <regex>\d+</regex>
         <unitOfMeasure name="Newton" id="http://www.example.com/units/Newton" status="DRAFT" symbol="N">
             <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
-            <relatedTo ref="http://www.bipm.org/en/publications/si-brochure/kilogram.html" />
             <extensions>
                 <extension key="From">SI</extension>
             </extensions>
-            <relationships>
-                <to ref="http://www.bipm.org/en/publications/si-brochure/metre.html" relationshipType="derivedFrom"/>
-            </relationships>
         </unitOfMeasure>
         <dataType name="Decimal" id="http://www.example.com/types/Decimal" status="DRAFT">
             <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
