@@ -60,6 +60,7 @@ angular.module('mc.core.ui.bs', [
   'mc.core.ui.bs.saveOrUpdatePublishedElementCtrl'
   'mc.core.ui.bs.saveAndCreateAnotherCtrlMixin'
   'mc.core.ui.bs.modalPromptConvert'
+  'mc.core.ui.bs.modalPromptCurrentActivity'
   'mc.core.ui.bs.modalPromptValidateValue'
   'mc.core.ui.bs.modelWizard'
   'mc.core.ui.bs.classificationWizard'

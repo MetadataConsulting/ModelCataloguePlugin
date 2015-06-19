@@ -28,4 +28,9 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners 
     User getCurrentUser() {
         return null
     }
+
+    @Override
+    Map<String, Long> getUsersLastSeen() {
+        return [:]
+    }
 }

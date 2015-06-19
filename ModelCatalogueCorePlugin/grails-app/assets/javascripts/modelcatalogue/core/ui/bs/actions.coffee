@@ -66,6 +66,21 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       }
   ]
 
+  actionsProvider.registerActionInRoles 'user-last-seen', [actionsProvider.ROLE_GLOBAL_ACTION], [
+    '$scope', 'names','security', '$state', 'messages',
+    ($scope ,  names , security ,  $state ,  messages) ->
+      return undefined if not security.hasRole('ADMIN')
+
+      {
+      position: 1000
+      label: "Activity"
+      icon: 'fa fa-users'
+      type: 'success'
+      action: ->
+        messages.prompt('Recent Activity', '', type: 'current-activity')
+      }
+  ]
+
   loincImport = ['$scope', 'messages', ($scope, messages) -> {
     label: "Import Loinc"
     action: ->

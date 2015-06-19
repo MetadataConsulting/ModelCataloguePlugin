@@ -41,4 +41,12 @@ class UserController extends AbstractCatalogueElementController<User> {
         ] as JSON)
     }
 
+    def lastSeen() {
+        if (!modelCatalogueSecurityService.hasRole('ADMIN')) {
+            notFound()
+            return
+        }
+        respond modelCatalogueSecurityService.usersLastSeen.sort { it.value }.collect { [username: it.key, lastSeen: new Date(it.value)] }.reverse()
+    }
+
 }

@@ -41,4 +41,6 @@ public interface SecurityService {
     User getCurrentUser()
 
     void addLogoutListener(LogoutListener listener)
+
+    Map<String, Long> getUsersLastSeen()
 }

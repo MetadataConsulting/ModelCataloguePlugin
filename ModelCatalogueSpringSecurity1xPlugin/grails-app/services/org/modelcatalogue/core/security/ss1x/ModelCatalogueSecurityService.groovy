@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.security.ss1x
 
+import com.google.common.cache.Cache
+import com.google.common.cache.CacheBuilder
 import grails.plugins.springsecurity.SpringSecurityService
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.modelcatalogue.core.LogoutListeners
@@ -10,12 +12,15 @@ import org.springframework.security.web.authentication.logout.LogoutHandler
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import java.util.concurrent.TimeUnit
 
 class ModelCatalogueSecurityService implements SecurityService, LogoutListeners, LogoutHandler {
 
     static transactional = false
 
     SpringSecurityService springSecurityService
+
+    Cache<String, Long> lastSeenCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1, TimeUnit.DAYS).build()
 
     boolean isUserLoggedIn() {
         return springSecurityService.isLoggedIn()
@@ -40,7 +45,10 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners,
     }
 
     User getCurrentUser() {
-        return springSecurityService.currentUser
+        User user = springSecurityService.currentUser
+        if (!user) return user
+        lastSeenCache.put(user.username, System.currentTimeMillis())
+        return user as User
     }
 
     @Override
@@ -49,5 +57,10 @@ class ModelCatalogueSecurityService implements SecurityService, LogoutListeners,
         if (id) {
             userLoggedOut(User.get(id as Long))
         }
+    }
+
+    @Override
+    Map<String, Long> getUsersLastSeen() {
+        lastSeenCache.asMap()
     }
 }

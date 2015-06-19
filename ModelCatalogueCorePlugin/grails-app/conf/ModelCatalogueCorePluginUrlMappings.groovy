@@ -100,6 +100,7 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$controllerName/classifications"(controller: controllerName, action: 'classifications', method: HttpMethod.POST)
+                    "/api/modelCatalogue/core/$controllerName/lastSeen"(controller: controllerName, action: 'lastSeen', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'asset') {
