@@ -224,13 +224,13 @@ import org.modelcatalogue.core.*
 
             Relationship found = Relationship.findBySourceAndDestinationAndRelationshipType(source, destination, type)
 
-            foundRelationships << found.getId()
 
             if (!found) {
                 log.debug "$this has changed at least one relationship $it"
                 return true
             }
 
+            foundRelationships << found.getId()
 
             if (it.extensions != found.ext) {
                 log.debug "$this has changed at least one relationship $it. it has changed metadata. old: ${found.ext}, new: ${it.extensions}"
