@@ -244,7 +244,7 @@ import org.modelcatalogue.core.*
             return true
         }
 
-        if (!repository.isCopyRelationship()) {
+        if (underControl && !repository.isCopyRelationship()) {
             CatalogueElement existing = findExisting()
             if (!existing) {
                 return true
@@ -254,6 +254,7 @@ import org.modelcatalogue.core.*
             allRelationships.addAll existing.outgoingRelationships*.getId()
             return !(allRelationships - foundRelationships).isEmpty()
         }
+
         return false
     }
 
