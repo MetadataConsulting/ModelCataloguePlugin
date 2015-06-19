@@ -37,8 +37,9 @@ class GelXmlController {
             render status: HttpStatus.NOT_FOUND
             return
         }
+        
         def assetName="$model.name Model for XML Shredder"
-        def assetFileName="${model.name}-gel-xml-shredder.xml"
+        def assetFileName=model.ext.get(GelXmlService.XSD_SCHEMA_NAME)?model.ext.get(GelXmlService.XSD_SCHEMA_NAME)+"-v${model.ext.get(GelXmlService.XSD_SCHEMA_VERSION)}.xml":" Invalid Asset $model.name XML Shredder Model.xml"
         def assetPendingDesc="Your XML Model will be available in this asset soon. Use Refresh action to reload"
         def assetFinalizedDesc="Your Xml model  is ready. Use Download button to download it."
         def assetErrorDesc="Error generating xml model"
@@ -53,6 +54,7 @@ class GelXmlController {
 
         response.setHeader("X-Asset-ID",assetId.toString())
         redirect controller: 'asset', id: assetId, action: 'show'
+        
 
     }
 
