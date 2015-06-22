@@ -234,23 +234,19 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     direction = if $scope.list.base?.indexOf('/incoming/') > -1 then 'destinationToSource' else 'sourceToDestination'
     relationshipType = $scope.list.base.substring($scope.list.base.lastIndexOf('/') + 1)
 
-    action = {
+    {
       position:   200
       label:      'Add'
       icon:       'fa fa-plus-circle'
       type:       'success'
       disabled:   $scope.$parent.element.archived
+      watches:    [
+        (scope) -> scope.$parent.element.status
+        (scope) -> scope.$parent.element.archived
+      ]
       action:     ->
         messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.$parent.element, direction: direction, relationshipTypeName: relationshipType}).catch showErrorsUsingMessages(messages)
     }
-
-    updateAction = ->
-      $scope.$broadcast 'redrawContextualActions'
-
-    $scope.$parent.$watch 'element.status', updateAction
-    $scope.$parent.$watch 'element.archived', updateAction
-
-    action
   ]
 
   actionsProvider.registerActionInRoles 'create-new-mapping-in-header',  [actionsProvider.ROLE_LIST_HEADER_ACTION, actionsProvider.ROLE_LIST_FOOTER_ACTION], ['$scope', 'messages', 'names', 'security', 'catalogue', ($scope, messages, names, security, catalogue) ->
@@ -601,6 +597,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:     'primary'
       icon:     'glyphicon glyphicon-open'
       label:    'Add or Remove Dependency'
+      watches:   -> $rootScope.selectedAction
       action:   ->
         if $rootScope.selectedAction == $scope.action
           $rootScope.selectedAction = undefined
@@ -644,9 +641,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       action.active = false
       action.label = 'Add or Remove Dependency'
       action.mode = 'select'
-
-    $rootScope.$watch 'selectedAction', ->
-      $rootScope.$broadcast 'redrawContextualActions'
 
     action
   ]

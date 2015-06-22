@@ -25,13 +25,31 @@ angular.module('mc.util.ui.contextualActions', ['mc.util.ui.bs.actionButtonSingl
       scopes = []
 
       $element.empty()
-      for action in actions.getActions($scope.scope ? $scope.$parent, $scope.role)
+
+      actionsScope = $scope.scope ? $scope.$parent
+
+      for action in actions.getActions(actionsScope, $scope.role)
+        watches = []
         hasActions = hasActions || true
         newScope = $scope.$new()
         newScope.action = action
 
         scopes.push newScope
+
+        if angular.isArray(action.watches)
+          watches =  action.watches
+        else if action.watches
+          watches.push action.watches
+
         $element.append($compile(getTemplate(action))(newScope))
+
+        if watches.length > 0
+          removeWatchers = actionsScope.$watchGroup watches, (newValue, oldValue) ->
+            if angular.equals(newValue, oldValue)
+              return
+            updateActions()
+          newScope.$on '$destroy', ->
+            removeWatchers()
 
       if not hasActions and $scope.noActions
         $element.append("""<em>No Actions</em>""")
