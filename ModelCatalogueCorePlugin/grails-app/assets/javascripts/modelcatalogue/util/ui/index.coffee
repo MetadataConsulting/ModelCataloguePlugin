@@ -10,8 +10,6 @@ angular.module 'mc.util.ui', [
   'mc.util.ui.contextualActions'
   'mc.util.ui.actions'
   'mc.util.ui.focusMe'
-  'mc.util.ui.actionButtonSingle'
-  'mc.util.ui.actionButtonDropdown'
   'mc.util.ui.applicationTitle'
   'mc.util.ui.contextualActions'
   'mc.util.ui.contextualMenu'
