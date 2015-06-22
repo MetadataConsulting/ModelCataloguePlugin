@@ -91,22 +91,23 @@ changes.config ['actionsProvider', (actionsProvider)->
     return undefined if not security.hasRole('CURATOR')
 
     {
-    position:   150
-    label:      'Undo'
-    icon:       'fa fa-undo'
-    type:       'primary'
-    disabled:   not $scope.element.undoSupported or $scope.element.undone
-    action:     ->
-      security.requireRole('CURATOR').then ->
-        messages.confirm("Do you want to undo selected change?", "Current element will be reverted to the previous state if it is still possible. Undoing change does not check if the current state").then ->
-          $http(url: "#{modelCatalogueApiRoot}/change/#{$scope.element.id}", method: 'DELETE').then ->
-            messages.success "Change was reverted successfully"
-            $state.go '.', {}, {inherit: true, reload: true}
-          ,  ->
-            msg = "Cannot undo selected change. It would leave catalogue in inconsistent state."
-            if $scope.element.changes.total > 0
-              msg += " Try undo child actions one by one first."
-            messages.error msg
+      position:   150
+      label:      'Undo'
+      icon:       'fa fa-undo'
+      type:       'primary'
+      watches:    'element.undone'
+      disabled:   not $scope.element.undoSupported or $scope.element.undone
+      action:     ->
+        security.requireRole('CURATOR').then ->
+          messages.confirm("Do you want to undo selected change?", "Current element will be reverted to the previous state if it is still possible. Undoing change does not check if the current state").then ->
+            $http(url: "#{modelCatalogueApiRoot}/change/#{$scope.element.id}", method: 'DELETE').then ->
+              messages.success "Change was reverted successfully"
+              $state.go '.', {}, {inherit: true, reload: true}
+            ,  ->
+              msg = "Cannot undo selected change. It would leave catalogue in inconsistent state."
+              if $scope.element.changes.total > 0
+                msg += " Try undo child actions one by one first."
+              messages.error msg
     }
   ]
 

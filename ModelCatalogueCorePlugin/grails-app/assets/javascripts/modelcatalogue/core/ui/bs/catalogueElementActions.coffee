@@ -27,21 +27,17 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       return undefined if not angular.isFunction $scope.element.isInstanceOf
       return undefined if $scope.element.isInstanceOf 'dataImport'
 
-    action = {
+    {
       position:   3000
       label:      names.getNaturalName(names.getPropertyNameFromQualifier($scope.element.elementType))
       icon:       catalogue.getIcon($scope.element.elementType)
       type:       'primary'
+      watches:    'element.elementType'
       expandToLeft: true
     }
-
-    $scope.$watch 'element.elementType', (elementType) ->
-      action.icon   = catalogue.getIcon(elementType)
-      action.label  = names.getNaturalName(names.getPropertyNameFromQualifier(elementType))
-    action
   ]
 
-  actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', 'messages', 'names', 'security', ($rootScope, $scope, messages, names, security) ->
+  actionsProvider.registerActionInRole 'edit-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', 'names', 'security', ($scope, messages, names, security) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not angular.isFunction $scope.element.getResourceName
@@ -49,24 +45,18 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not messages.hasPromptFactory('create-' + $scope.element.getResourceName()) and not messages.hasPromptFactory('edit-' + $scope.element.getResourceName())
     return undefined if not security.hasRole('CURATOR')
 
-    action =
+    {
       position:   4000
       label:      ''
       icon:       'fa fa-fw fa-edit'
       type:       'primary'
       disabled:   $scope.element.archived or $scope.element?.status == 'FINALIZED'
+      watches:    ['element.status', 'element.archived']
       action:     ->
         messages.prompt('Edit ' + $scope.element.getElementTypeName(), '', {type: 'edit-' + names.getPropertyNameFromType($scope.element.elementType), element: $scope.element}).then (updated)->
           updateFrom $scope.element, updated
 
-    updateAction = ->
-      action.disabled = $scope.element.archived or $scope.element?.status == 'FINALIZED'
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-    $scope.$on 'newVersionCreated', updateAction
-
-    return action
+    }
 
   ]
 
@@ -77,23 +67,18 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if $scope.element.isInstanceOf 'dataImport'
     return undefined if not security.hasRole('CURATOR')
 
-    action = {
+    {
       position:   200
       label:      'Create Relationship'
       icon:       'fa fa-fw fa-chain'
       icon:       'fa fa-fw fa-chain'
       type:       'success'
+      watches:    ['element.status', 'element.archived']
+      disabled:   $scope.element.archived
       action:     ->
         messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.element}).catch showErrorsUsingMessages(messages)
     }
 
-    updateAction = ->
-      action.disabled = $scope.element.archived
-
-    $scope.$watch 'element.status', updateAction
-    $scope.$watch 'element.archived', updateAction
-
-    action
   ]
 
   actionsProvider.registerChildActionInRole 'catalogue-element', 'compare-catalogue-element', actionsProvider.ROLE_ITEM_ACTION, ['$scope', 'messages', '$state', ($scope, messages, $state) ->
@@ -106,14 +91,14 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     ids = if elementPresent then [element.id] else (e.id for e in $scope.elements)
 
     {
-    position: 500
-    label: if elementPresent then 'Compare' else 'Compare Another'
-    icon: 'fa fa-fw fa-arrows-h'
-    type: 'primary'
-    action: ->
-      messages.prompt('Compare ' + element.getElementTypeName(), "Select the #{element.getElementTypeName()} for the comparison",
-        {type: 'catalogue-element', resource: element.getResourceName()}).then (toBeCompared)->
-          $state.go 'mc.resource.diff', ids: ids.concat([toBeCompared.id]).join('~')
+      position: 500
+      label: if elementPresent then 'Compare' else 'Compare Another'
+      icon: 'fa fa-fw fa-arrows-h'
+      type: 'primary'
+      action: ->
+        messages.prompt('Compare ' + element.getElementTypeName(), "Select the #{element.getElementTypeName()} for the comparison",
+          {type: 'catalogue-element', resource: element.getResourceName()}).then (toBeCompared)->
+            $state.go 'mc.resource.diff', ids: ids.concat([toBeCompared.id]).join('~')
     }
   ]
 
@@ -124,12 +109,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not security.hasRole('CURATOR')
 
     {
-    position:   300
-    label:      'Create Mapping'
-    icon:       'fa fa-fw fa-superscript'
-    type:       'success'
-    action:     ->
-      messages.prompt('Create new mapping for ' + $scope.element.name, '', {type: 'new-mapping', element: $scope.element}).catch showErrorsUsingMessages(messages)
+      position:   300
+      label:      'Create Mapping'
+      icon:       'fa fa-fw fa-superscript'
+      type:       'success'
+      action:     ->
+        messages.prompt('Create new mapping for ' + $scope.element.name, '', {type: 'new-mapping', element: $scope.element}).catch showErrorsUsingMessages(messages)
     }
   ]
 
@@ -139,25 +124,16 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('valueDomain')
 
-    action = {
+    {
       position:   1200
       label:      'Validate Value'
       icon:       'fa fa-fw fa-check-circle-o'
       type:       'primary'
+      watches:    ['element.rule', 'element.dataType']
+      disabled:   not $scope.element.rule and not ($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType')) and $scope.element.basedOn?.length == 0
       action:     ->
         messages.prompt('', '', {type: 'validate-value-by-domain', domain: $scope.element})
     }
-
-    updateDisabled =  ->
-      action.disabled = not $scope.element.rule and not ($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType')) and $scope.element.basedOn?.length == 0
-
-
-    $scope.$watch 'element.rule',     updateDisabled
-    $scope.$watch 'element.dataType', updateDisabled
-
-    updateDisabled()
-
-    action
   ]
 
 
@@ -167,15 +143,15 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('mapping')
 
     {
-    position:   1100
-    label:      'Convert Value'
-    icon:       'fa fa-fw fa-long-arrow-right'
-    type:       'primary'
-    action:     ->
-      if $scope.element.isInstanceOf('valueDomain')
-        messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
-      else if $scope.element.isInstanceOf('mapping')
-        messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element.source, destination: $scope.element.destination})
+      position:   1100
+      label:      'Convert Value'
+      icon:       'fa fa-fw fa-long-arrow-right'
+      type:       'primary'
+      action:     ->
+        if $scope.element.isInstanceOf('valueDomain')
+          messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
+        else if $scope.element.isInstanceOf('mapping')
+          messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element.source, destination: $scope.element.destination})
 
     }
   ]
@@ -199,12 +175,12 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not $scope.element?.downloadUrl?
 
     {
-    position:   - 50
-    label:      ''
-    icon:       'fa fa-fw fa-download'
-    type:       'primary'
-    action:     ->
-      $window.open $scope.element.downloadUrl, '_blank'; return true
+      position:   - 50
+      label:      ''
+      icon:       'fa fa-fw fa-download'
+      type:       'primary'
+      action:     ->
+        $window.open $scope.element.downloadUrl, '_blank'; return true
 
     }
   ]
@@ -258,6 +234,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       label:      'Restore Archived'
       icon:       'glyphicon glyphicon-refresh'
       type:       'primary'
+      watches:    'element.archived'
+      disabled:   !$scope.element.archived
       action:     ->
         rel   = $scope.element
         messages.confirm('Restore Relationship', "Do you really want to restore relation '#{rel.element.name} #{rel.type[rel.direction]} #{rel.relation.name}'?").then () ->
@@ -275,9 +253,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
               messages.error('Error restoring relationship', 'Relationship cannot be restored, it probably does not exist anymore. The table was refreshed to get the most up to date results.')
             else
               messages.error('Error restoring relationship', 'Relationship cannot be restored, see application logs for details')
-
-    $scope.$watch 'element.archived', (archived) ->
-      action.disabled = !archived
 
     return action
   ]
@@ -308,11 +283,13 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     return undefined if not angular.isFunction $scope.element.isInstanceOf
     return undefined if not $scope.element.isInstanceOf('mapping')
 
-    action =  {
+    {
       position:   100
       label:      ''
       icon:       'glyphicon glyphicon-edit'
       type:       'primary'
+      watches:    'element.mappings.total'
+      disabled:    $scope.element.isInstanceOf('valueDomain') and not $scope.element.mappings.total
       action:     ->
         $scope.element.source.refresh().then (element)->
           args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}
@@ -320,11 +297,6 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
             updateFrom $scope.element, updated
 
     }
-
-    $scope.$watch 'element.mappings.total', (total) ->
-      action.disabled = $scope.element.isInstanceOf('valueDomain') and not total
-
-    action
 
   ]
 

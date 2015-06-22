@@ -153,6 +153,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       label: ''
       icon: 'fa fa-star'
       type: 'primary'
+      watches: 'element.favourite'
       action: ->
         catalogueElementResource('user').get(security.getCurrentUser()?.id).then (user) ->
           favourite = $scope.element.favourite
@@ -167,13 +168,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
             relation
 
-    $scope.$watch 'element.favourite', (favourite) ->
-      if favourite
-        action.active = true
-        action.icon   = 'fa fa-star-o'
-      else
-        action.active = false
-        action.icon   = 'fa fa-star'
+    if $scope.element.favourite
+      action.active = true
+      action.icon   = 'fa fa-star-o'
+    else
+      action.active = false
+      action.icon   = 'fa fa-star'
 
     action
   ]
@@ -206,11 +206,13 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined unless $scope.element and angular.isFunction($scope.element.isInstanceOf) and $scope.element.isInstanceOf('batch') or $scope.batch
     return undefined if not security.hasRole('CURATOR')
 
-    action = {
+    {
       position:   150
       label:      'Archive'
       icon:       'glyphicon glyphicon-compressed'
       type:       'danger'
+      watches:    ['batch.archived', 'element.archived']
+      disabled:   ($scope.batch ? $scope.element).archived
       action:     ->
         batch = $scope.batch ? $scope.element
         messages.confirm("Do you want to archive batch #{batch.name} ?", "The batch #{batch.name} will be archived").then ->
@@ -218,14 +220,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
             updateFroms batch, archived
           , showErrorsUsingMessages(messages)
     }
-
-    updateAction = ->
-      action.disabled = ($scope.batch ? $scope.element).archived
-
-    $scope.$watch 'batch.archived', updateAction
-    $scope.$watch 'element.archived', updateAction
-
-    action
   ]
 
 
@@ -245,12 +239,13 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       label:      'Add'
       icon:       'fa fa-plus-circle'
       type:       'success'
+      disabled:   $scope.$parent.element.archived
       action:     ->
         messages.prompt('Create Relationship', '', {type: 'create-new-relationship', element: $scope.$parent.element, direction: direction, relationshipTypeName: relationshipType}).catch showErrorsUsingMessages(messages)
     }
 
     updateAction = ->
-      action.disabled = $scope.$parent.element.archived
+      $scope.$broadcast 'redrawContextualActions'
 
     $scope.$parent.$watch 'element.status', updateAction
     $scope.$parent.$watch 'element.archived', updateAction
@@ -266,12 +261,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if not catalogue.isInstanceOf($scope.list.itemType, 'mapping')
 
     {
-    position:   300
-    label:      'Add'
-    icon:       'fa fa-plus-circle'
-    type:       'success'
-    action:     ->
-      messages.prompt('Create new mapping for ' + $scope.$parent.element.name, '', {type: 'new-mapping', element: $scope.$parent.element}).catch showErrorsUsingMessages(messages)
+      position:   300
+      label:      'Add'
+      icon:       'fa fa-plus-circle'
+      type:       'success'
+      action:     ->
+        messages.prompt('Create new mapping for ' + $scope.$parent.element.name, '', {type: 'new-mapping', element: $scope.$parent.element}).catch showErrorsUsingMessages(messages)
     }
   ]
 
@@ -331,12 +326,12 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined unless $scope.list
     return undefined unless catalogue.isInstanceOf($scope.list.itemType, 'batch')
     {
-    position:   0
-    label:      'Refresh'
-    icon:       'fa fa-refresh'
-    type:       'primary'
-    action: ->
-      $state.go('.', {page: undefined}, {reload: true})
+      position:   0
+      label:      'Refresh'
+      icon:       'fa fa-refresh'
+      type:       'primary'
+      action: ->
+        $state.go('.', {page: undefined}, {reload: true})
     }
   ]
 
@@ -627,29 +622,31 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     }
 
-    $rootScope.$watch 'selectedAction', (selectedAction) ->
-      if selectedAction
-        if selectedAction == $scope.action
-          action.active = true
-          action.icon = 'glyphicon glyphicon-open'
-          action.label = 'Add or Remove Dependency'
-          action.mode = 'select'
-        else
-          action.active = false
-          if selectedAction.dependsOn.hasOwnProperty('' + $scope.action.id)
-            action.icon = 'glyphicon glyphicon-remove-circle'
-            action.label = 'Remove Dependency'
-            action.mode = 'remove'
-          else
-            action.icon = 'glyphicon glyphicon-save'
-            action.label = 'Select as Dependency'
-            action.mode = 'add'
-
-      else
+    if $rootScope.selectedAction
+      if $rootScope.selectedAction == $scope.action
+        action.active = true
         action.icon = 'glyphicon glyphicon-open'
-        action.active = false
         action.label = 'Add or Remove Dependency'
         action.mode = 'select'
+      else
+        action.active = false
+        if $rootScope.selectedAction.dependsOn.hasOwnProperty('' + $scope.action.id)
+          action.icon = 'glyphicon glyphicon-remove-circle'
+          action.label = 'Remove Dependency'
+          action.mode = 'remove'
+        else
+          action.icon = 'glyphicon glyphicon-save'
+          action.label = 'Select as Dependency'
+          action.mode = 'add'
+
+    else
+      action.icon = 'glyphicon glyphicon-open'
+      action.active = false
+      action.label = 'Add or Remove Dependency'
+      action.mode = 'select'
+
+    $rootScope.$watch 'selectedAction', ->
+      $rootScope.$broadcast 'redrawContextualActions'
 
     action
   ]
@@ -664,6 +661,7 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       type:     'success'
       icon:     'glyphicon glyphicon-flash'
       label:    'Run All Pending'
+      watches:  ['batch', 'element']
       action:   ->
         batch = $scope.batch ? $scope.element
         messages.confirm('Run All Actions', "Do you really wan to run all actions from '#{batch.name}' batch").then ->
@@ -678,9 +676,6 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
 
     updateDisabled($scope.batch ? $scope.element)
 
-    $scope.$watch 'batch', updateDisabled
-    $scope.$watch 'element', updateDisabled
-
     action
 
   ]
@@ -692,23 +687,18 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
     return undefined if $scope.action.state in ['PERFORMING', 'PERFORMED']
     return undefined if not security.hasRole('CURATOR')
 
-    action =
-      position:   100
-      label:      'Update Action Parameters'
-      icon:       'glyphicon glyphicon-edit'
-      type:       'primary'
-      action:     ->
-        messages.prompt('Update Action Parameters', '', {type: 'update-action-parameters', action: $scope.action}).then (updated)->
-          $scope.action = updated
-
-    updateAction = ->
-      action.disabled = $scope.action.state in ['PERFORMING', 'PERFORMED']
-
-    $scope.$watch 'action.state', updateAction
-
-    updateAction()
-
-    return action
+    {
+      position: 100
+      label: 'Update Action Parameters'
+      icon: 'glyphicon glyphicon-edit'
+      type: 'primary'
+      watches: 'action.state'
+      disabled: $scope.action.state in ['PERFORMING', 'PERFORMED']
+      action: ->
+        messages.prompt('Update Action Parameters', '',
+          {type: 'update-action-parameters', action: $scope.action}).then (updated)->
+            $scope.action = updated
+    }
 
   ]
 
@@ -727,56 +717,47 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
   actionsProvider.registerActionInRole 'modal-save-element', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveElement
 
-    action = {
+    {
       position:   1000
       label:      'Save'
       icon:       'glyphicon glyphicon-ok'
       type:       'success'
+      watches:    'hasChanged()'
+      disabled:   not $scope.hasChanged()
       action: ->
        $scope.saveElement() if $scope.hasChanged()
     }
-
-    $scope.$watch 'hasChanged()', (changed)->
-      action.disabled = not changed
-
-    action
   ]
 
   actionsProvider.registerActionInRole 'modal-save-and-add-another', actionsProvider.ROLE_MODAL_ACTION, ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveAndCreateAnother
 
-    action = {
+    {
       position:   2000
       label:      'Save and Create Another'
       icon:       'glyphicon glyphicon-ok'
       type:       'success'
+      watches:    'hasChanged()'
+      disabled:   not $scope.hasChanged()
       action: ->
         $scope.saveAndCreateAnother() if $scope.hasChanged()
     }
-
-    $scope.$watch 'hasChanged()', (changed)->
-      action.disabled = not changed
-
-    action
   ]
 
 
   actionsProvider.registerChildAction 'modal-save-element', 'modal-save-element-as-new-version', ['$scope', ($scope) ->
     return undefined unless $scope.hasChanged and $scope.saveElement and not $scope.create and $scope.original and $scope.original.isInstanceOf and $scope.original.isInstanceOf 'catalogueElement'
 
-    action = {
+    {
       position:   1000
       label:      'Save as New Version'
       icon:       'glyphicon glyphicon-circle-arrow-up'
       type:       'success'
+      watches:    'hasChanged()'
+      disabled:   not $scope.hasChanged()
       action: ->
         $scope.saveElement(true) if $scope.hasChanged()
     }
-
-    $scope.$watch 'hasChanged()', (changed)->
-      action.disabled = not changed
-
-    action
   ]
 
   actionsProvider.registerActionInRole 'expand-all-rows', actionsProvider.ROLE_LIST_HEADER_ACTION, ['$scope', ($scope) ->
