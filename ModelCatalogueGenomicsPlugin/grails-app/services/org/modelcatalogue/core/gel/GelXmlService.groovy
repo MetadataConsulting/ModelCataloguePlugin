@@ -78,9 +78,7 @@ class GelXmlService {
             form(id: printXSDFriendlyString(model.name)) {
                 name model.ext.get(XSD_SCHEMA_NAME)
                 instructions model?.ext?.instructions
-                version {
-                    model.ext.get(XSD_SCHEMA_VERSION)
-                }
+                version   model.ext.get(XSD_SCHEMA_VERSION)
                 versionDescription model.ext.get(XSD_SCHEMA_VERSION_DESCRIPTION)
                 //order all elements based on their ext.order
                 //these are actually CRFs
@@ -274,9 +272,7 @@ class GelXmlService {
                 printSimpleType(xml, valueDomain)
             }
         }
-
-        log.debug('<?xml version="1.0" encoding="UTF-8"?>' + writer.toString())
-
+        
         return '<?xml version="1.0" encoding="UTF-8"?>\n' + writer.toString()
 
     }
