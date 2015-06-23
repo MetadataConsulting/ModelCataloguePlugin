@@ -3,6 +3,7 @@ package org.modelcatalogue.core.dataarchitect
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.obolibrary.oboformat.model.Clause
 import org.obolibrary.oboformat.model.Frame
 import org.obolibrary.oboformat.model.OBODoc
@@ -156,7 +157,7 @@ class OBOService {
         log.info "Parsing OBO file for ${name}"
         OBODoc document = new OBOFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
 
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
+        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
 
         Map<String, String> namespacesToClassifications = [:]
         Map<String, String> oboIdsToNames = [:]

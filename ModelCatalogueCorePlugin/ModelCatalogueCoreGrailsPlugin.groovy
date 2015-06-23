@@ -5,7 +5,7 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.CatalogueElementDynamicHelper
 import org.modelcatalogue.core.util.ListWrapper
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.marshalling.*
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.core.audit.AuditJsonMarshallingCustomizer
@@ -98,7 +98,7 @@ Model catalogue core plugin (metadata registry)
             springConfig.addAlias('modelCatalogueStorageService','localFilesStorageService')
         }
 
-        catalogueBuilder(CatalogueBuilder, ref('classificationService'), ref('elementService')) { bean ->
+        catalogueBuilder(DefaultCatalogueBuilder, ref('classificationService'), ref('elementService')) { bean ->
             bean.scope = 'prototype'
         }
 

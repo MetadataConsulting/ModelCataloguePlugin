@@ -14,7 +14,7 @@ import org.modelcatalogue.core.util.OrderedMap
 
 class EnumeratedType extends DataType {
 
-    private static final QUOTED_CHARS = [
+    static final QUOTED_CHARS = [
             "\\": "&#92;",
             ":": "&#58;",
             "|": "&#124;",

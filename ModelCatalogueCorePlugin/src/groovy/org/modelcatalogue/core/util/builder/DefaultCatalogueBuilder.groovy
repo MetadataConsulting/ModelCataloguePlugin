@@ -14,7 +14,58 @@ import org.modelcatalogue.core.*
  *
  * @see CatalogueBuilderScript
  */
-interface CatalogueBuilder extends ExtensionAwareBuilder {
+@Log4j class DefaultCatalogueBuilder implements CatalogueBuilder {
+
+    /**
+     * These classes can be created automatically setting e.g. <code>automatic dataType</code> flag on.
+     *
+     * @see #automatic(java.lang.Class)
+     */
+    private static Set<Class> SUPPORTED_FOR_AUTO = [DataType, EnumeratedType, ValueDomain]
+
+    /**
+     * Repository handles fetching the right elements from the database based on id, value or classification.
+     */
+    private CatalogueElementProxyRepository repository
+
+    /**
+     * Keeps the references to currently active elements which will be target of calls to domain language functions.
+     */
+    private CatalogueBuilderContext context
+
+    /**
+     * Set of all catalogue elements created by last call to <code>CatalogueBuilder#build(groovy.lang.Closure)</code> method.
+     * The elements don't have to be created by that call but it should be resolved by any of the element creation
+     * method such as <code>CatalogueBuilder#model(java.util.Map, groovy.lang.Closure)</code>.
+     */
+    private Set<CatalogueElement> created = []
+
+    /**
+     * Set of types to be created automatically.
+     *
+     * @see #automatic(java.lang.Class)
+     */
+    private Set<Class> createAutomatically = []
+
+    /**
+     * Top level builder settings to skip dirty checking during the resolution.
+     */
+    private boolean skipDrafts
+
+    /**
+     * Closure for assigning ids based on their names
+     */
+    private Closure<String> idBuilder
+
+    /**
+     * Creates new catalogue builder with given classification and element services.
+     * @param classificationService classification service
+     * @param elementService element service
+     */
+    DefaultCatalogueBuilder(ClassificationService classificationService, ElementService elementService) {
+        this.repository = new CatalogueElementProxyRepository(classificationService, elementService)
+        this.context = new CatalogueBuilderContext(this)
+    }
 
     /**
      * Builds catalogue elements based on the DSL method call inside the closure.
@@ -25,12 +76,20 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param c catalogue definition
      * @return set of resolved elements
      */
-    Set<CatalogueElement> build(@DelegatesTo(CatalogueBuilder) Closure c)
+    Set<CatalogueElement> build(@DelegatesTo(CatalogueBuilder) Closure c) {
+        reset()
+        DefaultCatalogueBuilder self = this
+        self.with c
 
-    /**
-     * @see #classification(java.util.Map, Closure)
-     */
-    CatalogueElementProxy<Classification> classification(Map<String, Object> parameters)
+        created = repository.resolveAllProxies(skipDrafts)
+
+        // we don't want to keep any references in this point
+        context.clear()
+        repository.clear()
+        createAutomatically.clear()
+
+        created
+    }
 
     /**
      * Creates new classification, reuses the latest draft or creates new draft unless the exactly same classification
@@ -44,7 +103,16 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param c DSL definition closure
      * @return proxy to classification specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<Classification> classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c)
+    CatalogueElementProxy<Classification> classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<Classification> classification = createProxy(Classification, parameters, null, true)
+
+        context.withNewContext classification, c
+
+        repository.unclassifiedQueriesFor = [MeasurementUnit]
+        idBuilder = null
+
+        classification
+    }
 
     /**
      * Creates new model, reuses the latest draft or creates new draft unless the exactly same model already exists
@@ -57,12 +125,16 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param c DSL definition closure
      * @return proxy to model specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<Model> model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c)
+    CatalogueElementProxy<Model> model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, true)
 
-    /**
-     * @see #model(java.util.Map, groovy.lang.Closure)
-     */
-    CatalogueElementProxy<Model> model(Map<String, Object> parameters)
+        context.withNewContext model, c
+        context.withContextElement(Model) { ignored, Closure relConf ->
+            child model, relConf
+        }
+
+        model
+    }
 
     /**
      * Creates new data element, reuses the latest draft or creates new draft unless the exactly same data element
@@ -77,12 +149,23 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param c DSL definition closure
      * @return proxy to data element specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<DataElement> dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c)
+    CatalogueElementProxy<DataElement> dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model, true)
 
-    /**
-     * @see #dataElement(java.util.Map, groovy.lang.Closure)
-     */
-    CatalogueElementProxy<DataElement> dataElement(Map<String, Object> parameters)
+        context.withNewContext element, c
+
+        if (element.getParameter('valueDomain') == null && ValueDomain in createAutomatically) {
+            context.withNewContext element, {
+                valueDomain()
+            }
+        }
+
+        context.withContextElement(Model) { ignored, Closure relConf ->
+            contains element, relConf
+        }
+
+        element
+    }
 
     /**
      * Creates new value domain, reuses the latest draft or creates new draft unless the exactly same value domain
@@ -98,17 +181,22 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param c DSL definition closure
      * @return proxy to value domain specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<ValueDomain> valueDomain(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c)
+    CatalogueElementProxy<ValueDomain> valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<ValueDomain> domain = createProxy(ValueDomain, parameters, DataElement, true)
 
-    /**
-     * see #valueDomain(java.util.Map, groovy.lang.Closure)
-     */
-    CatalogueElementProxy<ValueDomain> valueDomain(Map<String, Object> parameters)
+        context.withNewContext domain, c
 
-    /**
-     * see #valueDomain(java.util.Map, groovy.lang.Closure)
-     */
-    CatalogueElementProxy<ValueDomain> valueDomain()
+        context.withContextElement(DataElement) {
+            it.setParameter('valueDomain', domain)
+        }
+
+        if (domain.getParameter('dataType') == null && DataType in createAutomatically) {
+            context.withNewContext domain, {
+                dataType()
+            }
+        }
+        domain
+    }
 
     /**
      * Creates new data type, reuses the latest draft or creates new draft unless the exactly same data type
@@ -118,17 +206,21 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param c DSL definition closure
      * @return proxy to data type specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<? extends DataType> dataType(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c)
+    CatalogueElementProxy<? extends DataType> dataType(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        Class type = (parameters.enumerations ? EnumeratedType : DataType)
+        if (parameters.containsKey('enumerations') && !parameters.enumerations) {
+            parameters.remove('enumerations')
+        }
+        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain, true)
 
-    /**
-     * see #dataType(java.util.Map, groovy.lang.Closure)
-     */
-    CatalogueElementProxy<? extends DataType> dataType(Map<String, Object> parameters)
+        context.withNewContext dataType, c
 
-    /**
-     * see #dataType(java.util.Map, groovy.lang.Closure)
-     */
-    CatalogueElementProxy<? extends DataType> dataType()
+        context.withContextElement(ValueDomain) {
+            it.setParameter('dataType', dataType)
+        }
+
+        dataType
+    }
 
     /**
      * Creates new measurement unit, reuses the latest draft or creates new draft unless the exactly same measurement
@@ -138,12 +230,17 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param c DSL definition closure
      * @return proxy to measurement unit specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<MeasurementUnit> measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c)
+    CatalogueElementProxy<MeasurementUnit> measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<MeasurementUnit> unit = createProxy(MeasurementUnit, parameters, null, true)
 
-    /**
-     * see #measurementUnit(java.util.Map, groovy.lang.Closure)
-     */
-    CatalogueElementProxy<MeasurementUnit> measurementUnit(Map<String, Object> parameters)
+        context.withNewContext unit, c
+
+        context.withContextElement(ValueDomain) {
+            it.setParameter('unitOfMeasure', unit)
+        }
+
+        unit
+    }
 
     /**
      * Configures the relationships created automatically for nested elements such as the containment relationship
@@ -154,7 +251,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param relationshipExtensionsConfiguration DSL definition closure expecting setting the relationship metadata
      * @see RelationshipProxyConfiguration
      */
-    void relationship(@DelegatesTo(RelationshipProxyConfiguration) Closure relationshipExtensionsConfiguration)
+    void relationship(@DelegatesTo(RelationshipProxyConfiguration) Closure relationshipExtensionsConfiguration) {
+        context.configureCurrentRelationship(relationshipExtensionsConfiguration)
+    }
 
     /**
      * Adds the model specified by given classification and name to a parent model.
@@ -166,12 +265,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipProxyConfiguration
      */
-    void child(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions)
-
-    /**
-     * see #child(String, String, Closure)
-     */
-    void child(String classification, String name)
+    void child(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        rel "hierarchy" to classification, name, extensions
+    }
 
     /**
      * Adds the model specified by given name to the parent model. The model is searched within the parent
@@ -184,12 +280,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void child(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions)
-
-    /**
-     * see #child(String, Closure)
-     */
-    void child(String name)
+    void child(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        rel "hierarchy" to name, extensions
+    }
 
     /**
      * Adds the model specified by given proxy to the parent model.
@@ -201,12 +294,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void child(CatalogueElementProxy<Model> model, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions)
-
-    /**
-     * see #child(org.modelcatalogue.core.util.builder.CatalogueElementProxy, Closure)
-     */
-    void child(CatalogueElementProxy<Model> model)
+    void child(CatalogueElementProxy<Model> model, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        rel "hierarchy" to model, extensions
+    }
 
     /**
      * Adds the data element specified by given classification and name to a parent model.
@@ -218,12 +308,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipProxyConfiguration
      */
-    void contains(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions)
-
-    /**
-     * see #contains(String, String, Closure)
-     */
-    void contains(String classification, String name)
+    void contains(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        rel "containment" to classification, name, extensions
+    }
 
     /**
      * Adds the data element specified by given name to the parent model. The data element is searched within the parent
@@ -236,12 +323,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void contains(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions)
-
-    /**
-     * see #contains(String, Closure)
-     */
-    void contains(String name)
+    void contains(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        rel "containment" to name, extensions
+    }
 
     /**
      * Adds the data element specified by given proxy to the parent model.
@@ -253,12 +337,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions)
-
-    /**
-     * see #contains(org.modelcatalogue.core.util.builder.CatalogueElementProxy, Closure)
-     */
-    void contains(CatalogueElementProxy<DataElement> element)
+    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        rel "containment" to element, extensions
+    }
 
     /**
      * Adds the base element specified by given classification and name to a parent element.
@@ -270,12 +351,11 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipProxyConfiguration
      */
-    void basedOn(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions)
-
-    /**
-     * see #basedOn(String, String, Closure)
-     */
-    void basedOn(String classification, String name)
+    void basedOn(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        context.withContextElement(CatalogueElement) {
+            rel "base" from it.domain called classification, name, extensions
+        }
+    }
 
     /**
      * Adds the base element specified by given name to the parent element. The model is searched within the parent
@@ -288,12 +368,11 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void basedOn(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions)
-
-    /**
-     * see #basedOn(String, Closure)
-     */
-    void basedOn(String name)
+    void basedOn(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        context.withContextElement(CatalogueElement) {
+            rel "base" from it.domain called name, extensions
+        }
+    }
 
     /**
      * Adds the base element specified by given proxy to the parent element.
@@ -305,12 +384,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipProxyConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions )
-
-    /**
-     * see #basedOn(org.modelcatalogue.core.util.builder.CatalogueElementProxy, Closure)
-     */
-    void basedOn(CatalogueElementProxy<CatalogueElement> element)
+    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+        rel "base" from element, extensions
+    }
 
     /**
      * Assigns the id of the element dynamically.
@@ -320,14 +396,18 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param idBuilder builder closure
      */
-    void id(@DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options=['String,Class']) Closure<String> idBuilder)
+    void id(@DelegatesTo(CatalogueBuilder) @ClosureParams(value=FromString, options=['String,Class']) Closure<String> idBuilder) {
+        this.idBuilder = idBuilder
+    }
 
     /**
      * Allows to create a catalogue element proxy only from given ID.
      * @param id ID of the target of the proxy created
      * @return proxy specified by given ID
      */
-    CatalogueElementProxy<? extends CatalogueElement> ref(String id)
+    CatalogueElementProxy<? extends CatalogueElement> ref(String id) {
+        repository.createAbstractionById(CatalogueElement, null, id, false)
+    }
 
     /**
      * Creates new relationship builder for given relationship type specified by name.
@@ -335,41 +415,53 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @return the builder for given relationship type
      * @see RelationshipBuilder
      */
-    RelationshipBuilder rel(String relationshipTypeName)
+    RelationshipBuilder rel(String relationshipTypeName) {
+        return new RelationshipBuilder(context, repository, relationshipTypeName)
+    }
 
     /**
      * Sets the description of element.
      * @param description description of element
      */
-    void description(String description)
+    void description(String description) { setStringValue('description', description) }
 
     /**
      * Sets the rule of the value domain. Fails if not inside value domain definition or any other catalogue element
      * having the rule property.
      * @param rule rule of the parent value domain
      */
-    void rule(String rule)
+    void rule(String rule)               { setStringValue('rule', rule) }
 
     /**
      * Sets the regular expression rule of the value domain. Fails if the current is not a value domain or any other
      * catalogue element supporting setting the regular expression rule property.
      * @param rule rule of the parent value domain
      */
-    void regex(String regex)
+    void regex(String regex)             { setStringValue('regexDef', regex) }
 
     /**
      * Sets the model catalogue id of the current element. The id must be a valid URL.
      * @param id id which must be valid URL
      * @see #id(groovy.lang.Closure)
      */
-    void id(String id)
+    void id(String id) {
+        setStringValue('modelCatalogueId', id)
+    }
 
     /**
      * Sets the status of the current element. Currently it does not work as expected as it sets the status property
      * right after object is resolved instead e.g. finalizing the element after all the work is done.
      * @param status new status of the element
+     * @see https://metadata.atlassian.net/browse/MET-620
      */
-    void status(ElementStatus status)
+    @Deprecated
+    void status(ElementStatus status) {
+        context.withContextElement(CatalogueElement) {
+            it.setParameter('status', status)
+        } or {
+            throw new IllegalStateException("No element to set status on")
+        }
+    }
 
     /**
      * Sets the extension (metadata) for current element from given key and value pair.
@@ -380,7 +472,13 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param key metadata key
      * @param value metadata value
      */
-    void ext(String key, String value)
+    void ext(String key, String value) {
+        context.withContextElement(CatalogueElement) {
+            it.setExtension(key, value)
+        } or {
+            throw new IllegalStateException("No element to set ext on")
+        }
+    }
 
     /**
      * Sets the extensions (metadata) for parent element from given map.
@@ -390,14 +488,24 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param values metadata
      */
-    void ext(Map<String, String> values)
+    void ext(Map<String, String> values) {
+        values.each { String key, String value ->
+            ext key, value
+        }
+    }
 
     /**
      * Disables the dirty-checking during the builder calls for faster imports when it's known that all the changes
      * are desired (i.e. importing into an empty catalogue).
      * @param draft must be "draft" or ElementStatus#DRAFT
      */
-    void skip(ElementStatus draft)
+    void skip(ElementStatus draft) {
+        if (draft == ElementStatus.DRAFT) {
+            skipDrafts = true
+            return
+        }
+        throw new IllegalArgumentException("Only 'draft' is expected after 'skip' keyword")
+    }
 
     /**
      * Sets the flag to copy relationships when draft element is created (e.g. there is an update for element).
@@ -408,67 +516,73 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param relationships must be "relationships" string (#getRelationships() shortcut can be used)
      */
-    void copy(String relationships)
+    void copy(String relationships) {
+        if (relationships == getRelationships()) {
+            repository.copyRelationships()
+            return
+        }
+        throw new IllegalArgumentException("Only 'relationships' is expected after 'copy' keyword")
+    }
 
     /**
      * Shortcut for Classification type so it does not have to me imported into the DSL scripts.
      * @return Classification type
      */
-    Class<Classification> getClassification()
+    Class<Classification> getClassification() { Classification }
 
     /**
      * Shortcut for Model type so it does not have to me imported into the DSL scripts.
      * @return Model type
      */
-    Class<Model> getModel()
+    Class<Model> getModel() { Model }
 
     /**
      * Shortcut for DataElement type so it does not have to me imported into the DSL scripts.
      * @return DataElement type
      */
-    Class<DataElement> getDataElement()
+    Class<DataElement> getDataElement() { DataElement }
 
     /**
      * Shortcut for ValueDomain type so it does not have to me imported into the DSL scripts.
      * @return ValueDomain type
      */
-    Class<ValueDomain> getValueDomain()
+    Class<ValueDomain> getValueDomain() { ValueDomain }
 
     /**
      * Shortcut for DataType type so it does not have to me imported into the DSL scripts.
      * @return DataType type
      */
-    Class<DataType> getDataType()
+    Class<DataType> getDataType() { DataType }
 
     /**
      * Shortcut for DataType type so it does not have to me imported into the DSL scripts.
      * @return DataType type
      */
-    Class<MeasurementUnit> getMeasurementUnit()
+    Class<MeasurementUnit> getMeasurementUnit() { MeasurementUnit }
 
     /**
      * Shortcut for ElementStatus#DRAFT type so it does not have to me imported into the DSL scripts.
      * @return ElementStatus#DRAFT
      */
-    ElementStatus getDraft()
+    ElementStatus getDraft() { ElementStatus.DRAFT }
 
     /**
      * Shortcut for ElementStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
      * @return ElementStatus#DEPRECATED
      */
-    ElementStatus getDeprecated()
+    ElementStatus getDeprecated() { ElementStatus.DEPRECATED }
 
     /**
      * Shortcut for ElementStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
      * @return ElementStatus#DEPRECATED
      */
-    ElementStatus getFinalized()
+    ElementStatus getFinalized() { ElementStatus.FINALIZED }
 
     /**
      * Keyword to be used with #copy(String) method.
      * @return string "relationships"
      */
-    String getRelationships()
+    String getRelationships() { "relationships" }
 
     /**
      * Sets the flag to be able to search for elements having no classification at all even the classification is
@@ -486,7 +600,9 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param type type for unclassified searches
      */
-    public <T extends CatalogueElement> void globalSearchFor(Class<T> type)
+    public <T extends CatalogueElement> void globalSearchFor(Class<T> type){
+        repository.unclassifiedQueriesFor << type
+    }
 
     /**
      * Trigger the automatic creation of nested elements of given types. Currently data types and value domains are
@@ -501,7 +617,13 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param type either dataType or valueDomain
      */
-    public <T extends CatalogueElement> void automatic(Class<T> type)
+    public <T extends CatalogueElement> void automatic(Class<T> type){
+
+        if (!(type in SUPPORTED_FOR_AUTO)) {
+            throw new IllegalArgumentException("Only supported values are ${SUPPORTED_FOR_AUTO.collect{GrailsNameUtils.getPropertyName(it)}.join(', ')}")
+        }
+        createAutomatically << type
+    }
 
     /**
      * Returns the set of elements resolve by latest call to build method. They don't have to be newly created if there were matched
@@ -510,7 +632,108 @@ interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @return set of elements resolve by the latest call to the build method
      */
-    public Set<CatalogueElement> getLastCreated()
+    public Set<CatalogueElement> getLastCreated() {
+      new HashSet<CatalogueElement>(created)
+    }
+
+    /**
+     * Adds classifications to given element. It uses the deepest parent classification.
+     * @param element element to be classified
+     */
+    private <T extends CatalogueElement, A extends CatalogueElementProxy<T>> void classifyIfNeeded(A element) {
+        if (Classification.isAssignableFrom(element.domain)) {
+            return
+        }
+        context.withContextElement(Classification) {
+            element.addToPendingRelationships(new RelationshipProxy('classification', it, element, [:]))
+        }
+    }
+
+    /**
+     * Helper method to set the sting value the the parent element.
+     *
+     * If the value is null or empty string nothing happens.
+     *
+     * @param name name of the property
+     * @param value value of the propery
+     */
+    private void setStringValue(String name, String value) {
+        // XXX: this may cause problem later when someone would like to erase some value
+        // this is here because of generated COSD MC file was sending empty strings even for the values which
+        // does not accept them
+        if (!value) {
+            return
+        }
+        context.withContextElement(CatalogueElement) {
+            it.setParameter(name, value?.stripIndent()?.trim())
+        } or {
+            throw new IllegalStateException("No element to set string value '$name'")
+        }
+    }
+
+    /**
+     * Resets the builder.
+     *
+     * This is called as the first statement inside the #build(Closure) method resetting builder to defaults.
+     */
+    private void reset() {
+        context.clear()
+        repository.clear()
+        createAutomatically.clear()
+        created.clear()
+        idBuilder = null
+    }
+
+    /**
+     * Creates the proxy for given configuration.
+     *
+     * If a type is supported for automatic creation (data type and value domain at the moment) it also handles
+     * inheriting the name and description for every nested dataType or valueDomain call.
+     *
+     * @param domain the class of the resolved element
+     * @param parameters initial parameters mapp
+     * @param inheritFrom class from which the name and description should be inherited
+     * @return proxy for given configuration.
+     */
+    protected <T extends CatalogueElement, A extends CatalogueElementProxy<T>> A createProxy(Class<T> domain, Map<String, Object> parameters, Class inheritFrom = null, boolean underControl = false) {
+        if (inheritFrom && domain in SUPPORTED_FOR_AUTO) {
+            context.withContextElement(inheritFrom) {
+                if (!parameters.name) {
+                    if (it.name) {
+                        parameters.name = it.name
+                        parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] = true
+                    }
+                    // description is only transffered for the elements created automatically
+                    if (!parameters.id && parameters.name && domain in createAutomatically && !parameters.description && it.getParameter('description')) {
+                        parameters[CatalogueElementProxyRepository.AUTOMATIC_DESCRIPTION_FLAG] = true
+                        parameters.description = it.getParameter('description')
+                    }
+                }
+            }
+        }
+
+        A element = repository.createProxy(domain, parameters, underControl) as A
+
+        element.setParameter('name', parameters.name)
+
+        if (parameters.id) {
+            element.setParameter('modelCatalogueId', parameters.id)
+        } else if(idBuilder != null) {
+            element.setParameter('modelCatalogueId', idBuilder(element.name, domain))
+        }
+
+        parameters.each { String key, Object value ->
+            // these are specials handled directly
+            if (key in ['id', 'classification', 'name']) {
+                return
+            }
+            element.setParameter(key, value)
+        }
+
+        classifyIfNeeded element
+
+        element
+    }
 
 }
 

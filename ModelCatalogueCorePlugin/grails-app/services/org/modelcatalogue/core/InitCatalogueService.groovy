@@ -8,6 +8,7 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
 
 class InitCatalogueService {
@@ -32,7 +33,7 @@ class InitCatalogueService {
     }
 
     def initDefaultDataTypes(boolean failOnError = false) {
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
+        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
         builder.skip ElementStatus.DRAFT
 
         GroovyShell shell = prepareGroovyShell(builder)
@@ -116,7 +117,7 @@ class InitCatalogueService {
     }
 
     Set<CatalogueElement> importMCFile(InputStream inputStream) {
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
+        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
         GroovyShell shell = prepareGroovyShell(builder)
         shell.evaluate(inputStream.newReader())
         builder.lastCreated

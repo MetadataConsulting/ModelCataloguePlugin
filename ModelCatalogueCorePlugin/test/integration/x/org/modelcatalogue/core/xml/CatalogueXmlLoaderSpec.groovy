@@ -3,6 +3,7 @@ package x.org.modelcatalogue.core.xml
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.xml.CatalogueXmlLoader
 import spock.lang.Shared
 
@@ -30,7 +31,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
     }
 
     def setup() {
-        loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
+        loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(classificationService, elementService))
     }
 
     def "read simple measurement unit"() {

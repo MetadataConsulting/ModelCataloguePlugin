@@ -4,6 +4,7 @@ import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Ignore
 import spock.lang.Issue
 
@@ -600,7 +601,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        created = new CatalogueBuilder(classificationService, elementService).build cl
+        created = new DefaultCatalogueBuilder(classificationService, elementService).build cl
     }
 
 

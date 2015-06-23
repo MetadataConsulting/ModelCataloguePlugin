@@ -6,6 +6,7 @@ import org.custommonkey.xmlunit.Diff
 import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import spock.lang.Ignore
 
@@ -113,7 +114,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
     }
 
     private <E extends CatalogueElement> E build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        new CatalogueBuilder(classificationService, elementService).build(cl).first() as E
+        new DefaultCatalogueBuilder(classificationService, elementService).build(cl).first() as E
     }
 
     private ValueDomain getPressure() {
