@@ -18,11 +18,7 @@
             </dataElement>
         </model>
         <model name="Engine" id="http://www.example.com/models/Engine" status="DRAFT">
-            <dataElement ref="http://www.example.com/elements/Adhesion">
-                <metadata>
-                    <extension key="Min. Occurs">0</extension>
-                </metadata>
-            </dataElement>
+            <dataElement ref="http://www.example.com/elements/Adhesion"/>
         </model>
     </classification>
 </catalogue>

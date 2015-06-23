@@ -12,7 +12,7 @@ import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
 
-@Stepwise
+//@Stepwise
 class CatalogueXmlPrinterSpec extends IntegrationSpec {
 
     CatalogueXmlPrinter printer
