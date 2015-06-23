@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import com.google.common.base.Function
-import com.google.common.collect.Collections2
-import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.publishing.DraftContext
@@ -13,7 +11,6 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.builder.RelationshipDefinition
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model

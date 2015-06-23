@@ -6,7 +6,7 @@ import org.modelcatalogue.core.*
  * RelationshipBuilder is supplementary class to CatalogueBuilder handling part of the DSL dealing with creating
  * relationships.
  */
-class RelationshipBuilder {
+class DefaultRelationshipBuilder implements RelationshipBuilder {
 
     /**
      * Current context of the parent catalogue builder.
@@ -40,7 +40,7 @@ class RelationshipBuilder {
      * @param repository current repository of the catalogue builder
      * @param type type of the relationship created
      */
-    RelationshipBuilder(CatalogueBuilderContext context, CatalogueElementProxyRepository repository, String type) {
+    DefaultRelationshipBuilder(CatalogueBuilderContext context, CatalogueElementProxyRepository repository, String type) {
         this.repository = repository
         this.context = context
         this.type = RelationshipType.readByName(type)
@@ -54,7 +54,7 @@ class RelationshipBuilder {
      * @param name name of the destination
      * @param extensions closure defining the metadata
      */
-    void to(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void to(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         to repository.createProxy(getDestinationHintOrClass(), [classification: classification, name: name]), extensions
     }
 
@@ -65,7 +65,7 @@ class RelationshipBuilder {
      * @param name name of the destination
      * @param extensions closure defining the metadata
      */
-    void to(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void to(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(Classification) {
             to repository.createProxy(getDestinationHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
@@ -81,7 +81,7 @@ class RelationshipBuilder {
      * @param proxy proxy of the destination
      * @param extensions closure defining the metadata
      */
-    public <T extends CatalogueElement> void to(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    public <T extends CatalogueElement> void to(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(getSourceHintOrClass()) {
             return it.addToPendingRelationships(new RelationshipProxy(type.name, it, element, extensions))
         } or {
@@ -97,7 +97,7 @@ class RelationshipBuilder {
      * @param name name of the source
      * @param extensions closure defining the metadata
      */
-    void from(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void from(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         from repository.createProxy(getSourceHintOrClass(), [classification: classification, name: name]), extensions
     }
 
@@ -109,7 +109,7 @@ class RelationshipBuilder {
      * @param name name of the source
      * @param extensions closure defining the metadata
      */
-    void from(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void from(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(Classification) {
             from repository.createProxy(getSourceHintOrClass(), [classification: it.name, name: name]), extensions
         } or {
@@ -123,7 +123,7 @@ class RelationshipBuilder {
      * @param proxy proxy of the source
      * @param extensions closure defining the metadata
      */
-    public <T extends CatalogueElement> void from(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    public <T extends CatalogueElement> void from(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(getDestinationHintOrClass()) {
             return it.addToPendingRelationships(new RelationshipProxy(type.name, element, it, extensions))
         } or {
@@ -137,7 +137,7 @@ class RelationshipBuilder {
      * @param domain expected type of the destination
      * @return self
      */
-    RelationshipBuilder to(Class domain) {
+    DefaultRelationshipBuilder to(Class domain) {
         destinationClassHint = domain == EnumeratedType ? DataType : domain
         this
     }
@@ -148,7 +148,7 @@ class RelationshipBuilder {
      * @param domain expected type of the source
      * @return self
      */
-    RelationshipBuilder from(Class domain) {
+    DefaultRelationshipBuilder from(Class domain) {
         sourceClassHint = domain == EnumeratedType ? DataType : domain
         this
     }
@@ -161,7 +161,7 @@ class RelationshipBuilder {
      * @param name name of the source or destination
      * @param extensions closure defining the metadata
      */
-    void called(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void called(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         if (sourceClassHint) {
             from name, extensions
         } else if (destinationClassHint) {
@@ -179,7 +179,7 @@ class RelationshipBuilder {
      * @param name name of the source or destination
      * @param extensions closure defining the metadata
      */
-    void called(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void called(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         if (sourceClassHint) {
             from classification, name, extensions
         } else if (destinationClassHint) {

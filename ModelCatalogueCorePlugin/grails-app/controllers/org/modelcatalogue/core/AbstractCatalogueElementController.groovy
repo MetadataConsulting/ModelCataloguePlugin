@@ -3,8 +3,6 @@ package org.modelcatalogue.core
 import grails.transaction.Transactional
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.*
-import org.modelcatalogue.core.util.builder.RelationshipDefinition
-import org.modelcatalogue.core.util.builder.RelationshipDefinitionBuilder
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import org.modelcatalogue.core.util.marshalling.RelationshipsMarshaller
 import org.springframework.http.HttpStatus

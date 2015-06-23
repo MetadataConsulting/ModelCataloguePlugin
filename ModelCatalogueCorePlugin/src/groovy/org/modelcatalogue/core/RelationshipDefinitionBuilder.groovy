@@ -1,10 +1,5 @@
-package org.modelcatalogue.core.util.builder
+package org.modelcatalogue.core
 
-import org.modelcatalogue.core.Classification
-
-/**
- * Created by ladin on 18.03.15.
- */
 class RelationshipDefinitionBuilder {
 
     final RelationshipDefinition definition

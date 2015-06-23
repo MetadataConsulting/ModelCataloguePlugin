@@ -446,10 +446,10 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             }
             classification name: "Other234", {
                 valueDomain name: 'VDRel1'
-                def vd2 = valueDomain name: 'VDRel2'
+                valueDomain name: 'VDRel2'
                 valueDomain name: 'VDRel3'
                 valueDomain name: 'VDRel4', {
-                    rel 'synonym'   to      vd2
+                    rel 'synonym'   to      valueDomain called 'VDRel2'
                     rel 'synonym'   from    'VDRel1'
                     rel 'relatedTo' to      'Other123', 'WD40'
                     rel 'base'      to      'Other123', 'WD40'

@@ -1,13 +1,7 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.builder.RelationshipDefinition
 import spock.lang.Unroll
-
-/**
- * Created by adammilward on 04/02/2014.
- */
-
 
 class RelationshipISpec extends AbstractIntegrationSpec{
 

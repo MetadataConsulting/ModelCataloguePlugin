@@ -7,8 +7,8 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.builder.RelationshipDefinition
-import org.modelcatalogue.core.util.builder.RelationshipDefinitionBuilder
+import org.modelcatalogue.core.RelationshipDefinition
+import org.modelcatalogue.core.RelationshipDefinitionBuilder
 
 @Log4j
 class CopyAssociationsAndRelationships {

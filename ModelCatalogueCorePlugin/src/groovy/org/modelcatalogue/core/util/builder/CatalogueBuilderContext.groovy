@@ -56,7 +56,7 @@ class CatalogueBuilderContext {
         new DefaultWithOptionalOrClause(builder)
     }
 
-    void configureCurrentRelationship(@DelegatesTo(RelationshipProxyConfiguration) Closure relationshipExtensionsConfiguration) {
+    void configureCurrentRelationship(@DelegatesTo(RelationshipConfiguration) Closure relationshipExtensionsConfiguration) {
         ContextItem item = getContextElement(CatalogueElement, 1)
         if (item) {
             if (item.relationshipConfiguration) {

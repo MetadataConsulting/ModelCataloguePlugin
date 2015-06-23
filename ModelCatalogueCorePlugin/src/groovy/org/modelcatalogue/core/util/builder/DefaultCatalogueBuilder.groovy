@@ -103,7 +103,7 @@ import org.modelcatalogue.core.*
      * @param c DSL definition closure
      * @return proxy to classification specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<Classification> classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+    void classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         CatalogueElementProxy<Classification> classification = createProxy(Classification, parameters, null, true)
 
         context.withNewContext classification, c
@@ -112,28 +112,6 @@ import org.modelcatalogue.core.*
         idBuilder = null
 
         classification
-    }
-
-    /**
-     * Creates new model, reuses the latest draft or creates new draft unless the exactly same model already exists
-     * in the catalogue. Accepts any bindable parameters which Model instances does.
-     *
-     * Models nested inside the DSL definition closure will be set as child models for this model.
-     * Data elements nested inside the DSL definition closure will be set as contained elements for this model.
-     *
-     * @param parameters map of parameters such as name or id
-     * @param c DSL definition closure
-     * @return proxy to model specified by the parameters map and the DSL closure
-     */
-    CatalogueElementProxy<Model> model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, true)
-
-        context.withNewContext model, c
-        context.withContextElement(Model) { ignored, Closure relConf ->
-            child model, relConf
-        }
-
-        model
     }
 
     /**
@@ -149,7 +127,7 @@ import org.modelcatalogue.core.*
      * @param c DSL definition closure
      * @return proxy to data element specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<DataElement> dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+    void dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model, true)
 
         context.withNewContext element, c
@@ -168,6 +146,28 @@ import org.modelcatalogue.core.*
     }
 
     /**
+     * Creates new model, reuses the latest draft or creates new draft unless the exactly same model already exists
+     * in the catalogue. Accepts any bindable parameters which Model instances does.
+     *
+     * Models nested inside the DSL definition closure will be set as child models for this model.
+     * Data elements nested inside the DSL definition closure will be set as contained elements for this model.
+     *
+     * @param parameters map of parameters such as name or id
+     * @param c DSL definition closure
+     * @return proxy to model specified by the parameters map and the DSL closure
+     */
+    void model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, true)
+
+        context.withNewContext model, c
+        context.withContextElement(Model) { ignored, Closure relConf ->
+            child model, relConf
+        }
+
+        model
+    }
+
+    /**
      * Creates new value domain, reuses the latest draft or creates new draft unless the exactly same value domain
      * already exists in the catalogue. Accepts any bindable parameters which ValueDomain instances does.
      *
@@ -181,7 +181,7 @@ import org.modelcatalogue.core.*
      * @param c DSL definition closure
      * @return proxy to value domain specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<ValueDomain> valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+    void valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         CatalogueElementProxy<ValueDomain> domain = createProxy(ValueDomain, parameters, DataElement, true)
 
         context.withNewContext domain, c
@@ -206,7 +206,7 @@ import org.modelcatalogue.core.*
      * @param c DSL definition closure
      * @return proxy to data type specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<? extends DataType> dataType(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+    void dataType(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         Class type = (parameters.enumerations ? EnumeratedType : DataType)
         if (parameters.containsKey('enumerations') && !parameters.enumerations) {
             parameters.remove('enumerations')
@@ -230,7 +230,7 @@ import org.modelcatalogue.core.*
      * @param c DSL definition closure
      * @return proxy to measurement unit specified by the parameters map and the DSL closure
      */
-    CatalogueElementProxy<MeasurementUnit> measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+    void measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         CatalogueElementProxy<MeasurementUnit> unit = createProxy(MeasurementUnit, parameters, null, true)
 
         context.withNewContext unit, c
@@ -249,9 +249,9 @@ import org.modelcatalogue.core.*
      * Primary use case for this method call is to configure the relationship metadata such as "Min. Occurs".
      *
      * @param relationshipExtensionsConfiguration DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      */
-    void relationship(@DelegatesTo(RelationshipProxyConfiguration) Closure relationshipExtensionsConfiguration) {
+    void relationship(@DelegatesTo(RelationshipConfiguration) Closure relationshipExtensionsConfiguration) {
         context.configureCurrentRelationship(relationshipExtensionsConfiguration)
     }
 
@@ -263,9 +263,9 @@ import org.modelcatalogue.core.*
      * @param classification classification of the child model
      * @param name name of the child model
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      */
-    void child(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void child(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "hierarchy" to classification, name, extensions
     }
 
@@ -277,10 +277,10 @@ import org.modelcatalogue.core.*
      *
      * @param name name of the child model
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void child(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void child(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "hierarchy" to name, extensions
     }
 
@@ -291,10 +291,10 @@ import org.modelcatalogue.core.*
      *
      * @param model proxy of the child model
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void child(CatalogueElementProxy<Model> model, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void child(CatalogueElementProxy<Model> model, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "hierarchy" to model, extensions
     }
 
@@ -306,9 +306,9 @@ import org.modelcatalogue.core.*
      * @param classification classification of the contained data element
      * @param name name of the contained data element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      */
-    void contains(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void contains(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "containment" to classification, name, extensions
     }
 
@@ -320,10 +320,10 @@ import org.modelcatalogue.core.*
      *
      * @param name name of the contained data element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void contains(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void contains(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "containment" to name, extensions
     }
 
@@ -334,10 +334,10 @@ import org.modelcatalogue.core.*
      *
      * @param model proxy of the contained data element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "containment" to element, extensions
     }
 
@@ -349,9 +349,9 @@ import org.modelcatalogue.core.*
      * @param classification classification of the base element
      * @param name name of the base element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      */
-    void basedOn(String classification, String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void basedOn(String classification, String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
             rel "base" from it.domain called classification, name, extensions
         }
@@ -365,10 +365,10 @@ import org.modelcatalogue.core.*
      *
      * @param name name of the base element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void basedOn(String name, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void basedOn(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(CatalogueElement) {
             rel "base" from it.domain called name, extensions
         }
@@ -381,10 +381,10 @@ import org.modelcatalogue.core.*
      *
      * @param model proxy of the base element
      * @param extensions DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipProxyConfiguration
+     * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions = {}) {
+    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "base" from element, extensions
     }
 
@@ -416,7 +416,7 @@ import org.modelcatalogue.core.*
      * @see RelationshipBuilder
      */
     RelationshipBuilder rel(String relationshipTypeName) {
-        return new RelationshipBuilder(context, repository, relationshipTypeName)
+        return new DefaultRelationshipBuilder(context, repository, relationshipTypeName)
     }
 
     /**
@@ -455,7 +455,7 @@ import org.modelcatalogue.core.*
      * @see https://metadata.atlassian.net/browse/MET-620
      */
     @Deprecated
-    void status(ElementStatus status) {
+    void status(PublishingStatus status) {
         context.withContextElement(CatalogueElement) {
             it.setParameter('status', status)
         } or {
@@ -497,9 +497,9 @@ import org.modelcatalogue.core.*
     /**
      * Disables the dirty-checking during the builder calls for faster imports when it's known that all the changes
      * are desired (i.e. importing into an empty catalogue).
-     * @param draft must be "draft" or ElementStatus#DRAFT
+     * @param draft must be "draft" or PublishingStatus#DRAFT
      */
-    void skip(ElementStatus draft) {
+    void skip(PublishingStatus draft) {
         if (draft == ElementStatus.DRAFT) {
             skipDrafts = true
             return
@@ -561,22 +561,22 @@ import org.modelcatalogue.core.*
     Class<MeasurementUnit> getMeasurementUnit() { MeasurementUnit }
 
     /**
-     * Shortcut for ElementStatus#DRAFT type so it does not have to me imported into the DSL scripts.
-     * @return ElementStatus#DRAFT
+     * Shortcut for PublishingStatus#DRAFT type so it does not have to me imported into the DSL scripts.
+     * @return PublishingStatus#DRAFT
      */
-    ElementStatus getDraft() { ElementStatus.DRAFT }
+    PublishingStatus getDraft() { ElementStatus.DRAFT }
 
     /**
-     * Shortcut for ElementStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
-     * @return ElementStatus#DEPRECATED
+     * Shortcut for PublishingStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
+     * @return PublishingStatus#DEPRECATED
      */
-    ElementStatus getDeprecated() { ElementStatus.DEPRECATED }
+    PublishingStatus getDeprecated() { ElementStatus.DEPRECATED }
 
     /**
-     * Shortcut for ElementStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
-     * @return ElementStatus#DEPRECATED
+     * Shortcut for PublishingStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
+     * @return PublishingStatus#DEPRECATED
      */
-    ElementStatus getFinalized() { ElementStatus.FINALIZED }
+    PublishingStatus getFinalized() { ElementStatus.FINALIZED }
 
     /**
      * Keyword to be used with #copy(String) method.

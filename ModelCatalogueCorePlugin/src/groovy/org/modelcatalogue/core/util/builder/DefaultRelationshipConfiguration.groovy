@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
-class RelationshipProxyConfiguration implements ExtensionAwareBuilder {
+class DefaultRelationshipConfiguration implements RelationshipConfiguration {
 
     Map<String, String> extensions = [:]
     boolean archived = false
