@@ -60,6 +60,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     $scope.welcome = modelcatalogue.welcome
 
+    $scope.image = (relativePath) -> "#{security.contextPath}/assets#{relativePath}"
+
   ])
 
 .controller('mc.core.ui.states.ShowCtrl', ['$scope', '$stateParams', '$state', 'element', '$rootScope', 'names' , ($scope, $stateParams, $state, element, $rootScope) ->
@@ -716,279 +718,268 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
 		<!-- from config mc.welcome.info -->
 		<div id="info" class="row" ng-bind-html="welcome.info"></div>
-		<div class="row">
+</div>
+
+<div show-if-logged-in>
+      <div class="row">
+        <div class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}">Finalized Classifications</a> {{finalizedClassificationCount}} </div>
+                            <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Classifications</a> {{draftClassificationCount}} </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a show-for-role="CURATOR" ng-click="create('classification')">
+                    <div class="panel-footer">
+                        <span class="pull-left">Create Classification</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Finalized Models</a> {{finalizedModelCount}} </div>
+                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Models</a> {{draftModelCount}}</div>
+
+                        </div>
+                    </div>
+                </div>
+                <a show-for-role="CURATOR" ng-click="create('model')">
+                    <div class="panel-footer">
+                        <span class="pull-left">Create Model</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cube fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
+                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
+                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'uninstantiated'})" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElementCount}}</div>
+                        </div>
+                    </div>
+                </div>
+                <a show-for-role="CURATOR" ng-click="create('dataElement')">
+                    <div class="panel-footer">
+                        <span class="pull-left">Create Data Element</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cog fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{finalizedValueDomainCount}} <span ng-show="incompleteValueDomainsCount"> / <a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}">Incomplete </a> {{incompleteValueDomainsCount}}</span></div>
+                            <div><a ng-click="validate()">Validate</a> / <a ng-click="convert()">Convert</a></div>
+                        </div>
+                    </div>
+                </div>
+
+                <a show-for-role="CURATOR" ng-click="create('valueDomain')">
+                    <div class="panel-footer">
+                        <span class="pull-left">Create Value Domain</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-th-large fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="dataTypesLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Finalized Data Types</a> {{finalizedDataTypeCount}} </div>
+                            <div show-for-role="VIEWER"><a id="draftDataTypesLink" ui-sref="mc.resource.list({resource: 'dataType', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Types</a> {{draftDataTypeCount}} </div>
+                        </div>
+                    </div>
+                </div>
+                <a show-for-role="CURATOR" ng-click="create('dataType')">
+                    <div class="panel-footer">
+                        <span class="pull-left" >Create Data Type</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tachometer fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Finalized Measurement Units</a> {{finalizedMeasurementUnitCount}} </div>
+                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Measurement Units</a> {{draftMeasurementUnitCount}} </div>
+                        </div>
+                    </div>
+                </div>
+                <a show-for-role="CURATOR" ng-click="create('measurementUnit')">
+                    <div class="panel-footer">
+                        <span class="pull-left">Create Measurement Unit</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}"><i class="fa fa-file-code-o fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>
+                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftAssetCount}}</div>
+
+                        </div>
+                    </div>
+                </div>
+                <a show-for-role="CURATOR" ng-click="create('asset')">
+                    <div class="panel-footer">
+                        <span class="pull-left">Create Asset</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4">
+              <div class="panel panel-default">
+                  <div class="panel-heading">
+                      <div class="row">
+                          <div class="col-xs-3">
+                              <a ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-link fa-5x fa-fw"></i></a>
+                          </div>
+                          <div class="col-xs-9 text-right">
+                              <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypeCount}}</div>
+                          </div>
+                      </div>
+                  </div>
+                  <a ng-click="create('relationshipType')">
+                      <div class="panel-footer">
+                          <span class="pull-left">Create Relationship Type</span>
+                          <span class="pull-right"><i class="fa fa-magic"></i></span>
+                          <div class="clearfix"></div>
+                      </div>
+                  </a>
+              </div>
+          </div>
+        <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}"><i class="fa fa-long-arrow-right fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}">CSV Transformations</a> {{transformationsCount}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <a ng-click="create('csvTransformation')">
+                    <div class="panel-footer">
+                        <span class="pull-left">Create CSV Transformation</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <a ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"><i class="fa fa-flash fa-5x fa-fw"></i></a>
+                        </div>
+                        <div class="col-xs-9 text-right">
+                            <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}">Active Batches</a> {{activeBatchCount}}</div>
+                            <div><a id="archivedbatchesLink" ui-sref="mc.resource.list({resource: 'batch', status: 'archived'})" ui-sref-opts="{inherit: false}">Archived Batches</a> {{archivedBatchCount}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <a ng-click="create('batch')">
+                    <div class="panel-footer">
+                        <span class="pull-left">Create Batch</span>
+                        <span class="pull-right"><i class="fa fa-magic"></i></span>
+                        <div class="clearfix"></div>
+                    </div>
+                </a>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
         <div class="col-lg-12 col-sm-12 col-md-12">
             <div class="panel panel-default">
                 <div class="panel-body">
                     <div class="row">
-                      <div class="col-lg-6 col-sm-3 col-md-12"><p>This site is built using the model catalogue toolkit and released under an <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a>.</p><p>The model catalogue toolkit is kindly sponsored by:</p></div>
-                      <div class="col-lg-2 col-sm-3 col-md-3">
-                        <p><a href="http://www.genomicsengland.co.uk/"><img src="http://www.genomicsengland.co.uk/wp-content/uploads/2013/07/Genomics-England-logo21.jpg" class="img-thumbnail" alt="Genomics England" width="60%" height="60%"></a></p>
+                      <div class=" col-xs-12 col-sm-12 col-md-4 col-lg-4"><p>Model catalogue development supported by</p></div>
+                      <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                        <p>
+                          <a href="http://www.genomicsengland.co.uk/">
+                            <img ng-src="{{image('/modelcatalogue/GEL.jpg')}}" class="img-thumbnail sponsor-logo-small" alt="Genomics England">
+                          </a>
+                        </p>
+                        <p class="hidden-xs"><a href="http://www.genomicsengland.co.uk/" class="text-muted">Genomics England</a></p>
                       </div>
-                      <div class="col-lg-2 col-sm-3 col-md-3">
-                        <p><a href="http://www.nihr.ac.uk/"><img src="http://www.nihr.ac.uk/2014-layout/img/logo.png" class="img-thumbnail" alt="NIHR" width="60%" height="60%"></a></p>
+                      <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                        <p><a href="http://www.mrc.ac.uk"><img ng-src="{{image('/modelcatalogue/MRC.png')}}" class="img-thumbnail sponsor-logo-small" alt="Medical Research Council"></a></p>
+                        <p class="hidden-xs"><a href="http://www.mrc.ac.uk" class="text-muted">Medical Research Council</a></p>
                       </div>
-                      <div class="col-lg-2 col-sm-3 col-md-3">
-                        <p><a href="http://www.metadataconsusting.co.uk"><img src="http://www.metadataconsulting.co.uk/wp-content/themes/metadata/library/images/smallforweb.png" class="img-thumbnail" alt="Metadata Consulting Ltd" width="50%" height="50%"></a></p>
+                      <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                        <p><a href="http://www.nihr.ac.uk/"><img ng-src="{{image('/modelcatalogue/NIHR.png')}}" class="img-thumbnail sponsor-logo-small" alt="NIHR"></a></p>
+                        <p class="hidden-xs"><a href="http://www.nihr.ac.uk/" class="text-muted">National Institute for Health Research</a></p>
+                      </div>
+                      <div class=" col-xs-3 col-sm-3 col-md-2 col-lg-2">
+                        <p><a href="http://www.metadataconsusting.co.uk"><img ng-src="{{image('/modelcatalogue/MDC.png')}}" class="img-thumbnail sponsor-logo-small" alt="Metadata Consulting Ltd"></a></p>
+                        <p class="hidden-xs"><a href="http://www.metadataconsusting.co.uk" class="text-muted">Metadata Consulting</a></p>
                       </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<div show-if-logged-in>
-      <div class="row">
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}">Finalized Classifications</a> {{finalizedClassificationCount}} </div>
-                                        <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Classifications</a> {{draftClassificationCount}} </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <a show-for-role="CURATOR" ng-click="create('classification')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Classification</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Finalized Models</a> {{finalizedModelCount}} </div>
-                                        <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Models</a> {{draftModelCount}}</div>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <a show-for-role="CURATOR" ng-click="create('model')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Model</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cube fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement'})" ui-sref-opts="{inherit: false}">Finalized Data Elements</a> {{finalizedDataElementCount}} </div>
-                                        <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Elements</a> {{draftDataElementCount}}</div>
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'dataElement', status:'uninstantiated'})" ui-sref-opts="{inherit: false}">Uninstantiated Data Elements</a>  {{uninstantiatedDataElementCount}}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a show-for-role="CURATOR" ng-click="create('dataElement')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Data Element</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cog fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{finalizedValueDomainCount}} <span ng-show="incompleteValueDomainsCount"> / <a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}">Incomplete </a> {{incompleteValueDomainsCount}}</span></div>
-                                        <div><a ng-click="validate()">Validate</a> / <a ng-click="convert()">Convert</a></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <a show-for-role="CURATOR" ng-click="create('valueDomain')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Value Domain</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-th-large fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="dataTypesLink" ui-sref="mc.resource.list({resource: 'dataType'})" ui-sref-opts="{inherit: false}">Finalized Data Types</a> {{finalizedDataTypeCount}} </div>
-                                        <div show-for-role="VIEWER"><a id="draftDataTypesLink" ui-sref="mc.resource.list({resource: 'dataType', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Types</a> {{draftDataTypeCount}} </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a show-for-role="CURATOR" ng-click="create('dataType')">
-                                <div class="panel-footer">
-                                    <span class="pull-left" >Create Data Type</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tachometer fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit'})" ui-sref-opts="{inherit: false}">Finalized Measurement Units</a> {{finalizedMeasurementUnitCount}} </div>
-                                        <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'measurementUnit', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Measurement Units</a> {{draftMeasurementUnitCount}} </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a show-for-role="CURATOR" ng-click="create('measurementUnit')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Measurement Unit</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}"><i class="fa fa-file-code-o fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset'})" ui-sref-opts="{inherit: false}">Finalized Assets</a> {{finalizedAssetCount}} </div>
-                                        <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'asset', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Assets</a> {{draftAssetCount}}</div>
-
-                                    </div>
-                                </div>
-                            </div>
-                            <a show-for-role="CURATOR" ng-click="create('asset')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Asset</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                  <div show-for-role="ADMIN" class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"><i class="fa fa-link fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'relationshipType'})" ui-sref-opts="{inherit: false}"> Relationship Types </a> {{relationshipTypeCount}}</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <a ng-click="create('relationshipType')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Relationship Type</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}"><i class="fa fa-long-arrow-right fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'csvTransformation'})" ui-sref-opts="{inherit: false}">CSV Transformations</a> {{transformationsCount}}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <a ng-click="create('csvTransformation')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create CSV Transformation</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div show-for-role="CURATOR" class="col-lg-4 col-sm-6 col-md-4">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-3">
-                                        <a ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}"><i class="fa fa-flash fa-5x fa-fw"></i></a>
-                                    </div>
-                                    <div class="col-xs-9 text-right">
-                                        <div><a id="batchesLink" ui-sref="mc.resource.list({resource: 'batch'})" ui-sref-opts="{inherit: false}">Active Batches</a> {{activeBatchCount}}</div>
-                                        <div><a id="archivedbatchesLink" ui-sref="mc.resource.list({resource: 'batch', status: 'archived'})" ui-sref-opts="{inherit: false}">Archived Batches</a> {{archivedBatchCount}}</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <a ng-click="create('batch')">
-                                <div class="panel-footer">
-                                    <span class="pull-left">Create Batch</span>
-                                    <span class="pull-right"><i class="fa fa-magic"></i></span>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12 col-sm-12 col-md-12">
-                            <div class="panel panel-default">
-                                <div class="panel-body">
-                                    <div class="row">
-                                      <div class="col-lg-6 col-sm-3 col-md-12"><p>This site is built using the model catalogue toolkit and released under an <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache license</a>.</p><p>The model catalogue toolkit is kindly sponsored by:</p></div>
-                                      <div class="col-lg-2 col-sm-3 col-md-3">
-                                        <p><a href="http://www.genomicsengland.co.uk/"><img src="http://www.genomicsengland.co.uk/wp-content/uploads/2013/07/Genomics-England-logo21.jpg" class="img-thumbnail" alt="Genomics England" width="60%" height="60%"></a></p>
-                                      </div>
-                                      <div class="col-lg-2 col-sm-3 col-md-3">
-                                        <p><a href="http://www.nihr.ac.uk/"><img src="http://www.nihr.ac.uk/2014-layout/img/logo.png" class="img-thumbnail" alt="NIHR" width="60%" height="60%"></a></p>
-                                      </div>
-                                      <div class="col-lg-2 col-sm-3 col-md-3">
-                                        <p><a href="http://www.metadataconsusting.co.uk"><img src="http://www.metadataconsulting.co.uk/wp-content/themes/metadata/library/images/smallforweb.png" class="img-thumbnail" alt="Metadata Consulting Ltd" width="50%" height="50%"></a></p>
-                                      </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-      </div>
     </div>
   '''
 
