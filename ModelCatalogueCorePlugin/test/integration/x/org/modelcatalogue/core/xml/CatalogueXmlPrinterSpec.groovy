@@ -1,6 +1,5 @@
 package x.org.modelcatalogue.core.xml
 
-import grails.test.spock.IntegrationSpec
 import groovy.xml.XmlUtil
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.Diff
@@ -9,23 +8,20 @@ import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import spock.lang.Ignore
-import spock.lang.Shared
-import spock.lang.Stepwise
 
-//@Stepwise
-class CatalogueXmlPrinterSpec extends IntegrationSpec {
+class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     CatalogueXmlPrinter printer
 
-    @Shared def classificationService
-    @Shared def elementService
-    @Shared def modelService
-    @Shared def initCatalogueService
+    def classificationService
+    def elementService
+    def modelService
 
-    def setupSpec() {
+
+    def setup() {
         XMLUnit.ignoreWhitespace = true
 
-        initCatalogueService.initCatalogue(true)
+        initCatalogue()
 
         if (!RelationshipType.findByName('derivedFrom')) {
             new RelationshipType(
@@ -36,9 +32,7 @@ class CatalogueXmlPrinterSpec extends IntegrationSpec {
                     destinationToSource: 'derives'
             ).save(failOnError: true, flush: true)
         }
-    }
 
-    def setup() {
         printer = new CatalogueXmlPrinter(classificationService, modelService)
     }
 

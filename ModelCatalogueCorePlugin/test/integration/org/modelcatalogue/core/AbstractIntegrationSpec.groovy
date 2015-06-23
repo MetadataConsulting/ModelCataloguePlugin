@@ -6,9 +6,6 @@ import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.web.context.support.WebApplicationContextUtils
 import spock.lang.Shared
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 abstract class AbstractIntegrationSpec extends IntegrationSpec {
 
     @Shared
@@ -17,6 +14,17 @@ abstract class AbstractIntegrationSpec extends IntegrationSpec {
     def loadMarshallers() {
         def springContext = WebApplicationContextUtils.getWebApplicationContext( ServletContextHolder.servletContext )
         springContext.getBean('modelCatalogueCorePluginCustomObjectMarshallers').register()
+    }
+
+
+    def initRelationshipTypes(){
+        TestDataHelper.initFreshDb(sessionFactory, 'reltypes.sql') {
+            initCatalogueService.initDefaultRelationshipTypes()
+        }
+    }
+
+    def initCatalogue(){
+        initCatalogueService.initCatalogue(true)
     }
 
     def loadFixtures(){
