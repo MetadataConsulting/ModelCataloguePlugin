@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.util.builder
 
-import org.modelcatalogue.core.api.builder.CatalogueBuilder
-import org.modelcatalogue.core.api.builder.WithOptionalOrClause
+import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.api.builder.WithOptionalOrClause
 
 class DefaultWithOptionalOrClause implements WithOptionalOrClause {
 

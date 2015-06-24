@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
-import org.modelcatalogue.core.api.builder.RelationshipConfiguration
+import org.modelcatalogue.api.builder.RelationshipConfiguration
 
 class DefaultRelationshipConfiguration implements RelationshipConfiguration {
 

@@ -1,6 +1,6 @@
 package org.modelcatalogue.core;
 
-import org.modelcatalogue.core.api.builder.PublishingStatus;
+import org.modelcatalogue.api.builder.PublishingStatus;
 
 public enum ElementStatus implements PublishingStatus {
     /**

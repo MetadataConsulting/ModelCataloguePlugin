@@ -4,7 +4,7 @@ import groovy.util.logging.Log4j
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.api.builder.CatalogueBuilder
+import org.modelcatalogue.api.builder.CatalogueBuilder
 
 
 @Log4j

@@ -9,9 +9,9 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ValueDomain
-import org.modelcatalogue.core.api.builder.CatalogueBuilder
-import org.modelcatalogue.core.api.builder.RelationshipConfiguration
-import org.modelcatalogue.core.api.builder.WithOptionalOrClause
+import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.api.builder.RelationshipConfiguration
+import org.modelcatalogue.api.builder.WithOptionalOrClause
 
 class CatalogueBuilderContext {
 
