@@ -11,6 +11,7 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
+import org.modelcatalogue.core.util.builder.Catalogizable
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -18,7 +19,7 @@ import org.modelcatalogue.core.util.RelationshipDirection
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement> {
+abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, Catalogizable {
 
     def grailsLinkGenerator
     def relationshipService

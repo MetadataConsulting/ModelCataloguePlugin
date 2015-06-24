@@ -45,12 +45,12 @@ public interface RelationshipBuilder {
      * @param element      proxy of the destination
      * @param extensions closure defining the metadata
      */
-    <T extends CatalogueElement> void to(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void to(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
-     * @see #to(CatalogueElementProxy, Closure)
+     * @see #to(Catalogizable, Closure)
      */
-    <T extends CatalogueElement> void to(CatalogueElementProxy<T> element);
+    void to(Catalogizable element);
 
     /**
      * Specifies the source of the relationship created by given classification and name. The metadata for this
@@ -88,12 +88,12 @@ public interface RelationshipBuilder {
      * @param element      proxy of the source
      * @param extensions closure defining the metadata
      */
-    <T extends CatalogueElement> void from(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    <T extends CatalogueElement> void from(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
-     * @see #from(CatalogueElementProxy, Closure)
+     * @see #from(Catalogizable, Closure)
      */
-    <T extends CatalogueElement> void from(CatalogueElementProxy<T> element);
+    <T extends CatalogueElement> void from(Catalogizable element);
 
     /**
      * Specifies type hint for the destination. Continue with #called(String, String) or #called(String) to

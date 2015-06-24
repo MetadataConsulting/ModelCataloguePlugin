@@ -3,13 +3,13 @@ package org.modelcatalogue.core.util.builder
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 
-@Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T> {
+@Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, Catalogizable {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, Classification, DataElement, DataType, EnumeratedType, MeasurementUnit, Model, ValueDomain]
 
     Class<T> domain
 
-    String id
+    String modelCatalogueId
     String name
     String classification
 
@@ -35,7 +35,7 @@ import org.modelcatalogue.core.*
         this.repository = repository
         this.domain = domain
 
-        this.id = id
+        this.modelCatalogueId = id
         this.name = name
         this.classification = classification
 
@@ -94,7 +94,7 @@ import org.modelcatalogue.core.*
         }
 
         if (key == 'modelCatalogueId') {
-            id = value?.toString()
+            modelCatalogueId = value?.toString()
         }
 
         if (key == 'name') {
@@ -146,7 +146,7 @@ import org.modelcatalogue.core.*
                     log.debug "$this has changed at least one property - property $key (different latest version id)\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
                     return true
                 }
-                if (realValue?.id != currentValue?.id) {
+                if (realValue?.modelCatalogueId != currentValue?.modelCatalogueId) {
                     log.debug "$this has changed at least one property - property $key (different id)\n\n===NEW===\n$realValue\n===OLD===\n${currentValue}\n========="
                     return true
                 }
@@ -259,8 +259,8 @@ import org.modelcatalogue.core.*
     }
 
     T findExisting() {
-        if (id) {
-            T result = repository.findById(domain, id)
+        if (modelCatalogueId) {
+            T result = repository.findById(domain, modelCatalogueId)
             if (result) {
                 return result
             }
@@ -270,9 +270,9 @@ import org.modelcatalogue.core.*
         }
         if (name) {
             if (classification) {
-                return repository.tryFind(domain, classification, name, id)
+                return repository.tryFind(domain, classification, name, modelCatalogueId)
             }
-            return repository.tryFindUnclassified(domain, name, id)
+            return repository.tryFindUnclassified(domain, name, modelCatalogueId)
         }
         throw new IllegalStateException("Missing id, classification and name so there is no way how to find existing element")
     }
@@ -302,8 +302,8 @@ import org.modelcatalogue.core.*
 
     private Map<String, Object> updateProperties(T element) {
         element.name = name
-        if (id && !id.startsWith(element.getDefaultModelCatalogueId(true))) {
-            element.modelCatalogueId = id
+        if (modelCatalogueId && !modelCatalogueId.startsWith(element.getDefaultModelCatalogueId(true))) {
+            element.modelCatalogueId = modelCatalogueId
         }
         parameters.each { String key, Object value ->
             if (key == 'status') return
@@ -339,7 +339,7 @@ import org.modelcatalogue.core.*
     }
 
     String toString() {
-        "Proxy of $domain.simpleName[id: $id, classification: $classification, name: $name]"
+        "Proxy of $domain.simpleName[id: $modelCatalogueId, classification: $classification, name: $name]"
     }
 
     @Override

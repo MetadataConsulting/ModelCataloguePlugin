@@ -294,7 +294,7 @@ import org.modelcatalogue.core.*
      * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void child(CatalogueElementProxy<Model> model, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
+    void child(Catalogizable model, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "hierarchy" to model, extensions
     }
 
@@ -337,7 +337,7 @@ import org.modelcatalogue.core.*
      * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
+    void contains(Catalogizable element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "containment" to element, extensions
     }
 
@@ -384,7 +384,7 @@ import org.modelcatalogue.core.*
      * @see RelationshipConfiguration
      * @see #globalSearchFor(java.lang.Class)
      */
-    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
+    void basedOn(Catalogizable element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         rel "base" from element, extensions
     }
 
@@ -405,7 +405,7 @@ import org.modelcatalogue.core.*
      * @param id ID of the target of the proxy created
      * @return proxy specified by given ID
      */
-    CatalogueElementProxy<? extends CatalogueElement> ref(String id) {
+    Catalogizable ref(String id) {
         repository.createAbstractionById(CatalogueElement, null, id, false)
     }
 

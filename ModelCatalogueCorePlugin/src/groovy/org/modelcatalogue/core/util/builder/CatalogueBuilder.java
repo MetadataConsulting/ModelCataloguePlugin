@@ -4,7 +4,6 @@ import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 import groovy.transform.stc.ClosureParams;
 import groovy.transform.stc.FromString;
-import org.modelcatalogue.core.*;
 
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +26,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param c catalogue definition
      * @return set of resolved elements
      */
-    Set<CatalogueElement> build(@DelegatesTo(CatalogueBuilder.class) Closure c);
+    Set<Catalogizable> build(@DelegatesTo(CatalogueBuilder.class) Closure c);
 
     /**
      * @see #classification(Map, Closure)
@@ -197,12 +196,12 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipConfiguration
      * @see #globalSearchFor(Class)
      */
-    void child(CatalogueElementProxy<Model> model, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void child(Catalogizable model, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
-     * see #child(org.modelcatalogue.core.util.builder.CatalogueElementProxy, Closure)
+     * see #child(org.modelcatalogue.core.util.builder.Catalogizable, Closure)
      */
-    void child(CatalogueElementProxy<Model> model);
+    void child(Catalogizable model);
 
     /**
      * Adds the data element specified by given classification and name to a parent model.
@@ -249,12 +248,12 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipConfiguration
      * @see #globalSearchFor(Class)
      */
-    void contains(CatalogueElementProxy<DataElement> element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void contains(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
-     * see #contains(org.modelcatalogue.core.util.builder.CatalogueElementProxy, Closure)
+     * see #contains(org.modelcatalogue.core.util.builder.Catalogizable, Closure)
      */
-    void contains(CatalogueElementProxy<DataElement> element);
+    void contains(Catalogizable element);
 
     /**
      * Adds the base element specified by given classification and name to a parent element.
@@ -301,12 +300,12 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @see RelationshipConfiguration
      * @see #globalSearchFor(Class)
      */
-    void basedOn(CatalogueElementProxy<CatalogueElement> element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void basedOn(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
-     * see #basedOn(org.modelcatalogue.core.util.builder.CatalogueElementProxy, Closure)
+     * see #basedOn(org.modelcatalogue.core.util.builder.Catalogizable, Closure)
      */
-    void basedOn(CatalogueElementProxy<CatalogueElement> element);
+    void basedOn(Catalogizable element);
 
     /**
      * Assigns the id of the element dynamically.
@@ -324,7 +323,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param id ID of the target of the proxy created
      * @return proxy specified by given ID
      */
-    CatalogueElementProxy<? extends CatalogueElement> ref(String id);
+    Catalogizable ref(String id);
 
     /**
      * Creates new relationship builder for given relationship type specified by name.

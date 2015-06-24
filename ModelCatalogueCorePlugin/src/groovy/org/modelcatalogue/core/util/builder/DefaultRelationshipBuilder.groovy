@@ -109,6 +109,42 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param name name of the source
      * @param extensions closure defining the metadata
      */
+    @Override
+    void to(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions) {
+        if (element instanceof CatalogueElementProxy) {
+            to((CatalogueElementProxy) element, extensions)
+            return
+        }
+        to repository.createProxy(getDestinationHintOrClass(), [id: element.modelCatalogueId]), extensions
+    }
+
+    @Override
+    void to(Catalogizable element) {
+        if (element instanceof CatalogueElementProxy) {
+            to((CatalogueElementProxy) element)
+            return
+        }
+        to repository.createProxy(getDestinationHintOrClass(), [id: element.modelCatalogueId])
+    }
+
+    @Override
+    void from(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions) {
+        if (element instanceof CatalogueElementProxy) {
+            from((CatalogueElementProxy) element, extensions)
+            return
+        }
+        from repository.createProxy(getSourceHintOrClass(), [id: element.modelCatalogueId]), extensions
+    }
+
+    @Override
+    void from(Catalogizable element) {
+        if (element instanceof CatalogueElementProxy) {
+            from((CatalogueElementProxy) element)
+            return
+        }
+        from repository.createProxy(getSourceHintOrClass(), [id: element.modelCatalogueId])
+    }
+
     void from(String name, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(Classification) {
             from repository.createProxy(getSourceHintOrClass(), [classification: it.name, name: name]), extensions

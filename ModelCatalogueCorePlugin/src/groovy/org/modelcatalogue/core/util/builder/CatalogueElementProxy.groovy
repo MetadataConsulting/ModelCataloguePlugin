@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
-interface CatalogueElementProxy<T> {
+interface CatalogueElementProxy<T> extends Catalogizable {
 
 
     T resolve()
@@ -17,8 +17,7 @@ interface CatalogueElementProxy<T> {
 
     Class<T> getDomain()
 
-    String getId()
-    void setId(String id)
+    void setModelCatalogueId(String id)
 
     String getName()
     String getClassification()
