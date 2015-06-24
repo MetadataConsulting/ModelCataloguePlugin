@@ -170,7 +170,7 @@ class OBOService {
 
 
         log.info "Building new models"
-        builder.build {
+        Set<CatalogueElement> created = builder.build {
 
             classification(name: name) {
 
@@ -213,7 +213,7 @@ class OBOService {
 
         log.info "Import finished for ${name}"
 
-        builder.lastCreated.find { it.instanceOf(Classification) }
+        created.find { it.instanceOf(Classification) }
     }
 
     private static void handleIsA(CatalogueBuilder builder, Frame frame, Template idTemplate, Map<String, String> oboIdsToNames) {

@@ -33,10 +33,6 @@ class InitCatalogueService {
     }
 
     def initDefaultDataTypes(boolean failOnError = false) {
-        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
-        builder.skip ElementStatus.DRAFT
-
-        GroovyShell shell = prepareGroovyShell(builder)
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver()
 
         List<Resource> forSecondPass = []
@@ -47,7 +43,7 @@ class InitCatalogueService {
                 continue
             }
             try {
-                readMCFile(resource, shell, builder, true)
+                readMCFile(resource, true)
             } catch (Exception e) {
                 log.info("Resource $resource couldn't be processed at the moment, will try again later", e)
                 forSecondPass << resource
@@ -57,15 +53,15 @@ class InitCatalogueService {
 
         // second pass
         for (Resource resource in forSecondPass) {
-            readMCFile(resource, shell, builder, failOnError)
+            readMCFile(resource, failOnError)
         }
     }
 
-    private void readMCFile(Resource resource, GroovyShell shell, CatalogueBuilder builder, boolean failOnError) {
+    private void readMCFile(Resource resource, boolean failOnError) {
         try {
             log.info "Importing MC file ${resource.URI}"
-            shell.evaluate(resource.inputStream.newReader())
-            for (CatalogueElement element in builder.lastCreated) {
+            Set<CatalogueElement> lastCreated = importMCFile(resource.inputStream, true)
+            for (CatalogueElement element in lastCreated) {
                 if (element.status == ElementStatus.DRAFT) {
                     elementService.finalizeElement(element)
                 }
@@ -116,11 +112,14 @@ class InitCatalogueService {
         }
     }
 
-    Set<CatalogueElement> importMCFile(InputStream inputStream) {
+    Set<CatalogueElement> importMCFile(InputStream inputStream, boolean skipDraft = false) {
         CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        if (skipDraft) {
+            builder.skip ElementStatus.DRAFT
+        }
         GroovyShell shell = prepareGroovyShell(builder)
-        shell.evaluate(inputStream.newReader())
-        builder.lastCreated
+        CatalogueBuilderScript script = shell.parse(inputStream.newReader()) as CatalogueBuilderScript
+        script.run() as Set<CatalogueElement>
     }
 
     private GroovyShell prepareGroovyShell(CatalogueBuilder builder) {

@@ -419,42 +419,42 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @return Classification type
      */
-    Class<Classification> getClassification();
+    Class<?> getClassification();
 
     /**
      * Shortcut for Model type so it does not have to me imported into the DSL scripts.
      *
      * @return Model type
      */
-    Class<Model> getModel();
+    Class<?> getModel();
 
     /**
      * Shortcut for DataElement type so it does not have to me imported into the DSL scripts.
      *
      * @return DataElement type
      */
-    Class<DataElement> getDataElement();
+    Class<?> getDataElement();
 
     /**
      * Shortcut for ValueDomain type so it does not have to me imported into the DSL scripts.
      *
      * @return ValueDomain type
      */
-    Class<ValueDomain> getValueDomain();
+    Class<?> getValueDomain();
 
     /**
      * Shortcut for DataType type so it does not have to me imported into the DSL scripts.
      *
      * @return DataType type
      */
-    Class<DataType> getDataType();
+    Class<?> getDataType();
 
     /**
      * Shortcut for DataType type so it does not have to me imported into the DSL scripts.
      *
      * @return DataType type
      */
-    Class<MeasurementUnit> getMeasurementUnit();
+    Class<?> getMeasurementUnit();
 
     /**
      * Shortcut for ElementStatus#DRAFT type so it does not have to me imported into the DSL scripts.
@@ -500,7 +500,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param type type for unclassified searches
      */
-    <T extends CatalogueElement> void globalSearchFor(Class<T> type);
+    void globalSearchFor(Class<?> type);
 
     /**
      * Trigger the automatic creation of nested elements of given types. Currently data types and value domains are
@@ -515,14 +515,5 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param type either dataType or valueDomain
      */
-    <T extends CatalogueElement> void automatic(Class<T> type);
-
-    /**
-     * Returns the set of elements resolve by latest call to build method. They don't have to be newly created if there were matched
-     * against existing elements in the database. The set is exactly the same as the one returned from the
-     * #build(Closure) method.
-     *
-     * @return set of elements resolve by the latest call to the build method
-     */
-    Set<CatalogueElement> getLastCreated();
+    void automatic(Class<?> type);
 }

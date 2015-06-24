@@ -1,8 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
-import org.modelcatalogue.core.CatalogueElement
-
-interface CatalogueElementProxy<T extends CatalogueElement> {
+interface CatalogueElementProxy<T> {
 
 
     T resolve()

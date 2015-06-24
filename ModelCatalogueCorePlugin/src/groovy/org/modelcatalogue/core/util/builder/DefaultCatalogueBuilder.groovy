@@ -600,7 +600,7 @@ import org.modelcatalogue.core.*
      *
      * @param type type for unclassified searches
      */
-    public <T extends CatalogueElement> void globalSearchFor(Class<T> type){
+    void globalSearchFor(Class<?> type){
         repository.unclassifiedQueriesFor << type
     }
 
@@ -617,23 +617,12 @@ import org.modelcatalogue.core.*
      *
      * @param type either dataType or valueDomain
      */
-    public <T extends CatalogueElement> void automatic(Class<T> type){
+    void automatic(Class<?> type){
 
         if (!(type in SUPPORTED_FOR_AUTO)) {
             throw new IllegalArgumentException("Only supported values are ${SUPPORTED_FOR_AUTO.collect{GrailsNameUtils.getPropertyName(it)}.join(', ')}")
         }
         createAutomatically << type
-    }
-
-    /**
-     * Returns the set of elements resolve by latest call to build method. They don't have to be newly created if there were matched
-     * against existing elements in the database. The set is exactly the same as the one returned from the
-     * #build(Closure) method.
-     *
-     * @return set of elements resolve by the latest call to the build method
-     */
-    public Set<CatalogueElement> getLastCreated() {
-      new HashSet<CatalogueElement>(created)
     }
 
     /**
