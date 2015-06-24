@@ -3,7 +3,7 @@ package x.org.modelcatalogue.core.util
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Issue
 

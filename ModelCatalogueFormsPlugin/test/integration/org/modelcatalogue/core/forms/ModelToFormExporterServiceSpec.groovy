@@ -12,7 +12,7 @@ import static org.modelcatalogue.core.forms.ModelToFormExporterService.*
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.springframework.validation.Errors
 

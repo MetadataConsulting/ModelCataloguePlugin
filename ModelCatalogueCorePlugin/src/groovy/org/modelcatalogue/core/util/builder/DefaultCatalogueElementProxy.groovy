@@ -2,7 +2,7 @@ package org.modelcatalogue.core.util.builder
 
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
-import org.modelcatalogue.api.builder.Catalogizable
+import org.modelcatalogue.builder.api.Catalogizable
 
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, Catalogizable {
 

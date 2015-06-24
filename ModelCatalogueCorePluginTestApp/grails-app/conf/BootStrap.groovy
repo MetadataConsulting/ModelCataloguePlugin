@@ -7,7 +7,7 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod

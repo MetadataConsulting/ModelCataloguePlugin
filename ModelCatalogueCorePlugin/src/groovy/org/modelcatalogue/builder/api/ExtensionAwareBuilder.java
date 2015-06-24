@@ -1,4 +1,4 @@
-package org.modelcatalogue.api.builder;
+package org.modelcatalogue.builder.api;
 
 import java.util.Map;
 

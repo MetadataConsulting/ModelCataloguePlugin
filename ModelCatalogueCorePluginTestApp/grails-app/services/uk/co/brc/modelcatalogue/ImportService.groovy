@@ -1,7 +1,7 @@
 package uk.co.brc.modelcatalogue
 
 import org.modelcatalogue.core.dataarchitect.DataImportService
-import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 
 class ImportService {
 

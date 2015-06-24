@@ -8,7 +8,7 @@ import groovy.json.JsonSlurper
 import groovy.json.internal.LazyMap
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class UmljService {

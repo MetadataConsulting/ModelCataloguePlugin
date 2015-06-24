@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.util.builder
 
-import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 
 abstract class CatalogueBuilderScript extends Script {
 

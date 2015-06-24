@@ -1,4 +1,4 @@
-package org.modelcatalogue.api.builder;
+package org.modelcatalogue.builder.api;
 
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;

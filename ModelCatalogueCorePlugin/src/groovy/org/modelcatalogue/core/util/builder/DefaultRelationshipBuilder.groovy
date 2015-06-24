@@ -1,9 +1,9 @@
 package org.modelcatalogue.core.util.builder
 
 import org.modelcatalogue.core.*
-import org.modelcatalogue.api.builder.Catalogizable
-import org.modelcatalogue.api.builder.RelationshipBuilder
-import org.modelcatalogue.api.builder.RelationshipConfiguration
+import org.modelcatalogue.builder.api.Catalogizable
+import org.modelcatalogue.builder.api.RelationshipBuilder
+import org.modelcatalogue.builder.api.RelationshipConfiguration
 
 /**
  * RelationshipBuilder is supplementary class to CatalogueBuilder handling part of the DSL dealing with creating

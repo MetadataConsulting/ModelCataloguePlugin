@@ -8,7 +8,7 @@ import org.obolibrary.oboformat.model.Clause
 import org.obolibrary.oboformat.model.Frame
 import org.obolibrary.oboformat.model.OBODoc
 import org.obolibrary.oboformat.parser.OBOFormatParser
-import org.modelcatalogue.api.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 
 class OBOService {
 

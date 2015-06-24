@@ -5,11 +5,11 @@ import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
-import org.modelcatalogue.api.builder.Catalogizable
-import org.modelcatalogue.api.builder.CatalogueBuilder
-import org.modelcatalogue.api.builder.PublishingStatus
-import org.modelcatalogue.api.builder.RelationshipBuilder
-import org.modelcatalogue.api.builder.RelationshipConfiguration
+import org.modelcatalogue.builder.api.Catalogizable
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.builder.api.PublishingStatus
+import org.modelcatalogue.builder.api.RelationshipBuilder
+import org.modelcatalogue.builder.api.RelationshipConfiguration
 
 /**
  * CatalogueBuilder class allows to design the catalogue elements relationship in a tree-like structure simply without
