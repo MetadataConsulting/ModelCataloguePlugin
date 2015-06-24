@@ -1,4 +1,6 @@
-package org.modelcatalogue.core.util.builder;
+package org.modelcatalogue.core.api.builder;
+
+import org.modelcatalogue.core.api.builder.ExtensionAwareBuilder;
 
 import java.util.Map;
 

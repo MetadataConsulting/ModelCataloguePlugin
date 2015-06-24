@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.util.builder;
+package org.modelcatalogue.core.api.builder;
 
 public interface Catalogizable {
     String getModelCatalogueId();

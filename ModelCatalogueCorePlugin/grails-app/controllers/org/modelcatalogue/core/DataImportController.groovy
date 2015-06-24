@@ -3,7 +3,6 @@ package org.modelcatalogue.core
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus

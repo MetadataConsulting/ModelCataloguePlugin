@@ -1,9 +1,10 @@
-package org.modelcatalogue.core.util.builder;
+package org.modelcatalogue.core.api.builder;
 
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 import groovy.transform.stc.ClosureParams;
 import groovy.transform.stc.FromString;
+import org.modelcatalogue.core.util.builder.*;
 
 import java.util.Map;
 import java.util.Set;

@@ -3,9 +3,8 @@ package x.org.modelcatalogue.core.util
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.api.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import spock.lang.Ignore
 import spock.lang.Issue
 
 class CatalogueBuilderIntegrationSpec extends IntegrationSpec {

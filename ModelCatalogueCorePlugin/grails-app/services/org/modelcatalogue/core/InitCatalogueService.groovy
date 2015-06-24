@@ -6,7 +6,7 @@ import org.codehaus.groovy.grails.io.support.PathMatchingResourcePatternResolver
 import org.codehaus.groovy.grails.io.support.Resource
 import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.api.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper

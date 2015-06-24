@@ -11,7 +11,7 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.builder.Catalogizable
+import org.modelcatalogue.core.api.builder.Catalogizable
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model

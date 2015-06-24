@@ -5,6 +5,11 @@ import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.builder.Catalogizable
+import org.modelcatalogue.core.api.builder.CatalogueBuilder
+import org.modelcatalogue.core.api.builder.PublishingStatus
+import org.modelcatalogue.core.api.builder.RelationshipBuilder
+import org.modelcatalogue.core.api.builder.RelationshipConfiguration
 
 /**
  * CatalogueBuilder class allows to design the catalogue elements relationship in a tree-like structure simply without
@@ -249,7 +254,7 @@ import org.modelcatalogue.core.*
      * Primary use case for this method call is to configure the relationship metadata such as "Min. Occurs".
      *
      * @param relationshipExtensionsConfiguration DSL definition closure expecting setting the relationship metadata
-     * @see RelationshipConfiguration
+     * @see org.modelcatalogue.core.api.builder.RelationshipConfiguration
      */
     void relationship(@DelegatesTo(RelationshipConfiguration) Closure relationshipExtensionsConfiguration) {
         context.configureCurrentRelationship(relationshipExtensionsConfiguration)
@@ -413,7 +418,7 @@ import org.modelcatalogue.core.*
      * Creates new relationship builder for given relationship type specified by name.
      * @param relationshipTypeName name of the relationship type
      * @return the builder for given relationship type
-     * @see RelationshipBuilder
+     * @see org.modelcatalogue.core.api.builder.RelationshipBuilder
      */
     RelationshipBuilder rel(String relationshipTypeName) {
         return new DefaultRelationshipBuilder(context, repository, relationshipTypeName)

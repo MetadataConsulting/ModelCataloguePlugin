@@ -2,7 +2,7 @@ package org.modelcatalogue.core.dataarchitect
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.api.builder.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class DataImportService {

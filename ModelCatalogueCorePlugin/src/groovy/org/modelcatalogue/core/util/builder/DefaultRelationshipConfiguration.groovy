@@ -1,5 +1,7 @@
 package org.modelcatalogue.core.util.builder
 
+import org.modelcatalogue.core.api.builder.RelationshipConfiguration
+
 class DefaultRelationshipConfiguration implements RelationshipConfiguration {
 
     Map<String, String> extensions = [:]

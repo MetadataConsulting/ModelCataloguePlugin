@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util.builder
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
+import org.modelcatalogue.core.api.builder.RelationshipConfiguration
 import org.modelcatalogue.core.util.FriendlyErrors
 
 @Log4j

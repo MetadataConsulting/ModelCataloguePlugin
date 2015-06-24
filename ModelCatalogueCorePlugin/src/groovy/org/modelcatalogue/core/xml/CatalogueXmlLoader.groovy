@@ -4,7 +4,7 @@ import groovy.util.logging.Log4j
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.api.builder.CatalogueBuilder
 
 
 @Log4j
@@ -26,7 +26,7 @@ class CatalogueXmlLoader {
             // figure out how to make this validating
             XmlSlurper xs = new XmlSlurper(false, true)
             handleChildren(xs.parse(xml))
-        }
+        } as Set<CatalogueElement>
     }
 
     private static Map<String, Object> parameters(NodeChild element) {

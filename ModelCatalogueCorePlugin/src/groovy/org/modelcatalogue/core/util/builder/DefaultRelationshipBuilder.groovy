@@ -1,6 +1,9 @@
 package org.modelcatalogue.core.util.builder
 
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.builder.Catalogizable
+import org.modelcatalogue.core.api.builder.RelationshipBuilder
+import org.modelcatalogue.core.api.builder.RelationshipConfiguration
 
 /**
  * RelationshipBuilder is supplementary class to CatalogueBuilder handling part of the DSL dealing with creating
@@ -110,7 +113,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param extensions closure defining the metadata
      */
     @Override
-    void to(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions) {
+    void to(Catalogizable element, @DelegatesTo(RelationshipConfiguration) Closure extensions) {
         if (element instanceof CatalogueElementProxy) {
             to((CatalogueElementProxy) element, extensions)
             return
@@ -128,7 +131,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
     }
 
     @Override
-    void from(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions) {
+    void from(Catalogizable element, @DelegatesTo(RelationshipConfiguration) Closure extensions) {
         if (element instanceof CatalogueElementProxy) {
             from((CatalogueElementProxy) element, extensions)
             return
