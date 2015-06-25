@@ -3,14 +3,20 @@ package org.modelcatalogue.core.xml
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
 
-/**
- * Created by ladin on 15.01.15.
- */
 class ValueDomainPrintHelper extends CatalogueElementPrintHelper<ValueDomain> {
 
     @Override
     String getTopLevelName() {
         "valueDomain"
+    }
+
+    @Override
+    Map<String, Object> collectAttributes(ValueDomain element, PrintContext context) {
+        Map<String, Object> ret = super.collectAttributes(element, context)
+        if (element.multiple) {
+            ret.multiple = element.multiple
+        }
+        ret
     }
 
     @Override
