@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema
-        xmlns:mdr="http://www.metadataregistry.org.uk/assets/schema/1.0.1/metadataregistry.xsd"
+        xmlns:mdr="http://www.metadataregistry.org.uk/assets/schema/1.0.2/metadataregistry.xsd"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/1.0.1/metadataregistry.xsd"
+        targetNamespace="http://www.metadataregistry.org.uk/assets/schema/1.0.2/metadataregistry.xsd"
         elementFormDefault="qualified" version="1.0" xml:lang="EN">
 
     <xs:simpleType name="Name">
@@ -225,6 +225,7 @@
                     <xs:element name="unitOfMeasure"    type="mdr:MeasurementUnit"   minOccurs="0" />
                     <xs:element name="dataType"         type="mdr:DataType"          minOccurs="0" />
                 </xs:sequence>
+                <xs:attribute name="multiple" type="xs:boolean" />
                 <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>

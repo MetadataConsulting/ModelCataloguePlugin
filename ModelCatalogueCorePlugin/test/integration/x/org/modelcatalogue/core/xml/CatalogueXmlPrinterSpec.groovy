@@ -44,7 +44,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         StringWriter writer = new StringWriter()
         writable.writeTo(writer)
         expect:
-        writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.0.1/metadataregistry.xsd">
+        writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.0.2/metadataregistry.xsd">
   <valueDomain name="Test" id="http://example.com/specialchars" status="DRAFT">
     <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
   </valueDomain>
