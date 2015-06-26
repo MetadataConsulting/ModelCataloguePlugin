@@ -6,7 +6,7 @@ grails.serverURL = System.getenv('METADATA_SERVER_URL') ?:  "http://localhost:${
 // datasource
 dataSource {
     driverClassName = "com.mysql.jdbc.Driver"
-    dialect='org.hibernate.dialect.MySQLInnoDBDialect'
+    dialect='org.hibernate.dialect.MySQLDialect'
     url = System.getenv('METADATA_DB_NAME') ?: "jdbc:mysql://localhost:3306/${System.getProperty('mc.db.schema') ?: System.getenv('METADATA_DB_SCHEMA') ?: 'nhic'}?autoReconnect=true&useUnicode=yes"
     username = System.getenv('METADATA_DB_USERNAME')
     password = System.getenv('METADATA_DB_PASSWORD')
