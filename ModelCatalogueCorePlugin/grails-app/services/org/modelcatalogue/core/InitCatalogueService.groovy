@@ -114,13 +114,14 @@ class InitCatalogueService {
     }
 
     Set<CatalogueElement> importMCFile(InputStream inputStream, boolean skipDraft = false) {
-        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
         if (skipDraft) {
             builder.skip ElementStatus.DRAFT
         }
         GroovyShell shell = prepareGroovyShell(builder)
         CatalogueBuilderScript script = shell.parse(inputStream.newReader()) as CatalogueBuilderScript
-        script.run() as Set<CatalogueElement>
+        script.run()
+        builder.created
     }
 
     private GroovyShell prepareGroovyShell(CatalogueBuilder builder) {

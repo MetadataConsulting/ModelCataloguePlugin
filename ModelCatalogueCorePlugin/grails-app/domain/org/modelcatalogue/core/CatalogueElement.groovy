@@ -194,7 +194,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
-        createLinkTo([:], source, type)
+        createLinkFrom([:], source, type)
     }
 
     Relationship removeLinkTo(CatalogueElement destination, RelationshipType type) {
