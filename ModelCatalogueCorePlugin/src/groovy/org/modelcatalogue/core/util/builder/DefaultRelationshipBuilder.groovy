@@ -1,9 +1,14 @@
 package org.modelcatalogue.core.util.builder
 
-import org.modelcatalogue.core.*
-import org.modelcatalogue.builder.api.Catalogizable
+import org.modelcatalogue.builder.api.BuilderKeyword
+import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.builder.api.RelationshipBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
+import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.api.CatalogueElement
+import org.modelcatalogue.core.api.RelationshipType
 
 /**
  * RelationshipBuilder is supplementary class to CatalogueBuilder handling part of the DSL dealing with creating
@@ -46,7 +51,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
     DefaultRelationshipBuilder(CatalogueBuilderContext context, CatalogueElementProxyRepository repository, String type) {
         this.repository = repository
         this.context = context
-        this.type = RelationshipType.readByName(type)
+        this.type = org.modelcatalogue.core.RelationshipType.readByName(type)
     }
 
     /**
@@ -84,7 +89,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param proxy proxy of the destination
      * @param extensions closure defining the metadata
      */
-    public <T extends CatalogueElement> void to(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
+    void to(CatalogueElementProxy element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(getSourceHintOrClass()) {
             return it.addToPendingRelationships(new RelationshipProxy(type.name, it, element, extensions))
         } or {
@@ -113,7 +118,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param extensions closure defining the metadata
      */
     @Override
-    void to(Catalogizable element, @DelegatesTo(RelationshipConfiguration) Closure extensions) {
+    void to(CatalogueElement element, @DelegatesTo(RelationshipConfiguration) Closure extensions) {
         if (element instanceof CatalogueElementProxy) {
             to((CatalogueElementProxy) element, extensions)
             return
@@ -122,7 +127,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
     }
 
     @Override
-    void to(Catalogizable element) {
+    void to(CatalogueElement element) {
         if (element instanceof CatalogueElementProxy) {
             to((CatalogueElementProxy) element)
             return
@@ -131,7 +136,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
     }
 
     @Override
-    void from(Catalogizable element, @DelegatesTo(RelationshipConfiguration) Closure extensions) {
+    void from(CatalogueElement element, @DelegatesTo(RelationshipConfiguration) Closure extensions) {
         if (element instanceof CatalogueElementProxy) {
             from((CatalogueElementProxy) element, extensions)
             return
@@ -140,7 +145,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
     }
 
     @Override
-    void from(Catalogizable element) {
+    void from(CatalogueElement element) {
         if (element instanceof CatalogueElementProxy) {
             from((CatalogueElementProxy) element)
             return
@@ -162,7 +167,7 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param proxy proxy of the source
      * @param extensions closure defining the metadata
      */
-    public <T extends CatalogueElement> void from(CatalogueElementProxy<T> element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
+    public void from(CatalogueElementProxy element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(getDestinationHintOrClass()) {
             return it.addToPendingRelationships(new RelationshipProxy(type.name, element, it, extensions))
         } or {
@@ -176,8 +181,12 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param domain expected type of the destination
      * @return self
      */
-    DefaultRelationshipBuilder to(Class domain) {
-        destinationClassHint = domain == EnumeratedType ? DataType : domain
+    DefaultRelationshipBuilder to(BuilderKeyword type) {
+        if (type instanceof ModelCatalogueTypes) {
+            destinationClassHint = type.implementation == EnumeratedType ? DataType : type.implementation
+        } else {
+            throw new IllegalArgumentException("Unsupported keyword: $type")
+        }
         this
     }
 
@@ -187,8 +196,12 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      * @param domain expected type of the source
      * @return self
      */
-    DefaultRelationshipBuilder from(Class domain) {
-        sourceClassHint = domain == EnumeratedType ? DataType : domain
+    DefaultRelationshipBuilder from(BuilderKeyword type) {
+        if (type instanceof ModelCatalogueTypes) {
+            sourceClassHint = type.implementation == EnumeratedType ? DataType : type.implementation
+        } else {
+            throw new IllegalArgumentException("Unsupported keyword: $type")
+        }
         this
     }
 

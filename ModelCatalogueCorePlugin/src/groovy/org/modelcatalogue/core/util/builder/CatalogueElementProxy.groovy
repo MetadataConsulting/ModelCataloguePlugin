@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.util.builder
 
-import org.modelcatalogue.builder.api.Catalogizable
+import org.modelcatalogue.core.api.CatalogueElement
 
-interface CatalogueElementProxy<T> extends Catalogizable {
+interface CatalogueElementProxy<T> extends CatalogueElement {
 
 
     T resolve()

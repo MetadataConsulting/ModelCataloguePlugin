@@ -11,7 +11,6 @@ import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
-import org.modelcatalogue.builder.api.WithOptionalOrClause
 
 class CatalogueBuilderContext {
 

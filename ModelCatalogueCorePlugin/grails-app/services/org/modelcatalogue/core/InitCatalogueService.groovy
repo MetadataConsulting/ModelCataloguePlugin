@@ -8,7 +8,7 @@ import org.grails.datastore.gorm.GormStaticApi
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.core.util.builder.CatalogueBuilderScript
+import org.modelcatalogue.builder.util.CatalogueBuilderScript
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.util.test.TestDataHelper
 

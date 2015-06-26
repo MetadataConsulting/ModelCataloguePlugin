@@ -1,7 +1,8 @@
-package org.modelcatalogue.builder.api;
+package org.modelcatalogue.core.util.builder;
 
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
+import org.modelcatalogue.builder.api.CatalogueBuilder;
 
 public interface WithOptionalOrClause {
     WithOptionalOrClause NOOP = new WithOptionalOrClause() {

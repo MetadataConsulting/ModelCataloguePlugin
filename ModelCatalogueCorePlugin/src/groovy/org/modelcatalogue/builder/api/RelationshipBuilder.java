@@ -2,7 +2,7 @@ package org.modelcatalogue.builder.api;
 
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
-import org.modelcatalogue.core.CatalogueElement;
+import org.modelcatalogue.core.api.CatalogueElement;
 
 /**
  * RelationshipBuilder is supplementary class to CatalogueBuilder handling part of the DSL dealing with creating
@@ -45,12 +45,12 @@ public interface RelationshipBuilder {
      * @param element      proxy of the destination
      * @param extensions closure defining the metadata
      */
-    void to(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void to(CatalogueElement element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
-     * @see #to(Catalogizable, Closure)
+     * @see #to(CatalogueElement, Closure)
      */
-    void to(Catalogizable element);
+    void to(CatalogueElement element);
 
     /**
      * Specifies the source of the relationship created by given classification and name. The metadata for this
@@ -88,12 +88,12 @@ public interface RelationshipBuilder {
      * @param element      proxy of the source
      * @param extensions closure defining the metadata
      */
-    <T extends CatalogueElement> void from(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void from(CatalogueElement element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
-     * @see #from(Catalogizable, Closure)
+     * @see #from(CatalogueElement, Closure)
      */
-    <T extends CatalogueElement> void from(Catalogizable element);
+    void from(CatalogueElement element);
 
     /**
      * Specifies type hint for the destination. Continue with #called(String, String) or #called(String) to
@@ -102,7 +102,7 @@ public interface RelationshipBuilder {
      * @param domain expected type of the destination
      * @return self
      */
-    RelationshipBuilder to(Class domain);
+    RelationshipBuilder to(BuilderKeyword domain);
 
     /**
      * Specifies type hint for the source. Continue with #called(String, String) or #called(String) to
@@ -111,11 +111,11 @@ public interface RelationshipBuilder {
      * @param domain expected type of the source
      * @return self
      */
-    RelationshipBuilder from(Class domain);
+    RelationshipBuilder from(BuilderKeyword domain);
 
     /**
      * Specifies the source or destination of the relationship created by given name. The metadata for this
-     * relationship can be specified inside the extensions closure. #from(Class) or #to(Class) must be called before)
+     * relationship can be specified inside the extensions closure. #from(BuilderKeyword) or #to(BuilderKeyword) must be called before)
      * calling this method.
      *
      * @param name       name of the source or destination
@@ -130,7 +130,7 @@ public interface RelationshipBuilder {
 
     /**
      * Specifies the source or destination of the relationship created by given name. The metadata for this
-     * relationship can be specified inside the extensions closure. #from(Class) or #to(Class) must be called before)
+     * relationship can be specified inside the extensions closure. #from(BuilderKeyword) or #to(BuilderKeyword) must be called before)
      * calling this method.
      *
      * @param classification classification of the source or destination

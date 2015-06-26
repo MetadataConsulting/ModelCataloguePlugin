@@ -2,9 +2,9 @@ package org.modelcatalogue.core.util.builder
 
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
-import org.modelcatalogue.builder.api.Catalogizable
+import org.modelcatalogue.core.api.ElementStatus
 
-@Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, Catalogizable {
+@Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
     static final List<Class> KNOWN_DOMAIN_CLASSES = [Asset, CatalogueElement, Classification, DataElement, DataType, EnumeratedType, MeasurementUnit, Model, ValueDomain]
 
@@ -395,5 +395,80 @@ import org.modelcatalogue.builder.api.Catalogizable
             return ''
         }
         return o
+    }
+
+    @Override
+    String getDescription() {
+        return parameters.description?.toString()
+    }
+
+    @Override
+    void setDescription(String description) {
+        parameters.description = description
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    int countIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    int countOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    int countRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkTo(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkFrom(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkTo(org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkFrom(org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    Map<String, String> getExt() {
+        throw new UnsupportedOperationException("Not Implemented")
+    }
+
+    @Override
+    ElementStatus getStatus() {
+        return parameters.status as ElementStatus
+    }
+
+    @Override
+    void setStatus(ElementStatus status) {
+        parameters.status = status
     }
 }

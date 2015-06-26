@@ -24,7 +24,7 @@ import org.modelcatalogue.core.util.OrderedMap
 *
 */
 
-class Relationship implements Extendible<RelationshipMetadata> {
+class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalogue.core.api.Relationship {
 
     def auditService
 

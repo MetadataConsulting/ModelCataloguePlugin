@@ -62,8 +62,8 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         de2.getIncomingRelationsByType(reltype).contains(de1)
         de1.getOutgoingRelationsByType(reltype).contains(de2)
         de1.getRelationsByType(reltype).contains(de2)
-        de2.countIncomingRelationsByType(reltype) == 1
-        de1.countOutgoingRelationsByType(reltype) == 1
+        de2.countIncomingRelationshipsByType(reltype) == 1
+        de1.countOutgoingRelationshipsByType(reltype) == 1
 
 
         when:

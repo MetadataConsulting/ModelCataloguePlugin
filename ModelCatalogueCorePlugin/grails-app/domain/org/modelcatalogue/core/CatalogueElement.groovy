@@ -12,7 +12,8 @@ import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.builder.api.Catalogizable
+
+import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
 /**
 * Catalogue Element - there are a number of catalogue elements that make up the model
@@ -20,7 +21,7 @@ import org.modelcatalogue.builder.api.Catalogizable
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, Catalogizable {
+abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement {
 
     def grailsLinkGenerator
     def relationshipService
@@ -159,7 +160,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         [getOutgoingRelationshipsByType(type), getIncomingRelationshipsByType(type)].flatten()
     }
 
-    int countIncomingRelationsByType(RelationshipType type) {
+    int countIncomingRelationshipsByType(RelationshipType type) {
         CatalogueElement self = this.isAttached() ? this : get(this.id)
         if (archived) {
             return Relationship.countByDestinationAndRelationshipType(self, type)
@@ -168,7 +169,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
 
     }
 
-    int countOutgoingRelationsByType(RelationshipType type) {
+    int countOutgoingRelationshipsByType(RelationshipType type) {
         CatalogueElement self = this.isAttached() ? this : get(this.id)
         if (archived) {
             return Relationship.countBySourceAndRelationshipType(self, type)
@@ -176,17 +177,24 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         Relationship.countBySourceAndRelationshipTypeAndArchived(self, type, false)
     }
 
-    int countRelationsByType(RelationshipType type) {
-        countOutgoingRelationsByType(type) + countIncomingRelationsByType(type)
+    int countRelationshipsByType(RelationshipType type) {
+        countOutgoingRelationshipsByType(type) + countIncomingRelationshipsByType(type)
     }
 
-
-    Relationship createLinkTo(Map<String, Object> params = [:], CatalogueElement destination, RelationshipType type) {
+    Relationship createLinkTo(Map<String, Object> params, CatalogueElement destination, RelationshipType type) {
         relationshipService.link RelationshipDefinition.create(this, destination, type).withParams(params).definition
     }
 
-    Relationship createLinkFrom(Map<String, Object> params = [:], CatalogueElement source, RelationshipType type) {
+    Relationship createLinkTo(CatalogueElement destination, RelationshipType type) {
+        createLinkTo([:], destination, type)
+    }
+
+    Relationship createLinkFrom(Map<String, Object> params, CatalogueElement source, RelationshipType type) {
         relationshipService.link RelationshipDefinition.create(source, this, type).withParams(params).definition
+    }
+
+    Relationship createLinkFrom(CatalogueElement source, RelationshipType type) {
+        createLinkTo([:], source, type)
     }
 
     Relationship removeLinkTo(CatalogueElement destination, RelationshipType type) {
@@ -409,5 +417,58 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
             auditService.logMetadataUpdated(old)
         }
         FriendlyErrors.failFriendlySaveWithoutFlush(old)
+    }
+
+
+    // -- API
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getIncomingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getOutgoingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    List<org.modelcatalogue.core.api.Relationship> getRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        getRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    int countIncomingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countIncomingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    int countOutgoingRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countOutgoingRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    int countRelationshipsByType(org.modelcatalogue.core.api.RelationshipType type) {
+        countRelationshipsByType(type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkTo(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        createLinkTo(parameters, destination as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship createLinkFrom(Map<String, Object> parameters, org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        createLinkFrom(parameters, source as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkTo(org.modelcatalogue.core.api.CatalogueElement destination, org.modelcatalogue.core.api.RelationshipType type) {
+        removeLinkTo(destination as CatalogueElement, type as RelationshipType)
+    }
+
+    @Override
+    org.modelcatalogue.core.api.Relationship removeLinkFrom(org.modelcatalogue.core.api.CatalogueElement source, org.modelcatalogue.core.api.RelationshipType type) {
+        removeLinkFrom(source as CatalogueElement, type as RelationshipType)
     }
 }

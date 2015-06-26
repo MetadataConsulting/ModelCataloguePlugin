@@ -1,7 +1,4 @@
 package org.modelcatalogue.core
-/**
- * Created by adammilward on 05/02/2014.
- */
 
 class DataElementISpec extends AbstractIntegrationSpec{
 

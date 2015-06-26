@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.util.builder
+package org.modelcatalogue.builder.util
 
 import org.modelcatalogue.builder.api.CatalogueBuilder
 

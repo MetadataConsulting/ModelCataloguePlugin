@@ -9,7 +9,7 @@ import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 import java.util.concurrent.Callable
 
-class RelationshipType {
+class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
     private static final Cache<String, Long> typesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 

@@ -4,6 +4,7 @@ import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 import groovy.transform.stc.ClosureParams;
 import groovy.transform.stc.FromString;
+import org.modelcatalogue.core.api.CatalogueElement;
 import org.modelcatalogue.core.api.ElementStatus;
 import org.modelcatalogue.core.util.builder.*;
 
@@ -16,7 +17,6 @@ import java.util.Set;
  * <p/>
  * Practical example how the builder can be used are the imports present in the application or DSL MC files.
  *
- * @see CatalogueBuilderScript
  */
 public interface CatalogueBuilder extends ExtensionAwareBuilder {
     /**
@@ -178,7 +178,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param name       name of the child model
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipConfiguration
-     * @see #globalSearchFor(Class)
+     * @see #globalSearchFor(BuilderKeyword)
      */
     void child(String name, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
@@ -195,14 +195,14 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param model      proxy of the child model
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipConfiguration
-     * @see #globalSearchFor(Class)
+     * @see #globalSearchFor(BuilderKeyword)
      */
-    void child(Catalogizable model, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void child(CatalogueElement model, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
      * see #child(org.modelcatalogue.core.util.builder.Catalogizable, Closure)
      */
-    void child(Catalogizable model);
+    void child(CatalogueElement model);
 
     /**
      * Adds the data element specified by given classification and name to a parent model.
@@ -230,7 +230,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param name       name of the contained data element
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipConfiguration
-     * @see #globalSearchFor(Class)
+     * @see #globalSearchFor(BuilderKeyword)
      */
     void contains(String name, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
@@ -247,14 +247,14 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param element proxy of the contained data element
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipConfiguration
-     * @see #globalSearchFor(Class)
+     * @see #globalSearchFor(BuilderKeyword)
      */
-    void contains(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void contains(CatalogueElement element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
      * see #contains(org.modelcatalogue.core.util.builder.Catalogizable, Closure)
      */
-    void contains(Catalogizable element);
+    void contains(CatalogueElement element);
 
     /**
      * Adds the base element specified by given classification and name to a parent element.
@@ -282,7 +282,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param name       name of the base element
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipConfiguration
-     * @see #globalSearchFor(Class)
+     * @see #globalSearchFor(BuilderKeyword)
      */
     void basedOn(String name, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
@@ -299,14 +299,14 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param element proxy of the base element
      * @param extensions DSL definition closure expecting setting the relationship metadata
      * @see RelationshipConfiguration
-     * @see #globalSearchFor(Class)
+     * @see #globalSearchFor(BuilderKeyword)
      */
-    void basedOn(Catalogizable element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
+    void basedOn(CatalogueElement element, @DelegatesTo(RelationshipConfiguration.class) Closure extensions);
 
     /**
      * see #basedOn(org.modelcatalogue.core.util.builder.Catalogizable, Closure)
      */
-    void basedOn(Catalogizable element);
+    void basedOn(CatalogueElement element);
 
     /**
      * Assigns the id of the element dynamically.
@@ -324,7 +324,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * @param id ID of the target of the proxy created
      * @return proxy specified by given ID
      */
-    Catalogizable ref(String id);
+    CatalogueElement ref(String id);
 
     /**
      * Creates new relationship builder for given relationship type specified by name.
@@ -419,42 +419,42 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @return Classification type
      */
-    Class<?> getClassification();
+    BuilderKeyword getClassification();
 
     /**
      * Shortcut for Model type so it does not have to me imported into the DSL scripts.
      *
      * @return Model type
      */
-    Class<?> getModel();
+    BuilderKeyword getModel();
 
     /**
      * Shortcut for DataElement type so it does not have to me imported into the DSL scripts.
      *
      * @return DataElement type
      */
-    Class<?> getDataElement();
+    BuilderKeyword getDataElement();
 
     /**
      * Shortcut for ValueDomain type so it does not have to me imported into the DSL scripts.
      *
      * @return ValueDomain type
      */
-    Class<?> getValueDomain();
+    BuilderKeyword getValueDomain();
 
     /**
      * Shortcut for DataType type so it does not have to me imported into the DSL scripts.
      *
      * @return DataType type
      */
-    Class<?> getDataType();
+    BuilderKeyword getDataType();
 
     /**
      * Shortcut for DataType type so it does not have to me imported into the DSL scripts.
      *
      * @return DataType type
      */
-    Class<?> getMeasurementUnit();
+    BuilderKeyword getMeasurementUnit();
 
     /**
      * Shortcut for ElementStatus#DRAFT type so it does not have to me imported into the DSL scripts.
@@ -500,7 +500,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param type type for unclassified searches
      */
-    void globalSearchFor(Class<?> type);
+    void globalSearchFor(BuilderKeyword type);
 
     /**
      * Trigger the automatic creation of nested elements of given types. Currently data types and value domains are
@@ -515,5 +515,5 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param type either dataType or valueDomain
      */
-    void automatic(Class<?> type);
+    void automatic(BuilderKeyword type);
 }
