@@ -25,9 +25,8 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      * reset the state of the builder to the default (but the <code>skipDrafts</code> flag remains the same).
      *
      * @param c catalogue definition
-     * @return set of resolved elements
      */
-    Set<Catalogizable> build(@DelegatesTo(CatalogueBuilder.class) Closure c);
+    void build(@DelegatesTo(CatalogueBuilder.class) Closure c);
 
     /**
      * @see #classification(Map, Closure)

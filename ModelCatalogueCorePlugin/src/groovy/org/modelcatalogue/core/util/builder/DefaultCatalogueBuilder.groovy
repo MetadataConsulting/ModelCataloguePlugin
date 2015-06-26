@@ -43,7 +43,7 @@ import org.modelcatalogue.builder.api.RelationshipConfiguration
      * The elements don't have to be created by that call but it should be resolved by any of the element creation
      * method such as <code>CatalogueBuilder#model(java.util.Map, groovy.lang.Closure)</code>.
      */
-    private Set<CatalogueElement> created = []
+    Set<CatalogueElement> created = []
 
     /**
      * Set of types to be created automatically.
@@ -81,7 +81,7 @@ import org.modelcatalogue.builder.api.RelationshipConfiguration
      * @param c catalogue definition
      * @return set of resolved elements
      */
-    Set<CatalogueElement> build(@DelegatesTo(CatalogueBuilder) Closure c) {
+    void build(@DelegatesTo(CatalogueBuilder) Closure c) {
         reset()
         DefaultCatalogueBuilder self = this
         self.with c

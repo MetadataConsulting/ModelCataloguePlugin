@@ -36,7 +36,7 @@ class DataImportService {
 
         if (dataItemNameIndex == -1) throw new Exception("Can not find '${headersMap.dataElementName}' column")
         //iterate through the rows and import each line
-        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
         builder.build {
             copy relationships
             rows.eachWithIndex { def row, int i ->
@@ -100,6 +100,7 @@ class DataImportService {
                 }
             }
         }
+        builder.created
     }
 
     def getRowValue(row, index){

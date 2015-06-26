@@ -26,7 +26,8 @@ class CatalogueXmlLoader {
             // figure out how to make this validating
             XmlSlurper xs = new XmlSlurper(false, true)
             handleChildren(xs.parse(xml))
-        } as Set<CatalogueElement>
+        }
+        builder.created as Set<CatalogueElement>
     }
 
     private static Map<String, Object> parameters(NodeChild element) {

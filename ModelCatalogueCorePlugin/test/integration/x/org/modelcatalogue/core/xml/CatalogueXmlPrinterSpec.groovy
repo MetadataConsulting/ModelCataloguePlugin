@@ -114,7 +114,9 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
     }
 
     private <E extends CatalogueElement> E build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        new DefaultCatalogueBuilder(classificationService, elementService).build(cl).first() as E
+        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(classificationService, elementService)
+        build cl
+        defaultCatalogueBuilder.created.first() as E
     }
 
     private ValueDomain getPressure() {

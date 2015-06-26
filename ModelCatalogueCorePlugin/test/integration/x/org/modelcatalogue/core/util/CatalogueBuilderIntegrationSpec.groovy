@@ -600,7 +600,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        created = new DefaultCatalogueBuilder(classificationService, elementService).build cl
+        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(classificationService, elementService)
+        build cl
+        defaultCatalogueBuilder.created
     }
 
 

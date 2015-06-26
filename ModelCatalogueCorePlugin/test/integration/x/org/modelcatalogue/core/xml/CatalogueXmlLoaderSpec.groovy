@@ -9,6 +9,7 @@ import spock.lang.Shared
 class CatalogueXmlLoaderSpec extends IntegrationSpec {
 
     CatalogueXmlLoader loader
+    DefaultCatalogueBuilder builder
 
     @Shared def initCatalogueService
 
@@ -30,7 +31,8 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
     }
 
     def setup() {
-        loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(classificationService, elementService))
+        builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        loader = new CatalogueXmlLoader()
     }
 
     def "read simple measurement unit"() {
@@ -211,6 +213,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
             throw new IllegalArgumentException("File ${getClass().getResource(location)} does not exist!")
         }
         loader.load(input)
+        builder.created
     }
 
 }

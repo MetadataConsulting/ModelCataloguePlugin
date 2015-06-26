@@ -157,7 +157,7 @@ class OBOService {
         log.info "Parsing OBO file for ${name}"
         OBODoc document = new OBOFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
 
-        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
 
         Map<String, String> namespacesToClassifications = [:]
         Map<String, String> oboIdsToNames = [:]
@@ -170,8 +170,7 @@ class OBOService {
 
 
         log.info "Building new models"
-        Set<CatalogueElement> created = builder.build {
-
+        builder.build {
             classification(name: name) {
 
                 for (Clause clause in document.headerFrame.getClauses('subsetdef')) {
@@ -213,7 +212,7 @@ class OBOService {
 
         log.info "Import finished for ${name}"
 
-        created.find { it.instanceOf(Classification) }
+        builder.created.find { it.instanceOf(Classification) }
     }
 
     private static void handleIsA(CatalogueBuilder builder, Frame frame, Template idTemplate, Map<String, String> oboIdsToNames) {
