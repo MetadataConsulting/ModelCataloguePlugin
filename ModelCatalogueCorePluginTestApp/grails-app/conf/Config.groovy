@@ -147,20 +147,18 @@ environments {
 
         grails.assets.minifyJs = true
 
-        grails.config.locations = [ "classpath:mc-config.properties",
-                                    "classpath:mc-config.groovy",
-                                    "file:${userHome}/.grails/mc-config.properties",
-                                    "file:${userHome}/.grails/mc-config.groovy"]
-
-        if (System.properties["mc.config.location"]) {
-            grails.config.locations << "file:" + System.properties["mc.config.location"]
-        }
-
         if (System.properties['catalina.base']) {
             def tomcatConfDir = new File("${System.properties['catalina.base']}/conf")
             if (tomcatConfDir.isDirectory()) {
-                grails.config.locations << "file:${tomcatConfDir.canonicalPath}/mc-config.groovy"
+                grails.config.locations = ["file:${tomcatConfDir.canonicalPath}/mc-config.groovy"]
             }
+        } else if (System.properties["mc.config.location"]) {
+            grails.config.locations = ["file:" + System.properties["mc.config.location"]]
+        } else {
+            grails.config.locations = [ "classpath:mc-config.properties",
+                                        "classpath:mc-config.groovy",
+                                        "file:${userHome}/.grails/mc-config.properties",
+                                        "file:${userHome}/.grails/mc-config.groovy"]
         }
 
     }
