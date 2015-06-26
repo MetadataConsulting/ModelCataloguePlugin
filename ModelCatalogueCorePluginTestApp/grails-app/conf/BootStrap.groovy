@@ -126,11 +126,11 @@ class BootStrap {
             importService.importData()
 
             println 'Finalizing all published elements'
-            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
+            CatalogueElement.findAllByStatus(org.modelcatalogue.core.api.ElementStatus.DRAFT).each {
                 if (it instanceof Model) {
                     elementService.finalizeElement(it)
                 } else {
-                    it.status = ElementStatus.FINALIZED
+                    it.status = org.modelcatalogue.core.api.ElementStatus.FINALIZED
                     it.save failOnError: true
                 }
             }

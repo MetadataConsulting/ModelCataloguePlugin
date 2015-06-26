@@ -1,7 +1,6 @@
 package org.modelcatalogue.core.actions
 
 import org.modelcatalogue.core.Extendible
-import org.modelcatalogue.core.Extension
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
 

@@ -128,7 +128,7 @@ import org.modelcatalogue.builder.api.Catalogizable
             return null
         }
 
-        if (existing.status in [ElementStatus.FINALIZED, ElementStatus.DEPRECATED]) {
+        if (existing.status in [org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DEPRECATED]) {
             log.info("New draft version created for $this. Reason: $draftRequest")
             return repository.createDraftVersion(existing)
         }

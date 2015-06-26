@@ -4,6 +4,7 @@ import au.com.bytecode.opencsv.CSVReader
 import au.com.bytecode.opencsv.CSVWriter
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.actions.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.ListAndCount
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
@@ -37,7 +38,7 @@ class DataArchitectService {
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
         classificationService.classified Lists.fromCriteria(params, DataElement) {
-            'in'('status', ElementStatus.DRAFT, ElementStatus.PENDING, ElementStatus.UPDATED, ElementStatus.FINALIZED)
+            'in'('status', org.modelcatalogue.core.api.ElementStatus.DRAFT, org.modelcatalogue.core.api.ElementStatus.PENDING, org.modelcatalogue.core.api.ElementStatus.UPDATED, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
             isNull 'valueDomain'
 
         }
@@ -119,25 +120,25 @@ class DataArchitectService {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
+            def element = DataElement.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
             if (!element) {
                 element = DataElement.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = DataElement.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
+                element = DataElement.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.DRAFT)
                 } else {
-                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
+                    element = DataElement.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.DRAFT)
                 }
             }
             if (element) {
@@ -160,25 +161,25 @@ class DataArchitectService {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = Model.findByNameIlikeAndStatus(header, ElementStatus.FINALIZED)
+            def element = Model.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
             if (!element) {
                 element = Model.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.FINALIZED)
+                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
                 } else {
-                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.FINALIZED)
+                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = Model.findByNameIlikeAndStatus(header, ElementStatus.DRAFT)
+                element = Model.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), ElementStatus.DRAFT)
+                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.DRAFT)
                 } else {
-                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), ElementStatus.DRAFT)
+                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.DRAFT)
                 }
             }
             if (element) {
@@ -262,7 +263,7 @@ class DataArchitectService {
             from ValueDomain v
             where
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
-        """, [archived: ElementStatus.DEPRECATED]
+        """, [archived: org.modelcatalogue.core.api.ElementStatus.DEPRECATED]
     }
 
     ListWithTotal<ValueDomain> duplicateValueDomains(Map params) {
@@ -274,7 +275,7 @@ class DataArchitectService {
                 v.id in (select vd.id from ValueDomain vd left join vd.dataElements de group by vd.id having count(de.id) = sum(case when de.status = :archived then 1 else 0 end))
             and
                 v.name in (select vd.name from ValueDomain vd group by vd.name having count(vd.name) > 1)
-        """, [archived: ElementStatus.DEPRECATED]
+        """, [archived: org.modelcatalogue.core.api.ElementStatus.DEPRECATED]
     }
 
     Map<Long, String> dataTypesNamesSuggestions() {

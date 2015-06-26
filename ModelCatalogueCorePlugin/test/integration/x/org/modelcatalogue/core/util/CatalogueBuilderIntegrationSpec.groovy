@@ -35,7 +35,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuse existing classification by name"() {
-        Classification c = new Classification(name: 'ExistingSchema', status: ElementStatus.DEPRECATED).save(failOnError: true)
+        Classification c = new Classification(name: 'ExistingSchema', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             classification(name: 'ExistingSchema', namespace: 'http://www.w3.org/2001/ExistingSchema') {
@@ -91,7 +91,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuse existing measurement unit by name"() {
-        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit', status: ElementStatus.DEPRECATED).save(failOnError: true)
+        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             measurementUnit(name: 'ExistingUnit', symbol: 'EU') {
@@ -106,7 +106,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "creates only one measurement unit as measurement unit name is unique"() {
-        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit2', status: ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
+        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit2', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
 
         build {
             classification(name: "TestClassificationA") {
@@ -159,7 +159,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuse existing data element unit by name"() {
-        DataElement unit = new DataElement(name: 'ExistingElement', status: ElementStatus.DEPRECATED).save(failOnError: true)
+        DataElement unit = new DataElement(name: 'ExistingElement', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             dataElement(name: 'ExistingElement') {
@@ -199,7 +199,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuse existing model by name"() {
-        Model unit = new Model(name: 'ExistingModel', status: ElementStatus.DEPRECATED).save(failOnError: true)
+        Model unit = new Model(name: 'ExistingModel', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             model(name: 'ExistingModel') {
@@ -339,7 +339,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "complain if data type name is missing"() {
         when:
         build {
-            dataType status: ElementStatus.FINALIZED
+            dataType status: org.modelcatalogue.core.api.ElementStatus.FINALIZED
         }
 
         then:
@@ -482,7 +482,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        Model.findByName("ModelNV1")?.status == ElementStatus.FINALIZED
+        Model.findByName("ModelNV1")?.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
 
         when:
         build {
@@ -496,16 +496,16 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         then: "new model is draft"
         Model.findByName("ModelNV2")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
         Model.findByName("ModelNV2")?.latestVersionId   == Model.findByName("ModelNV1")?.id
-        Model.findByName("ModelNV2")?.status            == ElementStatus.DRAFT
+        Model.findByName("ModelNV2")?.status            == org.modelcatalogue.core.api.ElementStatus.DRAFT
 
         and: "the old model is still finalized"
-        Model.findByName("ModelNV1")?.status            == ElementStatus.FINALIZED
+        Model.findByName("ModelNV1")?.status            == org.modelcatalogue.core.api.ElementStatus.FINALIZED
         Model.findByName("ModelNV1")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
 
         and: "there are two NewVersion1 classifications at the moment"
         Classification.countByName('NewVersion1')                                   == 2
-        Classification.countByNameAndStatus('NewVersion1', ElementStatus.DRAFT)     == 1
-        Classification.countByNameAndStatus('NewVersion1', ElementStatus.FINALIZED) == 1
+        Classification.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.DRAFT)     == 1
+        Classification.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.FINALIZED) == 1
 
 
     }
@@ -536,7 +536,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
 
         then:
-        Model.findByName('Parent 007').status == ElementStatus.FINALIZED
+        Model.findByName('Parent 007').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
 
         when:
         build {
@@ -550,7 +550,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         then:
-        Model.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == ElementStatus.DRAFT
+        Model.findByName('Parent 007', [sort: 'versionNumber', order: 'desc']).status == org.modelcatalogue.core.api.ElementStatus.DRAFT
     }
 
 
@@ -571,7 +571,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         expect:
         l1Finalized
-        l1Finalized.status == ElementStatus.FINALIZED
+        l1Finalized.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
         l1Finalized.countParentOf() == 1
 
         when:
@@ -579,7 +579,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         l1Draft
-        l1Draft.status == ElementStatus.DRAFT
+        l1Draft.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         l1Draft.countParentOf() == 1
 
         when:
@@ -594,15 +594,15 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         then:
         l3Draft
-        l3Draft.status == ElementStatus.DRAFT
+        l3Draft.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         l3Draft.countChildOf()  == 1
         l1Draft.countParentOf() == 1
     }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
         DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(classificationService, elementService)
-        build cl
-        defaultCatalogueBuilder.created
+        defaultCatalogueBuilder.build cl
+        created = defaultCatalogueBuilder.created
     }
 
 
@@ -687,7 +687,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when: "model is removed from finalized element"
         elementService.finalizeElement(c4rmc)
-        c4rmc.status == ElementStatus.FINALIZED
+        c4rmc.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
 
         build {
             classification(name: "C4RMC") {
@@ -698,7 +698,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             }
         }
 
-        Model draft = Model.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
+        Model draft = Model.findByNameAndStatus('C4RMC Parent', org.modelcatalogue.core.api.ElementStatus.DRAFT)
 
         then: "creation of draft should be triggered for finalized element"
         draft
@@ -706,7 +706,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when: "model is removed from draft element"
         elementService.finalizeElement(c4rmc)
-        c4rmc.status == ElementStatus.FINALIZED
+        c4rmc.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
 
         build {
             classification(name: "C4RMC") {
@@ -716,7 +716,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             }
         }
 
-        draft = Model.findByNameAndStatus('C4RMC Parent', ElementStatus.DRAFT)
+        draft = Model.findByNameAndStatus('C4RMC Parent', org.modelcatalogue.core.api.ElementStatus.DRAFT)
 
         then: "the relationship should be removed from the element"
         draft
@@ -734,8 +734,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
         then:
         noExceptionThrown()
-        Model.findByName('Parent Model 4 Finalization').status == ElementStatus.FINALIZED
-        Model.findByName('Child Model 4 Finalization').status == ElementStatus.FINALIZED
+        Model.findByName('Parent Model 4 Finalization').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
+        Model.findByName('Child Model 4 Finalization').status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
     }
 
     def "can call relationship closure more than once"() {

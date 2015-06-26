@@ -52,7 +52,7 @@ class DefaultAuditor implements Auditor {
                 property: 'status',
                 type: ChangeType.ELEMENT_FINALIZED,
                 oldValue: storeValue(element.status),
-                newValue: storeValue(ElementStatus.FINALIZED)
+                newValue: storeValue(org.modelcatalogue.core.api.ElementStatus.FINALIZED)
         )
     }
 
@@ -65,7 +65,7 @@ class DefaultAuditor implements Auditor {
                 property: 'status',
                 type: ChangeType.ELEMENT_DEPRECATED,
                 oldValue: storeValue(element.status),
-                newValue: storeValue(ElementStatus.DEPRECATED)
+                newValue: storeValue(org.modelcatalogue.core.api.ElementStatus.DEPRECATED)
         )
     }
 

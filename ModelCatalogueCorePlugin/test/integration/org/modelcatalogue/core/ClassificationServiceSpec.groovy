@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import grails.test.spock.IntegrationSpec
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists

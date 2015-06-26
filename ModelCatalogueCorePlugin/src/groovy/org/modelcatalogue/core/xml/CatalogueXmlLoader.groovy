@@ -20,14 +20,13 @@ class CatalogueXmlLoader {
     }
 
 
-    Set<CatalogueElement> load(InputStream xml) {
+    void load(InputStream xml) {
         assert xml, "no input stream provided"
         builder.build {
             // figure out how to make this validating
             XmlSlurper xs = new XmlSlurper(false, true)
             handleChildren(xs.parse(xml))
         }
-        builder.created as Set<CatalogueElement>
     }
 
     private static Map<String, Object> parameters(NodeChild element) {

@@ -7,9 +7,9 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.builder.api.Catalogizable
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.builder.api.PublishingStatus
 import org.modelcatalogue.builder.api.RelationshipBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
+import org.modelcatalogue.core.api.ElementStatus
 
 /**
  * CatalogueBuilder class allows to design the catalogue elements relationship in a tree-like structure simply without
@@ -460,7 +460,7 @@ import org.modelcatalogue.builder.api.RelationshipConfiguration
      * @see https://metadata.atlassian.net/browse/MET-620
      */
     @Deprecated
-    void status(PublishingStatus status) {
+    void status(ElementStatus status) {
         context.withContextElement(CatalogueElement) {
             it.setParameter('status', status)
         } or {
@@ -504,8 +504,8 @@ import org.modelcatalogue.builder.api.RelationshipConfiguration
      * are desired (i.e. importing into an empty catalogue).
      * @param draft must be "draft" or PublishingStatus#DRAFT
      */
-    void skip(PublishingStatus draft) {
-        if (draft == ElementStatus.DRAFT) {
+    void skip(ElementStatus draft) {
+        if (draft == org.modelcatalogue.core.api.ElementStatus.DRAFT) {
             skipDrafts = true
             return
         }
@@ -569,19 +569,19 @@ import org.modelcatalogue.builder.api.RelationshipConfiguration
      * Shortcut for PublishingStatus#DRAFT type so it does not have to me imported into the DSL scripts.
      * @return PublishingStatus#DRAFT
      */
-    PublishingStatus getDraft() { ElementStatus.DRAFT }
+    ElementStatus getDraft() { org.modelcatalogue.core.api.ElementStatus.DRAFT }
 
     /**
      * Shortcut for PublishingStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
      * @return PublishingStatus#DEPRECATED
      */
-    PublishingStatus getDeprecated() { ElementStatus.DEPRECATED }
+    ElementStatus getDeprecated() { org.modelcatalogue.core.api.ElementStatus.DEPRECATED }
 
     /**
      * Shortcut for PublishingStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
      * @return PublishingStatus#DEPRECATED
      */
-    PublishingStatus getFinalized() { ElementStatus.FINALIZED }
+    ElementStatus getFinalized() { org.modelcatalogue.core.api.ElementStatus.FINALIZED }
 
     /**
      * Keyword to be used with #copy(String) method.

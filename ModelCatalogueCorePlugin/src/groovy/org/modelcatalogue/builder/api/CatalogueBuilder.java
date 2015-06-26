@@ -4,6 +4,7 @@ import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 import groovy.transform.stc.ClosureParams;
 import groovy.transform.stc.FromString;
+import org.modelcatalogue.core.api.ElementStatus;
 import org.modelcatalogue.core.util.builder.*;
 
 import java.util.Map;
@@ -371,7 +372,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param status new status of the element
      */
-    void status(PublishingStatus status);
+    void status(ElementStatus status);
 
     /**
      * Sets the extension (metadata) for current element from given key and value pair.
@@ -400,7 +401,7 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @param draft must be "draft" or ElementStatus#DRAFT
      */
-    void skip(PublishingStatus draft);
+    void skip(ElementStatus draft);
 
     /**
      * Sets the flag to copy relationships when draft element is created (e.g. there is an update for element).
@@ -460,21 +461,21 @@ public interface CatalogueBuilder extends ExtensionAwareBuilder {
      *
      * @return ElementStatus#DRAFT
      */
-    PublishingStatus getDraft();
+    ElementStatus getDraft();
 
     /**
      * Shortcut for ElementStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
      *
      * @return ElementStatus#DEPRECATED
      */
-    PublishingStatus getDeprecated();
+    ElementStatus getDeprecated();
 
     /**
      * Shortcut for ElementStatus#DEPRECATED type so it does not have to me imported into the DSL scripts.
      *
      * @return ElementStatus#DEPRECATED
      */
-    PublishingStatus getFinalized();
+    ElementStatus getFinalized();
 
     /**
      * Keyword to be used with #copy(String) method.

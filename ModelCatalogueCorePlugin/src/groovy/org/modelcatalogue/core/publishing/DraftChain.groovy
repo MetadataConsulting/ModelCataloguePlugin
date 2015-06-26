@@ -5,7 +5,7 @@ import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
 @Log4j

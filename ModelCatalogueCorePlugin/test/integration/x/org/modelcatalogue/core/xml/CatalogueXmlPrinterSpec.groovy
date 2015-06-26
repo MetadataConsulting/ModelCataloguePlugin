@@ -115,7 +115,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     private <E extends CatalogueElement> E build(@DelegatesTo(CatalogueBuilder) Closure cl) {
         DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(classificationService, elementService)
-        build cl
+        defaultCatalogueBuilder.build cl
         defaultCatalogueBuilder.created.first() as E
     }
 

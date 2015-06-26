@@ -32,7 +32,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
 
     def setup() {
         builder = new DefaultCatalogueBuilder(classificationService, elementService)
-        loader = new CatalogueXmlLoader()
+        loader = new CatalogueXmlLoader(builder)
     }
 
     def "read simple measurement unit"() {
@@ -49,7 +49,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         then:
         unit.name == 'Newton'
         unit.modelCatalogueId == 'http://www.example.com/units/Newton'
-        unit.status == ElementStatus.DRAFT
+        unit.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         unit.symbol == 'N'
         unit.description == 'The newton (symbol: N) is the International System of Units (SI) derived unit of force.'
         unit.ext.From == 'SI'
@@ -74,7 +74,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         then:
         type.name == 'Integer'
         type.modelCatalogueId == 'http://www.example.com/types/Integer'
-        type.status == ElementStatus.DRAFT
+        type.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         type.description == 'A number with no fractional part.'
         type.countIsBasedOn() == 1
         type.isBasedOn.contains(decimal)
@@ -94,7 +94,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         then:
         type.name == 'Gender'
         type.modelCatalogueId == 'http://www.example.com/types/Gender'
-        type.status == ElementStatus.DRAFT
+        type.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         type.description == 'The state of being male or female (typically used with reference to social and cultural differences rather than biological ones)'
         type.enumerations.size() == 2
         type.enumerations.F == 'Female'
@@ -117,7 +117,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         then:
         domain.name == 'Force'
         domain.modelCatalogueId == 'http://www.example.com/domains/Force'
-        domain.status == ElementStatus.DRAFT
+        domain.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         domain.description == 'A force is a push or pull upon an object resulting from the object\'s interaction with another object.'
         domain.unitOfMeasure
         domain.unitOfMeasure.name == 'Newton'
@@ -145,7 +145,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         then:
         element.name == 'Factor of Adhesion'
         element.modelCatalogueId == 'http://www.example.com/elements/Adhesion'
-        element.status == ElementStatus.DRAFT
+        element.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         element.description == null
         element.valueDomain
         element.valueDomain.name == 'Force'
@@ -167,7 +167,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         then:
         model
         model.modelCatalogueId == 'http://www.example.com/models/Locomotive'
-        model.status == ElementStatus.DRAFT
+        model.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         model.description == null
         model.countContains() == 1
         model.contains.first().name == 'Factor of Adhesion'
@@ -198,7 +198,7 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
         then:
         classification.name == 'Transportation'
         classification.modelCatalogueId == 'http://www.example.com/datasets/Transportation'
-        classification.status == ElementStatus.DRAFT
+        classification.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
         classification.description == null
         classification.countClassifies() == 6
     }

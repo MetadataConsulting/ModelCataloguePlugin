@@ -1,8 +1,7 @@
-package org.modelcatalogue.core;
+package org.modelcatalogue.core.api;
 
-import org.modelcatalogue.builder.api.PublishingStatus;
+public enum ElementStatus {
 
-public enum ElementStatus implements PublishingStatus {
     /**
      * DRAFT status indicates newly created element which will probably change in future.
      */

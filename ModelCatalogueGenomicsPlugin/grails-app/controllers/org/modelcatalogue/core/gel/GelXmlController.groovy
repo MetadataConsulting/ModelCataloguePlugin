@@ -2,7 +2,7 @@ package org.modelcatalogue.core.gel
 
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetService
-import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.audit.AuditService

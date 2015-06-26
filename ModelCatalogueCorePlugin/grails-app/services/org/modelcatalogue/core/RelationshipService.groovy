@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
