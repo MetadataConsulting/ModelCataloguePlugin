@@ -5,10 +5,12 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.builder.api.BuilderKeyword
 import org.modelcatalogue.builder.api.ModelCatalogueTypes
 import org.modelcatalogue.builder.util.AbstractCatalogueBuilder
-import org.modelcatalogue.core.*
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.api.RelationshipBuilder
 import org.modelcatalogue.builder.api.RelationshipConfiguration
+import org.modelcatalogue.builder.api.RelationshipTypeBuilder
+import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.*
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
@@ -549,7 +551,26 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
     }
 
-    /**
+    @Override
+    void relationshipType(Map<String, Object> map, @DelegatesTo(RelationshipTypeBuilder) Closure closure) {
+        RelationshipType type = RelationshipType.readByName(map.name?.toString())
+        if (type) {
+            return
+        }
+
+        type = new RelationshipType(name: map.name)
+        type.system = repository.canCreateRelationshipTypes ? map.system : true
+        type.bidirectional = map.bidirectional
+        type.versionSpecific = map.versionSpecific
+        type.sourceClass = Class.forName(map.source?.toString())
+        type.destinationClass = Class.forName(map.destination?.toString())
+
+        DefaultRelationshipTypeBuilder relationshipTypeBuilder = new DefaultRelationshipTypeBuilder(type)
+        relationshipTypeBuilder.with closure
+
+        FriendlyErrors.failFriendlySave(type)
+    }
+/**
      * Adds classifications to given element. It uses the deepest parent classification.
      * @param element element to be classified
      */

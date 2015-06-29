@@ -52,7 +52,7 @@ grails.project.dependency.resolution = {
         compile 'com.google.guava:guava:18.0'
         compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
 
-        String mcToolkitVersion = '1.0.0-alpha-2'
+        String mcToolkitVersion = '1.0.0-alpha-3'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
 

@@ -3,8 +3,8 @@ package org.modelcatalogue.core.xml
 import groovy.util.logging.Log4j
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
-import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.RelationshipType
 
 
 @Log4j
@@ -25,7 +25,9 @@ class CatalogueXmlLoader {
         builder.build {
             // figure out how to make this validating
             XmlSlurper xs = new XmlSlurper(false, true)
-            handleChildren(xs.parse(xml))
+            GPathResult loaded = xs.parse(xml)
+            handleRelationshipTypes(loaded)
+            handleChildren(loaded)
         }
     }
 
@@ -41,6 +43,20 @@ class CatalogueXmlLoader {
             ret[key.toString()] = value
         }
         ret
+    }
+
+    private void handleRelationshipTypes(GPathResult parent) {
+        parent.relationshipTypes.children().each { type ->
+            String name = type.@name.text()
+            RelationshipType existing = RelationshipType.readByName(name)
+            if (!existing) {
+                builder.relationshipType(name: name, source: type.@source.text(), destination: type.@destination.text(), system: type.@system.text(), bidirectional: 'true' == type.@bidirectional.text(),  versionSpecific: 'true' == type.@versionSpecific.text()){
+                    sourceToDestination(type.sourceToDestination[0].@label.text(), description: type.sourceToDestination[0].text())
+                    destinationToSource(type.destinationToSource[0].@label.text(), description: type.destinationToSource[0].text())
+                    rule(type.rule[0].text())
+                }
+            }
+        }
     }
 
     private void handleChildren(GPathResult parent) {
@@ -67,6 +83,7 @@ class CatalogueXmlLoader {
             case 'extensions': handleChildren(element) ; break
             case 'relationships': handleChildren(element) ; break
             case 'enumerations': break // handled by data type
+            case 'relationshipTypes': break // handled already by handleRelationshipTypes(GPathResult)
             case 'metadata': handleMetadata(element) ; break
             case 'archived': handleArchived(element) ; break
             case 'extension': handleExtension(element) ; break

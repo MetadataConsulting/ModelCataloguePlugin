@@ -19,15 +19,6 @@ class CatalogueXmlLoaderSpec extends IntegrationSpec {
     def setupSpec() {
         initCatalogueService.initCatalogue(true)
 
-        if (!RelationshipType.readByName('derivedFrom')) {
-            new RelationshipType(
-                    name: 'derivedFrom',
-                    sourceClass: MeasurementUnit,
-                    sourceToDestination: 'is derived from',
-                    destinationClass: MeasurementUnit,
-                    destinationToSource: 'derives'
-            ).save(failOnError: true)
-        }
     }
 
     def setup() {

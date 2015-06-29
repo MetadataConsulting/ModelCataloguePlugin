@@ -428,4 +428,8 @@ class CatalogueElementProxyRepository {
         return relationship
     }
 
+    boolean isCanCreateRelationshipTypes() {
+        classificationService.modelCatalogueSecurityService.hasRole('ADMIN')
+    }
+
 }
