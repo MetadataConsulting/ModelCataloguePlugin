@@ -3,11 +3,12 @@ package org.modelcatalogue.core.dataarchitect
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.obolibrary.oboformat.model.Clause
 import org.obolibrary.oboformat.model.Frame
 import org.obolibrary.oboformat.model.OBODoc
 import org.obolibrary.oboformat.parser.OBOFormatParser
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 
 class OBOService {
 
@@ -156,7 +157,7 @@ class OBOService {
         log.info "Parsing OBO file for ${name}"
         OBODoc document = new OBOFormatParser().parse(new BufferedReader(new InputStreamReader(is)))
 
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
 
         Map<String, String> namespacesToClassifications = [:]
         Map<String, String> oboIdsToNames = [:]
@@ -170,7 +171,6 @@ class OBOService {
 
         log.info "Building new models"
         builder.build {
-
             classification(name: name) {
 
                 for (Clause clause in document.headerFrame.getClauses('subsetdef')) {
@@ -212,7 +212,7 @@ class OBOService {
 
         log.info "Import finished for ${name}"
 
-        builder.lastCreated.find { it.instanceOf(Classification) }
+        builder.created.find { it.instanceOf(Classification) }
     }
 
     private static void handleIsA(CatalogueBuilder builder, Frame frame, Template idTemplate, Map<String, String> oboIdsToNames) {

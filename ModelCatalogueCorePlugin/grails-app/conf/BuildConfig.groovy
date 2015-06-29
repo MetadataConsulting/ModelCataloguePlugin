@@ -46,13 +46,16 @@ grails.project.dependency.resolution = {
 
     }
     dependencies {
+
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'com.google.guava:guava:18.0'
         compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
-        test 'xmlunit:xmlunit:1.6'
-        test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
-		
+
+        String mcToolkitVersion = '1.0.0-alpha-2'
+        compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
+
 		//----- Jasper Reports specific dependencies 
 		 //from the bintray
 		compile 'net.sf.jasperreports:jasperreports-javaflow:6.0.3'
@@ -65,6 +68,9 @@ grails.project.dependency.resolution = {
                      'batik-css','batik-gvt','batik-script', 'batik-svggen','batik-util','batik-bridge','persistence-api','jdtcore','bcmail-jdk16','bcprov-jdk16','bctsp-jdk16',
                      'bcmail-jdk14','bcprov-jdk14','bctsp-jdk14','xmlbeans', 'olap4j'
         }
+
+        test 'xmlunit:xmlunit:1.6'
+        test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 		 
     }
 

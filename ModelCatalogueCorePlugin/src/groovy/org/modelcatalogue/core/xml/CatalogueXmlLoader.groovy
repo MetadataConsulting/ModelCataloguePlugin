@@ -4,7 +4,7 @@ import groovy.util.logging.Log4j
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 
 
 @Log4j
@@ -20,7 +20,7 @@ class CatalogueXmlLoader {
     }
 
 
-    Set<CatalogueElement> load(InputStream xml) {
+    void load(InputStream xml) {
         assert xml, "no input stream provided"
         builder.build {
             // figure out how to make this validating

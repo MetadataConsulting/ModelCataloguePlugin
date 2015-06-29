@@ -31,7 +31,7 @@ class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classificati
 
     private static <E extends CatalogueElement> List<E> allClassified(Class<E> type, Classification classification, PrintContext context) {
         DetachedCriteria<E> criteria = new DetachedCriteria<E>(type).build {
-            'in'('status', [ElementStatus.DEPRECATED, ElementStatus.FINALIZED, ElementStatus.DRAFT])
+            'in'('status', [org.modelcatalogue.core.api.ElementStatus.DEPRECATED, org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DRAFT])
             not {
                 'in'('id', context.idsOfPrinted)
             }

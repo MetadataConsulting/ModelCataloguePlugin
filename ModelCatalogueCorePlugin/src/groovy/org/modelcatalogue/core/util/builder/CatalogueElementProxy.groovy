@@ -1,8 +1,8 @@
 package org.modelcatalogue.core.util.builder
 
-import org.modelcatalogue.core.CatalogueElement
+import org.modelcatalogue.core.api.CatalogueElement
 
-interface CatalogueElementProxy<T extends CatalogueElement> {
+interface CatalogueElementProxy<T> extends CatalogueElement {
 
 
     T resolve()
@@ -19,8 +19,7 @@ interface CatalogueElementProxy<T extends CatalogueElement> {
 
     Class<T> getDomain()
 
-    String getId()
-    void setId(String id)
+    void setModelCatalogueId(String id)
 
     String getName()
     String getClassification()

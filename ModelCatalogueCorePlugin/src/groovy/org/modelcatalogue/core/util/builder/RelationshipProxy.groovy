@@ -3,11 +3,11 @@ package org.modelcatalogue.core.util.builder
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.builder.api.RelationshipConfiguration
 import org.modelcatalogue.core.util.FriendlyErrors
 
 @Log4j
-class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> implements ExtensionAwareBuilder {
+class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> {
 
     final String relationshipTypeName
     final CatalogueElementProxy<T> source
@@ -15,12 +15,12 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
     final Map<String, String> extensions = [:]
     final boolean archived
 
-    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination, @DelegatesTo(RelationshipProxyConfiguration) Closure extensions) {
+    RelationshipProxy(String relationshipTypeName, CatalogueElementProxy<T> source, CatalogueElementProxy<T> destination, Closure extensions) {
         this.relationshipTypeName = relationshipTypeName
         this.source = source
         this.destination = destination
 
-        RelationshipProxyConfiguration configuration = new RelationshipProxyConfiguration()
+        RelationshipConfiguration configuration = new DefaultRelationshipConfiguration()
         configuration.with extensions
 
         if (configuration.extensions) {
@@ -56,15 +56,6 @@ class RelationshipProxy<T extends CatalogueElement, U extends CatalogueElement> 
         }
 
     }
-
-    void ext(String key, String value) {
-        extensions[key] = value
-    }
-
-    void ext(Map<String, String> values) {
-        extensions.putAll(values)
-    }
-
 
     @Override
     String toString() {

@@ -9,6 +9,8 @@ import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.MeasurementUnit
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.builder.api.RelationshipConfiguration
 
 class CatalogueBuilderContext {
 
@@ -56,7 +58,7 @@ class CatalogueBuilderContext {
         new DefaultWithOptionalOrClause(builder)
     }
 
-    void configureCurrentRelationship(@DelegatesTo(RelationshipProxyConfiguration) Closure relationshipExtensionsConfiguration) {
+    void configureCurrentRelationship(@DelegatesTo(RelationshipConfiguration) Closure relationshipExtensionsConfiguration) {
         ContextItem item = getContextElement(CatalogueElement, 1)
         if (item) {
             if (item.relationshipConfiguration) {
@@ -103,9 +105,3 @@ class CatalogueBuilderContext {
     }
 
 }
-
-class ContextItem<T extends CatalogueElement> {
-    CatalogueElementProxy<T> element
-    Closure relationshipConfiguration
-}
-

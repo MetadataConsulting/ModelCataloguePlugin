@@ -1,6 +1,6 @@
 package org.modelcatalogue.core.dataarchitect
 
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 
 class LoincImportService {
 

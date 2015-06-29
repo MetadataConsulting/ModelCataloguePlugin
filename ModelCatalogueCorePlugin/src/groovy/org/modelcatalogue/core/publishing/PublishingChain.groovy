@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.publishing
 
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.FriendlyErrors
 
 abstract class PublishingChain {

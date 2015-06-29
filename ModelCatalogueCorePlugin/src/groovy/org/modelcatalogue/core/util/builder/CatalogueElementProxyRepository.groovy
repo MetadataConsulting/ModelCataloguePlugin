@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util.builder
 import grails.gorm.DetachedCriteria
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
@@ -57,7 +58,7 @@ class CatalogueElementProxyRepository {
         if (a && !b || b && !a) {
             return false
         }
-        if (a.id && a.id == b.id) {
+        if (a.modelCatalogueId && a.modelCatalogueId == b.modelCatalogueId) {
             return true
         }
         if (a.domain != b.domain) {
@@ -85,11 +86,11 @@ class CatalogueElementProxyRepository {
         watch.start('merging proxies')
         log.info "(1/6) merging proxies"
         for (CatalogueElementProxy proxy in pendingProxies) {
-            if (proxy.id) {
-                CatalogueElementProxy existing = byID[proxy.id]
+            if (proxy.modelCatalogueId) {
+                CatalogueElementProxy existing = byID[proxy.modelCatalogueId]
 
                 if (!existing) {
-                    byID[proxy.id] = proxy
+                    byID[proxy.modelCatalogueId] = proxy
                     elementProxiesToBeResolved << proxy
                 } else {
                     existing.merge(proxy)
@@ -247,7 +248,7 @@ class CatalogueElementProxyRepository {
     }
 
 
-    private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id, boolean underControl) {
+    public <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionById(Class<T> domain, String name, String id, boolean underControl) {
         return new DefaultCatalogueElementProxy<T>(this, domain, id, null, name, underControl)
     }
 

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.forms
 
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.crf.model.DataType
 import org.modelcatalogue.crf.model.GridGroup
 import org.modelcatalogue.crf.model.Group
@@ -12,7 +13,7 @@ import static org.modelcatalogue.core.forms.ModelToFormExporterService.*
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.springframework.validation.Errors
 
@@ -46,7 +47,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     public static final String ITEM_TEXT_NAME_NORMALIZED = "Form_1_Section_1_Stuff_with_Units"
 
 
-    CatalogueBuilder catalogueBuilder
+    DefaultCatalogueBuilder catalogueBuilder
     ModelToFormExporterService modelToFormExporterService
 
     def "there must be a top level model representing a form and at least one model representing the section"(){
@@ -274,7 +275,9 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     // TODO: more tests
 
     Model build(@DelegatesTo(CatalogueBuilder) Closure builder) {
-        catalogueBuilder.build(builder).find{ it.instanceOf(Model) } as Model
+        catalogueBuilder.build(builder)
+        catalogueBuilder.created.find{ it.instanceOf(Model) } as Model
+
     }
 
 }

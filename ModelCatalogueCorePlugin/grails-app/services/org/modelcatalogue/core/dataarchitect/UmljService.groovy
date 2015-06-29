@@ -8,7 +8,8 @@ import groovy.json.JsonSlurper
 import groovy.json.internal.LazyMap
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class UmljService {
 
@@ -17,9 +18,6 @@ class UmljService {
     static transactional = false
 
     protected void importUmlDiagram(InputStream is, String name, Classification classification) {
-
-        def allClasses, topLevelClasses, allDataTypes, allEnumerations;
-
         log.info "Parsing Umlj file for ${name}"
         def slurper = new JsonSlurper()
         def result  = slurper.parse(new BufferedReader(new InputStreamReader(is)))
@@ -30,7 +28,7 @@ class UmljService {
 
     protected void generateCatalogueElements(StarUMLDiagram umlFile, Classification clsf) {
 
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
+        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
         builder.build {
             classification(name: clsf.name) {
                 globalSearchFor dataType
@@ -130,20 +128,20 @@ class UmljService {
 
 
 
-    protected getAttributes(cls, carried_forward_atts){
+    protected static getAttributes(cls, carried_forward_atts){
         def cfa = new ArrayList<Object>()
         cfa.addAll(carried_forward_atts)
         if(cls.attributes)cfa.addAll(cls.attributes)
         return cfa
     }
 
-    protected getComponents(cls, carried_forward_comps, umlFile){
+    protected static getComponents(cls, carried_forward_comps, umlFile){
         def cfc = new ArrayList<Object>()
         cfc.addAll(carried_forward_comps)
         def components = umlFile.allClasses.findAll{
             id, component -> component.ownedElements.findAll{
                 ct ->
-                    ct._type.equals("UMLAssociation") && ct.end2.aggregation.equals("composite") && ct.end2.reference?.$ref.equals(cls._id)
+                    ct._type.equals("UMLAssociation") && ct.end2.aggregation.equals("composite") && ct.end2.reference?.$ref?.equals(cls._id)
             }.size() > 0
 
         }
@@ -154,7 +152,7 @@ class UmljService {
 
     }
 
-    protected getMultiplicity(att){
+    protected static getMultiplicity(att){
 
         def multiplicity = [:]
 
@@ -187,11 +185,11 @@ class UmljService {
 
 
 
-    protected getSubTypes(cls, umlFile){
+    protected static getSubTypes(cls, umlFile){
         return umlFile.allClasses.findAll{
             id, subtype -> subtype.ownedElements.findAll{
                 oe ->
-                    oe._type?.equals("UMLGeneralization") && oe?.target?.$ref.equals(cls._id)
+                    oe._type?.equals("UMLGeneralization") && oe?.target?.$ref?.equals(cls._id)
             }.size() > 0
         }
     }

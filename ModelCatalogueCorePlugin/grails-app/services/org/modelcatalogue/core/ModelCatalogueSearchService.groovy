@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection

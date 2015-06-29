@@ -7,7 +7,7 @@ import org.modelcatalogue.core.security.Role
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.security.UserRole
 import org.modelcatalogue.core.testapp.Requestmap
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.ExtensionModulesLoader
 import org.modelcatalogue.core.util.test.TestDataHelper
 import org.springframework.http.HttpMethod
@@ -126,11 +126,11 @@ class BootStrap {
             importService.importData()
 
             println 'Finalizing all published elements'
-            CatalogueElement.findAllByStatus(ElementStatus.DRAFT).each {
+            CatalogueElement.findAllByStatus(org.modelcatalogue.core.api.ElementStatus.DRAFT).each {
                 if (it instanceof Model) {
                     elementService.finalizeElement(it)
                 } else {
-                    it.status = ElementStatus.FINALIZED
+                    it.status = org.modelcatalogue.core.api.ElementStatus.FINALIZED
                     it.save failOnError: true
                 }
             }

@@ -1,5 +1,6 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.Lists
 
 class ValueDomainController extends AbstractCatalogueElementController<ValueDomain> {

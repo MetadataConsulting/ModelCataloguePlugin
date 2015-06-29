@@ -60,8 +60,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == vOne.id
         change.authorId == null
         change.property == 'status'
-        change.newValue == DefaultAuditor.storeValue(ElementStatus.FINALIZED)
-        change.oldValue == DefaultAuditor.storeValue(ElementStatus.DRAFT)
+        change.newValue == DefaultAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+        change.oldValue == DefaultAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DRAFT)
     }
 
     def "deprecation is logged"() {
@@ -79,8 +79,8 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         change.latestVersionId == vOne.id
         change.authorId == null
         change.property == 'status'
-        change.newValue == DefaultAuditor.storeValue(ElementStatus.DEPRECATED)
-        change.oldValue == DefaultAuditor.storeValue(ElementStatus.DRAFT)
+        change.newValue == DefaultAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DEPRECATED)
+        change.oldValue == DefaultAuditor.storeValue(org.modelcatalogue.core.api.ElementStatus.DRAFT)
     }
 
     def "valid updating property is logged"() {
@@ -445,9 +445,9 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     }
 
     def "creating draft is ignored as it is already logged as creating new version"() {
-        DataType type = new DataType(name: 'DT4DSI', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+        DataType type = new DataType(name: 'DT4DSI', status: org.modelcatalogue.core.api.ElementStatus.FINALIZED).save(failOnError: true, flush: true)
 
-        type.status = ElementStatus.DRAFT
+        type.status = org.modelcatalogue.core.api.ElementStatus.DRAFT
         type.save(failOnError: true, flush: true)
 
         expect:
@@ -456,7 +456,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
 
     def "auditing can be disabled"() {
         DataType type = auditService.mute {
-             new DataType(name: 'DT4DIS', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+             new DataType(name: 'DT4DIS', status: org.modelcatalogue.core.api.ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
 
         expect:
@@ -466,7 +466,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
     def "you can set default author id"() {
         def defaultAuthorId = 1234567890
         DataType type = auditService.withDefaultAuthorId(defaultAuthorId) {
-            new DataType(name: 'DT4DA', status: ElementStatus.FINALIZED).save(failOnError: true, flush: true)
+            new DataType(name: 'DT4DA', status: org.modelcatalogue.core.api.ElementStatus.FINALIZED).save(failOnError: true, flush: true)
         }
 
         Change change = Change.findByTypeAndChangedId(ChangeType.NEW_ELEMENT_CREATED, type.id)

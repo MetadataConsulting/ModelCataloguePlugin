@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.forms
 
 import org.modelcatalogue.core.Asset
-import org.modelcatalogue.core.ElementStatus
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer

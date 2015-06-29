@@ -7,8 +7,8 @@ import org.codehaus.groovy.grails.commons.GrailsDomainClass
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.builder.RelationshipDefinition
-import org.modelcatalogue.core.util.builder.RelationshipDefinitionBuilder
+import org.modelcatalogue.core.RelationshipDefinition
+import org.modelcatalogue.core.RelationshipDefinitionBuilder
 
 @Log4j
 class CopyAssociationsAndRelationships {
@@ -147,13 +147,13 @@ class CopyAssociationsAndRelationships {
     }
 
     static boolean isOverriding(Relationship created, Relationship old) {
-        if (!(created.source.status == ElementStatus.DRAFT && created.destination.status == ElementStatus.DRAFT)) {
+        if (!(created.source.status == org.modelcatalogue.core.api.ElementStatus.DRAFT && created.destination.status == org.modelcatalogue.core.api.ElementStatus.DRAFT)) {
             return false
         }
-        if (old.source.status == ElementStatus.DRAFT && old.destination.status != ElementStatus.DRAFT) {
+        if (old.source.status == org.modelcatalogue.core.api.ElementStatus.DRAFT && old.destination.status != org.modelcatalogue.core.api.ElementStatus.DRAFT) {
             return true
         }
-        if (old.source.status != ElementStatus.DRAFT && old.destination.status == ElementStatus.DRAFT) {
+        if (old.source.status != org.modelcatalogue.core.api.ElementStatus.DRAFT && old.destination.status == org.modelcatalogue.core.api.ElementStatus.DRAFT) {
             return true
         }
         return false

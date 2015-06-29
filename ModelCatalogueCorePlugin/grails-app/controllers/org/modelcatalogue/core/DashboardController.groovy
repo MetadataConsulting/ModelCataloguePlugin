@@ -4,6 +4,7 @@ import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.actions.Action
 import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
 import org.modelcatalogue.core.util.Lists
 

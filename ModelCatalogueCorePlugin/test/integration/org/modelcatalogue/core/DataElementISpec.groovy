@@ -1,7 +1,4 @@
 package org.modelcatalogue.core
-/**
- * Created by adammilward on 05/02/2014.
- */
 
 class DataElementISpec extends AbstractIntegrationSpec{
 
@@ -46,7 +43,7 @@ class DataElementISpec extends AbstractIntegrationSpec{
 
         auth2     in auth1.relations
         auth1     in auth2.relations
-        auth3      in auth2.relations
+        auth3     in auth2.relations
         auth2     in auth3.relations
 
         when:

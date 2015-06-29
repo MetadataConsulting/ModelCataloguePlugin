@@ -2,7 +2,8 @@ package org.modelcatalogue.core.dataarchitect
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class DataImportService {
     static transactional = false
@@ -35,7 +36,7 @@ class DataImportService {
 
         if (dataItemNameIndex == -1) throw new Exception("Can not find '${headersMap.dataElementName}' column")
         //iterate through the rows and import each line
-        CatalogueBuilder builder = new CatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
         builder.build {
             copy relationships
             rows.eachWithIndex { def row, int i ->
@@ -99,6 +100,7 @@ class DataImportService {
                 }
             }
         }
+        builder.created
     }
 
     def getRowValue(row, index){

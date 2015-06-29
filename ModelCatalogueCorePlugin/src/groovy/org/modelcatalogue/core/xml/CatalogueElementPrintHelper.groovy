@@ -79,8 +79,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             attrs.id = element.getDefaultModelCatalogueId(!context.idIncludeVersion)
         }
 
-        if (element.status != ElementStatus.FINALIZED) {
-            if (element.status in [ElementStatus.DRAFT, ElementStatus.DEPRECATED]) {
+        if (element.status != org.modelcatalogue.core.api.ElementStatus.FINALIZED) {
+            if (element.status in [org.modelcatalogue.core.api.ElementStatus.DRAFT, org.modelcatalogue.core.api.ElementStatus.DEPRECATED]) {
                 attrs.status = element.status
             } else {
                 throw new IllegalArgumentException("Cannot print ${element.getClass().simpleName} with status $element.status")

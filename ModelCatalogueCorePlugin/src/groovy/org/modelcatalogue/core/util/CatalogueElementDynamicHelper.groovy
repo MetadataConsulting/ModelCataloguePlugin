@@ -65,7 +65,7 @@ class CatalogueElementDynamicHelper {
                         log.warning "querying count of $name for $delegate.name but the relationship type $relName does not exist"
                         return 0
                     }
-                    delegate."count${direction.capitalize()}RelationsByType"(relType)
+                    delegate."count${direction.capitalize()}RelationshipsByType"(relType)
                 }
             }
 

@@ -8,7 +8,7 @@ import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.RelationshipService;
 import org.modelcatalogue.core.RelationshipType;
-import org.modelcatalogue.core.util.builder.RelationshipDefinition
+import org.modelcatalogue.core.RelationshipDefinition
 
 class GelXmlServiceIntegrationSpec extends IntegrationSpec {
     
@@ -67,13 +67,13 @@ class GelXmlServiceIntegrationSpec extends IntegrationSpec {
         assert result.contains("<xs:element name='${grandChild.name.toLowerCase()}'")
         
         when :
-        def metadata=parent1.ext
         result=null
         try{
             parent1.ext=[:]
             result=gelXmlService.printXSDModel(parent1)
-        }catch(e){
-             
+        } catch(e){
+           e.printStackTrace()
+           e.printStackTrace()
         }
         then :
         assert result==null

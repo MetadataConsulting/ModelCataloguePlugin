@@ -9,6 +9,7 @@ import org.codehaus.groovy.grails.web.mime.MimeType
 import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
 import org.grails.plugins.web.rest.render.ServletRenderContext
 import org.modelcatalogue.core.*
+import org.modelcatalogue.core.Extendible
 import org.modelcatalogue.core.audit.AuditService
 import org.modelcatalogue.core.reports.ReportsRegistry
 import org.modelcatalogue.core.util.ListWrapper
@@ -103,7 +104,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                 name: theName,
                 originalFileName: theName,
                 description: "Your export will be available in this asset soon. Use Refresh action to reload",
-                status: ElementStatus.PENDING,
+                status: org.modelcatalogue.core.api.ElementStatus.PENDING,
                 contentType: XLSX.name,
                 size: 0
         )
@@ -174,7 +175,7 @@ class XLSXListRenderer extends AbstractRenderer<ListWrapper> {
                         exporter.save(it)
                     }
 
-                    updated.status = ElementStatus.FINALIZED
+                    updated.status = org.modelcatalogue.core.api.ElementStatus.FINALIZED
                     updated.description = "Your export is ready. Use Download button to view it."
                     updated.save(flush: true, failOnError: true)
                 } catch (e) {

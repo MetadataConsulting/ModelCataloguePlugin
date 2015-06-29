@@ -1,10 +1,6 @@
-package org.modelcatalogue.core.util.builder
+package org.modelcatalogue.core
 
 import groovy.transform.AutoClone
-import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.Relationship
-import org.modelcatalogue.core.RelationshipType
 
 @AutoClone
 class RelationshipDefinition {

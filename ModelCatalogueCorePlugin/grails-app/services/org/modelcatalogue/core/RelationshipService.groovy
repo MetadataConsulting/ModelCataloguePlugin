@@ -2,13 +2,13 @@ package org.modelcatalogue.core
 
 import groovy.transform.stc.ClosureParams
 import groovy.transform.stc.FromString
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
-import org.modelcatalogue.core.util.builder.RelationshipDefinition
 
 class RelationshipService {
 

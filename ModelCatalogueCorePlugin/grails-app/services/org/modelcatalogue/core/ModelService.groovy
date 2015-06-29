@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.ListCountAndType
 import org.modelcatalogue.core.util.ListWithTotalAndType

@@ -1,9 +1,10 @@
 package org.modelcatalogue.core
 
+import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
-import org.modelcatalogue.core.util.builder.CatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.core.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
@@ -46,7 +47,7 @@ class DataImportController  {
 
 
 
-    def upload(Integer max) {
+    def upload() {
         if (!modelCatalogueSecurityService.hasRole('CURATOR')) {
             render status: HttpStatus.UNAUTHORIZED
             return
@@ -58,7 +59,7 @@ class DataImportController  {
             return
         }
 
-        def errors = [], response
+        def errors = []
 
         String conceptualDomainName
         MultipartFile file = request.getFile("file")
@@ -97,7 +98,7 @@ class DataImportController  {
             populateHeaders(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from XML") {
                 try {
-                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new CatalogueBuilder(classificationService, elementService))
+                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(classificationService, elementService))
                     loader.load(inputStream)
                     finalizeAsset(id)
                 } catch (Exception e) {
