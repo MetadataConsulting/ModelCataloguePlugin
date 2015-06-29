@@ -3,7 +3,7 @@ package x.org.modelcatalogue.core.xml
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.xml.CatalogueXmlLoader
+import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import spock.lang.Shared
 
 class CatalogueXmlLoaderSpec extends IntegrationSpec {

@@ -5,7 +5,7 @@ import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.xml.CatalogueXmlLoader
+import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest

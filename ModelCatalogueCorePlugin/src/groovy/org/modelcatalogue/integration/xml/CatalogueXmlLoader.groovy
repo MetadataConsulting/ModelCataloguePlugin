@@ -1,10 +1,9 @@
-package org.modelcatalogue.core.xml
+package org.modelcatalogue.integration.xml
 
 import groovy.util.logging.Log4j
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import org.modelcatalogue.builder.api.CatalogueBuilder
-import org.modelcatalogue.core.RelationshipType
 
 
 @Log4j
@@ -57,13 +56,10 @@ class CatalogueXmlLoader {
     private void handleRelationshipTypes(GPathResult parent) {
         parent.relationshipTypes.children().each { type ->
             String name = type.@name.text()
-            RelationshipType existing = RelationshipType.readByName(name)
-            if (!existing) {
-                builder.relationshipType(name: name, source: type.@source.text(), destination: type.@destination.text(), system: type.@system.text(), bidirectional: 'true' == type.@bidirectional.text(),  versionSpecific: 'true' == type.@versionSpecific.text()){
-                    sourceToDestination(type.sourceToDestination[0].@label.text(), description: type.sourceToDestination[0].text())
-                    destinationToSource(type.destinationToSource[0].@label.text(), description: type.destinationToSource[0].text())
-                    rule(type.rule[0].text())
-                }
+            builder.relationshipType(name: name, source: type.@source.text(), destination: type.@destination.text(), system: type.@system.text(), bidirectional: 'true' == type.@bidirectional.text(),  versionSpecific: 'true' == type.@versionSpecific.text()){
+                sourceToDestination(type.sourceToDestination[0].@label.text(), description: type.sourceToDestination[0].text())
+                destinationToSource(type.destinationToSource[0].@label.text(), description: type.destinationToSource[0].text())
+                rule(type.rule[0].text())
             }
         }
     }
