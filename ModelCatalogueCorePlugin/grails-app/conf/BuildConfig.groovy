@@ -52,9 +52,10 @@ grails.project.dependency.resolution = {
         compile 'com.google.guava:guava:18.0'
         compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
 
-        String mcToolkitVersion = '1.0.0-alpha-3'
+        String mcToolkitVersion = '1.0.0-alpha-4'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
 
 		//----- Jasper Reports specific dependencies 
 		 //from the bintray
