@@ -10,6 +10,15 @@ import org.modelcatalogue.core.RelationshipType
 @Log4j
 class CatalogueXmlLoader {
 
+    private static final List<String> SUPPORTED_NAMESPACE_URLS = [
+            'http://www.metadataregistry.org.uk/assets/schema/1.0/metadataregistry.xsd',
+            'http://www.metadataregistry.org.uk/assets/schema/1.0.1/metadataregistry.xsd',
+            'http://www.metadataregistry.org.uk/assets/schema/1.0.2/metadataregistry.xsd',
+            'http://www.metadataregistry.org.uk/assets/schema/1.1/metadataregistry.xsd'
+    ].asImmutable()
+
+    private static final String CATALOGUE_NAMESPACE_PREFIX = "http://www.metadataregistry.org.uk/assets/schema/"
+
     private static final List<String> IGNORED_ATTRS = ['href']
     private static final List<String> CATALOGUE_ELEMENT_ELEMENTS = ['classification', 'model', 'dataElement', 'valueDomain', 'dataType', 'measurementUnit', 'unitOfMeasure']
 
@@ -66,7 +75,10 @@ class CatalogueXmlLoader {
     }
 
     private void handleNode(NodeChild element) {
-        if (element.namespaceURI() != CatalogueXmlPrinter.NAMESPACE_URL) {
+        if (!(element.namespaceURI() in SUPPORTED_NAMESPACE_URLS)) {
+            if (element.namespaceURI().startsWith(CATALOGUE_NAMESPACE_PREFIX)) {
+                throw new IllegalArgumentException("Unsupported Catalogue XML namespace version: ${element.namespaceURI()}")
+            }
             return
         }
         switch(element.name()) {
