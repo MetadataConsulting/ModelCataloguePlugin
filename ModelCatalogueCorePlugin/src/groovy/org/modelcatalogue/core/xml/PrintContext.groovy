@@ -4,10 +4,8 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ClassificationService
 import org.modelcatalogue.core.ModelService
+import org.modelcatalogue.core.RelationshipType
 
-/**
- * Created by ladin on 15.01.15.
- */
 class PrintContext {
 
     ClassificationService classificationService
@@ -19,6 +17,8 @@ class PrintContext {
 
     Classification currentClassification
     Set<Long> idsOfPrinted = []
+
+    Set<String> typesUsed = new TreeSet<String>()
 
     PrintContext(ClassificationService classificationService, ModelService modelService) {
         this.classificationService = classificationService

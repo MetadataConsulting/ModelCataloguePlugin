@@ -37,16 +37,17 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (element instanceof Classification) {
             if (context.currentClassification) {
                 theMkp."${elementName}"(ref(element, context)) {
-                    processRelationshipMetadata(theMkp, rel)
+                    processRelationshipMetadata(theMkp, context, rel)
                 }
                 return
             }
             context.currentClassification = element
+            context.typesUsed << 'classification'
         }
 
         if (context.wasPrinted(element)) {
             theMkp."${elementName}"(ref(element, context)) {
-                processRelationshipMetadata(theMkp, rel)
+                processRelationshipMetadata(theMkp, context, rel)
             }
             return
         }
@@ -91,26 +92,26 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     }
 
     void processElements(theMkp, E element, PrintContext context, Relationship relationship) {
-        processRelationshipMetadata(theMkp, relationship)
+        processRelationshipMetadata(theMkp, context, relationship)
 
         if (element.description) {
             theMkp.description element.description
         }
         for (Relationship rel in element.isBasedOnRelationships) {
             theMkp.basedOn(ref(rel.source, context)) {
-                processRelationshipMetadata(theMkp, rel)
+                processRelationshipMetadata(theMkp, context, rel)
             }
         }
         for (Relationship rel in element.relatedToRelationships) {
             CatalogueElement other = rel.source == element ? rel.destination : rel.source
             theMkp.relatedTo(ref(other, context)) {
-                processRelationshipMetadata(theMkp, rel)
+                processRelationshipMetadata(theMkp, context, rel)
             }
         }
         for (Relationship rel in element.isSynonymForRelationships) {
             CatalogueElement other = rel.source == element ? rel.destination : rel.source
             theMkp.synonym(ref(other, context)){
-                processRelationshipMetadata(theMkp, rel)
+                processRelationshipMetadata(theMkp, context, rel)
             }
         }
         if (element.ext) {
@@ -128,28 +129,32 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             theMkp.relationships {
                 for (Relationship rel in outgoing){
                     to(relationshipAttrs(rel, true, context)) {
-                        processRelationshipMetadata(theMkp, rel)
+                        processRelationshipMetadata(theMkp, context, rel)
                     }
                 }
 
                 for (Relationship rel in incoming){
                     from(relationshipAttrs(rel, false, context)) {
-                        processRelationshipMetadata(theMkp, rel)
+                        processRelationshipMetadata(theMkp, context, rel)
                     }
                 }
             }
         }
     }
 
-    static void processRelationshipMetadata(theMkp, Relationship rel) {
-        if (rel?.ext) {
+    static void processRelationshipMetadata(theMkp, PrintContext context, Relationship rel) {
+        if (!rel) {
+            return
+        }
+        context.typesUsed << rel.relationshipType.name
+        if (rel.ext) {
             theMkp.metadata {
                 for (Map.Entry<String, String> entry in rel.ext.entrySet()) {
                     extension(key: entry.key, entry.value)
                 }
             }
         }
-        if (rel?.archived) {
+        if (rel.archived) {
             theMkp.archived true
         }
     }

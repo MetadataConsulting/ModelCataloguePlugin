@@ -166,7 +166,7 @@
         <xs:sequence>
             <xs:element name="sourceToDestination" type="mdr:RelationshipTypeDefinitionDirectionDescription" />
             <xs:element name="destinationToSource" type="mdr:RelationshipTypeDefinitionDirectionDescription" />
-            <xs:element name="rule" type="mdr:Rule" />
+            <xs:element name="rule" type="mdr:Rule" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="source" type="mdr:CatalogueElementType" use="required" />
         <xs:attribute name="destination" type="mdr:CatalogueElementType" use="required" />
@@ -302,7 +302,6 @@
 
     <xs:complexType name="Catalogue">
         <xs:sequence>
-            <xs:element name="relationshipTypes" type="mdr:RelationshipTypesDefinitions" minOccurs="0" />
             <xs:element name="createAutomatically" type="mdr:CatalogueElementType" minOccurs="0" maxOccurs="unbounded" />
             <xs:choice maxOccurs="unbounded">
                 <xs:element name="classification"   type="mdr:Classification"  />
@@ -312,6 +311,7 @@
                 <xs:element name="dataType"         type="mdr:DataType"        />
                 <xs:element name="measurementUnit"  type="mdr:MeasurementUnit" />
             </xs:choice>
+            <xs:element name="relationshipTypes" type="mdr:RelationshipTypesDefinitions" minOccurs="0" />
         </xs:sequence>
     </xs:complexType>
 

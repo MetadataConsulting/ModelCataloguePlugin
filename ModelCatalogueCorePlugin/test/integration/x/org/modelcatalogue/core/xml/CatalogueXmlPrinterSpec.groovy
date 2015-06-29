@@ -24,6 +24,11 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
         initCatalogue()
 
+        RelationshipType.containmentType.with {
+            rule = "/* A RULE */"
+            save(failOnError: true)
+        }
+
         if (!RelationshipType.findByName('derivedFrom')) {
             new RelationshipType(
                     name: 'derivedFrom',
@@ -108,6 +113,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
         Diff diff = new Diff(xml, getClass().classLoader.getResourceAsStream("resources/xml/$sampleFile").text)
         DetailedDiff detailedDiff = new DetailedDiff(diff)
+
 
         assert detailedDiff.similar(), detailedDiff.toString()
         return true

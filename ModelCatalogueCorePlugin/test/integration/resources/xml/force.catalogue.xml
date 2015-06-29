@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1/metadataregistry.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1/metadataregistry.xsd">
     <valueDomain name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
         <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
         <relatedTo ref="http://www.example.com/domains/Pressure">
@@ -17,4 +18,11 @@
             <description>A number that uses a decimal point followed by digits that show a value smaller than one.</description>
         </dataType>
     </valueDomain>
+    <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
+    <relationshipTypes>
+        <relationshipType name="relatedTo" source="org.modelcatalogue.core.CatalogueElement" destination="org.modelcatalogue.core.CatalogueElement" bidirectional="true">
+            <sourceToDestination label="related to">Any element can be related to multiple elements. This relationship has no specific meaning.</sourceToDestination>
+            <destinationToSource label="related to"/>
+        </relationshipType>
+    </relationshipTypes>
 </catalogue>
