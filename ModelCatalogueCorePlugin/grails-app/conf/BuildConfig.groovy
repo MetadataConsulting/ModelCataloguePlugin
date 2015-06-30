@@ -50,11 +50,13 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'com.google.guava:guava:18.0'
 
-        String mcToolkitVersion = '1.0.0-alpha-7'
+        String mcToolkitVersion = '1.0.0-alpha-8'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
-        compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-excel:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-integration-obo:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
+        test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
 		//----- Jasper Reports specific dependencies 
 		 //from the bintray

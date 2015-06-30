@@ -2,14 +2,21 @@ package org.modelcatalogue.core
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-import org.modelcatalogue.core.dataarchitect.ExcelLoader
+import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
+import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.core.pages.AssetListPage
+import org.modelcatalogue.integration.excel.HeadersMap
 import spock.lang.Stepwise
 
 @Stepwise
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     @Rule TemporaryFolder tmp = new TemporaryFolder()
+
+    ClassificationService classificationService
+    ElementService elementService
 
     def "go to login"() {
         go "#/"
@@ -268,14 +275,15 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             }
             waitUntilFinalized('Data Elements to Excel.xlsx')
 
-            ExcelLoader parser = new ExcelLoader(new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
-            def (headers, rows) = parser.parse()
+            DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+            ExcelLoader parser = new ExcelLoader(builder)
+            parser.importData(HeadersMap.create(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
 
-            assert headers.size() >= 17
-            assert rows.size() == 5
+            builder.created.count { it.instanceOf(DataElement) } == 15
         }
 
         then:
+
         true
     }
 

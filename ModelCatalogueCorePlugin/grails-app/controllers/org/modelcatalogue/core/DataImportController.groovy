@@ -1,8 +1,8 @@
 package org.modelcatalogue.core
 
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.dataarchitect.ExcelLoader
-import org.modelcatalogue.core.dataarchitect.HeadersMap
+import org.modelcatalogue.integration.excel.ExcelLoader
+import org.modelcatalogue.integration.excel.HeadersMap
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.integration.obo.OboLoader
@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 
 class DataImportController  {
 
-    def dataImportService
     def initCatalogueService
     def XSDImportService
     def umljService
@@ -76,12 +75,12 @@ class DataImportController  {
             def asset = storeAsset(params, file, 'application/vnd.ms-excel')
             def id = asset.id
             InputStream inputStream = file.inputStream
-            HeadersMap headersMap = populateHeaders(request.JSON.headersMap ?: [:])
+            HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from Excel") {
                 try {
-                    ExcelLoader parser = new ExcelLoader(inputStream)
-                    def (headers, rows) = parser.parse()
-                    dataImportService.importData(headers, rows, headersMap)
+                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+                    ExcelLoader parser = new ExcelLoader(builder)
+                    parser.importData(headersMap, inputStream)
                     finalizeAsset(id)
                 } catch (Exception e) {
                     logError(id, e)
@@ -95,7 +94,6 @@ class DataImportController  {
             def asset = storeAsset(params, file, 'application/xml')
             def id = asset.id
             InputStream inputStream = file.inputStream
-            populateHeaders(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from XML") {
                 try {
                     CatalogueXmlLoader loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(classificationService, elementService))
@@ -288,29 +286,6 @@ class DataImportController  {
             }
         }
         asset
-    }
-
-    protected static HeadersMap populateHeaders(params){
-
-        HeadersMap headersMap = new HeadersMap()
-        headersMap.dataElementCode = params.dataElementCode ?: "Data Item Unique Code"
-        headersMap.dataElementName = params.dataElementName ?: "Data Item Name"
-        headersMap.dataElementDescription = params.dataElementDescription ?: "Data Item Description"
-        headersMap.dataTypeName = params.dataTypeName ?: "Data Type"
-        headersMap.dataTypeClassification = params.dataTypeClassification ?: "Data Type Classification"
-        headersMap.dataTypeCode = params.dataTypeCode ?: "Data Type Unique Code"
-        headersMap.valueDomainName = params.valueDomainName ?: "Value Domain"
-        headersMap.valueDomainClassification = params.valueDomainClassification ?: "Value Domain Classification"
-        headersMap.valueDomainCode = params.valueDomainCode ?: "Value Domain Unique Code"
-        headersMap.parentModelName = params.parentModelName ?: "Parent Model"
-        headersMap.parentModelCode = params.parentModelCode ?: "Parent Model Unique Code"
-        headersMap.containingModelName = params.containingModelName ?: "Model"
-        headersMap.containingModelCode = params.containingModelCode ?: "Model Unique Code"
-        headersMap.measurementUnitName = params.measurementUnitName ?: "Measurement Unit"
-        headersMap.measurementSymbol = params.measurementSymbol ?: "Measurement Unit Symbol"
-        headersMap.classification = params.classification ?: "Classification"
-        headersMap.metadata = params.metadata ?: "Metadata"
-        return headersMap
     }
 
     protected executeInBackground(Long assetId, String message, Closure code) {

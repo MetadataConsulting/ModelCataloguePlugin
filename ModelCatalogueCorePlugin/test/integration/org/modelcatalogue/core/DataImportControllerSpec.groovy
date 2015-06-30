@@ -1,7 +1,7 @@
 package org.modelcatalogue.core
 
 import org.codehaus.groovy.grails.web.json.JSONElement
-import org.modelcatalogue.core.dataarchitect.HeadersMap
+import org.modelcatalogue.integration.excel.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 
@@ -27,7 +27,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     }
 
     def testHeaderSetup(){
-        HeadersMap headersMap = DataImportController.populateHeaders([])
+        HeadersMap headersMap = DataImportController.create([])
         expect:
         headersMap.dataElementCode == "Data Item Unique Code"
         headersMap.dataElementName == "Data Item Name"
@@ -71,7 +71,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         params.classification = "Classification"
         params.metadata = "metadata"
 
-        HeadersMap headersMap = DataImportController.populateHeaders(params)
+        HeadersMap headersMap = DataImportController.create(params)
         expect:
         headersMap.dataElementCode == "Data Item UC"
         headersMap.dataElementName == "DataI Name"
