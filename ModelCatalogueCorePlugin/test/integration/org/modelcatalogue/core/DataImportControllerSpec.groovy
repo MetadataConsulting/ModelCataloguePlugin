@@ -5,10 +5,6 @@ import org.modelcatalogue.integration.excel.HeadersMap
 import org.modelcatalogue.core.util.DefaultResultRecorder
 import org.modelcatalogue.core.util.ResultRecorder
 
-/**
- * Created by sus_avi on 01/05/2014.
- */
-
 class DataImportControllerSpec extends AbstractIntegrationSpec implements ResultRecorder {
 
     def fileName, recorder, filenameXsd, filenameXsd2, fileNameStarUML
@@ -27,7 +23,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
     }
 
     def testHeaderSetup(){
-        HeadersMap headersMap = DataImportController.create([])
+        HeadersMap headersMap = HeadersMap.create()
         expect:
         headersMap.dataElementCode == "Data Item Unique Code"
         headersMap.dataElementName == "Data Item Name"
@@ -71,7 +67,7 @@ class DataImportControllerSpec extends AbstractIntegrationSpec implements Result
         params.classification = "Classification"
         params.metadata = "metadata"
 
-        HeadersMap headersMap = DataImportController.create(params)
+        HeadersMap headersMap = HeadersMap.create(params)
         expect:
         headersMap.dataElementCode == "Data Item UC"
         headersMap.dataElementName == "DataI Name"

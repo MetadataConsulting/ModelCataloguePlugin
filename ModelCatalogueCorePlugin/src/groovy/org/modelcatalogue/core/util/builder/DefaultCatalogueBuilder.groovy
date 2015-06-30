@@ -398,7 +398,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy specified by given ID
      */
     ApiCatalogueElement ref(String id) {
-        repository.createAbstractionById(CatalogueElement, null, id, false)
+        repository.createProxy(CatalogueElement, [id: id])
     }
 
     /**

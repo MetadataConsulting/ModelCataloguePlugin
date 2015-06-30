@@ -275,11 +275,12 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
             }
             waitUntilFinalized('Data Elements to Excel.xlsx')
 
-            DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+            StringWriter sw = new StringWriter()
+            CatalogueBuilder builder = new XmlCatalogueBuilder(sw)
             ExcelLoader parser = new ExcelLoader(builder)
             parser.importData(HeadersMap.create(), new ByteArrayInputStream(downloadBytes("api/modelCatalogue/core/asset/${currentId}/download")))
 
-            builder.created.count { it.instanceOf(DataElement) } == 15
+            sw.toString().count('<dataElement') == 15
         }
 
         then:
