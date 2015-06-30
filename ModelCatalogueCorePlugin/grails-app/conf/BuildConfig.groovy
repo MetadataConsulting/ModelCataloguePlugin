@@ -29,7 +29,6 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
         grailsCentral()
-        mavenLocal()
         mavenCentral()
         // uncomment the below to enable remote dependency resolution
         // from public Maven repositories
@@ -51,10 +50,11 @@ grails.project.dependency.resolution = {
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'com.google.guava:guava:18.0'
 
-        compile "org.modelcatalogue:mc-core-api:1.0.0-alpha-5"
-        compile "org.modelcatalogue:mc-builder-api:1.0.0-alpha-5"
-        compile "org.modelcatalogue:mc-integration-xml:1.0.0-alpha-5"
-        compile "org.modelcatalogue:mc-integration-obo:1.0.0-alpha-5"
+        String mcToolkitVersion = '1.0.0-alpha-7'
+        compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-obo:$mcToolkitVersion"
 
 		//----- Jasper Reports specific dependencies 
 		 //from the bintray
