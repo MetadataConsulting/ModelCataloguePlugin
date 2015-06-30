@@ -50,12 +50,12 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
         compile 'com.google.guava:guava:18.0'
-        compile 'net.sourceforge.owlapi:owlapi-oboformat:3.5.1'
 
-        String mcToolkitVersion = '1.0.0-alpha-4'
+        String mcToolkitVersion = '1.0.0-alpha-5'
         compile "org.modelcatalogue:mc-core-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-builder-api:$mcToolkitVersion"
         compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
+        compile "org.modelcatalogue:mc-integration-obo:$mcToolkitVersion"
 
 		//----- Jasper Reports specific dependencies 
 		 //from the bintray

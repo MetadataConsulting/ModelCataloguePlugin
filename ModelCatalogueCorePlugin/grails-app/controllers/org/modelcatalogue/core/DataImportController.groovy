@@ -5,6 +5,7 @@ import org.modelcatalogue.core.dataarchitect.ExcelLoader
 import org.modelcatalogue.core.dataarchitect.HeadersMap
 import org.modelcatalogue.core.dataarchitect.xsd.XsdLoader
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
 import org.springframework.web.multipart.MultipartFile
@@ -15,7 +16,6 @@ class DataImportController  {
     def dataImportService
     def initCatalogueService
     def XSDImportService
-    def OBOService
     def umljService
     def loincImportService
     def modelCatalogueSecurityService
@@ -117,7 +117,11 @@ class DataImportController  {
             String idpattern = params.idpattern
             executeInBackground(id, "Imported from OBO") {
                 try {
-                    Classification classification = OBOService.importOntology(inputStream, name, idpattern)
+                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+                    OboLoader loader = new OboLoader(builder)
+                    idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${OboLoader.OBO_ID}/:id".toString().replace(':id', '$id')
+                    loader.load(inputStream, name, idpattern)
+                    Classification classification = builder.created.find { it.instanceOf(Classification) } as Classification
                     Asset updated = finalizeAsset(id)
                     classifyAsset(updated, classification)
                 } catch (Exception e) {
