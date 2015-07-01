@@ -63,13 +63,19 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     private boolean skipDrafts
 
     /**
+     * If false, all imported relationships will be system.
+     */
+    private boolean canCreateRelationshipTypes
+
+    /**
      * Creates new catalogue builder with given classification and element services.
      * @param classificationService classification service
      * @param elementService element service
      */
-    DefaultCatalogueBuilder(ClassificationService classificationService, ElementService elementService) {
+    DefaultCatalogueBuilder(ClassificationService classificationService, ElementService elementService, boolean canCreateRelationshipTypes = false) {
         this.repository = new CatalogueElementProxyRepository(classificationService, elementService)
         this.context = new CatalogueBuilderContext(this)
+        this.canCreateRelationshipTypes = canCreateRelationshipTypes
     }
 
     /**
@@ -559,7 +565,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         }
 
         type = new RelationshipType(name: map.name)
-        type.system = repository.canCreateRelationshipTypes ? map.system : true
+        type.system = canCreateRelationshipTypes ? map.system : true
         type.bidirectional = map.bidirectional
         type.versionSpecific = map.versionSpecific
         type.sourceClass = Class.forName(map.source?.toString())
