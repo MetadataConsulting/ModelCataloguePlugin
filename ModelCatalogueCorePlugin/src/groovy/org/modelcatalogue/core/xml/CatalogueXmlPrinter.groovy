@@ -10,7 +10,7 @@ import org.modelcatalogue.core.RelationshipType
 
 class CatalogueXmlPrinter {
 
-    static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/1.1.1/metadataregistry.xsd'
+    static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd'
 
     ClassificationService classificationService
     ModelService modelService

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.1/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
     <dataType name="Gender" id="http://www.example.com/types/Gender" status="DRAFT">
         <description>The state of being male or female (typically used with reference to social and cultural differences rather than biological ones)</description>
         <enumerations>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.1/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
     <classification name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT">
         <model name="Locomotive" id="http://www.example.com/models/Locomotive" status="DRAFT">
             <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">

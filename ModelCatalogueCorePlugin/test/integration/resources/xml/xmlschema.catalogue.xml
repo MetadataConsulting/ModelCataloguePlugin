@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.1/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
     <classification name="XMLSchema" id="http://www.w3.org/2001/XMLSchema">
         <description>XML Schema provides standard types for describing your own XML formats</description>
         <valueDomain name="xs:boolean" id="http://www.w3.org/2001/XMLSchema#boolean">

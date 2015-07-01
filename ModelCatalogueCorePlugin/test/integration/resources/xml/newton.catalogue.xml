@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.1/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
     <measurementUnit name="Newton" id="http://www.example.com/units/Newton" status="DRAFT" symbol="N">
         <description>The newton (symbol: N) is the International System of Units (SI) derived unit of force.</description>
         <relatedTo ref="http://www.bipm.org/en/publications/si-brochure/kilogram.html"/>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.1/metadataregistry.xsd">
+<?xml version="1.0" encoding="UTF-8"?><catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
     <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
         <valueDomain name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
             <description>A force is a push or pull upon an object resulting from the object's interaction with another object.</description>
