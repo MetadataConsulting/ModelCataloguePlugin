@@ -8,6 +8,7 @@ import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import org.modelcatalogue.integration.obo.OboLoader
 import org.modelcatalogue.integration.xml.CatalogueXmlLoader
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
@@ -289,8 +290,10 @@ class DataImportController  {
     }
 
     protected executeInBackground(Long assetId, String message, Closure code) {
+        def context = SecurityContextHolder.context
         Long userId = modelCatalogueSecurityService.currentUser?.id
         executorService.submit {
+            SecurityContextHolder.context = context
             auditService.logExternalChange(Asset.get(assetId), userId, message, code)
         }
     }
