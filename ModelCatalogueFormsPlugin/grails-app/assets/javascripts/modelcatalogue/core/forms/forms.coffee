@@ -81,6 +81,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     title: 'Form (Item)'
     types: [
       'dataElement'
+      '=[containment]=>'
     ]
 
     keys: [
@@ -89,6 +90,10 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
       "http://forms.modelcatalogue.org/item#phi"
       "http://forms.modelcatalogue.org/item#instructions"
       "http://forms.modelcatalogue.org/item#description"
+      "http://forms.modelcatalogue.org/item#layout"
+      "http://forms.modelcatalogue.org/item#columnNumber"
+      "http://forms.modelcatalogue.org/item#required"
+      "http://forms.modelcatalogue.org/item#questionNumber"
     ]
     template: 'modelcatalogue/core/ui/metadataEditors/formItemDataElement.html'
   }
@@ -100,10 +105,7 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     ]
 
     keys: [
-      "http://forms.modelcatalogue.org/item#layout"
-      "http://forms.modelcatalogue.org/item#columnNumber"
-      "http://forms.modelcatalogue.org/item#required"
-      "http://forms.modelcatalogue.org/item#questionNumber"
+
     ]
     template: 'modelcatalogue/core/ui/metadataEditors/formItemContainment.html'
   }
@@ -456,62 +458,56 @@ forms.run ['$templateCache', ($templateCache) ->
             If the item is part of a repeating group (GRID), the RIGHT_ITEM_TEXT will be ignored and never displayed.<br/>
         </p>
       </div>
-    </form>
-  '''
-
-
-  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/formItemContainment.html', '''
-    <form class="form">
       <div class="checkbox">
-        <label>
-          <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#required')" ng-model-options="{ getterSetter: true }">
-          Required
-        </label>
-        <p class="help-block">
-          This field determines whether the user must provide a value for it before saving the section the item appears in. Defaults to <code>true</code> if data element's <code>Min Occurs</code> is <code>1</code><br/>
+      <label>
+        <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#required')" ng-model-options="{ getterSetter: true }">
+        Required
+      </label>
+      <p class="help-block">
+        This field determines whether the user must provide a value for it before saving the section the item appears in. Defaults to <code>true</code> if data element's <code>Min Occurs</code> is <code>1</code><br/>
 
-          Leaving the field blank means the item would be optional so the data entry person does not have to
-          provide a value for it.  If selected, the data entry person must provide a value, or enter a discrepancy
-          note explaining why the field is left blank. This can be used for any RESPONSE_TYPE.
-        </p>
-      </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#layout')" ng-model-options="{ getterSetter: true }" ng-true-value="'horizontal'" ng-false-value="''">
-          Horizontal (for checkbox or radio)
-        </label>
-        <p class="help-block">
-          The layout of the options for radio and checkbox fields.
+        Leaving the field blank means the item would be optional so the data entry person does not have to
+        provide a value for it.  If selected, the data entry person must provide a value, or enter a discrepancy
+        note explaining why the field is left blank. This can be used for any RESPONSE_TYPE.
+      </p>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" ng-model="object.access('http://forms.modelcatalogue.org/item#layout')" ng-model-options="{ getterSetter: true }" ng-true-value="'horizontal'" ng-false-value="''">
+        Horizontal (for checkbox or radio)
+      </label>
+      <p class="help-block">
+        The layout of the options for radio and checkbox fields.
 
-          The options can be left to right, or top to bottom depending on the value specified in the Items worksheet.
+        The options can be left to right, or top to bottom depending on the value specified in the Items worksheet.
 
-          Leaving unchecked the items will be displayred in a single column from top to bottom.
-          Choosing Horizontal will put the items in a single row, left to right.
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="item-column-number" class="control-label">Column Number</label>
-        <input type="number" min="1" max="3" class="form-control" id="item-column-number" ng-model="object.access('http://forms.modelcatalogue.org/item#columnNumber').asInt" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-          Assigns items to an item group.<br/>
+        Leaving unchecked the items will be displayred in a single column from top to bottom.
+        Choosing Horizontal will put the items in a single row, left to right.
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="item-column-number" class="control-label">Column Number</label>
+      <input type="number" min="1" max="3" class="form-control" id="item-column-number" ng-model="object.access('http://forms.modelcatalogue.org/item#columnNumber').asInt" ng-model-options="{ getterSetter: true }">
+      <p class="help-block">
+        Assigns items to an item group.<br/>
 
-          This is to be used with only non-repeating items and controls display of multiple items on a single row.
-          If you set the column to 3 for an item, the previous two items in the worksheet should have COLUMN_NUMBERS
-          of 1 and 2.  Otherwise, it will just be applied to the first column.<br/>
+        This is to be used with only non-repeating items and controls display of multiple items on a single row.
+        If you set the column to 3 for an item, the previous two items in the worksheet should have COLUMN_NUMBERS
+        of 1 and 2.  Otherwise, it will just be applied to the first column.<br/>
 
-          Use of COLUMN_NUMBERS greater than 3 is not recommended due to typical screen width limitations.<br/>
-        </p>
-      </div>
-      <div class="form-group">
-        <label for="item-question-number" class="control-label">Question Number</label>
-        <input maxlength="20" type="text" class="form-control" id="item-question-number" ng-model="object.access('http://forms.modelcatalogue.org/item#questionNumber')" ng-model-options="{ getterSetter: true }">
-        <p class="help-block">
-            This field is used to specify an identifier for each item or question in the Items worksheet.  It appears to the
-            left of the LEFT_ITEM_TEXT field, or if that field was left blank, to the left of the form input.
+        Use of COLUMN_NUMBERS greater than 3 is not recommended due to typical screen width limitations.<br/>
+      </p>
+    </div>
+    <div class="form-group">
+      <label for="item-question-number" class="control-label">Question Number</label>
+      <input maxlength="20" type="text" class="form-control" id="item-question-number" ng-model="object.access('http://forms.modelcatalogue.org/item#questionNumber')" ng-model-options="{ getterSetter: true }">
+      <p class="help-block">
+          This field is used to specify an identifier for each item or question in the Items worksheet.  It appears to the
+          left of the LEFT_ITEM_TEXT field, or if that field was left blank, to the left of the form input.
 
-            This field allows you to specify questions as 1, 2, 2a etc. in a field.
-        </p>
-      </div>
+          This field allows you to specify questions as 1, 2, 2a etc. in a field.
+      </p>
+    </div>
     </form>
   '''
 ]
