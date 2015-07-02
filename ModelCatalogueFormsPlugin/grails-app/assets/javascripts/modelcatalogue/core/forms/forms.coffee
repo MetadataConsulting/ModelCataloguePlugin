@@ -98,18 +98,6 @@ forms.config ['metadataEditorsProvider', (metadataEditorsProvider)->
     template: 'modelcatalogue/core/ui/metadataEditors/formItemDataElement.html'
   }
 
-  metadataEditorsProvider.register {
-    title: 'Form (Item)'
-    types: [
-      '=[containment]=>'
-    ]
-
-    keys: [
-
-    ]
-    template: 'modelcatalogue/core/ui/metadataEditors/formItemContainment.html'
-  }
-
 ]
 
 forms.run ['$templateCache', ($templateCache) ->
