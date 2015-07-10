@@ -138,7 +138,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to data element specified by the parameters map and the DSL closure
      */
     void dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model, true)
+        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext element, c
 
@@ -167,7 +167,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to model specified by the parameters map and the DSL closure
      */
     void model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, true)
+        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext model, c
         context.withContextElement(Model) { ignored, Closure relConf ->
@@ -192,7 +192,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to value domain specified by the parameters map and the DSL closure
      */
     void valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<ValueDomain> domain = createProxy(ValueDomain, parameters, DataElement, true)
+        CatalogueElementProxy<ValueDomain> domain = createProxy(ValueDomain, parameters, DataElement, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext domain, c
 
@@ -221,7 +221,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         if (parameters.containsKey('enumerations') && !parameters.enumerations) {
             parameters.remove('enumerations')
         }
-        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain, true)
+        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext dataType, c
 
@@ -241,7 +241,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to measurement unit specified by the parameters map and the DSL closure
      */
     void measurementUnit(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<MeasurementUnit> unit = createProxy(MeasurementUnit, parameters, null, true)
+        CatalogueElementProxy<MeasurementUnit> unit = createProxy(MeasurementUnit, parameters, null, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext unit, c
 
@@ -672,6 +672,17 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         classifyIfNeeded element
 
         element
+    }
+
+    private boolean isUnderControlIfSameClassification(Map<String, Object> parameters) {
+        if (!parameters.classification) {
+            return true
+        }
+        boolean ret = true
+        context.withContextElement(Classification) {
+            ret = it.name == parameters.classification?.toString()
+        }
+        return ret
     }
 
 }
