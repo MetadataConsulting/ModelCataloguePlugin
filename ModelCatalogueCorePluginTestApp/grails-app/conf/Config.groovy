@@ -304,8 +304,9 @@ grails.assets.plugin."model-catalogue-core-plugin".excludes = [
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "Model Catalogue"
 grails.plugin.springsecurity.filterChain.chainMap = [
-        '/catalogue/upload': 'JOINED_FILTERS,-exceptionTranslationFilter',
-        '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
+        '/catalogue/upload':        'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/catalogue/*/*/export':    'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/**':                      'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
 ]
 grails.plugin.springsecurity.logout.handlerNames = [
         'rememberMeServices',
