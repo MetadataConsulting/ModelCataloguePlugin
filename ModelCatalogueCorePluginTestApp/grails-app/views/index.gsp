@@ -84,7 +84,7 @@
         demoConfig.config(['securityProvider', function (securityProvider) {
             securityProvider.springSecurity({
                 oauthProviders: ${oauthService.services.keySet().collect{"'$it'"}},
-                contextPath: '${request.contextPath ?: ''}',
+                contextPath: '${grailsApplication.config.grails.app.context ?: request.contextPath ?: ''}',
                 roles: {
                     VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
                     CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
