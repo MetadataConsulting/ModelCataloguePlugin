@@ -1,5 +1,7 @@
 angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalogueProvider', (catalogueProvider)->
+  catalogueProvider.setIcon 'dataModel',          "fa fa-fw fa-tags"
   catalogueProvider.setIcon 'classification',     "fa fa-fw fa-tags"
+  catalogueProvider.setIcon 'dataClass',          "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'model',              "fa fa-fw fa-cubes"
   catalogueProvider.setIcon 'dataElement',        "fa fa-fw fa-cube"
   catalogueProvider.setIcon 'valueDomain',        "fa fa-fw fa-cog"
@@ -19,6 +21,8 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   # this should be generated automatically in the future
 
 
+  catalogueProvider.setInstanceOf 'dataModel',          'classification'
+  catalogueProvider.setInstanceOf 'dataClass',          'model'
   catalogueProvider.setInstanceOf 'publishedElement',   'catalogueElement'
   catalogueProvider.setInstanceOf 'user',               'catalogueElement'
   catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'
