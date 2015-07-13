@@ -207,11 +207,9 @@
             <xs:extension base="mdr:Reference">
                 <xs:sequence>
                     <xs:element name="description"      type="mdr:Description"   minOccurs="0"/>
-                    <xs:choice minOccurs="0" maxOccurs="unbounded">
-                        <xs:element name="basedOn"      type="mdr:Reference"/>
-                        <xs:element name="relatedTo"    type="mdr:Reference"/>
-                        <xs:element name="synonym"      type="mdr:Reference"/>
-                    </xs:choice>
+                    <xs:element name="basedOn"      type="mdr:Reference" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="relatedTo"    type="mdr:Reference" minOccurs="0" maxOccurs="unbounded"/>
+                    <xs:element name="synonym"      type="mdr:Reference" minOccurs="0" maxOccurs="unbounded"/>
                     <xs:element name="extensions"       type="mdr:Extensions"    minOccurs="0"/>
                     <xs:element name="relationships"    type="mdr:Relationships" minOccurs="0"/>
                 </xs:sequence>
@@ -274,7 +272,7 @@
             <xs:extension base="mdr:CatalogueElement">
                 <xs:choice minOccurs="0" maxOccurs="unbounded">
                     <xs:element name="dataClass"        type="mdr:DataClass" />
-                    <xs:element name="dataElement"  type="mdr:DataElement" />
+                    <xs:element name="dataElement"      type="mdr:DataElement" />
                 </xs:choice>
                 <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
