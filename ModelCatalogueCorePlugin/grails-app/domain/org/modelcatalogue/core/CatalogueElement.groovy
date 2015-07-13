@@ -11,6 +11,7 @@ import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.RelationshipDirection
 
 import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
@@ -301,6 +302,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
+        ext = OrderedMap.fromJsonMap(ext)
         for (String key in this.ext.keySet() - ext.keySet()) {
             this.ext.remove key
         }
