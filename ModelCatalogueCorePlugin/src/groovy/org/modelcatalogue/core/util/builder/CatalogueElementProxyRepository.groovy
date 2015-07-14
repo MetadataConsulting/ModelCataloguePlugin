@@ -8,6 +8,7 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
+import org.modelcatalogue.core.util.Legacy
 
 @Log4j
 class CatalogueElementProxyRepository {

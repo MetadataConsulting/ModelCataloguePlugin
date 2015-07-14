@@ -25,8 +25,13 @@ class Model extends CatalogueElement {
     }
 
     @Override
-    String getModelCatalogueId() {
+    void setModelCatalogueId(String mcID) {
+        super.setModelCatalogueId(Legacy.fixModelCatalogueId(mcID))
+    }
+
+    @Override
+    String getDefaultModelCatalogueId(boolean withoutVersion = false) {
         // TODO: remove when the class is renamed
-        return Legacy.fixModelCatalogueId(super.getModelCatalogueId())
+        return Legacy.fixModelCatalogueId(super.getDefaultModelCatalogueId(withoutVersion))
     }
 }
