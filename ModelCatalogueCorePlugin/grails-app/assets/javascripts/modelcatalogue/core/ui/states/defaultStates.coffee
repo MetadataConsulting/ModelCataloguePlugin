@@ -112,7 +112,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     getLastModelsKey = (status = $stateParams.status)->
       "#{status ? 'finalized'}"
 
-    if $scope.resource == 'model'
+    if $scope.resource == 'dataClass' || $scope.resource == 'model'
       if $rootScope.$$lastModels and $rootScope.$$lastModels[getLastModelsKey()]
         if $rootScope.$$lastModels[getLastModelsKey()].element
           $rootScope.$$lastModels[getLastModelsKey()].element.refresh().then (element) ->
@@ -254,7 +254,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         list: ['$stateParams','catalogueElementResource', ($stateParams,catalogueElementResource) ->
           page = parseInt($stateParams.page ? 1, 10)
           page = 1 if isNaN(page)
-          # it's safe to call top level for each controller, only model controller will respond on it
+          # it's safe to call top level for each controller, only data class controller will respond on it
 
           defaultSorts = catalogueProvider.getDefaultSort($stateParams.resource) ? {sort: 'name', order: 'asc'}
 
@@ -727,18 +727,18 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({resource: 'dataModel'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification'})" ui-sref-opts="{inherit: false}">Finalized Classifications</a> {{finalizedClassificationCount}} </div>
-                            <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'classification', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Classifications</a> {{draftClassificationCount}} </div>
+                            <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'dataModel'})" ui-sref-opts="{inherit: false}">Finalized Data Models</a> {{finalizedClassificationCount}} </div>
+                            <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'dataModel', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Models</a> {{draftClassificationCount}} </div>
                         </div>
                     </div>
                 </div>
 
-                <a show-for-role="CURATOR" ng-click="create('classification')">
+                <a show-for-role="CURATOR" ng-click="create('dataModel')">
                     <div class="panel-footer">
-                        <span class="pull-left">Create Classification</span>
+                        <span class="pull-left">Create Data Model</span>
                         <span class="pull-right"><i class="fa fa-magic"></i></span>
                         <div class="clearfix"></div>
                     </div>
@@ -750,18 +750,18 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                 <div class="panel-heading">
                     <div class="row">
                         <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
+                            <a ui-sref="mc.resource.list({resource: 'dataClass'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model'})" ui-sref-opts="{inherit: false}">Finalized Models</a> {{finalizedModelCount}} </div>
-                            <div show-for-role="VIEWER"><a id="modelsLink" ui-sref="mc.resource.list({resource: 'model', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Models</a> {{draftModelCount}}</div>
+                            <div><a id="dataClasssLink" ui-sref="mc.resource.list({resource: 'dataClass'})" ui-sref-opts="{inherit: false}">Finalized Data Classes</a> {{finalizedModelCount}} </div>
+                            <div show-for-role="VIEWER"><a id="dataClassLink" ui-sref="mc.resource.list({resource: 'dataClass', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Classes</a> {{draftModelCount}}</div>
 
                         </div>
                     </div>
                 </div>
-                <a show-for-role="CURATOR" ng-click="create('model')">
+                <a show-for-role="CURATOR" ng-click="create('dataClass')">
                     <div class="panel-footer">
-                        <span class="pull-left">Create Model</span>
+                        <span class="pull-left">Create Data Class</span>
                         <span class="pull-right"><i class="fa fa-magic"></i></span>
                         <div class="clearfix"></div>
                     </div>
