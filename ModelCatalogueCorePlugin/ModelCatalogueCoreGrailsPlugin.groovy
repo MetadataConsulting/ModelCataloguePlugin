@@ -67,6 +67,7 @@ Model catalogue core plugin (metadata registry)
         ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
 
 
+
         mergeConfig(application)
 
         xlsxListRenderer(XLSXListRenderer)
