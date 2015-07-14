@@ -194,10 +194,6 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
     static readByName(String name) {
-        if (name == 'definition') {
-            // TODO: remove when migrated
-            return RelationshipType.classificationType
-        }
         try {
             Long id = typesCache.get(name, { ->
                 RelationshipType type = RelationshipType.findByName(name, [cache: true, readOnly: true])
