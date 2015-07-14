@@ -1,20 +1,15 @@
 import org.codehaus.groovy.grails.commons.GrailsClass
 import org.modelcatalogue.core.AbstractRestfulController
-import org.springframework.http.HttpStatus
+import org.modelcatalogue.core.util.Legacy
 
 class ApiFilters {
 
-    static final Map<String, String> LEGACY_ENTITY_NAMES = [dataClass: 'model', dataModel: 'classification']
 
     def filters = {
         legacy(controller:'*', action:'*') {
             before = {
-                if (LEGACY_ENTITY_NAMES.containsKey(controllerName) && !request.forwardURI.contains(controllerName)) {
-                    String url = grailsApplication.config.grails.serverURL + (request.forwardURI.replaceAll("/${LEGACY_ENTITY_NAMES[controllerName]}(?!Catalogue)", "/$controllerName"))
-                    if (request.contextPath) {
-                        url = (grailsApplication.config.grails.serverURL - request.contextPath) + (request.forwardURI.replaceAll("/${LEGACY_ENTITY_NAMES[controllerName]}(?!Catalogue)", "/$controllerName"))
-                    }
-                    redirect url: url, permanent: true
+                if (Legacy.hasLegacyName(controllerName) && !request.forwardURI.contains(controllerName)) {
+                    redirect url: Legacy.getRedirectUrl(controllerName, request), permanent: true
                 }
             }
         }

@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.util.GrailsNameUtils
 import org.hibernate.proxy.HibernateProxyHelper
+import org.modelcatalogue.core.util.Legacy
 import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import org.springframework.http.HttpStatus
 
@@ -13,6 +14,12 @@ class CatalogueController {
 
     def xref() {
         String resource = params.resource
+
+        if (Legacy.isLegacyResourceName(resource)) {
+            redirect permanent: true, url: Legacy.getRedirectUrl(Legacy.getNewResourceName(resource), request)
+            return
+        }
+
         Long id = params.long('id')
         Integer version = params.int('version')
 
