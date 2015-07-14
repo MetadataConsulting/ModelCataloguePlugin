@@ -13,13 +13,13 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
         template: '''
         <div class="modal-header">
             <button type="button" class="close" id="exit-wizard" ng-click="dismiss()"><span aria-hidden="true">&times;</span><span class="sr-only">Cancel</span></button>
-            <h4>Classification Wizard</h4>
+            <h4>Data Model Wizard</h4>
             <ul class="tutorial-steps">
               <li>
                 <button id="step-previous" ng-disabled="step == 'classification'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
               </li>
               <li>
-                <button id="step-classification" ng-click="select('classification')" class="btn btn-default" ng-class="{'btn-primary': step == 'classification'}">1. Classification</button>
+                <button id="step-classification" ng-click="select('classification')" class="btn btn-default" ng-class="{'btn-primary': step == 'classification'}">1. Data Model</button>
               </li>
               <li>
                 <button id="step-elements" ng-disabled="!nameUnique" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements'}">2. Elements</button>
@@ -71,7 +71,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
               </div>
           </div>
           <div ng-switch-when="summary" id="summary">
-              <h4 ng-show="classification.name &amp;&amp;  finished">Classification <strong>{{classification.name}} created</strong></h4>
+              <h4 ng-show="classification.name &amp;&amp;  finished">Data Model <strong>{{classification.name}} created</strong></h4>
           </div>
         </div>
         <div class="modal-footer" ng-if="step == 'summary'">
@@ -164,7 +164,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                 catalogueElementResource('classification').save($scope.classification)
 
               promise = promise.then (classification) ->
-                  messages.success "Classification #{classification.name} created"
+                  messages.success "Data Model #{classification.name} created"
                   $scope.finished = true
 
           $scope.$watch 'classification.name', (name) ->
@@ -205,7 +205,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
           $scope.dismiss = (reason) ->
             return $modalInstance.dismiss(reason) if $scope.finished
             if $scope.classification.name or $scope.dataElements.length > 0
-              messages.confirm("Close Classification Wizard", "Do you want to discard all changes?").then ->
+              messages.confirm("Close Data Model Wizard", "Do you want to discard all changes?").then ->
                 $modalInstance.dismiss(reason)
             else
               $modalInstance.dismiss(reason)
@@ -231,4 +231,5 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
   ]
 
   messagesProvider.setPromptFactory 'create-classification', factory
+  messagesProvider.setPromptFactory 'create-dataModel', factory
 ]

@@ -1,8 +1,8 @@
 angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.util.security']).config ['actionsProvider', 'names', (actionsProvider, names)->
 
   RESOURCES = [
-    'classification'
-    'model'
+    'dataModel'
+    'dataClass'
     'dataElement'
     'valueDomain'
     'dataType'
@@ -33,6 +33,8 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
         label = 'Actions'
       else if resource == 'csvTransformation'
         label = 'CSV Transformations'
+      else if resource == 'dataClass'
+        label = 'Data Classes'
 
       action = {
         icon:       catalogue.getIcon(resource)

@@ -36,13 +36,13 @@ angular.module('mc.core.ui.bs.actions', ['mc.util.ui.actions']).config ['actions
       args      = {create: ($scope.resource)}
       args.type = if messages.hasPromptFactory('create-' + $scope.resource) then "create-#{$scope.resource}" else "edit-#{$scope.resource}"
 
-      if $scope.resource == 'model' and $scope.element and $scope.elementSelectedInTree
+      if ($scope.resource == 'model' || $scope.resource == 'dataClass') and $scope.element and $scope.elementSelectedInTree
         args.parent = $scope.element
 
       security.requireRole('CURATOR')
       .then ->
         messages.prompt('Create ' + names.getNaturalName($scope.resource), '', args).then ->
-          if $scope.resource == 'model' and $state.current.name == 'mc.resource.list'
+          if ($scope.resource == 'model' || $scope.resource == 'dataClass')and $state.current.name == 'mc.resource.list'
             # reload in draft mode
             $state.go '.', {status: 'draft'}, {reload: true}
       , (errors)->

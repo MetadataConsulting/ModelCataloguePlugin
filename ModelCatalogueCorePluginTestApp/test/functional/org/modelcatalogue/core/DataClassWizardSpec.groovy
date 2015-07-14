@@ -5,14 +5,14 @@ import org.openqa.selenium.Keys
 import spock.lang.Stepwise
 
 @Stepwise
-class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
+class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
         go "#/"
         loginAdmin()
 
         when:
-        go "#/catalogue/model/all"
+        go "#/catalogue/dataClass/all"
 
         then:
         at ModalTreeViewPage
@@ -20,7 +20,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
             !$('#jserrors').displayed && viewTitle.displayed
         }
         waitFor {
-            viewTitle.text()?.trim() == 'Models'
+            viewTitle.text()?.trim() == 'Data Classes'
         }
         waitFor {
             subviewTitle.text()?.trim()  == 'NHIC Datasets FINALIZED'
@@ -32,8 +32,8 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     }
 
-    def "Add new model"() {
-        when: 'I click the add model button'
+    def "Add new data class"() {
+        when: 'I click the add data class button'
         addModelButton.click()
 
 
@@ -84,7 +84,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         and: 'create child from scratch and leave it filled in'
-        name = 'This should create new child model'
+        name = 'This should create new child data class'
 
         and: 'elements step is clicked'
         stepElements.click()
@@ -110,16 +110,16 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when: 'the classification is selected'
-        name = 'TEST CLASSIFICATION'
+        name = 'TEST DATA MODEL'
         selectCepItemIfExists()
         name << Keys.ENTER
 
         and: 'finish is clicked'
         stepFinish.click()
 
-        then: 'the model is saved'
+        then: 'the data class is saved'
         waitFor {
-            $('div.messages-panel span', text: "Model New created").displayed
+            $('div.messages-panel span', text: "Data Class New created").displayed
         }
         when:
         exitButton.click()
@@ -199,9 +199,9 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
     }
 
 
-    def "Add another model"(){
+    def "Add another data class"(){
         when:
-        go "#/catalogue/model/all"
+        go "#/catalogue/dataClass/all"
 
         then:
         at ModalTreeViewPage
@@ -209,24 +209,24 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
             viewTitle.displayed
         }
 
-        when: 'I click the add model button'
+        when: 'I click the add data class button'
         addModelButton.click()
 
 
-        then: 'the model dialog opens'
+        then: 'the data class dialog opens'
         waitFor {
             modelWizard.displayed
         }
 
-        when: 'the model details are filled in'
+        when: 'the data class details are filled in'
         name = "Another New"
 
         and: 'finish is clicked'
         stepFinish.click()
 
-        then: 'the model is saved'
+        then: 'the data class is saved'
         waitFor {
-            $('div.messages-panel span', text: "Model Another New created").displayed
+            $('div.messages-panel span', text: "Data Class Another New created").displayed
         }
         when:
         exitButton.click()
@@ -259,7 +259,7 @@ class ModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     }
 
-    def "edit child model"() {
+    def "edit child data class"() {
         expect:
         actionButton('edit-catalogue-element').displayed
 

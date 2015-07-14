@@ -2,10 +2,10 @@ package org.modelcatalogue.core.pages
 
 class ModalTreeViewPage extends ModelCataloguePage {
 
-    static url = "#/catalogue/model/all"
+    static url = "#/catalogue/dataClass/all"
 
     static at = {
-        url == "#/catalogue/model/all"
+        url == "#/catalogue/dataClass/all"
     }
     static content = {
 
@@ -25,7 +25,7 @@ class ModalTreeViewPage extends ModelCataloguePage {
         stepParents         { $("#step-parents") }
         stepChildren        { $("#step-children") }
         stepElements        { $("#step-elements") }
-        stepClassifications { $("#step-classifications") }
+        stepClassifications { $("#step-dataModels") }
         stepNext            { $("#step-next") }
         stepFinish          { $("#step-finish") }
 

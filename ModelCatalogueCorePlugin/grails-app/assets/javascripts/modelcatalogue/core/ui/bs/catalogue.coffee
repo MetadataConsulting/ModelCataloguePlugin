@@ -22,7 +22,9 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
 
 
   catalogueProvider.setInstanceOf 'dataModel',          'classification'
+  catalogueProvider.setInstanceOf 'dataModel',          'catalogueElement'
   catalogueProvider.setInstanceOf 'dataClass',          'model'
+  catalogueProvider.setInstanceOf 'dataClass',          'catalogueElement'
   catalogueProvider.setInstanceOf 'publishedElement',   'catalogueElement'
   catalogueProvider.setInstanceOf 'user',               'catalogueElement'
   catalogueProvider.setInstanceOf 'valueDomain',        'catalogueElement'

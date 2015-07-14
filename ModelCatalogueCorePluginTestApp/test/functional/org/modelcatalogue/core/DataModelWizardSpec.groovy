@@ -4,14 +4,14 @@ import org.modelcatalogue.core.pages.ClassificationListPage
 import spock.lang.Stepwise
 
 @Stepwise
-class ClassificationWizardSpec extends AbstractModelCatalogueGebSpec {
+class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
 
     def "go to login"() {
         go "#/"
         loginAdmin()
 
         when:
-        go "#/catalogue/classification/all"
+        go "#/catalogue/dataModel/all"
 
         then:
         at ClassificationListPage
@@ -19,14 +19,14 @@ class ClassificationWizardSpec extends AbstractModelCatalogueGebSpec {
             viewTitle.displayed
         }
         waitFor(120) {
-            viewTitle.text().trim() == 'Classification List'
+            viewTitle.text().trim() == 'Data Model List'
         }
         waitFor {
             actionButton('create-catalogue-element', 'list').displayed
         }
     }
 
-    def "add new classification"() {
+    def "add new data model"() {
         when:
         actionButton('create-catalogue-element', 'list').click()
 
@@ -37,9 +37,9 @@ class ClassificationWizardSpec extends AbstractModelCatalogueGebSpec {
         }
 
         when:
-        name = "New Classification"
+        name = "New Data Model"
         modelCatalogueId = "http://www.example.com/${UUID.randomUUID().toString()}"
-        description = "Description of Classification"
+        description = "Description of Data Model"
 
         then:
         waitFor {
@@ -72,14 +72,14 @@ class ClassificationWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('div.messages-panel span', text: "Classification New Classification created").displayed
+            $('div.messages-panel span', text: "Data Model New Data Model created").displayed
         }
         when:
         exitButton.click()
 
         then:
         waitFor {
-            infTableCell(1, 2, text: 'New Classification').displayed
+            infTableCell(1, 2, text: 'New Data Model').displayed
         }
 
     }

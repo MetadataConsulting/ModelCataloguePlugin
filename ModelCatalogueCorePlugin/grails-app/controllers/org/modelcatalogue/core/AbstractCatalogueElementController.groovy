@@ -684,7 +684,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
-        def classifications = objectToBind.classifications ?: []
+        def classifications = objectToBind.classifications ?: objectToBind.dataModels ?: []
         for (classification in instance.classifications.findAll { !(it.id in classifications.collect { it.id as Long } || it.latestVersionId in classifications.collect { it.id as Long })  }) {
             instance.removeFromClassifications classification
             classification.removeFromClassifies instance

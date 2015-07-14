@@ -636,7 +636,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
 
     #language=HTML
     $templateCache.put 'modelcatalogue/core/ui/state/list.html', '''
-    <div ng-if="resource != 'model' || $stateParams.display != undefined">
+    <div ng-if="(resource != 'model' &amp;&amp;  resource != 'dataClass')|| $stateParams.display != undefined">
       <span class="contextual-actions-right">
         <contextual-actions size="sm" no-colors="true" role="list"></contextual-actions>
       </span>
@@ -644,7 +644,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <infinite-list  ng-if="$stateParams.display == 'grid'"  list="list"></infinite-list>
       <infinite-table ng-if="$stateParams.display != 'grid'"  list="list" columns="columns" ></infinite-table>
     </div>
-    <div ng-if="resource == 'model' &amp;&amp; $stateParams.display == undefined">
+    <div ng-if="(resource == 'dataClass' || resource == 'model')&amp;&amp; $stateParams.display == undefined">
 
       <div class="row">
 
@@ -653,7 +653,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
              <contextual-actions size="sm" icon-only="true" no-colors="true" role="list"></contextual-actions>
           </span>
           <h2>
-            <small ng-class="catalogue.getIcon('model')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Models
+            <small ng-class="catalogue.getIcon('dataClass')"></small>&nbsp;<span ng-show="$stateParams.status">{{natural($stateParams.status)}}</span> Data Classes
           </h2>
           <catalogue-element-treeview list="list" descend="'parentOf'" id="model-treeview"></catalogue-element-treeview>
         </div>
