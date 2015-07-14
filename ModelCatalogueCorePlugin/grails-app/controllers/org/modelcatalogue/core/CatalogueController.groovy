@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus
 class CatalogueController {
 
     def classificationService
-    def modelService
+    def dataClassService
 
     def xref() {
         String resource = params.resource
@@ -34,7 +34,7 @@ class CatalogueController {
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
             response.setHeader("Content-disposition", "attachment; filename=${element.name.replaceAll(/\s+/, '_')}.xml")
-            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(classificationService, modelService)
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(classificationService, dataClassService)
             printer.bind(element).writeTo(response.writer)
             return
         }
@@ -69,7 +69,7 @@ class CatalogueController {
         if (params.format == 'xml') {
             response.contentType = 'application/xml'
             response.setHeader("Content-disposition", "attachment; filename=${element.name.replaceAll(/\s+/, '_')}.xml")
-            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(classificationService, modelService)
+            CatalogueXmlPrinter printer = new CatalogueXmlPrinter(classificationService, dataClassService)
             printer.bind(element).writeTo(response.writer)
             return
         }

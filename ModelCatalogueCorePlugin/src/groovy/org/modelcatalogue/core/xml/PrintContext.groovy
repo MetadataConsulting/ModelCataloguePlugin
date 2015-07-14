@@ -3,13 +3,12 @@ package org.modelcatalogue.core.xml
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.ClassificationService
-import org.modelcatalogue.core.ModelService
-import org.modelcatalogue.core.RelationshipType
+import org.modelcatalogue.core.DataClassService
 
 class PrintContext {
 
     ClassificationService classificationService
-    ModelService modelService
+    DataClassService modelService
 
 
     boolean idIncludeVersion
@@ -20,7 +19,7 @@ class PrintContext {
 
     Set<String> typesUsed = new TreeSet<String>()
 
-    PrintContext(ClassificationService classificationService, ModelService modelService) {
+    PrintContext(ClassificationService classificationService, DataClassService modelService) {
         this.classificationService = classificationService
         this.modelService = modelService
     }

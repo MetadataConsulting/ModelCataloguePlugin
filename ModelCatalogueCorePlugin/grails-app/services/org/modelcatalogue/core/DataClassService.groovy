@@ -9,7 +9,7 @@ import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 
 @Transactional
-class ModelService {
+class DataClassService {
 
     SecurityService modelCatalogueSecurityService
     ClassificationService classificationService

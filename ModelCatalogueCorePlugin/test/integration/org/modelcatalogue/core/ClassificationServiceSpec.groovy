@@ -11,7 +11,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
 
     def classificationService
     def initCatalogueService
-    def modelService
+    def dataClassService
 
     Classification classification1
     Classification classification2
@@ -94,7 +94,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get unclassified top level models"() {
-        ListWithTotalAndType<Model> models = modelService.getTopLevelModels(ClassificationFilter.create(true), [:])
+        ListWithTotalAndType<Model> models = dataClassService.getTopLevelModels(ClassificationFilter.create(true), [:])
 
         expect:
         models.total >= 1
@@ -103,7 +103,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include classification filter"() {
-        ListWithTotalAndType<Model> models = modelService.getTopLevelModels(ClassificationFilter.create([classification1], []), [:])
+        ListWithTotalAndType<Model> models = dataClassService.getTopLevelModels(ClassificationFilter.create([classification1], []), [:])
 
         expect:
         models.total >= 1
@@ -114,7 +114,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
 
 
     def "get top level models with exclude classification filter"() {
-        ListWithTotalAndType<Model> models = modelService.getTopLevelModels(ClassificationFilter.create([], [classification2]), [:])
+        ListWithTotalAndType<Model> models = dataClassService.getTopLevelModels(ClassificationFilter.create([], [classification2]), [:])
 
         expect:
         models.total >= 2
@@ -124,7 +124,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include and exclude classification filter"() {
-        ListWithTotalAndType<Model> models = modelService.getTopLevelModels(ClassificationFilter.create([classification1], [classification2]), [:])
+        ListWithTotalAndType<Model> models = dataClassService.getTopLevelModels(ClassificationFilter.create([classification1], [classification2]), [:])
 
         expect:
         models.total >= 1

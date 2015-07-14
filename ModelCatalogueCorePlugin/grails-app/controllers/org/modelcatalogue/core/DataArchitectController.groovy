@@ -14,7 +14,7 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
 
     def dataArchitectService
     def executorService
-    def modelService
+    def dataClassService
     @Autowired CSVService csvService
 
     DataArchitectController() {
@@ -39,8 +39,8 @@ class DataArchitectController extends AbstractRestfulController<CatalogueElement
         respond Lists.lazy(params, DataElement, "/dataArchitect/getSubModelElements") {
             if (id){
                 Model model = Model.get(id)
-                ListWithTotalAndType<Model> subModels = modelService.getSubModels(model)
-                return modelService.getDataElementsFromModels(subModels.items).items
+                ListWithTotalAndType<Model> subModels = dataClassService.getSubModels(model)
+                return dataClassService.getDataElementsFromModels(subModels.items).items
             }
             return []
         }

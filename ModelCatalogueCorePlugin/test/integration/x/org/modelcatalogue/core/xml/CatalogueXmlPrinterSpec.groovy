@@ -16,7 +16,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     def classificationService
     def elementService
-    def modelService
+    def dataClassService
 
 
     def setup() {
@@ -39,7 +39,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
             ).save(failOnError: true, flush: true)
         }
 
-        printer = new CatalogueXmlPrinter(classificationService, modelService)
+        printer = new CatalogueXmlPrinter(classificationService, dataClassService)
     }
 
 

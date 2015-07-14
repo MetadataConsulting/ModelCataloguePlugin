@@ -2,14 +2,14 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ListWithTotal
 
-class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
+class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     Model parent1
     Model parent2
     Model child1
     Model child2
     Model grandChild
-    ModelService modelService
+    DataClassService dataClassService
     DataElement de1
     DataElement de2
     DataElement de3
@@ -30,7 +30,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "get top level elements"() {
-        ListWithTotal topLevel = modelService.getTopLevelModels([:])
+        ListWithTotal topLevel = dataClassService.getTopLevelModels([:])
 
         expect:
         Model.count()           >= 5
@@ -44,7 +44,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "get subModels"() {
         when:
-        ListWithTotal subModels = modelService.getSubModels(parent1)
+        ListWithTotal subModels = dataClassService.getSubModels(parent1)
 
         then:
         subModels.count == 3
@@ -60,7 +60,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
         grandChild.addToContains(de3)
 
         when:
-        ListWithTotal dataElements = modelService.getDataElementsFromModels([parent1, child1, grandChild])
+        ListWithTotal dataElements = dataClassService.getDataElementsFromModels([parent1, child1, grandChild])
 
         then:
         dataElements.count ==3
@@ -71,7 +71,7 @@ class ModelServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "test infinite recursion"(){
         when:
-        ListWithTotal subModels = modelService.getSubModels(parent1)
+        ListWithTotal subModels = dataClassService.getSubModels(parent1)
 
         then:
         subModels.count ==3

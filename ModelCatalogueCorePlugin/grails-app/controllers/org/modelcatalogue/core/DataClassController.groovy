@@ -2,11 +2,11 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 
-class ModelController extends AbstractCatalogueElementController<Model> {
+class DataClassController extends AbstractCatalogueElementController<Model> {
 
-    def modelService
+    def dataClassService
 
-    ModelController() {
+    DataClassController() {
         super(Model, false)
     }
 
@@ -21,7 +21,7 @@ class ModelController extends AbstractCatalogueElementController<Model> {
         }
         handleParams(max)
 
-        respond Lists.wrap(params, "/${resourceName}/", modelService.getTopLevelModels(params))
+        respond Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelModels(params))
     }
 
 }

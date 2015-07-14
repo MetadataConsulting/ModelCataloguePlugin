@@ -14,9 +14,9 @@ import org.hibernate.FetchMode
 import org.springframework.core.io.Resource
 
 
-class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
+class DataModelController extends AbstractCatalogueElementController<Classification> {
 
-	ClassificationController() {
+	DataModelController() {
 		super(Classification, false)
 	}
 
