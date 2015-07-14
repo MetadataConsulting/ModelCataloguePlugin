@@ -28,14 +28,17 @@ class Legacy {
     static String getRedirectUrl(String newResourceName, HttpServletRequest request) {
         GrailsApplication grailsApplication = Holders.grailsApplication
         if (request.contextPath) {
-            return (grailsApplication.config.grails.serverURL - request.contextPath) + (request.forwardURI.replaceAll("/${getLegacyResourceName(newResourceName)}(?!Catalogue)", "/$newResourceName"))
+            return (grailsApplication.config.grails.serverURL - request.contextPath) + (request.forwardURI.replaceAll("/${getLegacyResourceName(newResourceName)}(?!Catalogue)", "/$newResourceName")) + "?${request.queryString}"
         }
-        return grailsApplication.config.grails.serverURL + (request.forwardURI.replaceAll("/${getLegacyResourceName(newResourceName)}(?!Catalogue)", "/$newResourceName"))
+        return grailsApplication.config.grails.serverURL + (request.forwardURI.replaceAll("/${getLegacyResourceName(newResourceName)}(?!Catalogue)", "/$newResourceName")) + "?${request.queryString}"
 
     }
 
     static String fixModelCatalogueId(String modelCatalogueId) {
         if (!modelCatalogueId) {
+            return modelCatalogueId
+        }
+        if (Holders.grailsApplication.config.grails.serverURL && !modelCatalogueId.startsWith(Holders.grailsApplication.config.grails.serverURL?.toString())) {
             return modelCatalogueId
         }
         for (Map.Entry<String, String> entry in LEGACY_ENTITY_NAMES) {

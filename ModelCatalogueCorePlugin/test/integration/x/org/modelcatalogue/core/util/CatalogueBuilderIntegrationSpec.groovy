@@ -1,6 +1,7 @@
 package x.org.modelcatalogue.core.util
 
 import grails.test.spock.IntegrationSpec
+import grails.util.Holders
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.builder.api.CatalogueBuilder
@@ -649,6 +650,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "define id as closure"() {
+        Object old = Holders.grailsApplication.config.grails.serverURL
+        Holders.grailsApplication.config.grails.serverURL = "http://localhost:8080/ModelCatalogueCorePluginTestApp"
         build {
             classification(name: 'CS4ID') {
                 id { String name, Class type ->
@@ -662,9 +665,11 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         expect:
         model.modelCatalogueId == "http://www.example.com/classification/m/Model_ID"
+
+        cleanup:
+        Holders.grailsApplication.config.grails.serverURL = old
     }
 
-    // @Ignore
     @Issue("MET-587")
     def "remove child model when missing"() {
         when:
