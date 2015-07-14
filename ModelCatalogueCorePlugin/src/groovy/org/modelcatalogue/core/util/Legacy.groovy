@@ -34,6 +34,18 @@ class Legacy {
 
     }
 
+    static String fixModelCatalogueId(String modelCatalogueId) {
+        if (!modelCatalogueId) {
+            return modelCatalogueId
+        }
+        for (Map.Entry<String, String> entry in LEGACY_ENTITY_NAMES) {
+            if (modelCatalogueId.contains("/${entry.value}/")) {
+                return modelCatalogueId.replace("/$entry.value/", "/$entry.key/")
+            }
+        }
+        return modelCatalogueId
+    }
+
 
 
 }

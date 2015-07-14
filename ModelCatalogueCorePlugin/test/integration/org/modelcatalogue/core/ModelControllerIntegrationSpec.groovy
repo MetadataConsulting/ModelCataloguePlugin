@@ -37,7 +37,7 @@ class ModelControllerIntegrationSpec extends AbstractCatalogueElementControllerI
 
     @Override
     AbstractCatalogueElementController getController() {
-        new ModelController()
+        new DataClassController()
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util.builder
 import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
+import org.modelcatalogue.core.util.Legacy
 
 @Log4j class DefaultCatalogueElementProxy<T extends CatalogueElement> implements CatalogueElementProxy<T>, org.modelcatalogue.core.api.CatalogueElement {
 
@@ -154,7 +155,7 @@ import org.modelcatalogue.core.api.ElementStatus
                 return false
             }
             if (normalizeWhitespace(currentValue) != normalizeWhitespace(value)) {
-                if (key == 'modelCatalogueId' && value?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
+                if (key == 'modelCatalogueId' && Legacy.fixModelCatalogueId(value)?.toString()?.startsWith(element.getDefaultModelCatalogueId(true))) {
                     return false
                 }
                 if (key == 'name' && parameters[CatalogueElementProxyRepository.AUTOMATIC_NAME_FLAG] && element.name) {
@@ -303,8 +304,8 @@ import org.modelcatalogue.core.api.ElementStatus
 
     private Map<String, Object> updateProperties(T element) {
         element.name = name
-        if (modelCatalogueId && !modelCatalogueId.startsWith(element.getDefaultModelCatalogueId(true))) {
-            element.modelCatalogueId = modelCatalogueId
+        if (modelCatalogueId && !Legacy.fixModelCatalogueId(modelCatalogueId).startsWith(element.getDefaultModelCatalogueId(true))) {
+            element.modelCatalogueId = Legacy.fixModelCatalogueId(modelCatalogueId)
         }
         parameters.each { String key, Object value ->
             if (key == 'status') return

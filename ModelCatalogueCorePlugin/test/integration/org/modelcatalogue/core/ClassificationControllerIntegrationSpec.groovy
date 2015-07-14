@@ -26,7 +26,7 @@ class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementCo
 
     @Override
     AbstractCatalogueElementController getController() {
-        new ClassificationController()
+        new DataModelController()
     }
 
     @Override

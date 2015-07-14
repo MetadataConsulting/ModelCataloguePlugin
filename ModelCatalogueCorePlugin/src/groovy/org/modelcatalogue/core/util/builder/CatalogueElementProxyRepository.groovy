@@ -354,7 +354,7 @@ class CatalogueElementProxyRepository {
 
             if (version) {
                 result = CatalogueElement.findByLatestVersionIdAndVersionNumber(theId, version) as T
-                if (result && result.getDefaultModelCatalogueId(false) == id.toString()) {
+                if (result && result.getDefaultModelCatalogueId(false) == org.modelcatalogue.core.util.Legacy.fixModelCatalogueId(id).toString()) {
                     return result
                 }
                 return null
@@ -362,12 +362,12 @@ class CatalogueElementProxyRepository {
 
             result = CatalogueElement.findByLatestVersionId(theId, [sort: 'versionNumber', order: 'desc']) as T
 
-            if (result && id.toString().startsWith(result.getDefaultModelCatalogueId(true))) {
+            if (result && org.modelcatalogue.core.util.Legacy.fixModelCatalogueId(id).toString().startsWith(result.getDefaultModelCatalogueId(true))) {
                 return result
             }
 
             result = CatalogueElement.get(theId) as T
-            if (result && result.getDefaultModelCatalogueId(true) == id.toString()) {
+            if (result && result.getDefaultModelCatalogueId(true) == Legacy.fixModelCatalogueId(id).toString()) {
                 return result
             }
         }

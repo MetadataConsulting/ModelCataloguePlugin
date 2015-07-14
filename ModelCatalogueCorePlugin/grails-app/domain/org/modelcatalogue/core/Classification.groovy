@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.util.Legacy
 
 class Classification extends CatalogueElement {
 
@@ -34,5 +35,11 @@ class Classification extends CatalogueElement {
         PublishingChain.finalize(this)
         .add(this.classifies)
         .run(publisher)
+    }
+
+    @Override
+    String getModelCatalogueId() {
+        // TODO: remove when the class is renamed
+        return Legacy.fixModelCatalogueId(super.getModelCatalogueId())
     }
 }

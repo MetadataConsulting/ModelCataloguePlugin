@@ -63,8 +63,8 @@ class SearchISpec extends AbstractIntegrationSpec{
         5 | "DataElement"       | new DataElementController()         | "de_author1"                    | "json"    | "DE_author1"              | 1         | null
         9 | "EnumeratedType"    | new EnumeratedTypeController()      | "sub1"                          | "json"    | "sub1"                    | 1         | null
        11 | "MeasurementUnit"   | new MeasurementUnitController()     | "°C"                            | "json"    | "Degrees Celsius"         | 1         | null
-       13 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 1         | null
-       14 | "Model"             | new ModelController()               | "Jabberwocky"                   | "json"    | "chapter1"                | 0         | 'deprecated'
+       13 | "Model"             | new DataClassController()           | "Jabberwocky"                   | "json"    | "chapter1"                | 1         | null
+       14 | "Model"             | new DataClassController()           | "Jabberwocky"                   | "json"    | "chapter1"                | 0         | 'deprecated'
        15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1         | null
        17 | "RelationshipType"  | new RelationshipTypeController()    | "classification"                | "json"    | "classification"          | 2         | null
        18 | "RelationshipType"  | new RelationshipTypeController()    | "classification"                | "json"    | "classification"          | 2         | null

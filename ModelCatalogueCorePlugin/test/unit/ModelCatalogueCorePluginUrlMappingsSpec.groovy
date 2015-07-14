@@ -15,7 +15,7 @@ import spock.lang.Unroll
     DataTypeController,
     EnumeratedTypeController,
     MeasurementUnitController,
-    ModelController,
+    DataClassController,
     ValueDomainController,
     SearchController,
     BatchController
