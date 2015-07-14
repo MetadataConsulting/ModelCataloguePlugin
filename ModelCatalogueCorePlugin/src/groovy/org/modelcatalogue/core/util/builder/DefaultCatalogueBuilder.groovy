@@ -114,7 +114,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @param c DSL definition closure
      * @return proxy to classification specified by the parameters map and the DSL closure
      */
-    void classification(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+    void dataModel(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         CatalogueElementProxy<Classification> classification = createProxy(Classification, parameters, null, true)
 
         context.withNewContext classification, c
@@ -166,7 +166,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @param c DSL definition closure
      * @return proxy to model specified by the parameters map and the DSL closure
      */
-    void model(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
+    void dataClass(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
         CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext model, c
@@ -450,7 +450,6 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * Sets the status of the current element. Currently it does not work as expected as it sets the status property
      * right after object is resolved instead e.g. finalizing the element after all the work is done.
      * @param status new status of the element
-     * @see https://metadata.atlassian.net/browse/MET-620
      */
     @Deprecated
     void status(ElementStatus status) {

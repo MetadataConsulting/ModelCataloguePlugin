@@ -58,8 +58,8 @@ Model catalogue core plugin (metadata registry)
 
 
     def doWithSpring = {
-        ModelCatalogueTypes.CLASSIFICATION.implementation = Classification
-        ModelCatalogueTypes.MODEL.implementation = Model
+        ModelCatalogueTypes.DATA_MODEL.implementation = Classification
+        ModelCatalogueTypes.DATA_CLASS.implementation = Model
         ModelCatalogueTypes.DATA_ELEMENT.implementation = DataElement
         ModelCatalogueTypes.VALUE_DOMAIN.implementation = ValueDomain
         ModelCatalogueTypes.DATA_TYPE.implementation = DataType
