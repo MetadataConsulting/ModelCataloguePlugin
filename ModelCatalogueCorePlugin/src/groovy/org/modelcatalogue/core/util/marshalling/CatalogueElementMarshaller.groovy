@@ -85,7 +85,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
         relationships.bidirectional?.each   addRelationsJson('relationships', el, ret, types, incomingCounts, outgoingCounts)
 
         ret.availableReports = getAvailableReports(el)
-        ret.classifications  = relationshipService.getClassificationsInfo(el)
+        ret.dataModels = relationshipService.getDataModelsInfo(el)
 
         if (modelCatalogueSecurityService.currentUser) {
             RelationshipType favorite = RelationshipType.readByName('favourite')

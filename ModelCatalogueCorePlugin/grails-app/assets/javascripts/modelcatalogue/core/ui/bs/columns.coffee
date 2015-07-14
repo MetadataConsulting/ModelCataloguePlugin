@@ -29,7 +29,8 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     classificationNames.join(' ')
 
   # default
-  columnsProvider.registerColumns 'org.modelcatalogue.core.Model', idNameAndDescription()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataClass', idNameAndDescription()
+  columnsProvider.registerColumns 'org.modelcatalogue.core.Model',     idNameAndDescription()
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataElement', [
     { header: 'Classifications',  value: getClassificationsForDataElement,  classes: 'col-md-2'}

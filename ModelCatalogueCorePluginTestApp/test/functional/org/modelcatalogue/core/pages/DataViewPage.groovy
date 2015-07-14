@@ -23,7 +23,7 @@ class DataViewPage extends ModelCataloguePage {
         dataWizard         { $('div.basic-edit-modal-prompt') }
 
         name                { dataWizard.find('input[id=name]') }
-        classifications     { dataWizard.find('input[id=classification-]') }
+        classifications     { dataWizard.find('input[id=dataModel-]') }
         description         { dataWizard.find('textarea[id=description]') }
         valueDomain         { dataWizard.find('input[id=valueDomain]') }
 

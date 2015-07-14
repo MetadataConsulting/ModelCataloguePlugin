@@ -73,7 +73,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'containedIn', label: 'Models', columns: nameAndIdAndMetadata()
   catalogueElementPropertiesProvider.configureProperty 'hasAttachmentOf', label: 'Attachments', columns: attachmentColumns()
   catalogueElementPropertiesProvider.configureProperty 'hasContextOf', label: 'Conceptual Domains', columns: nameAndIdent()
-  catalogueElementPropertiesProvider.configureProperty 'classifies', label: 'Classifies', columns: localNameAndIdent()
+  catalogueElementPropertiesProvider.configureProperty 'classifies', label: 'Defines', columns: localNameAndIdent()
 
   catalogueElementPropertiesProvider.configureProperty 'instantiates', label: 'Data Elements', columns: nameAndIdAndMetadata()
 
@@ -173,6 +173,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty '$$cachedChildren', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'supersededBy', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'supersedes', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'classifications', hidden: true
 
 
   catalogueElementPropertiesProvider.configureProperty 'enhanced:listReference', tabDefinition: [ '$element', '$name', '$value', 'catalogueElementProperties', 'enhance', 'security', 'columns', ($element, $name, $value, catalogueElementProperties, enhance, security, columns) ->

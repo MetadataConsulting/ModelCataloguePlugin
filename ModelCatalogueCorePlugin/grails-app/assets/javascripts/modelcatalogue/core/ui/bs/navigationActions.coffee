@@ -158,38 +158,38 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     return undefined if not security.isUserLoggedIn()
 
     getLabel = (user) ->
-      if not user or not user.classifications
-        return 'All Classifications'
-      if user.classifications.unclassifiedOnly
-        return 'Unclassified Only'
+      if not user or not user.dataModels
+        return 'All Data Models'
+      if user.dataModels.unclassifiedOnly
+        return 'Orphaned Only'
 
-      label = 'All Classifications'
+      label = 'All Data Models'
 
-      if user.classifications.includes?.length > 0
-        label = (classification.name for classification in user.classifications.includes).join(', ')
+      if user.dataModels.includes?.length > 0
+        label = (dataModel.name for dataModel in user.dataModels.includes).join(', ')
 
-      if user.classifications.excludes?.length > 0
-        label += " except " + (classification.name for classification in user.classifications.excludes).join(', ')
+      if user.dataModels.excludes?.length > 0
+        label += " except " + (dataModel.name for dataModel in user.dataModels.excludes).join(', ')
 
       return label
 
     action = {
       position:   2100
-      label:      if global then 'Filter by Classification' else  getLabel(security.getCurrentUser())
+      label:      if global then 'Filter by Data Model' else  getLabel(security.getCurrentUser())
       icon:       'fa fa-tags'
-      action: -> messages.prompt('Select Classifications', 'Select which classifications should be visible to you', type: 'classification-filter', filter: security.getCurrentUser().classifications).then (filter) ->
+      action: -> messages.prompt('Select Data Model', 'Select which data models should be visible to you', type: 'classification-filter', filter: security.getCurrentUser().dataModels).then (filter) ->
         security.requireUser().then ->
           enhance(rest(method: 'POST', url: "#{modelCatalogueApiRoot}/user/classifications", data: filter)).then (user)->
             action.label = getLabel(user)
-            security.getCurrentUser().classifications = user.classifications
+            security.getCurrentUser().dataModels = user.dataModels
             $state.go '.', $stateParams, reload: true
     }
 
     action
   ]
 
-  actionsProvider.registerActionInRole 'classifications', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, toggleClassification(false)
-  actionsProvider.registerActionInRole 'global-classifications', actionsProvider.ROLE_GLOBAL_ACTION, toggleClassification(true)
+  actionsProvider.registerActionInRole 'dataModels', actionsProvider.ROLE_NAVIGATION_BOTTOM_LEFT, toggleClassification(false)
+  actionsProvider.registerActionInRole 'global-dataModels', actionsProvider.ROLE_GLOBAL_ACTION, toggleClassification(true)
 
   actionsProvider.registerActionInRole 'global-draft', actionsProvider.ROLE_GLOBAL_ACTION, ['$state', '$stateParams', 'catalogue', ($state, $stateParams, catalogue) ->
     return undefined unless $state.current.name == 'mc.resource.list'

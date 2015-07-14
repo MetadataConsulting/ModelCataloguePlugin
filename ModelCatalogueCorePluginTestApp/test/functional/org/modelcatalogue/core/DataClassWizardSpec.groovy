@@ -133,10 +133,10 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
     }
     def "filter by classification"() {
         expect:
-        menuItem('classifications', 'navigation-bottom-left').displayed
+        menuItem('dataModels', 'navigation-bottom-left').displayed
 
         when:
-        menuItem('classifications', 'navigation-bottom-left').click()
+        menuItem('dataModels', 'navigation-bottom-left').click()
 
         then:
         waitFor {
@@ -151,11 +151,11 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            !$('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('XMLSchema')
+            !$('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('dataModels', 'navigation-bottom-left').text().contains('XMLSchema')
         }
 
         when:
-        menuItem('classifications', 'navigation-bottom-left').click()
+        menuItem('dataModels', 'navigation-bottom-left').click()
 
         then:
         waitFor {
@@ -174,7 +174,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
             !modalDialog.find("#remove-tag-0").displayed
         }
         waitFor {
-            $('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('classifications', 'navigation-bottom-left').text().contains('All Classifications')
+            $('span.catalogue-element-treeview-name', text: "New 1").displayed && menuItem('dataModels', 'navigation-bottom-left').text().contains('All Data Models')
         }
 
     }

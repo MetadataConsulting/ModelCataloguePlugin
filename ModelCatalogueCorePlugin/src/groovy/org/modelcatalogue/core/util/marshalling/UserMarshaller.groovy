@@ -20,7 +20,7 @@ class UserMarshaller extends CatalogueElementMarshaller {
                 passwordExpired: el.passwordExpired
 
         // rename the filteredBy to classifications
-        ret.classifications = ret.remove('filteredBy')
+        ret.dataModels = ret.remove('filteredBy')
 
         ret
     }

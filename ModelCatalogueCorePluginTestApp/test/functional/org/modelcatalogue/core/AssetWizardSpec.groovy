@@ -178,11 +178,11 @@ class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
         then:
         waitFor {
-            $('td', 'data-value-for': 'Classifications').text() == 'MET-523'
+            $('td', 'data-value-for': 'Data Models').text() == 'MET-523'
         }
 
         when:
-        noStale({$('td', 'data-value-for': 'Classifications').find('a')}) {
+        noStale({$('td', 'data-value-for': 'Data Models').find('a')}) {
             it.click()
         }
 

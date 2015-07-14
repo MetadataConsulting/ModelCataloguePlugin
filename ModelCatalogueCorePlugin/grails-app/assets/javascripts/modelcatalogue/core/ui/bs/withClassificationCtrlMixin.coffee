@@ -1,40 +1,40 @@
 angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']).controller 'withClassificationCtrlMixin', ['$scope', 'security',  ($scope, security) ->
   createdMessages = []
-  classificationsChanged = (newClassifications) ->
+  dataModelsChanged = (newDataModels) ->
     msg.remove() for msg in createdMessages
     createdMessages = []
-    noDrafts = (classification.name for classification in newClassifications when classification.status isnt 'DRAFT')
+    noDrafts = (dataModel.name for dataModel in newDataModels when dataModel.status isnt 'DRAFT')
     if noDrafts.length > 0 and $scope.messages
-      createdMessages.push $scope.messages.warning "Draft versions of #{noDrafts.join(', ')} classification#{if noDrafts.length == 1 then '' else 's'} will be used"
+      createdMessages.push $scope.messages.warning "Draft versions of #{noDrafts.join(', ')} dataModel#{if noDrafts.length == 1 then '' else 's'} will be used"
 
-  $scope.addToClassifications = (classification = $scope.pending?.classification) ->
-    return unless classification
-    if classification.status != 'DRAFT'
-      for c in $scope.copy.classifications
-        if c.name == classification.name and c.status == 'DRAFT'
-          $scope.pending.classification = null if $scope.pending
+  $scope.addToDataModels = (dataModel = $scope.pending?.dataModel) ->
+    return unless dataModel
+    if dataModel.status != 'DRAFT'
+      for c in $scope.copy.dataModels
+        if c.name == dataModel.name and c.status == 'DRAFT'
+          $scope.pending.dataModel = null if $scope.pending
           $scope.messages.info("You have already selected draft version of '#{c.name}'")
           return
     else
       replaceIndex = -1
-      for c, index in $scope.copy.classifications
-        if c.name == classification.name
+      for c, index in $scope.copy.dataModels
+        if c.name == dataModel.name
           replaceIndex = index
           break
       if replaceIndex >= 0
-        $scope.copy.classifications.splice(replaceIndex, 1, classification)
-        $scope.pending.classification = null if $scope.pending
+        $scope.copy.dataModels.splice(replaceIndex, 1, dataModel)
+        $scope.pending.dataModel = null if $scope.pending
         return
 
-    $scope.copy.classifications.push(classification)
-    $scope.pending.classification = null if $scope.pending
+    $scope.copy.dataModels.push(dataModel)
+    $scope.pending.dataModel = null if $scope.pending
 
 
-  $scope.$watchCollection 'copy.classifications', classificationsChanged
+  $scope.$watchCollection 'copy.dataModels', dataModelsChanged
 
 
-  if security.getCurrentUser()?.classifications?.length and not $scope.copy.classifications.length
-    for classification in security.getCurrentUser().classifications
-      $scope.addToClassifications classification
+  if security.getCurrentUser()?.dataModels?.length and not $scope.copy.dataModels.length
+    for dataModel in security.getCurrentUser().dataModels
+      $scope.addToDataModels dataModel
 
 ]

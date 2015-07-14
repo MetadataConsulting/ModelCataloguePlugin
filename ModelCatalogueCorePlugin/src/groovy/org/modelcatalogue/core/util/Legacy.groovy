@@ -28,9 +28,9 @@ class Legacy {
     static String getRedirectUrl(String newResourceName, HttpServletRequest request) {
         GrailsApplication grailsApplication = Holders.grailsApplication
         if (request.contextPath) {
-            return (grailsApplication.config.grails.serverURL - request.contextPath) + (request.forwardURI.replaceAll("/${getLegacyResourceName(newResourceName)}(?!Catalogue)", "/$newResourceName")) + "?${request.queryString}"
+            return (grailsApplication.config.grails.serverURL - request.contextPath) + (request.forwardURI.replaceAll("/${getLegacyResourceName(newResourceName)}(?!Catalogue)", "/$newResourceName")) + (request.queryString ? "?${request.queryString}" : "")
         }
-        return grailsApplication.config.grails.serverURL + (request.forwardURI.replaceAll("/${getLegacyResourceName(newResourceName)}(?!Catalogue)", "/$newResourceName")) + "?${request.queryString}"
+        return grailsApplication.config.grails.serverURL + (request.forwardURI.replaceAll("/${getLegacyResourceName(newResourceName)}(?!Catalogue)", "/$newResourceName")) + (request.queryString ? "?${request.queryString}" : '')
 
     }
 
@@ -43,7 +43,7 @@ class Legacy {
         }
         for (Map.Entry<String, String> entry in LEGACY_ENTITY_NAMES) {
             if (modelCatalogueId.contains("/${entry.value}/")) {
-                return modelCatalogueId.replace("/$entry.value/", "/$entry.key/")
+                return modelCatalogueId.replaceFirst("/$entry.value/", "/$entry.key/")
             }
         }
         return modelCatalogueId

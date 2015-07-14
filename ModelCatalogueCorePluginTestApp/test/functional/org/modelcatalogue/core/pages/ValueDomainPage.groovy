@@ -16,7 +16,7 @@ class ValueDomainPage extends ModelCataloguePage {
 
         basicEditDialog     { $('div.basic-edit-modal-prompt') }
 
-        classification      { basicEditDialog.find('#classification') }
+        classification      { basicEditDialog.find('#dataModel') }
         name                { basicEditDialog.find('#name') }
         modelCatalogueId    { basicEditDialog.find('#modelCatalogueId') }
         description         { basicEditDialog.find('#description') }

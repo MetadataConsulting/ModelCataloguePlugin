@@ -35,6 +35,7 @@ angular.module('mc.core.catalogueElementEnhancer', ['ui.router', 'mc.util.rest',
           self = @
 
           self.dataModels = [] unless self.dataModels
+          self.classifications = self.dataModels
 
           self['delete']      = () ->
             enhance(rest(method: 'DELETE', url: "#{modelCatalogueApiRoot}#{self.link}")).then (result)->

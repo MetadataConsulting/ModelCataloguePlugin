@@ -233,7 +233,7 @@ class RelationshipService {
         return element.name
     }
 
-    def getClassificationsInfo(CatalogueElement element) {
+    def getDataModelsInfo(CatalogueElement element) {
         if (!element) {
             return []
         }

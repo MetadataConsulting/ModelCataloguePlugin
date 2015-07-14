@@ -130,15 +130,15 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
     def "get classification info"() {
         expect:
-        relationshipService.getClassificationsInfo(null)                     == []
-        relationshipService.getClassificationsInfo(new Model(name: 'BLAH'))  == []
+        relationshipService.getDataModelsInfo(null)                     == []
+        relationshipService.getDataModelsInfo(new Model(name: 'BLAH'))  == []
 
         when:
         Classification classification = new Classification(name: "classy").save(failOnError: true)
         Model model = new Model(name: "Supermodel").save(failOnError: true)
         model.addToClassifications(classification)
 
-        def info = relationshipService.getClassificationsInfo(model)
+        def info = relationshipService.getDataModelsInfo(model)
 
         then:
         info == [

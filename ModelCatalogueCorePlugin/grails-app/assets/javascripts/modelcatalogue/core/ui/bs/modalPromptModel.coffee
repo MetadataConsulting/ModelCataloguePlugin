@@ -17,9 +17,9 @@ angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
-                <label for="classification"> Classifications</label>
-                <elements-as-tags elements="copy.classifications"></elements-as-tags>
-                <input id="classification-{{$index}}" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addToClassifications()">
+                <label for="dataModel"> Data Models</label>
+                <elements-as-tags elements="copy.dataModels"></elements-as-tags>
+                <input id="dataModel-{{$index}}" placeholder="Data Model" ng-model="pending.dataModel" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="addToDataModels()">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>

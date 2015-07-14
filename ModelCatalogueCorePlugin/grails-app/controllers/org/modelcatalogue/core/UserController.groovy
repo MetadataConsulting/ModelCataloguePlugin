@@ -37,7 +37,7 @@ class UserController extends AbstractCatalogueElementController<User> {
                 username: modelCatalogueSecurityService.currentUser.username,
                 roles: modelCatalogueSecurityService.currentUser.authorities*.authority,
                 id: modelCatalogueSecurityService.currentUser.hasProperty('id') ? modelCatalogueSecurityService.currentUser.id : null,
-                classifications: filter.toMap()
+                dataModels: filter.toMap()
         ] as JSON)
     }
 

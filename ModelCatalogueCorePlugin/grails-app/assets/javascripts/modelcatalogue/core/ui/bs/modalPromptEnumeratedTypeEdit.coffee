@@ -15,9 +15,9 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="saveElement()">
               <div class="form-group">
-                <label for="classification"> Classifications</label>
-                <elements-as-tags elements="copy.classifications"></elements-as-tags>
-                <input id="classification" placeholder="Classification" ng-model="pending.classification" catalogue-element-picker="classification" label="el.name" typeahead-on-select="addToClassifications()">
+                <label for="dataModel"> Data Models</label>
+                <elements-as-tags elements="copy.dataModels"></elements-as-tags>
+                <input id="dataModel" placeholder="Data Model" ng-model="pending.dataModel" catalogue-element-picker="dataModel" label="el.name" typeahead-on-select="addToDataModels()">
               </div>
               <div class="form-group">
                 <label for="name" class="">Name</label>
@@ -46,7 +46,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
         controller: ['$scope', 'messages', '$controller', '$modalInstance', 'enhance', ($scope, messages, $controller, $modalInstance, enhance) ->
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
-          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(), classifications: []}
+          $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(), dataModels: []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
           $scope.original = args.element ? $scope.newEntity()
           $scope.messages = messages.createNewMessages()
@@ -65,7 +65,7 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
 
           $scope.hasChanged   = ->
-            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.classifications ? {}, $scope.copy.classifications ? {})
+            $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
 
 
 
