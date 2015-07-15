@@ -26,9 +26,9 @@ class DataModelServiceSpec extends IntegrationSpec {
         classification2 = new DataModel(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
         model0 = new DataClass(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
         model1 = new DataClass(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
-        model1.addToClassifications(classification1)
+        model1.addToDefinedWithin(classification1)
         model2 = new DataClass(name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
-        model2.addToClassifications(classification2)
+        model2.addToDefinedWithin(classification2)
 
     }
 
@@ -65,7 +65,7 @@ class DataModelServiceSpec extends IntegrationSpec {
 
     def "does not fail when there are no results"() {
         ValueDomain domain = new ValueDomain(name: "Test Domain").save(failOnError: true)
-        domain.addToClassifications classification1
+        domain.addToDefinedWithin classification1
         DetachedCriteria<ValueDomain> criteria = dataModelService.classified(ValueDomain, DataModelFilter.create(true))
 
         expect:

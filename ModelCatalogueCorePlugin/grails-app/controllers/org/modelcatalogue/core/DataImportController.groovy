@@ -187,8 +187,8 @@ class DataImportController  {
                     updated.status = ElementStatus.FINALIZED
                     updated.description = "Your import has finished."
                     updated.save(flush: true, failOnError: true)
-                    updated.addToClassifications(classification, skipUniqueChecking: true)
-                    classification.addToClassifies(updated, skipUniqueChecking: true)
+                    updated.addToDefinedWithin(classification, skipUniqueChecking: true)
+                    classification.addToDefines(updated, skipUniqueChecking: true)
                 } catch (Exception e) {
                     Asset updated = Asset.get(id)
                     updated.refresh()
@@ -217,7 +217,7 @@ class DataImportController  {
 
     protected static classifyAsset(Asset asset, DataModel classification){
         if (classification) {
-            asset.addToClassifications(classification, skipUniqueChecking: true)
+            asset.addToDefinedWithin(classification, skipUniqueChecking: true)
         }
     }
 

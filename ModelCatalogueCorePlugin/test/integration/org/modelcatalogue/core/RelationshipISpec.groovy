@@ -118,7 +118,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         when:
         DataModel classification = new DataModel(name: "classy").save(failOnError: true)
         DataClass model = new DataClass(name: "Supermodel").save(failOnError: true)
-        model.addToClassifications(classification)
+        model.addToDefinedWithin(classification)
 
         then:
         relationshipService.getClassifiedName(model) == 'Supermodel (classy)'
@@ -136,7 +136,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         when:
         DataModel classification = new DataModel(name: "classy").save(failOnError: true)
         DataClass model = new DataClass(name: "Supermodel").save(failOnError: true)
-        model.addToClassifications(classification)
+        model.addToDefinedWithin(classification)
 
         def info = relationshipService.getDataModelsInfo(model)
 

@@ -686,16 +686,16 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
         def classifications = objectToBind.classifications ?: objectToBind.dataModels ?: []
         for (classification in instance.classifications.findAll { !(it.id in classifications.collect { it.id as Long } || it.latestVersionId in classifications.collect { it.id as Long })  }) {
-            instance.removeFromClassifications classification
-            classification.removeFromClassifies instance
+            instance.removeFromDefinedWithin classification
+            classification.removeFromDefines instance
         }
         for (domain in classifications) {
             DataModel classification = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
             if (!(classification.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
                 classification = elementService.createDraftVersion(classification, DraftContext.userFriendly())
             }
-            instance.addToClassifications classification
-            classification.addToClassifies instance
+            instance.addToDefinedWithin classification
+            classification.addToDefines instance
         }
     }
 

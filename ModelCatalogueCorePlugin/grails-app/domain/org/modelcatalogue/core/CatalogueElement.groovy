@@ -388,7 +388,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     
     void clearAssociationsBeforeDelete() {
         for (DataModel c in this.classifications) {
-            this.removeFromClassifications(c)
+            this.removeFromDefinedWithin(c)
         }
 
         // it is safe to remove all versioning informations
