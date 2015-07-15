@@ -1,10 +1,10 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.a
 
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.builder.xml.XmlCatalogueBuilder
-import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
+import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.integration.excel.ExcelLoader
 import org.modelcatalogue.core.pages.AssetListPage
 import org.modelcatalogue.integration.excel.HeadersMap
@@ -14,9 +14,6 @@ import spock.lang.Stepwise
 class AssetWizardSpec extends AbstractModelCatalogueGebSpec {
 
     @Rule TemporaryFolder tmp = new TemporaryFolder()
-
-    ClassificationService classificationService
-    ElementService elementService
 
     def "go to login"() {
         go "#/"

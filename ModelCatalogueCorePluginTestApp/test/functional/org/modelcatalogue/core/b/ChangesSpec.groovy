@@ -1,6 +1,7 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.b
 
 import geb.navigator.Navigator
+import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.pages.GlobalChangesPage
 import org.modelcatalogue.core.pages.MeasurementUnitListPage
 import org.modelcatalogue.core.pages.ValueDomainPage

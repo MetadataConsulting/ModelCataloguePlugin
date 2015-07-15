@@ -1,5 +1,6 @@
-    package org.modelcatalogue.core
+    package org.modelcatalogue.core.c
 
+    import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
     import org.modelcatalogue.core.pages.ValueDomainPage
     import spock.lang.Stepwise
 

@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<shiporder orderid="889923"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<shiporder xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+orderid="889923"
 xsi:noNamespaceSchemaLocation="shiporder.xsd">
   <orderperson>John Smith</orderperson>
-  <shipito>
+  <shipto>
     <name>Ola Nordmann</name>
     <address>Langgt 23</address>
     <city>4000 Stavanger</city>
     <country>Norway</country>
-  </shipito>
+  </shipto>
   <item>
     <title>Empire Burlesque</title>
     <note>Special Edition</note>

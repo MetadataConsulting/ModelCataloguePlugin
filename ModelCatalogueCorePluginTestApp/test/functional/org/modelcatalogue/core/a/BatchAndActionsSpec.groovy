@@ -1,4 +1,4 @@
-package org.modelcatalogue.core.actions
+package org.modelcatalogue.core.a
 
 import geb.waiting.WaitTimeoutException
 import org.modelcatalogue.core.AbstractModelCatalogueGebSpec

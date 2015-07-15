@@ -84,4 +84,22 @@ if [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "" ] ; then
     cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
 fi
 
+if [ "$TEST_SUITE" = "app_functional_a" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw test-app functional: org.modelcatalogue.core.a.**.* -war --non-interactive
+    mkdir -p $HOME/reports/test-app-functional-tests-reports
+    cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
+fi
+
+if [ "$TEST_SUITE" = "app_functional_b" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw test-app functional: org.modelcatalogue.core.b.**.* -war --non-interactive
+    mkdir -p $HOME/reports/test-app-functional-tests-reports
+    cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
+fi
+
+if [ "$TEST_SUITE" = "app_functional_c" ] || [ "$TEST_SUITE" = "" ] ; then
+    ./grailsw test-app functional: org.modelcatalogue.core.c.**.* -war --non-interactive
+    mkdir -p $HOME/reports/test-app-functional-tests-reports
+    cp -Rf target/test-reports $HOME/reports/test-app-functional-tests-reports
+fi
+
 cd ..

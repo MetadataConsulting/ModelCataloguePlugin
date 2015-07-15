@@ -1,5 +1,6 @@
-package org.modelcatalogue.core
+package org.modelcatalogue.core.b
 
+import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.pages.ClassificationListPage
 import spock.lang.Stepwise
 
