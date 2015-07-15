@@ -87,7 +87,7 @@ describe "mc.core.ui.catalogueElementPicker", ->
     $scope.resource = 'model'
     $scope.$digest()
 
-    $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/model/search?search=other+test").respond(fixtures.model.searchElement13)
+    $httpBackend.expect('GET', "#{modelCatalogueApiRoot}/model/search?search=other+test").respond(fixtures.dataClass.searchElement13)
 
     element.val('other test')
     element.change()
