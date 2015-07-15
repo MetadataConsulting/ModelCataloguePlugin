@@ -138,8 +138,8 @@ Model catalogue core plugin (metadata registry)
             headers  'Model Catalogue ID',  'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
                     context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || DataModel.isAssignableFrom(container.itemType))
-            } then { DataModel classification ->
-                [[ classification.modelCatalogueId,  classification.name, classification.description]]
+            } then { DataModel dataModel ->
+                [[ dataModel.modelCatalogueId,  dataModel.name, dataModel.description]]
             }
         }
 
