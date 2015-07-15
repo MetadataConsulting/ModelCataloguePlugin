@@ -14,7 +14,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     CatalogueXmlPrinter printer
 
-    def classificationService
+    def dataModelService
     def elementService
     def dataClassService
 
@@ -39,7 +39,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
             ).save(failOnError: true, flush: true)
         }
 
-        printer = new CatalogueXmlPrinter(classificationService, dataClassService)
+        printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
     }
 
 
@@ -120,7 +120,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
     }
 
     private <E extends CatalogueElement> E build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
         defaultCatalogueBuilder.build cl
         defaultCatalogueBuilder.created.first() as E
     }

@@ -1,19 +1,19 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.DetachedListWithTotalAndType
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.ListWithTotalAndTypeWrapper
 import org.modelcatalogue.core.util.ListWrapper
 
-class ClassificationService {
+class DataModelService {
 
     static transactional = false
 
     def modelCatalogueSecurityService
 
-    public <T> ListWrapper<T> classified(ListWrapper<T> list, ClassificationFilter classificationsFilter = classificationsInUse) {
+    public <T> ListWrapper<T> classified(ListWrapper<T> list, DataModelFilter classificationsFilter = classificationsInUse) {
         if (!(list instanceof ListWithTotalAndTypeWrapper)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only ListWithTotalAndTypeWrapper is currently supported")
         }
@@ -27,7 +27,7 @@ class ClassificationService {
         return list
     }
 
-    public <T> ListWithTotalAndType<T> classified(ListWithTotalAndType<T> list, ClassificationFilter classificationsFilter = classificationsInUse) {
+    public <T> ListWithTotalAndType<T> classified(ListWithTotalAndType<T> list, DataModelFilter classificationsFilter = classificationsInUse) {
         if (!(list instanceof DetachedListWithTotalAndType)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only DetachedListWithTotalAndType is currently supported")
         }
@@ -37,7 +37,7 @@ class ClassificationService {
         return list
     }
 
-    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, ClassificationFilter classificationsFilter = classificationsInUse) {
+    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, DataModelFilter classificationsFilter = classificationsInUse) {
         if (criteria.persistentEntity.javaClass == DataModel) {
             return criteria
         }
@@ -91,20 +91,20 @@ class ClassificationService {
         criteria
     }
 
-    public <T> DetachedCriteria<T> classified(Class<T> resource, ClassificationFilter classificationsFilter = classificationsInUse) {
+    public <T> DetachedCriteria<T> classified(Class<T> resource, DataModelFilter classificationsFilter = classificationsInUse) {
         classified(new DetachedCriteria<T>(resource), classificationsFilter)
     }
 
-    public ClassificationFilter getClassificationsInUse() {
+    public DataModelFilter getClassificationsInUse() {
         if (!modelCatalogueSecurityService.isUserLoggedIn()) {
-            return ClassificationFilter.NO_FILTER
+            return DataModelFilter.NO_FILTER
         }
 
         if (!modelCatalogueSecurityService.currentUser) {
-            return ClassificationFilter.NO_FILTER
+            return DataModelFilter.NO_FILTER
         }
 
 
-        ClassificationFilter.from(modelCatalogueSecurityService.currentUser)
+        DataModelFilter.from(modelCatalogueSecurityService.currentUser)
     }
 }

@@ -18,7 +18,7 @@ class MeasurementUnitController extends AbstractCatalogueElementController<Measu
             return
         }
 
-        respond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain") {
+        respond dataModelService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain") {
             eq "unitOfMeasure", unit
             if (!unit.attach().archived) {
                 ne 'status', ElementStatus.DEPRECATED

@@ -280,7 +280,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 type: type,
                 owner: element,
                 direction: direction,
-                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, ClassificationFilter.from(modelCatalogueSecurityService.currentUser)))
+                list: Lists.fromCriteria(params, "/${resourceName}/${params.id}/${direction.actionName}" + (typeParam ? "/${typeParam}" : ""), direction.composeWhere(element, type, DataModelFilter.from(modelCatalogueSecurityService.currentUser)))
         )
     }
 
@@ -393,7 +393,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
     protected getDefaultSort()  { actionName == 'index' ? 'name'  : null }
     protected getDefaultOrder() { actionName == 'index' ? 'asc'   : null }
 
-    def classificationService
+    def dataModelService
 
     @Override
     def index(Integer max) {
@@ -404,7 +404,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             return
         }
 
-        respond classificationService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
+        respond dataModelService.classified(Lists.fromCriteria(params, resource, "/${resourceName}/") {
             eq 'status', ElementService.getStatusFromParams(params)
         })
     }

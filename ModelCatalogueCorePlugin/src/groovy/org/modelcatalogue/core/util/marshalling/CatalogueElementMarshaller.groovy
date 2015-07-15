@@ -13,7 +13,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
     @Autowired ReportsRegistry reportsRegistry
     @Autowired RelationshipTypeService relationshipTypeService
     @Autowired RelationshipService relationshipService
-    @Autowired ClassificationService classificationService
+    @Autowired DataModelService dataModelService
 
     CatalogueElementMarshaller(Class type) {
         super(type)
@@ -60,7 +60,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 eq 'destination', el
             }
 
-            incomingCounts.putAll classificationService.classified(incomingTypes).list().countBy { row ->
+            incomingCounts.putAll dataModelService.classified(incomingTypes).list().countBy { row ->
                 row[1]
             }
 
@@ -72,7 +72,7 @@ abstract class CatalogueElementMarshaller extends AbstractMarshaller {
                 eq 'source', el
             }
 
-            outgoingCounts.putAll classificationService.classified(outgoingTypes).list().countBy { row ->
+            outgoingCounts.putAll dataModelService.classified(outgoingTypes).list().countBy { row ->
                 row[1]
             }
         }

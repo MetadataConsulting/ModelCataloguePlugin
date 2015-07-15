@@ -3,7 +3,7 @@ package org.modelcatalogue.core.dataarchitect.xsd
 import groovy.util.logging.Log4j
 import groovy.xml.QName
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.RelationshipDirection
 
@@ -49,7 +49,7 @@ class XSDImporter {
     Collection<DataModel> classifications
 
     RelationshipService relationshipService
-    ClassificationService classificationService
+    DataModelService dataModelService
 
     XsdSchema schema
     Collection<QName> namespaces
@@ -254,7 +254,7 @@ class XSDImporter {
 
 
     List<DataClass> findModels(String modelName) {
-        classificationService.classified(DataClass.where { name == modelName }, ClassificationFilter.includes(classifications)).list()
+        dataModelService.classified(DataClass.where { name == modelName }, DataModelFilter.includes(classifications)).list()
     }
 
     DataClass findModel(String name) {
@@ -582,13 +582,13 @@ class XSDImporter {
         List<DataElement> elements
 
         if (domain) {
-            elements = classificationService.classified(DataElement.where {
+            elements = dataModelService.classified(DataElement.where {
                 name == theName && valueDomain == domain
-            }, ClassificationFilter.includes(classifications)).list()
+            }, DataModelFilter.includes(classifications)).list()
         } else {
-            elements = classificationService.classified(DataElement.where {
+            elements = dataModelService.classified(DataElement.where {
                 name == theName && valueDomain == null
-            }, ClassificationFilter.includes(classifications)).list()
+            }, DataModelFilter.includes(classifications)).list()
         }
 
         if (elements) {

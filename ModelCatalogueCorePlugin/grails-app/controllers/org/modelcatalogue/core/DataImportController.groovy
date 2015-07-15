@@ -20,7 +20,7 @@ class DataImportController  {
     def modelCatalogueSecurityService
     def executorService
     def elementService
-    def classificationService
+    def dataModelService
     def assetService
     def auditService
 
@@ -79,7 +79,7 @@ class DataImportController  {
             HeadersMap headersMap = HeadersMap.create(request.JSON.headersMap ?: [:])
             executeInBackground(id, "Imported from Excel") {
                 try {
-                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService, isAdmin)
+                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
                     ExcelLoader parser = new ExcelLoader(builder)
                     parser.importData(headersMap, inputStream)
                     finalizeAsset(id)
@@ -97,7 +97,7 @@ class DataImportController  {
             InputStream inputStream = file.inputStream
             executeInBackground(id, "Imported from XML") {
                 try {
-                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(classificationService, elementService, isAdmin))
+                    CatalogueXmlLoader loader = new CatalogueXmlLoader(new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin))
                     loader.load(inputStream)
                     finalizeAsset(id)
                 } catch (Exception e) {
@@ -116,7 +116,7 @@ class DataImportController  {
             String idpattern = params.idpattern
             executeInBackground(id, "Imported from OBO") {
                 try {
-                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService, isAdmin)
+                    DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService, isAdmin)
                     OboLoader loader = new OboLoader(builder)
                     idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${OboLoader.OBO_ID}/:id".toString().replace(':id', '$id')
                     loader.load(inputStream, name, idpattern)

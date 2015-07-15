@@ -10,7 +10,7 @@ class DashboardController {
 
     static responseFormats = ['json', 'xlsx']
     def dataArchitectService
-    def classificationService
+    def dataModelService
 
     def index() {
         response.addHeader('Expires', '-1')
@@ -21,7 +21,7 @@ class DashboardController {
         List<Class> displayed = [DataModel, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit, Asset]
 
         for (Class type in displayed) {
-            DetachedCriteria criteria = classificationService.classified(type)
+            DetachedCriteria criteria = dataModelService.classified(type)
             criteria.projections {
                 property 'status'
                 property 'id'
@@ -55,11 +55,11 @@ class DashboardController {
     }
 
     private Long countWithClassification(Class resource) {
-        classificationService.classified(Lists.all([:], resource)).total
+        dataModelService.classified(Lists.all([:], resource)).total
     }
 
     private Long countWithClassificationAndStatus(Class resource, ElementStatus desiredStatus) {
-        classificationService.classified(resource).build {
+        dataModelService.classified(resource).build {
             eq 'status', desiredStatus
         }.count()
     }

@@ -3,7 +3,7 @@ import org.modelcatalogue.core.util.marshalling.*
 beans = {
     customObjectMarshallers( ModelCatalogueCorePluginCustomObjectMarshallers ) {
         marshallers = [
-                            new ClassificationMarshaller(),
+                            new DataModelMarshaller(),
                             new DataElementMarshaller(),
                             new DataTypeMarshaller(),
                             new ElementsMarshaller(),

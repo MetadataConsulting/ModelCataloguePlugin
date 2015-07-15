@@ -9,7 +9,7 @@ class XSDImportService {
     static transactional = false
     
     def relationshipService
-    def classificationService
+    def dataModelService
 
     def getClassifications(XsdSchema schema, String classificationName, Collection<QName> namespaces, String description) {
         Collection<DataModel> classifications = []
@@ -63,7 +63,7 @@ class XSDImportService {
                         createModelsForElements:    createModelsForElements,
 
                         relationshipService: relationshipService,
-                        classificationService: classificationService
+                        dataModelService: dataModelService
                 ).createAll()
             }
 

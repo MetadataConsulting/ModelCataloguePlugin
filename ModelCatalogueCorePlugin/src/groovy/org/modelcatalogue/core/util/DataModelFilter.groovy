@@ -10,11 +10,11 @@ import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 
 import java.util.concurrent.TimeUnit
 
-class ClassificationFilter {
+class DataModelFilter {
 
-    public static final ClassificationFilter NO_FILTER = new ClassificationFilter(false)
+    public static final DataModelFilter NO_FILTER = new DataModelFilter(false)
 
-    private static final Cache<Long, ClassificationFilter> filtersCache = CacheBuilder
+    private static final Cache<Long, DataModelFilter> filtersCache = CacheBuilder
             .newBuilder()
             .initialCapacity(10)
             .maximumSize(100)
@@ -24,61 +24,61 @@ class ClassificationFilter {
     private static final String UNCLASSIFIED_ONLY_KEY = '$unclassifiedOnly'
     private static final String EXCLUDE_KEY = '$exclude'
 
-    private ClassificationFilter(ImmutableSet<Long> includes, ImmutableSet<Long> excludes) {
+    private DataModelFilter(ImmutableSet<Long> includes, ImmutableSet<Long> excludes) {
         this.includes = includes
         this.excludes = excludes
         this.unclassifiedOnly = false
     }
 
-    private ClassificationFilter(boolean unclassifiedOnly) {
+    private DataModelFilter(boolean unclassifiedOnly) {
         this.unclassifiedOnly = unclassifiedOnly
         this.includes = ImmutableSet.of()
         this.excludes = ImmutableSet.of()
     }
 
-    static ClassificationFilter includes(Iterable<DataModel> classifications) {
-        new ClassificationFilter(ImmutableSet.copyOf(classifications.collect { it.id }), ImmutableSet.of())
+    static DataModelFilter includes(Iterable<DataModel> dataModels) {
+        new DataModelFilter(ImmutableSet.copyOf(dataModels.collect { it.id }), ImmutableSet.of())
     }
 
-    static ClassificationFilter excludes(Iterable<DataModel> classifications) {
-        new ClassificationFilter(ImmutableSet.of(), ImmutableSet.copyOf(classifications.collect { it.id }))
+    static DataModelFilter excludes(Iterable<DataModel> dataModels) {
+        new DataModelFilter(ImmutableSet.of(), ImmutableSet.copyOf(dataModels.collect { it.id }))
     }
 
-    static ClassificationFilter create(boolean unclassifiedOnly) {
-        new ClassificationFilter(unclassifiedOnly)
+    static DataModelFilter create(boolean orphanedOnly) {
+        new DataModelFilter(orphanedOnly)
     }
 
-    static ClassificationFilter create(Iterable<DataModel> includes, Iterable<DataModel> excludes) {
-        new ClassificationFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect { it.id }))
+    static DataModelFilter create(Iterable<DataModel> includes, Iterable<DataModel> excludes) {
+        new DataModelFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect { it.id }))
     }
 
-    static ClassificationFilter includes(DataModel... includes) {
-        new ClassificationFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.of())
+    static DataModelFilter includes(DataModel... includes) {
+        new DataModelFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.of())
     }
 
-    static ClassificationFilter excludes(DataModel... excludes) {
-        new ClassificationFilter(ImmutableSet.of(), ImmutableSet.copyOf(excludes.collect { it.id }))
+    static DataModelFilter excludes(DataModel... excludes) {
+        new DataModelFilter(ImmutableSet.of(), ImmutableSet.copyOf(excludes.collect { it.id }))
     }
 
-    static ClassificationFilter from(Map<String, Object> json) {
+    static DataModelFilter from(Map<String, Object> json) {
         if (json.unclassifiedOnly) {
             return create(true)
         }
         return create((json.includes ?: []).collect { DataModel.get(it.id) }, (json.excludes ?: []).collect { DataModel.get(it.id) })
     }
 
-    static ClassificationFilter from(Object other) {
+    static DataModelFilter from(Object other) {
         return NO_FILTER
     }
 
-    static ClassificationFilter from(User user) {
+    static DataModelFilter from(User user) {
         if (!user) {
             return NO_FILTER
         }
 
         filtersCache.get(user.getId()) {
             if (user.ext[UNCLASSIFIED_ONLY_KEY]) {
-                return new ClassificationFilter(true)
+                return new DataModelFilter(true)
             }
 
             if (!user.filteredByRelationships) {
@@ -95,7 +95,7 @@ class ClassificationFilter {
                     includes.add(rel.source.id)
                 }
             }
-            return new ClassificationFilter(includes.build(), excludes.build())
+            return new DataModelFilter(includes.build(), excludes.build())
         }
     }
 

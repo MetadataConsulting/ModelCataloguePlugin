@@ -2,7 +2,7 @@ package org.modelcatalogue.core.xml
 
 import groovy.xml.MarkupBuilder
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.ClassificationService
+import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataClassService
 import org.modelcatalogue.core.RelationshipType
 
@@ -10,16 +10,16 @@ class CatalogueXmlPrinter {
 
     static final String NAMESPACE_URL = 'http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd'
 
-    ClassificationService classificationService
+    DataModelService dataModelService
     DataClassService modelService
 
-    CatalogueXmlPrinter(ClassificationService classificationService, DataClassService modelService) {
-        this.classificationService = classificationService
+    CatalogueXmlPrinter(DataModelService dataModelService, DataClassService modelService) {
+        this.dataModelService = dataModelService
         this.modelService = modelService
     }
 
     Writable bind(CatalogueElement element, @DelegatesTo(PrintContext) Closure contextConfigurer = {}) {
-        PrintContext context = new PrintContext(classificationService, modelService)
+        PrintContext context = new PrintContext(dataModelService, modelService)
         context.with contextConfigurer
 
         return { Writer writer ->

@@ -17,7 +17,7 @@ class InitCatalogueService {
     static transactional = false
 
     def grailsApplication
-    def classificationService
+    def dataModelService
     def elementService
     def sessionFactory
 
@@ -114,7 +114,7 @@ class InitCatalogueService {
     }
 
     Set<CatalogueElement> importMCFile(InputStream inputStream, boolean skipDraft = false) {
-        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
         if (skipDraft) {
             builder.skip ElementStatus.DRAFT
         }

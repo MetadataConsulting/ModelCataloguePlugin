@@ -69,11 +69,11 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
     /**
      * Creates new catalogue builder with given classification and element services.
-     * @param classificationService classification service
+     * @param dataModelService classification service
      * @param elementService element service
      */
-    DefaultCatalogueBuilder(ClassificationService classificationService, ElementService elementService, boolean canCreateRelationshipTypes = false) {
-        this.repository = new CatalogueElementProxyRepository(classificationService, elementService)
+    DefaultCatalogueBuilder(DataModelService dataModelService, ElementService elementService, boolean canCreateRelationshipTypes = false) {
+        this.repository = new CatalogueElementProxyRepository(dataModelService, elementService)
         this.context = new CatalogueBuilderContext(this)
         this.canCreateRelationshipTypes = canCreateRelationshipTypes
     }

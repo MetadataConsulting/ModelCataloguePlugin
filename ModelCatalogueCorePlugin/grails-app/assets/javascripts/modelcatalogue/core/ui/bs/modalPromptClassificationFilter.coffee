@@ -11,7 +11,7 @@ angular.module('mc.core.ui.bs.modalPromptClassificationFilter', ['mc.util.messag
             <form role="form">
               <div class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="filter.unclassifiedOnly"> <strong>Show Unclassified Elements Only</strong>
+                  <input type="checkbox" ng-model="filter.unclassifiedOnly"> <strong>Show Orphaned Only</strong>
                 </label>
               </div>
               <div class="form-group" ng-hide="filter.unclassifiedOnly">

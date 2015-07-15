@@ -11,7 +11,7 @@ import spock.lang.Issue
 class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def initCatalogueService
-    def classificationService
+    def dataModelService
     def elementService
 
     Set<CatalogueElement> created = []
@@ -601,7 +601,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
-        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(classificationService, elementService)
+        DefaultCatalogueBuilder defaultCatalogueBuilder = new DefaultCatalogueBuilder(dataModelService, elementService)
         defaultCatalogueBuilder.build cl
         created = defaultCatalogueBuilder.created
     }

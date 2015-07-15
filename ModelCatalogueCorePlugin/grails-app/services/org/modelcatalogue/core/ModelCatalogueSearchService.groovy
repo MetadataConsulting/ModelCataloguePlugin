@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
 
@@ -12,14 +12,14 @@ import org.modelcatalogue.core.util.RelationshipDirection
  */
 class ModelCatalogueSearchService implements SearchCatalogue {
 
-    def classificationService
+    def dataModelService
     def modelCatalogueSecurityService
 
     @Override
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, classificationService.classificationsInUse)
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, dataModelService.classificationsInUse)
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
@@ -88,7 +88,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
-            ClassificationFilter classifications = classificationService.classificationsInUse
+            DataModelFilter classifications = dataModelService.classificationsInUse
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """

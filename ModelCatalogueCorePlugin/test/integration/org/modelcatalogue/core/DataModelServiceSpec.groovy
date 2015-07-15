@@ -3,13 +3,13 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
 
-class ClassificationServiceSpec extends IntegrationSpec {
+class DataModelServiceSpec extends IntegrationSpec {
 
-    def classificationService
+    def dataModelService
     def initCatalogueService
     def dataClassService
 
@@ -33,7 +33,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "all the models are returned if no classification is selected"(){
-        DetachedCriteria<DataClass> criteria = classificationService.classified(DataClass)
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass)
 
         expect:
         new DetachedCriteria<DataClass>(DataClass).count()
@@ -46,7 +46,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
             eq 'status', ElementStatus.FINALIZED
         }
 
-        DetachedCriteria<DataClass> criteria = classificationService.classified(finalized)
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(finalized)
 
         expect:
         finalized.count()
@@ -55,8 +55,8 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "is able to return only unclassified models"() {
-        DetachedCriteria<DataClass> all = classificationService.classified(DataClass, ClassificationFilter.NO_FILTER)
-        DetachedCriteria<DataClass> criteria = classificationService.classified(DataClass, ClassificationFilter.create(true))
+        DetachedCriteria<DataClass> all = dataModelService.classified(DataClass, DataModelFilter.NO_FILTER)
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create(true))
 
         expect:
         all.count() == DataClass.count()
@@ -66,7 +66,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     def "does not fail when there are no results"() {
         ValueDomain domain = new ValueDomain(name: "Test Domain").save(failOnError: true)
         domain.addToClassifications classification1
-        DetachedCriteria<ValueDomain> criteria = classificationService.classified(ValueDomain, ClassificationFilter.create(true))
+        DetachedCriteria<ValueDomain> criteria = dataModelService.classified(ValueDomain, DataModelFilter.create(true))
 
         expect:
         criteria.count() == ValueDomain.list().count { !it.classifications }
@@ -76,7 +76,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
 
 
     def "is able to return only models classified by"() {
-        DetachedCriteria<DataClass> criteria = classificationService.classified(DataClass, ClassificationFilter.create([classification1], []))
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([classification1], []))
 
         expect:
         criteria.count() == 1
@@ -85,7 +85,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "is able to return only models not classified by"() {
-        DetachedCriteria<DataClass> criteria = classificationService.classified(DataClass, ClassificationFilter.create([], [classification2]))
+        DetachedCriteria<DataClass> criteria = dataModelService.classified(DataClass, DataModelFilter.create([], [classification2]))
 
         expect:
         criteria.count() == 1
@@ -94,7 +94,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get unclassified top level models"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(ClassificationFilter.create(true), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(DataModelFilter.create(true), [:])
 
         expect:
         models.total >= 1
@@ -103,7 +103,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(ClassificationFilter.create([classification1], []), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(DataModelFilter.create([classification1], []), [:])
 
         expect:
         models.total >= 1
@@ -114,7 +114,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
 
 
     def "get top level models with exclude classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(ClassificationFilter.create([], [classification2]), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(DataModelFilter.create([], [classification2]), [:])
 
         expect:
         models.total >= 2
@@ -124,7 +124,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include and exclude classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(ClassificationFilter.create([classification1], [classification2]), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(DataModelFilter.create([classification1], [classification2]), [:])
 
         expect:
         models.total >= 1

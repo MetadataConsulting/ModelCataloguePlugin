@@ -22,7 +22,7 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
             return
         }
 
-        respond classificationService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain") {
+        respond dataModelService.classified(Lists.fromCriteria(params, ValueDomain, "/${resourceName}/${params.id}/valueDomain") {
             eq "dataType", dataType
             if (!dataType.attach().archived) {
                 ne 'status', ElementStatus.DEPRECATED

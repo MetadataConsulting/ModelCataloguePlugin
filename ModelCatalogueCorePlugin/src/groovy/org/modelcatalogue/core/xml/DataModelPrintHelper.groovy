@@ -2,7 +2,7 @@ package org.modelcatalogue.core.xml
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 
 class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
 
@@ -15,7 +15,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
     void processElements(Object theMkp, DataModel element, PrintContext context, Relationship rel) {
         super.processElements(theMkp, element, context, rel)
 
-        for (CatalogueElement other in context.modelService.getTopLevelModels(ClassificationFilter.includes(element), [:]).items) {
+        for (CatalogueElement other in context.modelService.getTopLevelModels(DataModelFilter.includes(element), [:]).items) {
                 printElement(theMkp, other, context, null)
         }
 
@@ -36,6 +36,6 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
                 'in'('id', context.idsOfPrinted)
             }
         }
-        context.classificationService.classified(criteria, ClassificationFilter.includes([classification])).list()
+        context.dataModelService.classified(criteria, DataModelFilter.includes([classification])).list()
     }
 }

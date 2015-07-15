@@ -2,12 +2,12 @@ package org.modelcatalogue.core.xml
 
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataModel
-import org.modelcatalogue.core.ClassificationService
+import org.modelcatalogue.core.DataModelService
 import org.modelcatalogue.core.DataClassService
 
 class PrintContext {
 
-    ClassificationService classificationService
+    DataModelService dataModelService
     DataClassService modelService
 
 
@@ -19,8 +19,8 @@ class PrintContext {
 
     Set<String> typesUsed = new TreeSet<String>()
 
-    PrintContext(ClassificationService classificationService, DataClassService modelService) {
-        this.classificationService = classificationService
+    PrintContext(DataModelService dataModelService, DataClassService modelService) {
+        this.dataModelService = dataModelService
         this.modelService = modelService
     }
 

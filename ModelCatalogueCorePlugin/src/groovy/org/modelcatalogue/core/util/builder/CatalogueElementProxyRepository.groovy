@@ -5,7 +5,7 @@ import groovy.util.logging.Log4j
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.springframework.util.StopWatch
 import org.modelcatalogue.core.util.Legacy
@@ -18,7 +18,7 @@ class CatalogueElementProxyRepository {
     static final String AUTOMATIC_DESCRIPTION_FLAG = '__automatic_description__'
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
 
-    private final ClassificationService classificationService
+    private final DataModelService dataModelService
     private final ElementService elementService
 
     Set<Class> unclassifiedQueriesFor = []
@@ -31,8 +31,8 @@ class CatalogueElementProxyRepository {
 
     private final Map<String, Relationship> createdRelationships = [:]
 
-    CatalogueElementProxyRepository(ClassificationService classificationService, ElementService elementService) {
-        this.classificationService = classificationService
+    CatalogueElementProxyRepository(DataModelService dataModelService, ElementService elementService) {
+        this.dataModelService = dataModelService
         this.elementService = elementService
     }
 
@@ -299,7 +299,7 @@ class CatalogueElementProxyRepository {
         }
 
         if (classifications) {
-            T result = getLatestFromCriteria(classificationService.classified(criteria, ClassificationFilter.includes(classifications)))
+            T result = getLatestFromCriteria(dataModelService.classified(criteria, DataModelFilter.includes(classifications)))
 
             if (result) {
                 if (!id || !result.modelCatalogueId) {

@@ -3,7 +3,7 @@ package org.modelcatalogue.core.audit
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 
 class AuditingIntegrationSpec extends IntegrationSpec {
 
@@ -602,7 +602,7 @@ class AuditingIntegrationSpec extends IntegrationSpec {
         new DataType(name: "DT4GF").save(failOnError: true)
 
         expect:
-        auditService.getGlobalChanges([:], ClassificationFilter.NO_FILTER).total > 0
+        auditService.getGlobalChanges([:], DataModelFilter.NO_FILTER).total > 0
     }
 
 }

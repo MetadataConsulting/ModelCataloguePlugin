@@ -20,7 +20,7 @@ class DataArchitectService {
     def relationshipService
     def elementService
     def actionService
-    def classificationService
+    def dataModelService
 
     private Map<String,Runnable> suggestions = [
             'Inline Models': this.&generateInlineModel,
@@ -37,7 +37,7 @@ class DataArchitectService {
     }
 
     ListWithTotal<DataElement> uninstantiatedDataElements(Map params){
-        classificationService.classified Lists.fromCriteria(params, DataElement) {
+        dataModelService.classified Lists.fromCriteria(params, DataElement) {
             'in'('status', org.modelcatalogue.core.api.ElementStatus.DRAFT, org.modelcatalogue.core.api.ElementStatus.PENDING, org.modelcatalogue.core.api.ElementStatus.UPDATED, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
             isNull 'valueDomain'
 
@@ -45,7 +45,7 @@ class DataArchitectService {
     }
 
     ListWithTotal<ValueDomain> incompleteValueDomains(Map params){
-        classificationService.classified Lists.fromCriteria(params, ValueDomain) {
+        dataModelService.classified Lists.fromCriteria(params, ValueDomain) {
             isNull 'dataType'
         }
     }

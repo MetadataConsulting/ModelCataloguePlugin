@@ -82,7 +82,7 @@ Model catalogue core plugin (metadata registry)
         modelCatalogueCorePluginCustomObjectMarshallers(ModelCatalogueCorePluginCustomObjectMarshallers) {
             marshallers = [
                     new AssetMarshaller(),
-                    new ClassificationMarshaller(),
+                    new DataModelMarshaller(),
                     new DataElementMarshaller(),
                     new DataTypeMarshaller(),
                     new ElementsMarshaller(),
@@ -109,7 +109,7 @@ Model catalogue core plugin (metadata registry)
             springConfig.addAlias('modelCatalogueStorageService','localFilesStorageService')
         }
 
-        catalogueBuilder(DefaultCatalogueBuilder, ref('classificationService'), ref('elementService')) { bean ->
+        catalogueBuilder(DefaultCatalogueBuilder, ref('dataModelService'), ref('elementService')) { bean ->
             bean.scope = 'prototype'
         }
 

@@ -13,7 +13,7 @@ import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 
 class UmljService {
 
-    def classificationService, elementService
+    def dataModelService, elementService
 
     static transactional = false
 
@@ -28,7 +28,7 @@ class UmljService {
 
     protected void generateCatalogueElements(StarUMLDiagram umlFile, DataModel clsf) {
 
-        CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
+        CatalogueBuilder builder = new DefaultCatalogueBuilder(dataModelService, elementService)
         builder.build {
             classification(name: clsf.name) {
                 globalSearchFor dataType

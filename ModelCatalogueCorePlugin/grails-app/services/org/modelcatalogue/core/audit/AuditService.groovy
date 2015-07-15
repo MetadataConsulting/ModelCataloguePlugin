@@ -4,7 +4,7 @@ import grails.util.Holders
 import org.hibernate.SessionFactory
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.security.User
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
@@ -14,7 +14,7 @@ class AuditService {
     static transactional = false
 
     def modelCatalogueSecurityService
-    def classificationService
+    def dataModelService
 
     private static ThreadLocal<Auditor> auditor = new ThreadLocal<Auditor>() {
         protected Auditor initialValue() { return new DefaultAuditor(); }
@@ -115,7 +115,7 @@ class AuditService {
         }
     }
 
-    ListWithTotalAndType<Change> getGlobalChanges(Map params, ClassificationFilter classifications) {
+    ListWithTotalAndType<Change> getGlobalChanges(Map params, DataModelFilter classifications) {
         if (!params.sort) {
             params.sort  = 'dateCreated'
             params.order = 'desc'
@@ -135,7 +135,7 @@ class AuditService {
             where c.system != true and c.otherSide != true and c.changedId in (""" + subquery + """)""", args
     }
 
-    private static String getClassifiedElementsSubQuery(ClassificationFilter classifications, Map<String, Object> args) {
+    private static String getClassifiedElementsSubQuery(DataModelFilter classifications, Map<String, Object> args) {
         args.classificationType = RelationshipType.classificationType
         if (classifications.unclassifiedOnly) {
             // language=HQL

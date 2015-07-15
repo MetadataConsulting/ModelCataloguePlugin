@@ -4,15 +4,12 @@ import grails.test.mixin.Mock
 import spock.lang.Specification
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 05/02/2014.
- */
 @Mock([DataModel, DataElement, DataClass, CatalogueElement])
-class ClassificationDomainSpec extends Specification {
+class DataModelDomainSpec extends Specification {
 
 
     @Unroll
-    def "Classiciation creation for #args results in #validates"()
+    def "Data model creation for #args results in #validates"()
     {
 
         expect:
@@ -21,13 +18,13 @@ class ClassificationDomainSpec extends Specification {
 
         when:
 		args.modelCatalogueId = "http://example.com/123"
-        def conceptInstance = new DataModel(args)
+        def dataModel = new DataModel(args)
 
-        conceptInstance.save()
+        dataModel.save()
 
         then:
 
-        (conceptInstance.errors.errorCount == 0) == validates
+        (dataModel.errors.errorCount == 0) == validates
 
         where:
 

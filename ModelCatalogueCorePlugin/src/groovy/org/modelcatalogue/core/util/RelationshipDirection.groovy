@@ -10,7 +10,7 @@ enum RelationshipDirection {
     INCOMING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'source'
             criteria.eq('destination', element)
@@ -85,7 +85,7 @@ enum RelationshipDirection {
     OUTGOING {
 
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'destination'
             criteria.eq('source', element)
@@ -161,7 +161,7 @@ enum RelationshipDirection {
     },
     BOTH {
         @Override
-        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter) {
+        DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter) {
             DetachedCriteria<Relationship> criteria = new DetachedCriteria<Relationship>(Relationship)
             criteria.join 'source'
             criteria.join 'destination'
@@ -238,7 +238,7 @@ enum RelationshipDirection {
         }
     }
 
-    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, ClassificationFilter filter)
+    abstract DetachedCriteria<Relationship> composeWhere(CatalogueElement element, RelationshipType type, DataModelFilter filter)
     abstract String getDirection(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getRelation(CatalogueElement owner, Relationship relationship)
     abstract CatalogueElement getElement(CatalogueElement owner, Relationship relationship)

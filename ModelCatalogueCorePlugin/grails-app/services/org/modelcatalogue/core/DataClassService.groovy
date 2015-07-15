@@ -3,7 +3,7 @@ package org.modelcatalogue.core
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.util.ClassificationFilter
+import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.ListCountAndType
 import org.modelcatalogue.core.util.ListWithTotalAndType
 import org.modelcatalogue.core.util.Lists
@@ -12,13 +12,13 @@ import org.modelcatalogue.core.util.Lists
 class DataClassService {
 
     SecurityService modelCatalogueSecurityService
-    ClassificationService classificationService
+    DataModelService dataModelService
 
     ListWithTotalAndType<DataClass> getTopLevelModels(Map params) {
-        getTopLevelModels(classificationService.classificationsInUse, params)
+        getTopLevelModels(dataModelService.classificationsInUse, params)
     }
 
-    ListWithTotalAndType<DataClass> getTopLevelModels(ClassificationFilter classifications, Map params) {
+    ListWithTotalAndType<DataClass> getTopLevelModels(DataModelFilter classifications, Map params) {
         RelationshipType hierarchy      = RelationshipType.hierarchyType
         ElementStatus status            = ElementService.getStatusFromParams(params)
         RelationshipType classification = RelationshipType.classificationType
