@@ -2,7 +2,7 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 
-class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+class DataModelControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     @Override
     Map getPropertiesToEdit(){
@@ -21,7 +21,7 @@ class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementCo
 
     @Override
     Class getResource() {
-        Classification
+        DataModel
     }
 
     @Override
@@ -35,13 +35,13 @@ class ClassificationControllerIntegrationSpec extends AbstractCatalogueElementCo
     }
 
     @Override
-    Classification getLoadItem() {
-        Classification.findByName("data set 1")
+    DataModel getLoadItem() {
+        DataModel.findByName("data set 1")
     }
 
     @Override
-    Classification getAnotherLoadItem() {
-        Classification.findByName("data set 2")
+    DataModel getAnotherLoadItem() {
+        DataModel.findByName("data set 2")
     }
 
     def getPaginationClassifiesParameters(baseLink){

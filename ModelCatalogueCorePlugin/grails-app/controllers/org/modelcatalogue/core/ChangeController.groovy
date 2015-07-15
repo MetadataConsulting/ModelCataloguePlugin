@@ -63,7 +63,7 @@ class ChangeController extends RestfulController<Change> {
 
     def classificationActivity(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        Classification element = Classification.get(params.id)
+        DataModel element = DataModel.get(params.id)
         if (!element) {
             notFound()
             return

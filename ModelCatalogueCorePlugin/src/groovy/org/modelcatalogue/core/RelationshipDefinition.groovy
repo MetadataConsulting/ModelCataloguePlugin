@@ -25,7 +25,7 @@ class RelationshipDefinition {
     }
 
     // optional
-    Classification classification = null
+    DataModel classification = null
     Map<String, String> metadata = [:]
     boolean archived
     Long outgoingIndex

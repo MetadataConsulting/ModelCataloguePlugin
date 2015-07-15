@@ -1,11 +1,11 @@
 package org.modelcatalogue.core.util.marshalling
 
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 
 class ClassificationMarshaller extends CatalogueElementMarshaller {
 
     ClassificationMarshaller() {
-        super(Classification)
+        super(DataModel)
     }
 
     protected Map<String, Object> prepareJsonMap(element) {

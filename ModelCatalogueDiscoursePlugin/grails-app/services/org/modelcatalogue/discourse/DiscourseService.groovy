@@ -2,7 +2,7 @@ package org.modelcatalogue.discourse
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.LogoutListener
 import org.modelcatalogue.core.security.User
 
@@ -21,7 +21,7 @@ class DiscourseService implements LogoutListener {
             return classification.discourseCategoryName
         }
 
-        Classification classificationEntity = Classification.get(classificationId)
+        DataModel classificationEntity = DataModel.get(classificationId)
         if (!classificationEntity) {
             throw new IllegalArgumentException("Classification with ID $classificationId does not exist")
         }

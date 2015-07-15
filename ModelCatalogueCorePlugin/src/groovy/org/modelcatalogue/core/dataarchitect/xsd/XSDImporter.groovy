@@ -46,7 +46,7 @@ class XSDImporter {
     }
 
     Collection<XsdElement> topLevelElements
-    Collection<Classification> classifications
+    Collection<DataModel> classifications
 
     RelationshipService relationshipService
     ClassificationService classificationService
@@ -106,8 +106,8 @@ class XSDImporter {
     def createModelsAndElements(String containerModelName = "", String rootElementsModelName = "") {
 
         if (!containerModelName) containerModelName = classifications.first()?.name + " Complex Types"
-        Classification typeClassification = Classification.findByNamespace(classifications.first()?.namespace + " Complex Types")
-        if (!typeClassification) typeClassification = new Classification(name: classifications.first()?.name + " Complex Types", namespace: classifications.first()?.namespace + " Complex Types").save(failOnError: true)
+        DataModel typeClassification = DataModel.findByNamespace(classifications.first()?.namespace + " Complex Types")
+        if (!typeClassification) typeClassification = new DataModel(name: classifications.first()?.name + " Complex Types", namespace: classifications.first()?.namespace + " Complex Types").save(failOnError: true)
         classifications.add(typeClassification)
 
         publicTypesContainer = findModel(containerModelName)
@@ -668,7 +668,7 @@ class XSDImporter {
         def valueDomain = findValueDomain(simpleDataType.name, dataType, rule)
         if (!valueDomain) {
             valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: rule).save(flush: true, failOnError: true)
-            for (Classification classification in classifications) {
+            for (DataModel classification in classifications) {
                 valueDomain.addToClassifications(classification)
             }
 

@@ -1,7 +1,7 @@
 package x.org.modelcatalogue.core
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ValueDomain
 import spock.lang.Stepwise
@@ -24,7 +24,7 @@ class InitXMLSchemaDataTypesSpec extends IntegrationSpec {
         initCatalogueService.initDefaultDataTypes(true)
         initCatalogueService.initDefaultDataTypes(true)
         expect:
-        Classification.countByName('XMLSchema') == 1
+        DataModel.countByName('XMLSchema') == 1
     }
 
     def "check #domain validates value #value as #valid"(){

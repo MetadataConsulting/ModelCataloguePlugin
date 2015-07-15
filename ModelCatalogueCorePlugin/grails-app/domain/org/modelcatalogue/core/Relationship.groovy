@@ -40,7 +40,7 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     RelationshipType relationshipType
 
-    Classification classification
+    DataModel classification
 
     Long outgoingIndex
     Long incomingIndex

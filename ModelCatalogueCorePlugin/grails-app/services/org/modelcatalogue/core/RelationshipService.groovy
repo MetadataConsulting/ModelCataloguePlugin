@@ -58,7 +58,7 @@ class RelationshipService {
      * @deprecated use #link(Closure)
      */
     @Deprecated
-    Relationship link(CatalogueElement theSource, CatalogueElement theDestination, RelationshipType type, Classification theClassification, boolean theArchived = false, boolean theIgnoreRules = false, boolean theResetIndices = false) {
+    Relationship link(CatalogueElement theSource, CatalogueElement theDestination, RelationshipType type, DataModel theClassification, boolean theArchived = false, boolean theIgnoreRules = false, boolean theResetIndices = false) {
         link RelationshipDefinition.create(theSource, theDestination, type)
                 .withClassification(theClassification)
                 .withArchived(theArchived)
@@ -182,7 +182,7 @@ class RelationshipService {
         unlink source, destination, relationshipType, null, ignoreRules
     }
 
-    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, Classification classification, boolean ignoreRules = false) {
+    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel classification, boolean ignoreRules = false) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withClassification(classification).definition)
@@ -251,11 +251,11 @@ class RelationshipService {
             and r.destination.id = :elementId
             order by r.source.name
         """, [classification: classification.id, elementId: element.id]).collect {
-            [name: it[0], id: it[1], status: "${it[2]}", elementType: Classification.name, link:  "/classification/${it[1]}"]
+            [name: it[0], id: it[1], status: "${it[2]}", elementType: DataModel.name, link:  "/classification/${it[1]}"]
         }
     }
 
-    def List<Classification> getClassifications(CatalogueElement element) {
+    def List<DataModel> getClassifications(CatalogueElement element) {
         if (!element) {
             return []
         }
@@ -266,9 +266,9 @@ class RelationshipService {
 
         RelationshipType classification = RelationshipType.readByName('classification')
 
-        Classification.executeQuery """
+        DataModel.executeQuery """
             select c
-            from Classification as c
+            from DataModel as c
             join c.outgoingRelationships as rel
             where rel.relationshipType.id = :classification
             and rel.destination.id = :elementId

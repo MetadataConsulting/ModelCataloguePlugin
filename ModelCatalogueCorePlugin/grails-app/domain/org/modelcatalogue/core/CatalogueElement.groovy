@@ -343,7 +343,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         listExtensions()?.find { it.name == name }
     }
 
-    List<Classification> getClassifications() {
+    List<DataModel> getClassifications() {
         relationshipService.getClassifications(this)
     }
 
@@ -387,7 +387,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
     
     void clearAssociationsBeforeDelete() {
-        for (Classification c in this.classifications) {
+        for (DataModel c in this.classifications) {
             this.removeFromClassifications(c)
         }
 

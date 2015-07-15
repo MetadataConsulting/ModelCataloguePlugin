@@ -58,7 +58,7 @@ Model catalogue core plugin (metadata registry)
 
 
     def doWithSpring = {
-        ModelCatalogueTypes.DATA_MODEL.implementation = Classification
+        ModelCatalogueTypes.DATA_MODEL.implementation = DataModel
         ModelCatalogueTypes.DATA_CLASS.implementation = DataClass
         ModelCatalogueTypes.DATA_ELEMENT.implementation = DataElement
         ModelCatalogueTypes.VALUE_DOMAIN.implementation = ValueDomain
@@ -137,8 +137,8 @@ Model catalogue core plugin (metadata registry)
             title "Data Models to Excel"
             headers  'Model Catalogue ID',  'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                    context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || Classification.isAssignableFrom(container.itemType))
-            } then { Classification classification ->
+                    context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || DataModel.isAssignableFrom(container.itemType))
+            } then { DataModel classification ->
                 [[ classification.modelCatalogueId,  classification.name, classification.description]]
             }
         }
@@ -307,27 +307,27 @@ Model catalogue core plugin (metadata registry)
         reportsRegistry.register {
             creates link
             title { "Inventory Report" }
-            type Classification
+            type DataModel
             link controller: 'dataModel', action: 'report', id: true
         }
 
         reportsRegistry.register {
             creates link
             title { "GE Inventory Report" }
-            type Classification
+            type DataModel
             link controller: 'dataModel', action: 'gereport', id: true
         }
 		
 		reportsRegistry.register {
 			creates link
 			title { "GE Inventory Report Docx" }
-			type Classification
+			type DataModel
 			link controller: 'dataModel', action: 'gereportDoc', id: true
 		}
 
         reportsRegistry.register {
             creates link
-            type Classification, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit
+            type DataModel, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit
             title { "Export to Catalogue XML" }
             link { CatalogueElement element ->
                 [url: element.getDefaultModelCatalogueId(false) + '?format=xml']

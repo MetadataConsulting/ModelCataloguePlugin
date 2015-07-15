@@ -18,7 +18,7 @@ class DashboardController {
 
         def model = [:]
 
-        List<Class> displayed = [Classification, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit, Asset]
+        List<Class> displayed = [DataModel, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit, Asset]
 
         for (Class type in displayed) {
             DetachedCriteria criteria = classificationService.classified(type)

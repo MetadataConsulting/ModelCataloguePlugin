@@ -158,7 +158,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 return
             }
 
-            Classification classification = otherSide.classification ? Classification.get(otherSide.classification.id) : null
+            DataModel classification = otherSide.classification ? DataModel.get(otherSide.classification.id) : null
 
             Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, classification) :  relationshipService.unlink(destination, source, relationshipType, classification)
             if (!old) {
@@ -200,13 +200,13 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             def newClassification = objectToBind['__classification']
             Long classificationId = newClassification instanceof Map ? newClassification.id : null
 
-            Classification classification = classificationId ? Classification.get(classificationId) : null
+            DataModel classification = classificationId ? DataModel.get(classificationId) : null
 
 
             def oldClassification = objectToBind['__oldClassification']
             Long oldClassificationId = oldClassification instanceof Map ? oldClassification.id : null
 
-            Classification oldClassificationInstance = oldClassificationId ? Classification.get(oldClassificationId) : null
+            DataModel oldClassificationInstance = oldClassificationId ? DataModel.get(oldClassificationId) : null
 
             if (classificationId && !classification) {
                 notFound()
@@ -690,7 +690,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             classification.removeFromClassifies instance
         }
         for (domain in classifications) {
-            Classification classification = DraftContext.preferDraft(Classification.get(domain.id as Long)) as Classification
+            DataModel classification = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
             if (!(classification.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
                 classification = elementService.createDraftVersion(classification, DraftContext.userFriendly())
             }

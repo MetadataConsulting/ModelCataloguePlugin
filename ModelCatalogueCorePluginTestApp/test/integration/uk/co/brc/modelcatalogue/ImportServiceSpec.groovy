@@ -27,7 +27,7 @@ class ImportServiceSpec extends IntegrationSpec {
         when:
         def core = models.find { it.name == "MAIN" }
         def patientIdentity = models.find { it.name == "PATIENT IDENTITY DETAILS" }
-        def NHICConceptualDomain = Classification.findByName("NHIC")
+        def NHICConceptualDomain = DataModel.findByName("NHIC")
         def indicatorCode = dataTypes.find { it.name == "NHS NUMBER STATUS INDICATOR CODE" }
         def valueDomain = valueDomains.find { it.name == "NHS_NUMBER_STATUS_INDICATOR_CODE" }
         def dataElement = dataElements.find { it.name == "NHS NUMBER STATUS INDICATOR CODE" }

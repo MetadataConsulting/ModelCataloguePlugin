@@ -6,7 +6,7 @@ import groovy.json.JsonSlurper
  * James Welch, A.Milward
  */
 import groovy.json.internal.LazyMap
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
@@ -17,7 +17,7 @@ class UmljService {
 
     static transactional = false
 
-    protected void importUmlDiagram(InputStream is, String name, Classification classification) {
+    protected void importUmlDiagram(InputStream is, String name, DataModel classification) {
         log.info "Parsing Umlj file for ${name}"
         def slurper = new JsonSlurper()
         def result  = slurper.parse(new BufferedReader(new InputStreamReader(is)))
@@ -26,7 +26,7 @@ class UmljService {
     }
 
 
-    protected void generateCatalogueElements(StarUMLDiagram umlFile, Classification clsf) {
+    protected void generateCatalogueElements(StarUMLDiagram umlFile, DataModel clsf) {
 
         CatalogueBuilder builder = new DefaultCatalogueBuilder(classificationService, elementService)
         builder.build {

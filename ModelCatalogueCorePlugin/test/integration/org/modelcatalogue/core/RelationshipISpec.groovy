@@ -116,7 +116,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         relationshipService.getClassifiedName(new DataClass(name: 'BLAH'))  == 'BLAH'
 
         when:
-        Classification classification = new Classification(name: "classy").save(failOnError: true)
+        DataModel classification = new DataModel(name: "classy").save(failOnError: true)
         DataClass model = new DataClass(name: "Supermodel").save(failOnError: true)
         model.addToClassifications(classification)
 
@@ -134,7 +134,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
         relationshipService.getDataModelsInfo(new DataClass(name: 'BLAH'))  == []
 
         when:
-        Classification classification = new Classification(name: "classy").save(failOnError: true)
+        DataModel classification = new DataModel(name: "classy").save(failOnError: true)
         DataClass model = new DataClass(name: "Supermodel").save(failOnError: true)
         model.addToClassifications(classification)
 
@@ -142,7 +142,7 @@ class RelationshipISpec extends AbstractIntegrationSpec{
 
         then:
         info == [
-                [name: classification.name, id: classification.id, elementType: Classification.name, link: "/classification/${classification.id}", status: 'DRAFT']
+                [name: classification.name, id: classification.id, elementType: DataModel.name, link: "/classification/${classification.id}", status: 'DRAFT']
         ]
 
         cleanup:

@@ -3,7 +3,7 @@ package org.modelcatalogue.core.util
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.collect.ImmutableSet
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
@@ -36,11 +36,11 @@ class ClassificationFilter {
         this.excludes = ImmutableSet.of()
     }
 
-    static ClassificationFilter includes(Iterable<Classification> classifications) {
+    static ClassificationFilter includes(Iterable<DataModel> classifications) {
         new ClassificationFilter(ImmutableSet.copyOf(classifications.collect { it.id }), ImmutableSet.of())
     }
 
-    static ClassificationFilter excludes(Iterable<Classification> classifications) {
+    static ClassificationFilter excludes(Iterable<DataModel> classifications) {
         new ClassificationFilter(ImmutableSet.of(), ImmutableSet.copyOf(classifications.collect { it.id }))
     }
 
@@ -48,15 +48,15 @@ class ClassificationFilter {
         new ClassificationFilter(unclassifiedOnly)
     }
 
-    static ClassificationFilter create(Iterable<Classification> includes, Iterable<Classification> excludes) {
+    static ClassificationFilter create(Iterable<DataModel> includes, Iterable<DataModel> excludes) {
         new ClassificationFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.copyOf(excludes.collect { it.id }))
     }
 
-    static ClassificationFilter includes(Classification... includes) {
+    static ClassificationFilter includes(DataModel... includes) {
         new ClassificationFilter(ImmutableSet.copyOf(includes.collect { it.id }), ImmutableSet.of())
     }
 
-    static ClassificationFilter excludes(Classification... excludes) {
+    static ClassificationFilter excludes(DataModel... excludes) {
         new ClassificationFilter(ImmutableSet.of(), ImmutableSet.copyOf(excludes.collect { it.id }))
     }
 
@@ -64,7 +64,7 @@ class ClassificationFilter {
         if (json.unclassifiedOnly) {
             return create(true)
         }
-        return create((json.includes ?: []).collect { Classification.get(it.id) }, (json.excludes ?: []).collect { Classification.get(it.id) })
+        return create((json.includes ?: []).collect { DataModel.get(it.id) }, (json.excludes ?: []).collect { DataModel.get(it.id) })
     }
 
     static ClassificationFilter from(Object other) {
@@ -119,16 +119,16 @@ class ClassificationFilter {
             user.ext.remove(UNCLASSIFIED_ONLY_KEY)
         }
 
-        user.filteredBy.each { Classification c ->
+        user.filteredBy.each { DataModel c ->
             user.removeFromFilteredBy(c)
         }
 
         for (Long id in includes) {
-            user.addToFilteredBy Classification.get(id)
+            user.addToFilteredBy DataModel.get(id)
         }
 
         for (Long id in excludes) {
-            user.addToFilteredBy Classification.get(id), metadata: [(EXCLUDE_KEY): 'true']
+            user.addToFilteredBy DataModel.get(id), metadata: [(EXCLUDE_KEY): 'true']
         }
 
         filtersCache.put(user.getId(), this)
@@ -137,8 +137,8 @@ class ClassificationFilter {
     Map<String, Object> toMap() {
         [
                 unclassifiedOnly: unclassifiedOnly,
-                includes: includes.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(Classification.get(it)) },
-                excludes: excludes.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(Classification.get(it)) }
+                includes: includes.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.get(it)) },
+                excludes: excludes.collect { CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.get(it)) }
         ]
     }
 

@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
 
 import groovy.xml.QName
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.dataarchitect.xsd.*
 
 class XSDImportService {
@@ -12,12 +12,12 @@ class XSDImportService {
     def classificationService
 
     def getClassifications(XsdSchema schema, String classificationName, Collection<QName> namespaces, String description) {
-        Collection<Classification> classifications = []
+        Collection<DataModel> classifications = []
 
         //match the conceptual domain
         classifications.add(matchOrCreateClassification(classificationName, schema.targetNamespace, description))
         for (namespace in namespaces) {
-            def classification = Classification.findByNamespace(namespace.namespaceURI)
+            def classification = DataModel.findByNamespace(namespace.namespaceURI)
             if (!classification) {
                 classifications = []
                 break
@@ -30,15 +30,15 @@ class XSDImportService {
     }
 
     def matchOrCreateClassification(String classificationName, String namespaceURI, String description) {
-        Classification classification = Classification.findByNamespace(namespaceURI)
-        if (!classification) classification = new Classification(name: classificationName, namespace: namespaceURI, description: description).save()
+        DataModel classification = DataModel.findByNamespace(namespaceURI)
+        if (!classification) classification = new DataModel(name: classificationName, namespace: namespaceURI, description: description).save()
         return classification
     }
 
-    Collection<Classification> createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationName, String conceptualDomainName, XsdSchema schema, Collection<QName> namespaces, Boolean createModelsForElements = false) {
+    Collection<DataModel> createAll(Collection<XsdSimpleType> simpleDataTypes, Collection<XsdComplexType> complexDataTypes, Collection<XsdElement> topLevelElements, String classificationName, String conceptualDomainName, XsdSchema schema, Collection<QName> namespaces, Boolean createModelsForElements = false) {
 
         try {
-            Collection<Classification> classifications = []
+            Collection<DataModel> classifications = []
             def description = null
             if (schema.targetNamespace) {
                 description = "Generated from Schema........ \r\n Info: \r\n targetNamespace: " + schema.targetNamespace + "\r\n"

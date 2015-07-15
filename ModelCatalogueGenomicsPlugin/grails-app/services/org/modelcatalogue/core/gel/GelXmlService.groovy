@@ -4,7 +4,7 @@ import grails.transaction.Transactional
 import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
 
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.DataClass
@@ -221,7 +221,7 @@ class GelXmlService {
     def printXSDModel(DataClass targetModel) {
         def valueDomains = new TreeSet({ k1, k2 -> k1.name+k1.id <=> k2.name+k1.id } as Comparator)
         StringWriter writer = new StringWriter()
-        def xmlSchema = Classification.findByName("XMLSchema")
+        def xmlSchema = DataModel.findByName("XMLSchema")
         def xml = new MarkupBuilder(writer)
         def childRelations = targetModel.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
         def subModels = listChildren(targetModel,[],true)

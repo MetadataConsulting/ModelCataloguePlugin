@@ -14,14 +14,14 @@ import org.hibernate.FetchMode
 import org.springframework.core.io.Resource
 
 
-class DataModelController extends AbstractCatalogueElementController<Classification> {
+class DataModelController extends AbstractCatalogueElementController<DataModel> {
 
 	DataModelController() {
-		super(Classification, false)
+		super(DataModel, false)
 	}
 
 	def report() {
-		Classification classification = Classification.get(params.id)
+		DataModel classification = DataModel.get(params.id)
 		if (!classification) {
 			notFound()
 			return
@@ -46,7 +46,7 @@ class DataModelController extends AbstractCatalogueElementController<Classificat
 
 
 	def gereportDoc() {
-		Classification classification = Classification.get(params.id)
+		DataModel classification = DataModel.get(params.id)
 		def models = getModelsForClassification(params.id as Long)
 		
 		if (!models) {
@@ -76,7 +76,7 @@ class DataModelController extends AbstractCatalogueElementController<Classificat
 	 * @param fileExtension only pdf and docx are supported
 	 * @return a byte array containing the result 
 	 */
-	private byte[] getClassificationReportAsByte(Classification classification, Collection models,String fileExtension) {
+	private byte[] getClassificationReportAsByte(DataModel classification, Collection models,String fileExtension) {
 		Resource resource=getApplicationContext().getResource('classpath:/jReports/ClassificationInventoryGe.jasper')
 		
 		JasperReport jasperReport = (JasperReport)JRLoader.loadObject(resource.inputStream)
@@ -142,7 +142,7 @@ class DataModelController extends AbstractCatalogueElementController<Classificat
 		true
 	}
 
-	protected bindRelations(Classification instance, boolean newVersion, Object objectToBind) {
+	protected bindRelations(DataModel instance, boolean newVersion, Object objectToBind) {
 		if (objectToBind.classifies != null) {
 			for (domain in instance.classifies.findAll { !(it.id in objectToBind.classifies*.id) }) {
 				instance.removeFromClassifies(domain)
@@ -164,8 +164,8 @@ class DataModelController extends AbstractCatalogueElementController<Classificat
 	}
 
 	@Override
-	protected Classification createResource() {
-		Classification instance = resource.newInstance()
+	protected DataModel createResource() {
+		DataModel instance = resource.newInstance()
 		bindData instance, getObjectToBind(), [include: includeFields]
 		instance
 	}

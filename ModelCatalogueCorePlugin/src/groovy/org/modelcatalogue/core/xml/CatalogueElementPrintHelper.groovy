@@ -22,7 +22,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (DataClass.isAssignableFrom(type)) {
             return new DataClassPrintHelper() as CatalogueElementPrintHelper<E>
         }
-        if (Classification.isAssignableFrom(type)) {
+        if (DataModel.isAssignableFrom(type)) {
             return new DataModelPrintHelper() as CatalogueElementPrintHelper<E>
         }
         throw new IllegalArgumentException("Not yet implemented for $type")
@@ -34,7 +34,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             elementName = helper.topLevelName
         }
 
-        if (element instanceof Classification) {
+        if (element instanceof DataModel) {
             if (context.currentClassification) {
                 theMkp."${elementName}"(ref(element, context)) {
                     processRelationshipMetadata(theMkp, context, rel)
@@ -58,7 +58,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             helper.processElements(theMkp, element, context, rel)
         }
 
-        if (element instanceof Classification) {
+        if (element instanceof DataModel) {
             context.currentClassification = null
         }
     }
@@ -204,7 +204,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (type == EnumeratedType) {
             return 'dataType'
         }
-        if (type in [Classification, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit]) {
+        if (type in [DataModel, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit]) {
             String simpleName = type.simpleName
             return simpleName[0].toLowerCase() + simpleName[1..-1]
         }

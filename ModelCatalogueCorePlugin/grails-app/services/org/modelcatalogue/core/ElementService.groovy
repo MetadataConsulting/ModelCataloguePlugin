@@ -118,7 +118,7 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    public <E extends CatalogueElement> E merge(E source, E destination, Set<Classification> classifications = new HashSet(source.classifications)) {
+    public <E extends CatalogueElement> E merge(E source, E destination, Set<DataModel> classifications = new HashSet(source.classifications)) {
         log.info "Merging $source into $destination"
         if (destination == null) return null
 
@@ -178,7 +178,7 @@ class ElementService implements Publisher<CatalogueElement> {
         destination.save(flush: true, validate: false)
 
 
-        for (Classification classification in new HashSet<Classification>(source.classifications)) {
+        for (DataModel classification in new HashSet<DataModel>(source.classifications)) {
             classification.removeFromClassifies(source)
             source.removeFromClassifications(classification)
             classification.addToClassifies(destination)

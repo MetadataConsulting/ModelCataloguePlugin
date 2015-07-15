@@ -4,7 +4,7 @@ import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.Legacy
 
-class Classification extends CatalogueElement {
+class DataModel extends CatalogueElement {
 
     /**
      * @deprecated use model catalogue id instead
@@ -25,6 +25,10 @@ class Classification extends CatalogueElement {
     }
 
     static transients = ['namespace']
+
+    static mapping = {
+        table 'classification'
+    }
 
     static relationships = [
             outgoing: [classification: 'classifies', classificationFilter: 'usedAsFilterBy']

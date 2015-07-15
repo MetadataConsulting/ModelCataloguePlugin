@@ -13,7 +13,7 @@ import org.modelcatalogue.core.util.Legacy
 @Log4j
 class CatalogueElementProxyRepository {
 
-    static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, Classification]
+    static Set<Class> HAS_UNIQUE_NAMES = [MeasurementUnit, DataModel]
     static final String AUTOMATIC_NAME_FLAG = '__automatic_name__'
     static final String AUTOMATIC_DESCRIPTION_FLAG = '__automatic_description__'
     private static final Map LATEST = [sort: 'versionNumber', order: 'desc', max: 1]
@@ -276,14 +276,14 @@ class CatalogueElementProxyRepository {
         if (type in HAS_UNIQUE_NAMES) {
             return tryFindWithClassification(type, null, name, id)
         }
-        tryFindWithClassification(type, Classification.findAllByName(classificationName?.toString()), name, id)
+        tryFindWithClassification(type, DataModel.findAllByName(classificationName?.toString()), name, id)
     }
 
     protected <T extends CatalogueElement> T tryFindUnclassified(Class<T> type, Object name, Object id) {
         tryFindWithClassification(type, null, name, id)
     }
 
-    protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<Classification> classifications, Object name, Object id) {
+    protected <T extends CatalogueElement> T tryFindWithClassification(Class<T> type, List<DataModel> classifications, Object name, Object id) {
         if (id) {
             T result = findById(type, id)
             if (result) {

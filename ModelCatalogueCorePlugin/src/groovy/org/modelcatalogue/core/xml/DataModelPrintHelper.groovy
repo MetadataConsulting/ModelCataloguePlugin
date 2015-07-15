@@ -4,7 +4,7 @@ import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.ClassificationFilter
 
-class DataModelPrintHelper extends CatalogueElementPrintHelper<Classification> {
+class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
 
     @Override
     String getTopLevelName() {
@@ -12,7 +12,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<Classification> {
     }
 
     @Override
-    void processElements(Object theMkp, Classification element, PrintContext context, Relationship rel) {
+    void processElements(Object theMkp, DataModel element, PrintContext context, Relationship rel) {
         super.processElements(theMkp, element, context, rel)
 
         for (CatalogueElement other in context.modelService.getTopLevelModels(ClassificationFilter.includes(element), [:]).items) {
@@ -29,7 +29,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<Classification> {
     }
 
 
-    private static <E extends CatalogueElement> List<E> allClassified(Class<E> type, Classification classification, PrintContext context) {
+    private static <E extends CatalogueElement> List<E> allClassified(Class<E> type, DataModel classification, PrintContext context) {
         DetachedCriteria<E> criteria = new DetachedCriteria<E>(type).build {
             'in'('status', [org.modelcatalogue.core.api.ElementStatus.DEPRECATED, org.modelcatalogue.core.api.ElementStatus.FINALIZED, org.modelcatalogue.core.api.ElementStatus.DRAFT])
             not {

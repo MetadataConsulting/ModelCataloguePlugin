@@ -120,7 +120,7 @@ class DataImportController  {
                     OboLoader loader = new OboLoader(builder)
                     idpattern = idpattern ?: "${grailsApplication.config.grails.serverURL}/catalogue/ext/${OboLoader.OBO_ID}/:id".toString().replace(':id', '$id')
                     loader.load(inputStream, name, idpattern)
-                    Classification classification = builder.created.find { it.instanceOf(Classification) } as Classification
+                    DataModel classification = builder.created.find { it.instanceOf(DataModel) } as DataModel
                     Asset updated = finalizeAsset(id)
                     classifyAsset(updated, classification)
                 } catch (Exception e) {
@@ -141,7 +141,7 @@ class DataImportController  {
                 try {
                     Set<CatalogueElement> created = loincImportService.serviceMethod(inputStream)
                     Asset updated = finalizeAsset(id)
-                    Classification classification = created.find { it instanceof Classification } as Classification
+                    DataModel classification = created.find { it instanceof DataModel } as DataModel
                     classifyAsset(updated, classification)
                 } catch (Exception e) {
                     logError(id, e)
@@ -161,7 +161,7 @@ class DataImportController  {
                 try {
                     Set<CatalogueElement> created = initCatalogueService.importMCFile(inputStream)
                     Asset updated = finalizeAsset(id)
-                    Classification classification = created.find { it instanceof Classification } as Classification
+                    DataModel classification = created.find { it instanceof DataModel } as DataModel
                     classifyAsset(updated, classification)
                 } catch (Exception e) {
                     logError(id, e)
@@ -180,8 +180,8 @@ class DataImportController  {
 
             executeInBackground(id, "Imported from Style UML")  {
                 try {
-                    Classification classification = Classification.findByName(name)
-                    if(!classification) classification =  new Classification(name: name).save(flush:true, failOnError:true)
+                    DataModel classification = DataModel.findByName(name)
+                    if(!classification) classification =  new DataModel(name: name).save(flush:true, failOnError:true)
                     umljService.importUmlDiagram(inputStream, name, classification)
                     Asset updated = Asset.get(id)
                     updated.status = ElementStatus.FINALIZED
@@ -215,7 +215,7 @@ class DataImportController  {
         respond "errors": errors
     }
 
-    protected static classifyAsset(Asset asset, Classification classification){
+    protected static classifyAsset(Asset asset, DataModel classification){
         if (classification) {
             asset.addToClassifications(classification, skipUniqueChecking: true)
         }

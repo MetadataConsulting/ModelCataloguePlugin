@@ -13,8 +13,8 @@ class ClassificationServiceSpec extends IntegrationSpec {
     def initCatalogueService
     def dataClassService
 
-    Classification classification1
-    Classification classification2
+    DataModel classification1
+    DataModel classification2
 
     DataClass model0
     DataClass model1
@@ -22,8 +22,8 @@ class ClassificationServiceSpec extends IntegrationSpec {
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
-        classification1 = new Classification(name: "Test Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
-        classification2 = new Classification(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
+        classification1 = new DataModel(name: "Test Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
+        classification2 = new DataModel(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
         model0 = new DataClass(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
         model1 = new DataClass(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
         model1.addToClassifications(classification1)

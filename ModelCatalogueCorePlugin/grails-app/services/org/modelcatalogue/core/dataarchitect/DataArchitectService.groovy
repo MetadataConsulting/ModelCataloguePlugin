@@ -482,7 +482,7 @@ class DataArchitectService {
 
     private void generateDeepClassification(result) {
         for (Object[] row in result) {
-            Classification classification = row[0] as Classification
+            DataModel classification = row[0] as DataModel
             CatalogueElement element = row[1] as CatalogueElement
 
             Batch batch = Batch.findOrSaveByName("Deep Classify '$classification.name'")

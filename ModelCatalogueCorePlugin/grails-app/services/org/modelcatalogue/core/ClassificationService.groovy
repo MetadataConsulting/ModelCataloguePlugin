@@ -38,7 +38,7 @@ class ClassificationService {
     }
 
     public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, ClassificationFilter classificationsFilter = classificationsInUse) {
-        if (criteria.persistentEntity.javaClass == Classification) {
+        if (criteria.persistentEntity.javaClass == DataModel) {
             return criteria
         }
 

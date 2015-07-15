@@ -75,7 +75,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
 
         String query = "%$params.search%"
 
-        if (Classification.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
+        if (DataModel.isAssignableFrom(resource) || MeasurementUnit.isAssignableFrom(resource)) {
             DetachedCriteria criteria = new DetachedCriteria(resource)
             criteria.or {
                 ilike('name', query)

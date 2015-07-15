@@ -135,8 +135,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "merge"() {
-        Classification sact = new Classification(name: "SACT").save(failOnError: true)
-        Classification cosd = new Classification(name: "COSD").save(failOnError: true)
+        DataModel sact = new DataModel(name: "SACT").save(failOnError: true)
+        DataModel cosd = new DataModel(name: "COSD").save(failOnError: true)
 
         ValueDomain domain = new ValueDomain(name: "merger test domain").save(failOnError: true)
 

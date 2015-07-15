@@ -226,7 +226,7 @@ enum ChangeType {
             CatalogueElement source = CatalogueElement.get(rel.source.id)
             CatalogueElement destination = CatalogueElement.get(rel.destination.id)
             RelationshipType type = RelationshipType.readByName(rel.type.name)
-            Classification classification = rel.classification ? Classification.get(rel.classification.id) : null
+            DataModel classification = rel.classification ? DataModel.get(rel.classification.id) : null
             Relationship newOne = source.relationshipService.link(source, destination, type, classification)
             if (!newOne) {
                 return false

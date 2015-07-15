@@ -2,7 +2,7 @@ package org.modelcatalogue.core.audit
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.ClassificationFilter
 import org.modelcatalogue.core.util.marshalling.JsonMarshallingCustomizer
@@ -19,7 +19,7 @@ class AuditJsonMarshallingCustomizer extends JsonMarshallingCustomizer {
             result.history = [count: el.countVersions(), itemType: el.getClass().name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/history"]
             result.changes = [count: auditService.getChanges([:], el).total, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/changes"]
         }
-        if (el instanceof Classification) {
+        if (el instanceof DataModel) {
             result.activity = [count: auditService.getGlobalChanges([:], ClassificationFilter.includes(el)).total, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/activity"]
         } else if (el instanceof User) {
             result.activity = [count: auditService.getChangesForUser([:], el).total, itemType: Change, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/activity"]

@@ -2,7 +2,6 @@ package org.modelcatalogue.core.util
 
 import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 

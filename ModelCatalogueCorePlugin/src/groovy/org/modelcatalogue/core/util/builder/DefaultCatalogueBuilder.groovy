@@ -115,7 +115,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to classification specified by the parameters map and the DSL closure
      */
     void dataModel(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<Classification> classification = createProxy(Classification, parameters, null, true)
+        CatalogueElementProxy<DataModel> classification = createProxy(DataModel, parameters, null, true)
 
         context.withNewContext classification, c
 
@@ -167,7 +167,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to model specified by the parameters map and the DSL closure
      */
     void dataClass(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<DataClass> model = createProxy(DataClass, parameters, Classification, isUnderControlIfSameClassification(parameters))
+        CatalogueElementProxy<DataClass> model = createProxy(DataClass, parameters, DataModel, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext model, c
         context.withContextElement(DataClass) { ignored, Closure relConf ->
@@ -580,10 +580,10 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @param element element to be classified
      */
     private <T extends CatalogueElement, A extends CatalogueElementProxy<T>> void classifyIfNeeded(A element) {
-        if (Classification.isAssignableFrom(element.domain)) {
+        if (DataModel.isAssignableFrom(element.domain)) {
             return
         }
-        context.withContextElement(Classification) {
+        context.withContextElement(DataModel) {
             element.addToPendingRelationships(new RelationshipProxy('classification', it, element, [:]))
         }
     }
@@ -678,7 +678,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             return true
         }
         boolean ret = true
-        context.withContextElement(Classification) {
+        context.withContextElement(DataModel) {
             ret = it.name == parameters.classification?.toString()
         }
         return ret

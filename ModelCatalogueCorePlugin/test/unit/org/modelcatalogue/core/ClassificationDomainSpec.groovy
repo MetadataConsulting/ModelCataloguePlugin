@@ -7,7 +7,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 05/02/2014.
  */
-@Mock([Classification, DataElement, DataClass, CatalogueElement])
+@Mock([DataModel, DataElement, DataClass, CatalogueElement])
 class ClassificationDomainSpec extends Specification {
 
 
@@ -17,11 +17,11 @@ class ClassificationDomainSpec extends Specification {
 
         expect:
 
-        Classification.list().isEmpty()
+        DataModel.list().isEmpty()
 
         when:
 		args.modelCatalogueId = "http://example.com/123"
-        def conceptInstance = new Classification(args)
+        def conceptInstance = new DataModel(args)
 
         conceptInstance.save()
 

@@ -101,7 +101,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
     @Ignore
     def "print xml schema"() {
         expect:
-        similar Classification.findByName('XMLSchema'), 'xmlschema.catalogue.xml'
+        similar DataModel.findByName('XMLSchema'), 'xmlschema.catalogue.xml'
     }
 
 
@@ -131,7 +131,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         }
     }
 
-    private Classification getTransportation() {
+    private DataModel getTransportation() {
         build {
             classification (name: "Transportation", id: "http://www.example.com/datasets/Transportation") {
                 dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {

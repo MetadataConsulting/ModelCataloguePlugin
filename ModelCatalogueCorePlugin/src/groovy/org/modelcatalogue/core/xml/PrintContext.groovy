@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.xml
 
 import org.modelcatalogue.core.CatalogueElement
-import org.modelcatalogue.core.Classification
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.ClassificationService
 import org.modelcatalogue.core.DataClassService
 
@@ -14,7 +14,7 @@ class PrintContext {
     boolean idIncludeVersion
     boolean noHref
 
-    Classification currentClassification
+    DataModel currentClassification
     Set<Long> idsOfPrinted = []
 
     Set<String> typesUsed = new TreeSet<String>()

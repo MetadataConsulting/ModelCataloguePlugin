@@ -30,13 +30,13 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         expect:
-        Classification.findByName('TestSchema')
-        Classification.findByName('TestSchema').description == 'This is a test schema which is just for test purposes!'
-        Classification.findByModelCatalogueId('http://www.w3.org/2001/TestSchema')
+        DataModel.findByName('TestSchema')
+        DataModel.findByName('TestSchema').description == 'This is a test schema which is just for test purposes!'
+        DataModel.findByModelCatalogueId('http://www.w3.org/2001/TestSchema')
     }
 
     def "reuse existing classification by name"() {
-        Classification c = new Classification(name: 'ExistingSchema', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
+        DataModel c = new DataModel(name: 'ExistingSchema', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
             classification(name: 'ExistingSchema', namespace: 'http://www.w3.org/2001/ExistingSchema') {
@@ -51,7 +51,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuse existing classification by id"() {
-        Classification c = new Classification(name: 'SchemaWithId', modelCatalogueId: 'http://www.example.com/SWI').save(failOnError: true)
+        DataModel c = new DataModel(name: 'SchemaWithId', modelCatalogueId: 'http://www.example.com/SWI').save(failOnError: true)
 
         build {
             classification(name: 'NotUniqueName', id: 'http://www.example.com/SWI') {
@@ -235,7 +235,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuses existing value domain with given name in classification"() {
-        Classification cls  = new Classification(name: 'Some').save(failOnError: true)
+        DataModel cls  = new DataModel(name: 'Some').save(failOnError: true)
         ValueDomain domain1 = new ValueDomain(name: 'SomeDomain').save(failOnError: true)
         ValueDomain domain2 = new ValueDomain(name: 'SomeDomain').save(failOnError: true)
 
@@ -314,7 +314,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "reuses existing data type with given name"() {
-        Classification cls  = new Classification(name: 'Some').save(failOnError: true)
+        DataModel cls  = new DataModel(name: 'Some').save(failOnError: true)
         DataType dt1 = new DataType(name: 'SomeType').save(failOnError: true)
         DataType dt2 = new DataType(name: 'SomeType').save(failOnError: true)
 
@@ -376,7 +376,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             }
         }
 
-        Classification schema       = Classification.findByName('TestSchema')
+        DataModel schema       = DataModel.findByName('TestSchema')
         ValueDomain stringDomain    = ValueDomain.findByName('test:string domain')
         ValueDomain tokenDomain     = ValueDomain.findByName('test:token domain')
         DataType stringType         = DataType.findByName('test:string')
@@ -504,9 +504,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         DataClass.findByName("ModelNV1")?.modelCatalogueId  == "http://www.example.com/models/ModelNV1"
 
         and: "there are two NewVersion1 classifications at the moment"
-        Classification.countByName('NewVersion1')                                   == 2
-        Classification.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.DRAFT)     == 1
-        Classification.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.FINALIZED) == 1
+        DataModel.countByName('NewVersion1')                                   == 2
+        DataModel.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.DRAFT)     == 1
+        DataModel.countByNameAndStatus('NewVersion1', org.modelcatalogue.core.api.ElementStatus.FINALIZED) == 1
 
 
     }
@@ -683,7 +683,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             }
         }
 
-        Classification c4rmc = Classification.findByName('C4RMC')
+        DataModel c4rmc = DataModel.findByName('C4RMC')
         DataClass c4rmcParent = DataClass.findByName('C4RMC Parent')
         then:
         c4rmc
