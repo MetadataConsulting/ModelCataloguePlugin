@@ -4,11 +4,11 @@ import grails.gorm.DetachedCriteria
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.util.ClassificationFilter
 
-class ClassificationPrintHelper extends CatalogueElementPrintHelper<Classification> {
+class DataModelPrintHelper extends CatalogueElementPrintHelper<Classification> {
 
     @Override
     String getTopLevelName() {
-        "classification"
+        "dataModel"
     }
 
     @Override

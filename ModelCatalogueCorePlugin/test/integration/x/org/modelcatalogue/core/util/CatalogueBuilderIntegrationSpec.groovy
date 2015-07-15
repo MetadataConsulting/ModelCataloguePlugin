@@ -610,8 +610,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "order from builder is persisted"() {
         when:
         build {
-            classification (name: 'Order Test') {
-                model (name: 'OT Parent') {
+            dataModel (name: 'Order Test') {
+                dataClass (name: 'OT Parent') {
                     dataElement (name: 'OT Child 002')
                     dataElement (name: 'OT Child 001')
                     dataElement (name: 'OT Child 004')
@@ -630,8 +630,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when:
         build {
-            classification (name: 'Order Test') {
-                model (name: 'OT Parent') {
+            dataModel (name: 'Order Test') {
+                dataClass (name: 'OT Parent') {
                     dataElement (name: 'OT Child 001')
                     dataElement (name: 'OT Child 002')
                     dataElement (name: 'OT Child 003')

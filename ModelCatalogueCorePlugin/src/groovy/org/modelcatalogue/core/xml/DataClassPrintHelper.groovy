@@ -1,17 +1,13 @@
 package org.modelcatalogue.core.xml
 
-import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.Model
 import org.modelcatalogue.core.Relationship
 
-/**
- * Created by ladin on 15.01.15.
- */
-class ModelPrintHelper extends CatalogueElementPrintHelper<Model> {
+class DataClassPrintHelper extends CatalogueElementPrintHelper<Model> {
 
     @Override
     String getTopLevelName() {
-        "model"
+        "dataClass"
     }
 
     @Override

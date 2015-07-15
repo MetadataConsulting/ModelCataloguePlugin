@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.1.2/metadataregistry.xsd">
-    <classification name="XMLSchema" id="http://www.w3.org/2001/XMLSchema">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+    <dataModel name="XMLSchema" id="http://www.w3.org/2001/XMLSchema">
         <description>XML Schema provides standard types for describing your own XML formats</description>
         <valueDomain name="xs:boolean" id="http://www.w3.org/2001/XMLSchema#boolean">
             <description>Binary-valued logic legal literals</description>
@@ -264,5 +264,5 @@
                 <description>NOTATION represents the NOTATION attribute type from [XML 1.0 (Second Edition)]. The value space of NOTATION is the set of QNames of notations declared in the current schema.</description>
             </dataType>
         </valueDomain>
-    </classification>
+    </dataModel>
 </catalogue>

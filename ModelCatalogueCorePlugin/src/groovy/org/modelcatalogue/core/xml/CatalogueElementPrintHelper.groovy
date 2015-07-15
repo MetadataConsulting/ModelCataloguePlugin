@@ -20,10 +20,10 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             return new DataElementPrintHelper() as CatalogueElementPrintHelper<E>
         }
         if (Model.isAssignableFrom(type)) {
-            return new ModelPrintHelper() as CatalogueElementPrintHelper<E>
+            return new DataClassPrintHelper() as CatalogueElementPrintHelper<E>
         }
         if (Classification.isAssignableFrom(type)) {
-            return new ClassificationPrintHelper() as CatalogueElementPrintHelper<E>
+            return new DataModelPrintHelper() as CatalogueElementPrintHelper<E>
         }
         throw new IllegalArgumentException("Not yet implemented for $type")
     }
