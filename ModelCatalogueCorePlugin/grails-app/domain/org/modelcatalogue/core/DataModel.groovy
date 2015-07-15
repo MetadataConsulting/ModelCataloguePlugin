@@ -37,7 +37,7 @@ class DataModel extends CatalogueElement {
     @Override
     CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain.finalize(this)
-        .add(this.classifies)
+        .add(this.defines)
         .run(publisher)
     }
 
