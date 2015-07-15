@@ -47,4 +47,5 @@ angular.module('mc.core.ui.bs.modalPromptModel', ['mc.util.messages']).config ['
   ]
 
   messagesProvider.setPromptFactory 'edit-model', factory
+  messagesProvider.setPromptFactory 'edit-dataClass', factory
 ]
