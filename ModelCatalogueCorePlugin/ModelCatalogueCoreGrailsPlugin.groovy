@@ -134,7 +134,7 @@ Model catalogue core plugin (metadata registry)
         XLSXListRenderer xlsxListRenderer = ctx.getBean(XLSXListRenderer)
 
         xlsxListRenderer.registerRowWriter ('Classifications'){
-            title "Classifications to Excel"
+            title "Data Models to Excel"
             headers  'Model Catalogue ID',  'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
                     context.actionName in [null, 'index', 'search', 'incoming', 'outgoing'] && (!container.itemType || Classification.isAssignableFrom(container.itemType))
@@ -144,7 +144,7 @@ Model catalogue core plugin (metadata registry)
         }
 
         xlsxListRenderer.registerRowWriter ('DataTypes') {
-            title "DataTypes to Excel"
+            title "Data Types to Excel"
             headers 'Model Catalogue ID', 'Name', 'Enumerations', 'Value Domains'
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'properties'] && (!container.itemType || DataType.isAssignableFrom(container.itemType))
@@ -155,8 +155,8 @@ Model catalogue core plugin (metadata registry)
 
 
         xlsxListRenderer.registerRowWriter ('ValueDomains') {
-            title "ValueDomains to Excel"
-            headers 'Model Catalogue ID', 'Name', 'Classifications', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
+            title "Value Domains to Excel"
+            headers 'Model Catalogue ID', 'Name', 'Data Models', 'Unit of Measurement', 'Rules', 'Data Type Model Catalogue ID', 'DataType Name', 'Data Type Enumeration'
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'valueDomains'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
             } then { ValueDomain valueDomain ->
@@ -247,20 +247,20 @@ Model catalogue core plugin (metadata registry)
         xlsxListRenderer.registerRowWriter('NHIC') {
             title "Data Elements to Excel"
             append metadata
-            headers "Classification",
-                    "Parent Model Unique Code",
-                    "Parent Model",
-                    "Model Unique Code",
-                    "Model",
+            headers "Data Model",
+                    "Parent Data Class Unique Code",
+                    "Parent Data Class",
+                    "Data Class Unique Code",
+                    "Data Class",
                     "Data Item Unique Code",
                     "Data Item Name",
                     "Data Item Description",
-                    "Value Domain Classification",
+                    "Value Domain Data Model",
                     "Value Domain Unique Code",
                     "Value Domain",
                     "Measurement Unit",
                     "Measurement Unit Symbol",
-                    "Data Type Classification",
+                    "Data Type Data Model",
                     "Data Type Unique Code",
                     "Data Type",
                     "Metadata"
@@ -308,21 +308,21 @@ Model catalogue core plugin (metadata registry)
             creates link
             title { "Inventory Report" }
             type Classification
-            link controller: 'classification', action: 'report', id: true
+            link controller: 'dataModel', action: 'report', id: true
         }
 
         reportsRegistry.register {
             creates link
             title { "GE Inventory Report" }
             type Classification
-            link controller: 'classification', action: 'gereport', id: true
+            link controller: 'dataModel', action: 'gereport', id: true
         }
 		
 		reportsRegistry.register {
 			creates link
 			title { "GE Inventory Report Docx" }
 			type Classification
-			link controller: 'classification', action: 'gereportDoc', id: true
+			link controller: 'dataModel', action: 'gereportDoc', id: true
 		}
 
         reportsRegistry.register {
