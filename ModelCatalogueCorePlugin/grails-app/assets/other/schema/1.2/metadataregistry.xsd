@@ -303,17 +303,7 @@
             <xs:element name="skipDraft" type="xs:boolean" minOccurs="0" />
             <xs:element name="copyRelationships" type="xs:boolean" minOccurs="0" />
             <xs:element name="createAutomatically" type="mdr:CatalogueElementType" minOccurs="0" maxOccurs="unbounded" />
-            <!-- there can be more than one element for basic types but not relationship types -->
-            <xs:choice maxOccurs="unbounded" minOccurs="0">
-                <xs:element name="dataModel"        type="mdr:DataModel"       />
-                <xs:element name="dataClass"        type="mdr:DataClass"       />
-                <xs:element name="dataElement"      type="mdr:DataElement"     />
-                <xs:element name="valueDomain"      type="mdr:ValueDomain"     />
-                <xs:element name="dataType"         type="mdr:DataType"        />
-                <xs:element name="measurementUnit"  type="mdr:MeasurementUnit" />
-            </xs:choice>
-            <!-- there must be at least one element inside the catalogue including relationship types-->
-            <xs:choice maxOccurs="1">
+            <xs:choice maxOccurs="unbounded">
                 <xs:element name="dataModel"         type="mdr:DataModel"       />
                 <xs:element name="dataClass"         type="mdr:DataModel"       />
                 <xs:element name="dataElement"       type="mdr:DataElement"     />
