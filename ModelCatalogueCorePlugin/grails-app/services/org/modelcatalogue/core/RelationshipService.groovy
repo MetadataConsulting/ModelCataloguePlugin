@@ -216,7 +216,7 @@ class RelationshipService {
             return element.name
         }
 
-        RelationshipType classification = RelationshipType.readByName('classification')
+        RelationshipType classification = RelationshipType.definitionType
 
         String classifications = Relationship.executeQuery("""
             select r.source.name
@@ -242,7 +242,7 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.readByName('classification')
+        RelationshipType classification = RelationshipType.definitionType
 
         Relationship.executeQuery("""
             select r.source.name, r.source.id, r.source.status
@@ -264,7 +264,7 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.readByName('classification')
+        RelationshipType classification = RelationshipType.definitionType
 
         DataModel.executeQuery """
             select c

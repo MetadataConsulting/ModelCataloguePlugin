@@ -29,16 +29,16 @@ class CopyAssociationsAndRelationships {
 
 
     void copyClassifications(Set<String> createdRelationshipHashes) {
-        relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.classificationType) { Relationship r ->
+        relationshipService.eachRelationshipPartitioned(RelationshipDirection.INCOMING, element, RelationshipType.definitionType) { Relationship r ->
             CatalogueElement source = DraftContext.preferDraft(r.source)
 
-            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.classificationType)
+            String hash = DraftContext.hashForRelationship(source, draft, RelationshipType.definitionType)
 
             if (hash in createdRelationshipHashes) {
                 return
             }
 
-            RelationshipDefinitionBuilder definitionBuilder = RelationshipDefinition.create(source, draft, RelationshipType.classificationType)
+            RelationshipDefinitionBuilder definitionBuilder = RelationshipDefinition.create(source, draft, RelationshipType.definitionType)
 
             definitionBuilder
                     .withArchived(r.archived)

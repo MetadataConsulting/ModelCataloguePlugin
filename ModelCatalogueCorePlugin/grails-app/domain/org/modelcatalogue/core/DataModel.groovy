@@ -31,7 +31,7 @@ class DataModel extends CatalogueElement {
     }
 
     static relationships = [
-            outgoing: [classification: 'classifies', classificationFilter: 'usedAsFilterBy']
+            outgoing: [definition: 'defines', classificationFilter: 'usedAsFilterBy']
     ]
 
     @Override

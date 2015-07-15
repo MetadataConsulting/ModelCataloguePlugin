@@ -21,7 +21,7 @@ class DataClassService {
     ListWithTotalAndType<DataClass> getTopLevelModels(DataModelFilter classifications, Map params) {
         RelationshipType hierarchy      = RelationshipType.hierarchyType
         ElementStatus status            = ElementService.getStatusFromParams(params)
-        RelationshipType classification = RelationshipType.classificationType
+        RelationshipType classification = RelationshipType.definitionType
 
         DetachedCriteria<DataClass> criteria = new DetachedCriteria<DataClass>(DataClass)
 

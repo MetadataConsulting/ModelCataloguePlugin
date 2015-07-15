@@ -5,6 +5,8 @@ import com.google.common.cache.CacheBuilder
 import com.google.common.util.concurrent.UncheckedExecutionException
 import grails.util.GrailsNameUtils
 import org.apache.log4j.Logger
+import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
+import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 import java.util.concurrent.Callable
@@ -165,8 +167,8 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         readByName("containment")
     }
 
-    static getClassificationType() {
-        readByName("classification")
+    static getDefinitionType() {
+        readByName("definition")
     }
 
     static getFavouriteType() {
@@ -194,6 +196,11 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
     static readByName(String name) {
+        // TODO: temporary give warning if 'classification' type is requested
+        if (name == 'classification') {
+            Logger.getLogger(RelationshipType).warn extractFormattedException(new IllegalArgumentException("Relationship 'classification' was replaced by 'definition'. Update your code properly!"))
+            return definitionType
+        }
         try {
             Long id = typesCache.get(name, { ->
                 RelationshipType type = RelationshipType.findByName(name, [cache: true, readOnly: true])
@@ -259,6 +266,13 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
             }
         }
         newParts.join('')
+    }
+
+    static String extractFormattedException(Throwable exception) {
+        String exceptionMsg = exception.message + "\n"
+        StackTraceFilterer stackTraceFilterer = new DefaultStackTraceFilterer()
+        exceptionMsg += stackTraceFilterer.filter(exception).stackTrace.join('\n')
+        return exceptionMsg
     }
 }
 

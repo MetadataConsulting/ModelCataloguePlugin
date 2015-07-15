@@ -584,7 +584,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             return
         }
         context.withContextElement(DataModel) {
-            element.addToPendingRelationships(new RelationshipProxy('classification', it, element, [:]))
+            element.addToPendingRelationships(new RelationshipProxy('definition', it, element, [:]))
         }
     }
 
@@ -662,7 +662,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         parameters.each { String key, Object value ->
             // these are specials handled directly
-            if (key in ['id', 'classification', 'name']) {
+            if (key in ['id', 'classification', 'dataModel',  'name']) {
                 return
             }
             element.setParameter(key, value)
@@ -674,12 +674,12 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     }
 
     private boolean isUnderControlIfSameClassification(Map<String, Object> parameters) {
-        if (!parameters.classification) {
+        if (!parameters.dataModel && !parameters.classification) {
             return true
         }
         boolean ret = true
         context.withContextElement(DataModel) {
-            ret = it.name == parameters.classification?.toString()
+            ret = it.name == (parameters.dataModel ?: parameters.classification)?.toString()
         }
         return ret
     }
