@@ -1,5 +1,3 @@
-package org.modelcatalogue.core.a
-
 classification name: 'MET-523', {
     model name: 'MET-523.M1', {
         dataElement name: 'MET-523.M1.DE1', {
