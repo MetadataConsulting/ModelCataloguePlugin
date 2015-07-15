@@ -393,8 +393,6 @@ class CatalogueElementProxyRepository {
 
 
     public <T extends CatalogueElement,U extends CatalogueElement> Relationship resolveRelationship(RelationshipProxy<T,U> proxy) {
-        long startNano = System.nanoTime()
-
         RelationshipType type = RelationshipType.readByName(proxy.relationshipTypeName)
 
         T sourceElement = proxy.source.resolve()
@@ -429,12 +427,6 @@ class CatalogueElementProxyRepository {
         Relationship relationship = sourceElement.createLinkTo(destinationElement, type, archived: proxy.archived, resetIndices: true, skipUniqueChecking: proxy.source.new || proxy.destination.new)
 
         createdRelationships[hash] = relationship
-
-        long endNano = System.nanoTime()
-
-        if ((endNano - startNano) < 1000) {
-            Thread.sleep(0.longValue(), (1000 - (endNano - startNano)).intValue())
-        }
 
         return relationship
     }

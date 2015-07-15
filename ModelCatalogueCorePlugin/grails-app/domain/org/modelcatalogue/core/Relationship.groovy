@@ -26,6 +26,13 @@ import org.modelcatalogue.core.util.OrderedMap
 
 class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalogue.core.api.Relationship {
 
+    // when the relationship class is first loaded set the next index to current time in milliseconds
+    static long nextIndex = System.currentTimeMillis()
+
+    static long getNextIndex() {
+        ++nextIndex;
+    }
+
     def auditService
 
     CatalogueElement source
@@ -35,8 +42,8 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     Classification classification
 
-    Long outgoingIndex = System.currentTimeMillis()
-    Long incomingIndex = System.currentTimeMillis()
+    Long outgoingIndex
+    Long incomingIndex
 
     /*
      * Reordeing bidirectional relationships is not supported as the combined index is
@@ -44,7 +51,12 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
      * and change from the other side would change the view from the opposite side
      */
     @Deprecated
-    Long combinedIndex = System.currentTimeMillis()
+    Long combinedIndex
+
+    // init the indexes
+    {
+        resetIndexes()
+    }
 
     static hasMany = [extensions: RelationshipMetadata]
     static transients = ['ext']
@@ -84,9 +96,10 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     }
 
     void resetIndexes() {
-        outgoingIndex = System.currentTimeMillis()
-        incomingIndex = System.currentTimeMillis()
-        combinedIndex = System.currentTimeMillis()
+        long nextIndex = getNextIndex()
+        outgoingIndex = nextIndex
+        incomingIndex = nextIndex
+        combinedIndex = nextIndex
     }
 
     @Override
