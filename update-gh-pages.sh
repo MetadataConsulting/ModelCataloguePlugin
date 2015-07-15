@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$TEST_SUITE" = "app_functional" ] ; then
+if [ "$TEST_SUITE" = "app_functional" ] || [ "$TEST_SUITE" = "app_functional_a" ]|| [ "$TEST_SUITE" = "app_functional_b" ]|| [ "$TEST_SUITE" = "app_functional_c" ] ; then
   echo "Starting to update gh-pages\n"
 
   #copy data we're interested in to other place
