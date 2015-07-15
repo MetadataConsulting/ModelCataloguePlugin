@@ -86,7 +86,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 }
 
                 if (controllerName in ['dataModel', 'classification']) {
-                    "/api/modelCatalogue/core/$elementName/$id/classifies"(controller: controllerName, action: 'classifies', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/defines"(controller: controllerName, action: 'defines', method: HttpMethod.GET)
                     // /ModelCatalogueCorePluginTestApp/api/modelCatalogue/core/classification/24/report
                     "/api/modelCatalogue/core/$elementName/$id/report"(controller: controllerName, action: 'report', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/gereport"(controller: controllerName, action: 'gereport', method: HttpMethod.GET)

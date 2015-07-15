@@ -387,10 +387,10 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         tokenDomain
         stringType
 
-        schema.classifies
-        stringDomain    in schema.classifies
-        tokenDomain     in schema.classifies
-        stringType      in schema.classifies
+        schema.defines
+        stringDomain    in schema.defines
+        tokenDomain     in schema.defines
+        stringType      in schema.defines
 
         stringDomain.dataType == stringType
 

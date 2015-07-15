@@ -143,15 +143,15 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 	}
 
 	protected bindRelations(DataModel instance, boolean newVersion, Object objectToBind) {
-		if (objectToBind.classifies != null) {
-			for (domain in instance.classifies.findAll { !(it.id in objectToBind.classifies*.id) }) {
-				instance.removeFromClassifies(domain)
-				domain.removeFromClassifications(instance)
+		if (objectToBind.defines != null) {
+			for (domain in instance.defines.findAll { !(it.id in objectToBind.defines*.id) }) {
+				instance.removeFromDefines(domain)
+				domain.removeFromDefinedWithin(instance)
 			}
-			for (domain in objectToBind.classifies) {
+			for (domain in objectToBind.defines) {
 				CatalogueElement catalogueElement = CatalogueElement.get(domain.id as Long)
-				instance.addToClassifies catalogueElement
-				catalogueElement.addToClassifications instance
+				instance.addToDefines catalogueElement
+				catalogueElement.addToDefinedWithin instance
 			}
 		}
 	}
@@ -159,7 +159,7 @@ class DataModelController extends AbstractCatalogueElementController<DataModel> 
 	@Override
 	protected getIncludeFields() {
 		def fields = super.includeFields
-		fields.removeAll(['classifies'])
+		fields.removeAll(['defines'])
 		fields
 	}
 
