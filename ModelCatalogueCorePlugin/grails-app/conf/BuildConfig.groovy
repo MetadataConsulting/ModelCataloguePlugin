@@ -85,9 +85,9 @@ grails.project.dependency.resolution = {
 
         runtime ':database-migration:1.3.6'
 
-        compile ":asset-pipeline:1.9.9"
-        compile ":coffee-asset-pipeline:1.9.0"
-        compile ":less-asset-pipeline:1.10.0"
+        compile ":asset-pipeline:2.3.9"
+        compile ":coffee-asset-pipeline:2.0.7"
+        compile ":less-asset-pipeline:2.3.0"
 //        runtime ":hibernate4:4.3.5.5"
         runtime  ":hibernate:3.6.10.18"
 
