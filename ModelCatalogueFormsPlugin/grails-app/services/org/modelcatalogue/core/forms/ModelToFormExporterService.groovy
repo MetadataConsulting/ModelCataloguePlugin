@@ -199,7 +199,7 @@ class ModelToFormExporterService {
                 // bit of heuristic
                 String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
                 String itemName = alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}")
-                if (candidates.any { it.name.toLowerCase() == 'file' } || candidates.any { normalizeResponseType(it.ext[EXT_ITEM_RESPONSE_TYPE]) == RESPONSE_TYPE_FILE }) {
+                if (candidates.any { it.name.toLowerCase() == 'file' } || normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_FILE  ) {
                     file(itemName)
                 } else if (dataType && dataType.instanceOf(EnumeratedType)) {
                     // either value domain is marked as multiple or
