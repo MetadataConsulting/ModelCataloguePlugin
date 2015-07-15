@@ -4,7 +4,7 @@ import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.crf.model.CaseReportForm
@@ -69,7 +69,7 @@ class ModelToFormExporterService {
     public static final ArrayList<String> DATA_TYPE_PDATE_NAMES = ['pdate', 'partialdate', 'xs:gYear', 'xs:gYearMonth']
 
 
-    CaseReportForm convert(Model formModel) {
+    CaseReportForm convert(DataClass formModel) {
         Set<Long> processed = []
         String formName = formModel.ext[EXT_FORM_NAME] ?:formModel.name
         CaseReportForm.build(formName) {
@@ -90,7 +90,7 @@ class ModelToFormExporterService {
     }
 
     private void handleSectionModel(Set<Long> processed, String prefix, CaseReportForm form, Relationship sectionRel, boolean dataElementsOnly = false) {
-        Model sectionModel = sectionRel.destination as Model
+        DataClass sectionModel = sectionRel.destination as DataClass
 
         if (sectionModel.getId() in processed) {
             return
@@ -124,7 +124,7 @@ class ModelToFormExporterService {
 
 
         for (Relationship itemsWithHeaderOrGridRel in relationships) {
-            Model itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as Model
+            DataClass itemsWithHeaderOrGrid = itemsWithHeaderOrGridRel.destination as DataClass
 
             if (itemsWithHeaderOrGridRel.getId() in processed) {
                 return
@@ -177,7 +177,7 @@ class ModelToFormExporterService {
         label?.replaceAll(/[^\pL\pN_]/, '_')
     }
 
-    private void generateItems(String prefix, ItemContainer container, Model model, String aHeader = null, String aSubheader = null) {
+    private void generateItems(String prefix, ItemContainer container, DataClass model, String aHeader = null, String aSubheader = null) {
         container.with {
 
             boolean first = true

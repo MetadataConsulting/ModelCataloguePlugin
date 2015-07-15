@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.actions
 
 import org.modelcatalogue.core.AbstractIntegrationSpec
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,7 +18,7 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
     @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
     @Shared
-    Model one, two
+    DataClass one, two
     @Shared
     RelationshipType relation, contains
     @Shared
@@ -29,8 +29,8 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
         createAction = new CreateRelationship()
         createAction.relationshipService = relationshipService
         createAction.autowireCapableBeanFactory = autowireCapableBeanFactory
-        one = Model.findByName("book")
-        two = Model.findByName("chapter1")
+        one = DataClass.findByName("book")
+        two = DataClass.findByName("chapter1")
         relation = RelationshipType.relatedToType
         contains = RelationshipType.containmentType
     }

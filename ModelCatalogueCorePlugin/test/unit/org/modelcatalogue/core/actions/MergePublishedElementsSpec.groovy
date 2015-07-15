@@ -2,28 +2,27 @@ package org.modelcatalogue.core.actions
 
 import grails.test.mixin.Mock
 import org.modelcatalogue.core.ExtensionValue
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipService
-import org.modelcatalogue.core.RelationshipType
 import spock.lang.Ignore
 import spock.lang.Specification
 
 import static org.modelcatalogue.core.actions.AbstractActionRunner.encodeEntity
 import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDescription
 
-@Mock([Model, ExtensionValue])
+@Mock([DataClass, ExtensionValue])
 class MergePublishedElementsSpec extends Specification {
 
     MergePublishedElements merge = new MergePublishedElements()
 
-    Model one
-    Model two
+    DataClass one
+    DataClass two
 
     def setup() {
-        one = new Model(name: 'one').save(failOnError: true)
-        two = new Model(name: 'two').save(failOnError: true)
+        one = new DataClass(name: 'one').save(failOnError: true)
+        two = new DataClass(name: 'two').save(failOnError: true)
 
         merge.autowireCapableBeanFactory = Mock(org.springframework.beans.factory.config.AutowireCapableBeanFactory)
         merge.relationshipService = Mock(RelationshipService)

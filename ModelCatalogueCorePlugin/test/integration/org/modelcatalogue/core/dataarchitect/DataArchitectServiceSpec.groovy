@@ -3,7 +3,7 @@ package org.modelcatalogue.core.dataarchitect
 import au.com.bytecode.opencsv.CSVReader
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.ListWithTotal
 
@@ -20,7 +20,7 @@ class DataArchitectServiceSpec extends AbstractIntegrationSpec {
         de4 = DataElement.findByName("auth4")
         de5 = DataElement.findByName("auth5")
         vd = ValueDomain.findByName("value domain Celsius")
-        md = new Model(name: "tsdfafsd").save()
+        md = new DataClass(name: "tsdfafsd").save()
         md.addToContains(de1)
         de2.valueDomain = vd
         de2.save()

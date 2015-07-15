@@ -20,11 +20,11 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.list().size()                == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
         elementService.list(max: 10).size()         == 10
         elementService.list(DataElement).size()     == DataElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.list(Model).size()           == Model.countByStatus(ElementStatus.FINALIZED)
+        elementService.list(DataClass).size()           == DataClass.countByStatus(ElementStatus.FINALIZED)
         elementService.list(Asset).size()           == Asset.countByStatus(ElementStatus.FINALIZED)
         elementService.count()                      == CatalogueElement.countByStatus(ElementStatus.FINALIZED)
         elementService.count(DataElement)           == DataElement.countByStatus(ElementStatus.FINALIZED)
-        elementService.count(Model)                 == Model.countByStatus(ElementStatus.FINALIZED)
+        elementService.count(DataClass)                 == DataClass.countByStatus(ElementStatus.FINALIZED)
         elementService.count(Asset)                 == Asset.countByStatus(ElementStatus.FINALIZED)
     }
 
@@ -34,16 +34,16 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         elementService.list(status: 'DRAFT', max: 10).size()                    == 10
         elementService.list(status: ElementStatus.DRAFT).size()                 == 17
         elementService.list(status: ElementStatus.DRAFT, max: 10).size()        == 10
-        elementService.list(Model, status: 'DRAFT').size()                      == 7
-        elementService.list(Model, status: ElementStatus.DRAFT).size()          == 7
+        elementService.list(DataClass, status: 'DRAFT').size()                      == 7
+        elementService.list(DataClass, status: ElementStatus.DRAFT).size()          == 7
         elementService.list(DataElement, status: 'DRAFT').size()                == 5
         elementService.list(DataElement, status: ElementStatus.DRAFT).size()    == 5
         elementService.list(Asset, status: 'DRAFT').size()                      == 5
         elementService.list(Asset, status: ElementStatus.DRAFT).size()          == 5
         elementService.count(status: 'DRAFT')                                   == 17
         elementService.count(status: ElementStatus.DRAFT)                       == 17
-        elementService.count(Model, status: 'DRAFT')                            == 7
-        elementService.count(Model, status: ElementStatus.DRAFT)                == 7
+        elementService.count(DataClass, status: 'DRAFT')                            == 7
+        elementService.count(DataClass, status: ElementStatus.DRAFT)                == 7
         elementService.count(DataElement, status: 'DRAFT')                      == 5
         elementService.count(DataElement, status: ElementStatus.DRAFT)          == 5
         elementService.count(Asset, status: 'DRAFT')                            == 5
@@ -146,13 +146,13 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         DataElement destination = new DataElement(name: "merge tester").save(failOnError: true)
         destination.addToClassifications(cosd)
 
-        Model m1 = new Model(name: 'merge test container 1').save(failOnError: true)
-        Model m2 = new Model(name: 'merge test container 2').save(failOnError: true)
+        DataClass m1 = new DataClass(name: 'merge test container 1').save(failOnError: true)
+        DataClass m2 = new DataClass(name: 'merge test container 2').save(failOnError: true)
 
-        Model m3cosd = new Model(name: 'merge test container 3').save(failOnError: true)
+        DataClass m3cosd = new DataClass(name: 'merge test container 3').save(failOnError: true)
         m3cosd.addToClassifications(cosd)
 
-        Model m3sact = new Model(name: 'merge test container 3').save(failOnError: true)
+        DataClass m3sact = new DataClass(name: 'merge test container 3').save(failOnError: true)
         m3sact.addToClassifications(sact)
 
         m1.addToContains(source)
@@ -203,9 +203,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "create new version of hierarchy model"() {
 
         setup:
-        Model md1      = new Model(name:"test1").save()
-        Model md2      = new Model(name:"test2").save()
-        Model md3      = new Model(name:"test3").save()
+        DataClass md1      = new DataClass(name:"test1").save()
+        DataClass md2      = new DataClass(name:"test2").save()
+        DataClass md3      = new DataClass(name:"test3").save()
 
         md1.addToParentOf(md2)
         md2.addToParentOf(md3)
@@ -216,7 +216,7 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
         int originalVersion     = md2.versionNumber
-        Model draft             = elementService.createDraftVersion(md2, DraftContext.userFriendly()) as Model
+        DataClass draft             = elementService.createDraftVersion(md2, DraftContext.userFriendly()) as DataClass
         int draftVersion        = draft.versionNumber
         int newVersion          = md2.versionNumber
 
@@ -264,10 +264,10 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "finalize tree"(){
 
         setup:
-        Model md1      = new Model(name:"test1").save()
-        Model md2      = new Model(name:"test2").save()
-        Model md3      = new Model(name:"test3").save()
-        Model md4      = new Model(name:"test3").save()
+        DataClass md1      = new DataClass(name:"test1").save()
+        DataClass md2      = new DataClass(name:"test2").save()
+        DataClass md3      = new DataClass(name:"test3").save()
+        DataClass md4      = new DataClass(name:"test3").save()
         DataElement de1 = new DataElement(name: "test1").save()
         DataElement de2 = new DataElement(name: "test1").save()
         DataElement de3 = new DataElement(name: "test1").save()
@@ -315,9 +315,9 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
     def "finalize tree infinite loop"(){
 
         setup:
-        Model md1      = new Model(name:"test1").save()
-        Model md2      = new Model(name:"test2").save()
-        Model md3      = new Model(name:"test3").save()
+        DataClass md1      = new DataClass(name:"test1").save()
+        DataClass md2      = new DataClass(name:"test2").save()
+        DataClass md3      = new DataClass(name:"test3").save()
 
         md1.addToParentOf(md2)
         md2.addToParentOf(md3)

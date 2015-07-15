@@ -32,7 +32,7 @@ class ModelControllerIntegrationSpec extends AbstractCatalogueElementControllerI
 
     @Override
     Class getResource() {
-        Model
+        DataClass
     }
 
     @Override
@@ -46,13 +46,13 @@ class ModelControllerIntegrationSpec extends AbstractCatalogueElementControllerI
     }
 
     @Override
-    Model getLoadItem() {
-        Model.findByName("mTest3")
+    DataClass getLoadItem() {
+        DataClass.findByName("mTest3")
     }
 
     @Override
-    Model getAnotherLoadItem() {
-        Model.findByName("mTest4")
+    DataClass getAnotherLoadItem() {
+        DataClass.findByName("mTest4")
     }
 
     @Override

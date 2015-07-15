@@ -1,22 +1,7 @@
 package org.modelcatalogue.core.dataarchitect
-
-import grails.converters.JSON
-import org.modelcatalogue.core.DataElement
-import org.modelcatalogue.core.DataType
-import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.Model
-import org.modelcatalogue.core.ValueDomain
-
 /**
  * Based on work by James Welch
  */
-import java.lang.String.CaseInsensitiveComparator;
-import java.lang.invoke.SwitchPoint;
-
-import groovy.json.JsonSlurper
-import groovy.xml.MarkupBuilder
-import groovy.xml.StreamingMarkupBuilder
-
 class StarUMLDiagram {
 
     //test

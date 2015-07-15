@@ -26,12 +26,12 @@
     </dataClass>
     <!-- Relationship types are only imported if and only if they are not present in the catalogue yet. Any subsequent changes are ignored! For non-admin users, the types are always imported as system ones and they need to be approved by the catalogue admin first. -->
     <relationshipTypes>
-        <relationshipType name="containment" source="org.modelcatalogue.core.Model" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
+        <relationshipType name="containment" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
             <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
             <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
             <rule>/* A RULE */</rule>
         </relationshipType>
-        <relationshipType name="hierarchy" source="org.modelcatalogue.core.Model" destination="org.modelcatalogue.core.Model" versionSpecific="true">
+        <relationshipType name="hierarchy" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataClass" versionSpecific="true">
             <sourceToDestination label="parent of">Model can contain (be parent of) multiple models. Child models are finalized when parent model is finalized,</sourceToDestination>
             <destinationToSource label="child of">Model can be contained (be child model) in multiple models. When draft is created for child model drafts for parent models are created as well.</destinationToSource>
         </relationshipType>

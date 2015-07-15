@@ -121,7 +121,7 @@ class DataModelController extends AbstractCatalogueElementController<Classificat
 
 	private Collection getModelsForClassification(Long classificationId) {
 		def classificationType = RelationshipType.findByName('classification')
-		def results = Model.createCriteria().list {
+		def results = DataClass.createCriteria().list {
 			fetchMode "extensions", FetchMode.JOIN
 			fetchMode "outgoingRelationships.extensions", FetchMode.JOIN
 			fetchMode "outgoingRelationships.destination.classifications", FetchMode.JOIN

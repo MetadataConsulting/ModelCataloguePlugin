@@ -4,7 +4,7 @@ import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.Legacy
 
-class Model extends CatalogueElement {
+class DataClass extends CatalogueElement {
 
     static relationships = [
             incoming: [hierarchy: 'childOf'],

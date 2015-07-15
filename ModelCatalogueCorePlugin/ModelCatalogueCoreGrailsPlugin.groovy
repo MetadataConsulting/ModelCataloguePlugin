@@ -59,7 +59,7 @@ Model catalogue core plugin (metadata registry)
 
     def doWithSpring = {
         ModelCatalogueTypes.DATA_MODEL.implementation = Classification
-        ModelCatalogueTypes.DATA_CLASS.implementation = Model
+        ModelCatalogueTypes.DATA_CLASS.implementation = DataClass
         ModelCatalogueTypes.DATA_ELEMENT.implementation = DataElement
         ModelCatalogueTypes.VALUE_DOMAIN.implementation = ValueDomain
         ModelCatalogueTypes.DATA_TYPE.implementation = DataType
@@ -199,8 +199,8 @@ Model catalogue core plugin (metadata registry)
             title "Models to Excel"
             headers  'Model Catalogue ID', 'Name', 'Description'
             when { ListWrapper container, RenderContext context ->
-                context.actionName in [null,'index'] && (!container.itemType || Model.isAssignableFrom(container.itemType))
-            } then { Model model ->
+                context.actionName in [null,'index'] && (!container.itemType || DataClass.isAssignableFrom(container.itemType))
+            } then { DataClass model ->
                 [[ model.modelCatalogueId, model.name, model.description]]
             }
         }
@@ -268,8 +268,8 @@ Model catalogue core plugin (metadata registry)
             when { ListWrapper container, RenderContext context ->
                 container.itemType && DataElement.isAssignableFrom(container.itemType)
             } then { DataElement element ->
-                Model parent = getParentModel(element)
-                Model model = getContainingModel(element)
+                DataClass parent = getParentModel(element)
+                DataClass model = getContainingModel(element)
                 ValueDomain valueDomain = element.valueDomain
                 DataType dataType = valueDomain?.dataType
                 [[
@@ -300,7 +300,7 @@ Model catalogue core plugin (metadata registry)
         reportsRegistry.register {
             creates asset
             title { "Export All Elements of ${it.name} to Excel XSLX" }
-            type Model
+            type DataClass
             link controller: 'dataArchitect', action: 'getSubModelElements', params: [format: 'xlsx', report:'NHIC'], id: true
         }
 
@@ -327,7 +327,7 @@ Model catalogue core plugin (metadata registry)
 
         reportsRegistry.register {
             creates link
-            type Classification, Model, DataElement, ValueDomain, DataType, MeasurementUnit
+            type Classification, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit
             title { "Export to Catalogue XML" }
             link { CatalogueElement element ->
                 [url: element.getDefaultModelCatalogueId(false) + '?format=xml']
@@ -371,7 +371,7 @@ Model catalogue core plugin (metadata registry)
     }
 
     def static getParentModel(DataElement dataElement){
-        Model containingModel = getContainingModel(dataElement)
+        DataClass containingModel = getContainingModel(dataElement)
         if(containingModel.childOf) {
             return containingModel.childOf.first()
         }

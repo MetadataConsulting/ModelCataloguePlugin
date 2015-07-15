@@ -7,7 +7,7 @@ import groovy.xml.XmlUtil
 import org.modelcatalogue.core.Classification
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.ValueDomain
@@ -43,7 +43,7 @@ class GelXmlService {
 
     private static final int MAX_COLUMN_NAME_63 = 63
 
-    protected List<Model> listChildren(Model model,List results = [],Boolean isRoot=false) {
+    protected List<DataClass> listChildren(DataClass model,List results = [],Boolean isRoot=false) {
         if (model && !results.contains(model)){
            //if we send root model as parameter means that this is a child and we have to add in the list
            if (isRoot==false){
@@ -62,7 +62,7 @@ class GelXmlService {
      * @param model
      * @return a string with xml formed
      */
-    def printXmlModelShredder(Model model) {
+    def printXmlModelShredder(DataClass model) {
         def subModels = listChildren(model,[],true)
         def childsRelationship=model.getOutgoingRelationshipsByType(RelationshipType.hierarchyType)
         //validate to see if have the element schema metadata
@@ -97,7 +97,7 @@ class GelXmlService {
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + "\n" + writer.toString()
     }
 
-    def printSection(Model model, Map ext, MarkupBuilder builder){
+    def printSection(DataClass model, Map ext, MarkupBuilder builder){
         if(model.ext.repeating=='true') {
             return builder.repeatingGroup(id: printXSDFriendlyString(model.name), minRepeat: defaultMinOccurs(ext.get(METADATA_MIN_OCCURS)), maxRepeat: defaultMaxOccurs(ext.get(METADATA_MAX_OCCURS))) {
                 setOmitEmptyAttributes(true)
@@ -218,7 +218,7 @@ class GelXmlService {
      * @return an String with formed xml
      * @throw Exception with text error messages corresponding for missing fields
      */
-    def printXSDModel(Model targetModel) {
+    def printXSDModel(DataClass targetModel) {
         def valueDomains = new TreeSet({ k1, k2 -> k1.name+k1.id <=> k2.name+k1.id } as Comparator)
         StringWriter writer = new StringWriter()
         def xmlSchema = Classification.findByName("XMLSchema")
@@ -264,7 +264,7 @@ class GelXmlService {
             printSchemaMetadata(xml,targetModel)
 
 
-            subModels.each { Model model ->
+            subModels.each { DataClass model ->
                 printComplexType(xml, model,valueDomains,xmlSchema)
             }
             //print datatypes
@@ -277,7 +277,7 @@ class GelXmlService {
 
     }
 
-    protected printSchemaMetadata(MarkupBuilder xml, Model model){
+    protected printSchemaMetadata(MarkupBuilder xml, DataClass model){
         return xml.'xs:complexType'(name:'metadata'){
                 'xs:sequence'{
                     'xs:element'(name:'schema-name',minOccurs:'1',maxOccurs:'1'){
@@ -313,7 +313,7 @@ class GelXmlService {
     }
 
 
-    protected printComplexType(MarkupBuilder xml, Model model,def valueDomains,def xmlSchema){
+    protected printComplexType(MarkupBuilder xml, DataClass model,def valueDomains,def xmlSchema){
         def sectionType='xs:sequence'
         if (model.ext.get(XSD_SCHEMA_SECTION_TYPE)?.compareToIgnoreCase("choice")==0){
             sectionType='xs:choice'
@@ -360,7 +360,7 @@ class GelXmlService {
      * @return void
      * @throw Exception with a text message for missing fields
      */
-    protected void validateFormMetadata (Model model,List subModels){
+    protected void validateFormMetadata (DataClass model,List subModels){
         String exceptionMessages="";
         if (!model.ext.get(XSD_SCHEMA_NAME)){
             exceptionMessages+="missing required field for xsd form 'schema-name', "
@@ -419,7 +419,7 @@ class GelXmlService {
         }
     }
 
-    protected printModelElements(MarkupBuilder xml, Model model, String minOccurs, String maxOccurs){
+    protected printModelElements(MarkupBuilder xml, DataClass model, String minOccurs, String maxOccurs){
         return xml.'xs:element'(name: printXSDFriendlyString(model.name), type: printXSDFriendlyString(model.name), minOccurs: defaultMinOccurs(minOccurs), maxOccurs: defaultMaxOccurs(maxOccurs)){
             }
 

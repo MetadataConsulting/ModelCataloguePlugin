@@ -1,8 +1,6 @@
 package org.modelcatalogue.core
 
 import grails.gorm.DetachedCriteria
-import org.modelcatalogue.core.actions.Action
-import org.modelcatalogue.core.actions.ActionState
 import org.modelcatalogue.core.actions.Batch
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.dataarchitect.CsvTransformation
@@ -20,7 +18,7 @@ class DashboardController {
 
         def model = [:]
 
-        List<Class> displayed = [Classification, Model, DataElement, ValueDomain, DataType, MeasurementUnit, Asset]
+        List<Class> displayed = [Classification, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit, Asset]
 
         for (Class type in displayed) {
             DetachedCriteria criteria = classificationService.classified(type)

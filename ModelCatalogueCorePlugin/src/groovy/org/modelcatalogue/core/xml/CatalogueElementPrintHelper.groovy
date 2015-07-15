@@ -19,7 +19,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (DataElement.isAssignableFrom(type)) {
             return new DataElementPrintHelper() as CatalogueElementPrintHelper<E>
         }
-        if (Model.isAssignableFrom(type)) {
+        if (DataClass.isAssignableFrom(type)) {
             return new DataClassPrintHelper() as CatalogueElementPrintHelper<E>
         }
         if (Classification.isAssignableFrom(type)) {
@@ -204,7 +204,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (type == EnumeratedType) {
             return 'dataType'
         }
-        if (type in [Classification, Model, DataElement, ValueDomain, DataType, MeasurementUnit]) {
+        if (type in [Classification, DataClass, DataElement, ValueDomain, DataType, MeasurementUnit]) {
             String simpleName = type.simpleName
             return simpleName[0].toLowerCase() + simpleName[1..-1]
         }

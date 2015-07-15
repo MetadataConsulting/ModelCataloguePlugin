@@ -1,4 +1,4 @@
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.reports.ReportsRegistry
 
 class ModelCatalogueFormsPluginGrailsPlugin {
@@ -57,7 +57,7 @@ Forms generator plugin for Model Catalogue
 
         reportsRegistry.register {
             creates asset
-            type Model
+            type DataClass
             title { "Export as Case Report From" }
             link controller: 'formGenerator', action: 'generateForm', id: true
         }

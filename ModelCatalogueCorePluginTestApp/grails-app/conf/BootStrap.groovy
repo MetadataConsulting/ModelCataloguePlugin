@@ -127,7 +127,7 @@ class BootStrap {
 
             println 'Finalizing all published elements'
             CatalogueElement.findAllByStatus(org.modelcatalogue.core.api.ElementStatus.DRAFT).each {
-                if (it instanceof Model) {
+                if (it instanceof DataClass) {
                     elementService.finalizeElement(it)
                 } else {
                     it.status = org.modelcatalogue.core.api.ElementStatus.FINALIZED
@@ -142,11 +142,11 @@ class BootStrap {
             15.times {
                 Action action
                 if (it == 7) {
-                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: Model.name)
+                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), five: Action.get(5), six: Action.get(6), name: "Model #${it}", type: DataClass.name)
                 } else if (it == 4) {
-                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: Model.name)
+                    action = actionService.create(batch, CreateCatalogueElement, two: Action.get(2), name: "Model #${it}", type: DataClass.name)
                 } else {
-                    action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: Model.name)
+                    action = actionService.create(batch, CreateCatalogueElement, name: "Model #${it}", type: DataClass.name)
                 }
                 if (it % 3 == 0) {
                     actionService.dismiss(action)

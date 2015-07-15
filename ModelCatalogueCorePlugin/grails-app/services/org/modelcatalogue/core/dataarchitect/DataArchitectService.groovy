@@ -161,31 +161,31 @@ class DataArchitectService {
         List<Object> elements = []
 
         for (String header in headers) {
-            def element = Model.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+            def element = DataClass.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.FINALIZED)
             if (!element) {
-                element = Model.findByModelCatalogueId(header)
+                element = DataClass.findByModelCatalogueId(header)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
                 } else {
-                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.FINALIZED)
                 }
             }
             if (!element) {
-                element = Model.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                element = DataClass.findByNameIlikeAndStatus(header, org.modelcatalogue.core.api.ElementStatus.DRAFT)
             }
             if (!element) {
                 if (header.contains('_')) {
-                    element = Model.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace('_', ' '), org.modelcatalogue.core.api.ElementStatus.DRAFT)
                 } else {
-                    element = Model.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.DRAFT)
+                    element = DataClass.findByNameIlikeAndStatus(header.replace(' ', '_'), org.modelcatalogue.core.api.ElementStatus.DRAFT)
                 }
             }
             if (element) {
                 elements << element
             } else {
-                def searchResult = modelCatalogueSearchService.search(Model, [search: header])
+                def searchResult = modelCatalogueSearchService.search(DataClass, [search: header])
                 // only if we have single hit
                 if (searchResult.total == 1) {
                     elements << searchResult.searchResults[0]
@@ -500,7 +500,7 @@ class DataArchitectService {
     private void generateInlineModel() {
         Batch.findAllByNameIlike("Inline Model '%'").each reset
         elementService.findModelsToBeInlined().each { sourceId, destId ->
-            Model model = Model.get(sourceId)
+            DataClass model = DataClass.get(sourceId)
             Batch batch = Batch.findOrSaveByName("Inline Model '$model.name'")
             batch.description = """Model '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
             Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$sourceId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
@@ -517,7 +517,7 @@ class DataArchitectService {
 
         Batch.findAllByNameIlike("Create Synonyms for Model '%'").each reset
         duplicateModelsSuggestions.each { destId, sources ->
-            Model model = Model.get(destId)
+            DataClass model = DataClass.get(destId)
             Batch batch = Batch.findOrSaveByName("Create Synonyms for Model '$model.name'")
             RelationshipType type = RelationshipType.readByName("synonym")
             sources.each { srcId ->
@@ -532,7 +532,7 @@ class DataArchitectService {
 
         Batch.findAllByNameIlike("Merge Model '%'").each reset
         duplicateModelsSuggestions.each { destId, sources ->
-            Model model = Model.get(destId)
+            DataClass model = DataClass.get(destId)
             Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
             sources.each { srcId ->
                 Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId"

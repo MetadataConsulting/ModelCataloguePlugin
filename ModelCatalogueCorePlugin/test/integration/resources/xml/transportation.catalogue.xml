@@ -28,7 +28,7 @@
             <sourceToDestination label="classifies">Classification can classify multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the classifications filter in the bottom left corner. When classification is finalized all classified elements are finalized as well.</sourceToDestination>
             <destinationToSource label="is classified by">Any element can be classified by multiple classifications. When new draft of the classified element is created then drafts for classifications are created as well.</destinationToSource>
         </relationshipType>
-        <relationshipType name="containment" source="org.modelcatalogue.core.Model" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
+        <relationshipType name="containment" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
             <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
             <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
             <rule>/* A RULE */</rule>

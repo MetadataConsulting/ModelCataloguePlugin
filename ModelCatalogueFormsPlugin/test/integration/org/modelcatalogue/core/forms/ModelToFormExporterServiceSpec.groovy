@@ -12,7 +12,7 @@ import org.modelcatalogue.crf.model.Section
 import static org.modelcatalogue.core.forms.ModelToFormExporterService.*
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.springframework.validation.Errors
@@ -52,7 +52,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
     def "there must be a top level model representing a form and at least one model representing the section"(){
         given:
-        Model formModel = build {
+        DataClass formModel = build {
             model(name: TEST_FORM_NAME) {
                 ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
                 ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
@@ -83,7 +83,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
     def "nested models represent sections"(){
         given:
-        Model formModel = build {
+        DataClass formModel = build {
             model(name: TEST_FORM_NAME) {
                 ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
                 ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
@@ -120,7 +120,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
     def "grids are signaled with flag"(){
         given:
-        Model formModel = build {
+        DataClass formModel = build {
             model(name: TEST_FORM_NAME) {
                 ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
                 ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
@@ -159,7 +159,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
     def "various item types"(){
         given:
-        Model formModel = build {
+        DataClass formModel = build {
             model(name: TEST_FORM_NAME) {
                 ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
                 ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
@@ -274,9 +274,9 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
 
     // TODO: more tests
 
-    Model build(@DelegatesTo(CatalogueBuilder) Closure builder) {
+    DataClass build(@DelegatesTo(CatalogueBuilder) Closure builder) {
         catalogueBuilder.build(builder)
-        catalogueBuilder.created.find{ it.instanceOf(Model) } as Model
+        catalogueBuilder.created.find{ it.instanceOf(DataClass) } as DataClass
 
     }
 

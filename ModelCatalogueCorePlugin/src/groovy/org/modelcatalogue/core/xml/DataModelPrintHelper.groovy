@@ -19,7 +19,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<Classification> {
                 printElement(theMkp, other, context, null)
         }
 
-        for (Class<? extends CatalogueElement> type in [Model, DataElement, ValueDomain, DataType, MeasurementUnit]) {
+        for (Class<? extends CatalogueElement> type in [DataClass, DataElement, ValueDomain, DataType, MeasurementUnit]) {
             for (CatalogueElement other in allClassified(type, element, context)) {
                 if (!context.wasPrinted(other)) {
                     printElement(theMkp, other, context, null)

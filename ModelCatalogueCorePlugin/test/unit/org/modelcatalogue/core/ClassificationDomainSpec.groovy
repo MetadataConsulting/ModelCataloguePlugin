@@ -7,7 +7,7 @@ import spock.lang.Unroll
 /**
  * Created by adammilward on 05/02/2014.
  */
-@Mock([Classification, DataElement, Model, CatalogueElement])
+@Mock([Classification, DataElement, DataClass, CatalogueElement])
 class ClassificationDomainSpec extends Specification {
 
 

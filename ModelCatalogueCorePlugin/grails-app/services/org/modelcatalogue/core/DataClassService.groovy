@@ -14,25 +14,25 @@ class DataClassService {
     SecurityService modelCatalogueSecurityService
     ClassificationService classificationService
 
-    ListWithTotalAndType<Model> getTopLevelModels(Map params) {
+    ListWithTotalAndType<DataClass> getTopLevelModels(Map params) {
         getTopLevelModels(classificationService.classificationsInUse, params)
     }
 
-    ListWithTotalAndType<Model> getTopLevelModels(ClassificationFilter classifications, Map params) {
+    ListWithTotalAndType<DataClass> getTopLevelModels(ClassificationFilter classifications, Map params) {
         RelationshipType hierarchy      = RelationshipType.hierarchyType
         ElementStatus status            = ElementService.getStatusFromParams(params)
         RelationshipType classification = RelationshipType.classificationType
 
-        DetachedCriteria<Model> criteria = new DetachedCriteria<Model>(Model)
+        DetachedCriteria<DataClass> criteria = new DetachedCriteria<DataClass>(DataClass)
 
 
 
 
         if (classifications.unclassifiedOnly) {
             // language=HQL
-            return Lists.fromQuery(params, Model, """
+            return Lists.fromQuery(params, DataClass, """
                 select distinct m
-                from Model as m left join m.incomingRelationships as rel
+                from DataClass as m left join m.incomingRelationships as rel
                 where m.status = :status
                     and (
                         (
@@ -45,7 +45,7 @@ class DataClassService {
                 order by m.name
             ""","""
                 select count(m.id)
-                from Model as m left join m.incomingRelationships as rel
+                from DataClass as m left join m.incomingRelationships as rel
                 where m.status = :status
                     and (
                         (
@@ -58,9 +58,9 @@ class DataClassService {
         }
         if (classifications.excludes && !classifications.includes) {
             // language=HQL
-            return Lists.fromQuery(params, Model, """
+            return Lists.fromQuery(params, DataClass, """
                 select distinct m
-                from Model as m
+                from DataClass as m
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:classifications))
@@ -68,7 +68,7 @@ class DataClassService {
                 order by m.name
             ""","""
                 select count(m.id)
-                from Model as m
+                from DataClass as m
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:classifications))
@@ -76,9 +76,9 @@ class DataClassService {
         }
         if (classifications.excludes && classifications.includes) {
             // language=HQL
-            return Lists.fromQuery(params, Model, """
+            return Lists.fromQuery(params, DataClass, """
                 select distinct m
-                from Model as m
+                from DataClass as m
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes))
@@ -87,7 +87,7 @@ class DataClassService {
                 order by m.name
             ""","""
                 select count(m.id)
-                from Model as m
+                from DataClass as m
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes))
@@ -96,9 +96,9 @@ class DataClassService {
         }
         if (classifications.includes && !classifications.excludes) {
             // language=HQL
-            return Lists.fromQuery(params, Model, """
+            return Lists.fromQuery(params, DataClass, """
                 select distinct m
-                from Model as m join m.incomingRelationships as rel
+                from DataClass as m join m.incomingRelationships as rel
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
                     and rel.source.id in (:classifications)
@@ -107,7 +107,7 @@ class DataClassService {
                 order by m.name
             ""","""
                 select count(m.id)
-                from Model as m join m.incomingRelationships as rel
+                from DataClass as m join m.incomingRelationships as rel
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
                     and rel.source.id in (:classifications)
@@ -115,26 +115,26 @@ class DataClassService {
             """, [type: hierarchy, status: status, classifications: classifications.includes, classificationType: classification ])
         }
         // language=HQL
-        Lists.fromQuery params, Model, """
+        Lists.fromQuery params, DataClass, """
             select distinct m
-            from Model m
+            from DataClass m
             where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
             group by m.name, m.id
             order by m.name
         ""","""
             select count(m.id)
-            from Model m
+            from DataClass m
             where m.status = :status and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
         """, [type: hierarchy, status: status]
     }
 
-    ListWithTotalAndType<Model> getSubModels(Model model) {
-        List<Model> models = listChildren(model)
-        new ListCountAndType<Model>(count: models.size(), list: models, itemType: Model)
+    ListWithTotalAndType<DataClass> getSubModels(DataClass model) {
+        List<DataClass> models = listChildren(model)
+        new ListCountAndType<DataClass>(count: models.size(), list: models, itemType: DataClass)
 
     }
 
-    ListWithTotalAndType<DataElement> getDataElementsFromModels(List<Model> models){
+    ListWithTotalAndType<DataElement> getDataElementsFromModels(List<DataClass> models){
         def results = []
         models.each{ model ->
             results.addAll(model.contains)
@@ -143,7 +143,7 @@ class DataClassService {
     }
 
 
-    protected List<Model> listChildren(Model model, results = []){
+    protected List<DataClass> listChildren(DataClass model, results = []){
             if (model && !results.contains(model)) {
                     results += model
                     model.parentOf?.each { child ->

@@ -289,9 +289,9 @@ class ElementService implements Publisher<CatalogueElement> {
             log.warn "Trying to find inlined models in development mode. This feature does not work with H2 database"
             return [:]
         }
-        List<Model> models = Model.executeQuery("""
+        List<DataClass> models = DataClass.executeQuery("""
             select m
-            from Model m left join m.incomingRelationships inc
+            from DataClass m left join m.incomingRelationships inc
             group by m.name
             having sum(case when inc.relationshipType = :base then 1 else 0 end) = 1
             and sum(case when inc.relationshipType = :hierarchy then 1 else 0 end) = 2
@@ -299,7 +299,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
         Map<Long, Long> ret = [:]
 
-        for (Model model in models) {
+        for (DataClass model in models) {
             if (model.ext.from == 'xs:element') {
                 ret[model.id] = model.isBasedOn[0].id
             }
@@ -316,12 +316,12 @@ class ElementService implements Publisher<CatalogueElement> {
      */
     Map<Long, Set<Long>> findDuplicateModelsSuggestions() {
         // TODO: create test
-        Object[][] results = Model.executeQuery """
+        Object[][] results = DataClass.executeQuery """
             select m.id, m.name, rel.relationshipType.name,  rel.destination.name
-            from Model m join m.outgoingRelationships as rel
+            from DataClass m join m.outgoingRelationships as rel
             where
                 m.name in (
-                    select model.name from Model model
+                    select model.name from DataClass model
                     where model.status in :states
                     group by model.name
                     having count(model.id) > 1

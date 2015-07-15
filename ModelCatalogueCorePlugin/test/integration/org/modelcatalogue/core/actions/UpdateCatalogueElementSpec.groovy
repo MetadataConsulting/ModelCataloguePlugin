@@ -1,16 +1,16 @@
 package org.modelcatalogue.core.actions
 
 import grails.test.spock.IntegrationSpec
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.RelationshipType
 
 class UpdateCatalogueElementSpec extends IntegrationSpec {
 
     UpdateCatalogueElement updateAction = new UpdateCatalogueElement()
-    Model model
+    DataClass model
 
     def setup() {
-        model = new Model(name: 'The Model UA').save(failOnError: true)
+        model = new DataClass(name: 'The Model UA').save(failOnError: true)
         model.ext.bar = 'foo'
     }
 
@@ -20,7 +20,7 @@ class UpdateCatalogueElementSpec extends IntegrationSpec {
         updateAction.description == AbstractActionRunner.normalizeDescription(UpdateCatalogueElement.description)
 
         when:
-        updateAction.initWith(id: model.id.toString(), type: Model.name, name: 'The Updated Model')
+        updateAction.initWith(id: model.id.toString(), type: DataClass.name, name: 'The Updated Model')
 
         then:
         updateAction.message == """
@@ -50,28 +50,28 @@ class UpdateCatalogueElementSpec extends IntegrationSpec {
         errorsForWrongType.containsKey 'type'
 
         when:
-        Map<String, String> errorsForWrongId = updateAction.validate(id: 'abc', type: Model.name)
+        Map<String, String> errorsForWrongId = updateAction.validate(id: 'abc', type: DataClass.name)
 
         then:
         errorsForWrongId.containsKey 'id'
 
         when:
-        Map<String, String> errorsForMissing = updateAction.validate(id: (model.id + 1).toString(), type: Model.name)
+        Map<String, String> errorsForMissing = updateAction.validate(id: (model.id + 1).toString(), type: DataClass.name)
 
         then:
         errorsForMissing.containsKey 'id'
 
         when:
-        Map<String, String> errorsForProperties = updateAction.validate(id: model.id.toString(), type: Model.name)
+        Map<String, String> errorsForProperties = updateAction.validate(id: model.id.toString(), type: DataClass.name)
 
         then:
         errorsForProperties.containsKey 'properties'
 
         when:
-        Map<String, String> errorsForCorrect = updateAction.validate(id: model.id.toString(), type: Model.name, name: "The Updated Model")
+        Map<String, String> errorsForCorrect = updateAction.validate(id: model.id.toString(), type: DataClass.name, name: "The Updated Model")
 
         then:
-        Model.exists(model.id)
+        DataClass.exists(model.id)
         errorsForCorrect.isEmpty()
     }
 
@@ -88,7 +88,7 @@ class UpdateCatalogueElementSpec extends IntegrationSpec {
         thrown IllegalStateException
 
         when:
-        updateAction.initWith(id: model.id.toString(), type: Model.name)
+        updateAction.initWith(id: model.id.toString(), type: DataClass.name)
         def fetched = updateAction.queryForCatalogueElement()
 
         then:
@@ -101,24 +101,24 @@ class UpdateCatalogueElementSpec extends IntegrationSpec {
 
         updateAction.out = pw
 
-        int initialCount = Model.count()
+        int initialCount = DataClass.count()
 
         when:
-        updateAction.initWith(name: "The New Model Name", type: Model.name, id: model.id.toString(), 'ext:foo': 'bar', 'ext:bar': '')
+        updateAction.initWith(name: "The New Model Name", type: DataClass.name, id: model.id.toString(), 'ext:foo': 'bar', 'ext:bar': '')
         updateAction.run()
 
-        Model changed = Model.findByName('The New Model Name')
+        DataClass changed = DataClass.findByName('The New Model Name')
 
         then:
         changed
         !updateAction.failed
-        Model.count() == initialCount
-        Model.countByName('The Model UA') == 0
-        Model.countByName('The New Model Name') == 1
+        DataClass.count() == initialCount
+        DataClass.countByName('The Model UA') == 0
+        DataClass.countByName('The New Model Name') == 1
         sw.toString() == "<a href='#/catalogue/model/${changed.id}'>Model 'The New Model Name'</a> updated"
         changed.ext.foo == 'bar'
         changed.ext.bar == null
-        updateAction.result == AbstractActionRunner.encodeEntity(Model.findByName('The New Model Name'))
+        updateAction.result == AbstractActionRunner.encodeEntity(DataClass.findByName('The New Model Name'))
     }
 
     def "error is reported to the output stream"() {
@@ -128,7 +128,7 @@ class UpdateCatalogueElementSpec extends IntegrationSpec {
         updateAction.out = pw
 
         when:
-        updateAction.initWith(name: "x" * 300, type: Model.name, id: model.id.toString())
+        updateAction.initWith(name: "x" * 300, type: DataClass.name, id: model.id.toString())
         updateAction.run()
 
         then:

@@ -1,5 +1,5 @@
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 
 fixture{
-    M_test6(Model, name: "mTest6", description: "this is a model test6")
+    M_test6(DataClass, name: "mTest6", description: "this is a model test6")
 }

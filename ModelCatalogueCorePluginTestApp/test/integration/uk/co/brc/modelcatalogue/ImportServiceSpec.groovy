@@ -13,7 +13,7 @@ class ImportServiceSpec extends IntegrationSpec {
     "import nhic spreadsheet"() {
 
         when:
-        def models = Model.list()
+        def models = DataClass.list()
         def dataTypes = DataType.list()
         def dataElements = DataElement.list()
         def valueDomains = ValueDomain.list()

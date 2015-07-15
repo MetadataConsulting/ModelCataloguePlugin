@@ -9,14 +9,14 @@ import spock.lang.Unroll
  * They contain data elements
  */
 
-class ModelSpec extends IntegrationSpec {
+class DataClassSpec extends IntegrationSpec {
 
     @Unroll
     def "Model creation for #args results in #validates"() {
-        int initialSize = Model.count()
+        int initialSize = DataClass.count()
 
         when:
-        Model modelInstance = new Model(args)
+        DataClass modelInstance = new DataClass(args)
         modelInstance.modelCatalogueId = args.modelCatalogueId
         modelInstance.save()
 
@@ -45,7 +45,7 @@ class ModelSpec extends IntegrationSpec {
 
         def dataExtension = ["ip": "x.xx.xx.xx", "owner": "BRC_Informatics"]
 
-        Model modelInstance = new Model(name: "result1", description: "this is the the result description")
+        DataClass modelInstance = new DataClass(name: "result1", description: "this is the the result description")
 
 
         modelInstance.save()
@@ -64,7 +64,7 @@ class ModelSpec extends IntegrationSpec {
     def "Get link info"() {
 
 
-        Model modelInstance = new Model(name: "result1", description: "this is the the result description").save(flush: true)
+        DataClass modelInstance = new DataClass(name: "result1", description: "this is the the result description").save(flush: true)
 
         expect:
         modelInstance

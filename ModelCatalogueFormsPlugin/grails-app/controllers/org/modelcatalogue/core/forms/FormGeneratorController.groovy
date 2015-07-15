@@ -2,7 +2,7 @@ package org.modelcatalogue.core.forms
 
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.marshalling.xlsx.XLSXListRenderer
 import org.modelcatalogue.crf.model.CaseReportForm
@@ -20,7 +20,7 @@ class FormGeneratorController {
 
     def generateForm() {
         Long modelId = params.id as Long
-        Model model = Model.findById(modelId)
+        DataClass model = DataClass.findById(modelId)
 
         if (!model) {
             render status: HttpStatus.NOT_FOUND
@@ -46,7 +46,7 @@ class FormGeneratorController {
             auditService.withDefaultAuthorId(authorId) {
                 try {
 
-                    Model theModel = Model.get(modelId)
+                    DataClass theModel = DataClass.get(modelId)
                     log.info "Generating form for $theModel"
                     CaseReportForm form = modelToFormExporterService.convert(theModel)
                     Asset updated = Asset.get(id)

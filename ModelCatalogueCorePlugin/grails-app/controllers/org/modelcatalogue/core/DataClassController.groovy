@@ -2,12 +2,12 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.Lists
 
-class DataClassController extends AbstractCatalogueElementController<Model> {
+class DataClassController extends AbstractCatalogueElementController<DataClass> {
 
     def dataClassService
 
     DataClassController() {
-        super(Model, false)
+        super(DataClass, false)
     }
 
     @Override

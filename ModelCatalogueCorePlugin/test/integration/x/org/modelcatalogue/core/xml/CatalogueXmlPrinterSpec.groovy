@@ -158,7 +158,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         }
     }
 
-    private Model getLocomotive() {
+    private DataClass getLocomotive() {
         build {
             model(name: "Locomotive", id: "http://www.example.com/models/Locomotive") {
                 dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {

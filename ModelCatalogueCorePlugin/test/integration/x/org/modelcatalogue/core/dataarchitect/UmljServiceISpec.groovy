@@ -2,7 +2,7 @@ package x.org.modelcatalogue.core.dataarchitect
 
 import org.modelcatalogue.core.AbstractIntegrationSpec
 import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 
 class UmljServiceISpec extends AbstractIntegrationSpec {
 
@@ -18,7 +18,7 @@ class UmljServiceISpec extends AbstractIntegrationSpec {
         InputStream inputStream = new FileInputStream(filenameXsd)
         umljService.importUmlDiagram(inputStream, "rare_diseases_combined", classification)
 
-        def patient = Model.findByName("Patient")
+        def patient = DataClass.findByName("Patient")
         def patientData = patient.contains
         def de4 = patientData[4]
 

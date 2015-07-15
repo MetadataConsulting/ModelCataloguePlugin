@@ -16,37 +16,37 @@ class ClassificationServiceSpec extends IntegrationSpec {
     Classification classification1
     Classification classification2
 
-    Model model0
-    Model model1
-    Model model2
+    DataClass model0
+    DataClass model1
+    DataClass model2
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
         classification1 = new Classification(name: "Test Classification 1 ${System.currentTimeMillis()}").save(failOnError: true)
         classification2 = new Classification(name: "Test Classification 2 ${System.currentTimeMillis()}").save(failOnError: true)
-        model0 = new Model(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
-        model1 = new Model(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
+        model0 = new DataClass(name: "Not Classified", status: ElementStatus.FINALIZED).save(failOnError: true)
+        model1 = new DataClass(name: "Classified 1", status: ElementStatus.FINALIZED).save(failOnError: true)
         model1.addToClassifications(classification1)
-        model2 = new Model(name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
+        model2 = new DataClass(name: "Classified 2 ", status: ElementStatus.FINALIZED).save(failOnError: true)
         model2.addToClassifications(classification2)
 
     }
 
     def "all the models are returned if no classification is selected"(){
-        DetachedCriteria<Model> criteria = classificationService.classified(Model)
+        DetachedCriteria<DataClass> criteria = classificationService.classified(DataClass)
 
         expect:
-        new DetachedCriteria<Model>(Model).count()
+        new DetachedCriteria<DataClass>(DataClass).count()
         criteria.count()
-        criteria.count() == new DetachedCriteria<Model>(Model).count()
+        criteria.count() == new DetachedCriteria<DataClass>(DataClass).count()
     }
 
     def "all the finalized models are returned when classification is not selected"() {
-        DetachedCriteria<Model> finalized = new DetachedCriteria<Model>(Model).build {
+        DetachedCriteria<DataClass> finalized = new DetachedCriteria<DataClass>(DataClass).build {
             eq 'status', ElementStatus.FINALIZED
         }
 
-        DetachedCriteria<Model> criteria = classificationService.classified(finalized)
+        DetachedCriteria<DataClass> criteria = classificationService.classified(finalized)
 
         expect:
         finalized.count()
@@ -55,11 +55,11 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "is able to return only unclassified models"() {
-        DetachedCriteria<Model> all = classificationService.classified(Model, ClassificationFilter.NO_FILTER)
-        DetachedCriteria<Model> criteria = classificationService.classified(Model, ClassificationFilter.create(true))
+        DetachedCriteria<DataClass> all = classificationService.classified(DataClass, ClassificationFilter.NO_FILTER)
+        DetachedCriteria<DataClass> criteria = classificationService.classified(DataClass, ClassificationFilter.create(true))
 
         expect:
-        all.count() == Model.count()
+        all.count() == DataClass.count()
         criteria.count() == Lists.fromCriteria([:], criteria).items.size()
     }
 
@@ -76,7 +76,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
 
 
     def "is able to return only models classified by"() {
-        DetachedCriteria<Model> criteria = classificationService.classified(Model, ClassificationFilter.create([classification1], []))
+        DetachedCriteria<DataClass> criteria = classificationService.classified(DataClass, ClassificationFilter.create([classification1], []))
 
         expect:
         criteria.count() == 1
@@ -85,7 +85,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "is able to return only models not classified by"() {
-        DetachedCriteria<Model> criteria = classificationService.classified(Model, ClassificationFilter.create([], [classification2]))
+        DetachedCriteria<DataClass> criteria = classificationService.classified(DataClass, ClassificationFilter.create([], [classification2]))
 
         expect:
         criteria.count() == 1
@@ -94,7 +94,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get unclassified top level models"() {
-        ListWithTotalAndType<Model> models = dataClassService.getTopLevelModels(ClassificationFilter.create(true), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(ClassificationFilter.create(true), [:])
 
         expect:
         models.total >= 1
@@ -103,7 +103,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include classification filter"() {
-        ListWithTotalAndType<Model> models = dataClassService.getTopLevelModels(ClassificationFilter.create([classification1], []), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(ClassificationFilter.create([classification1], []), [:])
 
         expect:
         models.total >= 1
@@ -114,7 +114,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
 
 
     def "get top level models with exclude classification filter"() {
-        ListWithTotalAndType<Model> models = dataClassService.getTopLevelModels(ClassificationFilter.create([], [classification2]), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(ClassificationFilter.create([], [classification2]), [:])
 
         expect:
         models.total >= 2
@@ -124,7 +124,7 @@ class ClassificationServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include and exclude classification filter"() {
-        ListWithTotalAndType<Model> models = dataClassService.getTopLevelModels(ClassificationFilter.create([classification1], [classification2]), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(ClassificationFilter.create([classification1], [classification2]), [:])
 
         expect:
         models.total >= 1

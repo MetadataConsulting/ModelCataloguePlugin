@@ -2,7 +2,7 @@ package org.modelcatalogue.core.actions
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.RelationshipType
 
 class CreateCatalogueElementSpec extends IntegrationSpec {
@@ -15,7 +15,7 @@ class CreateCatalogueElementSpec extends IntegrationSpec {
         createAction.description == AbstractActionRunner.normalizeDescription(CreateCatalogueElement.description)
 
         when:
-        createAction.initWith(name: 'The Model', type: Model.name)
+        createAction.initWith(name: 'The Model', type: DataClass.name)
 
         then:
         createAction.message == """
@@ -46,7 +46,7 @@ class CreateCatalogueElementSpec extends IntegrationSpec {
         errorsForWrongType.containsKey 'type'
 
         when:
-        Map<String, String> errorsForCorrect = createAction.validate(name: 'The Model', type: Model.name)
+        Map<String, String> errorsForCorrect = createAction.validate(name: 'The Model', type: DataClass.name)
 
         then:
         errorsForCorrect.isEmpty()
@@ -65,11 +65,11 @@ class CreateCatalogueElementSpec extends IntegrationSpec {
         thrown IllegalStateException
 
         when:
-        createAction.initWith(name: "The Model", type: Model.name)
+        createAction.initWith(name: "The Model", type: DataClass.name)
         def model = createAction.createCatalogueElement()
 
         then:
-        model instanceof Model
+        model instanceof DataClass
     }
 
     def "new instance is created and saved to the database"() {
@@ -78,24 +78,24 @@ class CreateCatalogueElementSpec extends IntegrationSpec {
 
         createAction.out = pw
 
-        int initialCount = Model.count()
-        int draftCount   = Model.countByStatus(ElementStatus.DRAFT)
+        int initialCount = DataClass.count()
+        int draftCount   = DataClass.countByStatus(ElementStatus.DRAFT)
 
         when:
-        createAction.initWith(name: "The Model", type: Model.name, description: "The Description", status: 'DRAFT', 'ext:foo': 'bar')
+        createAction.initWith(name: "The Model", type: DataClass.name, description: "The Description", status: 'DRAFT', 'ext:foo': 'bar')
         createAction.run()
 
-        Model created = Model.findByName('The Model')
+        DataClass created = DataClass.findByName('The Model')
 
         then:
         !createAction.failed
         created
-        Model.count() == 1 + initialCount
-        Model.countByName('The Model') == 1
-        Model.countByStatus(ElementStatus.DRAFT) == 1 + draftCount
+        DataClass.count() == 1 + initialCount
+        DataClass.countByName('The Model') == 1
+        DataClass.countByStatus(ElementStatus.DRAFT) == 1 + draftCount
         sw.toString() == "New <a href='#/catalogue/model/${created.id}'>Model 'The Model'</a> created"
         created.ext.foo == 'bar'
-        createAction.result == AbstractActionRunner.encodeEntity(Model.findByName('The Model'))
+        createAction.result == AbstractActionRunner.encodeEntity(DataClass.findByName('The Model'))
     }
 
     def "error is reported to the output stream"() {
@@ -104,15 +104,15 @@ class CreateCatalogueElementSpec extends IntegrationSpec {
 
         createAction.out = pw
 
-        int initialCount = Model.count()
+        int initialCount = DataClass.count()
 
         when:
-        createAction.initWith(name: "x" * 300, type: Model.name)
+        createAction.initWith(name: "x" * 300, type: DataClass.name)
         createAction.run()
 
         then:
         createAction.failed
-        Model.count() == initialCount
+        DataClass.count() == initialCount
         sw.toString().startsWith('Unable to create new Model')
     }
 }

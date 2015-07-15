@@ -138,7 +138,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to data element specified by the parameters map and the DSL closure
      */
     void dataElement(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, Model, isUnderControlIfSameClassification(parameters))
+        CatalogueElementProxy<DataElement> element = createProxy(DataElement, parameters, DataClass, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext element, c
 
@@ -148,7 +148,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             }
         }
 
-        context.withContextElement(Model) { ignored, Closure relConf ->
+        context.withContextElement(DataClass) { ignored, Closure relConf ->
             contains element, relConf
         }
 
@@ -167,10 +167,10 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to model specified by the parameters map and the DSL closure
      */
     void dataClass(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<Model> model = createProxy(Model, parameters, Classification, isUnderControlIfSameClassification(parameters))
+        CatalogueElementProxy<DataClass> model = createProxy(DataClass, parameters, Classification, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext model, c
-        context.withContextElement(Model) { ignored, Closure relConf ->
+        context.withContextElement(DataClass) { ignored, Closure relConf ->
             child model, relConf
         }
 

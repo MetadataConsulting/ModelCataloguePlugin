@@ -16,8 +16,8 @@ class PublishedElementISpec extends AbstractIntegrationSpec{
     def "finalize model with with finalized child models"(){
 
         setup:
-        CatalogueElement el1 = new Model(name: "parent1").save()
-        CatalogueElement el2 = new Model(name: "child1").save()
+        CatalogueElement el1 = new DataClass(name: "parent1").save()
+        CatalogueElement el2 = new DataClass(name: "child1").save()
         el1.addToParentOf(el2)
 
         when:
@@ -38,7 +38,7 @@ class PublishedElementISpec extends AbstractIntegrationSpec{
     def "finalize model with with finalized data elements"(){
 
         setup:
-        CatalogueElement el1 = new Model(name: "parent1").save()
+        CatalogueElement el1 = new DataClass(name: "parent1").save()
         CatalogueElement el2 = new DataElement(name: "dataElement").save()
         el1.addToContains(el2)
 

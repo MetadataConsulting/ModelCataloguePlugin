@@ -54,12 +54,12 @@ class XSDImporter {
     XsdSchema schema
     Collection<QName> namespaces
 
-    List<Model> circularModels = []
-    List<Model> modelsCreated = []
+    List<DataClass> circularModels = []
+    List<DataClass> modelsCreated = []
     List<DataElement> elementsCreated = []
 
-    Model publicTypesContainer
-    Model rootElementsContainer
+    DataClass publicTypesContainer
+    DataClass rootElementsContainer
 
     def createAll() {
         org.modelcatalogue.core.util.FriendlyErrors.withFriendlyFailure {
@@ -75,7 +75,7 @@ class XSDImporter {
             }
 
             log.info("Publishing models as DRAFT")
-            for (Model model in modelsCreated) {
+            for (DataClass model in modelsCreated) {
                 model.status = org.modelcatalogue.core.api.ElementStatus.DRAFT
                 model.save(failOnError: true)
             }
@@ -111,12 +111,12 @@ class XSDImporter {
         classifications.add(typeClassification)
 
         publicTypesContainer = findModel(containerModelName)
-        if (!publicTypesContainer) publicTypesContainer = new Model(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: org.modelcatalogue.core.api.ElementStatus.PENDING).save(failOnError: true)
+        if (!publicTypesContainer) publicTypesContainer = new DataClass(name: containerModelName, description: "Container model for complex types. This is automatically generated. You can remove this container model and curate the data as you wish", status: org.modelcatalogue.core.api.ElementStatus.PENDING).save(failOnError: true)
 
         if (!createModelsForElements) {
             if (!rootElementsModelName) rootElementsModelName = classifications.first()?.name + " Root Elements"
             rootElementsContainer = findModel(rootElementsModelName)
-            if (!rootElementsContainer) rootElementsContainer = new Model(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: org.modelcatalogue.core.api.ElementStatus.PENDING).save(failOnError: true)
+            if (!rootElementsContainer) rootElementsContainer = new DataClass(name: rootElementsModelName, description: "Container model for root elements. This is automatically generated. You can remove this container model and curate the data as you wish", status: org.modelcatalogue.core.api.ElementStatus.PENDING).save(failOnError: true)
         }
 
 
@@ -124,14 +124,14 @@ class XSDImporter {
             matchOrCreateModel(complexType)
         }
 
-        modelsCreated.each { Model model ->
+        modelsCreated.each { DataClass model ->
             if (!model.childOf) {
                 model.addToChildOf(publicTypesContainer)
                 model.addToClassifications(typeClassification)
             }
         }
 
-        circularModels.each { Model model ->
+        circularModels.each { DataClass model ->
             def isBasedOn = model.isBasedOn.first()
             def isBasedOnContains = (!isBasedOn) ?: isBasedOn.contains
             def modelContains = model.contains
@@ -141,7 +141,7 @@ class XSDImporter {
             }
             def isBasedOnChildren = (!isBasedOn) ?: isBasedOn.parentOf
             def modelChildren = model.parentOf
-            isBasedOnChildren.each { Model md ->
+            isBasedOnChildren.each { DataClass md ->
                 def contained = modelChildren.find { it.name == md.name }
                 if (!contained) model.addToParentOf(md)
             }
@@ -174,7 +174,7 @@ class XSDImporter {
         element
     }
 
-    Model matchOrCreateModel(XsdComplexType complexType, String elementName = null) {
+    DataClass matchOrCreateModel(XsdComplexType complexType, String elementName = null) {
         String modelName = createModelsForElements && elementName ? elementName : complexType.name
         log.info("Processing model for complex type ${modelName}: ${complexType?.description}")
         ArrayList<Element> elements = []
@@ -182,7 +182,7 @@ class XSDImporter {
         def model = findModel(modelName)
         if (!model) {
 
-            model = new Model(name: modelName, description: complexType?.description, status: org.modelcatalogue.core.api.ElementStatus.UPDATED).save(flush: true, failOnError: true)
+            model = new DataClass(name: modelName, description: complexType?.description, status: org.modelcatalogue.core.api.ElementStatus.UPDATED).save(flush: true, failOnError: true)
             model = addClassifications(model)
             modelsCreated.add(model)
 
@@ -224,7 +224,7 @@ class XSDImporter {
         return model
     }
 
-    protected getElementsFromModel(Model model) {
+    protected getElementsFromModel(DataClass model) {
         ArrayList<Element> elements = []
         ListWithTotal<Relationship> containedElements = relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, model, RelationshipType.containmentType)
         containedElements.items.each { Relationship relationship ->
@@ -253,12 +253,12 @@ class XSDImporter {
     }
 
 
-    List<Model> findModels(String modelName) {
-        classificationService.classified(Model.where { name == modelName }, ClassificationFilter.includes(classifications)).list()
+    List<DataClass> findModels(String modelName) {
+        classificationService.classified(DataClass.where { name == modelName }, ClassificationFilter.includes(classifications)).list()
     }
 
-    Model findModel(String name) {
-        List<Model> models = findModels(name)
+    DataClass findModel(String name) {
+        List<DataClass> models = findModels(name)
         if (models) {
             return models[0]
         }
@@ -436,7 +436,7 @@ class XSDImporter {
 
     protected getElementsFromXsdElement(ArrayList<Element> elements, XsdElement el) {
         if (el.type) {
-            Model complexType = !createModelsForElements ? findModel(el.type) : findModels(el.type).find {
+            DataClass complexType = !createModelsForElements ? findModel(el.type) : findModels(el.type).find {
                 it.ext.from != "xs:element"
             }
 
@@ -451,8 +451,8 @@ class XSDImporter {
             if (complexType) {
 
                 if (createModelsForElements) {
-                    List<Model> models = findModels(el.name) ?: []
-                    Model model = models.find {
+                    List<DataClass> models = findModels(el.name) ?: []
+                    DataClass model = models.find {
                         complexType in it.isBasedOn
                     }
                     if (!model) {
@@ -515,12 +515,12 @@ class XSDImporter {
         new Element(model: matchOrCreateModel(complexType, el.name), metadata: metadata + [Name: el.name])
     }
 
-    protected Element createElementModelFromXSDComplexElement(Model mode, XsdElement el, Map metadata) {
+    protected Element createElementModelFromXSDComplexElement(DataClass mode, XsdElement el, Map metadata) {
         new Element(model: mode, metadata: metadata + [Name: el.name])
     }
 
 
-    protected Model copyRelations(Model newModel, Model oldModel) {
+    protected DataClass copyRelations(DataClass newModel, DataClass oldModel) {
 
         for (Relationship r in oldModel.incomingRelationships) {
             if (r.archived || r.relationshipType.name == 'supersession' || r.relationshipType.name == 'base' || r.relationshipType.name == 'hierarchy') continue
@@ -811,7 +811,7 @@ class XSDImporter {
 
 class Element {
     DataElement dataElement
-    Model model
+    DataClass model
     Map metadata
 
 

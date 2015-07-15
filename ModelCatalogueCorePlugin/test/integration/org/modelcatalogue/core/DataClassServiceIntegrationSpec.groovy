@@ -4,11 +4,11 @@ import org.modelcatalogue.core.util.ListWithTotal
 
 class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
-    Model parent1
-    Model parent2
-    Model child1
-    Model child2
-    Model grandChild
+    DataClass parent1
+    DataClass parent2
+    DataClass child1
+    DataClass child2
+    DataClass grandChild
     DataClassService dataClassService
     DataElement de1
     DataElement de2
@@ -16,11 +16,11 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def setup(){
         loadFixtures()
-        parent1 = new Model(name: 'book').save(failOnError: true)
-        parent2 = new Model(name: 'chapter1').save(failOnError: true)
-        child1 = new Model(name: 'chapter2').save(failOnError: true)
-        child2 = new Model(name: 'mTest1').save(failOnError: true)
-        grandChild = new Model(name: 'mTest2').save(failOnError: true)
+        parent1 = new DataClass(name: 'book').save(failOnError: true)
+        parent2 = new DataClass(name: 'chapter1').save(failOnError: true)
+        child1 = new DataClass(name: 'chapter2').save(failOnError: true)
+        child2 = new DataClass(name: 'mTest1').save(failOnError: true)
+        grandChild = new DataClass(name: 'mTest2').save(failOnError: true)
         parent1.addToParentOf child1
         parent2.addToParentOf child2
         child1.addToParentOf grandChild
@@ -33,7 +33,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         ListWithTotal topLevel = dataClassService.getTopLevelModels([:])
 
         expect:
-        Model.count()           >= 5
+        DataClass.count()           >= 5
         topLevel.total          >= 2
         topLevel.items.size()   == topLevel.total
         topLevel.items.each {

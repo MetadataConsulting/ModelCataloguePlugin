@@ -3,7 +3,7 @@ package org.modelcatalogue.core.gel
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetService
 import org.modelcatalogue.core.api.ElementStatus
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.SecurityService
 import org.modelcatalogue.core.audit.AuditService
 import org.springframework.http.HttpStatus
@@ -31,7 +31,7 @@ class GelXmlController {
      * @return redirection to asset controller
      */
     def generateXmlShredderModel() {
-        Model model=Model.get(params.id)
+        DataClass model=DataClass.get(params.id)
 
         if (!model) {
             render status: HttpStatus.NOT_FOUND
@@ -64,7 +64,7 @@ class GelXmlController {
      * @return redirect to asset controller
      */
     def generateXSD(){
-        def model=Model.get(params.id)
+        def model=DataClass.get(params.id)
 
 
         if (!model) {
@@ -96,7 +96,7 @@ class GelXmlController {
      * @param closure must return a string 
      * @return assetID
      */
-    private def storeAssetFromString(Model model,Closure closure,String assetName=null,String mimeType="application/octet-stream",String assetPendingDesc="",String assetFinalizedDesc="",String assetErrorDesc="",String originalFileName="unknown"){
+    private def storeAssetFromString(DataClass model,Closure closure,String assetName=null,String mimeType="application/octet-stream",String assetPendingDesc="",String assetFinalizedDesc="",String assetErrorDesc="",String originalFileName="unknown"){
         Asset asset = new Asset(
                 name:assetName ,
                 originalFileName: originalFileName,

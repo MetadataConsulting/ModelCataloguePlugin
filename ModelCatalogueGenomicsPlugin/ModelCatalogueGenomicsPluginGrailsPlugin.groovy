@@ -1,4 +1,4 @@
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.reports.ReportsRegistry
 
 class ModelCatalogueGenomicsPluginGrailsPlugin {
@@ -58,14 +58,14 @@ Genomics England Custom Additions to Model Catalogue
         reportsRegistry.register {
             creates asset
             title { "Export  XML Schema Definition(XSD) " }
-            type Model
+            type DataClass
             link controller: 'gelXml', action: 'generateXSD',id: true
         }
 
         reportsRegistry.register {
             creates asset
             title { "Export  XML Shredder Model" }
-            type Model
+            type DataClass
             link controller: 'gelXml', action: 'generateXmlShredderModel',id: true
         }
 

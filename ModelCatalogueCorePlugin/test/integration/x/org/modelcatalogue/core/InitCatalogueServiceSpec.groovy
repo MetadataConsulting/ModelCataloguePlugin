@@ -48,7 +48,7 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
         then:
         loaded
-        loaded.sourceClass == Model
+        loaded.sourceClass == DataClass
         loaded.destinationClass == DataElement
         loaded.sourceToDestination == "contains"
         loaded.destinationToSource == "contained in"
@@ -62,8 +62,8 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
         then:
         loaded
-        loaded.sourceClass == Model
-        loaded.destinationClass == Model
+        loaded.sourceClass == DataClass
+        loaded.destinationClass == DataClass
         loaded.sourceToDestination == "parent of"
         loaded.destinationToSource == "child of"
         loaded.name == "hierarchy"
@@ -82,7 +82,7 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
         loaded.destinationToSource == "supersedes"
         loaded.name == "supersession"
 
-        !loaded.validateRule(new Model(), new DataElement(), [:])
+        !loaded.validateRule(new DataClass(), new DataElement(), [:])
         loaded.validateRule(new DataElement(), new DataElement(), [:])
 
     }

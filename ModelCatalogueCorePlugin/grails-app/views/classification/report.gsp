@@ -1,4 +1,4 @@
-        <%@ page import="org.modelcatalogue.core.util.CDN; grails.util.BuildScope; org.modelcatalogue.core.EnumeratedType; org.modelcatalogue.core.DataType; org.modelcatalogue.core.MeasurementUnit; org.modelcatalogue.core.ValueDomain; org.modelcatalogue.core.DataElement; org.modelcatalogue.core.Model; grails.util.Environment;grails.util.GrailsNameUtils" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
+        <%@ page import="org.modelcatalogue.core.DataClass; org.modelcatalogue.core.util.CDN; grails.util.BuildScope; org.modelcatalogue.core.EnumeratedType; org.modelcatalogue.core.DataType; org.modelcatalogue.core.MeasurementUnit; org.modelcatalogue.core.ValueDomain; org.modelcatalogue.core.DataElement; org.modelcatalogue.core.Model; grails.util.Environment;grails.util.GrailsNameUtils" contentType="text/html;charset=UTF-8" defaultCodec="none" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,7 +39,7 @@
             <div class="col-md-12">
                 <h1>${classification.name}</h1>
                     <h2>Models</h2>
-                    <g:each in="${classification.classifies.findAll{ it in Model}.sort { it.name }}">
+                    <g:each in="${classification.classifies.findAll{ it in org.modelcatalogue.core.DataClass}.sort { it.name }}">
                         <h3>${GrailsNameUtils.getNaturalName(it.getClass().simpleName)} ${it.name}</h3>
                         <table class="table">
                             <thead>
