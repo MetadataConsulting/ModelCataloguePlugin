@@ -24,7 +24,7 @@ class UpdateCatalogueElementSpec extends IntegrationSpec {
 
         then:
         updateAction.message == """
-            Update the Model 'The Model UA' with following parameters:
+            Update the Data Class 'The Model UA' with following parameters:
 
             Name: The Updated Model
         """.stripIndent().trim()
@@ -133,6 +133,6 @@ class UpdateCatalogueElementSpec extends IntegrationSpec {
 
         then:
         updateAction.failed
-        sw.toString().startsWith('Unable to update Model:' + model.id)
+        sw.toString().startsWith('Unable to update Data Class:' + model.id)
     }
 }

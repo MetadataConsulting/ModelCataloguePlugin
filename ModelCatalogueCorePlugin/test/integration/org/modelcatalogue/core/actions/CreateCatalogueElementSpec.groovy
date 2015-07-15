@@ -19,7 +19,7 @@ class CreateCatalogueElementSpec extends IntegrationSpec {
 
         then:
         createAction.message == """
-            Create new Model 'The Model' with following parameters:
+            Create new Data Class 'The Model' with following parameters:
 
             Name: The Model
         """.stripIndent().trim()

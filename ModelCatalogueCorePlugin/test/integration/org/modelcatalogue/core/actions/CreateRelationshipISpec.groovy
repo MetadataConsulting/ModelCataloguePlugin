@@ -45,7 +45,7 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
         then:
         createAction.message == """
-            Create new relationship '   <a href='#/catalogue/dataClass/${one.id}'> Data Clas 'book'</a>  related to <a href='#/catalogue/dataClass/${two.id}'> Data Class 'chapter1'</a> with following parameters:
+            Create new relationship '   <a href='#/catalogue/dataClass/${one.id}'> Data Class 'book'</a>  related to <a href='#/catalogue/dataClass/${two.id}'> Data Class 'chapter1'</a> with following parameters:
 
                         Source: book
             Destination: chapter1
@@ -63,7 +63,7 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
         errorsForEmpty.containsKey 'type'
 
         when:
-        Map<String, String> errorsForNonExisting = createAction.validate(source: 'gorm://org.modelacatalogue.core.Model:1233456')
+        Map<String, String> errorsForNonExisting = createAction.validate(source: 'gorm://org.modelacatalogue.core.DataClass:1233456')
 
         then:
         errorsForNonExisting.containsKey 'source'

@@ -2,10 +2,7 @@ package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
 
-/**
- * Created by adammilward on 27/02/2014.
- */
-class ModelControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
+class DataClassControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     protected boolean getRecord() {
         true
