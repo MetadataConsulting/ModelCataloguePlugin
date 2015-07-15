@@ -227,7 +227,8 @@ grails.plugin.springsecurity.authority.className = 'org.modelcatalogue.core.secu
 grails.plugin.springsecurity.requestMap.className = 'org.modelcatalogue.core.testapp.Requestmap'
 grails.plugin.springsecurity.securityConfigType = 'Requestmap'
 
-def assetExcludes = [
+
+grails.assets.excludes =  [
         "bootstrap/**/*.*",
         "jquery-ui/**/*.*",
         "font-awesome/**/*.*",
@@ -262,13 +263,42 @@ def assetExcludes = [
         "**/python3/*.*",
 ]
 
-grails.assets.excludes = assetExcludes
-
 grails.assets.plugin.famfamfam.excludes = ['**/*.*']
 
-grails.assets.plugin."model-catalogue-core-plugin".excludes = assetExcludes
-grails.assets.plugin."model-catalogue-core".excludes = assetExcludes
-grails.assets.plugin.ModelCatalogueCore.excludes = assetExcludes
+grails.assets.plugin."model-catalogue-core-plugin".excludes = [
+        "bootstrap/**/*.*",
+        "jquery-ui/**/*.*",
+        "font-awesome/**/*.*",
+        "jquery/**/*.*",
+        "angular/**/*.*",
+        "angular-animate/**/*.*",
+        "angular-bootstrap/**/*.*",
+        "angular-cookies/**/*.*",
+        "angular-i18n/**/*.*",
+        "angular-mocks/**/*.*",
+        "angular-sanitize/**/*.*",
+        "jasmine/**/*.*",
+        "**/*/GruntFile",
+        "**/*/Gruntfile",
+        "**/*/Gruntfile.coffee",
+        "**/*/LICENSE",
+        "**/*/COPYING",
+        "**/*/README",
+        "**/*/*.md",
+        "**/*/*.json",
+        "**/src/*.*",
+        "**/test/*.*",
+        "**/cpp/*.*",
+        "**/csharp/*.*",
+        "**/dart/*.*",
+        "**/demos/*.*",
+        "**/java/*.*",
+        "**/lua/*.*",
+        "**/maven/*.*",
+        "**/objectivec/*.*",
+        "**/python2/*.*",
+        "**/python3/*.*",
+]
 
 
 grails.plugin.springsecurity.useBasicAuth = true
