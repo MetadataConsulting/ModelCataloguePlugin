@@ -52,7 +52,7 @@ class DataModelService {
                 // but at the moment we're getting ConverterNotFoundException
                 'in' 'id', new DetachedCriteria<Relationship>(Relationship).build {
                     projections { property 'destination.id' }
-                    eq 'relationshipType', RelationshipType.definitionType
+                    eq 'relationshipType', RelationshipType.declarationType
                 }.list()
             }
             return criteria
@@ -60,7 +60,7 @@ class DataModelService {
 
         if (CatalogueElement.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.incomingRelationships {
-                'eq' 'relationshipType', RelationshipType.definitionType
+                'eq' 'relationshipType', RelationshipType.declarationType
                 source {
                     if (classificationsFilter.excludes) {
                         not {

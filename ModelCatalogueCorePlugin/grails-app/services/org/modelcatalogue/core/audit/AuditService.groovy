@@ -136,7 +136,7 @@ class AuditService {
     }
 
     private static String getClassifiedElementsSubQuery(DataModelFilter classifications, Map<String, Object> args) {
-        args.classificationType = RelationshipType.definitionType
+        args.classificationType = RelationshipType.declarationType
         if (classifications.unclassifiedOnly) {
             // language=HQL
             return """

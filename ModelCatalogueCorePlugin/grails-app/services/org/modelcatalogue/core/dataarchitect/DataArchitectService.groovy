@@ -424,7 +424,7 @@ class DataArchitectService {
                 and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
             )
         '''), [
-            classificationType: RelationshipType.definitionType,
+            classificationType: RelationshipType.declarationType,
             inheriting: [RelationshipType.hierarchyType, RelationshipType.containmentType],
             statuses: statuses
         ]))
@@ -447,7 +447,7 @@ class DataArchitectService {
                 and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
             )
         '''), [
-                classificationType: RelationshipType.definitionType,
+                classificationType: RelationshipType.declarationType,
                 statuses: statuses
         ]))
 
@@ -468,7 +468,7 @@ class DataArchitectService {
                 and (rel2.source.id = rel.source.id or rel2.source.latestVersionId = rel.source.latestVersionId)
             )
         '''), [
-                classificationType: RelationshipType.definitionType,
+                classificationType: RelationshipType.declarationType,
                 statuses: statuses
         ]))
     }
@@ -487,7 +487,7 @@ class DataArchitectService {
 
             Batch batch = Batch.findOrSaveByName("Deep Classify '$classification.name'")
 
-            Action action = actionService.create batch, CreateRelationship, source: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(classification)), destination: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(element)), type: "gorm://org.modelcatalogue.core.RelationshipType:${RelationshipType.definitionType.id}"
+            Action action = actionService.create batch, CreateRelationship, source: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(classification)), destination: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(element)), type: "gorm://org.modelcatalogue.core.RelationshipType:${RelationshipType.declarationType.id}"
             if (action.hasErrors()) {
                 log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating deep classification action", action.errors))
             }

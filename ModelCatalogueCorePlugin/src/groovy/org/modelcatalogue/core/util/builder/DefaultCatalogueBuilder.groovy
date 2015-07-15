@@ -584,7 +584,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             return
         }
         context.withContextElement(DataModel) {
-            element.addToPendingRelationships(new RelationshipProxy('definition', it, element, [:]))
+            element.addToPendingRelationships(new RelationshipProxy(RelationshipType.declarationType.name, it, element, [:]))
         }
     }
 

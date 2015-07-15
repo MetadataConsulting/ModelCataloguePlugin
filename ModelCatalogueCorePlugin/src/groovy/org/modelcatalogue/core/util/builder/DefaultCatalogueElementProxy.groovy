@@ -334,7 +334,7 @@ import org.modelcatalogue.core.util.Legacy
 
     @Override
     void addToPendingRelationships(RelationshipProxy relationshipProxy) {
-        if (!classification && relationshipProxy.relationshipTypeName == 'definition' && repository.equals(this, relationshipProxy.destination)) {
+        if (!classification && relationshipProxy.relationshipTypeName == RelationshipType.declarationType.name && repository.equals(this, relationshipProxy.destination)) {
             classification = relationshipProxy.source.name
         }
         relationships << relationshipProxy

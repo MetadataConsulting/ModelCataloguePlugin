@@ -63,8 +63,8 @@ class SearchISpec extends AbstractIntegrationSpec{
        13 | "DataClass"         | new DataClassController()           | "Jabberwocky"                   | "json"    | "chapter1"                | 1         | null
        14 | "DataClass"         | new DataClassController()           | "Jabberwocky"                   | "json"    | "chapter1"                | 0         | 'deprecated'
        15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1         | null
-       17 | "RelationshipType"  | new RelationshipTypeController()    | "definition"                    | "json"    | "definition"              | 1         | null
-       18 | "RelationshipType"  | new RelationshipTypeController()    | "definition"                    | "json"    | "definition"              | 1         | null
+       17 | "RelationshipType"  | new RelationshipTypeController()    | "declaration"                   | "json"    | "declaration"              | 1         | null
+       18 | "RelationshipType"  | new RelationshipTypeController()    | "declaration"                   | "json"    | "declaration"              | 1         | null
     }
 
     @Unroll

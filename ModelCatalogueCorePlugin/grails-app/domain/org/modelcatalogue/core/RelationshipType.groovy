@@ -167,8 +167,8 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         readByName("containment")
     }
 
-    static getDefinitionType() {
-        readByName("definition")
+    static getDeclarationType() {
+        readByName("declaration")
     }
 
     static getFavouriteType() {
@@ -199,7 +199,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         // TODO: temporary give warning if 'classification' type is requested
         if (name == 'classification') {
             Logger.getLogger(RelationshipType).warn extractFormattedException(new IllegalArgumentException("Relationship 'classification' was replaced by 'definition'. Update your code properly!"))
-            return definitionType
+            return declarationType
         }
         try {
             Long id = typesCache.get(name, { ->

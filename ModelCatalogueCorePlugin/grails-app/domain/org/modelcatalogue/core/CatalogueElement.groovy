@@ -62,7 +62,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     static hasMany = [incomingRelationships: Relationship, outgoingRelationships: Relationship, outgoingMappings: Mapping,  incomingMappings: Mapping, extensions: ExtensionValue]
 
     static relationships = [
-            incoming: [base: 'isBasedOn', definition: 'definedWithin', supersession: 'supersedes', favourite: 'isFavouriteOf'],
+            incoming: [base: 'isBasedOn', declaration: 'declaredWithin', supersession: 'supersedes', favourite: 'isFavouriteOf'],
             outgoing: [base: 'isBaseFor', attachment: 'hasAttachmentOf', supersession: 'supersededBy'],
             bidirectional: [relatedTo: 'relatedTo', synonym: 'isSynonymFor']
     ]
@@ -388,7 +388,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     
     void clearAssociationsBeforeDelete() {
         for (DataModel c in this.classifications) {
-            this.removeFromDefinedWithin(c)
+            this.removeFromDeclaredWithin(c)
         }
 
         // it is safe to remove all versioning informations

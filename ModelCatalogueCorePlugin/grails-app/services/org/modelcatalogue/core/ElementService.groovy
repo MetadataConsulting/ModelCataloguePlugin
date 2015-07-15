@@ -179,10 +179,10 @@ class ElementService implements Publisher<CatalogueElement> {
 
 
         for (DataModel classification in new HashSet<DataModel>(source.classifications)) {
-            classification.removeFromDefines(source)
-            source.removeFromDefinedWithin(classification)
-            classification.addToDefines(destination)
-            destination.addToDefinedWithin(classification)
+            classification.removeFromDeclares(source)
+            source.removeFromDeclaredWithin(classification)
+            classification.addToDeclares(destination)
+            destination.addToDeclaredWithin(classification)
         }
 
         for (Map.Entry<String, String> extension in new HashMap<String, String>(source.ext)) {

@@ -18,7 +18,7 @@ class DiscourseServiceSpec extends IntegrationSpec {
         MeasurementUnit mu = new MeasurementUnit(name: "Degree of Gray $time", description: "There are fifty of these...").save(failOnError: true)
         DataModel classification = new DataModel(name: "Discourse Test").save(failOnError: true)
 
-        mu.addToDefinedWithin classification
+        mu.addToDeclaredWithin classification
 
         Long id = discourseService.findOrCreateDiscourseTopic(mu.id)
 

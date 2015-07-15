@@ -31,7 +31,7 @@ class InitCatalogueServiceSpec extends IntegrationSpec {
 
         when:
         RelationshipType dt1 = RelationshipType.containmentType
-        RelationshipType dt2 = RelationshipType.definitionType
+        RelationshipType dt2 = RelationshipType.declarationType
         RelationshipType dt3 = RelationshipType.supersessionType
         RelationshipType dt4 = RelationshipType.hierarchyType
 

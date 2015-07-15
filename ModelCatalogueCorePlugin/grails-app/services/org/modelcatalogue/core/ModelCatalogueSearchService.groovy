@@ -128,7 +128,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                         )
                         and ${alias} not in (select rel.destination from Relationship rel where rel.relationshipType = :classificationType)
                     """
-                    arguments.classificationType = RelationshipType.definitionType
+                    arguments.classificationType = RelationshipType.declarationType
                 } else {
                     listQuery = """
                     from ${resource.simpleName} ${alias} left join ${alias}.incomingRelationships as rel
@@ -152,7 +152,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
                         listQuery += " and rel.source.id not in :excludes "
                         arguments.excludes = classifications.excludes
                     }
-                    arguments.classificationType = RelationshipType.definitionType
+                    arguments.classificationType = RelationshipType.declarationType
                 }
             }
 

@@ -239,7 +239,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         ValueDomain domain1 = new ValueDomain(name: 'SomeDomain').save(failOnError: true)
         ValueDomain domain2 = new ValueDomain(name: 'SomeDomain').save(failOnError: true)
 
-        cls.addToDefines(domain1)
+        cls.addToDeclares(domain1)
 
         build {
             valueDomain name: 'SomeDomain'
@@ -318,7 +318,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         DataType dt1 = new DataType(name: 'SomeType').save(failOnError: true)
         DataType dt2 = new DataType(name: 'SomeType').save(failOnError: true)
 
-        cls.addToDefines(dt1)
+        cls.addToDeclares(dt1)
 
         build {
             dataType name: 'SomeType'
@@ -387,10 +387,10 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         tokenDomain
         stringType
 
-        schema.defines
-        stringDomain    in schema.defines
-        tokenDomain     in schema.defines
-        stringType      in schema.defines
+        schema.declares
+        stringDomain    in schema.declares
+        tokenDomain     in schema.declares
+        stringType      in schema.declares
 
         stringDomain.dataType == stringType
 

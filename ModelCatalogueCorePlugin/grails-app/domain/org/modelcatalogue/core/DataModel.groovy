@@ -31,13 +31,13 @@ class DataModel extends CatalogueElement {
     }
 
     static relationships = [
-            outgoing: [definition: 'defines', classificationFilter: 'usedAsFilterBy']
+            outgoing: [declaration: 'declares', classificationFilter: 'usedAsFilterBy']
     ]
 
     @Override
     CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain.finalize(this)
-        .add(this.defines)
+        .add(this.declares)
         .run(publisher)
     }
 

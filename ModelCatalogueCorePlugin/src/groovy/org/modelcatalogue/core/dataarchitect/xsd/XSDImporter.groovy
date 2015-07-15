@@ -127,7 +127,7 @@ class XSDImporter {
         modelsCreated.each { DataClass model ->
             if (!model.childOf) {
                 model.addToChildOf(publicTypesContainer)
-                model.addToDefinedWithin(typeClassification)
+                model.addToDeclaredWithin(typeClassification)
             }
         }
 
@@ -170,7 +170,7 @@ class XSDImporter {
     }
 
     protected <E extends CatalogueElement> E addClassifications(E element) {
-        element.addToDefinedWithin(classifications.first())
+        element.addToDeclaredWithin(classifications.first())
         element
     }
 
@@ -669,7 +669,7 @@ class XSDImporter {
         if (!valueDomain) {
             valueDomain = new ValueDomain(name: simpleDataType.name, description: simpleDataType.description, dataType: dataType, rule: rule).save(flush: true, failOnError: true)
             for (DataModel classification in classifications) {
-                valueDomain.addToDefinedWithin(classification)
+                valueDomain.addToDeclaredWithin(classification)
             }
 
             if (baseValueDomain) valueDomain.addToIsBasedOn(baseValueDomain)

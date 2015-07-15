@@ -141,19 +141,19 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         ValueDomain domain = new ValueDomain(name: "merger test domain").save(failOnError: true)
 
         DataElement source = new DataElement(name: "merge tester", valueDomain: domain).save(failOnError: true)
-        source.addToDefinedWithin(sact)
+        source.addToDeclaredWithin(sact)
 
         DataElement destination = new DataElement(name: "merge tester").save(failOnError: true)
-        destination.addToDefinedWithin(cosd)
+        destination.addToDeclaredWithin(cosd)
 
         DataClass m1 = new DataClass(name: 'merge test container 1').save(failOnError: true)
         DataClass m2 = new DataClass(name: 'merge test container 2').save(failOnError: true)
 
         DataClass m3cosd = new DataClass(name: 'merge test container 3').save(failOnError: true)
-        m3cosd.addToDefinedWithin(cosd)
+        m3cosd.addToDeclaredWithin(cosd)
 
         DataClass m3sact = new DataClass(name: 'merge test container 3').save(failOnError: true)
-        m3sact.addToDefinedWithin(sact)
+        m3sact.addToDeclaredWithin(sact)
 
         m1.addToContains(source)
         m2.addToContains(destination)
