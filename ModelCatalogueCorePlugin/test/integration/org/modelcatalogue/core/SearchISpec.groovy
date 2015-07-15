@@ -6,9 +6,6 @@ import org.modelcatalogue.core.util.ResultRecorder
 import spock.lang.Shared
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 05/02/2014.
- */
 class SearchISpec extends AbstractIntegrationSpec{
 
  //runs ok in integration test (test-app :integration), fails as part of test-app (Grails Bug) - uncomment to run
@@ -66,8 +63,8 @@ class SearchISpec extends AbstractIntegrationSpec{
        13 | "DataClass"         | new DataClassController()           | "Jabberwocky"                   | "json"    | "chapter1"                | 1         | null
        14 | "DataClass"         | new DataClassController()           | "Jabberwocky"                   | "json"    | "chapter1"                | 0         | 'deprecated'
        15 | "ValueDomain"       | new ValueDomainController()         | "domain Celsius"                | "json"    | "value domain Celsius"    | 1         | null
-       17 | "RelationshipType"  | new RelationshipTypeController()    | "classification"                | "json"    | "classification"          | 2         | null
-       18 | "RelationshipType"  | new RelationshipTypeController()    | "classification"                | "json"    | "classification"          | 2         | null
+       17 | "RelationshipType"  | new RelationshipTypeController()    | "definition"                    | "json"    | "definition"              | 1         | null
+       18 | "RelationshipType"  | new RelationshipTypeController()    | "definition"                    | "json"    | "definition"              | 1         | null
     }
 
     @Unroll

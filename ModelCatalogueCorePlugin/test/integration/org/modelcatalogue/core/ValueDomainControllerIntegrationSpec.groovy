@@ -3,9 +3,6 @@ package org.modelcatalogue.core
 import grails.util.GrailsNameUtils
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class ValueDomainControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     protected boolean getRecord() {
@@ -110,7 +107,7 @@ class ValueDomainControllerIntegrationSpec extends AbstractCatalogueElementContr
         checkProperty(json.dataType.id, item.dataType.id, "dataType")
         checkProperty(json.multiple, item.multiple, "multiple")
 
-        assert json.classifications != null
+        assert json.dataModels != null
 
         return true
     }

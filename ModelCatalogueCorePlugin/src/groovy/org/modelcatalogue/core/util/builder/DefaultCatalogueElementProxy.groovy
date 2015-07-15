@@ -334,14 +334,14 @@ import org.modelcatalogue.core.util.Legacy
 
     @Override
     void addToPendingRelationships(RelationshipProxy relationshipProxy) {
-        if (!classification && relationshipProxy.relationshipTypeName == 'classification' && repository.equals(this, relationshipProxy.destination)) {
+        if (!classification && relationshipProxy.relationshipTypeName == 'definition' && repository.equals(this, relationshipProxy.destination)) {
             classification = relationshipProxy.source.name
         }
         relationships << relationshipProxy
     }
 
     String toString() {
-        "Proxy of $domain.simpleName[id: $modelCatalogueId, classification: $classification, name: $name]"
+        "Proxy of $domain.simpleName[id: $modelCatalogueId, dataModel: $classification, name: $name]"
     }
 
     @Override

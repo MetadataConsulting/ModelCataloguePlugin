@@ -1,4 +1,4 @@
-classification name: 'Java', {
+dataModel name: 'Java', {
 
     // if not set explicitly, the data type with the same name and description is created for value domains
     automatic dataType

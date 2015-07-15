@@ -240,8 +240,8 @@ class CatalogueElementProxyRepository {
     private <T extends CatalogueElement> CatalogueElementProxy<T> createAbstractionInternal(Class<T> domain, Map<String, Object> parameters, boolean underControl = false) {
         if (parameters.id) {
             return createAbstractionById(domain, parameters.name?.toString(), parameters.id?.toString(), underControl)
-        } else if (parameters.classification) {
-            return createAbstractionByClassificationAndName(domain, parameters.classification?.toString(), parameters.name?.toString(), underControl)
+        } else if (parameters.classification || parameters.dataModel) {
+            return createAbstractionByClassificationAndName(domain, (parameters.classification ?: parameters.dataModel)?.toString(), parameters.name?.toString(), underControl)
         } else if (parameters.name) {
             return createAbstractionByName(domain, parameters.name?.toString(), underControl)
         }
