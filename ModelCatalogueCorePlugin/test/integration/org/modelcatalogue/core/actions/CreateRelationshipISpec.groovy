@@ -13,7 +13,6 @@ import static org.modelcatalogue.core.actions.AbstractActionRunner.normalizeDesc
 
 class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
-    def modelCatalogueSecurityService
     def relationshipService
 
     @Autowired AutowireCapableBeanFactory autowireCapableBeanFactory
@@ -46,7 +45,7 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
         then:
         createAction.message == """
-            Create new relationship '   <a href='#/catalogue/model/${one.id}'> Model 'book'</a>  related to <a href='#/catalogue/model/${two.id}'> Model 'chapter1'</a> with following parameters:
+            Create new relationship '   <a href='#/catalogue/dataClass/${one.id}'> Data Clas 'book'</a>  related to <a href='#/catalogue/dataClass/${two.id}'> Data Class 'chapter1'</a> with following parameters:
 
                         Source: book
             Destination: chapter1
@@ -113,7 +112,7 @@ class CreateRelationshipISpec extends AbstractIntegrationSpec {
 
         then:
         !createAction.failed
-        sw.toString() == "<a href='#/catalogue/model/${one.id}'>Model 'book'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>related to</a> <a href='#/catalogue/model/${two.id}'>Model 'chapter1'</a>"
+        sw.toString() == "<a href='#/catalogue/dataClass/${one.id}'>Data Class 'book'</a> now <a href='#/catalogue/relationshipType/${relation.id}'>related to</a> <a href='#/catalogue/dataClass/${two.id}'>Data Class 'chapter1'</a>"
         createAction.result == encodeEntity(Relationship.list(limit: 1)[0])
     }
 

@@ -41,7 +41,7 @@ class MergePublishedElementsSpec extends Specification {
         merge.initWith(source: encodeEntity(one), destination: encodeEntity(two))
 
         then:
-        merge.message == """Merge Model <a target="_blank" href="#/catalogue/model/${one.id}">${one.name}</a> into Model <a target="_blank" href="#/catalogue/model/${two.id}">${two.name}</a> including all related elements having at least one classification as the source""".stripIndent().trim()
+        merge.message == """Merge Data Class <a target="_blank" href="#/catalogue/dataClass/${one.id}">${one.name}</a> into Data Class <a target="_blank" href="#/catalogue/dataClass/${two.id}">${two.name}</a> including all related elements having at least one data model as the source""".stripIndent().trim()
     }
 
 
@@ -53,7 +53,7 @@ class MergePublishedElementsSpec extends Specification {
         errorsForEmpty.containsKey 'destination'
 
         when:
-        Map<String, String> errorsForNonExisting = merge.validate(source: 'gorm://org.modelacatalogue.core.Model:1233456')
+        Map<String, String> errorsForNonExisting = merge.validate(source: 'gorm://org.modelacatalogue.core.DataClass:1233456')
 
         then:
         errorsForNonExisting.containsKey 'source'
@@ -95,7 +95,7 @@ class MergePublishedElementsSpec extends Specification {
         then:
         1 * merge.elementService.merge(one, two) >> one
         !merge.failed
-        sw.toString() == """Merged Model <a target="_blank" href="#/catalogue/model/${one.id}">${one.name}</a> into Model <a target="_blank" href="#/catalogue/model/${two.id}">${two.name}</a>"""
+        sw.toString() == """Merged Data Class <a target="_blank" href="#/catalogue/dataClass/${one.id}">${one.name}</a> into Data Class <a target="_blank" href="#/catalogue/dataClass/${two.id}">${two.name}</a>"""
         merge.result == encodeEntity(one)
     }
 

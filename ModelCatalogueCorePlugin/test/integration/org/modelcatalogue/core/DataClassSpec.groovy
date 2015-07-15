@@ -73,7 +73,7 @@ class DataClassSpec extends IntegrationSpec {
         modelInstance.info
         modelInstance.info.name == modelInstance.name
         modelInstance.info.id == modelInstance.id
-        modelInstance.info.link == "/model/${modelInstance.id}"
+        modelInstance.info.link == "/dataClass/${modelInstance.id}"
     }
 
 }

@@ -93,7 +93,7 @@ class CreateCatalogueElementSpec extends IntegrationSpec {
         DataClass.count() == 1 + initialCount
         DataClass.countByName('The Model') == 1
         DataClass.countByStatus(ElementStatus.DRAFT) == 1 + draftCount
-        sw.toString() == "New <a href='#/catalogue/model/${created.id}'>Model 'The Model'</a> created"
+        sw.toString() == "New <a href='#/catalogue/dataClass/${created.id}'>Data Class 'The Model'</a> created"
         created.ext.foo == 'bar'
         createAction.result == AbstractActionRunner.encodeEntity(DataClass.findByName('The Model'))
     }
@@ -113,6 +113,6 @@ class CreateCatalogueElementSpec extends IntegrationSpec {
         then:
         createAction.failed
         DataClass.count() == initialCount
-        sw.toString().startsWith('Unable to create new Model')
+        sw.toString().startsWith('Unable to create new Data Class')
     }
 }

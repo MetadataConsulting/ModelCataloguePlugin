@@ -115,7 +115,7 @@ class UpdateCatalogueElementSpec extends IntegrationSpec {
         DataClass.count() == initialCount
         DataClass.countByName('The Model UA') == 0
         DataClass.countByName('The New Model Name') == 1
-        sw.toString() == "<a href='#/catalogue/model/${changed.id}'>Model 'The New Model Name'</a> updated"
+        sw.toString() == "<a href='#/catalogue/dataClass/${changed.id}'>Data Class 'The New Model Name'</a> updated"
         changed.ext.foo == 'bar'
         changed.ext.bar == null
         updateAction.result == AbstractActionRunner.encodeEntity(DataClass.findByName('The New Model Name'))

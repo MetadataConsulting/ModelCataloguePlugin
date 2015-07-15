@@ -27,7 +27,7 @@ class MergePublishedElements extends AbstractActionRunner {
             Non-system relationships which exist by name in 'source' and are already present in 'destination' are archived
             If any reference are present in one of 'source' or 'destination' it's set to 'destinations'
             If any reference is set in both 'source' or 'destination' to different values then error is returned
-            If relationship on source belongs to same classification as the source and relationship with same name, type and direction on destination exists on destination, these two relationships are merged as well
+            If relationship on source belongs to same data model as the source and relationship with same name, type and direction on destination exists on destination, these two relationships are merged as well
 
 
         Parameters:
@@ -36,7 +36,7 @@ class MergePublishedElements extends AbstractActionRunner {
     """
 
     String getMessage() {
-        normalizeDescription """Merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${relationshipService.getClassifiedName(source)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${relationshipService.getClassifiedName(destination)}</a> including all related elements having at least one classification as the source"""
+        normalizeDescription """Merge ${GrailsNameUtils.getNaturalName(source.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(source.class.simpleName)}/${source.id}">${relationshipService.getClassifiedName(source)}</a> into ${GrailsNameUtils.getNaturalName(destination.class.simpleName)} <a target="_blank" href="#/catalogue/${GrailsNameUtils.getPropertyName(destination.class.simpleName)}/${destination.id}">${relationshipService.getClassifiedName(destination)}</a> including all related elements having at least one data model as the source"""
     }
 
     @Override
