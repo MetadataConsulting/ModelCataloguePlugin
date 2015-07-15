@@ -42,19 +42,19 @@ describe "mc.core.catalogueElementEnhancer", ->
 
   it "returns expected results for getLabel()", inject (enhance) ->
     domain  = enhance angular.copy(fixtures.valueDomain.showOne)
-    model   = enhance angular.copy(fixtures.model.showOne)
+    dataClass   = enhance angular.copy(fixtures.dataClass.showOne)
     element = enhance angular.copy(fixtures.dataType.showOne)
 
-    expect(domain.getLabel()) .toBe("school subject")
-    expect(model.getLabel())  .toBe("mTest3")
+    expect(domain.getLabel()).toBe("school subject")
+    expect(dataClass.getLabel()).toBe("mTest3")
     expect(element.getLabel()).toBe("boolean")
 
   it "returns expected results for instance of", inject (enhance) ->
     domain  = enhance angular.copy(fixtures.valueDomain.showOne)
-    model   = enhance angular.copy(fixtures.model.showOne)
+    dataClass   = enhance angular.copy(fixtures.dataClass.showOne)
 
     expect(domain.isInstanceOf).toBeFunction()
-    expect(model.isInstanceOf).toBeFunction()
+    expect(dataClass.isInstanceOf).toBeFunction()
 
     describe "test value domain and model", ->
       it "test value domain is ValueDomain", ->
@@ -65,12 +65,12 @@ describe "mc.core.catalogueElementEnhancer", ->
         expect(domain.isInstanceOf('org.modelcatalogue.core.Model')).toBeFalsy()
 
       it "test model isn't ValueDomain", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeFalsy()
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.ValueDomain')).toBeFalsy()
       it "test model isn't MeasurementUnit", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.MeasurementUnit')).toBeFalsy()
       it "test model is CatalogueElement", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.CatalogueElement')).toBeTruthy()
       it "test model is Model", ->
-        expect(model.isInstanceOf('org.modelcatalogue.core.Model')).toBeTruthy()
+        expect(dataClass.isInstanceOf('org.modelcatalogue.core.DataClass')).toBeTruthy()
 
 
