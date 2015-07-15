@@ -664,7 +664,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         DataClass model = DataClass.findByName('Model_ID')
 
         expect:
-        model.modelCatalogueId == "http://www.example.com/classification/m/Model_ID"
+        model.modelCatalogueId == "http://www.example.com/classification/d/Model_ID"
 
         cleanup:
         Holders.grailsApplication.config.grails.serverURL = old
