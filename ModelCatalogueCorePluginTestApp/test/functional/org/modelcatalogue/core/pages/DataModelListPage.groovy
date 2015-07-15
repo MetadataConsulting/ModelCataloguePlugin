@@ -3,12 +3,12 @@ package org.modelcatalogue.core.pages
 /**
  * Created by david on 04/11/14.
  */
-class ClassificationListPage extends ModelCataloguePage {
+class DataModelListPage extends ModelCataloguePage {
 
-    static url = "#/catalogue/classification/all"
+    static url = "#/catalogue/dataModel/all"
 
     static at = {
-        url == "#/catalogue/classification/all"
+        url == "#/catalogue/dataModel/all"
     }
 
     static content={

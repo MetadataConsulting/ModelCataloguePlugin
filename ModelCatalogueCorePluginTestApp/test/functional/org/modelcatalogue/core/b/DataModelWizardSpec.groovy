@@ -1,7 +1,7 @@
 package org.modelcatalogue.core.b
 
 import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
-import org.modelcatalogue.core.pages.ClassificationListPage
+import org.modelcatalogue.core.pages.DataModelListPage
 import spock.lang.Stepwise
 
 @Stepwise
@@ -15,7 +15,7 @@ class DataModelWizardSpec extends AbstractModelCatalogueGebSpec {
         go "#/catalogue/dataModel/all"
 
         then:
-        at ClassificationListPage
+        at DataModelListPage
         waitFor(120) {
             viewTitle.displayed
         }

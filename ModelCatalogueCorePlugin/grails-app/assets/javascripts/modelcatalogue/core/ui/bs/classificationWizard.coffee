@@ -138,7 +138,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
                 list.next.then checkForUniqueness
               else
                 deferred.resolve true
-            catalogueElementResource('classification').search(name).then checkForUniqueness
+            catalogueElementResource('dataModel').search(name).then checkForUniqueness
             deferred.promise
 
           $scope.finish = ->
@@ -161,7 +161,7 @@ angular.module('mc.core.ui.bs.classificationWizard', ['mc.util.messages', 'mc.ut
 
               promise = promise.then ->
                 $scope.classification.classifies = $scope.dataElements
-                catalogueElementResource('classification').save($scope.classification)
+                catalogueElementResource('dataModel').save($scope.classification)
 
               promise = promise.then (classification) ->
                   messages.success "Data Model #{classification.name} created"
