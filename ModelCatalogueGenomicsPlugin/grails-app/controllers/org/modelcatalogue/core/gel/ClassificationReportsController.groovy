@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.gel
 
+import org.modelcatalogue.core.DataClass
 
 import java.util.concurrent.ExecutorService
 import net.sf.jasperreports.engine.JasperFillManager
@@ -13,11 +14,9 @@ import net.sf.jasperreports.export.SimpleExporterInput
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput
 
 import org.hibernate.FetchMode
-import org.modelcatalogue.core.AbstractCatalogueElementController
 import org.modelcatalogue.core.Asset
 import org.modelcatalogue.core.AssetService
-import org.modelcatalogue.core.Classification
-import org.modelcatalogue.core.Model
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.RelationshipType
 import org.modelcatalogue.core.SecurityService;
 import org.modelcatalogue.core.ValueDomain
@@ -32,7 +31,6 @@ import org.springframework.http.HttpStatus;
  *
  */
 class ClassificationReportsController {
-    def gelXmlService
     ExecutorService executorService
     AuditService auditService
     AssetService assetService
@@ -41,8 +39,8 @@ class ClassificationReportsController {
     def index() { }
     
     def gereportDoc() {
-        Classification classification = Classification.get(params.id)
-        def models = getModelsForClassification(params.id as Long)
+        DataModel classification = DataModel.get(params.id)
+        def models = getDataClassesForDataModels(params.id as Long)
         
 
         if (!models) {
@@ -72,7 +70,7 @@ class ClassificationReportsController {
     }
 
 
-    private def storeAssetFromJasper(Classification classification,Collection models,Map params,String assetName=null,String mimeType="application/octet-stream",String assetPendingDesc="",String assetFinalizedDesc="",String assetErrorDesc="",String originalFileName="unknown"){
+    private def storeAssetFromJasper(DataModel classification,Collection models,Map params,String assetName=null,String mimeType="application/octet-stream",String assetPendingDesc="",String assetFinalizedDesc="",String assetErrorDesc="",String originalFileName="unknown"){
         Asset asset = new Asset(
                 name:assetName ,
                 originalFileName: originalFileName,
@@ -123,7 +121,7 @@ class ClassificationReportsController {
      * @param fileExtension only pdf and docx are supported
      * @return a byte array containing the result
      */
-    private byte[] getClassificationReportAsByte(Classification classification, Collection models,String fileExtension) {
+    private byte[] getClassificationReportAsByte(DataModel classification, Collection models,String fileExtension) {
         Resource resource=getApplicationContext().getResource('classpath:/jReports/ClassificationInventoryGe.jasper')
         
         JasperReport jasperReport = (JasperReport)JRLoader.loadObject(resource.inputStream)
@@ -166,9 +164,9 @@ class ClassificationReportsController {
         return baos.toByteArray()
     }
 
-    private Collection getModelsForClassification(Long classificationId) {
-        def classificationType = RelationshipType.findByName('classification')
-        def results = Model.createCriteria().list {
+    private Collection getDataClassesForDataModels(Long classificationId) {
+        def classificationType = RelationshipType.declarationType
+        def results = DataClass.createCriteria().list {
             fetchMode "extensions", FetchMode.JOIN
             fetchMode "outgoingRelationships.extensions", FetchMode.JOIN
             fetchMode "outgoingRelationships.destination.classifications", FetchMode.JOIN
