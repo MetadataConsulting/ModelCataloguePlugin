@@ -730,8 +730,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <a ui-sref="mc.resource.list({resource: 'dataModel'})" ui-sref-opts="{inherit: false}"><i class="fa fa-tags fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'dataModel'})" ui-sref-opts="{inherit: false}">Finalized Data Models</a> {{finalizedClassificationCount}} </div>
-                            <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'dataModel', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Models</a> {{draftClassificationCount}} </div>
+                            <div><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'dataModel'})" ui-sref-opts="{inherit: false}">Finalized Data Models</a> {{finalizedDataModelCount}} </div>
+                            <div show-for-role="VIEWER"><a id="dataSetsLink" ui-sref="mc.resource.list({resource: 'dataModel', status: 'draft'})" ui-sref-opts="{inherit: false}">Draft Data Models</a> {{draftDataModelCount}} </div>
                         </div>
                     </div>
                 </div>
@@ -753,8 +753,8 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
                             <a ui-sref="mc.resource.list({resource: 'dataClass'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cubes fa-5x fa-fw"></i></a>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div><a id="dataClasssLink" ui-sref="mc.resource.list({resource: 'dataClass'})" ui-sref-opts="{inherit: false}">Finalized Data Classes</a> {{finalizedModelCount}} </div>
-                            <div show-for-role="VIEWER"><a id="dataClassLink" ui-sref="mc.resource.list({resource: 'dataClass', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Classes</a> {{draftModelCount}}</div>
+                            <div><a id="dataClasssLink" ui-sref="mc.resource.list({resource: 'dataClass'})" ui-sref-opts="{inherit: false}">Finalized Data Classes</a> {{finalizedDataClassCount}} </div>
+                            <div show-for-role="VIEWER"><a id="dataClassLink" ui-sref="mc.resource.list({resource: 'dataClass', status:'draft'})" ui-sref-opts="{inherit: false}">Draft Data Classes</a> {{draftDataClassCount}}</div>
 
                         </div>
                     </div>

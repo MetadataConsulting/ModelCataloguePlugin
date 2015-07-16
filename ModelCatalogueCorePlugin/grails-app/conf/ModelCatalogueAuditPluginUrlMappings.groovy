@@ -10,10 +10,10 @@ class ModelCatalogueAuditPluginUrlMappings {
         "/api/modelCatalogue/core/change/$id/changes"(controller: 'change', action: 'changes', method: HttpMethod.GET)
         "/api/modelCatalogue/core/change/$id"(controller: 'change', action: 'undo', method: HttpMethod.DELETE)
 
-        "/api/modelCatalogue/core/classification/$id/activity"(controller: 'change', action: 'classificationActivity', method: HttpMethod.GET)
+        "/api/modelCatalogue/core/dataModel/$id/activity"(controller: 'change', action: 'classificationActivity', method: HttpMethod.GET)
         "/api/modelCatalogue/core/user/$id/activity"(controller: 'change', action: 'userActivity', method: HttpMethod.GET)
 
-        def catalogueElements = ['asset', 'dataElement', 'model', 'catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'classification']
+        def catalogueElements = ['asset', 'dataElement', 'dataModel', 'catalogueElement', 'dataType', 'enumeratedType', 'measurementUnit', 'valueDomain', 'user', 'dataClass']
 
         for (String controllerName in catalogueElements) {
             "/api/modelCatalogue/core/$controllerName/$id/changes"(controller: controllerName, action: 'changes', method: HttpMethod.GET)

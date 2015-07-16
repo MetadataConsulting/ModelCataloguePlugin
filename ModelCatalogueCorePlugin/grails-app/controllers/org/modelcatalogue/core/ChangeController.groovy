@@ -69,7 +69,7 @@ class ChangeController extends RestfulController<Change> {
             return
         }
 
-        respond Lists.wrap(params, "/classification/${params.id}/activity", auditService.getGlobalChanges(params, DataModelFilter.includes(element)))
+        respond Lists.wrap(params, "/dataModel/${params.id}/activity", auditService.getGlobalChanges(params, DataModelFilter.includes(element)))
     }
 
     def userActivity(Integer max) {
