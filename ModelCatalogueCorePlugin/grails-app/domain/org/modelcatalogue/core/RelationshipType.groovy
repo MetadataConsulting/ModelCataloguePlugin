@@ -163,35 +163,35 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
 
-    static getContainmentType() {
+    static RelationshipType getContainmentType() {
         readByName("containment")
     }
 
-    static getDeclarationType() {
+    static RelationshipType getDeclarationType() {
         readByName("declaration")
     }
 
-    static getFavouriteType() {
+    static RelationshipType getFavouriteType() {
         readByName("favourite")
     }
 
-    static getSynonymType() {
+    static RelationshipType getSynonymType() {
         readByName("synonym")
     }
 
-    static getRelatedToType() {
+    static RelationshipType getRelatedToType() {
         readByName("relatedTo")
     }
 
-    static getHierarchyType() {
+    static RelationshipType getHierarchyType() {
         readByName("hierarchy")
     }
 
-    static getSupersessionType() {
+    static RelationshipType getSupersessionType() {
         readByName("supersession")
     }
 
-    static getBaseType() {
+    static RelationshipType getBaseType() {
         readByName("base")
     }
 

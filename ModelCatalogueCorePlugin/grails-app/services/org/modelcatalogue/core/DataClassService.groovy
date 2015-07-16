@@ -23,10 +23,6 @@ class DataClassService {
         ElementStatus status            = ElementService.getStatusFromParams(params)
         RelationshipType classification = RelationshipType.declarationType
 
-        DetachedCriteria<DataClass> criteria = new DetachedCriteria<DataClass>(DataClass)
-
-
-
 
         if (classifications.unclassifiedOnly) {
             // language=HQL
