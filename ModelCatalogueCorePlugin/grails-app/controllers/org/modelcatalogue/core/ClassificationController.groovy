@@ -1,17 +1,6 @@
 package org.modelcatalogue.core
 
-import net.sf.jasperreports.engine.JasperFillManager
-import net.sf.jasperreports.engine.JasperPrint
-import net.sf.jasperreports.engine.JasperReport
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
-import net.sf.jasperreports.engine.export.JRPdfExporter
-import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter
-import net.sf.jasperreports.engine.util.JRLoader
-import net.sf.jasperreports.export.SimpleExporterInput
-import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput
-
 import org.hibernate.FetchMode
-import org.springframework.core.io.Resource
 
 
 class ClassificationController<T> extends AbstractCatalogueElementController<Classification> {
