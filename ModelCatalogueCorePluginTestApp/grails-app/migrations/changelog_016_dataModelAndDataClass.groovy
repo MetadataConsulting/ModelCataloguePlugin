@@ -84,6 +84,13 @@ databaseChangeLog = {
         """
     }
 
+    changeSet(author: "Vladimir Orany", id: "1432717633383-06") {
+        sql """
+             update batch set archived=1 where name like '% Model %' and not name like '% Data Model %';
+             update batch set archived=1 where name like 'Deep Classify %';
+        """
+    }
+
 
 }
 

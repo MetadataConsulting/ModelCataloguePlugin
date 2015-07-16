@@ -485,11 +485,11 @@ class DataArchitectService {
             DataModel classification = row[0] as DataModel
             CatalogueElement element = row[1] as CatalogueElement
 
-            Batch batch = Batch.findOrSaveByName("Deep Classify '$classification.name'")
+            Batch batch = Batch.findOrSaveByName("Deep Declare '$classification.name'")
 
             Action action = actionService.create batch, CreateRelationship, source: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(classification)), destination: AbstractActionRunner.encodeEntity(DraftContext.preferDraft(element)), type: "gorm://org.modelcatalogue.core.RelationshipType:${RelationshipType.declarationType.id}"
             if (action.hasErrors()) {
-                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating deep classification action", action.errors))
+                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating deep declaration action", action.errors))
             }
 
             batch.archived = false
@@ -498,14 +498,14 @@ class DataArchitectService {
     }
 
     private void generateInlineModel() {
-        Batch.findAllByNameIlike("Inline Model '%'").each reset
+        Batch.findAllByNameIlike("Inline Data Class '%'").each reset
         elementService.findModelsToBeInlined().each { sourceId, destId ->
             DataClass model = DataClass.get(sourceId)
-            Batch batch = Batch.findOrSaveByName("Inline Model '$model.name'")
-            batch.description = """Model '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
-            Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$sourceId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
+            Batch batch = Batch.findOrSaveByName("Inline Data Class '$model.name'")
+            batch.description = """Data Class '$model.name' was created from XML Schema element but it is actually used only in one place an can be replaced by its type"""
+            Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$sourceId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
             if (action.hasErrors()) {
-                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge model action", action.errors))
+                log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating merge data class action", action.errors))
             }
             batch.archived = false
             batch.save(flush: true)
@@ -515,13 +515,13 @@ class DataArchitectService {
     private void generateMergeModels() {
         def duplicateModelsSuggestions = elementService.findDuplicateModelsSuggestions()
 
-        Batch.findAllByNameIlike("Create Synonyms for Model '%'").each reset
+        Batch.findAllByNameIlike("Create Synonyms for Data Class '%'").each reset
         duplicateModelsSuggestions.each { destId, sources ->
             DataClass model = DataClass.get(destId)
-            Batch batch = Batch.findOrSaveByName("Create Synonyms for Model '$model.name'")
+            Batch batch = Batch.findOrSaveByName("Create Synonyms for Data Class '$model.name'")
             RelationshipType type = RelationshipType.readByName("synonym")
             sources.each { srcId ->
-                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
+                Action action = actionService.create batch, CreateRelationship, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId", type: "gorm://org.modelcatalogue.core.RelationshipType:$type.id"
                 if (action.hasErrors()) {
                     log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
@@ -530,12 +530,12 @@ class DataArchitectService {
             batch.save(flush: true)
         }
 
-        Batch.findAllByNameIlike("Merge Model '%'").each reset
+        Batch.findAllByNameIlike("Merge Data Class '%'").each reset
         duplicateModelsSuggestions.each { destId, sources ->
             DataClass model = DataClass.get(destId)
-            Batch batch = Batch.findOrSaveByName("Merge Model '$model.name'")
+            Batch batch = Batch.findOrSaveByName("Merge Data Class '$model.name'")
             sources.each { srcId ->
-                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.Model:$srcId", destination: "gorm://org.modelcatalogue.core.Model:$destId"
+                Action action = actionService.create batch, MergePublishedElements, source: "gorm://org.modelcatalogue.core.DataClass:$srcId", destination: "gorm://org.modelcatalogue.core.DataClass:$destId"
                 if (action.hasErrors()) {
                     log.error(org.modelcatalogue.core.util.FriendlyErrors.printErrors("Error generating create synonym action", action.errors))
                 }
