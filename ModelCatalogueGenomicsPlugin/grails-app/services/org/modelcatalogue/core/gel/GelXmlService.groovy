@@ -5,6 +5,7 @@ import groovy.xml.MarkupBuilder
 import groovy.xml.XmlUtil
 
 import org.modelcatalogue.core.DataModel
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.DataClass
@@ -32,6 +33,7 @@ class GelXmlService {
     static final String XSD_RESTRICTION_PATTERN="http://xsd.modelcatalogue.org/restrictions#pattern"
     static final String METADATA_MIN_OCCURS="Min Occurs"
     static final String METADATA_MAX_OCCURS="Max Occurs"
+    static final String XSL_TABLE_NAME="http://xsl.modelcatalogue.org/tableName"
 
     static final def XSD_RESTRICTION_LIST=[XSD_RESTRICTION_LENGTH,XSD_RESTRICTION_MIN_LENGTH,XSD_RESTRICTION_MAX_LENGTH,XSD_RESTRICTION_MAX_INCLUSIVE,
         XSD_RESTRICTION_MIN_INCLUSIVE,XSD_RESTRICTION_MAX_EXCLUSIVE,XSD_RESTRICTION_MIN_EXCLUSIVE,XSD_RESTRICTION_TOTAL_DIGITS,XSD_RESTRICTION_FRACTION_DIGITS,XSD_RESTRICTION_PATTERN]
@@ -103,6 +105,7 @@ class GelXmlService {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
+                tableName getXSLTableName(model)
                 
                 //validate occurs
                 validateMetadataOccurs(model.getOutgoingRelationshipsByType(RelationshipType.containmentType))
@@ -118,6 +121,7 @@ class GelXmlService {
                 setOmitEmptyAttributes(true)
                 setOmitNullAttributes(true)
                 name model.name
+                tableName getXSLTableName(model)
                 instructions model.ext.instructions
                 
                 //validate occurs
@@ -138,6 +142,9 @@ class GelXmlService {
             setOmitEmptyAttributes(true)
             setOmitNullAttributes(true)
             name dataElement.name
+            if (ext.get(METADATA_MIN_OCCURS)>0||"unbounded".equals(ext.get(METADATA_MAX_OCCURS))){
+             tableName getXSLTableName(dataElement)
+            }
             text dataElement.ext.text
             instructions dataElement.description
             
@@ -159,6 +166,10 @@ class GelXmlService {
         }
     }
 
+    def getXSLTableName(CatalogueElement element){
+        return (element.ext.get(XSL_TABLE_NAME))?element.ext.get(XSL_TABLE_NAME):element.name
+    }
+    
     protected transformDataType(String dataType) {
         def dataType2 = dataType.replace('xs:', '')
 

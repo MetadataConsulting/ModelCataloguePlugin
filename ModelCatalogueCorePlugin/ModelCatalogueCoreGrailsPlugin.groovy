@@ -67,7 +67,6 @@ Model catalogue core plugin (metadata registry)
         ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
 
 
-
         mergeConfig(application)
 
         xlsxListRenderer(XLSXListRenderer)
@@ -322,7 +321,7 @@ Model catalogue core plugin (metadata registry)
 			creates link
 			title { "GE Inventory Report Docx" }
 			type DataModel
-			link controller: 'dataModel', action: 'gereportDoc', id: true
+			link controller: 'classificationReports', action: 'gereportDoc', id: true
 		}
 
         reportsRegistry.register {

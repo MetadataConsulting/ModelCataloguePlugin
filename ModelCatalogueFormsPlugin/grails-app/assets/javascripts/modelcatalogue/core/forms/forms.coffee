@@ -508,7 +508,7 @@ forms.run ['$templateCache', ($templateCache) ->
 	    <label for="item-data-type" class="control-label">Data Type</label>
 	    <select id="item-data-type" class="form-control" ng-options="key for (key, value) in {'String':'string', 'Integer': 'int', 'Real':'real', 'Date':'date', 'Partial Date': 'pdate'}" ng-model="object.access('http://forms.modelcatalogue.org/item#dataType')" ng-model-options="{ getterSetter: true }"></select>
 	    <p class="help-block">
-	      Data type of the item. If you want to use data type <code>file</code> select the <code>File</code> response type on the value domain.<br/>
+	      Data type of the item. If you want to use data type <code>file</code> select the <code>File</code> response type.<br/>
 	      XMLSchema and Java data types are mapped to their proper data types automatically. This includes if the current data type is based on one of the data types from XMLSchema or Java classification. For a partial date, use <code>xs:gMonthYear</code> data type.
 	    </p>
 	</div>

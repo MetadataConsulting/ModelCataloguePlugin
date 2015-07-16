@@ -59,18 +59,7 @@ grails.project.dependency.resolution = {
         compile "org.modelcatalogue:mc-integration-xml:$mcToolkitVersion"
         test "org.modelcatalogue:mc-builder-xml:$mcToolkitVersion"
 
-		//----- Jasper Reports specific dependencies 
-		 //from the bintray
-		compile 'net.sf.jasperreports:jasperreports-javaflow:6.0.3'
-		compile 'commons-javaflow:commons-javaflow:20060411'
 		
-		compile ('net.sf.jasperreports:jasperreports:6.0.3'){
-            excludes 'antlr', 'commons-logging','jasperreports',
-                     'ant', 'mondrian' ,'barbecue', 'xml-apis-ext','xml-apis', 'xalan', 'groovy-all', 'hibernate', 'saaj-api', 'servlet-api',
-                     'xercesImpl','xmlParserAPIs','spring-core','bsh', 'spring-beans', 'jaxen', 'barcode4j','batik-svg-dom','batik-xml','batik-awt-util','batik-dom',
-                     'batik-css','batik-gvt','batik-script', 'batik-svggen','batik-util','batik-bridge','persistence-api','jdtcore','bcmail-jdk16','bcprov-jdk16','bctsp-jdk16',
-                     'bcmail-jdk14','bcprov-jdk14','bctsp-jdk14','xmlbeans', 'olap4j'
-        }
 
         test 'xmlunit:xmlunit:1.6'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
