@@ -28,8 +28,8 @@ class DataArchitectService {
             'Merge Models': this.&generateMergeModels,
             'Enum Duplicates and Synonyms': this.&generatePossibleEnumDuplicatesAndSynonyms,
             'Rename Data Types and Value Domains': this.&generateRenameDataTypesAndValueDomain,
-            'Deep Classification': this.&generateDeepClassify.curry(false),
-            'Deep Classification (Unclassified Only)': this.&generateDeepClassify.curry(true)
+            'Deep Declaration': this.&generateDeepClassify.curry(false),
+            'Deep Declaration (Orpahned Only)': this.&generateDeepClassify.curry(true)
     ]
 
     Set<String> getSuggestionsNames() {
@@ -402,11 +402,11 @@ class DataArchitectService {
 
 
     private void generateDeepClassify(boolean unclassifiedOnly = false) {
-        Batch.findAllByNameIlike("Deep Classify '%'").each reset
+        Batch.findAllByNameIlike("Deep Declaration '%'").each reset
 
         List<ElementStatus> statuses = [ElementStatus.FINALIZED, ElementStatus.DRAFT]
 
-        log.info "Generating deep classification suggestions for models => models/data elements"
+        log.info "Generating deep declaration suggestions for models => models/data elements"
         generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly,  '''
             select rel.source, destination
             from Relationship rel
@@ -430,7 +430,7 @@ class DataArchitectService {
         ]))
 
 
-        log.info "Generating deep classification suggestions for data elements => value domains"
+        log.info "Generating deep decalaration suggestions for data elements => value domains"
         //language=HQL
         generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly,  '''
             select rel.source, destination
@@ -451,7 +451,7 @@ class DataArchitectService {
                 statuses: statuses
         ]))
 
-        log.info "Generating deep classification suggestions for value domains => data types"
+        log.info "Generating deep declaration suggestions for value domains => data types"
         //language=HQL
         generateDeepClassification(Relationship.executeQuery(unclassifyIfNeeded(unclassifiedOnly, '''
             select rel.source, destination
