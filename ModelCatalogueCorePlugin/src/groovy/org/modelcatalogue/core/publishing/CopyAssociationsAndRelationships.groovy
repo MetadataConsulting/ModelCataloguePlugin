@@ -42,7 +42,7 @@ class CopyAssociationsAndRelationships {
 
             definitionBuilder
                     .withArchived(r.archived)
-                    .withClassification(r.classification)
+                    .withDataModel(r.classification)
                     .withIncomingIndex(r.incomingIndex)
                     .withOutgoingIndex(r.outgoingIndex)
                     .withCombinedIndex(r.combinedIndex)
@@ -117,7 +117,7 @@ class CopyAssociationsAndRelationships {
 
             definitionBuilder
                     .withArchived(r.archived)
-                    .withClassification(r.classification)
+                    .withDataModel(r.classification)
                     .withIncomingIndex(r.incomingIndex)
                     .withOutgoingIndex(r.outgoingIndex)
                     .withCombinedIndex(r.combinedIndex)

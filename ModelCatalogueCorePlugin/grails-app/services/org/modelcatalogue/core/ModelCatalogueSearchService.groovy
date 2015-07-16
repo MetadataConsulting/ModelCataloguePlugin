@@ -19,7 +19,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
     def search(CatalogueElement element, RelationshipType type, RelationshipDirection direction, Map params) {
         String query = "%$params.search%"
 
-        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, dataModelService.classificationsInUse)
+        DetachedCriteria<Relationship> criteria = direction.composeWhere(element, type, dataModelService.dataModelFilter)
 
         switch (direction) {
             case RelationshipDirection.OUTGOING:
@@ -88,7 +88,7 @@ class ModelCatalogueSearchService implements SearchCatalogue {
             searchResults.searchResults = criteria.list(params)
             searchResults.total = criteria.count()
         } else if (CatalogueElement.isAssignableFrom(resource)) {
-            DataModelFilter classifications = dataModelService.classificationsInUse
+            DataModelFilter classifications = dataModelService.dataModelFilter
 
             String alias = resource.simpleName[0].toLowerCase()
             String listQuery = """

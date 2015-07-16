@@ -54,14 +54,5 @@ class DashboardController {
         respond model
     }
 
-    private Long countWithClassification(Class resource) {
-        dataModelService.classified(Lists.all([:], resource)).total
-    }
-
-    private Long countWithClassificationAndStatus(Class resource, ElementStatus desiredStatus) {
-        dataModelService.classified(resource).build {
-            eq 'status', desiredStatus
-        }.count()
-    }
 }
 

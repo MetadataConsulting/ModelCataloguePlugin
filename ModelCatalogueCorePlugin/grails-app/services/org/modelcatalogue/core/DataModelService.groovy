@@ -13,7 +13,7 @@ class DataModelService {
 
     def modelCatalogueSecurityService
 
-    public <T> ListWrapper<T> classified(ListWrapper<T> list, DataModelFilter classificationsFilter = classificationsInUse) {
+    public <T> ListWrapper<T> classified(ListWrapper<T> list, DataModelFilter classificationsFilter = dataModelFilter) {
         if (!(list instanceof ListWithTotalAndTypeWrapper)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only ListWithTotalAndTypeWrapper is currently supported")
         }
@@ -27,7 +27,7 @@ class DataModelService {
         return list
     }
 
-    public <T> ListWithTotalAndType<T> classified(ListWithTotalAndType<T> list, DataModelFilter classificationsFilter = classificationsInUse) {
+    public <T> ListWithTotalAndType<T> classified(ListWithTotalAndType<T> list, DataModelFilter classificationsFilter = dataModelFilter) {
         if (!(list instanceof DetachedListWithTotalAndType)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only DetachedListWithTotalAndType is currently supported")
         }
@@ -37,7 +37,7 @@ class DataModelService {
         return list
     }
 
-    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, DataModelFilter classificationsFilter = classificationsInUse) {
+    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, DataModelFilter classificationsFilter = dataModelFilter) {
         if (criteria.persistentEntity.javaClass == DataModel) {
             return criteria
         }
@@ -91,11 +91,11 @@ class DataModelService {
         criteria
     }
 
-    public <T> DetachedCriteria<T> classified(Class<T> resource, DataModelFilter classificationsFilter = classificationsInUse) {
+    public <T> DetachedCriteria<T> classified(Class<T> resource, DataModelFilter classificationsFilter = dataModelFilter) {
         classified(new DetachedCriteria<T>(resource), classificationsFilter)
     }
 
-    public DataModelFilter getClassificationsInUse() {
+    public DataModelFilter getDataModelFilter() {
         if (!modelCatalogueSecurityService.isUserLoggedIn()) {
             return DataModelFilter.NO_FILTER
         }

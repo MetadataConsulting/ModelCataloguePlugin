@@ -22,7 +22,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 * DataElement) they extend catalogue element which allows creation of incoming and outgoing
 * relationships between them. They also  share a number of characteristics.
 * */
-abstract class CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement {
+abstract class  CatalogueElement implements Extendible<ExtensionValue>, Published<CatalogueElement>, ApiCatalogueElement {
 
     def grailsLinkGenerator
     def relationshipService
@@ -343,8 +343,13 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
         listExtensions()?.find { it.name == name }
     }
 
+    List<DataModel> getDataModels() {
+        relationshipService.getDataModels(this)
+    }
+
+    @Deprecated
     List<DataModel> getClassifications() {
-        relationshipService.getClassifications(this)
+        relationshipService.getDataModels(this)
     }
 
     boolean isReadyForQueries() {
@@ -362,7 +367,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
 
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(classifications)
+        chain.add(dataModels)
     }
 
     @Override
@@ -387,7 +392,7 @@ abstract class CatalogueElement implements Extendible<ExtensionValue>, Published
     }
     
     void clearAssociationsBeforeDelete() {
-        for (DataModel c in this.classifications) {
+        for (DataModel c in this.dataModels) {
             this.removeFromDeclaredWithin(c)
         }
 

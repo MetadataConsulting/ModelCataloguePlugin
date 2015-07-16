@@ -94,7 +94,7 @@ class DataModelServiceSpec extends IntegrationSpec {
     }
 
     def "get unclassified top level models"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(DataModelFilter.create(true), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create(true), [:])
 
         expect:
         models.total >= 1
@@ -103,7 +103,7 @@ class DataModelServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(DataModelFilter.create([classification1], []), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([classification1], []), [:])
 
         expect:
         models.total >= 1
@@ -114,7 +114,7 @@ class DataModelServiceSpec extends IntegrationSpec {
 
 
     def "get top level models with exclude classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(DataModelFilter.create([], [classification2]), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([], [classification2]), [:])
 
         expect:
         models.total >= 2
@@ -124,7 +124,7 @@ class DataModelServiceSpec extends IntegrationSpec {
     }
 
     def "get top level models with include and exclude classification filter"() {
-        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelModels(DataModelFilter.create([classification1], [classification2]), [:])
+        ListWithTotalAndType<DataClass> models = dataClassService.getTopLevelDataClasses(DataModelFilter.create([classification1], [classification2]), [:])
 
         expect:
         models.total >= 1

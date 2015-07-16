@@ -158,9 +158,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 return
             }
 
-            DataModel classification = otherSide.classification ? DataModel.get(otherSide.classification.id) : null
+            def dataModelObject = otherSide.dataModel ?: otherSide.classification
+            DataModel dataModel = dataModelObject ? DataModel.get(dataModelObject.id) : null
 
-            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, classification) :  relationshipService.unlink(destination, source, relationshipType, classification)
+            Relationship old = outgoing ?  relationshipService.unlink(source, destination, relationshipType, dataModel) :  relationshipService.unlink(destination, source, relationshipType, dataModel)
             if (!old) {
                 notFound()
                 return
@@ -197,18 +198,18 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
             }
 
-            def newClassification = objectToBind['__classification']
-            Long classificationId = newClassification instanceof Map ? newClassification.id : null
+            def newDataModel = objectToBind['__dataModel'] ?: objectToBind['__classification']
+            Long dataModelId = newDataModel instanceof Map ? newDataModel.id : null
 
-            DataModel classification = classificationId ? DataModel.get(classificationId) : null
+            DataModel dataModel = dataModelId ? DataModel.get(dataModelId) : null
 
 
-            def oldClassification = objectToBind['__oldClassification']
-            Long oldClassificationId = oldClassification instanceof Map ? oldClassification.id : null
+            def oldDataModel = objectToBind['__oldDataModel'] ?: objectToBind['__oldClassification']
+            Long oldDataModelId = oldDataModel instanceof Map ? oldDataModel.id : null
 
-            DataModel oldClassificationInstance = oldClassificationId ? DataModel.get(oldClassificationId) : null
+            DataModel oldDataModelInstance = oldDataModelId ? DataModel.get(oldDataModelId) : null
 
-            if (classificationId && !classification) {
+            if (dataModelId && !dataModel) {
                 notFound()
                 return
             }
@@ -227,17 +228,17 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
                 return
             }
 
-            if (oldClassificationInstance != classification) {
+            if (oldDataModelInstance != dataModel) {
                 if (outgoing) {
-                    relationshipService.unlink(source, destination, relationshipType, oldClassificationInstance)
+                    relationshipService.unlink(source, destination, relationshipType, oldDataModelInstance)
                 } else {
-                    relationshipService.unlink(destination, source, relationshipType, oldClassificationInstance)
+                    relationshipService.unlink(destination, source, relationshipType, oldDataModelInstance)
                 }
             }
 
             RelationshipDefinitionBuilder definition = outgoing ? RelationshipDefinition.create(source, destination, relationshipType) : RelationshipDefinition.create(destination, source, relationshipType)
 
-            definition.withClassification(classification).withMetadata(OrderedMap.fromJsonMap(objectToBind.metadata ?: [:]))
+            definition.withDataModel(dataModel).withMetadata(OrderedMap.fromJsonMap(objectToBind.metadata ?: [:]))
 
             Relationship rel = relationshipService.link(definition.definition)
 
@@ -249,7 +250,7 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
             response.status = HttpServletResponse.SC_CREATED
             RelationshipDirection direction = outgoing ? RelationshipDirection.OUTGOING : RelationshipDirection.INCOMING
 
-            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.classification)
+            respond(id: rel.id, type: rel.relationshipType, ext: OrderedMap.toJsonMap(rel.ext), element: CatalogueElementMarshaller.minimalCatalogueElementJSON(direction.getElement(source, rel)), relation: direction.getRelation(source, rel), direction: direction.getDirection(source, rel), removeLink: RelationshipsMarshaller.getDeleteLink(source, rel), archived: rel.archived, elementType: Relationship.name, classification: rel.classification, dataModel: rel.classification)
         }
     }
 
@@ -684,18 +685,18 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
-        def classifications = objectToBind.classifications ?: objectToBind.dataModels ?: []
-        for (classification in instance.classifications.findAll { !(it.id in classifications.collect { it.id as Long } || it.latestVersionId in classifications.collect { it.id as Long })  }) {
-            instance.removeFromDeclaredWithin classification
-            classification.removeFromDeclares instance
+        def dataModels = objectToBind.classifications ?: objectToBind.dataModels ?: []
+        for (dataModel in instance.dataModels.findAll { !(it.id in dataModels.collect { it.id as Long } || it.latestVersionId in dataModels.collect { it.id as Long })  }) {
+            instance.removeFromDeclaredWithin dataModel
+            dataModel.removeFromDeclares instance
         }
-        for (domain in classifications) {
-            DataModel classification = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
-            if (!(classification.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
-                classification = elementService.createDraftVersion(classification, DraftContext.userFriendly())
+        for (domain in dataModels) {
+            DataModel dataModel = DraftContext.preferDraft(DataModel.get(domain.id as Long)) as DataModel
+            if (!(dataModel.status in [ElementStatus.DRAFT, ElementStatus.UPDATED, ElementStatus.PENDING])) {
+                dataModel = elementService.createDraftVersion(dataModel, DraftContext.userFriendly())
             }
-            instance.addToDeclaredWithin classification
-            classification.addToDeclares instance
+            instance.addToDeclaredWithin dataModel
+            dataModel.addToDeclares instance
         }
     }
 

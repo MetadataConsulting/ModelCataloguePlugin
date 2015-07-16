@@ -58,10 +58,10 @@ class ChangeController extends RestfulController<Change> {
             params.max = params.long('max')
         }
 
-        respond Lists.wrap(params, "/change/", auditService.getGlobalChanges(params, dataModelService.classificationsInUse))
+        respond Lists.wrap(params, "/change/", auditService.getGlobalChanges(params, dataModelService.dataModelFilter))
     }
 
-    def classificationActivity(Integer max) {
+    def dataModelActivity(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         DataModel element = DataModel.get(params.id)
         if (!element) {

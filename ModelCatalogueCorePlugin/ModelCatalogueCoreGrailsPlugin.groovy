@@ -160,7 +160,7 @@ Model catalogue core plugin (metadata registry)
             when { ListWrapper container, RenderContext context ->
                 context.actionName in [null, 'index', 'search', 'incoming', 'outgoing', 'valueDomains'] && (!container.itemType || ValueDomain.isAssignableFrom(container.itemType))
             } then { ValueDomain valueDomain ->
-                [[valueDomain.modelCatalogueId, valueDomain.name, getClassificationString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
+                [[valueDomain.modelCatalogueId, valueDomain.name, getDataModelsString(valueDomain), valueDomain.unitOfMeasure, getValueDomainRuleString(valueDomain), valueDomain.dataTypeId, valueDomain.dataType.name, getEnumerationString(valueDomain.dataType)]]
             }
         }
 
@@ -273,7 +273,7 @@ Model catalogue core plugin (metadata registry)
                 ValueDomain valueDomain = element.valueDomain
                 DataType dataType = valueDomain?.dataType
                 [[
-                         getClassificationString(element),
+                         getDataModelsString(element),
                          parent?.modelCatalogueId ?: parent?.getDefaultModelCatalogueId(true),
                          parent?.name,
                          model?.modelCatalogueId  ?: model?.getDefaultModelCatalogueId(true),
@@ -281,12 +281,12 @@ Model catalogue core plugin (metadata registry)
                          element.modelCatalogueId ?: element.getDefaultModelCatalogueId(true),
                          element.name,
                          element.description,
-                         getClassificationString(valueDomain),
+                         getDataModelsString(valueDomain),
                          valueDomain?.modelCatalogueId ?: valueDomain?.getDefaultModelCatalogueId(true),
                          valueDomain?.name,
                          getUnitOfMeasure(element),
                          getUnitOfMeasureSymbol(element) ,
-                         getClassificationString(dataType),
+                         getDataModelsString(dataType),
                          dataType?.modelCatalogueId ?: dataType?.getDefaultModelCatalogueId(true),
                          getDataType(element),
                          "-"
@@ -416,11 +416,11 @@ Model catalogue core plugin (metadata registry)
         return null
     }
 
-    def static getClassificationString(CatalogueElement dataElement) {
-        if (!dataElement?.classifications) {
+    def static getDataModelsString(CatalogueElement dataElement) {
+        if (!dataElement?.dataModels) {
             return ""
         }
-        dataElement.classifications.first().name
+        dataElement.dataModels.first().name
     }
 
     def static getValueDomainString(DataType dataType){

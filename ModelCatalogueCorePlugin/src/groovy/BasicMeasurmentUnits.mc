@@ -2,7 +2,7 @@ measurementUnit name: "celsius", description: "degrees celsius", symbol: "°C"
 measurementUnit name: "fahrenheit", description: "degrees fahrenheit", symbol: "°F"
 measurementUnit name: "newtons", description: "measurement of force", symbol: "N"
 
-classification name: 'SI', {
+dataModel name: 'SI', {
     // the units are already there but unclassified
     globalSearchFor measurementUnit
 

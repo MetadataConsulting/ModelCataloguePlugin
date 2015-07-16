@@ -30,7 +30,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
     }
 
     def "get top level elements"() {
-        ListWithTotal topLevel = dataClassService.getTopLevelModels([:])
+        ListWithTotal topLevel = dataClassService.getTopLevelDataClasses([:])
 
         expect:
         DataClass.count()           >= 5
@@ -44,7 +44,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "get subModels"() {
         when:
-        ListWithTotal subModels = dataClassService.getSubModels(parent1)
+        ListWithTotal subModels = dataClassService.getInnerClasses(parent1)
 
         then:
         subModels.count == 3
@@ -60,7 +60,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
         grandChild.addToContains(de3)
 
         when:
-        ListWithTotal dataElements = dataClassService.getDataElementsFromModels([parent1, child1, grandChild])
+        ListWithTotal dataElements = dataClassService.getDataElementsFromClasses([parent1, child1, grandChild])
 
         then:
         dataElements.count ==3
@@ -71,7 +71,7 @@ class DataClassServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "test infinite recursion"(){
         when:
-        ListWithTotal subModels = dataClassService.getSubModels(parent1)
+        ListWithTotal subModels = dataClassService.getInnerClasses(parent1)
 
         then:
         subModels.count ==3

@@ -8,7 +8,7 @@ class RelationshipDefinitionBuilder {
         this.definition = definition
     }
 
-    RelationshipDefinitionBuilder withClassification(DataModel classification) {
+    RelationshipDefinitionBuilder withDataModel(DataModel classification) {
         definition.classification = classification
         this
     }

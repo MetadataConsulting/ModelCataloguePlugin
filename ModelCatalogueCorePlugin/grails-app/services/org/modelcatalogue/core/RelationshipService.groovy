@@ -60,7 +60,7 @@ class RelationshipService {
     @Deprecated
     Relationship link(CatalogueElement theSource, CatalogueElement theDestination, RelationshipType type, DataModel theClassification, boolean theArchived = false, boolean theIgnoreRules = false, boolean theResetIndices = false) {
         link RelationshipDefinition.create(theSource, theDestination, type)
-                .withClassification(theClassification)
+                .withDataModel(theClassification)
                 .withArchived(theArchived)
                 .withIgnoreRules(theIgnoreRules)
                 .withResetIndices(theResetIndices)
@@ -185,7 +185,7 @@ class RelationshipService {
     Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel classification, boolean ignoreRules = false) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withClassification(classification).definition)
+            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withDataModel(classification).definition)
 
             if(!ignoreRules) {
                 if (relationshipType.versionSpecific && !relationshipType.system && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
@@ -255,7 +255,7 @@ class RelationshipService {
         }
     }
 
-    def List<DataModel> getClassifications(CatalogueElement element) {
+    def List<DataModel> getDataModels(CatalogueElement element) {
         if (!element) {
             return []
         }

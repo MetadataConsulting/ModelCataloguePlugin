@@ -21,7 +21,7 @@ class DataClassController extends AbstractCatalogueElementController<DataClass> 
         }
         handleParams(max)
 
-        respond Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelModels(params))
+        respond Lists.wrap(params, "/${resourceName}/", dataClassService.getTopLevelDataClasses(params))
     }
 
 }

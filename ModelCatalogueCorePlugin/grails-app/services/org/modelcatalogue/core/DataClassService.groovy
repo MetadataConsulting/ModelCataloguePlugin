@@ -1,6 +1,5 @@
 package org.modelcatalogue.core
 
-import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.util.DataModelFilter
@@ -14,17 +13,17 @@ class DataClassService {
     SecurityService modelCatalogueSecurityService
     DataModelService dataModelService
 
-    ListWithTotalAndType<DataClass> getTopLevelModels(Map params) {
-        getTopLevelModels(dataModelService.classificationsInUse, params)
+    ListWithTotalAndType<DataClass> getTopLevelDataClasses(Map params) {
+        getTopLevelDataClasses(dataModelService.dataModelFilter, params)
     }
 
-    ListWithTotalAndType<DataClass> getTopLevelModels(DataModelFilter classifications, Map params) {
+    ListWithTotalAndType<DataClass> getTopLevelDataClasses(DataModelFilter dataModelFilter, Map params) {
         RelationshipType hierarchy      = RelationshipType.hierarchyType
         ElementStatus status            = ElementService.getStatusFromParams(params)
-        RelationshipType classification = RelationshipType.declarationType
+        RelationshipType declaration = RelationshipType.declarationType
 
 
-        if (classifications.unclassifiedOnly) {
+        if (dataModelFilter.unclassifiedOnly) {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
@@ -33,7 +32,7 @@ class DataClassService {
                     and (
                         (
                             m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                            and rel.relationshipType != :classificationType
+                            and rel.relationshipType != :declarationType
                         )
                         or m.incomingRelationships is empty
                      )
@@ -46,20 +45,20 @@ class DataClassService {
                     and (
                         (
                             m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                            and rel.relationshipType != :classificationType
+                            and rel.relationshipType != :declarationType
                         )
                         or m.incomingRelationships is empty
                      )
-            """, [type: hierarchy, status: status, classificationType: classification ])
+            """, [type: hierarchy, status: status, declarationType: declaration ])
         }
-        if (classifications.excludes && !classifications.includes) {
+        if (dataModelFilter.excludes && !dataModelFilter.includes) {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
                 from DataClass as m
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:classifications))
+                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:dataModels))
                 group by m.name, m.id
                 order by m.name
             ""","""
@@ -67,18 +66,18 @@ class DataClassService {
                 from DataClass as m
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:classifications))
-            """, [type: hierarchy, status: status, classifications: classifications.excludes, classificationType: classification ])
+                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:dataModels))
+            """, [type: hierarchy, status: status, dataModels: dataModelFilter.excludes, declarationType: declaration ])
         }
-        if (classifications.excludes && classifications.includes) {
+        if (dataModelFilter.excludes && dataModelFilter.includes) {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
                 from DataClass as m
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes))
-                    and m.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes))
+                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:excludes))
+                    and m.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:includes))
                 group by m.name, m.id
                 order by m.name
             ""","""
@@ -86,19 +85,19 @@ class DataClassService {
                 from DataClass as m
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:excludes))
-                    and m.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :classificationType and r.source.id in (:includes))
-            """, [type: hierarchy, status: status, includes: classifications.includes, excludes: classifications.excludes, classificationType: classification ])
+                    and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:excludes))
+                    and m.id in (select distinct r.destination.id from Relationship r where r.relationshipType = :declarationType and r.source.id in (:includes))
+            """, [type: hierarchy, status: status, includes: dataModelFilter.includes, excludes: dataModelFilter.excludes, declarationType: declaration ])
         }
-        if (classifications.includes && !classifications.excludes) {
+        if (dataModelFilter.includes && !dataModelFilter.excludes) {
             // language=HQL
             return Lists.fromQuery(params, DataClass, """
                 select distinct m
                 from DataClass as m join m.incomingRelationships as rel
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                    and rel.source.id in (:classifications)
-                    and rel.relationshipType = :classificationType
+                    and rel.source.id in (:dataModels)
+                    and rel.relationshipType = :declarationType
                 group by m.name, m.id
                 order by m.name
             ""","""
@@ -106,9 +105,9 @@ class DataClassService {
                 from DataClass as m join m.incomingRelationships as rel
                 where m.status = :status
                     and m.id not in (select distinct r.destination.id from Relationship r where r.relationshipType = :type)
-                    and rel.source.id in (:classifications)
-                    and rel.relationshipType = :classificationType
-            """, [type: hierarchy, status: status, classifications: classifications.includes, classificationType: classification ])
+                    and rel.source.id in (:dataModels)
+                    and rel.relationshipType = :declarationType
+            """, [type: hierarchy, status: status, dataModels: dataModelFilter.includes, declarationType: declaration ])
         }
         // language=HQL
         Lists.fromQuery params, DataClass, """
@@ -124,13 +123,13 @@ class DataClassService {
         """, [type: hierarchy, status: status]
     }
 
-    ListWithTotalAndType<DataClass> getSubModels(DataClass model) {
+    ListWithTotalAndType<DataClass> getInnerClasses(DataClass model) {
         List<DataClass> models = listChildren(model)
         new ListCountAndType<DataClass>(count: models.size(), list: models, itemType: DataClass)
 
     }
 
-    ListWithTotalAndType<DataElement> getDataElementsFromModels(List<DataClass> models){
+    ListWithTotalAndType<DataElement> getDataElementsFromClasses(List<DataClass> models){
         def results = []
         models.each{ model ->
             results.addAll(model.contains)

@@ -15,7 +15,7 @@ class DataModelPrintHelper extends CatalogueElementPrintHelper<DataModel> {
     void processElements(Object theMkp, DataModel element, PrintContext context, Relationship rel) {
         super.processElements(theMkp, element, context, rel)
 
-        for (CatalogueElement other in context.modelService.getTopLevelModels(DataModelFilter.includes(element), [:]).items) {
+        for (CatalogueElement other in context.modelService.getTopLevelDataClasses(DataModelFilter.includes(element), [:]).items) {
                 printElement(theMkp, other, context, null)
         }
 

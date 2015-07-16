@@ -1,7 +1,7 @@
 /**
  * XMLSchema classification provides default XML data types and their value domains
  */
-classification(name: 'XMLSchema') {
+dataModel(name: 'XMLSchema') {
 
     id 'http://www.w3.org/2001/XMLSchema'
     description 'XML Schema provides standard types for describing your own XML formats'
