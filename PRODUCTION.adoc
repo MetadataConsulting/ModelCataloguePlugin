@@ -58,6 +58,7 @@ dataSource {
 
 == OAuth 2.0 Configuration
 Following three providers are included out of the box:
+
  * Facebook - https://grails.org/plugin/spring-security-oauth-facebook
  * Google - https://grails.org/plugin/spring-security-oauth-google
  * Twitter - https://grails.org/plugin/spring-security-oauth-twitter
