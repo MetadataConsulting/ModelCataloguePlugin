@@ -78,7 +78,7 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     static belongsTo = [source: CatalogueElement, destination: CatalogueElement]
 
     static constraints = {
-        classification nullable: true
+        dataModel nullable: true
     }
 
     static mapping = {

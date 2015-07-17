@@ -58,9 +58,9 @@ class RelationshipService {
      * @deprecated use #link(Closure)
      */
     @Deprecated
-    Relationship link(CatalogueElement theSource, CatalogueElement theDestination, RelationshipType type, DataModel theClassification, boolean theArchived = false, boolean theIgnoreRules = false, boolean theResetIndices = false) {
+    Relationship link(CatalogueElement theSource, CatalogueElement theDestination, RelationshipType type, DataModel theDataModel, boolean theArchived = false, boolean theIgnoreRules = false, boolean theResetIndices = false) {
         link RelationshipDefinition.create(theSource, theDestination, type)
-                .withDataModel(theClassification)
+                .withDataModel(theDataModel)
                 .withArchived(theArchived)
                 .withIgnoreRules(theIgnoreRules)
                 .withResetIndices(theResetIndices)
@@ -143,9 +143,9 @@ class RelationshipService {
             and rel.dataModel = :dataModel
         """
 
-        Map<String, Object> params = [source: definition.source, destination: definition.destination, relationshipType: definition.relationshipType, dataModel: definition.classification]
+        Map<String, Object> params = [source: definition.source, destination: definition.destination, relationshipType: definition.relationshipType, dataModel: definition.dataModel]
 
-        if (!definition.classification) {
+        if (!definition.dataModel) {
             query = """
                 select rel from Relationship rel left join fetch rel.extensions
                 where rel.source = :source
@@ -182,10 +182,10 @@ class RelationshipService {
         unlink source, destination, relationshipType, null, ignoreRules
     }
 
-    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel classification, boolean ignoreRules = false) {
+    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel dataModel, boolean ignoreRules = false) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
-            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withDataModel(classification).definition)
+            Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withDataModel(dataModel).definition)
 
             if(!ignoreRules) {
                 if (relationshipType.versionSpecific && !relationshipType.system && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
@@ -198,7 +198,7 @@ class RelationshipService {
                 auditService.logRelationRemoved(relationshipInstance)
                 destination?.removeFromIncomingRelationships(relationshipInstance)
                 source?.removeFromOutgoingRelationships(relationshipInstance)
-                relationshipInstance.classification = null
+                relationshipInstance.dataModel = null
                 relationshipInstance.delete(flush: true)
                 return relationshipInstance
             }
@@ -216,18 +216,18 @@ class RelationshipService {
             return element.name
         }
 
-        RelationshipType classification = RelationshipType.declarationType
+        RelationshipType dataModel = RelationshipType.declarationType
 
-        String classifications = Relationship.executeQuery("""
+        String dataModels = Relationship.executeQuery("""
             select r.source.name
             from Relationship as r
-            where r.relationshipType.id = :classification
+            where r.relationshipType.id = :dataModel
             and r.destination.id = :elementId
             order by r.source.name
-        """, [classification: classification.id, elementId: element.id]).join(', ')
+        """, [dataModel: dataModel.id, elementId: element.id]).join(', ')
 
-        if (classifications) {
-            return "${element.name} (${classifications})"
+        if (dataModels) {
+            return "${element.name} (${dataModels})"
         }
 
         return element.name
@@ -242,16 +242,16 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.declarationType
+        RelationshipType dataModel = RelationshipType.declarationType
 
         Relationship.executeQuery("""
             select r.source.name, r.source.id, r.source.status
             from Relationship as r
-            where r.relationshipType.id = :classification
+            where r.relationshipType.id = :dataModel
             and r.destination.id = :elementId
             order by r.source.name
-        """, [classification: classification.id, elementId: element.id]).collect {
-            [name: it[0], id: it[1], status: "${it[2]}", elementType: DataModel.name, link:  "/classification/${it[1]}"]
+        """, [dataModel: dataModel.id, elementId: element.id]).collect {
+            [name: it[0], id: it[1], status: "${it[2]}", elementType: DataModel.name, link:  "/dataModel/${it[1]}"]
         }
     }
 
@@ -264,16 +264,16 @@ class RelationshipService {
             return []
         }
 
-        RelationshipType classification = RelationshipType.declarationType
+        RelationshipType dataModel = RelationshipType.declarationType
 
         DataModel.executeQuery """
             select c
             from DataModel as c
             join c.outgoingRelationships as rel
-            where rel.relationshipType.id = :classification
+            where rel.relationshipType.id = :dataModel
             and rel.destination.id = :elementId
             order by c.name
-        """, [classification: classification.id, elementId: element.id], [cache: true]
+        """, [dataModel: dataModel.id, elementId: element.id], [cache: true]
     }
 
     Relationship moveAfter(RelationshipDirection direction, CatalogueElement owner,  Relationship relationship, Relationship other) {
