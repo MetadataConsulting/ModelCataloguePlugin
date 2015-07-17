@@ -63,6 +63,9 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     Boolean archived = false
 
+    // TODO: we'll probably have to mark relationships as inherited
+    // Boolean inherited = false
+
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
     void setExt(Map<String, String> ext) {
