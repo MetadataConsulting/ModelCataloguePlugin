@@ -91,6 +91,37 @@ databaseChangeLog = {
         """
     }
 
+    changeSet(author: "Vladimir Orany", id: "1432717633383-07") {
+        preConditions (onFail: 'MARK_RAN') {
+            not {
+                tableExists tableName: "data_class"
+            }
+        }
+        renameTable oldTableName: 'model', newTableName: 'data_class'
+    }
+
+    changeSet(author: "Vladimir Orany", id: "1432717633383-08") {
+        preConditions (onFail: 'MARK_RAN') {
+            not {
+                tableExists tableName: "data_model"
+            }
+        }
+        renameTable oldTableName: 'classification', newTableName: 'data_model'
+    }
+
+
+
+    changeSet(author: "Vladimir Orany", id: "1432717633383-09") {
+        preConditions (onFail: 'MARK_RAN') {
+            not {
+                columnExists tableName: "relationship", columnName: "data_model_id"
+            }
+        }
+        renameColumn tableName: "relationship", columnDataType: "BIGINT", newColumnName: "data_model_id", oldColumnName: "classification_id"
+    }
+
+
+
 
 }
 

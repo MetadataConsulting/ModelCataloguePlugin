@@ -26,10 +26,6 @@ class DataModel extends CatalogueElement {
 
     static transients = ['namespace']
 
-    static mapping = {
-        table 'classification'
-    }
-
     static relationships = [
             outgoing: [declaration: 'declares', classificationFilter: 'usedAsFilterBy']
     ]

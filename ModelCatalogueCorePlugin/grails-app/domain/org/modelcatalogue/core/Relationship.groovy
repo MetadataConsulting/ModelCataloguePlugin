@@ -83,6 +83,7 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     static mapping = {
         extensions lazy: false, sort: 'orderIndex'
+        classification column: 'data_model_id'
     }
 
     String toString() {

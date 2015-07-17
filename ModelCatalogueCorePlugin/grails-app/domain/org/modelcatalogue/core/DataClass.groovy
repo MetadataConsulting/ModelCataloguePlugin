@@ -11,10 +11,6 @@ class DataClass extends CatalogueElement {
             outgoing: [containment: 'contains', hierarchy: 'parentOf']
     ]
 
-    static mapping = {
-        table 'model'
-    }
-
     @Override
     CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain.finalize(this)
