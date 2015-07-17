@@ -3,9 +3,6 @@ package org.modelcatalogue.core.util.marshalling
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.util.OrderedMap
 
-/**
- * Created by ladin on 14.02.14.
- */
 class RelationshipMarshallers extends AbstractMarshaller {
 
     RelationshipMarshallers() {
@@ -26,7 +23,8 @@ class RelationshipMarshallers extends AbstractMarshaller {
                 archived: rel.archived,
                 ext: OrderedMap.toJsonMap(rel.ext),
                 elementType: Relationship.name,
-                classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(rel.classification)
+                classification: CatalogueElementMarshaller.minimalCatalogueElementJSON(rel.dataModel),
+                dataModel: CatalogueElementMarshaller.minimalCatalogueElementJSON(rel.dataModel)
         ]
     }
 }

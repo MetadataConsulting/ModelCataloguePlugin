@@ -140,10 +140,10 @@ class RelationshipService {
             where rel.source = :source
             and rel.destination = :destination
             and rel.relationshipType = :relationshipType
-            and rel.classification = :classification
+            and rel.dataModel = :dataModel
         """
 
-        Map<String, Object> params = [source: definition.source, destination: definition.destination, relationshipType: definition.relationshipType, classification: definition.classification]
+        Map<String, Object> params = [source: definition.source, destination: definition.destination, relationshipType: definition.relationshipType, dataModel: definition.classification]
 
         if (!definition.classification) {
             query = """
@@ -151,9 +151,9 @@ class RelationshipService {
                 where rel.source = :source
                 and rel.destination = :destination
                 and rel.relationshipType = :relationshipType
-                and rel.classification is null
+                and rel.dataModel is null
             """
-            params.remove 'classification'
+            params.remove 'dataModel'
         }
         List<Relationship> relationships = Relationship.executeQuery(query, params)
         if (relationships)  {

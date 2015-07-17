@@ -25,7 +25,7 @@ class RelationshipDefinition {
     }
 
     // optional
-    DataModel classification = null
+    DataModel dataModel = null
     Map<String, String> metadata = [:]
     boolean archived
     Long outgoingIndex
@@ -42,7 +42,7 @@ class RelationshipDefinition {
                 source: source?.id ? source : null,
                 destination: destination?.id ? destination : null,
                 relationshipType: relationshipType?.id ? relationshipType : null,
-                classification: classification?.id ? classification : null,
+                dataModel: dataModel?.id ? dataModel : null,
                 archived: archived,
                 outgoingIndex: outgoingIndex ?: System.currentTimeMillis(),
                 incomingIndex: incomingIndex ?: System.currentTimeMillis(),
@@ -51,7 +51,7 @@ class RelationshipDefinition {
     }
 
     @Override String toString() {
-        "$source.name =[$relationshipType.sourceToDestination${classification ? ('/' + classification.name) : ''}]=> $destination.name"
+        "$source.name =[$relationshipType.sourceToDestination${dataModel ? ('/' + dataModel.name) : ''}]=> $destination.name"
     }
 }
 

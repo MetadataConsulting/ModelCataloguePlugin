@@ -198,7 +198,7 @@ class CatalogueElementProxyRepository {
                 relations.removeAll resolvedRelationships
 
                 relations.collect { Relationship.get(it) } each {
-                    elementService.relationshipService.unlink(it.source, it.destination, it.relationshipType, it.classification, it.archived)
+                    elementService.relationshipService.unlink(it.source, it.destination, it.relationshipType, it.dataModel, it.archived)
                 }
             }
         }

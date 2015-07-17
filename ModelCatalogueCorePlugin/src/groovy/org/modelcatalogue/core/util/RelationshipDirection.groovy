@@ -20,15 +20,15 @@ enum RelationshipDirection {
 
             if (filter) {
                 criteria.or {
-                    isNull 'classification'
+                    isNull 'dataModel'
                     and {
                         if (filter.excludes) {
                             criteria.not {
-                                criteria.'in' 'classification.id', filter.excludes
+                                criteria.'in' 'dataModel.id', filter.excludes
                             }
                         }
                         if (filter.includes) {
-                            criteria.'in'  'classification.id', filter.includes
+                            criteria.'in'  'dataModel.id', filter.includes
                         }
                     }
                 }
@@ -95,15 +95,15 @@ enum RelationshipDirection {
 
             if (filter) {
                 criteria.or {
-                    isNull 'classification'
+                    isNull 'dataModel'
                     and {
                         if (filter.excludes) {
                             criteria.not {
-                                criteria.'in' 'classification.id', filter.excludes
+                                criteria.'in' 'dataModel.id', filter.excludes
                             }
                         }
                         if (filter.includes) {
-                            criteria.'in'  'classification.id', filter.includes
+                            criteria.'in'  'dataModel.id', filter.includes
                         }
                     }
                 }
@@ -174,15 +174,15 @@ enum RelationshipDirection {
             }
             if (filter) {
                 criteria.or {
-                    isNull 'classification'
+                    isNull 'dataModel'
                     and {
                         if (filter.excludes) {
                             criteria.not {
-                                criteria.'in' 'classification.id', filter.excludes
+                                criteria.'in' 'dataModel.id', filter.excludes
                             }
                         }
                         if (filter.includes) {
-                            criteria.'in'  'classification.id', filter.includes
+                            criteria.'in'  'dataModel.id', filter.includes
                         }
                     }
                 }
