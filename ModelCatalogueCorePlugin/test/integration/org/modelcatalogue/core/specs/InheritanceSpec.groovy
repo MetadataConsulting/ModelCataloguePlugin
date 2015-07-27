@@ -190,6 +190,13 @@ class InheritanceSpec extends IntegrationSpec  {
         then: "the relation is persisted in the child as it was already customized"
         dataElement1 in childClass.contains
 
+        when: "metadata are added to the parent relationship"
+        rp2.ext[METADATA_KEY_5] = METADATA_VALUE_5
+
+        then: "the metadata are added to child relationships as well"
+        rc2.ext[METADATA_KEY_5] == METADATA_VALUE_5
+
+
         when:
         removeBasedOn()
 

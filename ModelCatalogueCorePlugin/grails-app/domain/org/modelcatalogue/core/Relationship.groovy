@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.util.ExtensionsWrapper
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.OrderedMap
 
 /*
@@ -34,6 +35,7 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     }
 
     def auditService
+    def relationshipService
 
     CatalogueElement source
     CatalogueElement destination
@@ -83,7 +85,6 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     static mapping = {
         extensions lazy: false, sort: 'orderIndex'
-        classification column: 'data_model_id'
     }
 
     String toString() {
@@ -128,6 +129,14 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
             FriendlyErrors.failFriendlySaveWithoutFlush(newOne)
             addToExtensions(newOne).save(validate: false)
             auditService.logNewRelationshipMetadata(newOne)
+            Inheritance.withChildren(source) {
+                RelationshipDefinition definition = RelationshipDefinition.from(this)
+                definition.source = it
+                Relationship rel = relationshipService.findExistingRelationship(definition)
+                if (rel) {
+                    rel.addExtension(name, value)
+                }
+            }
             return newOne
         }
         throw new IllegalStateException("Cannot add extension before saving the element (id: ${getId()}, attached: ${isAttached()})")
@@ -135,6 +144,17 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     @Override
     void removeExtension(RelationshipMetadata extension) {
+        Inheritance.withChildren(source) {
+            RelationshipDefinition definition = RelationshipDefinition.from(this)
+            definition.source = it
+            Relationship rel = relationshipService.findExistingRelationship(definition)
+            if (rel) {
+                RelationshipMetadata existing = rel.findExtensionByName(extension.name)
+                if (existing.extensionValue == extension.extensionValue) {
+                    rel.removeExtension(existing)
+                }
+            }
+        }
         auditService.logRelationshipMetadataDeleted(extension)
         removeFromExtensions(extension).save()
         extension.delete(flush: true)
@@ -142,6 +162,17 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
 
     @Override
     RelationshipMetadata updateExtension(RelationshipMetadata old, String value) {
+        Inheritance.withChildren(source) {
+            RelationshipDefinition definition = RelationshipDefinition.from(this)
+            definition.source = it
+            Relationship rel = relationshipService.findExistingRelationship(definition)
+            if (rel) {
+                RelationshipMetadata existing = rel.findExtensionByName(old.name)
+                if (existing.extensionValue == old.extensionValue) {
+                    rel.updateExtension(existing, value)
+                }
+            }
+        }
         if (old.extensionValue == value) {
             old.orderIndex = System.currentTimeMillis()
             FriendlyErrors.failFriendlySaveWithoutFlush(old)
