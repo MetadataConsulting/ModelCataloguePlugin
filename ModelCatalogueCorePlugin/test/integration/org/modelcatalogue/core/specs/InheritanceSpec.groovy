@@ -5,6 +5,7 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
+import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
@@ -12,7 +13,6 @@ import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.core.util.Inheritance
 import spock.lang.Ignore
 
-@Ignore
 class InheritanceSpec extends IntegrationSpec  {
 
     public static final String DUMMY_DATA_CLASS_NAME = 'Dummy'
@@ -37,6 +37,8 @@ class InheritanceSpec extends IntegrationSpec  {
     public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'Test Child Value Domain'
     public static final String TEST_DATA_TYPE_1_NAME = 'Test Data Type 1'
     public static final String TEST_DATA_TYPE_2_NAME = 'Test Data Type 2'
+    public static final String TEST_DATA_MODEL_1_NAME = 'Test Data Model 1'
+    public static final String TEST_DATA_MODEL_2_NAME = 'Test Data Model 2'
 
     InitCatalogueService initCatalogueService
     CatalogueBuilder catalogueBuilder
@@ -52,29 +54,36 @@ class InheritanceSpec extends IntegrationSpec  {
     ValueDomain childValueDomain
     DataType dataType1
     DataType dataType2
+    DataModel dataModel1
+    DataModel dataModel2
 
     def setup() {
         initCatalogueService.initDefaultRelationshipTypes()
         catalogueBuilder.build {
-            dataClass name: DUMMY_DATA_CLASS_NAME
-            dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
-                dataElement name: TEST_DATA_ELEMENT_1_NAME
-                dataElement name: TEST_DATA_ELEMENT_2_NAME
-                dataElement name: TEST_DATA_ELEMENT_3_NAME
-                ext METADATA_KEY_1, METADATA_VALUE_1
-                ext METADATA_KEY_2, METADATA_VALUE_2
-                ext METADATA_KEY_3, METADATA_VALUE_3
-                rel 'synonym' to dataClass called DUMMY_DATA_CLASS_NAME
+            dataModel name: TEST_DATA_MODEL_1_NAME, {
+                dataClass name: DUMMY_DATA_CLASS_NAME
+                dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
+                    dataElement name: TEST_DATA_ELEMENT_1_NAME
+                    dataElement name: TEST_DATA_ELEMENT_2_NAME
+                    dataElement name: TEST_DATA_ELEMENT_3_NAME
+                    ext METADATA_KEY_1, METADATA_VALUE_1
+                    ext METADATA_KEY_2, METADATA_VALUE_2
+                    ext METADATA_KEY_3, METADATA_VALUE_3
+                    rel 'synonym' to dataClass called DUMMY_DATA_CLASS_NAME
+                }
+                valueDomain name: TEST_PARENT_VALUE_DOMAIN_NAME, {
+                    dataType name: TEST_DATA_TYPE_1_NAME
+                }
+                valueDomain name: TEST_CHILD_VALUE_DOMAIN_NAME
+                dataType name: TEST_DATA_TYPE_2_NAME
             }
-            dataClass name: TEST_CHILD_DATA_CLASS_NAME, {
-                dataElement name: TEST_DATA_ELEMENT_4_NAME
-                ext METADATA_KEY_4, METADATA_VALUE_4
+
+            dataModel name: TEST_DATA_MODEL_2_NAME, {
+                dataClass name: TEST_CHILD_DATA_CLASS_NAME, {
+                    dataElement name: TEST_DATA_ELEMENT_4_NAME
+                    ext METADATA_KEY_4, METADATA_VALUE_4
+                }
             }
-            valueDomain name: TEST_PARENT_VALUE_DOMAIN_NAME, {
-                dataType name: TEST_DATA_TYPE_1_NAME
-            }
-            valueDomain name: TEST_CHILD_VALUE_DOMAIN_NAME
-            dataType name: TEST_DATA_TYPE_2_NAME
         }
 
         parentClass = DataClass.findByName(TEST_PARENT_DATA_CLASS_NAME)
@@ -88,6 +97,8 @@ class InheritanceSpec extends IntegrationSpec  {
         childValueDomain = ValueDomain.findByName(TEST_CHILD_VALUE_DOMAIN_NAME)
         dataType1 = DataType.findByName(TEST_DATA_TYPE_1_NAME)
         dataType2 = DataType.findByName(TEST_DATA_TYPE_2_NAME)
+        dataModel1 = DataModel.findByName(TEST_DATA_MODEL_1_NAME)
+        dataModel2 = DataModel.findByName(TEST_DATA_MODEL_2_NAME)
 
         assertNothingInherited()
     }
@@ -300,10 +311,16 @@ class InheritanceSpec extends IntegrationSpec  {
 
     }
 
-    @Ignore
     def "handle data models"() {
-        expect: "to be implemented"
-        false
+        expect: "both data classes belongs to right models"
+        dataModel1 in parentClass.dataModels
+        dataModel2 in childClass.dataModels
+
+        when:
+        addBasedOn()
+
+        then:
+        !(dataModel1 in childClass.dataModels)
     }
 
 
@@ -344,6 +361,9 @@ class InheritanceSpec extends IntegrationSpec  {
         assert childValueDomain
         assert dataType1
         assert dataType2
+
+        assert dataModel1
+        assert dataModel2
 
         assert parentValueDomain.dataType == dataType1
         assert childValueDomain.dataType == null
