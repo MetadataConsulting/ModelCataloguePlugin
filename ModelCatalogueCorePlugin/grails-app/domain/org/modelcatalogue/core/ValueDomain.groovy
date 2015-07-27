@@ -4,6 +4,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 import org.modelcatalogue.core.util.ValueDomainRuleScript
 
@@ -170,4 +171,8 @@ class ValueDomain extends CatalogueElement {
             FriendlyErrors.failFriendlySave(element)
         }
     }
+
+
+    @Override
+    List<String> getInheritedAssociationsNames() { ['unitOfMeasure', 'dataType'] }
 }

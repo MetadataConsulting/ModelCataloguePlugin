@@ -141,6 +141,8 @@ class RelationshipService {
                     link newDefinition
                 }
             }
+            relationshipDefinition.destination.ext.putAll relationshipDefinition.source.ext.subMap(relationshipDefinition.source.ext.keySet() - relationshipDefinition.destination.ext.keySet())
+            relationshipDefinition.source.addInheritedAssociations(relationshipDefinition.destination)
         } else if (relationshipDefinition.relationshipType.versionSpecific) {
             // propagate relationship to the children
             Inheritance.withChildren(relationshipInstance.source) {
@@ -234,6 +236,16 @@ class RelationshipService {
                         unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.dataModel, ignoreRules, relationship.ext
                     }
                 }
+                List<String> forRemoval = []
+                source.ext.each { String key, String value ->
+                    String valueInChild = destination.ext[key]
+                    if (valueInChild == value) {
+                        forRemoval << key
+                    }
+                }
+                forRemoval.each {
+                    source.ext.remove(it)
+                }
             } else if (relationshipType.versionSpecific) {
                 Inheritance.withChildren(source) {
                     unlink(it, destination, relationshipType, dataModel, ignoreRules, relationshipInstance.ext)
@@ -246,6 +258,9 @@ class RelationshipService {
             relationshipInstance.destination = null
             relationshipInstance.dataModel = null
             relationshipInstance.delete(flush: true)
+            if (relationshipType == RelationshipType.baseType) {
+                source.removeInheritedAssociations(destination)
+            }
 
             return relationshipInstance
         }
