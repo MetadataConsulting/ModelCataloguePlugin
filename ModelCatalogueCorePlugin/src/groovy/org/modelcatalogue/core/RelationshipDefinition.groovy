@@ -9,6 +9,19 @@ class RelationshipDefinition {
         return new RelationshipDefinitionBuilder(new RelationshipDefinition(source, destination, relationshipType))
     }
 
+    static RelationshipDefinition from(Relationship relationship) {
+        RelationshipDefinition definition = new RelationshipDefinition(relationship.source, relationship.destination, relationship.relationshipType)
+        definition.with {
+            dataModel = relationship.dataModel
+            metadata = new LinkedHashMap<String, String>(relationship.ext)
+            archived = relationship.archived
+            outgoingIndex = relationship.outgoingIndex
+            incomingIndex = relationship.incomingIndex
+            combinedIndex = relationship.combinedIndex
+        }
+        definition
+    }
+
     // required
     CatalogueElement source
     CatalogueElement destination

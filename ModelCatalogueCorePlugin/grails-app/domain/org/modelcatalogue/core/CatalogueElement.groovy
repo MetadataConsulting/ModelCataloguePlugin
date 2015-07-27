@@ -149,15 +149,15 @@ abstract class  CatalogueElement implements Extendible<ExtensionValue>, Publishe
         [getOutgoingRelationsByType(type), getIncomingRelationsByType(type)].flatten()
     }
 
-    List getIncomingRelationshipsByType(RelationshipType type) {
+    List<Relationship> getIncomingRelationshipsByType(RelationshipType type) {
         relationshipService.getRelationships([:], RelationshipDirection.INCOMING, this, type).items
     }
 
-    List getOutgoingRelationshipsByType(RelationshipType type) {
+    List<Relationship> getOutgoingRelationshipsByType(RelationshipType type) {
         relationshipService.getRelationships([:], RelationshipDirection.OUTGOING, this, type).items
     }
 
-    List getRelationshipsByType(RelationshipType type) {
+    List<Relationship> getRelationshipsByType(RelationshipType type) {
         [getOutgoingRelationshipsByType(type), getIncomingRelationshipsByType(type)].flatten()
     }
 

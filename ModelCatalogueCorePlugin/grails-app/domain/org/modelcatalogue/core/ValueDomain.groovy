@@ -156,7 +156,7 @@ class ValueDomain extends CatalogueElement {
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(this.dataElements).add(this.classifications)
+        chain.add(this.dataElements).add(this.dataModels)
     }
 
     @Override

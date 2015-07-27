@@ -6,6 +6,7 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.security.User
 import org.modelcatalogue.core.util.DataModelFilter
 import org.modelcatalogue.core.util.FriendlyErrors
+import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.ListWithTotal
 import org.modelcatalogue.core.util.Lists
 import org.modelcatalogue.core.util.RelationshipDirection
@@ -68,7 +69,7 @@ class RelationshipService {
     }
 
     Relationship link(RelationshipDefinition relationshipDefinition) {
-        if (relationshipDefinition.source?.id && relationshipDefinition.destination?.id && relationshipDefinition.relationshipType?.id) {
+        if (relationshipDefinition.source?.readyForQueries && relationshipDefinition.destination?.readyForQueries && relationshipDefinition.relationshipType?.getId()) {
             Relationship relationshipInstance = relationshipDefinition.skipUniqueChecking ? null : findExistingRelationship(relationshipDefinition)
 
             if (relationshipInstance) {
@@ -129,6 +130,26 @@ class RelationshipService {
         }
 
         log.debug "Created $relationshipDefinition"
+
+
+        if (relationshipDefinition.relationshipType == RelationshipType.baseType) {
+            // copy relationships when new based on relationship is created
+            for (Relationship relationship in new LinkedHashSet<Relationship>(relationshipDefinition.source.outgoingRelationships)) {
+                if (relationship.relationshipType.versionSpecific) {
+                    RelationshipDefinition newDefinition = RelationshipDefinition.from(relationship)
+                    relationship.source = relationshipDefinition.destination
+                    link newDefinition
+                }
+            }
+        } else if (relationshipDefinition.relationshipType.versionSpecific) {
+            // propagate relationship to the children
+            Inheritance.withChildren(relationshipInstance.source) {
+                RelationshipDefinition newDefinition = relationshipDefinition.clone()
+                newDefinition.source = it
+                link(newDefinition)
+            }
+        }
+
         
         relationshipInstance
     }
@@ -182,10 +203,14 @@ class RelationshipService {
         unlink source, destination, relationshipType, null, ignoreRules
     }
 
-    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel dataModel, boolean ignoreRules = false) {
+    Relationship unlink(CatalogueElement source, CatalogueElement destination, RelationshipType relationshipType, DataModel dataModel, boolean ignoreRules = false, Map<String, String> expectedMetadata = null) {
 
         if (source?.id && destination?.id && relationshipType?.id) {
             Relationship relationshipInstance = findExistingRelationship(RelationshipDefinition.create(source, destination, relationshipType).withDataModel(dataModel).definition)
+
+            if (!relationshipInstance) {
+                return null
+            }
 
             if(!ignoreRules) {
                 if (relationshipType.versionSpecific && !relationshipType.system && source.status != ElementStatus.DRAFT && source.status != ElementStatus.UPDATED && source.status != ElementStatus.DEPRECATED) {
@@ -194,14 +219,35 @@ class RelationshipService {
                 }
             }
 
-            if (relationshipInstance && source && destination) {
-                auditService.logRelationRemoved(relationshipInstance)
-                destination?.removeFromIncomingRelationships(relationshipInstance)
-                source?.removeFromOutgoingRelationships(relationshipInstance)
-                relationshipInstance.dataModel = null
-                relationshipInstance.delete(flush: true)
-                return relationshipInstance
+            if (expectedMetadata != null && expectedMetadata != relationshipInstance.ext) {
+                return null
             }
+
+            auditService.logRelationRemoved(relationshipInstance)
+
+            destination.refresh()
+            source.refresh()
+
+            if (relationshipType == RelationshipType.baseType) {
+                for (Relationship relationship in new LinkedHashSet<Relationship>(source.outgoingRelationships)) {
+                    if (relationship.relationshipType.versionSpecific) {
+                        unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.dataModel, ignoreRules, relationship.ext
+                    }
+                }
+            } else if (relationshipType.versionSpecific) {
+                Inheritance.withChildren(source) {
+                    unlink(it, destination, relationshipType, dataModel, ignoreRules, relationshipInstance.ext)
+                }
+            }
+
+            destination.removeFromIncomingRelationships(relationshipInstance)
+            source.removeFromOutgoingRelationships(relationshipInstance)
+            relationshipInstance.source = null
+            relationshipInstance.destination = null
+            relationshipInstance.dataModel = null
+            relationshipInstance.delete(flush: true)
+
+            return relationshipInstance
         }
         return null
     }

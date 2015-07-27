@@ -2,15 +2,17 @@ package org.modelcatalogue.core.specs
 
 import grails.test.spock.IntegrationSpec
 import org.modelcatalogue.builder.api.CatalogueBuilder
+import org.modelcatalogue.core.CatalogueElement
 import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.util.Inheritance
 import spock.lang.Ignore
 
-@Ignore
+//@Ignore
 class InheritanceSpec extends IntegrationSpec  {
 
     public static final String DUMMY_DATA_CLASS_NAME = 'Dummy'
@@ -18,6 +20,7 @@ class InheritanceSpec extends IntegrationSpec  {
     public static final String TEST_DATA_ELEMENT_1_NAME = 'Test Data Element 1'
     public static final String TEST_DATA_ELEMENT_2_NAME = 'Test Data Element 2'
     public static final String TEST_DATA_ELEMENT_3_NAME = 'Test Data Element 3'
+    public static final String TEST_DATA_ELEMENT_4_NAME = 'Test Data Element 4'
     public static final String METADATA_KEY_1 = 'one'
     public static final String METADATA_KEY_2 = 'two'
     public static final String METADATA_KEY_3 = 'three'
@@ -30,7 +33,6 @@ class InheritanceSpec extends IntegrationSpec  {
     public static final String METADATA_VALUE_5 = '5'
     public static final String METADATA_VALUE_5_ALT = 'V'
     public static final String TEST_CHILD_DATA_CLASS_NAME = 'Test Child Class'
-    public static final String TEST_DATA_ELEMENT_4_NAME = 'Test Data Element 4'
     public static final String TEST_PARENT_VALUE_DOMAIN_NAME = 'Test Parent Value Domain'
     public static final String TEST_CHILD_VALUE_DOMAIN_NAME = 'Test Child Value Domain'
     public static final String TEST_DATA_TYPE_1_NAME = 'Test Data Type 1'
@@ -56,6 +58,7 @@ class InheritanceSpec extends IntegrationSpec  {
         catalogueBuilder.build {
             dataClass name: DUMMY_DATA_CLASS_NAME
             dataClass name: TEST_PARENT_DATA_CLASS_NAME, {
+                dataElement name: TEST_DATA_ELEMENT_1_NAME
                 dataElement name: TEST_DATA_ELEMENT_2_NAME
                 dataElement name: TEST_DATA_ELEMENT_3_NAME
                 ext METADATA_KEY_1, METADATA_VALUE_1
@@ -89,13 +92,61 @@ class InheritanceSpec extends IntegrationSpec  {
         assertNothingInherited()
     }
 
+    def "with children works"(){
+        addBasedOn()
+
+        List<CatalogueElement> children = []
+        Inheritance.withChildren(parentClass) {
+            children << it
+        }
+
+        expect:
+        children == [childClass]
+    }
+
+    def "with all children works"(){
+        addBasedOn()
+
+        List<CatalogueElement> children = []
+        Inheritance.withAllChildren(parentClass) {
+            children << it
+        }
+
+        expect:
+        children == [childClass]
+    }
+
+    def "with parents works"(){
+        addBasedOn()
+
+        List<CatalogueElement> parents = []
+        Inheritance.withParents(childClass) {
+            parents << it
+        }
+
+        expect:
+        parents == [parentClass]
+    }
+
+    def "with all parents works"(){
+        addBasedOn()
+
+        List<CatalogueElement> parents = []
+        Inheritance.withAllParents(childClass) {
+            parents << it
+        }
+
+        expect:
+        parents == [parentClass]
+    }
+
     def "Inherit relationships"() {
         addBasedOn()
         expect: "version specific relationships are inherited"
         parentClass.countContains() == 3
         childClass.countContains() == 4
 
-        and: "sematic links aren't"
+        and: "semantic links aren't"
         parentClass.countIsSynonymFor() == 1
         childClass.countIsSynonymFor() == 0
 
@@ -112,7 +163,7 @@ class InheritanceSpec extends IntegrationSpec  {
         !(dataElement2 in childClass.contains)
 
         when: "we add relationships to the parent"
-        Relationship rp1 = parentClass.addToContains dataElement1, metadata: [METADATA_KEY_5: METADATA_VALUE_5]
+        Relationship rp1 = parentClass.addToContains dataElement1, metadata: [(METADATA_KEY_5): METADATA_VALUE_5]
         Relationship rp2 = parentClass.addToContains dataElement2
         Relationship rc1 = childClass.containsRelationships.find { it.destination == dataElement1 } as Relationship
         Relationship rc2 = childClass.containsRelationships.find { it.destination == dataElement2 } as Relationship
@@ -131,7 +182,7 @@ class InheritanceSpec extends IntegrationSpec  {
         dataElement2 in childClass.contains
 
         when: "metadata in the child relationship are overridden"
-        rc1.ext[METADATA_KEY_5] == METADATA_VALUE_5_ALT
+        rc1.ext[METADATA_KEY_5] = METADATA_VALUE_5_ALT
 
         and: "the relation is removed from the parent"
         parentClass.removeFromContains dataElement1
