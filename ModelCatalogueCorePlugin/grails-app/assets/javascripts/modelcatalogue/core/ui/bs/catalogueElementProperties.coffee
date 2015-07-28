@@ -337,6 +337,7 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'parent', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'oldValue', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'newValue', hidden: true
+  catalogueElementPropertiesProvider.configureProperty 'declaredWithin', hidden: true
 
 
   catalogueElementPropertiesProvider.configureProperty 'enumerations', tabDefinition: ['$element', '$name', '$value', '$scope', 'catalogueElementProperties', '$injector', 'security', ($element, $name, $value, $scope, catalogueElementProperties, $injector, security) ->
