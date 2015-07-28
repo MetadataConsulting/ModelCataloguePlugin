@@ -137,8 +137,11 @@ class RelationshipService {
             for (Relationship relationship in new LinkedHashSet<Relationship>(relationshipDefinition.source.outgoingRelationships)) {
                 if (relationship.relationshipType.versionSpecific) {
                     RelationshipDefinition newDefinition = RelationshipDefinition.from(relationship)
-                    relationship.source = relationshipDefinition.destination
-                    link newDefinition
+                    newDefinition.source = relationshipDefinition.destination
+                    Relationship newRelationship = link newDefinition
+                    if (newRelationship.hasErrors()) {
+                        relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to copy relationship $newDefinition from ${relationshipDefinition.source} to child ${relationshipDefinition.destination}", newRelationship.errors))
+                    }
                 }
             }
             relationshipDefinition.destination.ext.putAll relationshipDefinition.source.ext.subMap(relationshipDefinition.source.ext.keySet() - relationshipDefinition.destination.ext.keySet())
@@ -148,7 +151,10 @@ class RelationshipService {
             Inheritance.withChildren(relationshipInstance.source) {
                 RelationshipDefinition newDefinition = relationshipDefinition.clone()
                 newDefinition.source = it
-                link(newDefinition)
+                Relationship newRelationship = link newDefinition
+                if (newRelationship.hasErrors()) {
+                    relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to propagate relationship $newDefinition from ${relationshipDefinition.source} to child ${newDefinition.source}", newRelationship.errors))
+                }
             }
         }
 

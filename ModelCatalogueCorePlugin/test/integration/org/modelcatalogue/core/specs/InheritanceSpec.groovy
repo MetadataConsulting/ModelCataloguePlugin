@@ -7,6 +7,7 @@ import org.modelcatalogue.core.DataClass
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataModel
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.ElementService
 import org.modelcatalogue.core.InitCatalogueService
 import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
@@ -41,6 +42,7 @@ class InheritanceSpec extends IntegrationSpec  {
     public static final String TEST_DATA_MODEL_2_NAME = 'Test Data Model 2'
 
     InitCatalogueService initCatalogueService
+    ElementService elementService
     CatalogueBuilder catalogueBuilder
 
     DataClass parentClass
@@ -214,6 +216,14 @@ class InheritanceSpec extends IntegrationSpec  {
         then:
         !(dataElement2 in childClass.contains)
         !(dataElement3 in childClass.contains)
+    }
+
+    def "Inheriting relationships does not steal the relationships from finalized item"() {
+        elementService.finalizeElement(parentClass)
+        addBasedOn()
+        expect: "version specific relationships are inherited"
+        parentClass.countContains() == 3
+        childClass.countContains() == 4
     }
 
     def "inherit metadata"() {
