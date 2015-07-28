@@ -13,13 +13,13 @@ class DataModelService {
 
     def modelCatalogueSecurityService
 
-    public <T> ListWrapper<T> classified(ListWrapper<T> list, DataModelFilter classificationsFilter = dataModelFilter) {
+    public <T> ListWrapper<T> classified(ListWrapper<T> list, DataModelFilter modelFilter = dataModelFilter) {
         if (!(list instanceof ListWithTotalAndTypeWrapper)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only ListWithTotalAndTypeWrapper is currently supported")
         }
 
         if (list.list instanceof DetachedListWithTotalAndType) {
-            classified(list.list as DetachedListWithTotalAndType<T>, classificationsFilter)
+            classified(list.list as DetachedListWithTotalAndType<T>, modelFilter)
         } else {
             throw new IllegalArgumentException("Cannot classify list $list. Only wrappers of DetachedListWithTotalAndType are supported")
         }
@@ -27,26 +27,26 @@ class DataModelService {
         return list
     }
 
-    public <T> ListWithTotalAndType<T> classified(ListWithTotalAndType<T> list, DataModelFilter classificationsFilter = dataModelFilter) {
+    public <T> ListWithTotalAndType<T> classified(ListWithTotalAndType<T> list, DataModelFilter modelFilter = dataModelFilter) {
         if (!(list instanceof DetachedListWithTotalAndType)) {
             throw new IllegalArgumentException("Cannot classify list $list. Only DetachedListWithTotalAndType is currently supported")
         }
 
-        classified(list.criteria, classificationsFilter)
+        classified(list.criteria, modelFilter)
 
         return list
     }
 
-    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, DataModelFilter classificationsFilter = dataModelFilter) {
+    public <T> DetachedCriteria<T> classified(DetachedCriteria<T> criteria, DataModelFilter modelFilter = dataModelFilter) {
         if (criteria.persistentEntity.javaClass == DataModel) {
             return criteria
         }
 
-        if (!classificationsFilter) {
+        if (!modelFilter) {
             return criteria
         }
 
-        if (classificationsFilter.unclassifiedOnly) {
+        if (modelFilter.unclassifiedOnly) {
             criteria.not {
                 // this should work (better) without calling the .list()
                 // but at the moment we're getting ConverterNotFoundException
@@ -62,13 +62,13 @@ class DataModelService {
             criteria.incomingRelationships {
                 'eq' 'relationshipType', RelationshipType.declarationType
                 source {
-                    if (classificationsFilter.excludes) {
+                    if (modelFilter.excludes) {
                         not {
-                            'in' 'id', classificationsFilter.excludes
+                            'in' 'id', modelFilter.excludes
                         }
                     }
-                    if (classificationsFilter.includes) {
-                        'in'  'id', classificationsFilter.includes
+                    if (modelFilter.includes) {
+                        'in'  'id', modelFilter.includes
                     }
                 }
 
@@ -76,23 +76,23 @@ class DataModelService {
         } else if (Relationship.isAssignableFrom(criteria.persistentEntity.javaClass)) {
             criteria.or {
                 and {
-                    if (classificationsFilter.excludes) {
+                    if (modelFilter.excludes) {
                         not {
-                            'in' 'classification.id', classificationsFilter.excludes
+                            'in' 'dataModel.id', modelFilter.excludes
                         }
                     }
-                    if (classificationsFilter.includes) {
-                        'in'  'classification.id', classificationsFilter.includes
+                    if (modelFilter.includes) {
+                        'in'  'dataModel.id', modelFilter.includes
                     }
                 }
-                isNull('classification')
+                isNull('dataModel')
             }
         }
         criteria
     }
 
-    public <T> DetachedCriteria<T> classified(Class<T> resource, DataModelFilter classificationsFilter = dataModelFilter) {
-        classified(new DetachedCriteria<T>(resource), classificationsFilter)
+    public <T> DetachedCriteria<T> classified(Class<T> resource, DataModelFilter modelFilter = dataModelFilter) {
+        classified(new DetachedCriteria<T>(resource), modelFilter)
     }
 
     public DataModelFilter getDataModelFilter() {
