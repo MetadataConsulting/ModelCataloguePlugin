@@ -28,6 +28,10 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
             rule = "/* A RULE */"
             save(failOnError: true)
         }
+        RelationshipType.declarationType.with {
+            rule = "/* A RULE */"
+            save(failOnError: true)
+        }
 
         if (!RelationshipType.findByName('derivedFrom')) {
             new RelationshipType(

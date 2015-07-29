@@ -177,8 +177,8 @@ class ElementServiceIntegrationSpec extends AbstractIntegrationSpec {
         destination.ext.two == 'two'
         source.countContainedIn() == 2
         destination.countContainedIn() == 3
-        source.classifications.size() == 0
-        destination.classifications.size() == 2
+        source.dataModels.size() == 1
+        destination.dataModels.size() == 1
         source.archived
         destination.supersededBy.contains source
         !m3cosd.archived

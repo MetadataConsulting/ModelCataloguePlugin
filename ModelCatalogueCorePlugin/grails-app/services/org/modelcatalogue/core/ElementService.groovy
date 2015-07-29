@@ -118,7 +118,7 @@ class ElementService implements Publisher<CatalogueElement> {
     }
 
 
-    public <E extends CatalogueElement> E merge(E source, E destination, Set<DataModel> classifications = new HashSet(source.classifications)) {
+    public <E extends CatalogueElement> E merge(E source, E destination, Set<DataModel> classifications = new HashSet(source.dataModels)) {
         log.info "Merging $source into $destination"
         if (destination == null) return null
 
@@ -178,11 +178,13 @@ class ElementService implements Publisher<CatalogueElement> {
         destination.save(flush: true, validate: false)
 
 
-        for (DataModel classification in new HashSet<DataModel>(source.classifications)) {
-            classification.removeFromDeclares(source)
-            source.removeFromDeclaredWithin(classification)
-            classification.addToDeclares(destination)
-            destination.addToDeclaredWithin(classification)
+        if (!destination.dataModels) {
+            for (DataModel dataModel in new HashSet<DataModel>(source.dataModels)) {
+                dataModel.removeFromDeclares(source)
+                source.removeFromDeclaredWithin(dataModel)
+                dataModel.addToDeclares(destination)
+                destination.addToDeclaredWithin(dataModel)
+            }
         }
 
         for (Map.Entry<String, String> extension in new HashMap<String, String>(source.ext)) {
@@ -194,6 +196,10 @@ class ElementService implements Publisher<CatalogueElement> {
         for (Relationship rel in new HashSet<Relationship>(source.outgoingRelationships)) {
             if (rel.relationshipType.system) {
                 // skip system, currently only supersession
+                continue
+            }
+
+            if (rel.relationshipType == RelationshipType.declarationType) {
                 continue
             }
 
@@ -211,7 +217,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (existing) {
                 if (rel.destination instanceof CatalogueElement && existing.destination instanceof CatalogueElement && rel.destination.class == existing.destination.class && existing.destination != destination) {
-                    if (rel.destination.classifications.intersect(classifications)) {
+                    if (rel.destination.dataModels.intersect(classifications)) {
                         merge rel.destination, existing.destination, classifications
                     }
                 }
@@ -232,6 +238,10 @@ class ElementService implements Publisher<CatalogueElement> {
                 continue
             }
 
+            if (rel.relationshipType == RelationshipType.declarationType) {
+                continue
+            }
+
             if (rel.source == destination) {
                 // do not self-reference
                 continue
@@ -246,7 +256,7 @@ class ElementService implements Publisher<CatalogueElement> {
 
             if (existing) {
                 if (rel.source.class == existing.source.class && existing.source != destination) {
-                    if (rel.source.classifications.intersect(classifications)) {
+                    if (rel.source.dataModels.intersect(classifications)) {
                         merge rel.source, existing.source, classifications
                     }
                 }

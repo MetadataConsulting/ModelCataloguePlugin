@@ -107,8 +107,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     }
 
     def "creates only one measurement unit as measurement unit name is unique"() {
-        MeasurementUnit unit = new MeasurementUnit(name: 'ExistingUnit2', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
+        new MeasurementUnit(name: 'ExistingUnit2', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true, flush: true)
 
+        when:
         build {
             classification(name: "TestClassificationA") {
                 measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
@@ -126,12 +127,10 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             }
         }
 
-        expect:
-        created.find { it instanceof  MeasurementUnit}.latestVersionId == unit.refresh().latestVersionId
-        created.size() == 3
-        created.any { it.name == 'TestClassificationA'}
-        created.any { it.name == 'TestClassificationB'}
-        created.any { it.name == 'ExistingUnit2'}
+        then:
+        RuntimeException ex = thrown(RuntimeException)
+        ex.cause instanceof IllegalStateException
+        ex.cause.message.startsWith('Cannot create relationship of type declaration between')
     }
 
     def "complain if measurement unit name is missing"() {
@@ -573,7 +572,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         expect:
         l1Finalized
         l1Finalized.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
-        l1Finalized.countParentOf() == 1
+        l1Finalized.parentOf.size() == 1
 
         when:
         DataClass l1Draft = elementService.createDraftVersion(l1Finalized, DraftContext.userFriendly())
@@ -581,14 +580,14 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         then:
         l1Draft
         l1Draft.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
-        l1Draft.countParentOf() == 1
+        l1Draft.parentOf.size() == 1
 
         when:
         DataClass l3Finalized = DataClass.findByName('MHR L3')
 
         then:
         l3Finalized
-        l3Finalized.countChildOf() == 1
+        l3Finalized.childOf.size() == 1
 
         when:
         DataClass l3Draft = elementService.createDraftVersion(l3Finalized, DraftContext.userFriendly())
@@ -596,8 +595,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         then:
         l3Draft
         l3Draft.status == org.modelcatalogue.core.api.ElementStatus.DRAFT
-        l3Draft.countChildOf()  == 1
-        l1Draft.countParentOf() == 1
+        l3Draft.childOf.size()  == 1
+        l1Draft.parentOf.size() == 1
     }
 
     private void build(@DelegatesTo(CatalogueBuilder) Closure cl) {
