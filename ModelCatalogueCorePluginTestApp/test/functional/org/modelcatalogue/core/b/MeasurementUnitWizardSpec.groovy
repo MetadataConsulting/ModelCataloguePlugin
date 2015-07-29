@@ -46,6 +46,9 @@ class MeasurementUnitWizardSpec extends AbstractModelCatalogueGebSpec {
         $('#name').value('Foos')
         $('#symbol').value('Foo')
 
+        classifications = "NT1"
+        selectCepItemIfExists()
+
         actionButton('modal-save-element', 'modal').click()
 
         then:

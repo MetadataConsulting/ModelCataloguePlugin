@@ -40,6 +40,10 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         $('#name').value('New Enum Type')
+
+        classifications = "NT1"
+        selectCepItemIfExists()
+
         $('#enumerated').click()
 
 
@@ -69,6 +73,9 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
         when:
         $('#name').value('New Data Type')
+
+        classifications = "NT1"
+        selectCepItemIfExists()
 
         actionButton('modal-save-element', 'modal').click()
 

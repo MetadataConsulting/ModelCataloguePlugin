@@ -13,5 +13,7 @@ class MeasurementUnitListPage extends ModelCataloguePage {
 
     static content = {
         viewTitle(required: false)          { $("h2") }
+        dataWizard          { $('div.basic-edit-modal-prompt') }
+        classifications     { dataWizard.find('input[id=dataModel-]') }
     }
 }

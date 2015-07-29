@@ -234,6 +234,21 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.dataElements.push($scope.dataElement)        if angular.isString($scope.dataElement?.element)
             $scope.dataModels.push($scope.dataModel)  if angular.isString($scope.dataModel?.element)
 
+
+            angular.forEach $scope.dataModels, (dataModel) ->
+              if angular.isString dataModel.element
+                $scope.pendingActions.push (dataClass) ->
+                  catalogueElementResource('dataModel').save({name: dataModel.element}).then (newDataModel) ->
+                    dataClass.dataModels.push newDataModel
+                    dataClass
+              else
+                $scope.pendingActions.push (dataClass) ->
+                  dataClass.dataModels.push dataModel.element
+                  dataClass
+
+            $scope.pendingActions.push (dataClass) ->
+              execAfter50.submit -> catalogueElementResource('dataClass').save(dataClass)
+
             unless $scope.isEmpty($scope.metadata)
               $scope.pendingActions.push (dataClass)->
                 dataClass.ext = $scope.metadata
@@ -272,42 +287,34 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 execAfter50.submit -> dataClass.contains.add element.element
                 dataClass
 
-            angular.forEach $scope.dataModels, (dataModel) ->
-              if angular.isString dataModel.element
-                $scope.pendingActions.push (dataClass) ->
-                  catalogueElementResource('dataModel').save({name: dataModel.element}).then (newDataModel) ->
-                    dataClass.dataModels.push newDataModel
-                    execAfter50.submit -> catalogueElementResource('dataClass').update(dataClass)
-              else
-                $scope.pendingActions.push (dataClass) ->
-                    dataClass.dataModels.push dataModel.element
-                    execAfter50.submit -> catalogueElementResource('dataClass').update(dataClass)
-
-            $scope.totalActions = $scope.pendingActionsCount = $scope.pendingActions.length + 1
+            $scope.totalActions = $scope.pendingActionsCount = $scope.pendingActions.length
             $scope.step = 'summary'
 
             decreasePendingActionsCount = (dataClass) ->
               $scope.pendingActionsCount--
               # not very effective but otherwise lot of "entity updated by another transactions" occurs
-              dataClass.refresh().then (fresh) ->
-                $timeout((-> fresh), 200)
+              if angular.isFunction(dataClass.refresh)
+                return dataClass.refresh().then (fresh) ->
+                  $timeout((-> fresh), 200)
+              return dataClass
 
 
-            promise = catalogueElementResource('dataClass').save($scope.dataClass).then decreasePendingActionsCount
+            promise = $q.when($scope.dataClass)
 
             for action in $scope.pendingActions
              promise = promise.then(action).then decreasePendingActionsCount, (errorResponse) ->
-
-               if errorResponse.data.errors
+               errorResponse = data: errorResponse unless errorResponse.data?
+               if errorResponse.data?.errors
                 for error in errorResponse.data.errors
                   messages.error(error.message)
-               else if errorResponse.data.error
+               else if errorResponse.data?.error
                  messages.error(errorResponse.data.error)
                else
+                 $log.error 'Unknown response', errorResponse
                  messages.error('Unknown exception happened while creating new dataClass. See application logs for details.')
 
                $scope.finishInProgress = false
-               $q.reject errorResponse.data
+               $q.reject(errorResponse.data ? errorResponse)
 
             promise.then (dataClass) ->
               messages.success "Data Class #{dataClass.name} created"

@@ -225,6 +225,11 @@ class RelationshipService {
                     relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.sourceClass.finalizedDataElement.remove', [source.status.toString()] as Object[], "Cannot changed finalized elements.")
                     return relationshipInstance
                 }
+                // TODO: enable as soon as all the test are fixed
+/*                if (relationshipType == RelationshipType.declarationType && (destination.dataModels - [source]).size() == 0) {
+                    relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.single.owning.dataModel.remove', [] as Object[], "Cannot remove single owning data model.")
+                    return relationshipInstance
+                }*/
             }
 
             if (expectedMetadata != null && expectedMetadata != relationshipInstance.ext) {

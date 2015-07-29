@@ -119,7 +119,7 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         stepFinish.click()
 
         then: 'the data class is saved'
-        waitFor {
+        waitFor(60) {
             $('div.messages-panel span', text: "Data Class New created").displayed
         }
         when:

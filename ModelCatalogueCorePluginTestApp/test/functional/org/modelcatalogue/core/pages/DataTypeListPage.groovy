@@ -12,6 +12,7 @@ class DataTypeListPage extends ModelCataloguePage {
     }
 
     static content={
-
+        dataWizard          { $('div.basic-edit-modal-prompt') }
+        classifications     { dataWizard.find('input[id=dataModel-]') }
     }
 }
