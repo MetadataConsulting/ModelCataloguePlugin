@@ -9,13 +9,12 @@ import org.modelcatalogue.core.publishing.DraftContext
 import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.OrderedMap
 import org.modelcatalogue.core.util.ResultRecorder
+import org.modelcatalogue.core.util.marshalling.CatalogueElementMarshaller
 import spock.lang.Unroll
 
 import javax.servlet.http.HttpServletResponse
+import javax.xml.crypto.Data
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends AbstractControllerIntegrationSpec implements ResultRecorder{
 
 
@@ -39,7 +38,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method = 'PUT'
         controller.params.id = another.id
         controller.params.newVersion = true
-        controller.request.json = [name: newName]
+        controller.request.json = [name: newName, dataModels: dataModelsForSpec]
         controller.response.format = "json"
 
         controller.update()
@@ -739,7 +738,7 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
         controller.request.method       = 'PUT'
         controller.params.id            = another.id
         controller.params.newVersion    = true
-        controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue)]
+        controller.request.json         = [name: newName, ext: OrderedMap.toJsonMap(keyValue), dataModels: dataModelsForSpec]
         controller.response.format      = "json"
 
         controller.update()
@@ -778,6 +777,15 @@ abstract class AbstractCatalogueElementControllerIntegrationSpec<T> extends Abst
 
     }
 
+
+
+    def getDataModelsForSpec() {
+        [CatalogueElementMarshaller.minimalCatalogueElementJSON(DataModel.findOrCreateByName("data set 1").save(failOnError: true))]
+    }
+
+    protected  getBadNameJSON() {
+        [name: "g" * 256, dataModels: dataModelsForSpec]
+    }
 
 
 }

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 
 class DataClassControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
@@ -14,17 +15,17 @@ class DataClassControllerIntegrationSpec extends AbstractCatalogueElementControl
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description "]
+        [name: "changedName", description: "edited description ", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getNewInstance(){
-       [name:"new model", description: "the model of the book"]
+       [name:"new model", description: "the model of the book", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf"]
+        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
     }
 
     @Override

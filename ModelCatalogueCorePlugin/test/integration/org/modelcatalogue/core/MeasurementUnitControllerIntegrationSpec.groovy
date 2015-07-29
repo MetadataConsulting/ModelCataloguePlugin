@@ -1,10 +1,9 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 
-/**
- * Created by adammilward on 27/02/2014.
- */
+
 class MeasurementUnitControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
 
@@ -48,17 +47,17 @@ class MeasurementUnitControllerIntegrationSpec extends AbstractCatalogueElementC
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", symbol: "R"]
+        [name: "changedName", description: "edited description ", symbol: "R", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getNewInstance(){
-       [symbol: "FS", name: "Something", description: "blah blah blah"]
+       [symbol: "FS", name: "Something", description: "blah blah blah", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf"]
+        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
     }
 
 

@@ -1,6 +1,7 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 import spock.lang.Unroll
 
 class ValueDomainControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
@@ -62,17 +63,17 @@ class ValueDomainControllerIntegrationSpec extends AbstractCatalogueElementContr
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description "]
+        [name: "changedName", description: "edited description ", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getNewInstance(){
-        [name: "ground_speed2", unitOfMeasure: MeasurementUnit.findByName("Miles per hour"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: DataType.findByName("integer")]
+        [name: "ground_speed2", unitOfMeasure: MeasurementUnit.findByName("Miles per hour"), regexDef: "[+-]?(?=\\d*[.eE])(?=\\.?\\d)\\d*\\.?\\d*(?:[eE][+-]?\\d+)?", description: "the ground speed of the moving vehicle", dataType: DataType.findByName("integer"), dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf"]
+        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
     }
 
     @Override

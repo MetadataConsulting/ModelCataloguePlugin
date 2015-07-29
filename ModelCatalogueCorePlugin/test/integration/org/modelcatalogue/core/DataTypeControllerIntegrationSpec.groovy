@@ -1,11 +1,9 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 27/02/2014.
- */
 class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
     protected boolean getRecord() {
@@ -52,17 +50,17 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description "]
+        [name: "changedName", description: "edited description ", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getNewInstance(){
-        [name: "test data type"]
+        [name: "test data type", dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf"]
+        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
     }
 
     @Override

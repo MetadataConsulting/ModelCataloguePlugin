@@ -685,8 +685,11 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
 
     // classifications are marshalled with the published element so no need for special method to fetch them
     protected bindRelations(T instance, boolean newVersion, Object objectToBind) {
+        if (!instance.readyForQueries) {
+            return
+        }
         def dataModels = objectToBind.classifications ?: objectToBind.dataModels ?: []
-        if (!dataModels && !(instance.instanceOf(DataModel))) {
+        if (!dataModels && !instance.dataModels && !(instance.instanceOf(DataModel))) {
             instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
         }
         for (dataModel in instance.dataModels.findAll { !(it.id in dataModels.collect { it.id as Long } || it.latestVersionId in dataModels.collect { it.id as Long })  }) {

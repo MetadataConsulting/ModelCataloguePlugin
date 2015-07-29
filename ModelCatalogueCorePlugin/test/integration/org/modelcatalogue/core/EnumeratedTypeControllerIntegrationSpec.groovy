@@ -1,11 +1,10 @@
 package org.modelcatalogue.core
 
 import grails.util.GrailsNameUtils
+import org.modelcatalogue.core.api.ElementStatus
 import spock.lang.Unroll
 
-/**
- * Created by adammilward on 27/02/2014.
- */
+
 class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementControllerIntegrationSpec {
 
 
@@ -44,17 +43,17 @@ class EnumeratedTypeControllerIntegrationSpec extends AbstractCatalogueElementCo
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", enumerations:['d26':'test28', 'sadf':'asdgsadg']]
+        [name: "changedName", description: "edited description ", enumerations:['d26':'test28', 'sadf':'asdgsadg'], dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getNewInstance(){
-        [name: "etTest2123", enumerations:['d2n':'test2123', 't':'asdfsadfsadf']]
+        [name: "etTest2123", enumerations:['d2n':'test2123', 't':'asdfsadfsadf'], dataModels: dataModelsForSpec]
     }
 
     @Override
     Map getBadInstance(){
-        [name: "t"*300, description: "asdf"]
+        [name: "t"*300, description: "asdf", dataModels: dataModelsForSpec]
     }
 
     @Override
