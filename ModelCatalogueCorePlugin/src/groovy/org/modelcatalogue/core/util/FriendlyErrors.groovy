@@ -1,5 +1,6 @@
 package org.modelcatalogue.core.util
 
+import grails.util.GrailsNameUtils
 import grails.util.Holders
 import grails.validation.ValidationException
 import org.springframework.context.MessageSource
@@ -17,7 +18,7 @@ class FriendlyErrors {
         Set<String> messages = []
         for (ObjectError error in errors.allErrors) {
             if (error instanceof FieldError) {
-                messages << "${messageSource.getMessage(error, locale)} (${error.field})"
+                messages << "${messageSource.getMessage(error, locale)} (${GrailsNameUtils.getNaturalName(error.field)})"
             } else {
                 messages << "${messageSource.getMessage(error, locale)}"
             }

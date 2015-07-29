@@ -202,6 +202,7 @@ log4j = {
 //    }
 
     warn 'org.modelcatalogue'
+    warn 'grails.app.domain.org.modelcatalogue'
 
     error 'org.codehaus.groovy.grails.web.servlet',           // controllers
             'org.codehaus.groovy.grails.web.pages',          // GSP

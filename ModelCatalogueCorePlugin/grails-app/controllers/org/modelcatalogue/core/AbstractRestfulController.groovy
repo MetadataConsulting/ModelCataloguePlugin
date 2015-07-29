@@ -345,6 +345,8 @@ abstract class AbstractRestfulController<T> extends RestfulController<T> {
     protected final bindRelations(T instance, boolean newVersion) {
         try {
             bindRelations(instance, newVersion, objectToBind)
+        } catch (IllegalArgumentException e) {
+            instance.errors.reject 'error.binding.relations', e.message
         } catch (Exception e) {
             instance.errors.reject 'error.binding.relations', e.toString()
         }

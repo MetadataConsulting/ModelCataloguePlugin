@@ -101,7 +101,6 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
     }
 
     def validateSourceDestination(CatalogueElement source, CatalogueElement destination, Map<String, String> ext) {
-
         if (!sourceClass.isInstance(source)) {
             return 'source.not.instance.of'
         }
@@ -111,7 +110,13 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         }
 
         if (rule && rule.trim()) {
-            def result = validateRule(source, destination, ext)
+            def result = null
+            try {
+                result = validateRule(source, destination, ext)
+            } catch (e) {
+                log.warn("Exception validating rule of $this", e)
+                result = e
+            }
             if (result instanceof List && result.size() > 1 && result.first() instanceof String) {
                 return result
             }

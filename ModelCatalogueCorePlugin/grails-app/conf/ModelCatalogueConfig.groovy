@@ -76,7 +76,22 @@ modelcatalogue.defaults.relationshiptypes =  [
         [name: "relatedTo", sourceToDestination: "related to", destinationToSource: "related to", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true, sourceToDestinationDescription: "Any element can be related to multiple elements. This relationship has no specific meaning."],
         [name: "synonym", sourceToDestination: "is synonym for", destinationToSource: "is synonym for", sourceClass: CatalogueElement, destinationClass: CatalogueElement, bidirectional: true, rule: "source.class == destination.class", sourceToDestinationDescription: "Any element can be synonym of multiple elements of the same type having similar meaning."],
         [name: "favourite", sourceToDestination: "favourites", destinationToSource: "is favourite of", sourceClass: User, destinationClass: CatalogueElement, system: true, sourceToDestinationDescription: "User can favourite multiple elements which will be displayed at the Favourites page.", destinationToSourceDescription: "Any element can be favourited by multiple users and appear in their Favourites page."],
-        [name: "declaration", sourceToDestination: "declares", destinationToSource: "declared within", sourceClass: DataModel, destinationClass: CatalogueElement, versionSpecific: true, sourceToDestinationDescription: "Data models can declare multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the data model filter in the bottom left corner. When data model is finalized all defined elements are finalized as well.", destinationToSourceDescription: "Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well."],
+        [name: "declaration", sourceToDestination: "declares", destinationToSource: "declared within", sourceClass: DataModel, destinationClass: CatalogueElement, versionSpecific: true, sourceToDestinationDescription: "Data models can declare multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the data model filter in the bottom left corner. When data model is finalized all defined elements are finalized as well.", destinationToSourceDescription: "Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well.", rule: '''
+            if (!destination.dataModels) {
+                return true
+            }
+
+            long newModelLatestVersionId = source.latestVersionId ?: source.id
+
+            for (int i = 0; i < destination.dataModels.size() ; i++) {
+               def dataModel = destination.dataModels[i]
+               long existingDataModelLatestVersionId = dataModel.latestVersionId ?: dataModel.id
+               if (newModelLatestVersionId != existingDataModelLatestVersionId) {
+                   return ["catalogue.element.can.have.only.one.data.model", "'$destination.name' is already owned by data model '$dataModel.name'"]
+               }
+            }
+        '''
+        ],
         [name: "classificationFilter", sourceToDestination: "used as filter by", destinationToSource: "filtered by", sourceClass: DataModel, destinationClass: User, system: true, sourceToDestinationDescription: "Classification can be used as filter by multiple users. This is done using the classification filter in bottom left corner.", destinationToSourceDescription: "User can filter by multiple classifications. To use exclusion filter instead of inclusion, set metadata \$exclude to any non-null value."],
 ]
 

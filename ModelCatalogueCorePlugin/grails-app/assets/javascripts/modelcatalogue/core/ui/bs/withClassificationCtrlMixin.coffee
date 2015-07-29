@@ -1,6 +1,7 @@
 angular.module('mc.core.ui.bs.withClassificationCtrlMixin', ['mc.util.security']).controller 'withClassificationCtrlMixin', ['$scope', 'security',  ($scope, security) ->
   createdMessages = []
   dataModelsChanged = (newDataModels) ->
+    newDataModels = newDataModels ? []
     msg.remove() for msg in createdMessages
     createdMessages = []
     noDrafts = (dataModel.name for dataModel in newDataModels when dataModel.status isnt 'DRAFT')
