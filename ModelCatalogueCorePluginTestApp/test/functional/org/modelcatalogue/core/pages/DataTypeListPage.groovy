@@ -1,8 +1,5 @@
 package org.modelcatalogue.core.pages
 
-/**
- * Created by david on 04/11/14.
- */
 class DataTypeListPage extends ModelCataloguePage {
 
     static url = "#/catalogue/dataType/all"
@@ -13,6 +10,6 @@ class DataTypeListPage extends ModelCataloguePage {
 
     static content={
         dataWizard          { $('div.basic-edit-modal-prompt') }
-        classifications     { dataWizard.find('input[id=dataModel-]') }
+        classifications     { dataWizard.find('input[id=dataModel]') }
     }
 }

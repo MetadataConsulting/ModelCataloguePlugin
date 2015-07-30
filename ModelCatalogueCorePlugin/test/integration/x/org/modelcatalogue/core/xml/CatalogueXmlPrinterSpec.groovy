@@ -178,7 +178,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
                         }
                     }
                 }
-                dataClass(name: 'Engine', id: "http://www.example.com/models/Engine") {
+                daCl(name: 'Engine', id: "http://www.example.com/models/Engine") {
                     dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
                         relationship {
                             ext 'Min. Occurs', '0'

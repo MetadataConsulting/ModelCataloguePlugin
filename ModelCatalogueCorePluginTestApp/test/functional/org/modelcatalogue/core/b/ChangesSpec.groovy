@@ -30,6 +30,11 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
             it.value("Value Domain ${System.nanoTime()}")
         }
 
+        noStale({$('input[id=dataModel]')}) {
+            it.value("Data Model ${System.nanoTime()}")
+        }
+
+
         actionButton('modal-save-element', 'modal').click()
 
         fastAction 'Switch to Finalized'

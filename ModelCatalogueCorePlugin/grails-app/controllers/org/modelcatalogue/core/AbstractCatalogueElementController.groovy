@@ -692,6 +692,10 @@ abstract class AbstractCatalogueElementController<T extends CatalogueElement> ex
         if (!dataModels && !instance.dataModels && !(instance.instanceOf(DataModel))) {
             instance.errors.reject 'catalogue.element.at.least.one.data.model', "'$instance.name' has to be declared wihtin a data model"
         }
+        if (instance.dataModels && !dataModels) {
+            // data models not present in the request
+            return
+        }
         for (dataModel in instance.dataModels.findAll { !(it.id in dataModels.collect { it.id as Long } || it.latestVersionId in dataModels.collect { it.id as Long })  }) {
             instance.removeFromDeclaredWithin dataModel
             dataModel.removeFromDeclares instance

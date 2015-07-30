@@ -1,8 +1,5 @@
 package org.modelcatalogue.core.pages
 
-/**
- * Created by david on 04/11/14.
- */
 class MeasurementUnitListPage extends ModelCataloguePage {
 
     static url = "#/catalogue/measurementUnit/all"
@@ -14,6 +11,6 @@ class MeasurementUnitListPage extends ModelCataloguePage {
     static content = {
         viewTitle(required: false)          { $("h2") }
         dataWizard          { $('div.basic-edit-modal-prompt') }
-        classifications     { dataWizard.find('input[id=dataModel-]') }
+        classifications     { dataWizard.find('input[id=dataModel]') }
     }
 }

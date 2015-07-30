@@ -15,6 +15,11 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
 
     private static final Cache<String, Long> typesCache = CacheBuilder.newBuilder().initialCapacity(20).build()
 
+    static void clearCache() {
+        typesCache.invalidateAll()
+        typesCache.cleanUp()
+    }
+
     def relationshipTypeService
 
     //name of the relationship type i.e. parentChild  or synonym

@@ -78,7 +78,7 @@ class InitCatalogueService {
     }
 
     def initDefaultRelationshipTypes() {
-
+        RelationshipType.clearCache()
         def defaultDataTypes = grailsApplication.config.modelcatalogue.defaults.relationshiptypes
 
         for (Map definition in defaultDataTypes) {
