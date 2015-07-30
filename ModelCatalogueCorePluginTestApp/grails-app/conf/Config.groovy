@@ -355,3 +355,5 @@ mc.welcome.info = """
 <p></p>
 </div>
 """
+
+grails.plugin.springsecurity.ui.register.defaultRoleNames = [] // no roles
