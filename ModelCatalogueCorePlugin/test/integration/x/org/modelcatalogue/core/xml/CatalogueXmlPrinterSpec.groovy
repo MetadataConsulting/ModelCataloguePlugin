@@ -24,13 +24,13 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
         initCatalogue()
 
-        RelationshipType.containmentType.with {
+        RelationshipType.findByName('containment').with {
             rule = "/* A RULE */"
-            save(failOnError: true, flush: true)
+            save(failOnError: true)
         }
-        RelationshipType.declarationType.with {
+        RelationshipType.findByName('declaration').with {
             rule = "/* A RULE */"
-            save(failOnError: true, flush: true)
+            save(failOnError: true)
         }
 
         if (!RelationshipType.findByName('derivedFrom')) {
