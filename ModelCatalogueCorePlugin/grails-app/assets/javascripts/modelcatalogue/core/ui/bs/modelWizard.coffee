@@ -43,7 +43,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 <button id="step-next" ng-disabled="!dataClass.name || step == 'dataModels' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>
               </li>
               <li>
-                <button id="step-finish" ng-disabled="!dataClass.name || !isModelCatalogueIdValid()" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
+                <button id="step-finish" ng-disabled="!dataClass.name || !isModelCatalogueIdValid() || (dataModels.length == 0 &amp;&amp; !dataModel.element)" ng-click="finish()" class="btn btn-default btn-success"><span class="glyphicon glyphicon-ok"></span></button>
               </li>
             </ul>
         </div>
@@ -232,7 +232,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             $scope.parents.push($scope.parent)                  if angular.isString($scope.parent?.element)
             $scope.children.push($scope.child)                  if angular.isString($scope.child?.element)
             $scope.dataElements.push($scope.dataElement)        if angular.isString($scope.dataElement?.element)
-            $scope.dataModels.push($scope.dataModel)  if angular.isString($scope.dataModel?.element)
+            $scope.dataModels.push($scope.dataModel)            if angular.isString($scope.dataModel?.element)
 
 
             angular.forEach $scope.dataModels, (dataModel) ->
@@ -257,7 +257,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             angular.forEach $scope.parents, (parent) ->
               if angular.isString parent.element
                 $scope.pendingActions.push (dataClass) ->
-                  catalogueElementResource("dataClass").save({name: parent.element}).then (parentModel) ->
+                  catalogueElementResource("dataClass").save({name: parent.element, dataModels: dataClass.dataModels}).then (parentModel) ->
                     parent.element = parentModel
                     dataClass
               $scope.pendingActions.push (dataClass) ->
@@ -268,7 +268,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             angular.forEach $scope.children, (child) ->
               if angular.isString child.element
                 $scope.pendingActions.push (dataClass) ->
-                  catalogueElementResource("dataClass").save({name: child.element}).then (childModel) ->
+                  catalogueElementResource("dataClass").save({name: child.element, dataModels: dataClass.dataModels}).then (childModel) ->
                     child.element = childModel
                     dataClass
               $scope.pendingActions.push (dataClass) ->
@@ -279,7 +279,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
             angular.forEach $scope.dataElements, (element) ->
               if angular.isString element.element
                 $scope.pendingActions.push (dataClass) ->
-                  catalogueElementResource("dataElement").save({name: element.element}).then (newElement) ->
+                  catalogueElementResource("dataElement").save({name: element.element, dataModels: dataClass.dataModels}).then (newElement) ->
                     element.element = newElement
                     dataClass
               $scope.pendingActions.push (dataClass) ->
@@ -303,6 +303,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
 
             for action in $scope.pendingActions
              promise = promise.then(action).then decreasePendingActionsCount, (errorResponse) ->
+               $scope.finishInProgress = false
                errorResponse = data: errorResponse unless errorResponse.data?
                if errorResponse.data?.errors
                 for error in errorResponse.data.errors
@@ -313,7 +314,6 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                  $log.error 'Unknown response', errorResponse
                  messages.error('Unknown exception happened while creating new dataClass. See application logs for details.')
 
-               $scope.finishInProgress = false
                $q.reject(errorResponse.data ? errorResponse)
 
             promise.then (dataClass) ->

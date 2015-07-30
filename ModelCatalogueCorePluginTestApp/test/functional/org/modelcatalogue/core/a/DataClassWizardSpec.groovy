@@ -222,6 +222,19 @@ class DataClassWizardSpec extends AbstractModelCatalogueGebSpec {
         when: 'the data class details are filled in'
         name = "Another New"
 
+        and: 'the classifications step is clicked'
+        stepClassifications.click()
+
+        then:
+        waitFor {
+            stepClassifications.hasClass('btn-primary')
+        }
+
+        when: 'the classification is selected'
+        name = 'TEST DATA MODEL'
+        selectCepItemIfExists()
+        name << Keys.ENTER
+
         and: 'finish is clicked'
         stepFinish.click()
 

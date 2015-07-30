@@ -97,11 +97,11 @@ x in ['apple', 'banana', 'cherry']
                 $scope.pending.dataModel = null
 
             if $scope.copy.dataType and angular.isString($scope.copy.dataType)
-              promise = promise.then -> catalogueElementResource('dataType').save({name: $scope.copy.dataType}).then (newType) ->
+              promise = promise.then -> catalogueElementResource('dataType').save({name: $scope.copy.dataType, dataModels: $scope.copy.dataModels}).then (newType) ->
                 $scope.copy.dataType = newType
 
             if $scope.copy.unitOfMeasure and angular.isString($scope.copy.unitOfMeasure)
-              promise = promise.then -> catalogueElementResource('measurementUnit').save({name: $scope.copy.unitOfMeasure}).then (newUnit) ->
+              promise = promise.then -> catalogueElementResource('measurementUnit').save({name: $scope.copy.unitOfMeasure, dataModels: $scope.copy.dataModels}).then (newUnit) ->
                 $scope.copy.unitOfMeasure = newUnit
 
             promise

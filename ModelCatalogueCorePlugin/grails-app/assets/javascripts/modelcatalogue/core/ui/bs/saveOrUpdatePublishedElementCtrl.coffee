@@ -1,7 +1,7 @@
 angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs.withClassificationCtrlMixin']).controller 'saveOrUpdatePublishedElementCtrl', ['$scope', 'messages', '$controller', '$modalInstance', 'args', 'catalogueElementResource', '$q', ($scope, messages, $controller, $modalInstance, args, catalogueElementResource, $q) ->
   $scope.$modalInstance = $modalInstance
-  $scope.pending        = {classification: null}
-  $scope.newEntity      = -> {classifications: $scope.copy?.classifications ? []}
+  $scope.pending        = {dataModel: null}
+  $scope.newEntity      = -> {dataModels: $scope.copy?.dataModels ? []}
   $scope.copy           = angular.copy(args.element ? $scope.newEntity())
   $scope.original       = args.element ? {}
   $scope.messages       = messages.createNewMessages()
@@ -17,13 +17,14 @@ angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs
   $scope.beforeSave = ->
     promise = $q.when {}
 
-    if $scope.pending.classification and angular.isString($scope.pending.classification)
-      promise = promise.then -> catalogueElementResource('classification').save({name: $scope.pending.classification}).then (newClassification) ->
-        $scope.copy.classifications.push newClassification
-        $scope.pending.classification = null
+    if $scope.pending.dataModel and angular.isString($scope.pending.dataModel)
+      promise = promise.then -> catalogueElementResource('dataModel').save({name: $scope.pending.dataModel}).then (newDataModel) ->
+        $scope.copy.dataModels = $scope.copy.dataModels ? []
+        $scope.copy.dataModels.push newDataModel
+        $scope.pending.dataModel = null
 
     if $scope.copy.valueDomain and angular.isString($scope.copy.valueDomain)
-      promise = promise.then -> catalogueElementResource('valueDomain').save({name: $scope.copy.valueDomain}).then (newDomain) ->
+      promise = promise.then -> catalogueElementResource('valueDomain').save({name: $scope.copy.valueDomain, dataModels: $scope.copy.dataModels}).then (newDomain) ->
         $scope.copy.valueDomain = newDomain
 
     promise

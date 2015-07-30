@@ -26,11 +26,11 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
         RelationshipType.containmentType.with {
             rule = "/* A RULE */"
-            save(failOnError: true)
+            save(failOnError: true, flush: true)
         }
         RelationshipType.declarationType.with {
             rule = "/* A RULE */"
-            save(failOnError: true)
+            save(failOnError: true, flush: true)
         }
 
         if (!RelationshipType.findByName('derivedFrom')) {
@@ -164,7 +164,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
     private DataClass getLocomotive() {
         build {
-            model(name: "Locomotive", id: "http://www.example.com/models/Locomotive") {
+            dataClass(name: "Locomotive", id: "http://www.example.com/models/Locomotive") {
                 dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
                     valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
                         description "A force is a push or pull upon an object resulting from the object's interaction with another object."
@@ -178,7 +178,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
                         }
                     }
                 }
-                model(name: 'Engine', id: "http://www.example.com/models/Engine") {
+                dataClass(name: 'Engine', id: "http://www.example.com/models/Engine") {
                     dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
                         relationship {
                             ext 'Min. Occurs', '0'

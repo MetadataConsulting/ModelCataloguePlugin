@@ -22,7 +22,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     
     def "creates new classification with given name, namespace and description"() {
         build {
-            classification(name: 'TestSchema', namespace: 'http://www.w3.org/2001/TestSchema') {
+            dataModel(name: 'TestSchema', namespace: 'http://www.w3.org/2001/TestSchema') {
                 description '''
                     This is a test schema which is just for test purposes!
                 '''
@@ -39,7 +39,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         DataModel c = new DataModel(name: 'ExistingSchema', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
-            classification(name: 'ExistingSchema', namespace: 'http://www.w3.org/2001/ExistingSchema') {
+            dataModel(name: 'ExistingSchema', namespace: 'http://www.w3.org/2001/ExistingSchema') {
                 description '''
                     This is a test schema which is just for test purposes!
                 '''
@@ -54,7 +54,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         DataModel c = new DataModel(name: 'SchemaWithId', modelCatalogueId: 'http://www.example.com/SWI').save(failOnError: true)
 
         build {
-            classification(name: 'NotUniqueName', id: 'http://www.example.com/SWI') {
+            dataModel(name: 'NotUniqueName', id: 'http://www.example.com/SWI') {
                 description '''
                     This is a test schema which is just for test purposes!
                 '''
@@ -69,7 +69,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "complain if classification name is missing"() {
         when:
         build {
-            classification namespace: 'http://www.w3.org/2001/TestSchema'
+            dataModel namespace: 'http://www.w3.org/2001/TestSchema'
         }
 
         then:
@@ -111,14 +111,14 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when:
         build {
-            classification(name: "TestClassificationA") {
+            dataModel(name: "TestClassificationA") {
                 measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
                     description '''
                         This is a test unit which is just for test purposes!
                     '''
                 }
             }
-            classification(name: "TestClassificationB") {
+            dataModel(name: "TestClassificationB") {
                 measurementUnit(name: 'ExistingUnit2', symbol: 'EU2') {
                     description '''
                         This is a test unit which is just for test purposes!
@@ -186,7 +186,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def "creates new model with given name"() {
         build {
-            model(name: 'TestModel') {
+            dataClass(name: 'TestModel') {
                 description '''
                     This is a test model which is just for test purposes!
                 '''
@@ -202,7 +202,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         DataClass unit = new DataClass(name: 'ExistingModel', status: org.modelcatalogue.core.api.ElementStatus.DEPRECATED).save(failOnError: true)
 
         build {
-            model(name: 'ExistingModel') {
+            dataClass(name: 'ExistingModel') {
                 description '''
                     This is a test model which is just for test purposes!
                 '''
@@ -242,7 +242,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         build {
             valueDomain name: 'SomeDomain'
-            classification(name: 'Some') {
+            dataModel(name: 'Some') {
                 valueDomain name: 'SomeDomain'
             }
         }
@@ -321,7 +321,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         build {
             dataType name: 'SomeType'
-            classification(name: 'Some') {
+            dataModel(name: 'Some') {
                 dataType name: 'SomeType'
             }
         }
@@ -365,7 +365,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def "elements are added to classification"() {
         build {
-            classification(name: 'TestSchema') {
+            dataModel(name: 'TestSchema') {
                 valueDomain(name: 'test:string domain') {
                     dataType(name: 'test:string')
                 }
@@ -403,12 +403,12 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
             automatic valueDomain
             automatic dataType
 
-            classification name: 'Complex', {
+            dataModel name: 'Complex', {
                 id 'http://www.example.com/complex-model'
 
-                model name: "Complex Grand Parent", {
-                    model name: "Complex Parent", {
-                        model name: "Complex Child", {
+                dataClass name: "Complex Grand Parent", {
+                    dataClass name: "Complex Parent", {
+                        dataClass name: "Complex Child", {
                             dataElement name: "Complex Element 1"
                             dataElement name: "Complex Element 2", {
                                 valueDomain name: "Complex Domain 2", {
@@ -419,7 +419,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
                         }
                     }
 
-                    model name: "Complex Sibling", {
+                    dataClass name: "Complex Sibling", {
                         dataElement name: "Sibling Element"
                     }
                 }
@@ -440,10 +440,10 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def "create generic relationship"() {
         build {
-            classification name: "Other123", {
+            dataModel name: "Other123", {
                 valueDomain name: 'WD40'
             }
-            classification name: "Other234", {
+            dataModel name: "Other234", {
                 valueDomain name: 'VDRel1'
                 valueDomain name: 'VDRel2'
                 valueDomain name: 'VDRel3'
@@ -465,9 +465,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def "creates new version of the element"() {
         build {
-            classification(name: "NewVersion1") {
+            dataModel(name: "NewVersion1") {
                 // creates finalized model
-                model name: "ModelNV1", id: "http://www.example.com/models/ModelNV1"
+                dataClass name: "ModelNV1", id: "http://www.example.com/models/ModelNV1"
             }
         }
 
@@ -476,8 +476,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         }
 
         build {
-            classification(name: "NewVersion2") {
-                model name: "ModelNVX1", id: "http://www.example.com/models/ModelNVX1"
+            dataModel(name: "NewVersion2") {
+                dataClass name: "ModelNVX1", id: "http://www.example.com/models/ModelNVX1"
             }
         }
 
@@ -486,9 +486,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when:
         build {
-            classification(name: "NewVersion1") {
+            dataModel(name: "NewVersion1") {
                 // this should create new version with different name
-                model name: "ModelNV2", id: "http://www.example.com/models/ModelNV1"
+                dataClass name: "ModelNV2", id: "http://www.example.com/models/ModelNV1"
             }
         }
 
@@ -512,8 +512,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def "adds metadata to nested relationship like child model"() {
         build {
-            model(name: "Parent 007") {
-                model(name: "Child 008") {
+            dataClass(name: "Parent 007") {
+                dataClass(name: "Child 008") {
                     relationship {
                         ext "Min. Occurs", "1"
                     }
@@ -540,8 +540,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
         when:
         build {
-            model(name: "Parent 007") {
-                model(name: "Child 008") {
+            dataClass(name: "Parent 007") {
+                dataClass(name: "Child 008") {
                     relationship {
                         ext "Min. Occurs", "0"
                     }
@@ -556,10 +556,12 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def "migrates hierarchy relationship to new draft version"() {
         build {
-            model(name: 'MHR ROOT') {
-                model(name: 'MHR L1') {
-                    model(name: 'MHR L2') {
-                        model(name: 'MHR L3')
+            dataModel(name: 'MHR MODEL') {
+                dataClass(name: 'MHR ROOT') {
+                    dataClass(name: 'MHR L1') {
+                        dataClass(name: 'MHR L2') {
+                            dataClass(name: 'MHR L3')
+                        }
                     }
                 }
             }
@@ -652,11 +654,11 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         Object old = Holders.grailsApplication.config.grails.serverURL
         Holders.grailsApplication.config.grails.serverURL = "http://localhost:8080/ModelCatalogueCorePluginTestApp"
         build {
-            classification(name: 'CS4ID') {
+            daM(name: 'CS4ID') {
                 id { String name, Class type ->
                     "http://www.example.com/classification/${type.simpleName[0].toLowerCase()}/$name"
                 }
-                model(name: "Model_ID")
+                dataClass(name: "Model_ID")
             }
         }
 
@@ -673,11 +675,11 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "remove child model when missing"() {
         when:
         build {
-            classification(name: "C4RMC") {
-                model (name: 'C4RMC Parent') {
-                    model (name: 'C4RMC Child 1')
-                    model (name: 'C4RMC Child 2')
-                    model (name: 'C4RMC Child 3')
+            dataModel(name: "C4RMC") {
+                dataClass (name: 'C4RMC Parent') {
+                    dataClass (name: 'C4RMC Child 1')
+                    dataClass (name: 'C4RMC Child 2')
+                    dataClass (name: 'C4RMC Child 3')
                 }
             }
         }
@@ -694,10 +696,10 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         c4rmc.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
 
         build {
-            classification(name: "C4RMC") {
-                model (name: 'C4RMC Parent') {
-                    model (name: 'C4RMC Child 2')
-                    model (name: 'C4RMC Child 3')
+            dataModel(name: "C4RMC") {
+                dataClass (name: 'C4RMC Parent') {
+                    dataClass (name: 'C4RMC Child 2')
+                    dataClass (name: 'C4RMC Child 3')
                 }
             }
         }
@@ -713,9 +715,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         c4rmc.status == org.modelcatalogue.core.api.ElementStatus.FINALIZED
 
         build {
-            classification(name: "C4RMC") {
-                model (name: 'C4RMC Parent') {
-                    model (name: 'C4RMC Child 3')
+            dataModel(name: "C4RMC") {
+                dataClass (name: 'C4RMC Parent') {
+                    dataClass (name: 'C4RMC Child 3')
                 }
             }
         }
@@ -731,9 +733,9 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
     def "finalizes model after creation"() {
         when:
         build {
-            model(name: 'Parent Model 4 Finalization') {
+            dataClass(name: 'Parent Model 4 Finalization') {
                 status finalized
-                model(name: 'Child Model 4 Finalization')
+                dataClass(name: 'Child Model 4 Finalization')
             }
         }
         then:
@@ -746,8 +748,8 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         String name = 'Model for Double Relationship Call'
         when:
         build {
-            model(name: name) {
-                model(name: "$name Child") {
+            dataClass(name: name) {
+                dataClass(name: "$name Child") {
                     relationship {
                         ext 'one', '1'
                     }
@@ -774,15 +776,15 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         String ch2Name = "$name Child 2"
         when:
         build {
-            model(name: name) {
-                model(name: ch1Name) {
+            dataClass(name: name) {
+                dataClass(name: ch1Name) {
                     relationship {
                         ext 'one', '1'
                         ext 'two', '2'
                     }
                 }
 
-                model(name: ch2Name) {
+                dataClass(name: ch2Name) {
                     relationship {
                         ext 'two', 'II'
                         ext 'three', 'III'
