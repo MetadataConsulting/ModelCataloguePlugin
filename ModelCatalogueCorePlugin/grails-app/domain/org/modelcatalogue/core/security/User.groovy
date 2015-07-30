@@ -32,6 +32,13 @@ class User extends CatalogueElement {
 
     static hasMany = [oAuthIDs: OAuthID]
 
+    void setUsername(String username) {
+        if (!getName()) {
+            setName(username)
+        }
+        this.username = username
+    }
+
     Set<Role> getAuthorities() {
         UserRole.findAllByUser(this).collect { it.role } as Set
     }

@@ -7,36 +7,46 @@
 
 <body>
 
-<p/>
+<g:if test='${emailSent}'>
+    <div class="col-md-6 col-md-offset-3">
+	    <div class="alert alert-info">
+		    <g:message code='spring.security.ui.forgotPassword.sent'/>
+        </div>
+	</div>
+</g:if>
+<g:else>
+	<div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><g:message code='spring.security.ui.forgotPassword.header' default="Forgot Password"/></h3>
+			</div>
 
-<s2ui:form width='400' height='220' elementId='forgotPasswordFormContainer'
-           titleCode='spring.security.ui.forgotPassword.header' center='true'>
+			<div class="panel-body">
+                <div class="alert alert-info">
+                    <g:message code='spring.security.ui.forgotPassword.description'></g:message>
+                </div>
+				<g:form action="forgotPassword" method="post" autocomplete="off" class="form-horizontal">
+					<div class="form-group ">
+						<label for='username-new' class="control-label col-sm-3"><g:message
+								code="user.username.label" default="Username"/>:</label>
 
-	<g:form action='forgotPassword' name="forgotPasswordForm" autocomplete='off'>
+						<div class="col-sm-9">
+							<input type='text' class='form-control' name='username' id="username-new" />
+						</div>
+					</div>
 
-	<g:if test='${emailSent}'>
-	<br/>
-	<g:message code='spring.security.ui.forgotPassword.sent'/>
-	</g:if>
-
-	<g:else>
-
-	<br/>
-	<h4><g:message code='spring.security.ui.forgotPassword.description'/></h4>
-
-	<table>
-		<tr>
-			<td><label for="username"><g:message code='spring.security.ui.forgotPassword.username'/></label></td>
-			<td><g:textField name="username" size="25" /></td>
-		</tr>
-	</table>
-
-	<s2ui:submitButton elementId='reset' form='forgotPasswordForm' messageCode='spring.security.ui.forgotPassword.submit'/>
-
-	</g:else>
-
-	</g:form>
-</s2ui:form>
+					<div class="form-group">
+						<div class="col-sm-offset-3 col-sm-9">
+							<button type="submit" class="btn btn-primary"><i
+									class="glyphicon glyphicon-repeat"></i> <g:message
+									code="springSecurity.registration.create.button" default="Reset My Password"/></button>
+						</div>
+					</div>
+				</g:form>
+			</div>
+		</div>
+	</div>
+</g:else>
 
 <script>
 $(document).ready(function() {

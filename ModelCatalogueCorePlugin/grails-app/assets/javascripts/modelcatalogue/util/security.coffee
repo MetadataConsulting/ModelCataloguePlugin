@@ -80,6 +80,8 @@ angular.module('mc.util.security', ['http-auth-interceptor', 'mc.util.messages',
 
       security =
         oauthProviders: config.oauthProviders
+        allowRegistration: config.allowRegistration
+        canResetPassword: config.canResetPassword
         contextPath: config.contextPath
         isUserLoggedIn: ->
           currentUser?

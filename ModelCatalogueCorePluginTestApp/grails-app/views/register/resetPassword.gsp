@@ -7,32 +7,56 @@
 
 <body>
 
-<p/>
+<div class="col-md-6 col-md-offset-3">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title"><g:message code="spring.security.ui.resetPassword.header"
+											   default="Reset Password"/></h3>
+		</div>
 
-<s2ui:form width='475' height='250' elementId='resetPasswordFormContainer'
-           titleCode='spring.security.ui.resetPassword.header' center='true'>
+		<div class="panel-body">
+			<g:hasErrors bean="${command}">
+				<g:each in="${command.errors.allErrors}" var="error">
+					<div class='alert alert-danger'><g:message error="${error}"/></div>
+				</g:each>
+			</g:hasErrors>
 
-	<g:form action='resetPassword' name='resetPasswordForm' autocomplete='off'>
-	<g:hiddenField name='t' value='${token}'/>
-	<div class="sign-in">
+			<g:form action="resetPassword" method="post" autocomplete="off" class="form-horizontal">
+				<div class="alert alert-info">
+					<g:message code='spring.security.ui.resetPassword.description'></g:message>
+				</div>
 
-	<br/>
-	<h4><g:message code='spring.security.ui.resetPassword.description'/></h4>
+                <g:hiddenField name='t' value='${token}'/>
 
-	<table>
-		<s2ui:passwordFieldRow name='password' labelCode='resetPasswordCommand.password.label' bean="${command}"
-                             labelCodeDefault='Password' value="${command?.password}"/>
+				<div class="form-group">
+					<label for='password' class="control-label col-sm-3"><g:message code="user.password.label" default="Password"/>:</label>
 
-		<s2ui:passwordFieldRow name='password2' labelCode='resetPasswordCommand.password2.label' bean="${command}"
-                             labelCodeDefault='Password (again)' value="${command?.password2}"/>
-	</table>
+					<div class="col-sm-9">
+						<input type='password' class='form-control' name='password' id="password"/>
+					</div>
+				</div>
 
-	<s2ui:submitButton elementId='reset' form='resetPasswordForm' messageCode='spring.security.ui.resetPassword.submit'/>
+				<div class="form-group">
+					<label for='password2' class="control-label col-sm-3"><g:message code="user.password2.label"
+																					 default="Password (Again)"/>:</label>
 
+					<div class="col-sm-9">
+						<input type='password' class='form-control' name='password2' id="password2" />
+					</div>
+				</div>
+
+				<div class="form-group">
+					<div class="col-sm-offset-3 col-sm-9">
+						<button type="submit" class="btn btn-primary"><i
+								class="glyphicon glyphicon-repeat"></i> <g:message
+								code="spring.security.ui.resetPassword.submit" default="Reset Password"/></button>
+					</div>
+				</div>
+			</g:form>
+		</div>
 	</div>
-	</g:form>
+</div>
 
-</s2ui:form>
 
 <script>
 $(document).ready(function() {

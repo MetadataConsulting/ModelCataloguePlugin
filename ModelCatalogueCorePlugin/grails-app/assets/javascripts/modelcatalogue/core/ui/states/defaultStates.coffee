@@ -24,6 +24,11 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
     $scope.validate = ->
       messages.prompt('', '', {type: 'validate-value-by-domain'})
 
+    console.log security
+
+    if security.allowRegistration
+      $scope.registrationUrl = "#{security.contextPath}/register/"
+
     $scope.create = (what) ->
       dialogType = "create-#{what}"
       if not messages.hasPromptFactory(dialogType)
@@ -712,6 +717,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       <div ng-bind-html="welcome.jumbo"></div>
       <form ng-controller="defaultStates.userCtrl">
          <button ng-click="login()" class="btn btn-large btn-primary" type="submit">Login <i class="glyphicon glyphicon-log-in"></i></button>
+         <a ng-href="{{registrationUrl}}" ng-if="registrationUrl" class="btn btn-large btn-primary">Sign Up <span class="fa fa-user"></span></a>
          <!--a href="" class="btn btn-large btn-primary" >Sign Up <i class="glyphicon glyphicon-pencil"></i></a-->
       </form>
     </div>
