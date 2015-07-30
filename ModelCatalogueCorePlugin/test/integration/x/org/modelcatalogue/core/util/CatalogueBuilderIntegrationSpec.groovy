@@ -1,6 +1,5 @@
 package x.org.modelcatalogue.core.util
 
-import grails.test.spock.IntegrationSpec
 import grails.util.Holders
 import org.modelcatalogue.core.*
 import org.modelcatalogue.core.publishing.DraftContext
@@ -8,16 +7,15 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Issue
 
-class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
+class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
 
-    def initCatalogueService
     def dataModelService
     def elementService
 
     Set<CatalogueElement> created = []
 
     def setup() {
-        initCatalogueService.initDefaultRelationshipTypes()
+        initRelationshipTypes()
     }
     
     def "creates new classification with given name, namespace and description"() {
@@ -654,7 +652,7 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         Object old = Holders.grailsApplication.config.grails.serverURL
         Holders.grailsApplication.config.grails.serverURL = "http://localhost:8080/ModelCatalogueCorePluginTestApp"
         build {
-            daM(name: 'CS4ID') {
+            dataModel(name: 'CS4ID') {
                 id { String name, Class type ->
                     "http://www.example.com/classification/${type.simpleName[0].toLowerCase()}/$name"
                 }
