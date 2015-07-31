@@ -32,34 +32,49 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
             </form>
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" ng-model="settings.enumerated" ng-disabled="!create" id="enumerated"> Enumerated
-              </label>
+
+            <label class="radio-inline">
+              <input ng-disabled="!create" type="radio" ng-model="subtype" name="subtype" id="pickSimpleType" value="dataType"> Simple
+            </label>
+            <label class="radio-inline">
+              <input ng-disabled="!create" ng-model="subtype" type="radio"  name="subtype" id="pickEnumeratedType" value="enumeratedType"> Enumerated
+            </label>
+            <label class="radio-inline">
+              <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
+            </label>
+            <div collapse="subtype != 'enumeratedType'">
+              <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
             </div>
-            <div collapse="!settings.enumerated"><ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor></div>
+            <div collapse="subtype != 'referenceType'">
+            <div class="form-group">
+                <label for="dataClass" class="">Data Class</label>
+                <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
+              </div>
+            </div>
         </div>
         <div class="modal-footer">
           <contextual-actions role="modal"></contextual-actions>
         </div>
         '''
-        controller: ['$scope', 'messages', '$controller', '$modalInstance', 'enhance', ($scope, messages, $controller, $modalInstance, enhance) ->
+        controller: ['$scope', 'messages', '$controller', '$modalInstance', 'enhance', 'names', 'catalogueElementResource', ($scope, messages, $controller, $modalInstance, enhance, names, catalogueElementResource) ->
           orderedMapEnhancer = enhance.getEnhancer('orderedMap')
 
           $scope.newEntity = -> {enumerations: orderedMapEnhancer.emptyOrderedMap(), dataModels: []}
           $scope.copy     = angular.copy(args.element ? $scope.newEntity())
+          $scope.copy.enumerations = $scope.copy.enumerations ? orderedMapEnhancer.emptyOrderedMap()
           $scope.original = args.element ? $scope.newEntity()
           $scope.messages = messages.createNewMessages()
           $scope.create   = args.create
-
-          $scope.settings = {enumerated: args.create == 'enumeratedType' || args?.element?.isInstanceOf('enumeratedType')}
+          if args.create
+            $scope.subtype = args.create
+          else if args.element and args.element.elementType
+            $scope.subtype = names.getPropertyNameFromType(args.element.elementType)
+          else
+            $scope.subtype = 'dataType'
 
           if $scope.create
-            $scope.$watch 'settings.enumerated', (enumerated) ->
-              if enumerated
-                $scope.create = 'enumeratedType'
-              else
-                $scope.create = 'dataType'
+            $scope.$watch 'subtype', (subtype) ->
+                $scope.create = subtype
 
           angular.extend(this, $controller('withClassificationCtrlMixin', {$scope: $scope}))
           angular.extend(this, $controller('saveAndCreateAnotherCtrlMixin', {$scope: $scope, $modalInstance: $modalInstance}))
@@ -67,7 +82,20 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
           $scope.hasChanged   = ->
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
 
+          $scope.beforeSave = ->
+             promise = $q.when {}
 
+             if $scope.pending.dataModel and angular.isString($scope.pending.dataModel)
+               promise = promise.then -> catalogueElementResource('dataModel').save({name: $scope.pending.dataModel}).then (newDataModel) ->
+                 $scope.copy.dataModels = $scope.copy.dataModels ? []
+                 $scope.copy.dataModels.push newDataModel
+                 $scope.pending.dataModel = null
+
+             if $scope.copy.dataClass and angular.isString($scope.copy.dataClass)
+               promise = promise.then -> catalogueElementResource('dataClass').save({name: $scope.copy.dataClass, dataModels: $scope.copy.dataModels}).then (newClass) ->
+                 $scope.copy.dataClass = newClass
+
+             promise
 
         ]
 
@@ -78,4 +106,5 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
 
   messagesProvider.setPromptFactory 'edit-dataType', factory
   messagesProvider.setPromptFactory 'edit-enumeratedType', factory
+  messagesProvider.setPromptFactory 'edit-referenceType', factory
 ]

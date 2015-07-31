@@ -28,6 +28,43 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
 
     }
 
+    def "create reference"() {
+
+        when:
+        actionButton('create-catalogue-element', 'list').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        $('#name').value('New Reference Type')
+
+        classifications = "NT1"
+        selectCepItemIfExists()
+
+        $('#pickReferenceType').click()
+
+
+        waitFor {
+            $('input#dataClass').displayed
+        }
+
+        noStale({$('input#dataClass')}) {
+            it.value('DEMOGRAPHICS')
+        }
+
+        selectCepItemIfExists()
+
+        actionButton('modal-save-element', 'modal').click()
+
+        then:
+        waitFor {
+            infTableCell(1, 1, text: 'New Reference Type').displayed
+        }
+    }
+
     def "create enum"() {
 
         when:
@@ -44,7 +81,7 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         classifications = "NT1"
         selectCepItemIfExists()
 
-        $('#enumerated').click()
+        $('#pickEnumeratedType').click()
 
 
         waitFor {

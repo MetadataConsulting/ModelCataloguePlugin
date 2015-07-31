@@ -21,7 +21,7 @@ angular.module('mc.core.ui.bs.saveAndCreateAnotherCtrlMixin', []).controller 'sa
     unless $scope.copy.name
       $scope.messages.error 'Empty Name', 'Please fill the name'
       return false
-    unless $scope.pending.dataModel || (angular.isArray($scope.copy.dataModels) && $scope.copy.dataModels.length > 0)
+    unless $scope.pending?.dataModel || (angular.isArray($scope.copy.dataModels) && $scope.copy.dataModels.length > 0)
       $scope.messages.error 'Missing Data Model', 'Please select a data model'
       return false
     return true

@@ -6,6 +6,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setIcon 'dataElement',        "fa fa-fw fa-cube"
   catalogueProvider.setIcon 'valueDomain',        "fa fa-fw fa-cog"
   catalogueProvider.setIcon 'enumeratedType',     "fa fa-fw fa-list-alt"
+  catalogueProvider.setIcon 'referenceType',      "fa fa-fw fa-external-link-square"
   catalogueProvider.setIcon 'dataType',           "fa fa-fw fa-th-large"
   catalogueProvider.setIcon 'measurementUnit',    "fa fa-fw fa-tachometer"
   catalogueProvider.setIcon 'asset',              "fa fa-fw fa-file-code-o"
@@ -36,6 +37,7 @@ angular.module('mc.core.ui.bs.catalogue', ['mc.core.catalogue']).config ['catalo
   catalogueProvider.setInstanceOf 'dataElement',        'catalogueElement'
 
   catalogueProvider.setInstanceOf 'enumeratedType',     'dataType'
+  catalogueProvider.setInstanceOf 'referenceType',      'dataType'
 
   catalogueProvider.setDefaultSort 'catalogueElement',  sort: 'name',         order: 'asc'
   catalogueProvider.setDefaultSort 'asset',             sort: 'lastUpdated',  order: 'desc'

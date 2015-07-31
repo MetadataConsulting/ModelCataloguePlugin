@@ -186,7 +186,8 @@ angular.module('mc.core.ui.infiniteListCtrl', ['mc.core.listEnhancer']).controll
       or "#{modelCatalogueApiRoot}#{$scope.list.base}".indexOf(url) >= 0 \
       or url.indexOf("#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}") >= 0 \
       or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/relationships/', '/outgoing/')}".indexOf(url) >= 0 \
-      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0
+      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/dataType/', '/enumeratedType/')}".indexOf(url) >= 0 \
+      or "#{modelCatalogueApiRoot}#{$scope.list.base.replace('/dataType/', '/referenceType/')}".indexOf(url) >= 0
 
     $scope.total++
     $scope.elements.unshift newElement
