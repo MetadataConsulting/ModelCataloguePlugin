@@ -65,6 +65,6 @@ class DataType extends CatalogueElement {
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(this.relatedValueDomains).add(this.classifications)
+        chain.add(this.relatedValueDomains).add(this.dataModels)
     }
 }

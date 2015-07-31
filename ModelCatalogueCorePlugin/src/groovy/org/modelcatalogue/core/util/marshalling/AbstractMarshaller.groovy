@@ -31,6 +31,7 @@ abstract class AbstractMarshaller {
     abstract protected Map<String, Object> prepareJsonMap(element)
 
     protected getAvailableReports(el) {
+        // TODO: this should be moved to the frontend
         def reports = []
 
         for (ReportDescriptor descriptor in reportsRegistry.getAvailableReports(el)) {

@@ -1,20 +1,19 @@
 package org.modelcatalogue.core.util.marshalling
 
-import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.EnumeratedType
-import org.modelcatalogue.core.ValueDomain
+import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.util.OrderedMap
 
-class EnumeratedTypeMarshaller extends DataTypeMarshaller {
+class ReferenceTypeMarshaller extends DataTypeMarshaller {
 
-    EnumeratedTypeMarshaller() {
-        super(EnumeratedType)
+    ReferenceTypeMarshaller() {
+        super(ReferenceType)
     }
 
     protected Map<String, Object> prepareJsonMap(element) {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
-        ret.enumerations = OrderedMap.toJsonMap(element.enumerations)
+        ret.dataClass = minimalCatalogueElementJSON(element.dataClass)
         ret
     }
 

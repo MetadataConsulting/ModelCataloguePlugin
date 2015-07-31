@@ -11,7 +11,7 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
     }
 
     def setupSpec(){
-        totalCount = 24
+        totalCount = 36
     }
 
 
@@ -92,9 +92,9 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
     def getPaginationParameters(String baseLink) {
         [
                 // no,size, max , off. tot. next                           , previous
-                [1, 1, 1, 0, 24, "${baseLink}?max=1&offset=1", ""],
-                [2, 1, 1, 1, 24, "${baseLink}?max=1&offset=2", "${baseLink}?max=1&offset=0"],
-                [3, 1, 1, 2, 24, "${baseLink}?max=1&offset=3", "${baseLink}?max=1&offset=1"],
+                [1, 1, 1, 0, totalCount, "${baseLink}?max=1&offset=1", ""],
+                [2, 1, 1, 1, totalCount, "${baseLink}?max=1&offset=2", "${baseLink}?max=1&offset=0"],
+                [3, 1, 1, 2, totalCount, "${baseLink}?max=1&offset=3", "${baseLink}?max=1&offset=1"],
         ]
     }
 
