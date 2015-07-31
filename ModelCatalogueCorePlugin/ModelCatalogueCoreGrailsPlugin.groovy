@@ -88,7 +88,7 @@ Model catalogue core plugin (metadata registry)
                     new EnumeratedTypeMarshaller(),
                     new ReferenceTypeMarshaller(),
                     new MeasurementUnitMarshaller(),
-                    new ModelMarshaller(),
+                    new DataClassMarshaller(),
                     new RelationshipTypeMarshaller(),
                     new RelationshipMarshallers(),
                     new RelationshipsMarshaller(),

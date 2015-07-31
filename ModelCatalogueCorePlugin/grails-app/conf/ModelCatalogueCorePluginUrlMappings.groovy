@@ -102,6 +102,11 @@ class ModelCatalogueCorePluginUrlMappings {
                     "/api/modelCatalogue/core/$elementName/$id/validateValue"(controller: controllerName, action: 'validateValue', method: HttpMethod.GET)
                 }
 
+                if (controllerName == 'dataClass') {
+                    "/api/modelCatalogue/core/$elementName/$id/referenceType"(controller: controllerName, action: 'referenceTypes', method: HttpMethod.GET)
+
+                }
+
                 if (controllerName == 'user') {
                     "/$controllerName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/current"(controller: controllerName, action: 'current', method: HttpMethod.GET)
