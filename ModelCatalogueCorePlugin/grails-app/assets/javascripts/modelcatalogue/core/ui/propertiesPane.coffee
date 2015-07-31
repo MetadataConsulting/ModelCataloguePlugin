@@ -31,6 +31,7 @@ angular.module('mc.core.ui.propertiesPane', []).directive 'propertiesPane',  [->
 
       $scope.getEnumerations = (enumeratedType) ->
         return '' if not enumeratedType
+        return """<a href="#/catalogue/dataClass/#{enumeratedType.dataClass.id}"><span class="fa fa-fw fa-cubes"></span> #{enumeratedType.dataClass.name}</a>""" if enumeratedType.dataClass
         return enumeratedType.description if not enumeratedType.enumerations
         return enumeratedType.description if not enumeratedType.enumerations.values
         enumerations = []

@@ -81,7 +81,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$elementName/$id/finalize"(controller: controllerName, action: 'finalizeElement', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$elementName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
 
-                if (controllerName == 'dataType' || controllerName == 'enumeratedType' ) {
+                if (controllerName == 'dataType' || controllerName == 'enumeratedType' || controllerName == 'referenceType') {
                     "/api/modelCatalogue/core/$elementName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                 }
 

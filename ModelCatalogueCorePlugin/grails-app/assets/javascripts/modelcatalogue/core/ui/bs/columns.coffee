@@ -9,6 +9,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
 
   getEnumerations = (enumeratedType) ->
     return '' if not enumeratedType
+    return """<a href="#/catalogue/dataClass/#{enumeratedType.dataClass.id}"><span class="fa fa-fw fa-cubes"></span> #{enumeratedType.dataClass.name}</a>""" if enumeratedType.dataClass
     return enumeratedType.description if not enumeratedType.enumerations
     return enumeratedType.description if not enumeratedType.enumerations.values
     enumerations = []
@@ -108,15 +109,14 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
     {header: 'Data Type',           value: 'dataType.name',                       classes: 'col-md-3', href: 'dataType.href()',       show: 'dataType.show()'}
   ]
 
-  columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', [
+  dataTypeColumns = [
     {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
     {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6'}
   ]
 
-  columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', [
-    {header: "Name",                        value: 'name',          classes: 'col-md-6', show: true, href: 'href()', sort: {property: 'name', type: 'alpha'}}
-    {header: "Enumerations or Description", value: getEnumerations, classes: 'col-md-6'}
-  ]
+  columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', dataTypeColumns
+  columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', dataTypeColumns
+  columnsProvider.registerColumns 'org.modelcatalogue.core.ReferenceType', dataTypeColumns
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Batch', [
     {header: "Last Updated", value: "lastUpdated | date:'short'"   , classes: 'col-md-2',                              sort: {property: 'lastUpdated', type: 'numeric'}}

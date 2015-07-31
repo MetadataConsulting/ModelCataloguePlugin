@@ -31,6 +31,8 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
       ext     = dataType?.enumerations?.values ? []
       for e in ext
         result += "#{e.key} \n"
+    if dataType?.dataClass
+      result = """<a href="#{dataType.dataClass.modelCatalogueId}"><span class="fa fa-fw fa-cubes"></span>#{dataType.dataClass.name}</a>"""
     else if dataType
       result = dataType?.name
     result

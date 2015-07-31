@@ -84,7 +84,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                   <label for="name" class="">Parent Data Class</label>
                   <elements-as-tags elements="parents"></elements-as-tags>
                   <div class="input-group">
-                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="dataClass" typeahead-on-select="push('parents', 'parent')">
+                    <input type="text" class="form-control" id="name" placeholder="Name" ng-model="parent.element" focus-me="step=='parents'" catalogue-element-picker="dataClass" status='draft' typeahead-on-select="push('parents', 'parent')">
                     <span class="input-group-btn">
                       <button class="btn btn-success" ng-click="push('parents', 'parent')" ng-disabled="isEmpty(parent.element)"><span class="glyphicon glyphicon-plus"></span></button>
                     </span>
