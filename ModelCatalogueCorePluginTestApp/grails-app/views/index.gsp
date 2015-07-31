@@ -84,7 +84,9 @@
         demoConfig.config(['securityProvider', function (securityProvider) {
             securityProvider.springSecurity({
                 oauthProviders: ${oauthService.services.keySet().collect{"'$it'"}},
-                contextPath: '${grailsApplication.config.grails.app.context ?: request.contextPath ?: ''}',
+                contextPath:      '${grailsApplication.config.grails.app.context ?: request.contextPath ?: ''}',
+                allowRegistration: ${grailsApplication.config.grails.mc.allow.signup.asBoolean()},
+                canResetPassword:  ${grailsApplication.config.grails.mail.host.asBoolean() || grailsApplication.config.grails.mc.can.reset.password.asBoolean()},
                 roles: {
                     VIEWER:     ['ROLE_USER', 'ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],
                     CURATOR:    ['ROLE_METADATA_CURATOR', 'ROLE_ADMIN'],

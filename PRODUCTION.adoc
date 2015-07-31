@@ -55,6 +55,14 @@ dataSource {
 }
 ----
 
+== Mail Configuration
+Mail plugin must be configured properly to allow user registration (enabled by `grails.mc.allow.signup` configuration
+property set to true).
+
+For detailed information about setting the data source, please, follow the instruction in
+http://grails.org/plugins/mail[Grails Mail Plugin Documentation] where you can see the configuration for
+most common mail providers. By default the application expects unsecured mail server running on the localhost.
+
 
 == OAuth 2.0 Configuration
 Following three providers are included out of the box:

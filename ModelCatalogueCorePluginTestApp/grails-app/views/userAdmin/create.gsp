@@ -8,10 +8,10 @@
 
 <body>
 
-<h3>TEST3<g:message code="default.create.label" args="[entityName]"/>TEST</h3>
+<h3><g:message code="default.create.label" args="[entityName]"/></h3>
 
 <g:form action="save" name='userCreateForm'>
-
+<g:renderErrors bean="${user}"/>
 <%
 def tabData = []
 tabData << [name: 'userinfo', icon: 'icon_user', messageCode: 'spring.security.ui.user.info']
