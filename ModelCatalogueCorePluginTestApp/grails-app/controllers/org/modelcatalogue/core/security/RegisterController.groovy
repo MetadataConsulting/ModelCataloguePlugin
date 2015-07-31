@@ -6,7 +6,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 
     @Override
     def register(RegisterCommand command) {
-        if (!grailsApplication.grails.mc.allow.signup) {
+        if (!grailsApplication.config.grails.mc.allow.signup) {
             flash.error = "Registration is not enabled for this application"
             return
         }
