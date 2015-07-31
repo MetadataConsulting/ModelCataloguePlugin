@@ -48,8 +48,6 @@ class TestDataHelper {
             println "Database cleared from $clearScriptLocation"
         }
 
-        RelationshipType.clearCache()
-
         initCode()
 
         sessionFactory.currentSession.flush()

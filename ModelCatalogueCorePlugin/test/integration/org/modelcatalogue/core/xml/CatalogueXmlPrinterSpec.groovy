@@ -1,4 +1,4 @@
-package x.org.modelcatalogue.core.xml
+package org.modelcatalogue.core.xml
 
 import groovy.xml.XmlUtil
 import org.custommonkey.xmlunit.DetailedDiff
@@ -7,7 +7,6 @@ import org.custommonkey.xmlunit.XMLUnit
 import org.modelcatalogue.core.*
 import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
-import org.modelcatalogue.core.xml.CatalogueXmlPrinter
 import spock.lang.Ignore
 
 class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
@@ -24,15 +23,6 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
         initCatalogue()
 
-        RelationshipType.findByName('containment').with {
-            rule = "/* A RULE */"
-            save(failOnError: true)
-        }
-        RelationshipType.findByName('declaration').with {
-            rule = "/* A RULE */"
-            save(failOnError: true)
-        }
-
         if (!RelationshipType.findByName('derivedFrom')) {
             new RelationshipType(
                     name: 'derivedFrom',
@@ -40,7 +30,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
                     sourceToDestination: 'is derived from',
                     destinationClass: MeasurementUnit,
                     destinationToSource: 'derives'
-            ).save(failOnError: true, flush: true)
+            ).save(failOnError: true)
         }
 
         printer = new CatalogueXmlPrinter(dataModelService, dataClassService)
@@ -54,7 +44,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         StringWriter writer = new StringWriter()
         writable.writeTo(writer)
         expect:
-        writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+        writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2.1/metadataregistry.xsd">
   <valueDomain name="Test" id="http://example.com/specialchars" status="DRAFT">
     <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
   </valueDomain>
@@ -78,6 +68,13 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         expect:
         type instanceof EnumeratedType
         similar type, 'gender.catalogue.xml'
+    }
+
+    def "write reference type"() {
+        def type = user
+        expect:
+        type instanceof ReferenceType
+        similar type, 'user.catalogue.xml'
     }
 
     def "write simple value domain"() {
@@ -115,9 +112,8 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         })
         println xml
 
-        Diff diff = new Diff(xml, getClass().classLoader.getResourceAsStream("resources/xml/$sampleFile").text)
+        Diff diff = new Diff(xml.replaceAll(/[ \t]+/, " "), getClass().classLoader.getResourceAsStream("resources/xml/$sampleFile").text.replaceAll(/[ \t]+/, " "))
         DetailedDiff detailedDiff = new DetailedDiff(diff)
-
 
         assert detailedDiff.similar(), detailedDiff.toString()
         return true
@@ -255,6 +251,17 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         build {
             dataType(name: "Gender", id: "http://www.example.com/types/Gender", enumerations: [M: 'Male', F: 'Female']) {
                 description "The state of being male or female (typically used with reference to social and cultural differences rather than biological ones)"
+            }
+        }
+    }
+
+    private DataType getUser() {
+        build {
+            dataType(name: "User", id: "http://www.example.com/types/User") {
+                description "Reference to the user"
+                dataClass(name: "User", id: "http://www.example.com/classes/User") {
+                    description "The user of the system"
+                }
             }
         }
     }

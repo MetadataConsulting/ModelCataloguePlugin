@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2.1/metadataregistry.xsd">
     <dataClass name="Locomotive" id="http://www.example.com/models/Locomotive" status="DRAFT">
         <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
             <valueDomain name="Force" id="http://www.example.com/domains/Force" status="DRAFT">
@@ -29,7 +29,23 @@
         <relationshipType name="containment" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
             <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
             <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
-            <rule>/* A RULE */</rule>
+            <rule>String minOccursString = ext['Min Occurs']
+                String maxOccursString = ext['Max Occurs']
+
+                Integer minOccurs = minOccursString in ['unbounded', 'null', '*', null] ? 0 : (minOccursString as Integer)
+                Integer maxOccurs = maxOccursString in ['unbounded', 'null', '*', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
+
+                if (minOccurs &lt; 0) {
+                return ["relationshipType.containment.min.occurs.less.than.zero", "'Max Occurs' has to be greater than zero"]
+                }
+                if (maxOccurs &lt; minOccurs) {
+                return ["relationshipType.containment.min.occurs.greater.than.max.occurs", "The metadata 'Min Occurs' cannot be greater than 'Min Occurs'"]
+                }
+                if (maxOccurs &lt; 1) {
+                return ["relationshipType.containment.max.occurs.zero", "The metadata 'Max Occurs' must be greater than zero"]
+                }
+
+                return true</rule>
         </relationshipType>
         <relationshipType name="hierarchy" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataClass" versionSpecific="true">
             <sourceToDestination label="parent of">Model can contain (be parent of) multiple models. Child models are finalized when parent model is finalized,</sourceToDestination>

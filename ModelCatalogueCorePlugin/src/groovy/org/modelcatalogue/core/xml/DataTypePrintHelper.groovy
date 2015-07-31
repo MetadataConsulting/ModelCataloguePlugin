@@ -2,11 +2,9 @@ package org.modelcatalogue.core.xml
 
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 
-/**
- * Created by ladin on 15.01.15.
- */
 class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
 
     @Override
@@ -22,6 +20,11 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
                 for (Map.Entry<String, String> entry in element.enumerations) {
                     enumeration(value: entry.key, entry.value)
                 }
+            }
+        }
+        if (element instanceof ReferenceType) {
+            if (element.dataClass) {
+                printElement(mkp, element.dataClass, context, null)
             }
         }
     }

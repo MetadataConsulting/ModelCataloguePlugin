@@ -167,14 +167,17 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      * @return proxy to model specified by the parameters map and the DSL closure
      */
     void dataClass(Map<String, Object> parameters, @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<DataClass> model = createProxy(DataClass, parameters, DataModel, isUnderControlIfSameClassification(parameters))
+        CatalogueElementProxy<DataClass> dataClass = createProxy(DataClass, parameters, DataModel, isUnderControlIfSameClassification(parameters))
 
-        context.withNewContext model, c
+        context.withNewContext dataClass, c
+        context.withContextElement(DataType) {
+            it.setParameter('dataClass', dataClass)
+        }
         context.withContextElement(DataClass) { ignored, Closure relConf ->
-            child model, relConf
+            child dataClass, relConf
         }
 
-        model
+        dataClass
     }
 
     /**
@@ -224,6 +227,13 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext dataType, c
+
+        if (dataType.getParameter('dataClass')) {
+            if (dataType instanceof DefaultCatalogueElementProxy) {
+                DefaultCatalogueElementProxy proxy = (DefaultCatalogueElementProxy) dataType;
+                proxy.domain = ReferenceType
+            }
+        }
 
         context.withContextElement(ValueDomain) {
             it.setParameter('dataType', dataType)

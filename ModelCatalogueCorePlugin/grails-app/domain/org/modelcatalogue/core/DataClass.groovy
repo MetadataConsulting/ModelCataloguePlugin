@@ -2,6 +2,7 @@ package org.modelcatalogue.core
 
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
+import org.modelcatalogue.core.util.FriendlyErrors
 import org.modelcatalogue.core.util.Legacy
 
 class DataClass extends CatalogueElement {
@@ -21,7 +22,7 @@ class DataClass extends CatalogueElement {
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {
-        chain.add(this.childOf).add(this.dataModels)
+        chain.add(this.childOf).add(this.dataModels).add(referringDataTypes)
     }
 
     @Override
@@ -34,4 +35,27 @@ class DataClass extends CatalogueElement {
         // TODO: remove when the class is renamed
         return Legacy.fixModelCatalogueId(super.getDefaultModelCatalogueId(withoutVersion))
     }
+
+
+    List<ReferenceType> getReferringDataTypes() {
+        if (!readyForQueries) {
+            return []
+        }
+        return ReferenceType.findAllByDataClass(this)
+    }
+
+    Long countReferringDataTypes() {
+        if (!readyForQueries) {
+            return 0
+        }
+        return ReferenceType.countByDataClass(this)
+    }
+
+    DataClass removeFromReferringDataTypes(ReferenceType domain) {
+        domain.dataClass = null
+        FriendlyErrors.failFriendlySave(domain)
+        this
+    }
+
+
 }

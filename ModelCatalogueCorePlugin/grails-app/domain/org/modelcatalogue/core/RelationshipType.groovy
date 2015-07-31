@@ -3,6 +3,7 @@ package org.modelcatalogue.core
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.google.common.util.concurrent.UncheckedExecutionException
+import grails.util.Environment
 import grails.util.GrailsNameUtils
 import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
@@ -219,8 +220,17 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
                 }
                 return type.id
             } as Callable<Long>)
-            RelationshipType.get(id)
 
+            RelationshipType type = RelationshipType.get(id)
+            if (type) {
+                return type
+            }
+            type = RelationshipType.findByName(name)
+            if (type) {
+                typesCache.asMap().put(name, type.id)
+                return type
+            }
+            return null
         } catch (UncheckedExecutionException e) {
             if (e.cause instanceof IllegalArgumentException) {
                 Logger.getLogger(RelationshipType).warn "Type '$name' requested but not found!"

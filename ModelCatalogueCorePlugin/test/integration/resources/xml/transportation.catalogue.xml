@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
+<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2.1/metadataregistry.xsd">
     <dataModel name="Transportation" id="http://www.example.com/datasets/Transportation" status="DRAFT">
         <dataClass name="Locomotive" id="http://www.example.com/models/Locomotive" status="DRAFT">
             <dataElement name="Factor of Adhesion" id="http://www.example.com/elements/Adhesion" status="DRAFT">
@@ -27,12 +27,40 @@
         <relationshipType name="declaration" source="org.modelcatalogue.core.DataModel" destination="org.modelcatalogue.core.CatalogueElement" versionSpecific="true">
             <sourceToDestination label="declares">Data models can declare multiple elements. Based on this relationship you can narrow the elements shown in the catalogue using the data model filter in the bottom left corner. When data model is finalized all defined elements are finalized as well.</sourceToDestination>
             <destinationToSource label="declared within">Any element can be declared within multiple data models. When new draft of the element is created then drafts for data models are created as well.</destinationToSource>
-            <rule>/* A RULE */</rule>
+            <rule>if (!destination.dataModels) {
+                return true
+                }
+
+                long newModelLatestVersionId = source.latestVersionId ?: source.id
+
+                for (int i = 0; i &lt; destination.dataModels.size() ; i++) {
+                def dataModel = destination.dataModels[i]
+                long existingDataModelLatestVersionId = dataModel.latestVersionId ?: dataModel.id
+                if (newModelLatestVersionId != existingDataModelLatestVersionId) {
+                return ["catalogue.element.can.have.only.one.data.model", "'$destination.name' is already owned by data model '$dataModel.name'"]
+                }
+                }</rule>
         </relationshipType>
         <relationshipType name="containment" source="org.modelcatalogue.core.DataClass" destination="org.modelcatalogue.core.DataElement" versionSpecific="true">
             <sourceToDestination label="contains">Model can contain multiple data elements. Contained data elements are finalized when the model is finalized.</sourceToDestination>
             <destinationToSource label="contained in">Data element can be contained in multiple models. When new draft of the data element is created then drafts for all containing models are created as well.</destinationToSource>
-            <rule>/* A RULE */</rule>
+            <rule>String minOccursString = ext['Min Occurs']
+                String maxOccursString = ext['Max Occurs']
+
+                Integer minOccurs = minOccursString in ['unbounded', 'null', '*', null] ? 0 : (minOccursString as Integer)
+                Integer maxOccurs = maxOccursString in ['unbounded', 'null', '*', null] ? Integer.MAX_VALUE : (maxOccursString as Integer)
+
+                if (minOccurs &lt; 0) {
+                return ["relationshipType.containment.min.occurs.less.than.zero", "'Max Occurs' has to be greater than zero"]
+                }
+                if (maxOccurs &lt; minOccurs) {
+                return ["relationshipType.containment.min.occurs.greater.than.max.occurs", "The metadata 'Min Occurs' cannot be greater than 'Min Occurs'"]
+                }
+                if (maxOccurs &lt; 1) {
+                return ["relationshipType.containment.max.occurs.zero", "The metadata 'Max Occurs' must be greater than zero"]
+                }
+
+                return true</rule>
         </relationshipType>
     </relationshipTypes>
 </catalogue>

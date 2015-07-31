@@ -345,6 +345,31 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         e.message.startsWith "Cannot create element abstraction from"
     }
 
+    def "if enumerations present, create enumerated type"() {
+        build {
+            dataType name: 'ETTest', enumerations: [foo: 'bar']
+        }
+
+        expect:
+        EnumeratedType.findByName('ETTest')
+    }
+
+
+    def "if data class present, create reference type"() {
+        build {
+            dataType name: 'RTTest', {
+                dataClass name: 'RTTest DC'
+            }
+        }
+
+        ReferenceType referenceType = ReferenceType.findByName('RTTest')
+
+        expect:
+        referenceType
+        referenceType.dataClass
+        referenceType.dataClass.name == "RTTest DC"
+    }
+
     def "do not complain if data type name is missing but inside value domain"() {
         build {
             valueDomain(name: 'test:number') {
