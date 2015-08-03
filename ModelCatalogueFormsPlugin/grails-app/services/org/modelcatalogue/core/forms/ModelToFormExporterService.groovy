@@ -10,6 +10,7 @@ import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.GenericItem
 import org.modelcatalogue.crf.model.GridGroup
+import org.modelcatalogue.crf.model.Item
 import org.modelcatalogue.crf.model.ItemContainer
 import org.modelcatalogue.crf.model.ResponseType
 import org.modelcatalogue.crf.model.DataType as FormDataType
@@ -64,6 +65,7 @@ class ModelToFormExporterService {
     static final String EXT_MIN_OCCURS = "Min Occurs"
     static final String EXT_NAME_LC = "name"
     static final String EXT_NAME_CAP = "Name"
+    static final String ENUM_DEFAULT = "default"
     static final Set<String> DATA_TYPE_REAL_NAMES = ['number', 'decimal', 'float', 'double', 'real', 'xs:decimal', 'xs:double', 'xs:float']
     static final Set<String> DATA_TYPE_INTEGER_NAMES = ['int', 'integer', 'long', 'short', 'byte', 'xs:int', 'xs:integer', 'xs:long', 'xs:short', 'xs:byte','xs:nonNegativeInteger', 'xs:nonPositiveInteger', 'xs:negativeInteger', 'xs:positiveInteger', 'xs:unsignedLong', 'xs:unsignedInt', 'xs:unsignedShort', 'xs:unsignedByte']
     public static final ArrayList<String> DATA_TYPE_DATA_NAMES = ['date', 'xs:date']
@@ -203,7 +205,7 @@ class ModelToFormExporterService {
                 container.file(itemName)
             } else if (dataType && dataType.instanceOf(EnumeratedType)) {
                 // either value domain is marked as multiple or
-                Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerations.collectEntries { key, value -> [value ?: key, key]}
+                Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerations.collectEntries { key, value -> [value ?: key, key == ENUM_DEFAULT ? '' : key]}
                 if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] || valueDomain?.multiple || rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
                     // multi select or checkbox (default)
                     if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_MULTI_SELECT) {
@@ -289,6 +291,10 @@ class ModelToFormExporterService {
                     if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_LAYOUT)) == RESPONSE_LAYOUT_HORIZONTAL) {
                         layout horizontal
                     }
+                }
+                if (last instanceof Item) {
+                    CatalogueElement labelSource = dataType ?: valueDomain ?: dataElement
+                    last.setResponseLabel(alphaNumNoSpaces(labelSource.name + "_" + labelSource.versionNumber))
                 }
             }
         }
