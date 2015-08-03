@@ -67,8 +67,8 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
     Map<String, Object> collectAttributes(E element, PrintContext context) {
         Map<String, Object> attrs = [name: element.name]
 
-        if (element.classifications && !(context.currentClassification in element.classifications)) {
-            attrs.classification = element.classifications.first().name
+        if (element.dataModels && !(context.currentClassification in element.dataModels)) {
+            attrs.classification = element.dataModels.first().name
         }
 
         if (element.hasModelCatalogueId()) {
@@ -157,6 +157,9 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         if (rel.archived) {
             theMkp.archived true
         }
+        if (rel.inherited) {
+            theMkp.inherited true
+        }
     }
 
     static DetachedCriteria<Relationship> restOfRelationships(DetachedCriteria<Relationship>  criteria) {
@@ -174,11 +177,11 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
             return [ref: element.modelCatalogueId, href: element.getDefaultModelCatalogueId(!context.idIncludeVersion)]
         }
 
-        if (element.classifications) {
-            if (context.currentClassification in element.classifications) {
+        if (element.dataModels) {
+            if (context.currentClassification in element.dataModels) {
                 return [name: element.name]
             } else {
-                return [name: element.name, classification: element.classifications.first().name]
+                return [name: element.name, classification: element.dataModels.first().name]
             }
         }
 

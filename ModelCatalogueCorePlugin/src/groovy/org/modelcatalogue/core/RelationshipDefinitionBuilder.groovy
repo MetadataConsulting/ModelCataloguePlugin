@@ -23,6 +23,11 @@ class RelationshipDefinitionBuilder {
         this
     }
 
+    RelationshipDefinitionBuilder withInherited(boolean inherited) {
+        definition.inherited = inherited
+        this
+    }
+
     RelationshipDefinitionBuilder withResetIndices(boolean resetIndices) {
         definition.resetIndices = resetIndices
         this

@@ -41,6 +41,7 @@ class RelationshipDefinition {
     DataModel dataModel = null
     Map<String, String> metadata = [:]
     boolean archived
+    boolean inherited
     Long outgoingIndex
     Long incomingIndex
     Long combinedIndex
@@ -57,6 +58,7 @@ class RelationshipDefinition {
                 relationshipType: relationshipType?.id ? relationshipType : null,
                 dataModel: dataModel?.id ? dataModel : null,
                 archived: archived,
+                inherited: inherited,
                 outgoingIndex: outgoingIndex ?: System.currentTimeMillis(),
                 incomingIndex: incomingIndex ?: System.currentTimeMillis(),
                 combinedIndex: combinedIndex ?: System.currentTimeMillis()

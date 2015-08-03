@@ -218,6 +218,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       label:      ''
       icon:       'glyphicon glyphicon-remove'
       type:       'danger'
+      watches:    'element.inherited'
+      disabled:   $scope.element.inherited
       action:     ->
         rel   = $scope.element
         deferred = $q.defer()
@@ -288,6 +290,8 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     label:      ''
     icon:       'glyphicon glyphicon-edit'
     type:       'primary'
+    watches:    'element.inherited'
+    disabled:   $scope.element.inherited
     action:     ->
       rel   = $scope.element
       rel.element.refresh().then (element) ->

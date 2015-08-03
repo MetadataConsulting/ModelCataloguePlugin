@@ -138,6 +138,7 @@ class RelationshipService {
                 if (relationship.relationshipType.versionSpecific) {
                     RelationshipDefinition newDefinition = RelationshipDefinition.from(relationship)
                     newDefinition.source = relationshipDefinition.destination
+                    newDefinition.inherited = true
                     Relationship newRelationship = link newDefinition
                     if (newRelationship.hasErrors()) {
                         relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to copy relationship $newDefinition from ${relationshipDefinition.source} to child ${relationshipDefinition.destination}", newRelationship.errors))
@@ -151,6 +152,7 @@ class RelationshipService {
             Inheritance.withChildren(relationshipInstance.source) {
                 RelationshipDefinition newDefinition = relationshipDefinition.clone()
                 newDefinition.source = it
+                newDefinition.inherited = true
                 Relationship newRelationship = link newDefinition
                 if (newRelationship.hasErrors()) {
                     relationshipInstance.errors.reject('unable.to.copy.from.parent', FriendlyErrors.printErrors("Unable to propagate relationship $newDefinition from ${relationshipDefinition.source} to child ${newDefinition.source}", newRelationship.errors))
@@ -230,6 +232,12 @@ class RelationshipService {
                     relationshipInstance.errors.rejectValue('relationshipType', 'org.modelcatalogue.core.RelationshipType.single.owning.dataModel.remove', [] as Object[], "Cannot remove single owning data model.")
                     return relationshipInstance
                 }*/
+
+                if (relationshipInstance.inherited) {
+                    relationshipInstance.errors.rejectValue('inherited', 'org.modelcatalogue.core.RelationshipType.cannot.change.inherited',  "Cannot changed inherited relationships.")
+                    return relationshipInstance
+                }
+
             }
 
             if (expectedMetadata != null && expectedMetadata != relationshipInstance.ext) {
@@ -244,7 +252,7 @@ class RelationshipService {
             if (relationshipType == RelationshipType.baseType) {
                 for (Relationship relationship in new LinkedHashSet<Relationship>(source.outgoingRelationships)) {
                     if (relationship.relationshipType.versionSpecific) {
-                        unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.dataModel, ignoreRules, relationship.ext
+                        unlink relationship.source, relationship.destination, relationship.relationshipType, relationship.dataModel, true, relationship.ext
                     }
                 }
                 List<String> forRemoval = []
@@ -259,7 +267,7 @@ class RelationshipService {
                 }
             } else if (relationshipType.versionSpecific) {
                 Inheritance.withChildren(source) {
-                    unlink(it, destination, relationshipType, dataModel, ignoreRules, relationshipInstance.ext)
+                    unlink(it, destination, relationshipType, dataModel, true, relationshipInstance.ext)
                 }
             }
 

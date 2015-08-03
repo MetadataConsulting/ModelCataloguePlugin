@@ -22,7 +22,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 <button id="step-previous" ng-disabled="step == 'dataClass' || step == 'summary'" ng-click="previous()" class="btn btn-default"><span class="glyphicon glyphicon-chevron-left"></span></button>
               </li>
               <li>
-                <button id="step-dataClass" ng-disabled="step == 'summary'" ng-click="select('dataClass')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataClass'}">1. Data Class</button>
+                <button id="step-dataClass" ng-disabled="step == 'summary'" ng-click="select('dataClass')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataClass'}">1. Data Class*</button>
               </li>
               <li>
                 <button id="step-metadata" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('metadata')" class="btn btn-default" ng-class="{'btn-primary': step == 'metadata', 'btn-info': step != 'metadata' &amp;&amp; hasMetadata()}">2. Metadata</button>
@@ -37,7 +37,7 @@ angular.module('mc.core.ui.bs.modelWizard', ['mc.util.messages', 'mc.util.ui.foc
                 <button id="step-elements" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('elements')" class="btn btn-default" ng-class="{'btn-primary': step == 'elements', 'btn-info': step != 'elements' &amp;&amp; dataElements.length > 0}">5. Elements</button>
               </li>
               <li>
-                <button id="step-dataModels" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('dataModels')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataModels', 'btn-info': step != 'dataModels' &amp;&amp; dataModels.length > 0}">6. Data Models</button>
+                <button id="step-dataModels" ng-disabled="!dataClass.name || step == 'summary'" ng-click="select('dataModels')" class="btn btn-default" ng-class="{'btn-primary': step == 'dataModels', 'btn-info': step != 'dataModels' &amp;&amp; dataModels.length > 0}">6. Data Models*</button>
               </li>
               <li>
                 <button id="step-next" ng-disabled="!dataClass.name || step == 'dataModels' || step == 'summary'" ng-click="next()" class="btn btn-default" ><span class="glyphicon glyphicon-chevron-right"></span></button>

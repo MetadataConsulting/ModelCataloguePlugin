@@ -190,7 +190,9 @@ class InheritanceSpec extends IntegrationSpec  {
 
         and: "they are added to child as well"
         rc1
+        rc1.inherited
         rc2
+        rc2.inherited
         dataElement1 in childClass.contains
         dataElement2 in childClass.contains
 
@@ -208,6 +210,23 @@ class InheritanceSpec extends IntegrationSpec  {
 
         then: "the metadata are added to child relationships as well"
         rc2.ext[METADATA_KEY_5] == METADATA_VALUE_5
+
+        when: "we try to remove relationship from child"
+        Relationship rc3 = childClass.removeFromContains dataElement3
+
+        then: "error is returned"
+        rc3.errors.errorCount > 0
+
+        and: "the children still contain the data element"
+        dataElement3 in childClass.contains
+
+        when: "we try to add relationship which is already inherited"
+        childClass.addToContains dataElement3
+
+        then: "error is returned"
+        thrown(IllegalArgumentException)
+
+
 
 
         when:

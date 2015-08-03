@@ -64,9 +64,7 @@ class Relationship implements Extendible<RelationshipMetadata>, org.modelcatalog
     static transients = ['ext']
 
     Boolean archived = false
-
-    // TODO: we'll probably have to mark relationships as inherited
-    // Boolean inherited = false
+    Boolean inherited = false
 
     final Map<String, String> ext = new ExtensionsWrapper(this)
 
