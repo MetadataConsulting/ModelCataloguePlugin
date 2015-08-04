@@ -94,6 +94,16 @@ angular.module('mc.core.ui.bs.catalogueElementView', ['mc.core.ui.catalogueEleme
      <infinite-table  id="{{tab.name}}-changes"  list="tab.value" is-sortable="isTableSortable(tab)" reorder="reorder(tab, $row, $current)" columns="tab.columns" actions="tab.actions"></infinite-table>
     '''
 
+    $templateCache.put 'modelcatalogue/core/ui/catalogueElementView/relationship-details.html', '''
+     <div ng-init="element = tab.value">
+          <span class="contextual-actions-right">
+             <contextual-actions size="sm" no-colors="true" role="item"></contextual-actions>
+          </span>
+          <h3>Metadata</h3>
+          <properties-pane id="{{tab.name}}-relationship-metadata" item="element.ext" title="Key" value-title="Value"></properties-pane>
+     </div>
+    '''
+
     $templateCache.put 'modelcatalogue/core/ui/catalogueElementView.html', '''
     <div>
       <span class="contextual-actions-right">
