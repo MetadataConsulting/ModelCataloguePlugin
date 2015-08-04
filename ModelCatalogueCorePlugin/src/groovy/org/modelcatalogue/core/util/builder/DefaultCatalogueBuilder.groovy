@@ -585,7 +585,9 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             return
         }
         context.withContextElement(Classification) {
-            element.addToPendingRelationships(new RelationshipProxy('classification', it, element, [:]))
+            RelationshipProxy relationshipProxy = new RelationshipProxy('classification', it, element, [:])
+            element.addToPendingRelationships(relationshipProxy)
+            it.addToPendingRelationships(relationshipProxy)
         }
     }
 

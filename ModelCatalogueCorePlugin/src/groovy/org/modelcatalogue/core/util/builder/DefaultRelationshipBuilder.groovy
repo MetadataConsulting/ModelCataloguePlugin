@@ -91,7 +91,10 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      */
     void to(CatalogueElementProxy element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(getSourceHintOrClass()) {
-            return it.addToPendingRelationships(new RelationshipProxy(type.name, it, element, extensions))
+            RelationshipProxy relationshipProxy = new RelationshipProxy(type.name, it, element, extensions)
+            element.addToPendingRelationships(relationshipProxy)
+            return it.addToPendingRelationships(relationshipProxy)
+
         } or {
             throw new IllegalStateException("There is no contextual element available of type ${getSourceHintOrClass()}")
         }
@@ -169,7 +172,9 @@ class DefaultRelationshipBuilder implements RelationshipBuilder {
      */
     public void from(CatalogueElementProxy element, @DelegatesTo(RelationshipConfiguration) Closure extensions = {}) {
         context.withContextElement(getDestinationHintOrClass()) {
-            return it.addToPendingRelationships(new RelationshipProxy(type.name, element, it, extensions))
+            RelationshipProxy proxy = new RelationshipProxy(type.name, element, it, extensions)
+            element.addToPendingRelationships(proxy)
+            return it.addToPendingRelationships(proxy)
         } or {
             throw new IllegalStateException("There is no contextual element available of type ${getDestinationHintOrClass()}")
         }

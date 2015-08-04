@@ -7,6 +7,7 @@ import org.modelcatalogue.builder.api.CatalogueBuilder
 import org.modelcatalogue.core.util.builder.DefaultCatalogueBuilder
 import spock.lang.Issue
 
+
 class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
 
     def initCatalogueService
@@ -804,4 +805,54 @@ class CatalogueBuilderIntegrationSpec extends IntegrationSpec {
         ch2.ext.three == 'III'
     }
 
+    def "should be able to copy relationships where the classification is finalized"() {
+        build {
+            classification(name: 'C4CR', status: finalized)
+        }
+        when:
+        build {
+            // copy relationships
+            classification(name: 'C4CR') {
+                model(name: 'C4CR GP') {
+                    model(name: 'C4CR P') {
+                        model(name: 'C4CR C1')
+                        model(name: 'C4CR C2')
+                        model(name: 'C4CR C3')
+                    }
+                }
+            }
+        }
+
+        then:
+        noExceptionThrown()
+        CatalogueElement.findByNameAndStatus('C4CR GP', org.modelcatalogue.core.api.ElementStatus.DRAFT).classifications.any { it.name == 'C4CR'}
+    }
+
+
+    def "should be able to copy relationships where the model is finalized"() {
+        build {
+            classification(name: 'C4CR2', status: finalized) {
+                model(name: 'C4CR2 GP', status: finalized)
+            }
+        }
+        when:
+        build {
+            copy relationships
+            classification(name: 'C4CR2') {
+                model(name: 'C4CR2 GP') {
+                    model(name: 'C4CR2 P') {
+                        model(name: 'C4CR2 C1')
+                        model(name: 'C4CR2 C2')
+                        model(name: 'C4CR2 C3')
+                    }
+                }
+            }
+        }
+
+        then:
+        noExceptionThrown()
+        CatalogueElement.findByName('C4CR2 P').parentOf.size() == 3
+        CatalogueElement.findByName('C4CR2 P').childOf.any { it.name == 'C4CR2 GP'}
+        CatalogueElement.findByNameAndStatus('C4CR2 GP', org.modelcatalogue.core.api.ElementStatus.DRAFT).parentOf.any { it.name == 'C4CR2 P'}
+    }
 }

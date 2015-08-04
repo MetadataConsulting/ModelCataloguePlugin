@@ -363,11 +363,15 @@ import org.modelcatalogue.core.api.ElementStatus
 
         other.relationships.each { RelationshipProxy relationship ->
             if (repository.equals(this, relationship.source)) {
-                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions))
+                RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, this, relationship.destination, relationship.extensions)
+                addToPendingRelationships(relationshipProxy)
+                relationship.destination.addToPendingRelationships(relationshipProxy)
             }
 
             if (repository.equals(this, relationship.destination)) {
-                addToPendingRelationships(new RelationshipProxy(relationship.relationshipTypeName, relationship.source, this, relationship.extensions))
+                RelationshipProxy relationshipProxy = new RelationshipProxy(relationship.relationshipTypeName, relationship.source, this, relationship.extensions)
+                addToPendingRelationships(relationshipProxy)
+                relationship.source.addToPendingRelationships(relationshipProxy)
             }
         }
 
