@@ -42,13 +42,22 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             <label class="radio-inline">
               <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
             </label>
+            <label class="radio-inline">
+              <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickPrimitiveType" value="primitiveType"> Primitive
+            </label>
             <div collapse="subtype != 'enumeratedType'">
               <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
             </div>
             <div collapse="subtype != 'referenceType'">
-            <div class="form-group">
+              <div class="form-group">
                 <label for="dataClass" class="">Data Class</label>
                 <input type="text" id="dataClass" placeholder="Data Class" ng-model="copy.dataClass" catalogue-element-picker="dataClass" label="el.name">
+              </div>
+            </div>
+            <div collapse="subtype != 'primitiveType'">
+              <div class="form-group">
+                <label for="measurementUnit" class="">Measurement Unit</label>
+                <input type="text" id="measurementUnit" placeholder="Measurement Unit" ng-model="copy.measurementUnit" catalogue-element-picker="measurementUnit" label="el.name">
               </div>
             </div>
         </div>
@@ -83,19 +92,31 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
             $scope.copy.name != $scope.original.name or $scope.copy.description != $scope.original.description or $scope.copy.modelCatalogueId != $scope.original.modelCatalogueId or not angular.equals($scope.original.enumerations ? {}, $scope.copy.enumerations ? {}) or not angular.equals($scope.original.dataModels ? {}, $scope.copy.dataModels ? {})
 
           $scope.beforeSave = ->
-             promise = $q.when {}
+            promise = $q.when {}
 
-             if $scope.pending.dataModel and angular.isString($scope.pending.dataModel)
+            if $scope.pending.dataModel and angular.isString($scope.pending.dataModel)
                promise = promise.then -> catalogueElementResource('dataModel').save({name: $scope.pending.dataModel}).then (newDataModel) ->
                  $scope.copy.dataModels = $scope.copy.dataModels ? []
                  $scope.copy.dataModels.push newDataModel
                  $scope.pending.dataModel = null
 
-             if $scope.copy.dataClass and angular.isString($scope.copy.dataClass)
-               promise = promise.then -> catalogueElementResource('dataClass').save({name: $scope.copy.dataClass, dataModels: $scope.copy.dataModels}).then (newClass) ->
-                 $scope.copy.dataClass = newClass
 
-             promise
+
+            if $scope.subtype is 'referenceType'
+              if $scope.copy.dataClass and angular.isString($scope.copy.dataClass)
+                 promise = promise.then -> catalogueElementResource('dataClass').save({name: $scope.copy.dataClass, dataModels: $scope.copy.dataModels}).then (newClass) ->
+                   $scope.copy.dataClass = newClass
+              else
+                $scope.copy.dataClass = undefined
+
+            if $scope.subtype is 'primitiveType'
+              if $scope.copy.measurementUnit and angular.isString($scope.copy.measurementUnit)
+                 promise = promise.then -> catalogueElementResource('measurementUnit').save({name: $scope.copy.measurementUnit, dataModels: $scope.copy.dataModels}).then (newUnit) ->
+                   $scope.copy.measurementUnit = newUnit
+            else
+              $scope.copy.measurementUnit = undefined
+
+            promise
 
         ]
 

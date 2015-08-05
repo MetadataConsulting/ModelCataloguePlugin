@@ -117,6 +117,7 @@ angular.module('mc.core.ui.bs.columns', ['mc.util.names']).config ['columnsProvi
   columnsProvider.registerColumns 'org.modelcatalogue.core.DataType', dataTypeColumns
   columnsProvider.registerColumns 'org.modelcatalogue.core.EnumeratedType', dataTypeColumns
   columnsProvider.registerColumns 'org.modelcatalogue.core.ReferenceType', dataTypeColumns
+  columnsProvider.registerColumns 'org.modelcatalogue.core.PrimitiveType', dataTypeColumns
 
   columnsProvider.registerColumns 'org.modelcatalogue.core.actions.Batch', [
     {header: "Last Updated", value: "lastUpdated | date:'short'"   , classes: 'col-md-2',                              sort: {property: 'lastUpdated', type: 'numeric'}}

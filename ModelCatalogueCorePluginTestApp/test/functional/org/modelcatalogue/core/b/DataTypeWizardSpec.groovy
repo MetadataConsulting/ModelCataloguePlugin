@@ -65,6 +65,43 @@ class DataTypeWizardSpec extends AbstractModelCatalogueGebSpec {
         }
     }
 
+    def "create primitive"() {
+
+        when:
+        actionButton('create-catalogue-element', 'list').click()
+
+        then:
+        waitFor {
+            modalDialog.displayed
+        }
+
+        when:
+        $('#name').value('New Primitive Type')
+
+        classifications = "NT1"
+        selectCepItemIfExists()
+
+        $('#pickPrimitiveType').click()
+
+
+        waitFor {
+            $('input#measurementUnit').displayed
+        }
+
+        noStale({$('input#measurementUnit')}) {
+            it.value('celsius')
+        }
+
+        selectCepItemIfExists()
+
+        actionButton('modal-save-element', 'modal').click()
+
+        then:
+        waitFor {
+            infTableCell(1, 1, text: 'New Primitive Type').displayed
+        }
+    }
+
     def "create enum"() {
 
         when:
