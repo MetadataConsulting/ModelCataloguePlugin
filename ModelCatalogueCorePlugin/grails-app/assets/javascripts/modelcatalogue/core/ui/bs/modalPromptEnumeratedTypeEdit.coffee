@@ -40,10 +40,10 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
               <input ng-disabled="!create" ng-model="subtype" type="radio"  name="subtype" id="pickEnumeratedType" value="enumeratedType"> Enumerated
             </label>
             <label class="radio-inline">
-              <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
+              <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickPrimitiveType" value="primitiveType"> Primitive
             </label>
             <label class="radio-inline">
-              <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickPrimitiveType" value="primitiveType"> Primitive
+              <input ng-disabled="!create" ng-model="subtype" type="radio" name="subtype" id="pickReferenceType" value="referenceType"> Reference
             </label>
             <div collapse="subtype != 'enumeratedType'">
               <ordered-map-editor object="copy.enumerations" title="Enumerations" key-placeholder="Value" value-placeholder="Description"></ordered-map-editor>
