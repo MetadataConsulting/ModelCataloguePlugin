@@ -46,7 +46,7 @@
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="#"><span class="fa fa-fw fa-book"></span><span
+            <a class="navbar-brand" href="${grailsApplication.grails.serverURL}"><span class="fa fa-fw fa-book"></span><span
                     class="visible-md-inline">&nbsp; Model Catalogue</span></a>
         </div>
     </div>

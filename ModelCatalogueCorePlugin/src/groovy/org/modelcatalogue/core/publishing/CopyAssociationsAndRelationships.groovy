@@ -90,6 +90,10 @@ class CopyAssociationsAndRelationships {
                 return
             }
 
+            if (r.archived) {
+                return
+            }
+
             CatalogueElement otherSide
             String hash
 
@@ -103,14 +107,6 @@ class CopyAssociationsAndRelationships {
 
             if (hash in createdRelationshipHashes) {
                 return
-            }
-
-
-            if (direction == RelationshipDirection.INCOMING) {
-                if (r.archived && r.relationshipType.versionSpecific) {
-                    // e.g. don't copy archived parents, but copy children (that's why this is in the incoming branch)
-                    return
-                }
             }
 
             RelationshipDefinitionBuilder definitionBuilder = direction == RelationshipDirection.INCOMING ? RelationshipDefinition.create(otherSide, draft, r.relationshipType) : RelationshipDefinition.create(draft, otherSide, r.relationshipType)

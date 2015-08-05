@@ -9,6 +9,8 @@ import org.modelcatalogue.core.Relationship
 import org.modelcatalogue.core.ValueDomain
 import org.modelcatalogue.crf.model.CaseReportForm
 import org.modelcatalogue.crf.model.GenericItem
+import org.modelcatalogue.crf.model.GridGroup
+import org.modelcatalogue.crf.model.Item
 import org.modelcatalogue.crf.model.ItemContainer
 import org.modelcatalogue.crf.model.ResponseType
 import org.modelcatalogue.crf.model.DataType as FormDataType
@@ -61,8 +63,9 @@ class ModelToFormExporterService {
     static final String RESPONSE_LAYOUT_HORIZONTAL = "horizontal"
     static final String EXT_MAX_OCCURS = "Max Occurs"
     static final String EXT_MIN_OCCURS = "Min Occurs"
-    static final String EXT_NAME_LC = "Name"
+    static final String EXT_NAME_LC = "name"
     static final String EXT_NAME_CAP = "Name"
+    static final String ENUM_DEFAULT = "default"
     static final Set<String> DATA_TYPE_REAL_NAMES = ['number', 'decimal', 'float', 'double', 'real', 'xs:decimal', 'xs:double', 'xs:float']
     static final Set<String> DATA_TYPE_INTEGER_NAMES = ['int', 'integer', 'long', 'short', 'byte', 'xs:int', 'xs:integer', 'xs:long', 'xs:short', 'xs:byte','xs:nonNegativeInteger', 'xs:nonPositiveInteger', 'xs:negativeInteger', 'xs:positiveInteger', 'xs:unsignedLong', 'xs:unsignedInt', 'xs:unsignedShort', 'xs:unsignedByte']
     public static final ArrayList<String> DATA_TYPE_DATA_NAMES = ['date', 'xs:date']
@@ -137,10 +140,10 @@ class ModelToFormExporterService {
             String itemsWithHeaderOrGridName = fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_CAP, fromDestination(itemsWithHeaderOrGridRel, EXT_NAME_LC, itemsWithHeaderOrGrid.name))
             if (fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_GRID) == 'true') {
 
-                section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) {
+                section.grid(alphaNumNoSpaces(itemsWithHeaderOrGridName)) { GridGroup grid ->
                     header fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_HEADER, itemsWithHeaderOrGridName)
 
-                    generateItems(prefix, section, itemsWithHeaderOrGrid)
+                    generateItems(prefix, grid, itemsWithHeaderOrGrid)
 
                     Integer repeatNum = safeInteger(fromDestination(itemsWithHeaderOrGridRel, EXT_GROUP_REPEAT_NUM), EXT_GROUP_REPEAT_NUM, itemsWithHeaderOrGridRel.destination)
                     if (repeatNum) {
@@ -178,117 +181,120 @@ class ModelToFormExporterService {
     }
 
     private void generateItems(String prefix, ItemContainer container, DataClass model, String aHeader = null, String aSubheader = null) {
-        container.with {
+        
+        for (Relationship rel in model.containsRelationships) {
+            DataElement dataElement = rel.destination as DataElement
+            ValueDomain valueDomain = dataElement.valueDomain
+            DataType dataType = valueDomain?.dataType
 
-            boolean first = true
+            log.info "Generating items from data element $dataElement"
 
-            for (Relationship rel in model.containsRelationships) {
-                DataElement dataElement = rel.destination as DataElement
-                ValueDomain valueDomain = dataElement.valueDomain
-                DataType dataType = valueDomain?.dataType
+            List<CatalogueElement> candidates = [dataElement, valueDomain, dataType].grep()
 
-                log.info "Generating items from data element $dataElement"
-
-                List<CatalogueElement> candidates = [dataElement, valueDomain, dataType].grep()
-
-                collectBases(candidates, dataElement)
-                collectBases(candidates, valueDomain)
-                collectBases(candidates, dataType)
+            collectBases(candidates, dataElement)
+            collectBases(candidates, valueDomain)
+            collectBases(candidates, dataType)
 
 
-                // bit of heuristic
-                String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
-                String itemName = alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}")
-                if (candidates.any { it.name.toLowerCase() == 'file' } || normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_FILE  ) {
-                    file(itemName)
-                } else if (dataType && dataType.instanceOf(EnumeratedType)) {
-                    // either value domain is marked as multiple or
-                    Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerations.collectEntries { key, value -> [value ?: key, key]}
-                    if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] || valueDomain?.multiple || rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
-                        // multi select or checkbox (default)
-                        if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_MULTI_SELECT) {
-                            multiSelect(itemName) {
-                                options enumOptions
-                            }
-                        } else {
-                            checkbox(itemName) {
-                                options enumOptions
-                            }
+            // bit of heuristic
+            String localName = fromDestination(rel, EXT_NAME_CAP, fromDestination(rel, EXT_NAME_LC, dataElement.name))
+            String itemName = alphaNumNoSpaces("${prefix ? (prefix + '_') : ''}${model.name}_${localName}")
+            if (candidates.any { it.name.toLowerCase() == 'file' } || normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_FILE  ) {
+                container.file(itemName)
+            } else if (dataType && dataType.instanceOf(EnumeratedType)) {
+                // either value domain is marked as multiple or
+                Map<String, Object> enumOptions = (dataType as EnumeratedType).enumerations.collectEntries { key, value -> [value ?: key, key == ENUM_DEFAULT ? '' : key]}
+                if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) in [RESPONSE_TYPE_CHECKBOX, RESPONSE_TYPE_MULTI_SELECT] || valueDomain?.multiple || rel.ext[EXT_MAX_OCCURS] && rel.ext[EXT_MAX_OCCURS] != '1') {
+                    // multi select or checkbox (default)
+                    if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_MULTI_SELECT) {
+                        container.multiSelect(itemName) {
+                            options enumOptions
                         }
                     } else {
-                        // single select (default) or radio
-                        if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_RADIO) {
-                            radio(itemName) {
-                                options enumOptions
-                            }
-                        } else {
-                            singleSelect(itemName) {
-                                options enumOptions
-                            }
+                        container.checkbox(itemName) {
+                            options enumOptions
                         }
                     }
                 } else {
-                    if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_TEXTAREA) {
-                        textarea(itemName)
+                    // single select (default) or radio
+                    if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_RADIO) {
+                        container.radio(itemName) {
+                            options enumOptions
+                        }
                     } else {
-                        text(itemName)
+                        container.singleSelect(itemName) {
+                            options enumOptions
+                        }
                     }
                 }
-
-                GenericItem last = container.items.values().last()
-
-                last.with {
-                    // TODO: is there any way to configure simple conditional display
-                    // TODO: validation
-                    String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP, valueDomain?.regexDef)
-                    if (regexpDef) {
-                        regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, "Value must match /$regexpDef/")
-                    }
-                    description fromCandidates(rel, candidates, EXT_ITEM_DESCRIPTION, dataElement.description)
-                    question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, localName)
-                    questionNumber fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
-                    instructions fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS)
-                    phi(fromCandidates(rel, candidates, EXT_ITEM_PHI) == 'true')
-                    required(fromCandidates(rel, candidates, EXT_ITEM_REQUIRED) == 'true' || rel.ext[EXT_MIN_OCCURS] == '1')
-                    columnNumber = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_COLUMN_NUMBER), EXT_ITEM_COLUMN_NUMBER, rel)
-                    units fromCandidates(rel, candidates, EXT_ITEM_UNITS, candidates.find {
-                        it.instanceOf(ValueDomain) && it.unitOfMeasure
-                    }?.unitOfMeasure?.symbol)
-
-                    if (first) {
-                        header aHeader
-                        subheader aSubheader
-                        first = false
-                    }
-                    if (last.responseType != ResponseType.FILE) {
-                        Integer aLength = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_LENGTH), EXT_ITEM_LENGTH, rel)
-                        Integer aDigits = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_DIGITS), EXT_ITEM_DIGITS, rel)
-
-                        if (aLength) {
-                            if (aDigits) {
-                                digits aLength, aDigits
-                            } else {
-                                length aLength
-                            }
-                        } else if (aDigits) {
-                            digits aDigits
-                        }
-
-                        last.dataType(guessDataType(candidates, fromCandidates(rel, candidates, EXT_ITEM_DATA_TYPE)))
-                    }
-
-                    if (last.responseType.supportingDefaultValue) {
-                        value fromCandidates(rel, candidates, EXT_ITEM_DEFAULT_VALUE)
-                    }
-
-                    if (last.responseType in [ResponseType.CHECKBOX, ResponseType.RADIO]) {
-                        if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_LAYOUT)) == RESPONSE_LAYOUT_HORIZONTAL) {
-                            layout horizontal
-                        }
-                    }
+            } else {
+                if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_RESPONSE_TYPE)) == RESPONSE_TYPE_TEXTAREA) {
+                    container.textarea(itemName)
+                } else {
+                    container.text(itemName)
                 }
             }
 
+            GenericItem last = container.items.values().last()
+
+            last.with {
+                // TODO: is there any way to configure simple conditional display
+                // TODO: validation
+                String regexpDef = fromCandidates(rel, candidates, EXT_ITEM_REGEXP, valueDomain?.regexDef)
+                if (regexpDef) {
+                    regexp regexpDef, fromCandidates(rel, candidates, EXT_ITEM_REGEXP_ERROR_MESSAGE, "Value must match /$regexpDef/")
+                }
+                description fromCandidates(rel, candidates, EXT_ITEM_DESCRIPTION, dataElement.description)
+                question fromCandidates(rel, candidates, EXT_ITEM_QUESTION, localName)
+                questionNumber fromCandidates(rel, candidates, EXT_ITEM_QUESTION_NUMBER)
+                if (!last.group) {
+                    instructions fromCandidates(rel, candidates, EXT_ITEM_INSTRUCTIONS)
+                }
+                phi(fromCandidates(rel, candidates, EXT_ITEM_PHI) == 'true')
+                required(fromCandidates(rel, candidates, EXT_ITEM_REQUIRED) == 'true' || rel.ext[EXT_MIN_OCCURS] == '1')
+                columnNumber = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_COLUMN_NUMBER), EXT_ITEM_COLUMN_NUMBER, rel)
+                units fromCandidates(rel, candidates, EXT_ITEM_UNITS, candidates.find {
+                    it.instanceOf(ValueDomain) && it.unitOfMeasure
+                }?.unitOfMeasure?.symbol)
+
+                if (first) {
+                    if (!last.group) {
+                        header aHeader
+                        subheader aSubheader
+                    }
+                    first = false
+                }
+                if (last.responseType != ResponseType.FILE) {
+                    Integer aLength = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_LENGTH), EXT_ITEM_LENGTH, rel)
+                    Integer aDigits = safeInteger(fromCandidates(rel, candidates, EXT_ITEM_DIGITS), EXT_ITEM_DIGITS, rel)
+
+                    if (aLength) {
+                        if (aDigits) {
+                            digits aLength, aDigits
+                        } else {
+                            length aLength
+                        }
+                    } else if (aDigits) {
+                        digits aDigits
+                    }
+
+                    last.dataType(guessDataType(candidates, fromCandidates(rel, candidates, EXT_ITEM_DATA_TYPE)))
+                }
+
+                if (last.responseType.supportingDefaultValue) {
+                    value fromCandidates(rel, candidates, EXT_ITEM_DEFAULT_VALUE)
+                }
+
+                if (last.responseType in [ResponseType.CHECKBOX, ResponseType.RADIO]) {
+                    if (normalizeResponseType(fromCandidates(rel, candidates, EXT_ITEM_LAYOUT)) == RESPONSE_LAYOUT_HORIZONTAL) {
+                        layout horizontal
+                    }
+                }
+                if (last instanceof Item) {
+                    CatalogueElement labelSource = dataType ?: valueDomain ?: dataElement
+                    last.setResponseLabel(alphaNumNoSpaces(labelSource.name + "_" + labelSource.versionNumber))
+                }
+            }
         }
     }
 

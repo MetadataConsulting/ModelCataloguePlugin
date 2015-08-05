@@ -41,6 +41,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
         for item in list.list
           cachedChild  = if list.$$cachedChildren then list.$$cachedChildren[item.link]
           cachedChild ?= {}
+          delete cachedChild.$$relationship
           if cachedChild.$$collapsed
             cachedChild.$$resetHelperProperties() if angular.isFunction(cachedChild.$$resetHelperProperties)
           else
@@ -54,6 +55,7 @@ angular.module('mc.core.ui.catalogueElementTreeview', ['mc.core.ui.catalogueElem
           list.$$cachedChildren = oldList.$$cachedChildren ? {}
 
           for child in oldList.$$children
+            delete child.$$relationship
             list.$$cachedChildren[child.link] = child
 
         addItemsFromList(list)
