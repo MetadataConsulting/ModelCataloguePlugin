@@ -128,4 +128,5 @@ angular.module('mc.core.ui.bs.modalPromptEnumeratedTypeEdit', ['mc.util.messages
   messagesProvider.setPromptFactory 'edit-dataType', factory
   messagesProvider.setPromptFactory 'edit-enumeratedType', factory
   messagesProvider.setPromptFactory 'edit-referenceType', factory
+  messagesProvider.setPromptFactory 'edit-primitiveType', factory
 ]
