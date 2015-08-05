@@ -1,8 +1,6 @@
 package org.modelcatalogue.core.util.marshalling
 
-import org.modelcatalogue.core.EnumeratedType
 import org.modelcatalogue.core.ReferenceType
-import org.modelcatalogue.core.util.OrderedMap
 
 class ReferenceTypeMarshaller extends DataTypeMarshaller {
 

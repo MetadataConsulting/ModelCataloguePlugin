@@ -14,7 +14,7 @@ class MeasurementUnit extends CatalogueElement {
         symbol nullable: true, size: 1..100
     }
 
-    static transients = ['valueDomains']
+    static transients = ['valueDomains', 'primitiveTypes']
 
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, symbol: ${symbol}, status: ${status}, modelCatalogueId: ${modelCatalogueId}]"
@@ -33,5 +33,21 @@ class MeasurementUnit extends CatalogueElement {
         }
         return ValueDomain.countByUnitOfMeasure(this)
     }
+
+    List<PrimitiveType> getPrimitiveTypes() {
+        if (!readyForQueries) {
+            return []
+        }
+        return PrimitiveType.findAllByMeasurementUnit(this)
+    }
+
+    Long countPrimitiveTypes() {
+        if (!readyForQueries) {
+            return 0
+        }
+        return PrimitiveType.countByMeasurementUnit(this)
+    }
+
+
 
 }

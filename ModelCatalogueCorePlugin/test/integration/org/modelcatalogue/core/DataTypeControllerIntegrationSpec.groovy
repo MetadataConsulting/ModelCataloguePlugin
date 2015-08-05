@@ -11,7 +11,7 @@ class DataTypeControllerIntegrationSpec extends AbstractCatalogueElementControll
     }
 
     def setupSpec(){
-        totalCount = 36
+        totalCount = 48
     }
 
 

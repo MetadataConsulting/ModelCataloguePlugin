@@ -2,6 +2,7 @@ package org.modelcatalogue.core.util.marshalling
 
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.MeasurementUnit
+import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ValueDomain
 
 /**
@@ -18,6 +19,7 @@ class MeasurementUnitMarshaller extends CatalogueElementMarshaller {
         def ret = super.prepareJsonMap(unit)
         ret.putAll(symbol: unit.symbol)
         ret.valueDomains = [count: unit.countValueDomains(), itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(unit.getClass())}/$unit.id/valueDomain"]
+        ret.primitiveTypes = [count: unit.countPrimitiveTypes(), itemType: PrimitiveType.name, link: "/${GrailsNameUtils.getPropertyName(unit.getClass())}/$unit.id/primitiveType"]
         return ret
     }
 }

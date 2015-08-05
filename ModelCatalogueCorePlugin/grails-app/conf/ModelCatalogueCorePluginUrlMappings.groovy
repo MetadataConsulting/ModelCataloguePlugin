@@ -13,7 +13,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
         def legacyElements    = [model: 'dataClass', classification: 'dataModel']
         def resources         = ['batch', 'relationshipType', 'csvTransformation' ]
-        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'measurementUnit', 'valueDomain', 'user', 'dataModel', 'classification', 'model']
+        def catalogueElements = ['asset', 'dataElement', 'dataClass', 'catalogueElement', 'dataType', 'enumeratedType', 'referenceType', 'primitiveType', 'measurementUnit', 'valueDomain', 'user', 'dataModel', 'classification', 'model']
         def allElements       = catalogueElements + resources
 
         for (String elementName in allElements) {
@@ -81,7 +81,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$elementName/$id/finalize"(controller: controllerName, action: 'finalizeElement', method: HttpMethod.POST)
                 "/api/modelCatalogue/core/$elementName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
 
-                if (controllerName == 'dataType' || controllerName == 'enumeratedType' || controllerName == 'referenceType') {
+                if (controllerName == 'dataType' || controllerName == 'enumeratedType' || controllerName == 'referenceType' || controllerName == 'primitiveType') {
                     "/api/modelCatalogue/core/$elementName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                 }
 
@@ -94,6 +94,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName == 'measurementUnit') {
                     "/api/modelCatalogue/core/$elementName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/primitiveType"(controller: controllerName, action: 'primitiveTypes', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'valueDomain') {
