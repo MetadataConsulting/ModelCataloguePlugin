@@ -181,7 +181,7 @@ class ModelToFormExporterService {
     }
 
     private void generateItems(String prefix, ItemContainer container, DataClass model, String aHeader = null, String aSubheader = null) {
-        
+        boolean first = true
         for (Relationship rel in model.containsRelationships) {
             DataElement dataElement = rel.destination as DataElement
             ValueDomain valueDomain = dataElement.valueDomain
