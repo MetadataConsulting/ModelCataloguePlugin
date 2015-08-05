@@ -27,5 +27,9 @@ angular.module('mc.core.ui.bs.saveOrUpdatePublishedElementCtrl', ['mc.core.ui.bs
       promise = promise.then -> catalogueElementResource('valueDomain').save({name: $scope.copy.valueDomain, dataModels: $scope.copy.dataModels}).then (newDomain) ->
         $scope.copy.valueDomain = newDomain
 
+    if $scope.copy.dataType and angular.isString($scope.copy.dataType)
+      promise = promise.then -> catalogueElementResource('dataType').save({name: $scope.copy.dataType, dataModels: $scope.copy.dataModels}).then (newType) ->
+        $scope.copy.dataType = newType
+
     promise
 ]
