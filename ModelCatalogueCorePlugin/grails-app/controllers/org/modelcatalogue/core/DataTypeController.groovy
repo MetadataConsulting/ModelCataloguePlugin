@@ -50,7 +50,74 @@ class DataTypeController<T> extends AbstractCatalogueElementController<DataType>
                 ne 'status', ElementStatus.REMOVED
             }
         })
+    }
 
+    def convert() {
+        DataType dataType = queryForResource(params.id)
+        if (!dataType) {
+            notFound()
+            return
+        }
+
+        DataType other = queryForResource(params.destination)
+        if (!other) {
+            notFound()
+            return
+        }
+
+        Mapping mapping = Mapping.findBySourceAndDestination(dataType, other)
+        if (!mapping) {
+            respond result: "Mapping is missing. Don't know how to convert value."
+            return
+        }
+
+        if (!params.value) {
+            respond result: "Please, enter value."
+            return
+        }
+
+        def valid = dataType.validateRule(params.value)
+
+        if (!(valid instanceof Boolean && valid)) {
+            respond result: "INVALID: Please, enter valid value"
+            return
+        }
+
+        def result = mapping.map(params.value)
+
+        if (result instanceof Exception) {
+            respond result: "ERROR: ${result.class.simpleName}: $result.message"
+            return
+        }
+
+        respond result: result
+    }
+
+
+    def validateValue() {
+        DataType dataType = queryForResource(params.id)
+        if (!dataType) {
+            notFound()
+            return
+        }
+
+        if (!dataType.rule && !(dataType.instanceOf(EnumeratedType)) && dataType.countIsBasedOn() == 0) {
+            respond result: "Don't know how to validate value."
+            return
+        }
+
+        if (!params.value) {
+            respond result: "Please, enter value."
+            return
+        }
+
+        def result = dataType.validateRule(params.value)
+
+        if (result instanceof Exception) {
+            respond result: "ERROR: ${result.class.simpleName}: $result.message"
+        }
+
+        respond result: result
     }
 
 }

@@ -142,7 +142,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildActionInRole 'catalogue-element', 'validate-value', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain')
+    return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('dataType')
 
     {
       position:   1200
@@ -150,8 +150,10 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       'fa fa-fw fa-check-circle-o'
       type:       'primary'
       watches:    ['element.rule', 'element.dataType']
-      disabled:   not $scope.element.rule and not ($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType')) and $scope.element.basedOn?.length == 0
-      action:     ->
+      disabled:   not $scope.element.rule \
+        and $scope.element.basedOn?.length == 0 \
+        and not (($scope.element.dataType and $scope.element.dataType.isInstanceOf('enumeratedType')) or $scope.element.isInstanceOf('enumeratedType'))
+    action:     ->
         messages.prompt('', '', {type: 'validate-value-by-domain', domain: $scope.element})
     }
   ]
@@ -160,7 +162,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildActionInRole 'catalogue-element', 'convert', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('mapping')
+    return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('dataType') and not $scope.element.isInstanceOf('mapping')
 
     {
       position:   1100

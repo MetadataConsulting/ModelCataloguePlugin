@@ -18,6 +18,7 @@ class DataTypeMarshaller extends CatalogueElementMarshaller {
     protected Map<String, Object> prepareJsonMap(element) {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
+        ret.rule = element.rule
         ret.putAll valueDomains: [count: element.countRelatedValueDomains(), itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/valueDomain"]
         ret.putAll dataElements: [count: element.countRelatedDataElements(), itemType: DataElement.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/dataElement"]
         return ret

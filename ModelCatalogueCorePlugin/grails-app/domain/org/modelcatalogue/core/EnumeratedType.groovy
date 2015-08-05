@@ -77,6 +77,16 @@ class EnumeratedType extends DataType {
 		
 	}
 
+    boolean isEnumKey(Object x) {
+        if (!x) {
+            return true
+        }
+        if (!enumerations.keySet().contains(x.toString())) {
+            return false
+        }
+        return true
+    }
+
     String toString() {
         "${getClass().simpleName}[id: ${id}, name: ${name}, status: ${status}, modelCatalogueId: ${modelCatalogueId}, enumerations: ${enumerations}]"
     }
