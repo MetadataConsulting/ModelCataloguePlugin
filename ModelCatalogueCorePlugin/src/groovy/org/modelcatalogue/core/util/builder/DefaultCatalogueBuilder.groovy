@@ -245,6 +245,10 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
             it.setParameter('dataType', dataType)
         }
 
+        context.withContextElement(DataElement) {
+            it.setParameter('dataType', dataType)
+        }
+
         dataType
     }
 

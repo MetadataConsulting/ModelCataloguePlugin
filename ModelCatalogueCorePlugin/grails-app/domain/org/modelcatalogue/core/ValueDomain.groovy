@@ -4,9 +4,8 @@ import org.modelcatalogue.core.api.ElementStatus
 import org.modelcatalogue.core.publishing.Publisher
 import org.modelcatalogue.core.publishing.PublishingChain
 import org.modelcatalogue.core.util.FriendlyErrors
-import org.modelcatalogue.core.util.Inheritance
 import org.modelcatalogue.core.util.SecuredRuleExecutor
-import org.modelcatalogue.core.util.ValueDomainRuleScript
+import org.modelcatalogue.core.util.DataTypeRuleScript
 
 /*
 * subjects, isbn, rating
@@ -39,7 +38,7 @@ import org.modelcatalogue.core.util.ValueDomainRuleScript
  *
  *
 */
-
+@Deprecated
 class ValueDomain extends CatalogueElement {
 
     DataType dataType
@@ -62,7 +61,7 @@ class ValueDomain extends CatalogueElement {
 
 		rule nullable:true, maxSize: 10000, validator: { val,obj ->
             if(!val){return true}
-            SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(ValueDomainRuleScript, new Binding(x: null, domain: obj)).validate(val)
+            SecuredRuleExecutor.ValidationResult result = new SecuredRuleExecutor(DataTypeRuleScript, new Binding(x: null, domain: obj)).validate(val)
             result ? true : ['wontCompile', result.compilationFailedMessage]
         }
     }
@@ -120,7 +119,7 @@ class ValueDomain extends CatalogueElement {
         }
 
         if (rule) {
-            return new SecuredRuleExecutor(ValueDomainRuleScript, new Binding(x: x, domain: this)).execute(rule)
+            return new SecuredRuleExecutor(DataTypeRuleScript, new Binding(x: x, domain: this)).execute(rule)
         }
         return true
     }

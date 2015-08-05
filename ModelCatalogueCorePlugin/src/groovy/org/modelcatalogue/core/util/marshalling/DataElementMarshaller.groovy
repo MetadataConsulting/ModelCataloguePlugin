@@ -12,6 +12,7 @@ class DataElementMarshaller extends CatalogueElementMarshaller {
         if (!el) return [:]
         def ret = super.prepareJsonMap(el)
         ret.putAll valueDomain: minimumValueDomain(el.valueDomain)
+        ret.putAll dataType: minimumDataType(el.dataType)
         ret
     }
 

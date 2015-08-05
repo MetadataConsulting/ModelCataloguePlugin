@@ -12,10 +12,14 @@ import org.modelcatalogue.core.util.FriendlyErrors
 
 class DataElement extends CatalogueElement {
 
+    @Deprecated
     ValueDomain valueDomain
+
+    DataType dataType
 
     static constraints = {
         valueDomain nullable: true, fetch: 'join'
+        dataType nullable: true, fetch: 'join'
     }
 
     static relationships = [
@@ -26,6 +30,7 @@ class DataElement extends CatalogueElement {
     CatalogueElement publish(Publisher<CatalogueElement> publisher) {
         PublishingChain.finalize(this)
         .add(this.valueDomain)
+        .add(this.dataType)
         .run(publisher)
     }
 
@@ -34,6 +39,10 @@ class DataElement extends CatalogueElement {
         super.afterDraftPersisted(draft)
         if (valueDomain) {
             (draft as DataElement).valueDomain = valueDomain
+            FriendlyErrors.failFriendlySave(draft)
+        }
+        if (dataType) {
+            (draft as DataElement).dataType = dataType
             FriendlyErrors.failFriendlySave(draft)
         }
     }
@@ -45,6 +54,6 @@ class DataElement extends CatalogueElement {
 
     @Override
     List<String> getInheritedAssociationsNames() {
-        ['valueDomain']
+        ['valueDomain', 'dataType']
     }
 }

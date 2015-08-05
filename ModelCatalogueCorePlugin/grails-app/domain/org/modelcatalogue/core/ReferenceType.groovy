@@ -23,4 +23,6 @@ class ReferenceType extends DataType {
                 .run(publisher)
     }
 
+    List<String> getInheritedAssociationsNames() { ['dataClass'] }
+
 }

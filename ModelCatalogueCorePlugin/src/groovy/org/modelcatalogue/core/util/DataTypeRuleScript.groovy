@@ -1,12 +1,13 @@
 package org.modelcatalogue.core.util
 
+import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.ValueDomain
 
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 
-abstract class ValueDomainRuleScript  extends Script {
+abstract class DataTypeRuleScript extends Script {
 
     static final Class<BigDecimal> decimal  = BigDecimal
     static final Class<BigDecimal> number   = BigDecimal
@@ -190,5 +191,17 @@ abstract class ValueDomainRuleScript  extends Script {
 
     void setDomain(ValueDomain domain) {
         binding.setVariable('domain', domain)
+    }
+
+
+    DataType getDataType() {
+        if (!binding.hasVariable('dataType')) {
+            return null
+        }
+        (DataType)binding.getVariable('dataType')
+    }
+
+    void setDataType(DataType dataType) {
+        binding.setVariable('dataType', dataType)
     }
 }

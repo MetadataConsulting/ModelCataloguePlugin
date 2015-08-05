@@ -21,7 +21,7 @@ class ValueDomainRuleScriptSpec extends Specification {
         }
 
         def binding = new Binding(x: value, domain: domain)
-        def executor = new SecuredRuleExecutor<ValueDomainRuleScript>(ValueDomainRuleScript, binding)
+        def executor = new SecuredRuleExecutor<DataTypeRuleScript>(DataTypeRuleScript, binding)
         executor.execute(expression)
         then:
         noExceptionThrown()

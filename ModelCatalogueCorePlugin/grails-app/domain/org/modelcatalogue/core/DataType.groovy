@@ -43,6 +43,7 @@ class DataType extends CatalogueElement {
         result.join(" ")
     }
 
+    @Deprecated
     List<ValueDomain> getRelatedValueDomains() {
         if (!readyForQueries) {
             return []
@@ -50,6 +51,7 @@ class DataType extends CatalogueElement {
         return ValueDomain.findAllByDataType(this)
     }
 
+    @Deprecated
     Long countRelatedValueDomains() {
         if (!readyForQueries) {
             return 0
@@ -57,11 +59,33 @@ class DataType extends CatalogueElement {
         return ValueDomain.countByDataType(this)
     }
 
+    @Deprecated
     DataType removeFromRelatedValueDomains(ValueDomain domain) {
         domain.dataType = null
         FriendlyErrors.failFriendlySave(domain)
         this
     }
+
+    List<DataElement> getRelatedDataElements() {
+        if (!readyForQueries) {
+            return []
+        }
+        return DataElement.findAllByDataType(this)
+    }
+
+    Long countRelatedDataElements() {
+        if (!readyForQueries) {
+            return 0
+        }
+        return DataElement.countByDataType(this)
+    }
+
+    DataType removeFromRelatedDataElements(DataElement element) {
+        element.dataType = null
+        FriendlyErrors.failFriendlySave(element)
+        this
+    }
+
 
     @Override
     protected PublishingChain prepareDraftChain(PublishingChain chain) {

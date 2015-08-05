@@ -83,6 +83,7 @@ class ModelCatalogueCorePluginUrlMappings {
 
                 if (controllerName == 'dataType' || controllerName == 'enumeratedType' || controllerName == 'referenceType' || controllerName == 'primitiveType') {
                     "/api/modelCatalogue/core/$elementName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
+                    "/api/modelCatalogue/core/$elementName/$id/dataElement"(controller: controllerName, action: 'dataElements', method: HttpMethod.GET)
                 }
 
                 if (controllerName in ['dataModel', 'classification']) {
