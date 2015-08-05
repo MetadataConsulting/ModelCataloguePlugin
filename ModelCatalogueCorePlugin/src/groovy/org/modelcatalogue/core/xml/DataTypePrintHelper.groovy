@@ -2,6 +2,7 @@ package org.modelcatalogue.core.xml
 
 import org.modelcatalogue.core.DataType
 import org.modelcatalogue.core.EnumeratedType
+import org.modelcatalogue.core.PrimitiveType
 import org.modelcatalogue.core.ReferenceType
 import org.modelcatalogue.core.Relationship
 
@@ -15,14 +16,23 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
     @Override
     void processElements(Object mkp, DataType element, PrintContext context, Relationship rel) {
         super.processElements(mkp, element, context, rel)
-        if (element instanceof EnumeratedType) {
+        if (element instanceof EnumeratedType && element.enumerations) {
             mkp.enumerations {
                 for (Map.Entry<String, String> entry in element.enumerations) {
-                    enumeration(value: entry.key, entry.value)
+                    if (entry.value) {
+                        enumeration(value: entry.key, entry.value)
+                    } else {
+                        enumeration(value: entry.key)
+                    }
                 }
             }
         }
-        if (element instanceof ReferenceType) {
+        if (element instanceof ReferenceType && element.dataClass) {
+            if (element.dataClass) {
+                printElement(mkp, element.dataClass, context, null)
+            }
+        }
+        if (element instanceof PrimitiveType && element.measurementUnit) {
             if (element.dataClass) {
                 printElement(mkp, element.dataClass, context, null)
             }

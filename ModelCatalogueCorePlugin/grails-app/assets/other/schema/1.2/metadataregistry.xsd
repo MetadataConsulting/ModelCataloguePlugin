@@ -129,6 +129,7 @@
         <xs:all>
             <xs:element name="metadata" type="mdr:Extensions" minOccurs="0"/>
             <xs:element name="archived" type="xs:boolean" minOccurs="0"/>
+            <xs:element name="inherited" type="xs:boolean" minOccurs="0"/>
         </xs:all>
         <xs:attribute name="name"           type="mdr:Name" />
         <xs:attribute name="dataModel" type="mdr:Name" />
@@ -231,9 +232,11 @@
     <xs:complexType name="DataType">
         <xs:complexContent>
             <xs:extension base="mdr:CatalogueElement">
-                <xs:sequence>
-                    <xs:element name="enumerations" type="mdr:Enumerations" minOccurs="0"/>
-                </xs:sequence>
+                <xs:choice minOccurs="0">
+                    <xs:element name="enumerations"     type="mdr:Enumerations"/>
+                    <xs:element name="dataClass"        type="mdr:DataClass"       />
+                    <xs:element name="measurementUnit"  type="mdr:MeasurementUnit" />
+                </xs:choice>
                 <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>

@@ -68,7 +68,7 @@ abstract class CatalogueElementPrintHelper<E extends CatalogueElement> {
         Map<String, Object> attrs = [name: element.name]
 
         if (element.dataModels && !(context.currentClassification in element.dataModels)) {
-            attrs.classification = element.dataModels.first().name
+            attrs.dataModel = element.dataModels.first().name
         }
 
         if (element.hasModelCatalogueId()) {
