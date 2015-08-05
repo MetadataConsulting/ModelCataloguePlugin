@@ -370,6 +370,22 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         referenceType.dataClass.name == "RTTest DC"
     }
 
+
+    def "if unit of measure present, create primitive type"() {
+        build {
+            dataType name: 'PTTest', {
+                measurementUnit name: 'PTUnit'
+            }
+        }
+
+        PrimitiveType primitiveType = PrimitiveType.findByName('PTTest')
+
+        expect:
+        primitiveType
+        primitiveType.measurementUnit
+        primitiveType.measurementUnit.name == "PTUnit"
+    }
+
     def "do not complain if data type name is missing but inside value domain"() {
         build {
             valueDomain(name: 'test:number') {

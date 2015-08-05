@@ -31,7 +31,7 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
      *
      * @see #automatic(BuilderKeyword)
      */
-    private static Set<Class> SUPPORTED_FOR_AUTO = [DataType, EnumeratedType, ValueDomain]
+    private static Set<Class> SUPPORTED_FOR_AUTO = [DataType, EnumeratedType, ReferenceType, PrimitiveType, ValueDomain]
 
     /**
      * Repository handles fetching the right elements from the database based on id, value or classification.
@@ -234,6 +234,12 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
                 proxy.domain = ReferenceType
             }
         }
+        if (dataType.getParameter('measurementUnit')) {
+            if (dataType instanceof DefaultCatalogueElementProxy) {
+                DefaultCatalogueElementProxy proxy = (DefaultCatalogueElementProxy) dataType;
+                proxy.domain = PrimitiveType
+            }
+        }
 
         context.withContextElement(ValueDomain) {
             it.setParameter('dataType', dataType)
@@ -257,6 +263,10 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         context.withContextElement(ValueDomain) {
             it.setParameter('unitOfMeasure', unit)
+        }
+
+        context.withContextElement(DataType) {
+            it.setParameter('measurementUnit', unit)
         }
 
         unit
