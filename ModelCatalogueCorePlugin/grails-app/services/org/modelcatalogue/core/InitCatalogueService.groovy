@@ -95,9 +95,9 @@ class InitCatalogueService {
                     log.warn("""
                     Your current rule for relationship type '${existing.name}' is different than the one from configuration. This may cause unexpected behaviour:
                     ===EXPECTED'${existing.name}'===
-                    ${definition.rule.trim()}
+                    ${definition.rule?.trim()}
                     ===ACTUAL '${existing.name}'===
-                    ${existing.rule.trim()}
+                    ${existing.rule?.trim()}
                 """.stripIndent())
 
                 }
