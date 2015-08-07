@@ -158,13 +158,12 @@ databaseChangeLog = {
         grailsChange {
             change {
                 sql.eachRow """
-                        select vd.id, vd.unit_of_measure_id, vd.rule
+                        select vd.id, vd.unit_of_measure_id
                         from value_domain vd
                         where vd.data_type_id is null
                 """, { row ->
                     def vdid = row[0]
                     def muid = row[1]
-                    def rule = row[2]
                     def newDataTypeId = sql.executeInsert("""
                         insert into catalogue_element
                         (version, date_created, description, last_updated, latest_version_id, model_catalogue_id, name, status, version_created, version_number)
