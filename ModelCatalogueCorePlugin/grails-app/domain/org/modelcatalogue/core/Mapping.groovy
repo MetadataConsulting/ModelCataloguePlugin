@@ -36,7 +36,7 @@ class Mapping {
         source nullable: false, unique: ['destination']
         destination nullable: false, validator: { val, obj ->
             if (!val || !obj.source) return true
-            return val != obj.source && val.class == obj.source.class
+            return val != obj.source && val.class == obj.source.class || obj.source.instanceOf(DataType) && val.instanceOf(DataType)
         }
         mapping nullable: false, blank: false, maxSize: 10000, validator: { val, obj, Errors errors ->
             if (!val) return true

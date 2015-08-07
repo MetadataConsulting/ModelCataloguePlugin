@@ -4,7 +4,6 @@ angular.module('mc.core.ui.bs.navigationActions', ['mc.util.ui.actions', 'mc.uti
     'dataModel'
     'dataClass'
     'dataElement'
-    'valueDomain'
     'dataType'
     'measurementUnit'
     'asset'

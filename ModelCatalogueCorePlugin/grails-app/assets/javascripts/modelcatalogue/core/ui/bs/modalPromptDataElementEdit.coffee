@@ -35,10 +35,6 @@ angular.module('mc.core.ui.bs.modalPromptDataElementEdit', ['mc.util.messages'])
                 <textarea rows="10" ng-model="copy.description" placeholder="Description" class="form-control" id="description"></textarea>
               </div>
               <div class="form-group">
-                <label for="valueDomain" class="text-danger">Value Domain (deprecated, use Data Type instead)</label>
-                <input type="text" id="valueDomain" placeholder="Value Domain" ng-model="copy.valueDomain" catalogue-element-picker="valueDomain" label="el.name">
-              </div>
-              <div class="form-group">
                 <label for="dataType" class="">Data Type</label>
                 <input type="text" id="dataType" placeholder="Data Type" ng-model="copy.dataType" catalogue-element-picker="dataType" label="el.name">
               </div>

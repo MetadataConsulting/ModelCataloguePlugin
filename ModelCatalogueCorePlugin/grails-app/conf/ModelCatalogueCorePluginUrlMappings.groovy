@@ -82,7 +82,6 @@ class ModelCatalogueCorePluginUrlMappings {
                 "/api/modelCatalogue/core/$elementName/$source/merge/$destination"(controller: controllerName, action: 'merge', method: HttpMethod.POST)
 
                 if (controllerName == 'dataType' || controllerName == 'enumeratedType' || controllerName == 'referenceType' || controllerName == 'primitiveType') {
-                    "/api/modelCatalogue/core/$elementName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/dataElement"(controller: controllerName, action: 'dataElements', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/convert/$destination"(controller: controllerName, action: 'convert', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/validateValue"(controller: controllerName, action: 'validateValue', method: HttpMethod.GET)
@@ -96,14 +95,7 @@ class ModelCatalogueCorePluginUrlMappings {
                 }
 
                 if (controllerName == 'measurementUnit') {
-                    "/api/modelCatalogue/core/$elementName/$id/valueDomain"(controller: controllerName, action: 'valueDomains', method: HttpMethod.GET)
                     "/api/modelCatalogue/core/$elementName/$id/primitiveType"(controller: controllerName, action: 'primitiveTypes', method: HttpMethod.GET)
-                }
-
-                if (controllerName == 'valueDomain') {
-                    "/api/modelCatalogue/core/$elementName/$id/dataElement"(controller: controllerName, action: 'dataElements', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/$elementName/$id/convert/$destination"(controller: controllerName, action: 'convert', method: HttpMethod.GET)
-                    "/api/modelCatalogue/core/$elementName/$id/validateValue"(controller: controllerName, action: 'validateValue', method: HttpMethod.GET)
                 }
 
                 if (controllerName == 'dataClass') {

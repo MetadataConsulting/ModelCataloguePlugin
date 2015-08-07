@@ -145,7 +145,7 @@ class ElementService implements Publisher<CatalogueElement> {
             return destination
         }
 
-        if (destination.class != source.class) {
+        if (destination.class != source.class && !(destination.instanceOf(DataType) && source.instanceOf(DataType))) {
             destination.errors.reject('merge.not.same.type', 'Both source and destination must be of the same type')
             return destination
         }

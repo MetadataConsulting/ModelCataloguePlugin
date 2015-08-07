@@ -1,14 +1,12 @@
 package org.modelcatalogue.core.pages
 
-/**
- * Created by david on 05/11/14.
- */
-class ValueDomainPage extends ModelCataloguePage {
 
-    static url = "#/catalogue/valueDomain/all"
+class DataType2Page extends ModelCataloguePage {
+
+    static url = "#/catalogue/dataType/all"
 
     static at = {
-        url == "#/catalogue/valueDomain/all"
+        url == "#/catalogue/dataType/all"
     }
     static content = {
 

@@ -3,8 +3,7 @@ package org.modelcatalogue.core.b
 import geb.navigator.Navigator
 import org.modelcatalogue.core.AbstractModelCatalogueGebSpec
 import org.modelcatalogue.core.pages.GlobalChangesPage
-import org.modelcatalogue.core.pages.MeasurementUnitListPage
-import org.modelcatalogue.core.pages.ValueDomainPage
+import org.modelcatalogue.core.pages.DataType2Page
 import spock.lang.Stepwise
 
 @Stepwise
@@ -15,7 +14,7 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         loginAdmin()
 
         go "#/catalogue/valueDomain/all"
-        at ValueDomainPage
+        at DataType2Page
 
         waitFor(120) {
             viewTitle.displayed

@@ -8,7 +8,7 @@ class DataElementControllerIntegrationSpec extends AbstractCatalogueElementContr
 
     @Override
     Map getPropertiesToEdit(){
-        [name: "changedName", description: "edited description ", code: "AA123", valueDomain: ValueDomain.get(1), dataModels: dataModelsForSpec]
+        [name: "changedName", description: "edited description ", code: "AA123", dataModels: dataModelsForSpec]
     }
 
     @Override

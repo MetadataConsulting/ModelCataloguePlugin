@@ -1,9 +1,14 @@
-angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).config ['messagesProvider', (messagesProvider)->
+angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).config ['messagesProvider', 'catalogueProvider', (messagesProvider, catalogueProvider)->
   messagesProvider.setPromptFactory 'new-mapping', [ '$modal', '$q', 'messages', ($modal, $q, messages) ->
     (title, body, args) ->
       if not args?.element?
         messages.error('Cannot create mapping dialog.', 'The element to be mapped is missing.')
         return $q.reject('Missing element argument!')
+
+      elementType = args.element.elementType
+
+      elementType = 'dataType' if catalogueProvider.isInstanceOf(elementType, 'dataType')
+
 
       dialog = $modal.open {
         windowClass: 'new-relationship-modal-prompt'
@@ -15,8 +20,8 @@ angular.module('mc.core.ui.bs.modalPromptNewMapping', ['mc.util.messages']).conf
             <messages-panel messages="messages"></messages-panel>
             <form role="form" ng-submit="createMapping()">
               <div class="form-group">
-                <label for="valueDomain" class="">Destination Value Domain</label>
-                <input type="text" id="valueDomain" placeholder="Destination Value Domain" ng-model="copy.destination" catalogue-element-picker="''' + args.element.elementType + '''" label="el.name">
+                <label for="valueDomain" class="">Destination Data Type</label>
+                <input type="text" id="valueDomain" placeholder="Destination Data Type" ng-model="copy.destination" catalogue-element-picker="''' + elementType + '''" label="el.name">
               </div>
               <div class="form-group">
                 <label for="mapping">Mapping</label>

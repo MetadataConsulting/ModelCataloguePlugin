@@ -200,15 +200,15 @@ class BootStrap {
         assert f
         assert doubleType
 
-        ValueDomain temperatureUS = new ValueDomain(name: "temperature US", dataType: doubleType, unitOfMeasure: f, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
-        ValueDomain temperature   = new ValueDomain(name: "temperature",    dataType: doubleType, unitOfMeasure: c, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
+        PrimitiveType temperatureUS = new PrimitiveType(name: "temperature US", measurementUnit: f, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
+        PrimitiveType temperature   = new PrimitiveType(name: "temperature",    measurementUnit: c, regexDef: /\d+(\.\d+)?/).save(failOnError: true)
 
 
         assert mappingService.map(temperature, temperatureUS, "(x as Double) * 9 / 5 + 32")
         assert mappingService.map(temperatureUS, temperature, "((x as Double) - 32) * 5 / 9")
 
-        DataElement patientTemperature   = new DataElement(name: "patient temperature",    valueDomain: temperature).save(failOnError: true)
-        DataElement patientTemperatureUS = new DataElement(name: "patient temperature US", valueDomain: temperatureUS).save(failOnError: true)
+        DataElement patientTemperature   = new DataElement(name: "patient temperature",    dataType: temperature).save(failOnError: true)
+        DataElement patientTemperatureUS = new DataElement(name: "patient temperature US", dataType: temperatureUS).save(failOnError: true)
 
 
         CsvTransformation transformation = new CsvTransformation(name: "UK to US records").save(failOnError: true)

@@ -3,6 +3,7 @@ package org.modelcatalogue.core.util.marshalling
 import grails.util.GrailsNameUtils
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.DataType
+import org.modelcatalogue.core.Mapping
 import org.modelcatalogue.core.ValueDomain
 
 class DataTypeMarshaller extends CatalogueElementMarshaller {
@@ -19,8 +20,8 @@ class DataTypeMarshaller extends CatalogueElementMarshaller {
         if (!element) return [:]
         def ret = super.prepareJsonMap(element)
         ret.rule = element.rule
-        ret.putAll valueDomains: [count: element.countRelatedValueDomains(), itemType: ValueDomain.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/valueDomain"]
-        ret.putAll dataElements: [count: element.countRelatedDataElements(), itemType: DataElement.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/dataElement"]
+        ret.mappings = [count: element.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/mapping"]
+        ret.dataElements =[count: element.countRelatedDataElements(), itemType: DataElement.name, link: "/${GrailsNameUtils.getPropertyName(element.getClass())}/$element.id/dataElement"]
         return ret
     }
 }

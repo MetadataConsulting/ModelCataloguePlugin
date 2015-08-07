@@ -53,12 +53,9 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
       $scope.failedActionCount = ''
       $scope.activeBatchCount = ''
       $scope.archivedBatchCount = ''
-      $scope.uninstantiatedDataElements = ''
       $scope.relationshipTypeCount = ''
       $scope.measurementUnitCount = ''
       $scope.dataTypeCount = ''
-      $scope.valueDomainCount = ''
-      $scope.incompleteValueDomainsCount = ''
       $scope.totalAssetCount = ''
       $scope.draftAssetCount = ''
       $scope.finalizedAssetCount = ''
@@ -486,7 +483,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         actions.push {
           condition: -> true
           label: (term) ->
-            if $rootScope.elementToShow?.isInstanceOf('valueDomain') and $rootScope.elementToShow?.rule
+            if $rootScope.elementToShow?.isInstanceOf('dataType') and $rootScope.elementToShow?.rule
               "Validate <strong>#{term}</strong> by <strong>#{$rootScope.elementToShow.name}</strong>"
             else
               "Validate <strong>#{term}</strong>"
@@ -500,7 +497,7 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
         actions.push {
           condition: -> true
           label: (term) ->
-            if $rootScope.elementToShow?.isInstanceOf('valueDomain') and $rootScope.elementToShow?.mappings?.total > 0
+            if $rootScope.elementToShow?.isInstanceOf('dataType') and $rootScope.elementToShow?.mappings?.total > 0
               "Convert <strong>#{term}</strong> from <strong>#{$rootScope.elementToShow.name}</strong>"
             else
               "Convert <strong>#{term}</strong>"
@@ -798,29 +795,6 @@ angular.module('mc.core.ui.states.defaultStates', ['ui.router', 'mc.util.ui'])
             </div>
         </div>
 
-        <div class="col-lg-4 col-sm-6 col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <a ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"><i class="fa fa-cog fa-5x fa-fw"></i></a>
-                        </div>
-                        <div class="col-xs-9 text-right">
-                            <div><a id="valueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain'})" ui-sref-opts="{inherit: false}"> Value Domains</a> {{finalizedValueDomainCount}} <span ng-show="incompleteValueDomainsCount"> / <a id="incompleteValueDomainLink" ui-sref="mc.resource.list({resource: 'valueDomain', status: 'incomplete'})" ui-sref-opts="{inherit: false}">Incomplete </a> {{incompleteValueDomainsCount}}</span></div>
-                            <div><a ng-click="validate()">Validate</a> / <a ng-click="convert()">Convert</a></div>
-                        </div>
-                    </div>
-                </div>
-
-                <a show-for-role="CURATOR" ng-click="create('valueDomain')">
-                    <div class="panel-footer">
-                        <span class="pull-left">Create Value Domain</span>
-                        <span class="pull-right"><i class="fa fa-magic"></i></span>
-                        <div class="clearfix"></div>
-                    </div>
-                </a>
-            </div>
-        </div>
         <div class="col-lg-4 col-sm-6 col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">

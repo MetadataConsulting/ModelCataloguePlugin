@@ -142,7 +142,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildActionInRole 'catalogue-element', 'validate-value', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('dataType')
+    return undefined if not $scope.element.isInstanceOf('dataType')
 
     {
       position:   1200
@@ -162,7 +162,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   actionsProvider.registerChildActionInRole 'catalogue-element', 'convert', actionsProvider.ROLE_ITEM_ACTION, [ '$scope', 'messages', 'security', ($scope, messages) ->
     return undefined if not $scope.element
     return undefined if not angular.isFunction $scope.element.isInstanceOf
-    return undefined if not $scope.element.isInstanceOf('valueDomain') and not $scope.element.isInstanceOf('dataType') and not $scope.element.isInstanceOf('mapping')
+    return undefined if not $scope.element.isInstanceOf('dataType') and not $scope.element.isInstanceOf('mapping')
 
     {
       position:   1100
@@ -170,7 +170,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       'fa fa-fw fa-long-arrow-right'
       type:       'primary'
       action:     ->
-        if $scope.element.isInstanceOf('valueDomain')
+        if $scope.element.isInstanceOf('dataType')
           messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element})
         else if $scope.element.isInstanceOf('mapping')
           messages.prompt('', '', {type: 'convert-with-value-domain', source: $scope.element.source, destination: $scope.element.destination})
@@ -319,7 +319,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
       icon:       'glyphicon glyphicon-edit'
       type:       'primary'
       watches:    'element.mappings.total'
-      disabled:    $scope.element.isInstanceOf('valueDomain') and not $scope.element.mappings.total
+      disabled:    $scope.element.isInstanceOf('dataType') and not $scope.element.mappings.total
       action:     ->
         $scope.element.source.refresh().then (element)->
           args = {type: 'new-mapping', update: true, element: element, mapping: $scope.element}

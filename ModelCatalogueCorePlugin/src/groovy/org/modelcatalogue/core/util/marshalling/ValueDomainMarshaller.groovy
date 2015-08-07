@@ -19,7 +19,6 @@ class ValueDomainMarshaller extends CatalogueElementMarshaller {
                 rule: el.rule,
                 dataType: minimumDataType(el.dataType),
                 multiple: el.multiple ?: false,
-                mappings: [count: el.outgoingMappings?.size() ?: 0, itemType: Mapping.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/mapping"],
                 dataElements: [count: el.countDataElements(), itemType: DataElement.name, link: "/${GrailsNameUtils.getPropertyName(el.getClass())}/$el.id/dataElement"]
         ret
     }
