@@ -206,6 +206,7 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
             messages.success('Relationship removed!', "#{rel.relation.name} is no longer related to #{rel.element.name}")
             # reloads the table
             deferred.resolve(true)
+            $rootScope.$broadcast 'catalogueElementDeleted', rel
           , (response) ->
             if response.data?.errors
               if angular.isString response.data.errors
@@ -258,9 +259,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
   ]
 
   actionsProvider.registerActionInRole 'edit-relationship', actionsProvider.ROLE_ITEM_ACTION, ['$rootScope','$scope', '$state', 'messages', 'names', 'security', ($rootScope, $scope, $state, messages, names, security) ->
-    return undefined if not $scope.element
-    return undefined if not angular.isFunction($scope.element.isInstanceOf)
-    return undefined if not $scope.element.isInstanceOf('relationship')
+    getRelationship = ->
+      $scope.element ? $scope.tab?.value
+    return undefined if not getRelationship()
+    return undefined if not angular.isFunction(getRelationship().isInstanceOf)
+    return undefined if not getRelationship().isInstanceOf('relationship')
     return undefined if not security.hasRole('CURATOR')
 
     {
@@ -269,10 +272,11 @@ angular.module('mc.core.ui.bs.catalogueElementActions', ['mc.util.ui.actions']).
     icon:       'glyphicon glyphicon-edit'
     type:       'primary'
     action:     ->
-      rel   = $scope.element
+      rel   = getRelationship()
       rel.element.refresh().then (element) ->
         args = {relationshipType: rel.type, direction: rel.direction, type: 'update-relationship', update: true, element: element, relation: rel.relation, classification: rel.classification, metadata: angular.copy(rel.ext)}
         messages.prompt('Update Relationship', '', args).then (updated)->
+          $rootScope.$broadcast 'catalogueElementUpdated', updated
           rel.ext = updated.ext
           rel.classification = updated.classification
     }

@@ -174,6 +174,17 @@ angular.module('mc.core.ui.bs.catalogueElementProperties', []).config ['catalogu
   catalogueElementPropertiesProvider.configureProperty 'supersededBy', hidden: true
   catalogueElementPropertiesProvider.configureProperty 'supersedes', hidden: true
 
+  catalogueElementPropertiesProvider.configureProperty '$$relationship', tabDefinition: [ '$element', '$name', ($element, $name) ->
+
+    {
+      heading:  'Relationship'
+      value: $element.$$relationship
+      name: $name
+      type: 'relationship-details'
+    }
+
+  ]
+
 
   catalogueElementPropertiesProvider.configureProperty 'enhanced:listReference', tabDefinition: [ '$element', '$name', '$value', 'catalogueElementProperties', 'enhance', 'security', 'columns', ($element, $name, $value, catalogueElementProperties, enhance, security, columns) ->
     listEnhancer = enhance.getEnhancer('list')

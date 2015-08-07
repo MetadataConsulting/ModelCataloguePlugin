@@ -55,7 +55,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
           list.next().then (nextList) ->
             for item in nextList.list
               it = if item.relation then item.relation else item
-              $scope.element.$$children.push(angular.extend(it, {$$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
+              $scope.element.$$children.push(angular.extend(it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
             $scope.element.$$showMore = createShowMore(nextList)
             loadMoreIfNeeded()
             $scope.element.$$showingMore = false
@@ -89,7 +89,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
                 if key.indexOf('$') == 0
                   objectToExtend[key] = prop
 
-          newChildren.push(angular.extend(objectToExtend, it, {$$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
+          newChildren.push(angular.extend(objectToExtend, it, {$$relationship: (if item.relation then item else undefined), $$metadata: item.ext, $$archived: item.archived, $$localName: getLocalName(item) }))
 
         $scope.element.$$children = newChildren
         $scope.element.$$collapsed  = false
@@ -178,6 +178,8 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
 
       $scope.$on 'catalogueElementDeleted', (event, element) ->
         indexesToRemove = []
+        if $scope.element.$$relationship == element
+          delete $scope.element.$$relationship
         for item, i in $scope.element.$$children
           if element.relation and item.link == element.relation.link
             indexesToRemove.push i
@@ -189,6 +191,7 @@ angular.module('mc.core.ui.catalogueElementTreeviewItem', ['mc.util.names', 'mc.
         reloadChildrenOnChange event, element
 
       $scope.$on 'catalogueElementCreated', reloadChildrenOnChange
+      $scope.$on 'catalogueElementUpdated', reloadChildrenOnChange
       $scope.$on 'listReferenceReordered', (ignored, listReference) ->
         $scope.element.$$loadChildren() if $scope.descendFun.link == listReference.link
     ]

@@ -6,7 +6,7 @@ angular.module('mc.util.messages', []).provider 'messages', [ ->
 
   nextId = 1
 
-  hideAfter = 5000
+  hideAfter = 60000
 
   messagesProvider = @
 

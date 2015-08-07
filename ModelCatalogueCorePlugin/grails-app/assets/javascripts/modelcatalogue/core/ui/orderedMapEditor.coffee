@@ -38,12 +38,13 @@ angular.module('mc.core.ui.orderedMapEditor', ['mc.core.ui.metadataEditors']).di
         return true
 
       onObjectChanged = (object) ->
-        if object and not isOrderedMap(object)
-          $log.error "Object", object, "is not ordered map"
-          return
+        if object
+          if not isOrderedMap(object)
+            $log.error "Object", object, "is not ordered map"
+            return
 
-        object.clearIfOnlyContainsPlaceholder()
-        object.addPlaceholderIfEmpty()
+          object.clearIfOnlyContainsPlaceholder()
+          object.addPlaceholderIfEmpty()
 
       onObjectChanged($scope.object)
 
