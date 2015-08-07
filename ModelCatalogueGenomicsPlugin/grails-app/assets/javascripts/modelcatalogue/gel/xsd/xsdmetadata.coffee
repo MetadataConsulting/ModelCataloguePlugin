@@ -5,7 +5,7 @@ xsd = angular.module('mc.core.xsd', ['mc.core.ui.metadataEditors'])
 # TODO: inline help
 xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
   metadataEditorsProvider.register {
-    title: 'XSD (Metadata)'
+    title: 'XSD-XSL(Metadata)'
     types: [
       'model'
       '=[hierarchy]=>'
@@ -15,12 +15,13 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
       "http://xsd.modelcatalogue.org/metadata#schemaVersion"
       "http://xsd.modelcatalogue.org/metadata#schemaVersionDescription"
       "http://xsd.modelcatalogue.org/section#type"
+      "http://xsl.modelcatalogue.org/tableName"
     ]
     template: 'modelcatalogue/core/ui/metadataEditors/xsdMetadata.html'
   }
 
   metadataEditorsProvider.register {
-    title: 'XSD( Datatype Restrictions)'
+    title: 'XSD-XSL( Datatype Restrictions)'
     types: [
       'dataElement'   
       'valueDomain'
@@ -38,6 +39,7 @@ xsd.config ['metadataEditorsProvider', (metadataEditorsProvider)->
            "http://xsd.modelcatalogue.org/restrictions#totalDigits"
            "http://xsd.modelcatalogue.org/restrictions#fractionDigits"
            "http://xsd.modelcatalogue.org/restrictions#pattern"
+           "http://xsl.modelcatalogue.org/tableName"
     ]
     template: 'modelcatalogue/core/ui/metadataEditors/xsdItemValueDomainRestriction.html'
   }
@@ -63,6 +65,13 @@ xsd.run ['$templateCache', ($templateCache) ->
  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/xsdMetadata.html', '''
   <div class="alert alert-warning">This XSD metadata only applies on the root model of the Xml Schema.Every GEL Schema should have included these mandatory fields</div>
   <form class="form">
+      <div class="form-group">
+          <label for="xsl-table-name1" class="control-label">Table Name(XSL)</label>
+          <input maxlength="63" type="text" class="form-control" id="xsl-table-name1" ng-model="object.access('http://xsl.modelcatalogue.org/tableName')" ng-model-options="{ getterSetter: true }">
+          <p class="help-block">
+             Optional field used for database.If you don't specify the name here,it will be taken from the name of the current item.  Only if it's a section or occurrence &gt;1. Field used for XSL data model. It will be used only for sections,for items which are repeatable. Table name must be unique across the form.
+          </p>
+      </div>
       <div class="form-group">
           <label for="schema-name" class="control-label">XML Schema Name</label>
           <input maxlength="50" type="text" class="form-control" id="schema-name" ng-model="object.access('http://xsd.modelcatalogue.org/metadata#schemaName')" ng-model-options="{ getterSetter: true }">
@@ -95,6 +104,13 @@ xsd.run ['$templateCache', ($templateCache) ->
     '''
  $templateCache.put 'modelcatalogue/core/ui/metadataEditors/xsdItemValueDomainRestriction.html', '''
       <form class="form">
+        <div class="form-group">
+          <label for="xsl-table-name" class="control-label">XSL table Name</label>
+          <input maxlength="63" type="text" class="form-control" id="xsl-table-name" ng-model="object.access('http://xsl.modelcatalogue.org/tableName')" ng-model-options="{ getterSetter: true }">
+          <p class="help-block">
+             Only if it's a section or occurrence &gt;1. Field used for XSL data model. It will be used only for sections,for items which are repeatable. Table name must be unique across the form.
+          </p>
+        </div>
         <div class="form-group">
           <label for="xsd-restriction-pattern" class="control-label">Pattern (Valid XML Regex)</label>
           <input maxlength="500" type="text" class="form-control" id="xsd-restriction-pattern" ng-model="object.access('http://xsd.modelcatalogue.org/restrictions#pattern')" ng-model-options="{ getterSetter: true }">
