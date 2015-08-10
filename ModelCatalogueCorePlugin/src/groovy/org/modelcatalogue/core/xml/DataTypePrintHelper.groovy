@@ -16,6 +16,11 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
     @Override
     void processElements(Object mkp, DataType element, PrintContext context, Relationship rel) {
         super.processElements(mkp, element, context, rel)
+        if (element.regexDef) {
+            mkp.regex element.regexDef
+        } else if (element.rule) {
+            mkp.rule element.rule
+        }
         if (element instanceof EnumeratedType && element.enumerations) {
             mkp.enumerations {
                 for (Map.Entry<String, String> entry in element.enumerations) {
@@ -33,8 +38,8 @@ class DataTypePrintHelper extends CatalogueElementPrintHelper<DataType> {
             }
         }
         if (element instanceof PrimitiveType && element.measurementUnit) {
-            if (element.dataClass) {
-                printElement(mkp, element.dataClass, context, null)
+            if (element.measurementUnit) {
+                printElement(mkp, element.measurementUnit, context, null)
             }
         }
     }

@@ -52,8 +52,8 @@ class InheritanceSpec extends IntegrationSpec  {
     DataElement dataElement2
     DataElement dataElement3
     DataElement dataElement4
-    ValueDomain parentValueDomain
-    ValueDomain childValueDomain
+    DataElement parentValueDomain
+    DataElement childValueDomain
     DataType dataType1
     DataType dataType2
     DataModel dataModel1
@@ -73,10 +73,10 @@ class InheritanceSpec extends IntegrationSpec  {
                     ext METADATA_KEY_3, METADATA_VALUE_3
                     rel 'synonym' to dataClass called DUMMY_DATA_CLASS_NAME
                 }
-                valueDomain name: TEST_PARENT_VALUE_DOMAIN_NAME, {
+                dataElement name: TEST_PARENT_VALUE_DOMAIN_NAME, {
                     dataType name: TEST_DATA_TYPE_1_NAME
                 }
-                valueDomain name: TEST_CHILD_VALUE_DOMAIN_NAME
+                dataElement name: TEST_CHILD_VALUE_DOMAIN_NAME
                 dataType name: TEST_DATA_TYPE_2_NAME
             }
 
@@ -95,8 +95,8 @@ class InheritanceSpec extends IntegrationSpec  {
         dataElement2 = DataElement.findByName(TEST_DATA_ELEMENT_2_NAME)
         dataElement3 = DataElement.findByName(TEST_DATA_ELEMENT_3_NAME)
         dataElement4 = DataElement.findByName(TEST_DATA_ELEMENT_4_NAME)
-        parentValueDomain = ValueDomain.findByName(TEST_PARENT_VALUE_DOMAIN_NAME)
-        childValueDomain = ValueDomain.findByName(TEST_CHILD_VALUE_DOMAIN_NAME)
+        parentValueDomain = DataElement.findByName(TEST_PARENT_VALUE_DOMAIN_NAME)
+        childValueDomain = DataElement.findByName(TEST_CHILD_VALUE_DOMAIN_NAME)
         dataType1 = DataType.findByName(TEST_DATA_TYPE_1_NAME)
         dataType2 = DataType.findByName(TEST_DATA_TYPE_2_NAME)
         dataModel1 = DataModel.findByName(TEST_DATA_MODEL_1_NAME)

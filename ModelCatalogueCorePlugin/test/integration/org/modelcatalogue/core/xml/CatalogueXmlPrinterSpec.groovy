@@ -38,16 +38,16 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
 
 
     def "replace special chars"() {
-        Writable writable = printer.bind(new ValueDomain(name: 'Test', description: "diagnosis.ƒ‚ƒ‚ƒ‚'‚“ e", modelCatalogueId: 'http://example.com/specialchars').save()) {
+        Writable writable = printer.bind(new DataType(name: 'Test', description: "diagnosis.ƒ‚ƒ‚ƒ‚'‚“ e", modelCatalogueId: 'http://example.com/specialchars').save()) {
             noHref = true
         }
         StringWriter writer = new StringWriter()
         writable.writeTo(writer)
         expect:
         writer.toString() == '''<catalogue xmlns="http://www.metadataregistry.org.uk/assets/schema/1.2/metadataregistry.xsd">
-  <valueDomain name="Test" id="http://example.com/specialchars" status="DRAFT">
+  <dataType name="Test" id="http://example.com/specialchars" status="DRAFT">
     <description>diagnosis.&#402;&#8218;&#402;&#8218;&#402;&#8218;'&#8218;&#8220; e</description>
-  </valueDomain>
+  </dataType>
 </catalogue>'''
     }
 
@@ -99,12 +99,6 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         similar transportation, 'transportation.catalogue.xml'
     }
 
-    @Ignore
-    def "print xml schema"() {
-        expect:
-        similar DataModel.findByName('XMLSchema'), 'xmlschema.catalogue.xml'
-    }
-
 
     boolean similar(CatalogueElement input, String sampleFile) {
         String xml = XmlUtil.serialize(printer.bind(input){
@@ -125,9 +119,9 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         defaultCatalogueBuilder.created.first() as E
     }
 
-    private ValueDomain getPressure() {
+    private DataType getPressure() {
         build {
-            valueDomain(name: 'Pressure', id: "http://www.example.com/domains/Pressure")
+            dataType(name: 'Pressure', id: "http://www.example.com/domains/Pressure")
         }
     }
 
@@ -135,7 +129,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         build {
             dataModel (name: "Transportation", id: "http://www.example.com/datasets/Transportation") {
                 dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
-                    valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
+                    dataType(name: 'Force', id: "http://www.example.com/domains/Force") {
                         description "A force is a push or pull upon an object resulting from the object's interaction with another object."
                         regex "\\d+"
                         dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {
@@ -188,7 +182,7 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
     private DataElement getAdhesion() {
         build {
             dataElement(name: "Factor of Adhesion", id: "http://www.example.com/elements/Adhesion") {
-                valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
+                dataType(name: 'Force', id: "http://www.example.com/domains/Force") {
                     description "A force is a push or pull upon an object resulting from the object's interaction with another object."
                     regex "\\d+"
                     dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {
@@ -203,11 +197,11 @@ class CatalogueXmlPrinterSpec extends AbstractIntegrationSpec {
         }
     }
 
-    private ValueDomain getForce() {
+    private DataType getForce() {
         pressure
 
         build {
-            valueDomain(name: 'Force', id: "http://www.example.com/domains/Force") {
+            dataType(name: 'Force', id: "http://www.example.com/domains/Force") {
                 description "A force is a push or pull upon an object resulting from the object's interaction with another object."
                 regex "\\d+"
                 dataType(name: "Decimal", id: "http://www.example.com/types/Decimal") {

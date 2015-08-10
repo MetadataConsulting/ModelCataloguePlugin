@@ -43,7 +43,7 @@ class UmljService {
     }
 
 
-    static createValueDomain(CatalogueBuilder builder, LazyMap att, StarUMLDiagram umlFile) {
+    static createDataType(CatalogueBuilder builder, LazyMap att, StarUMLDiagram umlFile) {
 
             if (!(att.type instanceof String) && att.type?.$ref && umlFile.allDataTypes.get(att?.type?.$ref)) {
                 // Find highest supertype
@@ -52,9 +52,7 @@ class UmljService {
                     currType = umlFile.allDataTypes.get(currType.ownedElements.findAll({ oe -> oe._type.equals("UMLGeneralization") }).get(0).target?.$ref)
                 }
 
-                return builder.valueDomain(name: currType.name.toString()) {
-                        dataType(name: currType.name.toString())
-                    }
+                return builder.dataType(name: currType.name.toString())
 
             }
 
@@ -65,16 +63,12 @@ class UmljService {
                     enumMap.put(ev.name, ev.documentation)
                 }
 
-                return builder.valueDomain(name: enumeration.name) {
-                    dataType(name: enumeration.name, enumerations: enumMap)
-                }
+                return builder.dataType(name: enumeration.name, enumerations: enumMap)
 
             } else if (att.type instanceof String) {
                 if (att.type == "") att.type = "xs:string"
 
-                return builder.valueDomain(name: att.type) {
-                        dataType(name: att.type)
-                    }
+                return builder.dataType(name: att.type)
         }
     }
 
@@ -103,7 +97,7 @@ class UmljService {
                                 }
                             }
 
-                            createValueDomain(builder, att, umlFile)
+                            createDataType(builder, att, umlFile)
 
                         }
 

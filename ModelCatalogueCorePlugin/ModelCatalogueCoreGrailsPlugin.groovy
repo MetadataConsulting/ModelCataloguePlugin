@@ -61,10 +61,12 @@ Model catalogue core plugin (metadata registry)
         ModelCatalogueTypes.DATA_MODEL.implementation = DataModel
         ModelCatalogueTypes.DATA_CLASS.implementation = DataClass
         ModelCatalogueTypes.DATA_ELEMENT.implementation = DataElement
-        ModelCatalogueTypes.VALUE_DOMAIN.implementation = ValueDomain
+        ModelCatalogueTypes.VALUE_DOMAIN.implementation = DataType
         ModelCatalogueTypes.DATA_TYPE.implementation = DataType
         ModelCatalogueTypes.MEASUREMENT_UNIT.implementation = MeasurementUnit
         ModelCatalogueTypes.ENUMERATED_TYPE.implementation = EnumeratedType
+        ModelCatalogueTypes.PRIMITIVE_TYPE.implementation = PrimitiveType
+        ModelCatalogueTypes.REFERENCE_TYPE.implementation = ReferenceType
 
 
         mergeConfig(application)
@@ -256,9 +258,6 @@ Model catalogue core plugin (metadata registry)
                     "Data Item Unique Code",
                     "Data Item Name",
                     "Data Item Description",
-                    "Value Domain Data Model",
-                    "Value Domain Unique Code",
-                    "Value Domain",
                     "Measurement Unit",
                     "Measurement Unit Symbol",
                     "Data Type Data Model",
@@ -271,8 +270,7 @@ Model catalogue core plugin (metadata registry)
             } then { DataElement element ->
                 DataClass parent = getParentModel(element)
                 DataClass model = getContainingModel(element)
-                ValueDomain valueDomain = element.valueDomain
-                DataType dataType = valueDomain?.dataType
+                DataType dataType = element.dataType
                 [[
                          getDataModelsString(element),
                          parent?.modelCatalogueId ?: parent?.getDefaultModelCatalogueId(true),
@@ -282,9 +280,6 @@ Model catalogue core plugin (metadata registry)
                          element.modelCatalogueId ?: element.getDefaultModelCatalogueId(true),
                          element.name,
                          element.description,
-                         getDataModelsString(valueDomain),
-                         valueDomain?.modelCatalogueId ?: valueDomain?.getDefaultModelCatalogueId(true),
-                         valueDomain?.name,
                          getUnitOfMeasure(element),
                          getUnitOfMeasureSymbol(element) ,
                          getDataModelsString(dataType),

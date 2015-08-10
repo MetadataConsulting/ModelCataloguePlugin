@@ -53,18 +53,6 @@ angular.module('mc.core.ui.bs.modalPromptNewExcelImport', ['mc.util.messages', '
                       <input type="text" class="form-control" id="dataTypeCode" placeholder="Data Type Unique Code" ng-model="headersMap.dataTypeCode">
                     </div>
                     <div class="form-group">
-                      <label for="valueDomainClassification">Value Domain Data Model</label>
-                      <input type="text" class="form-control" id="valueDomainClassification" placeholder="Value Domain Data Model" ng-model="headersMap.valueDomainDataModel">
-                    </div>
-                    <div class="form-group">
-                      <label for="valueDomainName">Value Domain</label>
-                      <input type="text" class="form-control" id="valueDomainName" placeholder="Value Domain" ng-model="headersMap.valueDomainName">
-                    </div>
-                    <div class="form-group">
-                      <label for="valueDomainCode">Value Domain Unique Code</label>
-                      <input type="text" class="form-control" id="valueDomainCode" placeholder="Value Domain Unique Code" ng-model="headersMap.valueDomainCode">
-                    </div>
-                    <div class="form-group">
                       <label for="parentModelName">Parent Data Class</label>
                       <input type="text" class="form-control" id="parentModelName" placeholder="Parent Data Class" ng-model="headersMap.parentDataClassName">
                     </div>

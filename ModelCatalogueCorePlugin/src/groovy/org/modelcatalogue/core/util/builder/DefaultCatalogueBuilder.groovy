@@ -181,37 +181,6 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
     }
 
     /**
-     * Creates new value domain, reuses the latest draft or creates new draft unless the exactly same value domain
-     * already exists in the catalogue. Accepts any bindable parameters which ValueDomain instances does.
-     *
-     * Measurement unit nested inside the DSL definition closure will be set as unit of measure of this element.
-     * Data type nested inside the DSL definition closure will be set as data type of this element.
-     *
-     * If data types are created automatically a data type with the same name and description will be created
-     * if no nested data type is specified.
-     *
-     * @param parameters map of parameters such as name or id
-     * @param c DSL definition closure
-     * @return proxy to value domain specified by the parameters map and the DSL closure
-     */
-    void valueDomain(Map<String, Object> parameters = [:], @DelegatesTo(CatalogueBuilder) Closure c = {}) {
-        CatalogueElementProxy<ValueDomain> domain = createProxy(ValueDomain, parameters, DataElement, isUnderControlIfSameClassification(parameters))
-
-        context.withNewContext domain, c
-
-        context.withContextElement(DataElement) {
-            it.setParameter('valueDomain', domain)
-        }
-
-        if (domain.getParameter('dataType') == null && DataType in createAutomatically) {
-            context.withNewContext domain, {
-                dataType()
-            }
-        }
-        domain
-    }
-
-    /**
      * Creates new data type, reuses the latest draft or creates new draft unless the exactly same data type
      * already exists in the catalogue. Accepts any bindable parameters which DataType instances does.
      *
@@ -224,7 +193,15 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
         if (parameters.containsKey('enumerations') && !parameters.enumerations) {
             parameters.remove('enumerations')
         }
-        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, ValueDomain, isUnderControlIfSameClassification(parameters))
+
+        context.withContextElement(DataType) {
+            if (!parameters.name) {
+                parameters.name = it.getParameter('name')
+            }
+        }
+
+
+        CatalogueElementProxy<? extends DataType> dataType = createProxy(type, parameters, DataElement, isUnderControlIfSameClassification(parameters))
 
         context.withNewContext dataType, c
 
@@ -247,6 +224,12 @@ import org.modelcatalogue.core.api.CatalogueElement as ApiCatalogueElement
 
         context.withContextElement(DataElement) {
             it.setParameter('dataType', dataType)
+        }
+
+        context.withContextElement(DataType) { outerDataType, Closure relConf ->
+            if (outerDataType.name != dataType.name) {
+                basedOn dataType, relConf
+            }
         }
 
         dataType

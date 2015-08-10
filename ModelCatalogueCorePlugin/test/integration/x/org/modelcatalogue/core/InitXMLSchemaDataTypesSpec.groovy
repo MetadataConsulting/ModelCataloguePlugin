@@ -29,15 +29,13 @@ class InitXMLSchemaDataTypesSpec extends IntegrationSpec {
 
     def "check #domain validates value #value as #valid"(){
         when:
-        ValueDomain valueDomain = ValueDomain.findByName(domain)
         DataType dataType       = DataType.findByName(domain)
 
         then:
         dataType
-        valueDomain
 
         when:
-        def result = valueDomain.validateRule(value)
+        def result = dataType.validateRule(value)
 
         then:
         if (valid) {

@@ -8,6 +8,7 @@ import grails.util.GrailsNameUtils
 import org.apache.log4j.Logger
 import org.codehaus.groovy.grails.exceptions.DefaultStackTraceFilterer
 import org.codehaus.groovy.grails.exceptions.StackTraceFilterer
+import org.modelcatalogue.core.util.RelationshipTypeRuleScript
 import org.modelcatalogue.core.util.SecuredRuleExecutor
 
 import java.util.concurrent.Callable
@@ -157,7 +158,7 @@ class RelationshipType implements org.modelcatalogue.core.api.RelationshipType {
         }
 
         if (!ruleScript) {
-            ruleScript = new SecuredRuleExecutor(
+            ruleScript = new SecuredRuleExecutor(RelationshipTypeRuleScript,
                 source: source,
                 destination: destination,
                 type: this,

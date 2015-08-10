@@ -98,7 +98,6 @@
             <xs:enumeration value="dataModel"/>
             <xs:enumeration value="dataClass"/>
             <xs:enumeration value="dataElement"/>
-            <xs:enumeration value="valueDomain"/>
             <xs:enumeration value="dataType"/>
             <xs:enumeration value="measurementUnit"/>
         </xs:restriction>
@@ -232,28 +231,18 @@
     <xs:complexType name="DataType">
         <xs:complexContent>
             <xs:extension base="mdr:CatalogueElement">
-                <xs:choice minOccurs="0">
-                    <xs:element name="enumerations"     type="mdr:Enumerations"/>
-                    <xs:element name="dataClass"        type="mdr:DataClass"       />
-                    <xs:element name="measurementUnit"  type="mdr:MeasurementUnit" />
-                </xs:choice>
-                <xs:attribute name="type" use="prohibited"/>
-            </xs:extension>
-        </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="ValueDomain">
-        <xs:complexContent>
-            <xs:extension base="mdr:CatalogueElement">
                 <xs:sequence>
                     <xs:choice minOccurs="0">
                         <xs:element name="rule"     type="mdr:Rule" />
                         <xs:element name="regex"    type="xs:string" />
                     </xs:choice>
-                    <xs:element name="unitOfMeasure"    type="mdr:MeasurementUnit"   minOccurs="0" />
-                    <xs:element name="dataType"         type="mdr:DataType"          minOccurs="0" />
+                    <xs:choice minOccurs="0">
+                        <xs:element name="enumerations"     type="mdr:Enumerations"/>
+                        <xs:element name="dataClass"        type="mdr:DataClass"       />
+                        <xs:element name="measurementUnit"  type="mdr:MeasurementUnit" />
+                    </xs:choice>
+                    <xs:element name="dataType" type="mdr:DataType" minOccurs="0" />
                 </xs:sequence>
-                <xs:attribute name="multiple" type="xs:boolean" />
                 <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
         </xs:complexContent>
@@ -263,7 +252,7 @@
         <xs:complexContent>
             <xs:extension base="mdr:CatalogueElement">
                 <xs:sequence>
-                    <xs:element name="valueDomain" type="mdr:ValueDomain"   minOccurs="0" />
+                    <xs:element name="dataType" type="mdr:DataType"   minOccurs="0" />
                 </xs:sequence>
                 <xs:attribute name="type" use="prohibited"/>
             </xs:extension>
@@ -291,7 +280,6 @@
                         <xs:element name="dataModel"        type="mdr:DataModel"       />
                         <xs:element name="dataClass"        type="mdr:DataClass"       />
                         <xs:element name="dataElement"      type="mdr:DataElement"     />
-                        <xs:element name="valueDomain"      type="mdr:ValueDomain"     />
                         <xs:element name="dataType"         type="mdr:DataType"        />
                         <xs:element name="measurementUnit"  type="mdr:MeasurementUnit" />
                     </xs:choice>
@@ -310,7 +298,6 @@
                 <xs:element name="dataModel"         type="mdr:DataModel"       />
                 <xs:element name="dataClass"         type="mdr:DataModel"       />
                 <xs:element name="dataElement"       type="mdr:DataElement"     />
-                <xs:element name="valueDomain"       type="mdr:ValueDomain"     />
                 <xs:element name="dataType"          type="mdr:DataType"        />
                 <xs:element name="measurementUnit"   type="mdr:MeasurementUnit" />
                 <xs:element name="relationshipTypes" type="mdr:RelationshipTypesDefinitions" />

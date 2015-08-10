@@ -3,9 +3,6 @@ package org.modelcatalogue.core.xml
 import org.modelcatalogue.core.DataElement
 import org.modelcatalogue.core.Relationship
 
-/**
- * Created by ladin on 15.01.15.
- */
 class DataElementPrintHelper extends CatalogueElementPrintHelper<DataElement> {
 
     @Override
@@ -18,6 +15,9 @@ class DataElementPrintHelper extends CatalogueElementPrintHelper<DataElement> {
         super.processElements(mkp, element, context, rel)
         if (element.valueDomain) {
             printElement(mkp, element.valueDomain, context, null)
+        }
+        if (element.dataType) {
+            printElement(mkp, element.dataType, context, null)
         }
     }
 }

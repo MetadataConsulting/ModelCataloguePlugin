@@ -398,6 +398,10 @@ class CatalogueElementProxyRepository {
         T sourceElement = proxy.source.resolve()
         U destinationElement = proxy.destination.resolve()
 
+        if (sourceElement == destinationElement) {
+            throw new IllegalStateException("Source and the destinaiton is the same: $sourceElement")
+        }
+
         if (sourceElement.hasErrors()) {
             throw new IllegalStateException(FriendlyErrors.printErrors("Source element $sourceElement contains errors and is not ready to be part of the relationship ${proxy.toString()}", sourceElement.errors))
         }

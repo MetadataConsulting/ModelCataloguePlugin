@@ -214,7 +214,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     def "complain if model name is missing"() {
         when:
         build {
-            model([:])
+            dataClass([:])
         }
 
         then:
@@ -222,63 +222,58 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         e.message.startsWith "Cannot create element abstraction from"
     }
 
-    def "creates new value domain with given name"() {
+    def "value domain calls are delegated to the data type"() {
         build {
             valueDomain name: 'Domain'
         }
 
         expect:
-        ValueDomain.findByName('Domain')
+        DataType.findByName('Domain')
     }
 
-    def "reuses existing value domain with given name in classification"() {
-        DataModel cls  = new DataModel(name: 'Some').save(failOnError: true)
-        ValueDomain domain1 = new ValueDomain(name: 'SomeDomain').save(failOnError: true)
-        ValueDomain domain2 = new ValueDomain(name: 'SomeDomain').save(failOnError: true)
-
-        cls.addToDeclares(domain1)
-
+    def "if there is a nested data type with name missing - it is merged into single data type"() {
         build {
-            valueDomain name: 'SomeDomain'
-            dataModel(name: 'Some') {
-                valueDomain name: 'SomeDomain'
+            valueDomain name: 'Merged Type', {
+                dataType(description: 'MT DESC')
             }
         }
 
         expect:
-        ValueDomain.countByName('SomeDomain') == 2
-
-        cleanup:
-        [domain2].each {
-            it.beforeDelete()
-            it.delete()
-        }
+        DataType.findByName('Merged Type')
+        DataType.findByName('Merged Type').description == 'MT DESC'
     }
 
-    def "complain if value domain name is missing"() {
-        when:
+
+    def "if there is a nested data type with different name - it's set as base"() {
         build {
-            valueDomain rule: 'is number'
+            valueDomain name: 'Inherited Type', {
+                dataType(name: 'Base Type', description: 'MT DESC')
+            }
         }
 
-        then:
-        IllegalArgumentException e = thrown(IllegalArgumentException)
-        e.message.startsWith "Cannot create element abstraction from"
+        expect:
+        DataType.findByName('Inherited Type')
+        DataType.findByName('Base Type')
+
+        DataType.findByName('Inherited Type').isBasedOn
+        DataType.findByName('Inherited Type').isBasedOn.contains DataType.findByName('Base Type')
     }
+
+
 
     def "specify rule as regex"() {
         when:
         build {
-            valueDomain name: 'with regex', {
+            dataType name: 'with regex', {
                 regex(/\w+/)
             }
         }
 
-        ValueDomain domain = ValueDomain.findByName('with regex')
+        DataType dataType = DataType.findByName('with regex')
 
         then:
-        domain
-        domain.rule == """x ==~ /\\w+/"""
+        dataType
+        dataType.rule == """x ==~ /\\w+/"""
     }
 
     def "add extensions"() {
@@ -386,18 +381,18 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         primitiveType.measurementUnit.name == "PTUnit"
     }
 
-    def "do not complain if data type name is missing but inside value domain"() {
+    def "do not complain if data type name is missing but inside data element"() {
         build {
-            valueDomain(name: 'test:number') {
+            dataElement(name: 'test:number') {
                 dataType()
             }
         }
 
         expect:
         DataType.findByName('test:number')
-        ValueDomain.findByName('test:number')
-        ValueDomain.findByName('test:number').dataType
-        ValueDomain.findByName('test:number').dataType == DataType.findByName('test:number')
+        DataElement.findByName('test:number')
+        DataElement.findByName('test:number').dataType
+        DataElement.findByName('test:number').dataType == DataType.findByName('test:number')
     }
 
 
@@ -405,35 +400,28 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
     def "elements are added to classification"() {
         build {
             dataModel(name: 'TestSchema') {
-                valueDomain(name: 'test:string domain') {
-                    dataType(name: 'test:string')
-                }
-                valueDomain(name: 'test:token domain') {
-                    basedOn 'test:string domain'
+                dataType(name: 'test:string')
+                dataType(name: 'test:token') {
+                    basedOn 'test:string'
                 }
             }
         }
 
         DataModel schema       = DataModel.findByName('TestSchema')
-        ValueDomain stringDomain    = ValueDomain.findByName('test:string domain')
-        ValueDomain tokenDomain     = ValueDomain.findByName('test:token domain')
-        DataType stringType         = DataType.findByName('test:string')
+        DataType tokenType     = DataType.findByName('test:token')
+        DataType stringType    = DataType.findByName('test:string')
 
         expect:
         schema
-        stringDomain
-        tokenDomain
+        tokenType
         stringType
 
         schema.declares
-        stringDomain    in schema.declares
-        tokenDomain     in schema.declares
-        stringType      in schema.declares
+        tokenType in schema.declares
+        stringType in schema.declares
 
-        stringDomain.dataType == stringType
-
-        tokenDomain.isBasedOn
-        tokenDomain.isBasedOn.contains stringDomain
+        tokenType.isBasedOn
+        tokenType.isBasedOn.contains stringType
 
     }
 
@@ -450,10 +438,7 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
                         dataClass name: "Complex Child", {
                             dataElement name: "Complex Element 1"
                             dataElement name: "Complex Element 2", {
-                                valueDomain name: "Complex Domain 2", {
-                                    dataType enumerations: [yes: 'Yes', no: 'No']
-                                    measurementUnit name: 'Unit'
-                                }
+                                dataType enumerations: [yes: 'Yes', no: 'No']
                             }
                         }
                     }
@@ -473,21 +458,19 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         DataClass.findByName('Complex Child')
         DataClass.findByName('Complex Child').contains
         DataClass.findByName('Complex Child').contains.size() == 2
-
-        ValueDomain.findByName('Complex Element 1')
     }
 
     def "create generic relationship"() {
         build {
             dataModel name: "Other123", {
-                valueDomain name: 'WD40'
+                dataType name: 'WD40'
             }
             dataModel name: "Other234", {
-                valueDomain name: 'VDRel1'
-                valueDomain name: 'VDRel2'
-                valueDomain name: 'VDRel3'
-                valueDomain name: 'VDRel4', {
-                    rel 'synonym'   to      valueDomain called 'VDRel2'
+                dataType name: 'VDRel1'
+                dataType name: 'VDRel2'
+                dataType name: 'VDRel3'
+                dataType name: 'VDRel4', {
+                    rel 'synonym'   to      dataType called 'VDRel2'
                     rel 'synonym'   from    'VDRel1'
                     rel 'relatedTo' to      'Other123', 'WD40'
                     rel 'base'      to      'Other123', 'WD40'
@@ -496,10 +479,10 @@ class CatalogueBuilderIntegrationSpec extends AbstractIntegrationSpec {
         }
 
         expect:
-        ValueDomain.findByName('VDRel4')
-        ValueDomain.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('synonym'))   == 2
-        ValueDomain.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('base'))      == 1
-        ValueDomain.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('relatedTo')) == 1
+        DataType.findByName('VDRel4')
+        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('synonym'))   == 2
+        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('base'))      == 1
+        DataType.findByName('VDRel4').countRelationshipsByType(RelationshipType.readByName('relatedTo')) == 1
     }
 
     def "creates new version of the element"() {
