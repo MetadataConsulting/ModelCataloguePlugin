@@ -13,20 +13,20 @@ class ChangesSpec extends AbstractModelCatalogueGebSpec {
         go "#/"
         loginAdmin()
 
-        go "#/catalogue/valueDomain/all"
+        go "#/catalogue/dataType/all"
         at DataType2Page
 
         waitFor(120) {
             viewTitle.displayed
         }
         waitFor {
-            viewTitle.text().trim().endsWith 'Value Domain List'
+            viewTitle.text().trim().endsWith 'Data Type List'
         }
 
-        fastAction 'New Value Domain'
+        fastAction 'New Data Type'
 
         noStale({$('input[id=name]')}) {
-            it.value("Value Domain ${System.nanoTime()}")
+            it.value("Data Type ${System.nanoTime()}")
         }
 
         noStale({$('input[id=dataModel]')}) {

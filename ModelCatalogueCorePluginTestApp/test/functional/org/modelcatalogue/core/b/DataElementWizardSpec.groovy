@@ -51,9 +51,6 @@
             name        = "NewDE1"
             description = "NT1 Description"
 
-            valueDomain = "VD4Dent1"
-            selectCepItemIfExists()
-
             and: 'save button clicked'
             saveButton.click()
             then: 'the data element is saved and displayed at the top of the table'
@@ -81,54 +78,6 @@
 
             pageTitle.text().trim()     == 'NewDE1 DRAFT'
 
-        }
-
-        def "Edit the value domain"() {
-            waitUntilModalClosed()
-            when: "edit action is clicked"
-            actionButton('edit-catalogue-element').click()
-
-            then: "edit dialog is shown"
-            waitFor {
-                dataWizard.displayed
-            }
-
-            when: "new value domain is changed"
-            valueDomain = "VD4Dent2"
-            selectCepItemIfExists()
-
-            and: 'save button clicked'
-            saveButton.click()
-
-            and: "properties tab is shown"
-            selectTab('properties')
-
-            then: 'the data element is saved and and different value domain is shown'
-            waitFor(120) {
-                $('td', 'data-value-for': "Value Domain").text().contains('VD4Dent2')
-            }
-        }
-
-        def "Remove the value domain"() {
-            waitUntilModalClosed()
-            when: "edit action is clicked"
-            actionButton('edit-catalogue-element').click()
-
-            then: "edit dialog is shown"
-            waitFor {
-                dataWizard.displayed
-            }
-
-            when: "new value domain is changed"
-            valueDomain = ""
-
-            and: 'save button clicked'
-            saveButton.click()
-
-            then: 'the data element is saved and and no value domain is shown'
-            waitFor(120) {
-                $('td', 'data-value-for': "Value Domain").text().trim() == ''
-            }
         }
 
         def "finalize element"() {
