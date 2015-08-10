@@ -1,6 +1,7 @@
 #!/bin/bash
 
 rm -rf build
+find . -name '*.gen.fixture.js' -delete
 
 for file in */ .*/ ; do
     if [ -f $file/grailsw ]; then

@@ -4,7 +4,7 @@ describe "mc.core.ui.elementsAsTags", ->
 
   it "element get compiled",  inject ($compile, $rootScope) ->
 
-    $rootScope.elements = angular.copy fixtures.valueDomain.list1.list
+    $rootScope.elements = angular.copy fixtures.dataType.list1.list
 
 
     element = $compile('''

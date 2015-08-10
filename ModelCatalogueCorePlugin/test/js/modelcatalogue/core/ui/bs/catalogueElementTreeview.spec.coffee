@@ -5,10 +5,10 @@ describe "mc.core.ui.catalogueElementTreeview", ->
 
   it "treeview with single element",  inject ($compile, $rootScope, enhance) ->
 
-    catEl = enhance angular.copy(fixtures.valueDomain.showOne.dataType)
+    catEl = enhance angular.copy(fixtures.dataType.showOne.dataType)
 
     $rootScope.element = catEl
-    $rootScope.descend = ['valueDomains']
+    $rootScope.descend = ['dataTypes']
 
     element = $compile('''
       <catalogue-element-treeview element="element" descend="descend" id="tree-widget"></catalogue-element-treeview>
@@ -22,7 +22,7 @@ describe "mc.core.ui.catalogueElementTreeview", ->
 
   it "treeview with list",  inject ($compile, $rootScope, enhance) ->
 
-    elements = enhance angular.copy(fixtures.valueDomain.list1)
+    elements = enhance angular.copy(fixtures.dataType.list1)
 
     $rootScope.list = elements
     $rootScope.descend = ['relationships']
@@ -34,4 +34,4 @@ describe "mc.core.ui.catalogueElementTreeview", ->
     $rootScope.$digest()
 
     expect(element.find(':first-child').prop('tagName').toLowerCase()).toBe('ul')
-    expect(element.find('li').length).toBe(11) # one per item plus
+    expect(element.find('li').length).toBe(2) # one per item plus

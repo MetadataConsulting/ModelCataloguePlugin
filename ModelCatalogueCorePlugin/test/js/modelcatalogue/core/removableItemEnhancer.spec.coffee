@@ -12,7 +12,7 @@ describe "mc.core.removableItemEnancer", ->
     enhance               = _enhance_
 
   it "remove method will be added if removeLink is present", ->
-    list = angular.copy(fixtures.valueDomain.outgoing1)
+    list = angular.copy(fixtures.dataType.outgoing1)
     enhanced = enhance list
 
     item = enhanced.list[0]

@@ -15,7 +15,7 @@ describe "mc.core.ui.propertiesPane", ->
       {label: 'Data Type', value: 'dataType' }
     ]
 
-    $rootScope.element = enhance angular.copy(fixtures.valueDomain.showOne)
+    $rootScope.element = enhance angular.copy(fixtures.dataType.showOne)
     $rootScope.element.description = "Hello World!"
 
     element = $compile('''
@@ -37,7 +37,7 @@ describe "mc.core.ui.propertiesPane", ->
     # appropriate rows and cells count with expected classes
     expect(element.find('tr.pp-table-property-row').length).toBe(4)
     expect(element.find('th.pp-table-property-label').length).toBe(4)
-    expect(element.find('td.pp-table-property-value').length).toBe(3)
+    expect(element.find('td.pp-table-property-value').length).toBe(4)
 
     # appropriate cells with expected classes and content
     expect(element.find('tbody tr:nth-child(1) th.pp-table-property-label').text()).toBe('ID')
@@ -48,28 +48,6 @@ describe "mc.core.ui.propertiesPane", ->
     expect(element.find('tbody tr:nth-child(1) td.pp-table-property-value').text()).toBe("#{$rootScope.element.id}")
     expect(element.find('tbody tr:nth-child(2) td.pp-table-property-value').text()).toBe("#{$rootScope.element.name}")
     expect(element.find('tbody tr:nth-child(3) td.pp-table-property-value').text()).toBe("#{$rootScope.element.description}")
-    expect(element.find('tbody tr:nth-child(4) td.pp-table-property-value-no-wrap a').text()).toBe("#{$rootScope.element.dataType.name}")
-
-    shown = null
-
-    $httpBackend.expect('GET', /\/api\/modelCatalogue\/core\/enumeratedType\/\d+/).respond({ok: true})
-
-    $rootScope.$on '$stateChangeSuccess', (ignored, ignored2, params) ->
-      shown = params
-
-    expect(shown).toBeNull()
-
-    link = element.find('tbody tr:nth-child(4) td.pp-table-property-value-no-wrap a')
-
-    expect(link.length).toBe(1)
-
-    link.click()
-
-    $rootScope.$digest()
-    $httpBackend.flush()
-
-    expect(shown).not.toBeNull()
-
 
 
 

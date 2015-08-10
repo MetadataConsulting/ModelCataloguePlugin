@@ -22,25 +22,25 @@ describe "mc.core.catalogueElementResource", ->
 
 
   it "creates catalogue element resource", ->
-    valueDomains = catalogueElementResource('com.modelcatalogue.core.ValueDomain')
-    valueDomainsRootPath = "/api/modelCatalogue/core/valueDomain"
+    dataTypes = catalogueElementResource('com.modelcatalogue.core.DataType')
+    dataTypesRootPath = "/api/modelCatalogue/core/dataType"
 
-    expect(valueDomains.getIndexPath()).toBe(valueDomainsRootPath)
+    expect(dataTypes.getIndexPath()).toBe(dataTypesRootPath)
 
     describe "with methods for CRUD operations", ->
 
       describe "can get single resource", ->
 
-        testElementId = fixtures.valueDomain.showOne.id
+        testElementId = fixtures.dataType.showOne.id
 
         it "will respond with expected resource if exists", ->
           $httpBackend
-          .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}")
-          .respond(fixtures.valueDomain.showOne)
+          .when("GET", "#{modelCatalogueApiRoot}/dataType/#{testElementId}")
+          .respond(fixtures.dataType.showOne)
 
           result = null
           error  = null
-          valueDomains.get(testElementId).then( (_result_) ->
+          dataTypes.get(testElementId).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error = _error_
@@ -55,15 +55,15 @@ describe "mc.core.catalogueElementResource", ->
           expect(result).toBeDefined()
           expect(error).toBeNull()
           expect(result.id).toBe(testElementId)
-          expect(result.name).toBe("school subject")
+          expect(result.name).toBe("boolean")
           expect(result.description).toBeDefined()
 
 
           describe "fetched instance is enhanced", ->
             it "outgoing and incoming relationships are functions", ->
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/relationships/relatedTo")
-              .respond(fixtures.valueDomain.incoming1)
+              .when("GET", "#{modelCatalogueApiRoot}/dataType/#{testElementId}/relationships/relatedTo")
+              .respond(fixtures.dataType.incoming1)
 
               expect(angular.isFunction(result.isBaseFor)).toBeTruthy()
               expect(result.isBaseFor.total).toBe(0)
@@ -80,8 +80,8 @@ describe "mc.core.catalogueElementResource", ->
 
 
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/mapping")
-              .respond(fixtures.valueDomain.mapping1)
+              .when("GET", "#{modelCatalogueApiRoot}/dataType/#{testElementId}/mapping")
+              .respond(fixtures.dataType.mapping1)
 
               expect(angular.isFunction(result.mappings)).toBeTruthy()
 
@@ -99,7 +99,7 @@ describe "mc.core.catalogueElementResource", ->
 
             it "has delete method", ->
               $httpBackend
-              .when("DELETE", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}")
+              .when("DELETE", "#{modelCatalogueApiRoot}/dataType/#{testElementId}")
               .respond(204)
 
               expect(angular.isFunction(result.delete)).toBeTruthy()
@@ -118,8 +118,8 @@ describe "mc.core.catalogueElementResource", ->
               result.version = 1
 
               $httpBackend
-              .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}" )
-              .respond(fixtures.valueDomain.updateOk)
+              .when("PUT", "#{modelCatalogueApiRoot}/dataType/#{testElementId}" )
+              .respond(fixtures.dataType.updateOk)
 
               expect(angular.isFunction(result.update)).toBeTruthy()
 
@@ -136,8 +136,8 @@ describe "mc.core.catalogueElementResource", ->
             it "has refresh method", ->
 
               $httpBackend
-              .when("GET", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}" )
-              .respond(fixtures.valueDomain.showOne)
+              .when("GET", "#{modelCatalogueApiRoot}/dataType/#{testElementId}" )
+              .respond(fixtures.dataType.showOne)
 
               expect(angular.isFunction(result.refresh)).toBeTruthy()
 
@@ -155,8 +155,8 @@ describe "mc.core.catalogueElementResource", ->
               result.version = 1
 
               $httpBackend
-              .when("POST", "#{modelCatalogueApiRoot}/valueDomain/#{testElementId}/validate")
-              .respond(fixtures.valueDomain.updateOk)
+              .when("POST", "#{modelCatalogueApiRoot}/dataType/#{testElementId}/validate")
+              .respond(fixtures.dataType.updateOk)
 
               expect(angular.isFunction(result.validate)).toBeTruthy()
 
@@ -172,13 +172,13 @@ describe "mc.core.catalogueElementResource", ->
 
         xit "will respond with 404 if the resource does not exist", ->
           $httpBackend
-          .when("GET", "#{modelCatalogueApiRoot}/valueDomain/10000000")
+          .when("GET", "#{modelCatalogueApiRoot}/dataType/10000000")
           .respond(404)
 
           result = null
           error  = null
 
-          valueDomains.get(10000000).then( (_result_) ->
+          dataTypes.get(10000000).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error = _error_
@@ -199,7 +199,7 @@ describe "mc.core.catalogueElementResource", ->
       describe "can delete resource", ->
         it "will delete existing resource and return 204", ->
           $httpBackend
-          .when("DELETE", "#{modelCatalogueApiRoot}/valueDomain/1")
+          .when("DELETE", "#{modelCatalogueApiRoot}/dataType/1")
           .respond(204)
 
           result = null
@@ -211,7 +211,7 @@ describe "mc.core.catalogueElementResource", ->
           $rootScope.$on "catalogueElementDeleted", (event, element)->
             fromEvent = element
 
-          valueDomains.delete(1).then( (_result_) ->
+          dataTypes.delete(1).then( (_result_) ->
             result = _result_
             ok     = true
           , (_error_) ->
@@ -230,18 +230,18 @@ describe "mc.core.catalogueElementResource", ->
           expect(error).toBeNull()
           expect(result).toBe(204)
           expect(fromEvent).not.toBeNull()
-          expect(fromEvent.link).toBe('/valueDomain/1')
+          expect(fromEvent.link).toBe('/dataType/1')
 
         xit "will return 404 if the resource does not exist", ->
           $httpBackend
-          .when("DELETE", "#{modelCatalogueApiRoot}/valueDomain/1000000")
+          .when("DELETE", "#{modelCatalogueApiRoot}/dataType/1000000")
           .respond(404)
 
           result = null
           error  = null
           ok     = null
 
-          valueDomains.delete(1000000).then( (_result_) ->
+          dataTypes.delete(1000000).then( (_result_) ->
             result = _result_
             ok     = true
           , (_error_) ->
@@ -261,14 +261,14 @@ describe "mc.core.catalogueElementResource", ->
 
         it "will return 409 if constraints are violated", ->
           $httpBackend
-          .when("DELETE", "#{modelCatalogueApiRoot}/valueDomain/2")
+          .when("DELETE", "#{modelCatalogueApiRoot}/dataType/2")
           .respond(409)
 
           result = null
           error  = null
           ok     = null
 
-          valueDomains.delete(2).then( (_result_) ->
+          dataTypes.delete(2).then( (_result_) ->
             result = _result_
             ok     = true
           , (_error_) ->
@@ -288,17 +288,17 @@ describe "mc.core.catalogueElementResource", ->
 
       describe "can update entity", ->
         it "updates ok if entity exists", ->
-          payloadWithId = angular.extend({}, fixtures.valueDomain.updateInput)
-          payloadWithId.id = fixtures.valueDomain.showOne.id
+          payloadWithId = angular.extend({}, fixtures.dataType.updateInput)
+          payloadWithId.id = fixtures.dataType.showOne.id
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/#{payloadWithId.id}?format=json", fixtures.valueDomain.updateInput)
-          .respond(fixtures.valueDomain.updateOk)
+          .when("PUT", "#{modelCatalogueApiRoot}/dataType/#{payloadWithId.id}?format=json", fixtures.dataType.updateInput)
+          .respond(fixtures.dataType.updateOk)
 
           result = null
           error  = null
 
-          valueDomains.update(payloadWithId).then( (_result_) ->
+          dataTypes.update(payloadWithId).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error  = _error_
@@ -312,18 +312,18 @@ describe "mc.core.catalogueElementResource", ->
           expect(error).toBeNull()
           expect(result).toBeDefined()
           expect(result.id).toBe(payloadWithId.id)
-          expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
+          expect(result.name).toBe(fixtures.dataType.updateOk.name)
           expect(result.update).toBeDefined()
 
         it "validates ok if entity exists", ->
           $httpBackend
-          .when("POST", "#{modelCatalogueApiRoot}/valueDomain/validate", fixtures.valueDomain.updateInput)
-          .respond(fixtures.valueDomain.updateOk)
+          .when("POST", "#{modelCatalogueApiRoot}/dataType/validate", fixtures.dataType.updateInput)
+          .respond(fixtures.dataType.updateOk)
 
           result = null
           error  = null
 
-          valueDomains.validate(fixtures.valueDomain.updateInput).then( (_result_) ->
+          dataTypes.validate(fixtures.dataType.updateInput).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error  = _error_
@@ -336,21 +336,21 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.name).toBe(fixtures.valueDomain.updateOk.name)
+          expect(result.name).toBe(fixtures.dataType.updateOk.name)
           expect(result.update).toBeDefined()
 
         xit "returns 404 if the resource does not exist", ->
-          payloadWithId = angular.extend({}, fixtures.valueDomain.updateInput)
+          payloadWithId = angular.extend({}, fixtures.dataType.updateInput)
           payloadWithId.id = 1000000
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1000000?format=json", fixtures.valueDomain.updateInput)
+          .when("PUT", "#{modelCatalogueApiRoot}/dataType/1000000?format=json", fixtures.dataType.updateInput)
           .respond(404)
 
           result = null
           error  = null
 
-          valueDomains.update(payloadWithId).then( (_result_) ->
+          dataTypes.update(payloadWithId).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error  = _error_
@@ -366,21 +366,21 @@ describe "mc.core.catalogueElementResource", ->
           expect(result).toBeNull()
 
         it "updates failed if wrong input", ->
-          payloadWithId = angular.extend({}, fixtures.valueDomain.updateInput)
+          payloadWithId = angular.extend({}, fixtures.dataType.updateInput)
           payloadWithId.id = 1
-          payloadWithId.name = fixtures.valueDomain.updateErrors.errors[0]["rejected-value"]
+          payloadWithId.name = fixtures.dataType.updateErrors.errors[0]["rejected-value"]
 
           payloadWithoutId = angular.extend({}, payloadWithId)
           delete payloadWithoutId.id
 
           $httpBackend
-          .when("PUT", "#{modelCatalogueApiRoot}/valueDomain/1?format=json", payloadWithoutId)
-          .respond(fixtures.valueDomain.updateErrors)
+          .when("PUT", "#{modelCatalogueApiRoot}/dataType/1?format=json", payloadWithoutId)
+          .respond(fixtures.dataType.updateErrors)
 
           result = null
           error  = null
 
-          valueDomains.update(payloadWithId).then( (_result_) ->
+          dataTypes.update(payloadWithId).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error  = _error_
@@ -396,8 +396,8 @@ describe "mc.core.catalogueElementResource", ->
           expect(error.data).toBeDefined()
           expect(error.data.errors).toBeDefined()
           expect(error.data.errors[0].field).toBe("name")
-          expect(error.data.errors[0]["rejected-value"]).toBe(fixtures.valueDomain.updateErrors.errors[0]["rejected-value"])
-          expect(error.data.errors[0].message).toBe(fixtures.valueDomain.updateErrors.errors[0].message)
+          expect(error.data.errors[0]["rejected-value"]).toBe(fixtures.dataType.updateErrors.errors[0]["rejected-value"])
+          expect(error.data.errors[0].message).toBe(fixtures.dataType.updateErrors.errors[0].message)
 
       describe "can save new entity", ->
         it "saves if input data ok", ->
@@ -413,13 +413,13 @@ describe "mc.core.catalogueElementResource", ->
 
 
           $httpBackend
-          .when("POST", "#{modelCatalogueApiRoot}/valueDomain", payload)
-          .respond(fixtures.valueDomain.saveOk)
+          .when("POST", "#{modelCatalogueApiRoot}/dataType", payload)
+          .respond(fixtures.dataType.saveOk)
 
           result = null
           error  = null
 
-          valueDomains.save(payload).then( (_result_) ->
+          dataTypes.save(payload).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error  = _error_
@@ -434,9 +434,9 @@ describe "mc.core.catalogueElementResource", ->
 
           expect(error).toBeNull()
           expect(result).toBeDefined()
-          expect(result.id).toBe(fixtures.valueDomain.saveOk.id)
-          expect(result.version).toBe(fixtures.valueDomain.saveOk.version)
-          expect(result.name).toBe(fixtures.valueDomain.saveOk.name)
+          expect(result.id).toBe(fixtures.dataType.saveOk.id)
+          expect(result.version).toBe(fixtures.dataType.saveOk.version)
+          expect(result.name).toBe(fixtures.dataType.saveOk.name)
           expect(result.update).toBeDefined()
 
           expect(resultFromEvent).toEqual(result)
@@ -445,13 +445,13 @@ describe "mc.core.catalogueElementResource", ->
           payload = {symbol: "MPH"}
 
           $httpBackend
-          .when("POST", "#{modelCatalogueApiRoot}/valueDomain", payload)
-          .respond(fixtures.valueDomain.saveErrors)
+          .when("POST", "#{modelCatalogueApiRoot}/dataType", payload)
+          .respond(fixtures.dataType.saveErrors)
 
           result = null
           error  = null
 
-          valueDomains.save(payload).then( (_result_) ->
+          dataTypes.save(payload).then( (_result_) ->
             result = _result_
           , (_error_) ->
             error  = _error_
@@ -467,19 +467,19 @@ describe "mc.core.catalogueElementResource", ->
           expect(error.data).toBeDefined()
           expect(error.data.errors).toBeDefined()
           expect(error.data.errors[0].field).toBe("name")
-          expect(error.data.errors[0]["rejected-value"]).toBe(fixtures.valueDomain.saveErrors.errors[0]["rejected-value"])
-          expect(error.data.errors[0].message).toBe(fixtures.valueDomain.saveErrors.errors[0].message)
+          expect(error.data.errors[0]["rejected-value"]).toBe(fixtures.dataType.saveErrors.errors[0]["rejected-value"])
+          expect(error.data.errors[0].message).toBe(fixtures.dataType.saveErrors.errors[0].message)
 
     describe "can search resource", ->
       it "works", inject ($httpBackend) ->
         $httpBackend
-        .when("GET", "#{modelCatalogueApiRoot}/valueDomain/search?search=foo")
-        .respond(fixtures.valueDomain.searchElement15)
+        .when("GET", "#{modelCatalogueApiRoot}/dataType/search?search=foo")
+        .respond(fixtures.dataType.searchElement1)
 
         result = null
         error  = null
 
-        valueDomains.search('foo').then( (_result_) ->
+        dataTypes.search('foo').then( (_result_) ->
           result = _result_
         , (_error_) ->
           error = _error_
@@ -498,13 +498,13 @@ describe "mc.core.catalogueElementResource", ->
         expect(result.list.length).toBe(1)
       it "works with additional params", inject ($httpBackend) ->
         $httpBackend
-        .when("GET", "#{modelCatalogueApiRoot}/valueDomain/search?offset=10&search=foo")
-        .respond(angular.extend(angular.copy(fixtures.valueDomain.searchElement15), {total:0, offset: 10, list: []}))
+        .when("GET", "#{modelCatalogueApiRoot}/dataType/search?offset=10&search=foo")
+        .respond(angular.extend(angular.copy(fixtures.dataType.searchElement1), {total:0, offset: 10, list: []}))
 
         result = null
         error  = null
 
-        valueDomains.search('foo', {offset: 10}).then( (_result_) ->
+        dataTypes.search('foo', {offset: 10}).then( (_result_) ->
           result = _result_
         , (_error_) ->
           error = _error_
