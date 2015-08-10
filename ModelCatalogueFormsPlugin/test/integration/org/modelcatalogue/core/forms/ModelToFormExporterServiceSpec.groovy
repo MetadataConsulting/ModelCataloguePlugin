@@ -53,7 +53,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     def "there must be a top level model representing a form and at least one model representing the section"(){
         given:
         DataClass formModel = build {
-            model(name: TEST_FORM_NAME) {
+            dataClass(name: TEST_FORM_NAME) {
                 ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
                 ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
                 ext EXT_FORM_VERSION, TEST_FORM_VERSION
@@ -84,20 +84,20 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     def "nested models represent sections"(){
         given:
         DataClass formModel = build {
-            model(name: TEST_FORM_NAME) {
+            dataClass(name: TEST_FORM_NAME) {
                 ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
                 ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
                 ext EXT_FORM_VERSION, TEST_FORM_VERSION
 
-                model(name: TEST_SECTION_NAME_1) {
+                dataClass(name: TEST_SECTION_NAME_1) {
                     ext EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
                     ext EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
                     relationship {
                         ext EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
                     }
                 }
-                model(name: TEST_SECTION_NAME_2)
-                model(name: TEST_SECTION_NAME_3)
+                dataClass(name: TEST_SECTION_NAME_2)
+                dataClass(name: TEST_SECTION_NAME_3)
             }
         }
 
@@ -121,17 +121,17 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     def "grids are signaled with flag"(){
         given:
         DataClass formModel = build {
-            model(name: TEST_FORM_NAME) {
+            dataClass(name: TEST_FORM_NAME) {
                 ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
                 ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
                 ext EXT_FORM_VERSION, TEST_FORM_VERSION
 
-                model(name: TEST_SECTION_NAME_1) {
+                dataClass(name: TEST_SECTION_NAME_1) {
                     ext EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
                     ext EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
                     ext EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
 
-                    model(name: TEST_GRID_MODEL_NAME) {
+                    dataClass(name: TEST_GRID_MODEL_NAME) {
                         ext EXT_GROUP_GRID, 'true'
                         ext EXT_GROUP_REPEAT_NUM, TEST_GRID_REPEAT_NUM
                         ext EXT_GROUP_REPEAT_MAX, TEST_GRID_REPEAT_MAX
@@ -160,18 +160,18 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
     def "various item types"(){
         given:
         DataClass formModel = build {
-            model(name: TEST_FORM_NAME) {
+            dataClass(name: TEST_FORM_NAME) {
                 ext EXT_FORM_REVISION_NOTES, TEST_FORM_REVISION_NOTES
                 ext EXT_FORM_VERSION_DESCRIPTION, TEST_FORM_VERSION_DESCRIPTION
                 ext EXT_FORM_VERSION, TEST_FORM_VERSION
 
-                model(name: TEST_SECTION_NAME_1) {
+                dataClass(name: TEST_SECTION_NAME_1) {
                     ext EXT_SECTION_SUBTITLE, TEST_SECTION_SUBTITLE_1
                     ext EXT_SECTION_INSTRUCTIONS, TEST_SECTION_INSTRUCTIONS_1
                     ext EXT_SECTION_PAGE_NUMBER, TEST_SECTION_PAGE_NUMBER_1
 
                     dataElement(name: ITEM_FILE_NAME) {
-                        valueDomain(name: 'File')
+                        dataType(name: 'File')
 
                         relationship {
                             ext EXT_NAME_LC, ITEM_FILE_NAME_OVERRIDEN
@@ -181,9 +181,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
                     }
 
                     dataElement(name: ITEM_RADIO_NAME) {
-                        valueDomain(name: "Gender Domain") {
-                            dataType name: 'Gender', enumerations: [F: 'Female', M: 'Male']
-                        }
+                        dataType name: 'Gender', enumerations: [F: 'Female', M: 'Male']
 
                         relationship {
                             ext EXT_ITEM_RESPONSE_TYPE, RESPONSE_TYPE_RADIO
@@ -193,12 +191,10 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
                     }
 
                     dataElement(name: ITEM_SINGLE_SELECT_NAME) {
-                        valueDomain(name: "Single Domain") {
-                            dataType(name: 'Multi Type', enumerations: [A: 'Alpha', B: 'Beta', O: 'Omega']) {
-                                ext EXT_ITEM_INSTRUCTIONS, '''
-                                    <span class="MT"></span> Multi Type
-                                '''
-                            }
+                        dataType(name: 'Multi Type', enumerations: [A: 'Alpha', B: 'Beta', O: 'Omega']) {
+                            ext EXT_ITEM_INSTRUCTIONS, '''
+                                <span class="MT"></span> Multi Type
+                            '''
                         }
 
                         relationship {
@@ -209,7 +205,7 @@ class ModelToFormExporterServiceSpec extends IntegrationSpec {
                     dataElement(name: ITEM_TEXT_NAME) {
                         ext EXT_ITEM_PHI, 'true'
 
-                        valueDomain(name: 'double') {
+                        dataType(name: 'double') {
                             ext EXT_ITEM_LENGTH, '10'
                             ext EXT_ITEM_DIGITS, '2'
                             measurementUnit(name: 'Nano Coins', symbol: 'NC')

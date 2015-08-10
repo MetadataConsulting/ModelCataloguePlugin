@@ -15,22 +15,22 @@ class ImportService {
 
         catalogueBuilder.build {
             skip draft
-            classification(name:"NHIC"){
+            dataModel(name:"NHIC"){
                 new File("${basePath}" + "/WEB-INF/bootstrap-data/CAN_CUH.csv").toCsvReader([charset: 'UTF-8', skipLines: 1]).eachLine { tokens ->
                     globalSearchFor dataType
 
                     description("NHIC conceptual domain i.e. value domains used the NHIC project")
-                    model(name:"NHIC Datasets"){
-                        model(name:"Ovarian Cancer"){
-                            model(name:"CUH") {
-                                model(name:"Round 1"){
-                                    model(name:tokens[1]){
-                                        model(name:tokens[2]){
+                    dataClass(name:"NHIC Datasets"){
+                        dataClass(name:"Ovarian Cancer"){
+                            dataClass(name:"CUH") {
+                                dataClass(name:"Round 1"){
+                                    dataClass(name:tokens[1]){
+                                        dataClass(name:tokens[2]){
                                             dataElement(name:tokens[3], description:tokens[4]){
-                                                valueDomain(name:tokens[3].replaceAll("\\s", "_")){
-                                                    def enumerations = tokens[5] ? ExcelLoader.parseEnumeration(tokens[5].split("\\r?\\n")) : [:]
-                                                    ExcelLoader.importDataTypes(catalogueBuilder, tokens[3], enumerations ? tokens[5] : null, null, null)
-                                                }
+
+                                                def enumerations = tokens[5] ? ExcelLoader.parseEnumeration(tokens[5].split("\\r?\\n")) : [:]
+                                                ExcelLoader.importDataTypes(catalogueBuilder, tokens[3], enumerations ? tokens[5] : null, null, null, null, null)
+
                                                 ext "NHIC_Identifier:", tokens[0].take(2000)
                                                 ext "Link_to_existing definition:", tokens[6].take(2000)
                                                 ext "Notes_from_GD_JCIS", tokens[7].take(2000)

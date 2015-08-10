@@ -185,7 +185,7 @@ class ModelToFormExporterService {
         for (Relationship rel in model.containsRelationships) {
             DataElement dataElement = rel.destination as DataElement
             ValueDomain valueDomain = dataElement.valueDomain
-            DataType dataType = valueDomain?.dataType
+            DataType dataType = valueDomain?.dataType ?: dataElement.dataType
 
             log.info "Generating items from data element $dataElement"
 
